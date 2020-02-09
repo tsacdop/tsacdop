@@ -1,0 +1,451 @@
+import 'package:sqflite/sqflite.dart';
+import 'dart:async';
+import 'dart:io' as io;
+import 'package:path/path.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
+import 'podcastlocal.dart';
+import 'episodebrief.dart';
+import '../webfeed/webfeed.dart';
+
+class DBHelper {
+  static Database _db;
+  Future<Database> get database async {
+    if (_db != null) return _db;
+    _db = await initDb();
+    return _db;
+  }
+
+  initDb() async {
+    io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, "podcasts.db");
+    Database theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
+    return theDb;
+  }
+
+  void _onCreate(Database db, int version) async {
+    await db.execute(
+        """CREATE TABLE PodcastLocal(id INTEGER PRIMARY KEY,title TEXT, 
+        imageUrl TEXT,rssUrl TEXT UNIQUE,primaryColor TEXT,author TEXT, description TEXT, add_date INTEGER)""");
+    await db
+        .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
+        enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
+        description TEXT, feed_title TEXT, feed_link TEXT, milliseconds INTEGER, 
+        duration INTEGER DEFAULT 0, explicit INTEGER DEFAULT 0, liked INTEGER DEFAULT 0, 
+        downloaded TEXT DEFAULT 'ND', download_date INTEGER DEFAULT 0)""");
+  }
+
+  Future<List<PodcastLocal>> getPodcastLocal() async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT title, imageUrl, rssUrl, primaryColor, author FROM PodcastLocal ORDER BY add_date DESC');
+    List<PodcastLocal> podcastLocal = List();
+    for (int i = 0; i < list.length; i++) {
+      podcastLocal.add(PodcastLocal(
+        list[i]['title'],
+        list[i]['imageUrl'],
+        list[i]['rssUrl'],
+        list[i]['primaryColor'],
+        list[i]['author'],
+      ));
+    }
+    print(podcastLocal.length);
+    return podcastLocal;
+  }
+
+  Future savePodcastLocal(PodcastLocal podcastLocal) async {
+    print('save');
+    int _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var dbClient = await database;
+    await dbClient.transaction((txn) async {
+      return await txn.rawInsert(
+          """INSERT OR IGNORE INTO PodcastLocal (title, imageUrl, rssUrl, 
+          primaryColor, author, description, add_date) VALUES(?, ?, ?, ?, ?, ?, ?)""",
+          [
+            podcastLocal.title,
+            podcastLocal.imageUrl,
+            podcastLocal.rssUrl,
+            podcastLocal.primaryColor,
+            podcastLocal.author,
+            podcastLocal.description,
+            _milliseconds
+          ]);
+    });
+  }
+
+  Future delPodcastLocal(String title) async {
+    print('deleted');
+    var dbClient = await database;
+    await dbClient
+        .rawDelete('DELETE FROM PodcastLocal WHERE title =?', [title]);
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT downloaded FROM Episodes WHERE downloaded != 'ND' AND feed_title = ?""",
+        [title]);
+    for(int i=0; i < list.length; i++){
+      if(list[i] != null)
+      FlutterDownloader.remove(taskId: list[i]['downloaded'], shouldDeleteContent: true);
+      print('Removed all download task');
+    }
+    await dbClient
+        .rawDelete('DELETE FROM Episodes WHERE feed_title=?', [title]);
+  }
+
+  Future getImageUrl(String title) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT imageUrl FROM PodcastLocal WHERE title = ?', [title]);
+    String url = list[0]['imageUrl'];
+    return url;
+  }
+
+  int stringToDate(String s) {
+    var months = {
+      'Jan': 1,
+      'Feb': 2,
+      'Mar': 3,
+      'Apr': 4,
+      'May': 5,
+      'Jun': 6,
+      'Jul': 7,
+      'Aug': 8,
+      'Sep': 9,
+      'Oct': 10,
+      'Nov': 11,
+      'Dec': 12
+    };
+    int y;
+    int m;
+    int d;
+    int h;
+    int min;
+    int sec;
+    int result;
+    try {
+      y = int.parse(s.substring(12, 16));
+    } catch (e) {
+      y = 0;
+    }
+
+    try {
+      m = months[s.substring(8, 11)];
+    } catch (e) {
+      m = 0;
+    }
+    try {
+      d = int.parse(s.substring(5, 7));
+    } catch (e) {
+      d = 0;
+    }
+    try {
+      h = int.parse(s.substring(17, 19));
+    } catch (e) {
+      h = 0;
+    }
+    try {
+      min = int.parse(s.substring(20, 22));
+    } catch (e) {
+      min = 0;
+    }
+    try {
+      sec = int.parse(s.substring(23, 25));
+    } catch (e) {
+      sec = 0;
+    }
+    try {
+      result = DateTime(y, m, d, h, min, sec).millisecondsSinceEpoch;
+    } catch (e) {
+      result = 0;
+    }
+    return result;
+  }
+
+  static _parsePubDate(String pubDate) {
+    if (pubDate == null) return null;
+    return DateFormat('EEE, dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);
+  }
+
+  int getExplicit(bool b) {
+    int result;
+    if (b == true) {
+      result = 1;
+      return result;
+    } else {
+      result = 0;
+      return result;
+    }
+  }
+
+  bool isXimalaya(String input) {
+    RegExp ximalaya = RegExp(r"ximalaya.com");
+    return ximalaya.hasMatch(input);
+  }
+
+  Future<int> savePodcastRss(String rss) async {
+    String _title;
+    String _url;
+    String _description;
+    var _p = RssFeed.parse(rss);
+    int _result = _p.items.length;
+    var dbClient = await database;
+    int _count = Sqflite.firstIntValue(await dbClient.rawQuery(
+        'SELECT COUNT(*) FROM Episodes WHERE feed_title = ?', [_p.title]));
+    print(_count);
+    if (_count == _result) {
+      _result = 0;
+      return _result;
+    } else {
+      for (int i = 0; i < (_result - _count); i++) {
+        print(_p.items[i].title);
+        _p.items[i].itunes.title != null
+            ? _title = _p.items[i].itunes.title
+            : _title = _p.items[i].title;
+        _p.items[i].itunes.summary != null
+            ? _description = _p.items[i].itunes.summary
+            : _description = _p.items[i].description;
+        isXimalaya(_p.items[i].enclosure.url)
+            ? _url = _p.items[i].enclosure.url.split('=').last
+            : _url = _p.items[i].enclosure.url;
+        final _length = _p.items[i].enclosure.length;
+        final _pubDate = _p.items[i].pubDate;
+        final DateTime _date = _parsePubDate(_pubDate);
+        final _milliseconds = _date.millisecondsSinceEpoch;
+        final _duration = _p.items[i].itunes.duration.inMinutes;
+        final _explicit = getExplicit(_p.items[i].itunes.explicit);
+        if (_p.items[i].enclosure.url != null) {
+          await dbClient.transaction((txn) {
+            return txn.rawInsert(
+                """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
+                description, feed_title, milliseconds, duration, explicit) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                [
+                  _title,
+                  _url,
+                  _length,
+                  _pubDate,
+                  _description,
+                  _p.title,
+                  _milliseconds,
+                  _duration,
+                  _explicit,
+                ]);
+          });
+        }
+      }
+      _result = 0;
+      return _result;
+    }
+  }
+
+  Future<List<EpisodeBrief>> getRssItem(String title) async {
+    var dbClient = await database;
+    List<EpisodeBrief> episodes = List();
+    List<Map> list = await dbClient
+        .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.pubDate,  E.feed_title, E.duration, E.explicit, E.liked, 
+        E.downloaded, P.imageUrl, P.primaryColor 
+        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_title = P.title 
+        where E.feed_title = ? ORDER BY E.milliseconds DESC""", [title]);
+    for (int x = 0; x < list.length; x++) {
+      episodes.add(EpisodeBrief(
+          list[x]['title'],
+          list[x]['enclosure_url'],
+          list[x]['enclosure_length'],
+          list[x]['pubDate'],
+          list[x]['feed_title'],
+          list[x]['imageUrl'],
+          list[x]['primaryColor'],
+          list[x]['liked'],
+          list[x]['downloaded'],
+          list[x]['duration'],
+          list[x]['explicit']));
+    }
+    print(episodes.length);
+    print(title);
+    return episodes;
+  }
+
+  Future<List<EpisodeBrief>> getRssItemTop(String title) async {
+    var dbClient = await database;
+    List<EpisodeBrief> episodes = List();
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.pubDate, E.feed_title, E.duration, E.explicit, E.liked, 
+        E.downloaded, P.imageUrl, P.primaryColor 
+        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_title = P.title 
+        where E.feed_title = ? ORDER BY E.milliseconds DESC LIMIT 3""",
+        [title]);
+    for (int x = 0; x < list.length; x++) {
+      episodes.add(EpisodeBrief(
+          list[x]['title'],
+          list[x]['enclosure_url'],
+          list[x]['enclosure_length'],
+          list[x]['pubDate'],
+          list[x]['feed_title'],
+          list[x]['imageUrl'],
+          list[x]['primaryColor'],
+          list[x]['liked'],
+          list[x]['downloaded'],
+          list[x]['duration'],
+          list[x]['explicit']));
+    }
+    print(episodes.length);
+    print(title);
+    return episodes;
+  }
+
+  Future<EpisodeBrief> getRssItemDownload(String url) async {
+    var dbClient = await database;
+    EpisodeBrief episode;
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.pubDate, E.feed_title, E.duration, E.explicit, E.liked, 
+        E.downloaded, P.imageUrl, P.primaryColor 
+        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_title = P.title 
+        where E.enclosure_url = ? ORDER BY E.milliseconds DESC LIMIT 3""",
+        [url]);
+
+    if (list != null)
+      episode = EpisodeBrief(
+          list.first['title'],
+          list.first['enclosure_url'],
+          list.first['enclosure_length'],
+          list.first['pubDate'],
+          list.first['feed_title'],
+          list.first['imageUrl'],
+          list.first['primaryColor'],
+          list.first['liked'],
+          list.first['downloaded'],
+          list.first['duration'],
+          list.first['explicit']);
+    return episode;
+  }
+
+  Future<List<EpisodeBrief>> getRecentRssItem() async {
+    var dbClient = await database;
+    List<EpisodeBrief> episodes = List();
+    List<Map> list = await dbClient
+        .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.pubDate, E.feed_title, E.duration, E.explicit, E.liked, 
+        E.downloaded, P.imageUrl, P.primaryColor 
+        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_title = P.title 
+        ORDER BY E.milliseconds DESC LIMIT 99""");
+    for (int x = 0; x < list.length; x++) {
+      episodes.add(EpisodeBrief(
+          list[x]['title'],
+          list[x]['enclosure_url'],
+          list[x]['enclosure_length'],
+          list[x]['pubDate'],
+          list[x]['feed_title'],
+          list[x]['imageUrl'],
+          list[x]['primaryColor'],
+          list[x]['liked'],
+          list[x]['doanloaded'],
+          list[x]['duration'],
+          list[x]['explicit']));
+    }
+    print(episodes.length);
+    return episodes;
+  }
+
+  Future<List<EpisodeBrief>> getLikedRssItem() async {
+    var dbClient = await database;
+    List<EpisodeBrief> episodes = List();
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.pubDate, 
+        E.feed_title, E.duration, E.explicit, E.liked, E.downloaded, P.imageUrl, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_title = P.title 
+        WHERE E.liked = 1 ORDER BY E.milliseconds DESC LIMIT 99""");
+    for (int x = 0; x < list.length; x++) {
+      episodes.add(EpisodeBrief(
+          list[x]['title'],
+          list[x]['enclosure_url'],
+          list[x]['enclosure_length'],
+          list[x]['pubDate'],
+          list[x]['feed_title'],
+          list[x]['imageUrl'],
+          list[x]['primaryColor'],
+          list[x]['liked'],
+          list[x]['downloaded'],
+          list[x]['duration'],
+          list[x]['explicit']));
+    }
+    print(episodes.length);
+    return episodes;
+  }
+
+  Future<int> setLiked(String title) async {
+    var dbClient = await database;
+    int count = await dbClient
+        .rawUpdate("UPDATE Episodes SET liked = 1 WHERE title = ?", [title]);
+    print('liked');
+    return count;
+  }
+
+  Future<int> setUniked(String title) async {
+    var dbClient = await database;
+    int count = await dbClient
+        .rawUpdate("UPDATE Episodes SET liked = 0 WHERE title = ?", [title]);
+    print('unliked');
+    return count;
+  }
+
+  Future<int> saveDownloaded(String url, String id) async {
+    var dbClient = await database;
+    int _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    int count = await dbClient.rawUpdate(
+        "UPDATE Episodes SET downloaded = ?, download_date = ? WHERE enclosure_url = ?",
+        [id, _milliseconds, url]);
+    print('Downloaded ' + url);
+    return count;
+  }
+
+  Future<int> delDownloaded(String url) async {
+    var dbClient = await database;
+    int count = await dbClient.rawUpdate(
+        "UPDATE Episodes SET downloaded = 'ND' WHERE enclosure_url = ?", [url]);
+    print('Deleted ' + url);
+    return count;
+  }
+
+  Future<List<EpisodeBrief>> getDownloadedRssItem() async {
+    var dbClient = await database;
+    List<EpisodeBrief> episodes = List();
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.pubDate, 
+        E.feed_title, E.duration, E.explicit, E.liked, E.downloaded, P.imageUrl, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_title = P.title 
+        WHERE E.downloaded != 'ND' ORDER BY E.download_date DESC LIMIT 99""");
+    for (int x = 0; x < list.length; x++) {
+      episodes.add(EpisodeBrief(
+          list[x]['title'],
+          list[x]['enclosure_url'],
+          list[x]['enclosure_length'],
+          list[x]['pubDate'],
+          list[x]['feed_title'],
+          list[x]['imageUrl'],
+          list[x]['primaryColor'],
+          list[x]['liked'],
+          list[x]['downloaded'],
+          list[x]['duration'],
+          list[x]['explicit']));
+    }
+    print(episodes.length);
+    return episodes;
+  }
+
+  Future<String> getDescription(String title) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT description FROM Episodes WHERE title = ?', [title]);
+    String description = list[0]['description'];
+    return description;
+  }
+
+  Future<String> getFeedDescription(String title) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT description FROM PodcastLocal WHERE title = ?', [title]);
+    String description = list[0]['description'];
+    return description;
+  }
+}
