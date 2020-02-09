@@ -1,7 +1,12 @@
 # Tsacdop
 Enjoy podcasts with tsacdop!
 
-Tsacdop is a podcasts player developed with flutter.
+Tsacdop is a podcasts player developed with flutter. 
+
+
+Thanks for flutter team and all plugin developers, especially [webfeed](https://github.com/witochandra/webfeed) and [audiofileplayer](https://github.com/google/flutter.plugins/tree/master/packages/audiofileplayer/).
+
+The podcasts engine is powered by [ListenNote](https://listennote.com).
 
 ## Getting Started
 
