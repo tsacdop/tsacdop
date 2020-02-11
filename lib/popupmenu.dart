@@ -6,6 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:color_thief_flutter/color_thief_flutter.dart';
+import 'package:image/image.dart' as img;
 import 'about.dart';
 import 'class/podcastlocal.dart';
 import 'class/sqflite_localpodcast.dart';
@@ -28,43 +31,71 @@ class OmplOutline {
 
 class PopupMenu extends StatelessWidget {
 
-  Future<int> saveOmpl(String rss) async {
-    var dbHelper = DBHelper();
-    try {
-      Response response = await Dio().get(rss);
-      var _p = RssFeed.parse(response.data);
-      String _primaryColor = '[100,100,100]';
-      PodcastLocal podcastLocal = PodcastLocal(_p.title, _p.itunes.image.href,
-          rss, _primaryColor, _p.author);
-          podcastLocal.description = _p.description;
-      int total = await dbHelper.savePodcastLocal(podcastLocal);
-      return total;
-    } catch (e) {
-      return 0;
-    }
+  Future<String> getColor(File file) async {
+    final imageProvider = FileImage(file);
+    var colorImage = await getImageFromProvider(imageProvider);
+    var color = await getColorFromImage(colorImage);
+    String primaryColor = color.toString();
+    return primaryColor;
   }
 
   @override
   Widget build(BuildContext context) {
     final importOmpl = Provider.of<ImportOmpl>(context);
 
+    saveOmpl(String rss) async {
+      var dbHelper = DBHelper();
+      try {
+        importOmpl.importState = ImportState.import;
+        Response response = await Dio().get(rss);
+
+        var _p = RssFeed.parse(response.data);
+        var dir = await getApplicationDocumentsDirectory();
+
+        Response<List<int>> imageResponse = await Dio().get<List<int>>(
+            _p.itunes.image.href,
+            options: Options(responseType: ResponseType.bytes));
+        img.Image image = img.decodeImage(imageResponse.data);
+        img.Image thumbnail = img.copyResize(image, width: 300);
+        File("${dir.path}/${_p.title}.png")
+          ..writeAsBytesSync(img.encodePng(thumbnail));
+
+        String _primaryColor =
+            await getColor(File("${dir.path}/${_p.title}.png"));
+
+        PodcastLocal podcastLocal = PodcastLocal(
+            _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
+
+        podcastLocal.description = _p.description;
+        print('_p.description');
+        await dbHelper.savePodcastLocal(podcastLocal);
+
+        importOmpl.importState = ImportState.parse;
+
+        await dbHelper.savePodcastRss(response.data);
+      } catch (e) {
+        print(e);
+      }
+    }
+
     void _saveOmpl(String path) async {
       File file = File(path);
       String opml = file.readAsStringSync();
       try {
         var content = xml.parse(opml);
-        importOmpl.importState = ImportState.import;
         var total = content
             .findAllElements('outline')
             .map((ele) => OmplOutline.parse(ele))
             .toList();
         for (int i = 0; i < total.length; i++) {
-          if (total[i].xmlUrl != null)
-             await saveOmpl(total[i].xmlUrl);
-          importOmpl.rssTitle = total[i].text;
-          print(total[i].text);
+          if (total[i].xmlUrl != null) {
+            importOmpl.rssTitle = total[i].text;
+            await saveOmpl(total[i].xmlUrl);
+            print(total[i].text);
+          }
         }
         importOmpl.importState = ImportState.complete;
+        importOmpl.importState = ImportState.stop;
         print('Import fisnished');
       } catch (e) {
         print(e);

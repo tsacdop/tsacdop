@@ -6,26 +6,72 @@ class Import extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ImportOmpl>(
-        builder: (context, importOmpl, _) => Container(
-            child: importOmpl.importState == ImportState.start
-                ? Container(
-                    height: 20.0,
-                    alignment: Alignment.center,
-                    child: Text('Start'),
-                  )
-                : importOmpl.importState == ImportState.import
-                    ? Container(
+      builder: (context, importOmpl, _) => Container(
+          color: Colors.grey[300],
+          child: importOmpl.importState == ImportState.start
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                      SizedBox(
+                        height: 2.0,
+                        child: LinearProgressIndicator()),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
                         height: 20.0,
-                        alignment: Alignment.center,
-                        child: Text('Importing'+(importOmpl.rsstitle)))
-                    : importOmpl.importState == ImportState.complete
-                        ? Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Read file successful'),
+                      ),
+                    ])
+              : importOmpl.importState == ImportState.import
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 2.0,
+                          child: LinearProgressIndicator()),
+                        Container(
                             height: 20.0,
-                            alignment: Alignment.center,
-                            child: Text('Complete'),
-                          )
-                        : importOmpl.importState == ImportState.stop
-                            ? Center()
-                            : Center()));
+                            padding: EdgeInsets.symmetric(horizontal: 20.0),
+                            alignment: Alignment.centerLeft,
+                            child:
+                                Text('Importing:  ' + (importOmpl.rsstitle))),
+                      ],
+                    )
+                  : importOmpl.importState == ImportState.parse
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 2.0,
+                              child: LinearProgressIndicator()),
+                            Container(
+                              height: 20.0,
+                              padding: EdgeInsets.symmetric(horizontal: 20.0),
+                              alignment: Alignment.centerLeft,
+                              child: Text('Fatch:  ' + (importOmpl.rsstitle)),
+                            ),
+                          ],
+                        )
+                     : importOmpl.importState == ImportState.error
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 2.0,
+                              child: LinearProgressIndicator()),
+                            Container(
+                              height: 20.0,
+                              padding: EdgeInsets.symmetric(horizontal: 20.0),
+                              alignment: Alignment.centerLeft,
+                              child: Text('Error:  ' + (importOmpl.rsstitle)),
+                            ),
+                          ],
+                        )
+                      : Center()),
+    );
   }
 }

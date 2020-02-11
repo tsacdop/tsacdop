@@ -4,12 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'addpodcast.dart';
 import 'class/audiostate.dart';
+import 'class/importompl.dart';
 
 void main() async {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => Urlchange()),
+        ChangeNotifierProvider(create: (context) => ImportOmpl()),
       ],
       child: MyApp(),
     ),

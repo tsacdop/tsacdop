@@ -15,8 +15,8 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
   Decoration getIndicator() {
       return const UnderlineTabIndicator(
         borderSide: BorderSide(color: Colors.red, width: 2),
-        insets: EdgeInsets.only(left:20,top:10,)
-      );}
+        insets: EdgeInsets.only(left:10.0,right: 10.0, top:10.0,)
+          );}
   @override
   void initState() {
     super.initState();
@@ -36,20 +36,21 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
           height: 50,
           alignment: Alignment.centerLeft,
           child: TabBar(
             isScrollable: true,
             labelPadding:
-                EdgeInsets.only(bottom:10.0,left: 20.0),
+                EdgeInsets.all(10.0),
             controller: _controller,
             labelColor: Colors.red,
             unselectedLabelColor: Colors.black,
             indicator: getIndicator(),
             tabs: <Widget>[
               Text('Recent Update',style: TextStyle(fontWeight: FontWeight.bold),), 
-              Text('Favorite',style: TextStyle(fontWeight: FontWeight.bold),),
-              Text('Dowloads',style: TextStyle(fontWeight: FontWeight.bold),),
+              Text('Favorites',style: TextStyle(fontWeight: FontWeight.bold),),
+              Text('Downloads',style: TextStyle(fontWeight: FontWeight.bold),),
               ],
           ),
         ),

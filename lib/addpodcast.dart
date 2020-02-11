@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'class/importompl.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as img;
 import 'dart:convert';
 import 'dart:async';
 import 'class/searchpodcast.dart';
@@ -10,6 +14,7 @@ import 'class/podcastlocal.dart';
 import 'class/sqflite_localpodcast.dart';
 import 'home.dart';
 import 'popupmenu.dart';
+import 'webfeed/webfeed.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -22,31 +27,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ImportOmpl(),
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          elevation: 0,
-          centerTitle: true,
-          backgroundColor: Colors.grey[100],
-          leading: IconButton(
-            tooltip: 'Add',
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: () async {
-              await showSearch<int>(
-                context: context,
-                delegate: _delegate,
-              );
-            },
-          ),
-          title: Text('🎙TsacDop', style: TextStyle(color: Colors.blue[600])),
-          actions: <Widget>[
-            PopupMenu(),
-          ],
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: Colors.grey[100],
+        leading: IconButton(
+          tooltip: 'Add',
+          icon: const Icon(Icons.add_circle_outline),
+          onPressed: () async {
+            await showSearch<int>(
+              context: context,
+              delegate: _delegate,
+            );
+          },
         ),
-        body: Home(),
+        title: Text('🎙TsacDop', style: TextStyle(color: Colors.blue[600])),
+        actions: <Widget>[
+          PopupMenu(),
+        ],
       ),
+      body: Home(),
     );
   }
 }
@@ -119,13 +121,7 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
   List<Widget> buildActions(BuildContext context) {
     return <Widget>[
       if (query.isEmpty)
-        IconButton(
-          tooltip: 'Voice Search',
-          icon: const Icon(Icons.mic),
-          onPressed: () {
-            query = 'TODO: implement voice input';
-          },
-        )
+        Center()
       else
         IconButton(
           tooltip: 'Clear',
@@ -144,9 +140,12 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
         height: 10,
         width: 10,
         margin: EdgeInsets.only(top: 400),
-        child: Image.asset(
-          'assets/listennote.png',
-          fit: BoxFit.fill,
+        child: SizedBox(
+          height: 10,
+                  child: Image.asset(
+            'assets/listennote.png',
+            fit: BoxFit.fill,
+          ),
         ),
       );
     return FutureBuilder(
@@ -183,31 +182,6 @@ class SearchResult extends StatefulWidget {
 class _SearchResultState extends State<SearchResult> {
   bool _issubscribe;
   bool _adding;
-  Future _subscribe(OnlinePodcast t) async {
-    if (mounted)
-      setState(() {
-        _adding = true;
-      });
-    String _primaryColor;
-    await getColorFromUrl(t.image).then((color) {
-      print(color.toString());
-      _primaryColor = color.toString();
-    });
-    var dbHelper = DBHelper();
-    final PodcastLocal _pdt =
-        PodcastLocal(t.title, t.image, t.rss, _primaryColor, t.publisher);
-    _pdt.description = t.description;
-    print(t.title + t.rss);
-    await dbHelper.savePodcastLocal(_pdt);
-    final response = await Dio().get(t.rss);
-    int result = await dbHelper.savePodcastRss(response.data);
-    if (result == 0 && mounted) setState(() => _issubscribe = true);
-  }
-
-  bool isXimalaya(String input) {
-    RegExp ximalaya = RegExp(r"ximalaya");
-    return ximalaya.hasMatch(input);
-  }
 
   @override
   void initState() {
@@ -221,8 +195,60 @@ class _SearchResultState extends State<SearchResult> {
     super.dispose();
   }
 
+  Future<String> getColor(File file) async {
+    final imageProvider = FileImage(file);
+    var colorImage = await getImageFromProvider(imageProvider);
+    var color = await getColorFromImage(colorImage);
+    String primaryColor = color.toString();
+    return primaryColor;
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    final importOmpl = Provider.of<ImportOmpl>(context);
+    savePodcast(String rss) async {
+    print(rss);
+    if (mounted) setState(() => _adding = true);
+  
+   importOmpl.importState =
+        ImportState.import;
+
+    Response response = await Dio().get(rss);
+    if (mounted) setState(() => _issubscribe = true);
+
+    var _p = RssFeed.parse(response.data);
+
+    print(_p.title);
+    var dir = await getApplicationDocumentsDirectory();
+
+    Response<List<int>> imageResponse = await Dio().get<List<int>>(
+        _p.itunes.image.href,
+        options: Options(responseType: ResponseType.bytes));
+
+    img.Image image = img.decodeImage(imageResponse.data);
+    img.Image thumbnail = img.copyResize(image, width: 300);
+    File("${dir.path}/${_p.title}.png")
+      ..writeAsBytesSync(img.encodePng(thumbnail));
+
+    String _primaryColor = await getColor(File("${dir.path}/${_p.title}.png"));
+    PodcastLocal podcastLocal = PodcastLocal(
+        _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
+    podcastLocal.description = _p.description;
+      var dbHelper = DBHelper();
+    await dbHelper.savePodcastLocal(podcastLocal);
+
+    importOmpl.importState =
+        ImportState.parse;
+
+    await dbHelper.savePodcastRss(response.data);
+
+    importOmpl.importState =
+        ImportState.complete;
+    importOmpl.importState =
+        ImportState.stop;
+    print('fatch data');
+  }
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.0),
       child: ListTile(
@@ -238,27 +264,27 @@ class _SearchResultState extends State<SearchResult> {
         ),
         title: Text(widget.onlinePodcast.title),
         subtitle: Text(widget.onlinePodcast.publisher),
-        trailing: isXimalaya(widget.onlinePodcast.rss)
-            ? OutlineButton(child: Text('Not Support'), onPressed: null)
-            : !_issubscribe
-                ? !_adding
-                    ? OutlineButton(
-                        child: Text('Subscribe',
-                            style: TextStyle(color: Colors.blue)),
-                        onPressed: () {
-                          _subscribe(widget.onlinePodcast);
-                        })
-                    : OutlineButton(
-                        child: SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation(Colors.blue),
-                            )),
-                        onPressed: () {},
-                      )
-                : OutlineButton(child: Text('Subscribe'), onPressed: null),
+        trailing: !_issubscribe
+            ? !_adding
+                ? OutlineButton(
+                    child:
+                        Text('Subscribe', style: TextStyle(color: Colors.blue)),
+                    onPressed: () {
+                      importOmpl.rssTitle =
+                          widget.onlinePodcast.title;
+                         savePodcast(widget.onlinePodcast.rss);
+                    })
+                : OutlineButton(
+                    child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation(Colors.blue),
+                        )),
+                    onPressed: () {},
+                  )
+            : OutlineButton(child: Text('Subscribe'), onPressed: null),
       ),
     );
   }

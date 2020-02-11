@@ -1,11 +1,18 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:path_provider/path_provider.dart';
+
 import 'class/episodebrief.dart';
 import 'class/podcastlocal.dart';
+import 'class/importompl.dart';
 import 'class/sqflite_localpodcast.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'episodedetail.dart';
 import 'podcastdetail.dart';
 import 'pageroute.dart';
@@ -16,10 +23,21 @@ class ScrollPodcasts extends StatefulWidget {
 }
 
 class _ScrollPodcastsState extends State<ScrollPodcasts> {
+  var dir;
   Future<List<PodcastLocal>> getPodcastLocal() async {
     var dbHelper = DBHelper();
     List<PodcastLocal> podcastList = await dbHelper.getPodcastLocal();
+    dir = await getApplicationDocumentsDirectory();
     return podcastList;
+  }
+
+  ImportState importState;
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    final importState = Provider.of<ImportOmpl>(context).importState;
+    if (importState == ImportState.complete) {
+      setState(() {});
+    }
   }
 
   @override
@@ -38,8 +56,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                   height: 70,
                   alignment: Alignment.centerLeft,
                   child: TabBar(
-                    labelPadding:
-                        EdgeInsets.only(bottom: 15.0, left: 6.0, right: 6.0),
+                    labelPadding: EdgeInsets.only(
+                        top: 5.0, bottom: 10.0, left: 6.0, right: 6.0),
                     indicator:
                         CircleTabIndicator(color: Colors.blue, radius: 3),
                     isScrollable: true,
@@ -50,11 +68,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                           child: LimitedBox(
                             maxHeight: 50,
                             maxWidth: 50,
-                            child: CachedNetworkImage(
-                              imageUrl: podcastLocal.imageUrl,
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(),
-                            ),
+                            child: Image.file(
+                                File("${dir.path}/${podcastLocal.title}.png")),
                           ),
                         ),
                       );
@@ -62,7 +77,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                   ),
                 ),
                 Container(
-                  height: 200,
+                  height: 195,
                   margin: EdgeInsets.only(left: 10, right: 10),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -85,7 +100,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
             ),
           );
         }
-        return Center();
+        return Container(
+          height: 250.0,
+        );
       },
     );
   }
@@ -204,9 +221,9 @@ class ShowEpisode extends StatelessWidget {
                       context,
                       ScaleRoute(
                           page: EpisodeDetail(
-                                episodeItem: podcast[index],
-                                heroTag: 'scroll',
-                              )),
+                        episodeItem: podcast[index],
+                        heroTag: 'scroll',
+                      )),
                     );
                   },
                   child: Container(
@@ -258,6 +275,7 @@ class ShowEpisode extends StatelessWidget {
                           flex: 5,
                           child: Container(
                             padding: EdgeInsets.only(top: 2.0),
+                            alignment: Alignment.topLeft,
                             child: Text(
                               podcast[index].title,
                               style: TextStyle(
@@ -269,7 +287,7 @@ class ShowEpisode extends StatelessWidget {
                         ),
                         Expanded(
                           flex: 1,
-                          child: Align(
+                          child: Container(
                             alignment: Alignment.bottomLeft,
                             child: Text(
                               podcast[index].pubDate.substring(4, 16),
@@ -319,5 +337,3 @@ class _CirclePainter extends BoxPainter {
     canvas.drawCircle(circleOffset, radius, _paint);
   }
 }
-
-

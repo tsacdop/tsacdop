@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'class/podcastlocal.dart';
@@ -72,7 +73,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
         children: <Widget>[
           !_load
               ? Center()
-              : _description != null ? Text(_description) : Center(),
+              : _description != null ? Html(data: _description) : Center(),
           (widget.podcastLocal.author != null)
               ? Text(widget.podcastLocal.author,
                   style: TextStyle(color: Colors.blue))

@@ -54,12 +54,12 @@ class RssItem {
       guid: findElementOrNull(element, "guid")?.text,
       pubDate: findElementOrNull(element, "pubDate")?.text,
       author: findElementOrNull(element, "author")?.text,
-      comments: findElementOrNull(element, "comments")?.text,
-      source: RssSource.parse(findElementOrNull(element, "source")),
-      content: RssContent.parse(findElementOrNull(element, "content:encoded")),
-      media: Media.parse(element),
+     // comments: findElementOrNull(element, "comments")?.text,
+     // source: RssSource.parse(findElementOrNull(element, "source")),
+     // content: RssContent.parse(findElementOrNull(element, "content:encoded")),
+     // media: Media.parse(element),
       enclosure: RssEnclosure.parse(findElementOrNull(element, "enclosure")),
-      dc: DublinCore.parse(element),
+      //dc: DublinCore.parse(element),
       itunes: RssItemItunes.parse(element),
     );
   }

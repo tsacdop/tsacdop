@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'class/audiostate.dart';
 import 'class/episodebrief.dart';
 import 'class/sqflite_localpodcast.dart';
@@ -25,7 +26,6 @@ class EpisodeDetail extends StatefulWidget {
 class _EpisodeDetailState extends State<EpisodeDetail> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
   double downloadProgress;
-  Color _c;
   bool _loaddes;
 
   Future getSDescription(String title) async {
@@ -36,14 +36,15 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
         _loaddes = true;
       });
   }
-  
+
   _launchUrl(String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
-}
+
   @override
   void initState() {
     super.initState();
@@ -53,11 +54,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var color = json.decode(widget.episodeItem.primaryColor);
-    (color[0] > 200 && color[1] > 200 && color[2] > 200)
-        ? _c = Color.fromRGBO(
-            (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-        : _c = Color.fromRGBO(color[0], color[1], color[2], 0.8);
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -81,7 +77,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    margin: EdgeInsets.only(bottom: 10.0),
                     alignment: Alignment.topLeft,
                     child: Text(
                       widget.episodeItem.title,
@@ -89,21 +84,21 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     ),
                   ),
                   Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    height: 30.0,
+                    child: Text(
+                        'Published ' +
+                            widget.episodeItem.pubDate.substring(0, 16),
+                        style: TextStyle(color: Colors.blue[500])),
+                  ),
+                  Container(
                     padding: EdgeInsets.all(12.0),
-                    height: 50,
+                    height: 50.0,
                     child: Row(
                       children: <Widget>[
                         (widget.episodeItem.explicit == 1)
-                            ? Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.red[800],
-                                    shape: BoxShape.circle),
-                                height: 25.0,
-                                margin: EdgeInsets.only(right: 10.0),
-                                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                                alignment: Alignment.center,
-                                child: Text('E',
-                                    style: TextStyle(color: Colors.white)))
+                            ? ExplicitScale() 
                             : Center(),
                         Container(
                           decoration: BoxDecoration(
@@ -133,19 +128,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                   'MB',
                               style: textstyle),
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.lightGreen[300],
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0))),
-                          height: 30.0,
-                          alignment: Alignment.center,
-                          margin: EdgeInsets.only(right: 10.0),
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(
-                              widget.episodeItem.pubDate.substring(0, 16),
-                              style: textstyle),
-                        ),
                       ],
                     ),
                   ),
@@ -157,12 +139,13 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                 padding: EdgeInsets.only(left: 12.0, right: 12.0, top: 5.0),
                 child: SingleChildScrollView(
                   child: (widget.episodeItem.description != null && _loaddes)
-                      ? Html(data: widget.episodeItem.description,
-                      onLinkTap: (url){
-                          _launchUrl(url);
-                      },
-                      useRichText: true,
-                      )
+                      ? Html(
+                          data: widget.episodeItem.description,
+                          onLinkTap: (url) {
+                            _launchUrl(url);
+                          },
+                          useRichText: true,
+                        )
                       : Center(),
                 ),
               ),
@@ -530,4 +513,54 @@ class _ImageRotateState extends State<ImageRotate>
       ),
     );
   }
+}
+
+class ExplicitScale extends StatefulWidget {
+  @override
+  _ExplicitScaleState createState() => _ExplicitScaleState();
+}
+
+ class _ExplicitScaleState extends State<ExplicitScale>
+    with SingleTickerProviderStateMixin {
+  Animation _animation;
+  AnimationController _controller;
+  double _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
+    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        if (mounted)
+          setState(() {
+            _value = _animation.value;
+          });
+      });
+    _controller.forward();
+  }
+
+    @override
+    void dispose() {
+      _controller.dispose();
+      super.dispose();
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return Transform.scale(
+          scale: _value,
+          child: Container(
+              decoration:
+                  BoxDecoration(color: Colors.red[800], shape: BoxShape.circle),
+              height: 25.0,
+              width: 25.0,
+              margin: EdgeInsets.only(right: 10.0),
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              alignment: Alignment.center,
+              child: Text('E', style: TextStyle(color: Colors.white))));
+    }
 }

@@ -13,7 +13,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -25,21 +24,25 @@ class _HomeState extends State<Home> {
             height: 30,
             padding: EdgeInsets.symmetric(horizontal: 15),
             alignment: Alignment.bottomRight,
-
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  SlideLeftRoute(page: Podcast()),
-                );
-              },
-                child: Text('See All',
-                    style: TextStyle(
-                        color: Colors.red[300], fontWeight: FontWeight.bold, )),
-              
-            )),
-        Container(
-            child: ScrollPodcasts()),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    SlideLeftRoute(page: Podcast()),
+                  );
+                },
+                child: Container(
+                  height: 30,
+                  padding: EdgeInsets.all(5.0),
+                  child: Text('See All',
+                      style: TextStyle(
+                        color: Colors.red[300],
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
+              ),
+            ),
+        Container(child: ScrollPodcasts()),
         Expanded(
           child: MainTab(),
         ),

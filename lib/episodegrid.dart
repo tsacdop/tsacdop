@@ -120,6 +120,7 @@ class EpisodeGrid extends StatelessWidget {
                         Expanded(
                           flex: 5,
                           child: Container(
+                            alignment: Alignment.topLeft,
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text(
                               podcast[index].title,

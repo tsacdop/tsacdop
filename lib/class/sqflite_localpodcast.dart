@@ -82,10 +82,11 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT downloaded FROM Episodes WHERE downloaded != 'ND' AND feed_title = ?""",
         [title]);
-    for(int i=0; i < list.length; i++){
-      if(list[i] != null)
-      FlutterDownloader.remove(taskId: list[i]['downloaded'], shouldDeleteContent: true);
-      print('Removed all download task');
+    for (int i = 0; i < list.length; i++) {
+      if (list[i] != null)
+        FlutterDownloader.remove(
+            taskId: list[i]['downloaded'], shouldDeleteContent: true);
+      print('Removed all download tasks');
     }
     await dbClient
         .rawDelete('DELETE FROM Episodes WHERE feed_title=?', [title]);
@@ -99,70 +100,21 @@ class DBHelper {
     return url;
   }
 
-  int stringToDate(String s) {
-    var months = {
-      'Jan': 1,
-      'Feb': 2,
-      'Mar': 3,
-      'Apr': 4,
-      'May': 5,
-      'Jun': 6,
-      'Jul': 7,
-      'Aug': 8,
-      'Sep': 9,
-      'Oct': 10,
-      'Nov': 11,
-      'Dec': 12
-    };
-    int y;
-    int m;
-    int d;
-    int h;
-    int min;
-    int sec;
-    int result;
-    try {
-      y = int.parse(s.substring(12, 16));
-    } catch (e) {
-      y = 0;
-    }
-
-    try {
-      m = months[s.substring(8, 11)];
-    } catch (e) {
-      m = 0;
-    }
-    try {
-      d = int.parse(s.substring(5, 7));
-    } catch (e) {
-      d = 0;
-    }
-    try {
-      h = int.parse(s.substring(17, 19));
-    } catch (e) {
-      h = 0;
-    }
-    try {
-      min = int.parse(s.substring(20, 22));
-    } catch (e) {
-      min = 0;
-    }
-    try {
-      sec = int.parse(s.substring(23, 25));
-    } catch (e) {
-      sec = 0;
-    }
-    try {
-      result = DateTime(y, m, d, h, min, sec).millisecondsSinceEpoch;
-    } catch (e) {
-      result = 0;
-    }
-    return result;
-  }
-
-  static _parsePubDate(String pubDate) {
+  DateTime _parsePubDate(String pubDate) {
     if (pubDate == null) return null;
-    return DateFormat('EEE, dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);
+    DateTime date;
+    try {
+      date = DateFormat('EEE, dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);
+    } catch (e) {
+      try{
+      print('e');
+      date = DateFormat('dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);}
+      catch(e) {
+        print('e');
+        date = DateTime(0);
+      }
+    }
+    return date;
   }
 
   int getExplicit(bool b) {
@@ -185,6 +137,7 @@ class DBHelper {
     String _title;
     String _url;
     String _description;
+    int _duration;
     var _p = RssFeed.parse(rss);
     int _result = _p.items.length;
     var dbClient = await database;
@@ -208,9 +161,11 @@ class DBHelper {
             : _url = _p.items[i].enclosure.url;
         final _length = _p.items[i].enclosure.length;
         final _pubDate = _p.items[i].pubDate;
-        final DateTime _date = _parsePubDate(_pubDate);
+        final _date = _parsePubDate(_pubDate);
         final _milliseconds = _date.millisecondsSinceEpoch;
-        final _duration = _p.items[i].itunes.duration.inMinutes;
+        (_p.items[i].itunes.duration != null )
+        ? _duration = _p.items[i].itunes.duration.inMinutes
+        :  _duration = 0;
         final _explicit = getExplicit(_p.items[i].itunes.explicit);
         if (_p.items[i].enclosure.url != null) {
           await dbClient.transaction((txn) {
