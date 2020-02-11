@@ -6,10 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'class/audiostate.dart';
-import 'class/episodebrief.dart';
-import 'class/sqflite_localpodcast.dart';
+import 'package:tsacdop/class/audiostate.dart';
+import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/class/sqflite_localpodcast.dart';
 import 'episodedownload.dart';
 
 enum DownloadState { stop, load, donwload, complete, error }

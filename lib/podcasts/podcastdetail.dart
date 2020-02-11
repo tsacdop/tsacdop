@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:async';
 
-import 'class/podcastlocal.dart';
-import 'class/episodebrief.dart';
-import 'class/sqflite_localpodcast.dart';
-import 'episodegrid.dart';
+import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/util/episodegrid.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, this.podcastLocal}) : super(key: key);

@@ -8,14 +8,14 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'class/episodebrief.dart';
-import 'class/podcastlocal.dart';
-import 'class/importompl.dart';
-import 'class/sqflite_localpodcast.dart';
+import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:tsacdop/class/importompl.dart';
+import 'package:tsacdop/class/sqflite_localpodcast.dart';
 
-import 'episodedetail.dart';
-import 'podcastdetail.dart';
-import 'pageroute.dart';
+import 'package:tsacdop/episodes/episodedetail.dart';
+import 'package:tsacdop/podcasts/podcastdetail.dart';
+import 'package:tsacdop/util/pageroute.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override

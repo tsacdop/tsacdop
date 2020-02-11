@@ -1,20 +1,21 @@
 import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:color_thief_flutter/color_thief_flutter.dart';
-import 'class/importompl.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
-import 'dart:convert';
-import 'dart:async';
-import 'class/searchpodcast.dart';
-import 'class/podcastlocal.dart';
-import 'class/sqflite_localpodcast.dart';
-import 'home.dart';
+
+import 'package:tsacdop/class/importompl.dart';
+import 'package:tsacdop/class/searchpodcast.dart';
+import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/home/home.dart';
 import 'popupmenu.dart';
-import 'webfeed/webfeed.dart';
+import 'package:tsacdop/webfeed/webfeed.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -142,7 +143,7 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
         margin: EdgeInsets.only(top: 400),
         child: SizedBox(
           height: 10,
-                  child: Image.asset(
+          child: Image.asset(
             'assets/listennote.png',
             fit: BoxFit.fill,
           ),
@@ -203,52 +204,49 @@ class _SearchResultState extends State<SearchResult> {
     return primaryColor;
   }
 
-
   @override
   Widget build(BuildContext context) {
     final importOmpl = Provider.of<ImportOmpl>(context);
     savePodcast(String rss) async {
-    print(rss);
-    if (mounted) setState(() => _adding = true);
-  
-   importOmpl.importState =
-        ImportState.import;
+      print(rss);
+      if (mounted) setState(() => _adding = true);
 
-    Response response = await Dio().get(rss);
-    if (mounted) setState(() => _issubscribe = true);
+      importOmpl.importState = ImportState.import;
 
-    var _p = RssFeed.parse(response.data);
+      Response response = await Dio().get(rss);
+      if (mounted) setState(() => _issubscribe = true);
 
-    print(_p.title);
-    var dir = await getApplicationDocumentsDirectory();
+      var _p = RssFeed.parse(response.data);
 
-    Response<List<int>> imageResponse = await Dio().get<List<int>>(
-        _p.itunes.image.href,
-        options: Options(responseType: ResponseType.bytes));
+      print(_p.title);
+      var dir = await getApplicationDocumentsDirectory();
 
-    img.Image image = img.decodeImage(imageResponse.data);
-    img.Image thumbnail = img.copyResize(image, width: 300);
-    File("${dir.path}/${_p.title}.png")
-      ..writeAsBytesSync(img.encodePng(thumbnail));
+      Response<List<int>> imageResponse = await Dio().get<List<int>>(
+          _p.itunes.image.href,
+          options: Options(responseType: ResponseType.bytes));
 
-    String _primaryColor = await getColor(File("${dir.path}/${_p.title}.png"));
-    PodcastLocal podcastLocal = PodcastLocal(
-        _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
-    podcastLocal.description = _p.description;
+      img.Image image = img.decodeImage(imageResponse.data);
+      img.Image thumbnail = img.copyResize(image, width: 300);
+      File("${dir.path}/${_p.title}.png")
+        ..writeAsBytesSync(img.encodePng(thumbnail));
+
+      String _primaryColor =
+          await getColor(File("${dir.path}/${_p.title}.png"));
+      PodcastLocal podcastLocal = PodcastLocal(
+          _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
+      podcastLocal.description = _p.description;
       var dbHelper = DBHelper();
-    await dbHelper.savePodcastLocal(podcastLocal);
+      await dbHelper.savePodcastLocal(podcastLocal);
 
-    importOmpl.importState =
-        ImportState.parse;
+      importOmpl.importState = ImportState.parse;
 
-    await dbHelper.savePodcastRss(response.data);
+      await dbHelper.savePodcastRss(response.data);
 
-    importOmpl.importState =
-        ImportState.complete;
-    importOmpl.importState =
-        ImportState.stop;
-    print('fatch data');
-  }
+      importOmpl.importState = ImportState.complete;
+      importOmpl.importState = ImportState.stop;
+      print('fatch data');
+    }
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.0),
       child: ListTile(
@@ -270,9 +268,8 @@ class _SearchResultState extends State<SearchResult> {
                     child:
                         Text('Subscribe', style: TextStyle(color: Colors.blue)),
                     onPressed: () {
-                      importOmpl.rssTitle =
-                          widget.onlinePodcast.title;
-                         savePodcast(widget.onlinePodcast.rss);
+                      importOmpl.rssTitle = widget.onlinePodcast.title;
+                      savePodcast(widget.onlinePodcast.rss);
                     })
                 : OutlineButton(
                     child: SizedBox(

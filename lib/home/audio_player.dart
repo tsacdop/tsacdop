@@ -10,7 +10,7 @@ import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'class/audiostate.dart';
+import 'package:tsacdop/class/audiostate.dart';
 
 final Logger _logger = Logger('audiofileplayer');
 

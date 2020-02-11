@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'addpodcast.dart';
-import 'class/audiostate.dart';
-import 'class/importompl.dart';
+import 'package:tsacdop/home/appbar/addpodcast.dart';
+import 'package:tsacdop/class/audiostate.dart';
+import 'package:tsacdop/class/importompl.dart';
 
 void main() async {
   runApp(

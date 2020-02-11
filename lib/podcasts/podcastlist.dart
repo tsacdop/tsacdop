@@ -5,9 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import 'class/podcastlocal.dart';
-import 'class/sqflite_localpodcast.dart';
-import 'podcastdetail.dart';
+import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/podcasts/podcastdetail.dart';
 
 Future<List<PodcastLocal>> getPodcastLocal() async {
   var dbHelper = DBHelper();

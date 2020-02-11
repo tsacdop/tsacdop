@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'podcastlist.dart';
+
+import '../podcasts/podcastlist.dart';
 import 'hometab.dart';
-import 'importompl.dart';
+import 'package:tsacdop/home/appbar/importompl.dart';
 import 'audio_player.dart';
 import 'homescroll.dart';
-import 'pageroute.dart';
+import 'package:tsacdop/util/pageroute.dart';
 
 class Home extends StatefulWidget {
   @override

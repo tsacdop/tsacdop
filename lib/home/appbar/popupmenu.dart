@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
@@ -9,11 +10,12 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'package:image/image.dart' as img;
+
 import 'about.dart';
-import 'class/podcastlocal.dart';
-import 'class/sqflite_localpodcast.dart';
-import 'class/importompl.dart';
-import 'webfeed/webfeed.dart';
+import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/class/importompl.dart';
+import 'package:tsacdop/webfeed/webfeed.dart';
 
 class OmplOutline {
   final String text;

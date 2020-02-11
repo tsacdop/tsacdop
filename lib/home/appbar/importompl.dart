@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'class/importompl.dart';
+import 'package:tsacdop/class/importompl.dart';
 
 class Import extends StatelessWidget {
   @override
@@ -13,9 +13,7 @@ class Import extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                      SizedBox(
-                        height: 2.0,
-                        child: LinearProgressIndicator()),
+                      SizedBox(height: 2.0, child: LinearProgressIndicator()),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 20.0),
                         height: 20.0,
@@ -28,9 +26,7 @@ class Import extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        SizedBox(
-                          height: 2.0,
-                          child: LinearProgressIndicator()),
+                        SizedBox(height: 2.0, child: LinearProgressIndicator()),
                         Container(
                             height: 20.0,
                             padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -45,8 +41,7 @@ class Import extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             SizedBox(
-                              height: 2.0,
-                              child: LinearProgressIndicator()),
+                                height: 2.0, child: LinearProgressIndicator()),
                             Container(
                               height: 20.0,
                               padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -55,23 +50,25 @@ class Import extends StatelessWidget {
                             ),
                           ],
                         )
-                     : importOmpl.importState == ImportState.error
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            SizedBox(
-                              height: 2.0,
-                              child: LinearProgressIndicator()),
-                            Container(
-                              height: 20.0,
-                              padding: EdgeInsets.symmetric(horizontal: 20.0),
-                              alignment: Alignment.centerLeft,
-                              child: Text('Error:  ' + (importOmpl.rsstitle)),
-                            ),
-                          ],
-                        )
-                      : Center()),
+                      : importOmpl.importState == ImportState.error
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                SizedBox(
+                                    height: 2.0,
+                                    child: LinearProgressIndicator()),
+                                Container(
+                                  height: 20.0,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 20.0),
+                                  alignment: Alignment.centerLeft,
+                                  child:
+                                      Text('Error:  ' + (importOmpl.rsstitle)),
+                                ),
+                              ],
+                            )
+                          : Center()),
     );
   }
 }

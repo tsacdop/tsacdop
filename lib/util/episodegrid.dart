@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'class/episodebrief.dart';
-import 'episodedetail.dart';
-import 'pageroute.dart';
+import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/episodes/episodedetail.dart';
+import 'package:tsacdop/util/pageroute.dart';
 
 class EpisodeGrid extends StatelessWidget {
   final List<EpisodeBrief> podcast;
