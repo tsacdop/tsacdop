@@ -15,7 +15,7 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 
 ## License
 
-Tsacdop is under licensed under the [MIT](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
+Tsacdop is licensed under the [MIT](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
 
 ## Getting Started
 

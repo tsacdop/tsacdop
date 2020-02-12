@@ -19,16 +19,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override 
-  void dispose(){
-    super.dispose();
-  }
-
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final response = await Dio().get(podcastLocal.rssUrl);

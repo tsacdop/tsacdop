@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -53,7 +52,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -97,7 +95,16 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     child: Row(
                       children: <Widget>[
                         (widget.episodeItem.explicit == 1)
-                            ? ExplicitScale() 
+                            ? Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.red[800],
+                                    shape: BoxShape.circle),
+                                height: 25.0,
+                                width: 25.0,
+                                margin: EdgeInsets.only(right: 10.0),
+                                alignment: Alignment.center,
+                                child: Text('E',
+                                    style: TextStyle(color: Colors.white)))
                             : Center(),
                         Container(
                           decoration: BoxDecoration(
@@ -512,54 +519,4 @@ class _ImageRotateState extends State<ImageRotate>
       ),
     );
   }
-}
-
-class ExplicitScale extends StatefulWidget {
-  @override
-  _ExplicitScaleState createState() => _ExplicitScaleState();
-}
-
- class _ExplicitScaleState extends State<ExplicitScale>
-    with SingleTickerProviderStateMixin {
-  Animation _animation;
-  AnimationController _controller;
-  double _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 500),
-    );
-    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
-      ..addListener(() {
-        if (mounted)
-          setState(() {
-            _value = _animation.value;
-          });
-      });
-    _controller.forward();
-  }
-
-    @override
-    void dispose() {
-      _controller.dispose();
-      super.dispose();
-    }
-
-    @override
-    Widget build(BuildContext context) {
-      return Transform.scale(
-          scale: _value,
-          child: Container(
-              decoration:
-                  BoxDecoration(color: Colors.red[800], shape: BoxShape.circle),
-              height: 25.0,
-              width: 25.0,
-              margin: EdgeInsets.only(right: 10.0),
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              alignment: Alignment.center,
-              child: Text('E', style: TextStyle(color: Colors.white))));
-    }
 }

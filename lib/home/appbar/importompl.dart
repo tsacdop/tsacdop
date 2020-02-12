@@ -32,7 +32,7 @@ class Import extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: 20.0),
                             alignment: Alignment.centerLeft,
                             child:
-                                Text('Importing:  ' + (importOmpl.rsstitle))),
+                                Text('Connetting:  ' + (importOmpl.rsstitle))),
                       ],
                     )
                   : importOmpl.importState == ImportState.parse

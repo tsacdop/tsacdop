@@ -1,19 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
-
-Future<List<PodcastLocal>> getPodcastLocal() async {
-  var dbHelper = DBHelper();
-  Future<List<PodcastLocal>> podcastList = dbHelper.getPodcastLocal();
-  return podcastList;
-}
 
 class AboutPodcast extends StatefulWidget {
   final PodcastLocal podcastLocal;
@@ -90,6 +86,14 @@ class PodcastList extends StatefulWidget {
 }
 
 class _PodcastListState extends State<PodcastList> {
+  var dir;
+  Future<List<PodcastLocal>> getPodcastLocal() async {
+    dir = await getApplicationDocumentsDirectory();
+    var dbHelper = DBHelper();
+    Future<List<PodcastLocal>> podcastList = dbHelper.getPodcastLocal();
+    return podcastList;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -141,11 +145,8 @@ class _PodcastListState extends State<PodcastList> {
                                   child: Container(
                                     height: 120.0,
                                     width: 120.0,
-                                    child: CachedNetworkImage(
-                                      imageUrl: snapshot.data[index].imageUrl,
-                                      placeholder: (context, url) =>
-                                          CircularProgressIndicator(),
-                                    ),
+                                    child: Image.file(
+                                   File("${dir.path}/${snapshot.data[index].title}.png")),
                                   ),
                                 ),
                                 Container(
@@ -186,6 +187,7 @@ class Podcast extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.grey[100],
         elevation: 0,
+        centerTitle: true,
         title: Text('Podcasts'),
       ),
       body: Container(child: PodcastList()),

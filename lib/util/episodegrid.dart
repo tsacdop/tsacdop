@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/util/pageroute.dart';
@@ -24,160 +26,181 @@ class EpisodeGrid extends StatelessWidget {
       this.showNumber,
       this.heroTag})
       : super(key: key);
+
+  Future<String> _getPath() async {
+    var dir = await getApplicationDocumentsDirectory();
+    return dir.path;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      primary: false,
-      slivers: <Widget>[
-        SliverPadding(
-          padding: const EdgeInsets.all(5.0),
-          sliver: SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 1.0,
-              crossAxisCount: 3,
-              mainAxisSpacing: 6.0,
-              crossAxisSpacing: 6.0,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                Color _c;
-                var color = json.decode(podcast[index].primaryColor);
-                (color[0] > 200 && color[1] > 200 && color[2] > 200)
-                    ? _c = Color.fromRGBO(
-                        (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-                    : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-                return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      ScaleRoute(
-                          page: EpisodeDetail(
-                                episodeItem: podcast[index],
-                                heroTag: heroTag
-                              )),
-                    );
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        border: Border.all(
-                          color: Colors.grey[100],
-                          width: 3.0,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey[100],
-                            blurRadius: 1.0,
-                            spreadRadius: 0.5,
-                          ),
-                        ]),
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Hero(
-                                tag: podcast[index].enclosureUrl + heroTag,
-                                child: Container(
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15.0)),
-                                    child: Container(
-                                      height: 30.0,
-                                      width: 30.0,
-                                      child: CachedNetworkImage(
-                                        imageUrl: podcast[index].imageUrl,
-                                      ),
-                                    ),
-                                  ),
+    return FutureBuilder(
+        future: _getPath(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              primary: false,
+              slivers: <Widget>[
+                SliverPadding(
+                  padding: const EdgeInsets.all(5.0),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      childAspectRatio: 1.0,
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 6.0,
+                      crossAxisSpacing: 6.0,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        Color _c;
+                        var color = json.decode(podcast[index].primaryColor);
+                        (color[0] > 200 && color[1] > 200 && color[2] > 200)
+                            ? _c = Color.fromRGBO((255 - color[0]),
+                                255 - color[1], 255 - color[2], 1.0)
+                            : _c = Color.fromRGBO(
+                                color[0], color[1], color[2], 1.0);
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              ScaleRoute(
+                                  page: EpisodeDetail(
+                                      episodeItem: podcast[index],
+                                      heroTag: heroTag)),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0)),
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                border: Border.all(
+                                  color: Colors.grey[100],
+                                  width: 3.0,
                                 ),
-                              ),
-                              Spacer(),
-                              showNumber
-                                  ? Container(
-                                      alignment: Alignment.topRight,
-                                      child: Text(
-                                        (podcast.length - index).toString(),
-                                        style: GoogleFonts.teko(
-                                          textStyle: TextStyle(
-                                            fontSize: 20.0,
-                                            color: _c,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey[100],
+                                    blurRadius: 1.0,
+                                    spreadRadius: 0.5,
+                                  ),
+                                ]),
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 2,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Hero(
+                                        tag: podcast[index].enclosureUrl +
+                                            heroTag,
+                                        child: Container(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15.0)),
+                                            child: Container(
+                                              height: 30.0,
+                                              width: 30.0,
+                                              child: Image.file(File(
+                                                  "${snapshot.data}/${podcast[index].feedTitle}.png")),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    )
-                                  : Center(),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Container(
-                            alignment: Alignment.topLeft,
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text(
-                              podcast[index].title,
-                              style: TextStyle(
-                                fontSize: 15.0,
-                              ),
-                              maxLines: 4,
+                                      Spacer(),
+                                      showNumber
+                                          ? Container(
+                                              alignment: Alignment.topRight,
+                                              child: Text(
+                                                (podcast.length - index)
+                                                    .toString(),
+                                                style: GoogleFonts.teko(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 20.0,
+                                                    color: _c,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : Center(),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 5,
+                                  child: Container(
+                                    alignment: Alignment.topLeft,
+                                    padding: EdgeInsets.only(top: 2.0),
+                                    child: Text(
+                                      podcast[index].title,
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                      ),
+                                      maxLines: 4,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Text(
+                                          podcast[index]
+                                              .pubDate
+                                              .substring(4, 16),
+                                          style: TextStyle(
+                                              color: _c,
+                                              fontStyle: FontStyle.italic),
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      showDownload
+                                          ? DownloadIcon(
+                                              episodeBrief: podcast[index])
+                                          : Center(),
+                                      Padding(
+                                        padding: EdgeInsets.all(1),
+                                      ),
+                                      showFavorite
+                                          ? Container(
+                                              alignment: Alignment.bottomRight,
+                                              child: (podcast[index].liked == 0)
+                                                  ? Center()
+                                                  : IconTheme(
+                                                      data: IconThemeData(
+                                                          size: 15),
+                                                      child: Icon(
+                                                        Icons.favorite,
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
+                                            )
+                                          : Center(),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            children: <Widget>[
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Text(
-                                  podcast[index].pubDate.substring(4, 16),
-                                  style: TextStyle(
-                                      color: _c, fontStyle: FontStyle.italic),
-                                ),
-                              ),
-                              Spacer(),
-                              showDownload
-                                  ? DownloadIcon(episodeBrief: podcast[index])
-                                  : Center(),
-                              Padding(
-                                padding: EdgeInsets.all(1),
-                              ),
-                              showFavorite
-                                  ? Container(
-                                      alignment: Alignment.bottomRight,
-                                      child: (podcast[index].liked == 0)
-                                          ? Center()
-                                          : IconTheme(
-                                              data: IconThemeData(size: 15),
-                                              child: Icon(
-                                                Icons.favorite,
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                    )
-                                  : Center(),
-                            ],
-                          ),
-                        ),
-                      ],
+                        );
+                      },
+                      childCount: podcast.length,
                     ),
                   ),
-                );
-              },
-              childCount: podcast.length,
-            ),
-          ),
-        ),
-      ],
-    );
+                ),
+              ],
+            );
+          }
+          return Center();
+        });
   }
 }
 
