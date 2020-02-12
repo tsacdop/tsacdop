@@ -1,12 +1,19 @@
 # Tsacdop
-Enjoy podcasts with tsacdop!
+## About
+![logo][https://github.com/stonega/tsacdop/blob/master/android/app/src/main/res/mipmap-hdpi/ic_launcher.png]
+![tsacdop][https://github.com/stonega/tsacdop/blob/master/android/app/src/main/res/mipmap-hdpi/text.png]
 
-Tsacdop is a podcasts player developed with flutter. 
+Enjoy podcasts with Tsacdop.
+
+Tsacdop is a podcasts player developed with flutter, only for Android right now. 
 The development is still on early stage.
 
-Thanks for flutter team and all involved plugin developers, especially [webfeed](https://github.com/witochandra/webfeed) and [audiofileplayer](https://github.com/google/flutter.plugins/tree/master/packages/audiofileplayer/).
+Credit to flutter team and  involved plugin developers, especially [webfeed](https://github.com/witochandra/webfeed) and [audiofileplayer](https://github.com/google/flutter.plugins/tree/master/packages/audiofileplayer/).
 
 The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
+
+##License
+Tsacdop is under licensed under the [MIT][LICENSE] license.
 
 ## Getting Started
 
