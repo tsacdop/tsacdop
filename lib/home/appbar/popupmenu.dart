@@ -32,7 +32,6 @@ class OmplOutline {
 }
 
 class PopupMenu extends StatelessWidget {
-
   Future<String> getColor(File file) async {
     final imageProvider = FileImage(file);
     var colorImage = await getImageFromProvider(imageProvider);
@@ -44,6 +43,21 @@ class PopupMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final importOmpl = Provider.of<ImportOmpl>(context);
+
+    _refreshAll() async {
+      var dbHelper = DBHelper();
+      List<PodcastLocal> podcastList = await dbHelper.getPodcastLocal();
+      await Future.forEach(podcastList, (podcastLocal) async {
+        importOmpl.rssTitle = podcastLocal.title;
+        importOmpl.importState = ImportState.parse;
+        Response response = await Dio().get(podcastLocal.rssUrl);
+        var _p = RssFeed.parse(response.data);
+        await dbHelper.savePodcastRss(_p);
+        print('Refresh ' + podcastLocal.title);
+      });
+      importOmpl.importState = ImportState.complete;
+      importOmpl.importState = ImportState.stop;
+    }
 
     saveOmpl(String rss) async {
       var dbHelper = DBHelper();
@@ -74,7 +88,7 @@ class PopupMenu extends StatelessWidget {
 
         importOmpl.importState = ImportState.parse;
 
-        await dbHelper.savePodcastRss(response.data);
+        await dbHelper.savePodcastRss(_p);
       } catch (e) {
         print(e);
       }
@@ -120,24 +134,30 @@ class PopupMenu extends StatelessWidget {
     }
 
     return PopupMenuButton<int>(
-      elevation: 2,
+      elevation: 3,
       tooltip: 'Menu',
       itemBuilder: (context) => [
         PopupMenuItem(
           value: 1,
-          child: Text('Impoer OMPL'),
+          child: Text('Refresh All'),
         ),
         PopupMenuItem(
           value: 2,
+          child: Text('Impoer OMPL'),
+        ),
+        PopupMenuItem(
+          value: 3,
           child: Text('About'),
         ),
       ],
       onSelected: (value) {
-        if (value == 2) {
+        if (value == 3) {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => AboutApp()));
-        } else if (value == 1) {
+        } else if (value == 2) {
           _getFilePath();
+        } else if (value == 1) {
+          _refreshAll();
         }
       },
     );

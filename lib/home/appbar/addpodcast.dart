@@ -207,6 +207,7 @@ class _SearchResultState extends State<SearchResult> {
   @override
   Widget build(BuildContext context) {
     final importOmpl = Provider.of<ImportOmpl>(context);
+    
     savePodcast(String rss) async {
       print(rss);
       if (mounted) setState(() => _adding = true);
@@ -240,7 +241,7 @@ class _SearchResultState extends State<SearchResult> {
 
       importOmpl.importState = ImportState.parse;
 
-      await dbHelper.savePodcastRss(response.data);
+      await dbHelper.savePodcastRss(_p);
 
       importOmpl.importState = ImportState.complete;
       importOmpl.importState = ImportState.stop;

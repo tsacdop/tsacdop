@@ -7,7 +7,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'podcastlocal.dart';
 import 'episodebrief.dart';
-import '../webfeed/webfeed.dart';
+import 'package:tsacdop/webfeed/webfeed.dart';
 
 class DBHelper {
   static Database _db;
@@ -133,12 +133,11 @@ class DBHelper {
     return ximalaya.hasMatch(input);
   }
 
-  Future<int> savePodcastRss(String rss) async {
+  Future<int> savePodcastRss(RssFeed _p) async {
     String _title;
     String _url;
     String _description;
     int _duration;
-    var _p = RssFeed.parse(rss);
     int _result = _p.items.length;
     var dbClient = await database;
     int _count = Sqflite.firstIntValue(await dbClient.rawQuery(
