@@ -9,6 +9,7 @@ import 'package:audiofileplayer/audio_system.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:tsacdop/class/audiostate.dart';
 
@@ -250,7 +251,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       'playnow', likeButtonId, 'ic_stat_play_circle_filled');
 
   Future<void> _setNotification() async {
-    final Uint8List imageBytes = await _networkImageToByte(_imgurl);
+    var dir = await getApplicationDocumentsDirectory();
+    final Uint8List imageBytes =  File('${dir.path}/$_feedtitle.png').readAsBytesSync();
     AudioSystem.instance.setMetadata(AudioMetadata(
         title: _title,
         artist: _feedtitle,
@@ -288,8 +290,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       Provider.of<Urlchange>(context, listen: false).audioState =
           AudioState.play;
     });
-
-    final Uint8List imageBytes = await _networkImageToByte(_imgurl);
+     var dir = await getApplicationDocumentsDirectory();
+    final Uint8List imageBytes =  File('${dir.path}/$_feedtitle.png').readAsBytesSync();
+    //final Uint8List imageBytes = await _networkImageToByte(_imgurl);
     AudioSystem.instance.setMetadata(AudioMetadata(
         title: _title,
         artist: _feedtitle,

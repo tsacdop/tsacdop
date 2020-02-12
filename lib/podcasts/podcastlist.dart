@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
+import 'package:tsacdop/util/pageroute.dart';
 
 class AboutPodcast extends StatefulWidget {
   final PodcastLocal podcastLocal;
@@ -118,10 +119,10 @@ class _PodcastListState extends State<PodcastList> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => PodcastDetail(
-                                        podcastLocal: snapshot.data[index],
-                                      )),
+                              ScaleRoute(
+                                  page: PodcastDetail(
+                                podcastLocal: snapshot.data[index],
+                              )),
                             );
                           },
                           onLongPress: () {
@@ -145,8 +146,8 @@ class _PodcastListState extends State<PodcastList> {
                                   child: Container(
                                     height: 120.0,
                                     width: 120.0,
-                                    child: Image.file(
-                                   File("${dir.path}/${snapshot.data[index].title}.png")),
+                                    child: Image.file(File(
+                                        "${dir.path}/${snapshot.data[index].title}.png")),
                                   ),
                                 ),
                                 Container(

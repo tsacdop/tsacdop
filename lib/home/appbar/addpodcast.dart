@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/searchpodcast.dart';
@@ -221,8 +222,8 @@ class _SearchResultState extends State<SearchResult> {
 
       print(_p.title);
       var dir = await getApplicationDocumentsDirectory();
-
-      Response<List<int>> imageResponse = await Dio().get<List<int>>(
+      try{
+          Response<List<int>> imageResponse = await Dio().get<List<int>>(
           _p.itunes.image.href,
           options: Options(responseType: ResponseType.bytes));
 
@@ -246,6 +247,13 @@ class _SearchResultState extends State<SearchResult> {
       importOmpl.importState = ImportState.complete;
       importOmpl.importState = ImportState.stop;
       print('fatch data');
+      }
+      catch(e){
+         Fluttertoast.showToast(
+      msg: 'Network error, Subscribe failed',
+      gravity: ToastGravity.BOTTOM,
+    ); 
+      }
     }
 
     return Container(

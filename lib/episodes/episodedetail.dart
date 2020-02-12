@@ -241,23 +241,25 @@ class _MenuBarState extends State<MenuBar> {
                     ),
                   ),
             (_like == 0 && !_liked)
-                ? IconButton(
-                    icon: Icon(
-                      Icons.favorite_border,
-                      color: Colors.grey[700],
+                ? InkWell(
+                    onTap: () => saveLiked(widget.episodeItem.title),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Icon(
+                        Icons.favorite_border,
+                        color: Colors.grey[700],
+                      ),
                     ),
-                    onPressed: () {
-                      saveLiked(widget.episodeItem.title);
-                    },
                   )
-                : IconButton(
-                    icon: Icon(
-                      Icons.favorite,
-                      color: Colors.red,
+                : InkWell(
+                    onTap: () => setUnliked(widget.episodeItem.title),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                      ),
                     ),
-                    onPressed: () {
-                      setUnliked(widget.episodeItem.title);
-                    },
                   ),
             DownloadButton(episodeBrief: widget.episodeItem),
             IconButton(
