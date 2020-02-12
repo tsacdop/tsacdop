@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           },
         ),
-        title: Text('🎙TsacDop', style: TextStyle(color: Colors.blue[600])),
+        title: Image(image: AssetImage('assets/text.png'), height: 30,),
         actions: <Widget>[
           PopupMenu(),
         ],
@@ -91,8 +91,8 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
           child: Container(
         padding: EdgeInsets.only(top: 400),
         child: Image(
-          image: AssetImage('assets/listennote.png'),
-          width: 300,
+          image: AssetImage('assets/listennotes.png'),
+          height: 20,
         ),
       ));
     return FutureBuilder(
