@@ -1,7 +1,8 @@
 # Tsacdop
 ## About
-![logo][https://github.com/stonega/tsacdop/blob/master/android/app/src/main/res/mipmap-hdpi/ic_launcher.png]
-![tsacdop][https://github.com/stonega/tsacdop/blob/master/android/app/src/main/res/mipmap-hdpi/text.png]
+![logo](https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-hdpi/ic_launcher.png)
+
+![tsacdop](https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-hdpi/text.png)
 
 Enjoy podcasts with Tsacdop.
 
@@ -12,8 +13,9 @@ Credit to flutter team and  involved plugin developers, especially [webfeed](htt
 
 The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 
-##License
-Tsacdop is under licensed under the [MIT][LICENSE] license.
+## License
+
+Tsacdop is under licensed under the [MIT](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
 
 ## Getting Started
 
