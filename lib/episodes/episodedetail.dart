@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';
@@ -204,6 +205,17 @@ class _MenuBarState extends State<MenuBar> {
     _like = widget.episodeItem.liked;
   }
 
+  Widget _buttonOnMenu(Widget widget, Function() onTap) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+              height: 50.0,
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: widget),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final urlChange = Provider.of<Urlchange>(context);
@@ -241,44 +253,50 @@ class _MenuBarState extends State<MenuBar> {
                     ),
                   ),
             (_like == 0 && !_liked)
-                ? InkWell(
-                    onTap: () => saveLiked(widget.episodeItem.title),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Icon(
-                        Icons.favorite_border,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  )
-                : InkWell(
-                    onTap: () => setUnliked(widget.episodeItem.title),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Icon(
-                        Icons.favorite,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-            DownloadButton(episodeBrief: widget.episodeItem),
-            IconButton(
-              icon: Icon(Icons.playlist_add, color: Colors.grey[700]),
-              onPressed: () {/*TODO*/},
-            ),
-            Spacer(),
-            (widget.episodeItem.title != urlchange.title)
-                ? IconButton(
-                    icon: Icon(
-                      Icons.play_arrow,
+                ? _buttonOnMenu(
+                    Icon(
+                      Icons.favorite_border,
                       color: Colors.grey[700],
                     ),
-                    onPressed: () {
-                      urlChange.audioUrl = widget.episodeItem.enclosureUrl;
-                      urlChange.rssTitle = widget.episodeItem.title;
-                      urlChange.feedTitle = widget.episodeItem.feedTitle;
-                      urlChange.imageUrl = widget.episodeItem.imageUrl;
-                    },
+                    () => saveLiked(widget.episodeItem.title))
+                : _buttonOnMenu(
+                    Icon(
+                      Icons.favorite,
+                      color: Colors.red,
+                    ),
+                    () => setUnliked(widget.episodeItem.title)),
+            DownloadButton(episodeBrief: widget.episodeItem),
+            _buttonOnMenu(Icon(Icons.playlist_add, color: Colors.grey[700]),
+                () {
+              Fluttertoast.showToast(
+                msg: 'Not support yet',
+                gravity: ToastGravity.BOTTOM,
+              );
+              /*TODO*/
+            }),
+            Spacer(),
+            (widget.episodeItem.title != urlchange.title)
+                ? Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(5.0),
+                          bottomRight: Radius.circular(5.0)),
+                      onTap: () {
+                        urlChange.audioUrl = widget.episodeItem.enclosureUrl;
+                        urlChange.rssTitle = widget.episodeItem.title;
+                        urlChange.feedTitle = widget.episodeItem.feedTitle;
+                        urlChange.imageUrl = widget.episodeItem.imageUrl;
+                      },
+                      child: Container(
+                        height: 50.0,
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Icon(
+                          Icons.play_arrow,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
                   )
                 : (widget.episodeItem.title == urlchange.title &&
                         urlchange.audioState == AudioState.play)

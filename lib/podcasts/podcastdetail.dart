@@ -7,6 +7,7 @@ import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
+import 'package:tsacdop/webfeed/webfeed.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, this.podcastLocal}) : super(key: key);
@@ -22,7 +23,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final response = await Dio().get(podcastLocal.rssUrl);
-    final result = await dbHelper.savePodcastRss(response.data);
+    var _p = RssFeed.parse(response.data);
+    final result = await dbHelper.savePodcastRss(_p);
     if (result == 0 && mounted) setState(() {});
   }
 

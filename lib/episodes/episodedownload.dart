@@ -140,7 +140,7 @@ class _DownloadButtonState extends State<DownloadButton> {
     task.taskId = newTaskId;
     var dbHelper = DBHelper();
     await dbHelper.saveDownloaded(task.taskId, task.link);
-     Fluttertoast.showToast(
+    Fluttertoast.showToast(
       msg: 'Download again',
       gravity: ToastGravity.BOTTOM,
     );
@@ -190,6 +190,17 @@ class _DownloadButtonState extends State<DownloadButton> {
     }
   }
 
+  Widget _buttonOnMenu(Widget widget, Function() onTap) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+              height: 50.0,
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: widget),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return _downloadButton(_task);
@@ -199,72 +210,70 @@ class _DownloadButtonState extends State<DownloadButton> {
     if (_isLoading)
       return Center();
     else if (task.status == DownloadTaskStatus.undefined) {
-      
-      return IconButton(
-        onPressed: () {
-          _requestDownload(task);
-        },
-        icon: Icon(
-          Icons.arrow_downward,
-          color: Colors.grey[700],
-        ),
-      );
+      return _buttonOnMenu(
+          Icon(
+            Icons.arrow_downward,
+            color: Colors.grey[700],
+          ),
+          () => _requestDownload(task));
     } else if (task.status == DownloadTaskStatus.running) {
-      return InkWell(
-        onTap: () {
-          _pauseDownload(task);
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 18),
-          child: SizedBox(
-            height: 18,
-            width: 18,
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.grey[200],
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-              value: task.progress / 100,
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _pauseDownload(task);
+          },
+          child: Container(
+            height: 50.0,
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(horizontal: 18.0),
+            child: SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.grey[500],
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                value: task.progress / 100,
+              ),
             ),
           ),
         ),
       );
     } else if (task.status == DownloadTaskStatus.paused) {
-      return InkWell(
-        onTap: () {
-          _resumeDownload(task);
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 18),
-          child: SizedBox(
-            height: 18,
-            width: 18,
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.grey[200],
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-              value: task.progress / 100,
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _resumeDownload(task);
+          },
+          child: Container(
+            height: 50.0,
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(horizontal: 18),
+            child: SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.grey[500],
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                value: task.progress / 100,
+              ),
             ),
           ),
         ),
       );
     } else if (task.status == DownloadTaskStatus.complete) {
-      
-      return IconButton(
-        icon: Icon(
-          Icons.done_all,
-          color: Colors.blue,
-        ),
-        onPressed: () {
-          _deleteDownload(task);
-        },
-      );
+      return _buttonOnMenu(
+          Icon(
+            Icons.done_all,
+            color: Colors.blue,
+          ),
+          () => _deleteDownload(task));
     } else if (task.status == DownloadTaskStatus.failed) {
-      return IconButton(
-        icon: Icon(Icons.refresh, color: Colors.red),
-        onPressed: () {
-          _retryDownload(task);
-        },
-      );
+      return _buttonOnMenu(
+          Icon(Icons.refresh, color: Colors.red), () => _retryDownload(task));
     }
     return Center();
   }
