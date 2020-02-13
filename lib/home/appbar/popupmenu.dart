@@ -42,7 +42,7 @@ class PopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final importOmpl = Provider.of<ImportOmpl>(context);
+    ImportOmpl importOmpl = Provider.of<ImportOmpl>(context);
 
     _refreshAll() async {
       var dbHelper = DBHelper();

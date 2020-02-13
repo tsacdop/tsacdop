@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tsacdop/class/audiostate.dart';
+import 'package:provider/provider.dart';
 
-import '../podcasts/podcastlist.dart';
+import 'package:tsacdop/podcasts/podcastlist.dart';
 import 'hometab.dart';
 import 'package:tsacdop/home/appbar/importompl.dart';
-import 'audio_player.dart';
+import 'package:tsacdop/home/audio_player.dart';
 import 'homescroll.dart';
 import 'package:tsacdop/util/pageroute.dart';
 
@@ -16,15 +18,17 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Import(),
-        Container(
-            height: 30,
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            alignment: Alignment.bottomRight,
+    return ChangeNotifierProvider(
+        create: (context) => Urlchange(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Import(),
+            Container(
+              height: 30,
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              alignment: Alignment.bottomRight,
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -43,12 +47,12 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-        Container(child: ScrollPodcasts()),
-        Expanded(
-          child: MainTab(),
-        ),
-        PlayerWidget(),
-      ],
-    );
+            Container(child: ScrollPodcasts()),
+            Expanded(
+              child: MainTab(),
+            ),
+            PlayerWidget(),
+          ],
+        ));
   }
 }

@@ -15,7 +15,7 @@ import 'package:tsacdop/class/searchpodcast.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';
 import 'package:tsacdop/home/home.dart';
-import 'popupmenu.dart';
+import 'package:tsacdop/home/appbar/popupmenu.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -29,28 +29,34 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: Colors.grey[100],
-        leading: IconButton(
-          tooltip: 'Add',
-          icon: const Icon(Icons.add_circle_outline),
-          onPressed: () async {
-            await showSearch<int>(
-              context: context,
-              delegate: _delegate,
-            );
-          },
+    return ChangeNotifierProvider(
+      create: (context) => ImportOmpl(),
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          elevation: 0,
+          centerTitle: true,
+          backgroundColor: Colors.grey[100],
+          leading: IconButton(
+            tooltip: 'Add',
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () async {
+              await showSearch<int>(
+                context: context,
+                delegate: _delegate,
+              );
+            },
+          ),
+          title: Image(
+            image: AssetImage('assets/text.png'),
+            height: 30,
+          ),
+          actions: <Widget>[
+            PopupMenu(),
+          ],
         ),
-        title: Image(image: AssetImage('assets/text.png'), height: 30,),
-        actions: <Widget>[
-          PopupMenu(),
-        ],
+        body: Home(),
       ),
-      body: Home(),
     );
   }
 }
@@ -207,8 +213,8 @@ class _SearchResultState extends State<SearchResult> {
 
   @override
   Widget build(BuildContext context) {
-    final importOmpl = Provider.of<ImportOmpl>(context);
-    
+    ImportOmpl importOmpl = Provider.of<ImportOmpl>(context);
+
     savePodcast(String rss) async {
       print(rss);
       if (mounted) setState(() => _adding = true);
@@ -222,37 +228,36 @@ class _SearchResultState extends State<SearchResult> {
 
       print(_p.title);
       var dir = await getApplicationDocumentsDirectory();
-      try{
-          Response<List<int>> imageResponse = await Dio().get<List<int>>(
-          _p.itunes.image.href,
-          options: Options(responseType: ResponseType.bytes));
+      try {
+        Response<List<int>> imageResponse = await Dio().get<List<int>>(
+            _p.itunes.image.href,
+            options: Options(responseType: ResponseType.bytes));
 
-      img.Image image = img.decodeImage(imageResponse.data);
-      img.Image thumbnail = img.copyResize(image, width: 300);
-      File("${dir.path}/${_p.title}.png")
-        ..writeAsBytesSync(img.encodePng(thumbnail));
+        img.Image image = img.decodeImage(imageResponse.data);
+        img.Image thumbnail = img.copyResize(image, width: 300);
+        File("${dir.path}/${_p.title}.png")
+          ..writeAsBytesSync(img.encodePng(thumbnail));
 
-      String _primaryColor =
-          await getColor(File("${dir.path}/${_p.title}.png"));
-      PodcastLocal podcastLocal = PodcastLocal(
-          _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
-      podcastLocal.description = _p.description;
-      var dbHelper = DBHelper();
-      await dbHelper.savePodcastLocal(podcastLocal);
+        String _primaryColor =
+            await getColor(File("${dir.path}/${_p.title}.png"));
+        PodcastLocal podcastLocal = PodcastLocal(
+            _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
+        podcastLocal.description = _p.description;
+        var dbHelper = DBHelper();
+        await dbHelper.savePodcastLocal(podcastLocal);
 
-      importOmpl.importState = ImportState.parse;
+        importOmpl.importState = ImportState.parse;
 
-      await dbHelper.savePodcastRss(_p);
+        await dbHelper.savePodcastRss(_p);
 
-      importOmpl.importState = ImportState.complete;
-      importOmpl.importState = ImportState.stop;
-      print('fatch data');
-      }
-      catch(e){
-         Fluttertoast.showToast(
-      msg: 'Network error, Subscribe failed',
-      gravity: ToastGravity.BOTTOM,
-    ); 
+        importOmpl.importState = ImportState.complete;
+        importOmpl.importState = ImportState.stop;
+        print('fatch data');
+      } catch (e) {
+        Fluttertoast.showToast(
+          msg: 'Network error, Subscribe failed',
+          gravity: ToastGravity.BOTTOM,
+        );
       }
     }
 
