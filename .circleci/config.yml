@@ -18,6 +18,9 @@ jobs:
           name: Run the application tests
           command: flutter test
 
+      - run: echo $ENCODED_KEYSTORE | base64 --decode >> ${HOME}/repo/keystore.jks
+      - run: echo 'export KEYSTORE=${HOME}/repo/keystore.jks' >> $BASH_ENV
+
       - run:
           name: Build the Android version
           command: flutter build apk 
