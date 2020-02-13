@@ -1,0 +1,26 @@
+version: 2
+jobs:
+  build:    
+    docker:
+      - image: cirrusci/flutter:v1.13.6
+
+    branches:
+      only: master
+
+    steps:
+      - checkout
+
+      - run:
+          name: Run Flutter doctor
+          command: flutter doctor
+
+      - run:
+          name: Run the application tests
+          command: flutter test
+
+      - run:
+          name: Build the Android version
+          command: flutter build apk 
+
+      - store_artifacts:
+          path: build/app/outputs/apk/release/app-release.apk
