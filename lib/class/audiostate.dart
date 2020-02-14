@@ -22,10 +22,10 @@ class Urlchange with ChangeNotifier {
     _feedTitle = feed;
   }
   
-  String _imageurl;
-  String get imageurl => _imageurl;
-  set imageUrl(String image){
-    _imageurl = image;
+  String _primaryColor;
+  String get primarycolor => _primaryColor;
+  set primaryColor(String c){
+    _primaryColor = c;
   }
   
   AudioState _audioState;

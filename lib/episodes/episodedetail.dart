@@ -6,6 +6,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';
@@ -26,7 +27,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
   double downloadProgress;
   bool _loaddes;
-
   Future getSDescription(String title) async {
     var dbHelper = DBHelper();
     widget.episodeItem.description = await dbHelper.getDescription(title);
@@ -286,7 +286,8 @@ class _MenuBarState extends State<MenuBar> {
                         urlChange.audioUrl = widget.episodeItem.enclosureUrl;
                         urlChange.rssTitle = widget.episodeItem.title;
                         urlChange.feedTitle = widget.episodeItem.feedTitle;
-                        urlChange.imageUrl = widget.episodeItem.imageUrl;
+                        urlChange.primaryColor = widget.episodeItem.primaryColor;
+                        print('Playing');
                       },
                       child: Container(
                         height: 50.0,
@@ -355,7 +356,7 @@ class _LineLoaderState extends State<LineLoader>
   void initState() {
     super.initState();
     controller = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 1000));
+        vsync: this, duration: Duration(milliseconds: 500));
     animation = Tween(begin: 0.0, end: 1.0).animate(controller)
       ..addListener(() {
         if (mounted)
@@ -492,6 +493,7 @@ class _ImageRotateState extends State<ImageRotate>
   @override
   void initState() {
     super.initState();
+    _value = 0;
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 2000),

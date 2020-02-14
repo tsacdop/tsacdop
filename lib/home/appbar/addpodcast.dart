@@ -16,7 +16,9 @@ import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';
 import 'package:tsacdop/home/home.dart';
 import 'package:tsacdop/home/appbar/popupmenu.dart';
+import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
+import 'package:tsacdop/home/audiopanel.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -29,9 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ImportOmpl(),
-      child: Scaffold(
+    return  Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
           elevation: 0,
@@ -56,7 +56,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         body: Home(),
-      ),
     );
   }
 }
