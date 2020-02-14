@@ -16,9 +16,7 @@ import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';
 import 'package:tsacdop/home/home.dart';
 import 'package:tsacdop/home/appbar/popupmenu.dart';
-import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
-import 'package:tsacdop/home/audiopanel.dart';
 
 class MyHomePage extends StatefulWidget {
   @override

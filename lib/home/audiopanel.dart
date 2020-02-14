@@ -99,7 +99,7 @@ class _AudioPanelState extends State<AudioPanel>
     setState(() {
       _animation =
           Tween<double>(begin: initSize, end: minSize).animate(_controller);
-      initSize = minSize;
+      initSize = minSize;  
     });
     _controller.forward();
   }

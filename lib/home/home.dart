@@ -10,16 +10,7 @@ import 'package:tsacdop/home/audio_player.dart';
 import 'homescroll.dart';
 import 'package:tsacdop/util/pageroute.dart';
 
-class Home extends StatefulWidget {
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override 
-  void initState(){
-    super.initState();
-  }
+class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {

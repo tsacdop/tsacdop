@@ -402,4 +402,27 @@ class DBHelper {
     String description = list[0]['description'];
     return description;
   }
+
+    Future<EpisodeBrief> getRssItemWithUrl(String url) async {
+    var dbClient = await database;
+    EpisodeBrief episode;
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.pubDate, 
+        E.feed_title, E.duration, E.explicit, E.liked, E.downloaded, P.imageUrl, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_title = P.title 
+        WHERE E.enclosure_url = ?""",[url]);
+      episode = EpisodeBrief(
+          list.first['title'],
+          list.first['enclosure_url'],
+          list.first['enclosure_length'],
+          list.first['pubDate'],
+          list.first['feed_title'],
+          list.first['imageUrl'],
+          list.first['primaryColor'],
+          list.first['liked'],
+          list.first['downloaded'],
+          list.first['duration'],
+          list.first['explicit']);
+    return episode;
+  }
 }

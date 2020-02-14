@@ -6,7 +6,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/sqflite_localpodcast.dart';

@@ -12,7 +12,11 @@ import 'package:marquee/marquee.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:tsacdop/class/audiostate.dart';
+import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/home/audiopanel.dart';
+import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/util/pageroute.dart';
 
 final Logger _logger = Logger('audiofileplayer');
 
@@ -41,6 +45,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   bool _isLoading;
   String _primaryColor;
   Color _c;
+  String _imagePath;
+  bool _loadDir;
 
   @override
   void initState() {
@@ -48,8 +54,31 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     AudioSystem.instance.addMediaEventListener(_mediaEventListener);
     _isLoading = false;
     _remoteAudioLoading = true;
+    _loadDir = false;
+    getPath();
   }
 
+  //get path to load podcast image in expanded panel
+  getPath() async {
+    var dir = await getApplicationDocumentsDirectory();
+    _imagePath = dir.path;
+    setState(() {
+      _loadDir = true;
+    });
+  }
+
+  //open episoddetail page
+  _gotoEpisode() async {
+    var dbHelper = DBHelper();
+    EpisodeBrief episodeBrief = await dbHelper.getRssItemWithUrl(url);
+    Navigator.push(
+      context,
+      SlideUptRoute(
+          page: EpisodeDetail(episodeItem: episodeBrief, heroTag: 'playpanel')),
+    );
+  }
+
+  //init audio player from url
   void _initbackgroundAudioPlayer(String url) {
     _remoteErrorMessage = null;
     _remoteAudioLoading = true;
@@ -100,6 +129,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       ..play();
   }
 
+  //init audio player form local file
   void _initbackgroundAudioPlayerLocal(String path) {
     _remoteErrorMessage = null;
     _remoteAudioLoading = true;
@@ -150,6 +180,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       ..play();
   }
 
+  //if downloaded
   Future<String> _getFile(String url) async {
     final task = await FlutterDownloader.loadTasksWithRawQuery(
         query: "SELECT * FROM task WHERE url = '$url' AND status = 3");
@@ -160,6 +191,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return 'NotDownload';
   }
 
+  //get local audio file
   ByteData getAudio(String path) {
     File audioFile = File(path);
     Uint8List audio = audioFile.readAsBytesSync();
@@ -378,8 +410,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-                height: 100.0,
-                padding: EdgeInsets.all(30),
+                height: 80.0,
+                padding: EdgeInsets.all(20),
                 alignment: Alignment.center,
                 child: (_title.length > 10)
                     ? Marquee(
@@ -404,7 +436,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       ),
               ),
               Container(
-                padding: EdgeInsets.only(left: 40, right: 40, top: 20),
+                padding: EdgeInsets.only(left: 30, right: 30),
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: Colors.blue[100],
@@ -513,6 +545,44 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   ],
                 ),
               ),
+              Spacer(),
+              Container(
+                  height: 50.0,
+                  margin: EdgeInsets.symmetric(vertical: 10.0),
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                          child: Container(
+                            height: 30.0,
+                            width: 30.0,
+                            color: Colors.white,
+                            child: _loadDir
+                                ? Image.file(
+                                    File("$_imagePath/$_feedtitle.png"))
+                                : Center(),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _gotoEpisode(),
+                          child: Icon(Icons.info),
+                        ),
+                      ),
+                    ],
+                  ))
             ]),
       );
   Widget _miniPanel() => Container(
