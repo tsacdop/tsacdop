@@ -14,10 +14,6 @@ jobs:
           name: Run Flutter doctor
           command: flutter doctor
 
-      - run:
-          name: Run the application tests
-          command: flutter test
-     
       - run: echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
       - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
 
