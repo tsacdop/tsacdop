@@ -370,138 +370,150 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget _expandedPanel() => Container(
-          height: 300,
-          color: Colors.grey[100],
-          padding: EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(30),
-                  alignment: Alignment.center,
-                  child: (_title.length > 50)
-                      ? Marquee(
-                          text: _title,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 35),
-                          scrollAxis: Axis.horizontal,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          blankSpace: 30.0,
-                          velocity: 50.0,
-                          pauseAfterRound: Duration(seconds: 1),
-                          startPadding: 30.0,
-                          accelerationDuration: Duration(seconds: 1),
-                          accelerationCurve: Curves.linear,
-                          decelerationDuration: Duration(milliseconds: 500),
-                          decelerationCurve: Curves.easeOut,
-                        )
-                      : Text(
-                          _title,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
-                        ),
+        height: 300,
+        color: Colors.grey[100],
+        padding: EdgeInsets.symmetric(horizontal: 10.0),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                height: 100.0,
+                padding: EdgeInsets.all(30),
+                alignment: Alignment.center,
+                child: (_title.length > 10)
+                    ? Marquee(
+                        text: _title,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                        scrollAxis: Axis.horizontal,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        blankSpace: 30.0,
+                        velocity: 50.0,
+                        pauseAfterRound: Duration(seconds: 1),
+                        startPadding: 30.0,
+                        accelerationDuration: Duration(seconds: 1),
+                        accelerationCurve: Curves.linear,
+                        decelerationDuration: Duration(milliseconds: 500),
+                        decelerationCurve: Curves.easeOut,
+                      )
+                    : Text(
+                        _title,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 40, right: 40, top: 20),
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: Colors.blue[100],
+                    inactiveTrackColor: Colors.grey[300],
+                    trackHeight: 3.0,
+                    thumbColor: Colors.blue[400],
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                    overlayColor: Colors.blue.withAlpha(32),
+                    overlayShape: RoundSliderOverlayShape(overlayRadius: 14.0),
+                  ),
+                  child: Slider(
+                      value: _seekSliderValue,
+                      onChanged: (double val) {
+                        setState(() => _seekSliderValue = val);
+                        final double positionSeconds =
+                            val * _backgroundAudioDurationSeconds;
+                        _backgroundAudio.seek(positionSeconds);
+                        AudioSystem.instance
+                            .setPlaybackState(true, positionSeconds);
+                      }),
                 ),
-                Container(
-                  padding: EdgeInsets.only(left: 40, right: 40, top: 20),
-                  child: SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.blue[100],
-                      inactiveTrackColor: Colors.grey[300],
-                      trackHeight: 3.0,
-                      thumbColor: Colors.blue[400],
-                      thumbShape:
-                          RoundSliderThumbShape(enabledThumbRadius: 6.0),
-                      overlayColor: Colors.blue.withAlpha(32),
-                      overlayShape:
-                          RoundSliderOverlayShape(overlayRadius: 14.0),
+              ),
+              Container(
+                height: 20.0,
+                padding: EdgeInsets.symmetric(horizontal: 50.0),
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      _stringForSeconds(_backgroundAudioPositionSeconds) ?? '',
+                      style: TextStyle(fontSize: 10),
                     ),
-                    child: Slider(
-                        value: _seekSliderValue,
-                        onChanged: (double val) {
-                          setState(() => _seekSliderValue = val);
-                          final double positionSeconds =
-                              val * _backgroundAudioDurationSeconds;
-                          _backgroundAudio.seek(positionSeconds);
-                          AudioSystem.instance
-                              .setPlaybackState(true, positionSeconds);
-                        }),
-                  ),
-                ),
-                Container(
-                  height: 20.0,
-                  padding: EdgeInsets.symmetric(horizontal: 50.0),
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        _stringForSeconds(_backgroundAudioPositionSeconds) ??
-                            '',
-                        style: TextStyle(fontSize: 10),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: _remoteErrorMessage != null
+                            ? Text(_remoteErrorMessage,
+                                style: const TextStyle(
+                                    color: const Color(0xFFFF0000)))
+                            : Text(
+                                _remoteAudioLoading ? 'Buffring...' : '',
+                                style: TextStyle(color: Colors.blue),
+                              ),
                       ),
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: _remoteErrorMessage != null
-                              ? Text(_remoteErrorMessage,
-                                  style: const TextStyle(
-                                      color: const Color(0xFFFF0000)))
-                              : Text(
-                                  _remoteAudioLoading ? 'Buffring...' : '',
-                                  style: TextStyle(color: Colors.blue),
-                                ),
-                        ),
-                      ),
-                      Text(
-                        _stringForSeconds(_backgroundAudioDurationSeconds) ??
-                            '',
-                        style: TextStyle(fontSize: 10),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                        padding: EdgeInsets.symmetric(horizontal: 30.0),
-                        onPressed: _backgroundAudioPlaying
-                            ? () => _forwardBackgroundAudio(-10)
-                            : null,
-                        iconSize: 32.0,
-                        icon: Icon(Icons.replay_10),
-                        color: Colors.black),
-                    _backgroundAudioPlaying
-                        ? IconButton(
-                            padding: EdgeInsets.symmetric(horizontal: 30.0),
-                            onPressed: _backgroundAudioPlaying
-                                ? () {
-                                    _pauseBackgroundAudio();
-                                  }
-                                : null,
-                            iconSize: 40.0,
-                            icon: Icon(Icons.pause_circle_filled),
-                            color: Colors.black)
-                        : IconButton(
-                            padding: EdgeInsets.symmetric(horizontal: 30.0),
-                            onPressed: _backgroundAudioPlaying
-                                ? null
-                                : () {
-                                    _resumeBackgroundAudio();
-                                  },
-                            iconSize: 40.0,
-                            icon: Icon(Icons.play_circle_filled),
-                            color: Colors.black),
-                    IconButton(
-                        padding: EdgeInsets.symmetric(horizontal: 30.0),
-                        onPressed: _backgroundAudioPlaying
-                            ? () => _forwardBackgroundAudio(30)
-                            : null,
-                        iconSize: 32.0,
-                        icon: Icon(Icons.forward_30),
-                        color: Colors.black),
+                    ),
+                    Text(
+                      _stringForSeconds(_backgroundAudioDurationSeconds) ?? '',
+                      style: TextStyle(fontSize: 10),
+                    ),
                   ],
                 ),
-              ]),
+              ),
+              Container(
+                height: 100,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: IconButton(
+                          padding: EdgeInsets.symmetric(horizontal: 30.0),
+                          onPressed: _backgroundAudioPlaying
+                              ? () => _forwardBackgroundAudio(-10)
+                              : null,
+                          iconSize: 32.0,
+                          icon: Icon(Icons.replay_10),
+                          color: Colors.black),
+                    ),
+                    _backgroundAudioPlaying
+                        ? Material(
+                            color: Colors.transparent,
+                            child: IconButton(
+                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                onPressed: _backgroundAudioPlaying
+                                    ? () {
+                                        _pauseBackgroundAudio();
+                                      }
+                                    : null,
+                                iconSize: 40.0,
+                                icon: Icon(Icons.pause_circle_filled),
+                                color: Colors.black),
+                          )
+                        : Material(
+                            color: Colors.transparent,
+                            child: IconButton(
+                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                onPressed: _backgroundAudioPlaying
+                                    ? null
+                                    : () {
+                                        _resumeBackgroundAudio();
+                                      },
+                                iconSize: 40.0,
+                                icon: Icon(Icons.play_circle_filled),
+                                color: Colors.black),
+                          ),
+                    Material(
+                      color: Colors.transparent,
+                      child: IconButton(
+                          padding: EdgeInsets.symmetric(horizontal: 30.0),
+                          onPressed: _backgroundAudioPlaying
+                              ? () => _forwardBackgroundAudio(30)
+                              : null,
+                          iconSize: 32.0,
+                          icon: Icon(Icons.forward_30),
+                          color: Colors.black),
+                    ),
+                  ],
+                ),
+              ),
+            ]),
       );
   Widget _miniPanel() => Container(
         height: 60,
@@ -524,12 +536,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
+                    alignment: Alignment.centerLeft,
                     width: 220,
                     child: (_title.length > 30)
                         ? Marquee(
                             text: _title,
                             style: TextStyle(fontWeight: FontWeight.bold),
-                            scrollAxis: Axis.horizontal,
+                            scrollAxis: Axis.vertical,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             blankSpace: 30.0,
                             velocity: 50.0,
@@ -543,25 +556,32 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         : Text(
                             _title,
                             style: TextStyle(fontWeight: FontWeight.bold),
+                            maxLines: 2,
                           ),
                   ),
                   Spacer(),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Row(
-                      children: <Widget>[
-                        Text(
-                          _stringForSeconds(_backgroundAudioDurationSeconds -
-                                  _backgroundAudioPositionSeconds) ??
-                              '',
-                          style: TextStyle(color: _c),
-                        ),
-                        Text(
-                          '  Left',
-                          style: TextStyle(color: _c),
-                        ),
-                      ],
-                    ),
+                    child: _remoteAudioLoading
+                        ? Text(
+                            'Buffring...',
+                            style: TextStyle(color: Colors.blue),
+                          )
+                        : Row(
+                            children: <Widget>[
+                              Text(
+                                _stringForSeconds(
+                                        _backgroundAudioDurationSeconds -
+                                            _backgroundAudioPositionSeconds) ??
+                                    '',
+                                style: TextStyle(color: _c),
+                              ),
+                              Text(
+                                '  Left',
+                                style: TextStyle(color: _c),
+                              ),
+                            ],
+                          ),
                   ),
                   Row(
                     mainAxisSize: MainAxisSize.min,

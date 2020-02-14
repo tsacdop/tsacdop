@@ -170,19 +170,22 @@ class _PodcastPreviewState extends State<PodcastPreview> {
               Text(widget.podcastLocal.title,
                   style: TextStyle(fontWeight: FontWeight.bold, color: _c)),
               Spacer(),
-              IconButton(
-                icon: Icon(Icons.arrow_forward),
-                splashColor: Colors.transparent,
-                tooltip: 'See All',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    SlideLeftRoute(
-                        page: PodcastDetail(
-                      podcastLocal: widget.podcastLocal,
-                    )),
-                  );
-                },
+              Material(
+                color: Colors.transparent,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_forward),
+                  splashColor: Colors.transparent,
+                  tooltip: 'See All',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      SlideLeftRoute(
+                          page: PodcastDetail(
+                        podcastLocal: widget.podcastLocal,
+                      )),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -228,7 +231,7 @@ class ShowEpisode extends StatelessWidget {
                       ScaleRoute(
                           page: EpisodeDetail(
                         episodeItem: podcast[index],
-                        heroTag: 'scroll', 
+                        heroTag: 'scroll',
                         //unique hero tag
                       )),
                     );

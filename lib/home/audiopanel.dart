@@ -20,7 +20,6 @@ class _AudioPanelState extends State<AudioPanel>
 
   @override
   void initState() {
-    super.initState();
     initSize = minSize;
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 100))
@@ -29,6 +28,7 @@ class _AudioPanelState extends State<AudioPanel>
           });
     _animation =
         Tween<double>(begin: initSize, end: initSize).animate(_controller);
+    super.initState();
   }
 
   @override
@@ -39,63 +39,81 @@ class _AudioPanelState extends State<AudioPanel>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onVerticalDragStart: (event) => _start(event),
-      onVerticalDragUpdate: (event) => _update(event),
-      onVerticalDragEnd: (event) => _end(),
-      child: Container(
-        height: (_animation.value >= maxSize)
-            ? maxSize
-            : (_animation.value <= minSize) ? minSize : _animation.value,
-        child: _animation.value < minSize + 30
-            ? Opacity(
-                opacity: _animation.value > minSize
-                    ? (minSize + 30 - _animation.value) / 40
-                    : 1,
-                child: Container(
-                  child: widget.miniPanel,
-                ),
-              )
-            : Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  boxShadow: [
-                    
-                    BoxShadow(
-                      color: Colors.grey[400].withOpacity(0.8),
-                      spreadRadius: 3,
-                      blurRadius: 6,
-                      offset: Offset(0, -1),
-                    )
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  child: Opacity(
-                    opacity: _animation.value < (maxSize - 50)
-                        ? (_animation.value - minSize) /
-                            (maxSize - minSize - 50)
-                        : 1,
-                    child: Container(
-                      height: maxSize,
-                      child: widget.expandedPanel,
-                    ),
+    return Stack(children: <Widget>[
+      Container(
+        child: (_animation.value > minSize + 30)
+            ? Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => _backToMini(),
+                  child: Container(
+                    color: Colors.white.withOpacity(0.5),
                   ),
                 ),
-              ),
+              )
+            : Center(),
       ),
-    );
+      Container(
+        alignment: Alignment.bottomCenter,
+        child: GestureDetector(
+          onVerticalDragStart: (event) => _start(event),
+          onVerticalDragUpdate: (event) => _update(event),
+          onVerticalDragEnd: (event) => _end(),
+          child: Container(
+            height: (_animation.value >= maxSize)
+                ? maxSize
+                : (_animation.value <= minSize) ? minSize : _animation.value,
+            child: _animation.value < minSize + 30
+                ? Container(
+                    color: Colors.grey[100],
+                    child: Opacity(
+                      opacity: _animation.value > minSize
+                          ? (minSize + 30 - _animation.value) / 40
+                          : 1,
+                      child: Container(
+                        child: widget.miniPanel,
+                      ),
+                    ),
+                  )
+                : Container(
+                   color: Colors.grey[100], 
+                    child: SingleChildScrollView(
+                      child: Opacity(
+                        opacity: _animation.value < (maxSize - 50)
+                            ? (_animation.value - minSize) /
+                                (maxSize - minSize - 50)
+                            : 1,
+                        child: Container(
+                          height: maxSize,
+                          child: widget.expandedPanel,
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  _backToMini() {
+    setState(() {
+      _animation =
+          Tween<double>(begin: initSize, end: minSize).animate(_controller);
+      initSize = minSize;
+    });
+    _controller.forward();
   }
 
   _start(DragStartDetails event) {
-    print(event.localPosition.dy);
     setState(() {
       _startdy = event.localPosition.dy;
+      _animation =
+          Tween<double>(begin: initSize, end: initSize).animate(_controller);
     });
     _controller.forward();
   }
 
   _update(DragUpdateDetails event) {
-    print(event.localPosition.dy);
     setState(() {
       _move = _startdy - event.localPosition.dy;
       _animation = Tween<double>(begin: initSize, end: initSize + _move)
@@ -105,7 +123,6 @@ class _AudioPanelState extends State<AudioPanel>
   }
 
   _end() {
-    print(_animation.value);
     if (_animation.value >= (maxSize + minSize) / 2.2 &&
         _animation.value < maxSize) {
       setState(() {

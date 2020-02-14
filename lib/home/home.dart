@@ -16,6 +16,11 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  @override 
+  void initState(){
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: <Widget>[
@@ -53,7 +58,6 @@ class _HomeState extends State<Home> {
         ],
       ),
       Container(
-        alignment: Alignment.bottomCenter,
         child: PlayerWidget()),
     ]);
   }
