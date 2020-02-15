@@ -217,28 +217,33 @@ class _DownloadButtonState extends State<DownloadButton> {
           ),
           () => _requestDownload(task));
     } else if (task.status == DownloadTaskStatus.running) {
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            _pauseDownload(task);
-          },
-          child: Container(
-            height: 50.0,
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(horizontal: 18.0),
-            child: SizedBox(
-              height: 18,
-              width: 18,
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.grey[500],
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                value: task.progress / 100,
+      return Row(
+        children: <Widget>[
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                _pauseDownload(task);
+              },
+              child: Container(
+                height: 50.0,
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 18.0),
+                child: SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.grey[500],
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    value: task.progress / 100,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+          Text('${task.progress}%', style: TextStyle(color: Colors.blue,),),
+        ],
       );
     } else if (task.status == DownloadTaskStatus.paused) {
       return Material(

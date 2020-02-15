@@ -258,12 +258,18 @@ class _MenuBarState extends State<MenuBar> {
                       color: Colors.grey[700],
                     ),
                     () => saveLiked(widget.episodeItem.title))
-                : _buttonOnMenu(
-                    Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                    ),
-                    () => setUnliked(widget.episodeItem.title)),
+                : Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      LoveOpen(),
+                      _buttonOnMenu(
+                          Icon(
+                            Icons.favorite,
+                            color: Colors.red,
+                          ),
+                          () => setUnliked(widget.episodeItem.title)),
+                    ],
+                  ),
             DownloadButton(episodeBrief: widget.episodeItem),
             _buttonOnMenu(Icon(Icons.playlist_add, color: Colors.grey[700]),
                 () {
@@ -285,7 +291,8 @@ class _MenuBarState extends State<MenuBar> {
                         urlChange.audioUrl = widget.episodeItem.enclosureUrl;
                         urlChange.rssTitle = widget.episodeItem.title;
                         urlChange.feedTitle = widget.episodeItem.feedTitle;
-                        urlChange.primaryColor = widget.episodeItem.primaryColor;
+                        urlChange.primaryColor =
+                            widget.episodeItem.primaryColor;
                         print('Playing');
                       },
                       child: Container(
@@ -354,8 +361,8 @@ class _LineLoaderState extends State<LineLoader>
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 500));
+    controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     animation = Tween(begin: 0.0, end: 1.0).animate(controller)
       ..addListener(() {
         if (mounted)
@@ -537,6 +544,137 @@ class _ImageRotateState extends State<ImageRotate>
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class LovePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Path _path = Path();
+    Paint _paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+
+    _path.moveTo(size.width / 2, size.height / 6);
+    _path.quadraticBezierTo(size.width / 4, 0, size.width / 8, size.height / 6);
+    _path.quadraticBezierTo(
+        0, size.height / 3, size.width / 8, size.height * 0.55);
+    _path.quadraticBezierTo(
+        size.width / 4, size.height * 0.8, size.width / 2, size.height);
+    _path.quadraticBezierTo(size.width * 0.75, size.height * 0.8,
+        size.width * 7 / 8, size.height * 0.55);
+    _path.quadraticBezierTo(
+        size.width, size.height / 3, size.width * 7 / 8, size.height / 6);
+    _path.quadraticBezierTo(
+        size.width * 3 / 4, 0, size.width / 2, size.height / 6);
+
+    canvas.drawPath(_path, _paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class LoveOpen extends StatefulWidget {
+  @override
+  _LoveOpenState createState() => _LoveOpenState();
+}
+
+class _LoveOpenState extends State<LoveOpen>
+    with SingleTickerProviderStateMixin {
+  Animation _animationA;
+  Animation _animationB;
+  AnimationController _controller;
+
+  var rect = RelativeRect.fromLTRB(100, 100, 100, 100);
+  var rectend = RelativeRect.fromLTRB(0, 0, 0, 0);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
+
+    _animationA = Tween(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        if (mounted) setState(() {});
+      });
+    _animationB =
+        RelativeRectTween(begin: rect, end: rectend).animate(_controller)
+          ..addListener(() {
+            if (mounted) setState(() {});
+          });
+
+    _controller.forward();
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _controller.reset();
+      } 
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _littleHeart(double scale, double value, double angle) => Container(
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.only(left: value),
+        child: ScaleTransition(
+          scale: _animationA,
+          alignment: Alignment.center,
+          child: Transform.rotate(
+               angle: angle,
+                      child: SizedBox(
+              height: 5 * scale,
+              width: 6 * scale,
+              child: CustomPaint(
+                painter: LovePainter(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 50,
+      height: 50,
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              _littleHeart(1.3, 10, -math.pi/6),
+              _littleHeart(1.5, 3, 0),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              _littleHeart(0.8, 6, math.pi*1.5), 
+              _littleHeart(1.2, 24, math.pi/2),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              _littleHeart(1, 8,-math.pi*0.7),
+              _littleHeart(1.3, 8, math.pi),
+              _littleHeart(1.1, 3, -math.pi*1.2)
+            ],
+          ),
+        ],
       ),
     );
   }

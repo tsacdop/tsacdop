@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:provider/provider.dart';
 
 import 'package:tsacdop/podcasts/podcastlist.dart';
 import 'hometab.dart';
