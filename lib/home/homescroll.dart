@@ -41,6 +41,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
 
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
     return FutureBuilder<List<PodcastLocal>>(
       future: getPodcastLocal(),
       builder: (context, snapshot) {
@@ -76,7 +77,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                   ),
                 ),
                 Container(
-                  height: 195,
+                  height: (_width-20)/3+40,
                   margin: EdgeInsets.only(left: 10, right: 10),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -203,6 +204,7 @@ class ShowEpisode extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       primary: false,
@@ -266,10 +268,10 @@ class ShowEpisode extends StatelessWidget {
                                 child: Container(
                                   child: ClipRRect(
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(15.0)),
+                                        BorderRadius.all(Radius.circular(_width/36)),
                                     child: Container(
-                                      height: 30.0,
-                                      width: 30.0,
+                                      height: _width/18,
+                                      width: _width/18,
                                       child: Image.file(File(
                                           "$path/${podcastLocal.title}.png")),
                                     ),
@@ -288,9 +290,10 @@ class ShowEpisode extends StatelessWidget {
                             child: Text(
                               podcast[index].title,
                               style: TextStyle(
-                                fontSize: 15.0,
+                                fontSize: _width/32,
                               ),
                               maxLines: 4,
+                              overflow: TextOverflow.fade,
                             ),
                           ),
                         ),
@@ -301,6 +304,7 @@ class ShowEpisode extends StatelessWidget {
                             child: Text(
                               podcast[index].pubDate.substring(4, 16),
                               style: TextStyle(
+                                fontSize: _width/35,
                                 color: _c,
                                 fontStyle: FontStyle.italic,
                               ),

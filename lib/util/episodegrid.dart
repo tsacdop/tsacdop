@@ -25,14 +25,16 @@ class EpisodeGrid extends StatelessWidget {
       this.showNumber,
       this.heroTag})
       : super(key: key);
-
+  double _width;
   Future<String> _getPath() async {
+    print(_width);
     var dir = await getApplicationDocumentsDirectory();
     return dir.path;
   }
 
   @override
   Widget build(BuildContext context) {
+    _width = MediaQuery.of(context).size.width;
     return FutureBuilder(
         future: _getPath(),
         builder: (context, snapshot) {
@@ -102,10 +104,10 @@ class EpisodeGrid extends StatelessWidget {
                                         child: Container(
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.all(
-                                                Radius.circular(15.0)),
+                                                Radius.circular(_width/32)),
                                             child: Container(
-                                              height: 30.0,
-                                              width: 30.0,
+                                              height: _width/16,
+                                              width: _width/16,
                                               child: Image.file(File(
                                                   "${snapshot.data}/${podcast[index].feedTitle}.png")),
                                             ),
@@ -121,7 +123,7 @@ class EpisodeGrid extends StatelessWidget {
                                                     .toString(),
                                                 style: GoogleFonts.teko(
                                                   textStyle: TextStyle(
-                                                    fontSize: 20.0,
+                                                    fontSize: _width/24,
                                                     color: _c,
                                                   ),
                                                 ),
@@ -139,9 +141,10 @@ class EpisodeGrid extends StatelessWidget {
                                     child: Text(
                                       podcast[index].title,
                                       style: TextStyle(
-                                        fontSize: 15.0,
+                                        fontSize: _width/32,
                                       ),
                                       maxLines: 4,
+                                      overflow: TextOverflow.fade,
                                     ),
                                   ),
                                 ),
@@ -156,6 +159,7 @@ class EpisodeGrid extends StatelessWidget {
                                               .pubDate
                                               .substring(4, 16),
                                           style: TextStyle(
+                                            fontSize: _width/35,
                                               color: _c,
                                               fontStyle: FontStyle.italic),
                                         ),

@@ -417,7 +417,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     ? Marquee(
                         text: _title,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
+                            fontWeight: FontWeight.bold, fontSize: 18),
                         scrollAxis: Axis.horizontal,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         blankSpace: 30.0,
@@ -585,129 +585,138 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   ))
             ]),
       );
-  Widget _miniPanel() => Container(
+  Widget _miniPanel(double width) => Container(
         height: 60,
         color: Colors.grey[100],
-        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: <
-            Widget>[
-          SizedBox(
-              height: 2,
-              child: LinearProgressIndicator(
-                value: _seekSliderValue,
-                backgroundColor: Colors.grey[100],
-                valueColor: AlwaysStoppedAnimation<Color>(_c),
-              )),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.only(left: 30.0, right: 10.0),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    width: 220,
-                    child: (_title.length > 30)
-                        ? Marquee(
-                            text: _title,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            scrollAxis: Axis.vertical,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            blankSpace: 30.0,
-                            velocity: 50.0,
-                            pauseAfterRound: Duration(seconds: 1),
-                            startPadding: 30.0,
-                            accelerationDuration: Duration(seconds: 1),
-                            accelerationCurve: Curves.linear,
-                            decelerationDuration: Duration(milliseconds: 500),
-                            decelerationCurve: Curves.easeOut,
-                          )
-                        : Text(
-                            _title,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            maxLines: 2,
-                          ),
-                  ),
-                  Spacer(),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    child: _remoteAudioLoading
-                        ? Text(
-                            'Buffring...',
-                            style: TextStyle(color: Colors.blue),
-                          )
-                        : Row(
-                            children: <Widget>[
-                              Text(
-                                _stringForSeconds(
-                                        _backgroundAudioDurationSeconds -
-                                            _backgroundAudioPositionSeconds) ??
-                                    '',
-                                style: TextStyle(color: _c),
-                              ),
-                              Text(
-                                '  Left',
-                                style: TextStyle(color: _c),
-                              ),
-                            ],
-                          ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _backgroundAudioPlaying
-                          ? Material(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                  height: 2,
+                  child: LinearProgressIndicator(
+                    value: _seekSliderValue,
+                    backgroundColor: Colors.grey[100],
+                    valueColor: AlwaysStoppedAnimation<Color>(_c),
+                  )),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(left: 15, right: 10),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 4,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          alignment: Alignment.centerLeft,
+                          child: (_title.length > 55)
+                              ? Marquee(
+                                  text: _title,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  scrollAxis: Axis.vertical,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  blankSpace: 30.0,
+                                  velocity: 50.0,
+                                  pauseAfterRound: Duration(seconds: 1),
+                                  startPadding: 30.0,
+                                  accelerationDuration: Duration(seconds: 1),
+                                  accelerationCurve: Curves.linear,
+                                  decelerationDuration:
+                                      Duration(milliseconds: 500),
+                                  decelerationCurve: Curves.easeOut,
+                                )
+                              : Text(
+                                  _title,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  maxLines: 2,
+                                ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          alignment: Alignment.center,
+                          child: _remoteAudioLoading
+                              ? Text(
+                                  'Buffring...',
+                                  style: TextStyle(color: Colors.blue),
+                                )
+                              : Row(
+                                  children: <Widget>[
+                                    Text(
+                                      _stringForSeconds(
+                                              _backgroundAudioDurationSeconds -
+                                                  _backgroundAudioPositionSeconds)  ??
+                                          '',
+                                      style: TextStyle(color: _c),
+                                    ),
+                                    Text(
+                                      '  Left',
+                                      style: TextStyle(color: _c),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _backgroundAudioPlaying
+                                ? Material(
+                                    color: Colors.transparent,
+                                    child: IconButton(
+                                        onPressed: _backgroundAudioPlaying
+                                            ? () {
+                                                _pauseBackgroundAudio();
+                                              }
+                                            : null,
+                                        iconSize: 25.0,
+                                        icon: Icon(Icons.pause_circle_filled),
+                                        color: Colors.black),
+                                  )
+                                : Material(
+                                    color: Colors.transparent,
+                                    child: IconButton(
+                                        onPressed: _backgroundAudioPlaying
+                                            ? null
+                                            : () {
+                                                _resumeBackgroundAudio();
+                                              },
+                                        iconSize: 25.0,
+                                        icon: Icon(Icons.play_circle_filled),
+                                        color: Colors.black),
+                                  ),
+                            Material(
                               color: Colors.transparent,
                               child: IconButton(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 10.0),
                                   onPressed: _backgroundAudioPlaying
-                                      ? () {
-                                          _pauseBackgroundAudio();
-                                        }
+                                      ? () => _forwardBackgroundAudio(30)
                                       : null,
-                                  iconSize: 28.0,
-                                  icon: Icon(Icons.pause_circle_filled),
-                                  color: Colors.black),
-                            )
-                          : Material(
-                              color: Colors.transparent,
-                              child: IconButton(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 10.0),
-                                  onPressed: _backgroundAudioPlaying
-                                      ? null
-                                      : () {
-                                          _resumeBackgroundAudio();
-                                        },
                                   iconSize: 25.0,
-                                  icon: Icon(Icons.play_circle_filled),
+                                  icon: Icon(Icons.forward_30),
                                   color: Colors.black),
                             ),
-                      Material(
-                        color: Colors.transparent,
-                        child: IconButton(
-                            padding: EdgeInsets.symmetric(horizontal: 10.0),
-                            onPressed: _backgroundAudioPlaying
-                                ? () => _forwardBackgroundAudio(30)
-                                : null,
-                            iconSize: 25.0,
-                            icon: Icon(Icons.forward_30),
-                            color: Colors.black),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ]),
+            ]),
       );
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
     return !_isLoading
         ? Center()
-        : AudioPanel(miniPanel: _miniPanel(), expandedPanel: _expandedPanel());
+        : AudioPanel(
+            miniPanel: _miniPanel(_width), expandedPanel: _expandedPanel());
   }
 }

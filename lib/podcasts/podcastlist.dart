@@ -97,6 +97,7 @@ class _PodcastListState extends State<PodcastList> {
 
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
     return Container(
       color: Colors.grey[100],
       child: FutureBuilder<List<PodcastLocal>>(
@@ -142,10 +143,10 @@ class _PodcastListState extends State<PodcastList> {
                                 ),
                                 ClipRRect(
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(60.0)),
+                                      BorderRadius.all(Radius.circular(_width/8)),
                                   child: Container(
-                                    height: 120.0,
-                                    width: 120.0,
+                                    height: _width/4,
+                                    width: _width/4,
                                     child: Image.file(File(
                                         "${dir.path}/${snapshot.data[index].title}.png")),
                                   ),
