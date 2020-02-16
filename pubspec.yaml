@@ -49,7 +49,6 @@ dev_dependencies:
   intl: ^0.16.1
   url_launcher: ^5.4.1
   image: ^2.1.4
-  rubber: ^0.4.0
 
 
 # For information on the generic Dart part of this file, see the

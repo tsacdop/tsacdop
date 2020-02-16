@@ -91,7 +91,7 @@ class _PodcastListState extends State<PodcastList> {
   Future<List<PodcastLocal>> getPodcastLocal() async {
     dir = await getApplicationDocumentsDirectory();
     var dbHelper = DBHelper();
-    Future<List<PodcastLocal>> podcastList = dbHelper.getPodcastLocal();
+    var podcastList = await dbHelper.getPodcastLocal();
     return podcastList;
   }
 

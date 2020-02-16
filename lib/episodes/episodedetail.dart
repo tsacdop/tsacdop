@@ -293,14 +293,16 @@ class _MenuBarState extends State<MenuBar> {
                         urlChange.feedTitle = widget.episodeItem.feedTitle;
                         urlChange.primaryColor =
                             widget.episodeItem.primaryColor;
-                        print('Playing');
                       },
                       child: Container(
+                        alignment: Alignment.center,
                         height: 50.0,
                         padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Icon(
-                          Icons.play_arrow,
-                          color: Colors.grey[700],
+                        child:Row(
+                          children: <Widget>[
+                            Text('Play Now', style: TextStyle(color: Colors.blue, fontSize: 15, fontWeight: FontWeight.bold,)),
+                            Icon(Icons.play_arrow, color: Colors.blue,),
+                          ],
                         ),
                       ),
                     ),
@@ -308,13 +310,13 @@ class _MenuBarState extends State<MenuBar> {
                 : (widget.episodeItem.title == urlchange.title &&
                         urlchange.audioState == AudioState.play)
                     ? Container(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: EdgeInsets.only(right: 30),
                         child: SizedBox(
-                            width: 15, height: 15, child: WaveLoader()))
+                            width: 20, height: 15, child: WaveLoader()))
                     : Container(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: EdgeInsets.only(right: 30),
                         child: SizedBox(
-                          width: 15,
+                          width: 20,
                           height: 15,
                           child: LineLoader(),
                         ),

@@ -27,19 +27,38 @@ class DBHelper {
   void _onCreate(Database db, int version) async {
     await db.execute(
         """CREATE TABLE PodcastLocal(id INTEGER PRIMARY KEY,title TEXT, 
-        imageUrl TEXT,rssUrl TEXT UNIQUE,primaryColor TEXT,author TEXT, description TEXT, add_date INTEGER)""");
+        imageUrl TEXT,rssUrl TEXT UNIQUE,primaryColor TEXT,author TEXT, 
+        description TEXT, add_date INTEGER, order_id INTEGER default 0)""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
         description TEXT, feed_title TEXT, feed_link TEXT, milliseconds INTEGER, 
         duration INTEGER DEFAULT 0, explicit INTEGER DEFAULT 0, liked INTEGER DEFAULT 0, 
         downloaded TEXT DEFAULT 'ND', download_date INTEGER DEFAULT 0)""");
+    await db.execute(
+        """CREATE TABLE Setting(id INTEGER PRIMARY KEY, setting TEXT, setting_value INTEGER DEFAULT 0)""");
+    await db
+        .execute("""INSERT INTO Setting (setting) VALUES('podcasts_order') """);
   }
 
   Future<List<PodcastLocal>> getPodcastLocal() async {
     var dbClient = await database;
-    List<Map> list = await dbClient.rawQuery(
+    //query podcasts order setting
+    List<Map> setting = await dbClient.rawQuery("SELECT setting_value FROM Setting WHERE setting = 'podcasts_order'");
+    int podcastsOrder = setting.first['setting_value'];
+    List<Map> list;
+    if (podcastsOrder == 0)
+     { list = await dbClient.rawQuery(
         'SELECT title, imageUrl, rssUrl, primaryColor, author FROM PodcastLocal ORDER BY add_date DESC');
+        print('Get podcasts list Ordered by 0');}
+    else if (podcastsOrder == 1)
+     { list = await dbClient.rawQuery(
+        'SELECT title, imageUrl, rssUrl, primaryColor, author FROM PodcastLocal ORDER BY add_date');}
+    else if (podcastsOrder ==2)
+     { list = await dbClient.rawQuery(
+        'SELECT title, imageUrl, rssUrl, primaryColor, author FROM PodcastLocal ORDER BY order_id');
+        print('Get podcasts list Ordered by 2');}
+   
     List<PodcastLocal> podcastLocal = List();
     for (int i = 0; i < list.length; i++) {
       podcastLocal.add(PodcastLocal(
@@ -50,12 +69,32 @@ class DBHelper {
         list[i]['author'],
       ));
     }
-    print(podcastLocal.length);
     return podcastLocal;
   }
 
+  //save podcast order adter user save 
+  saveOrder(List<PodcastLocal> podcastList) async {
+    var dbClient = await database;
+    for (int i = 0; i < podcastList.length; i++){
+      await dbClient.rawUpdate(
+          "UPDATE OR IGNORE PodcastLocal SET order_id = ? WHERE title = ?",
+          [i, podcastList[i].title]);
+      print(podcastList[i].title);
+    }
+    await dbClient.rawUpdate(
+        "UPDATE OR IGNORE Setting SET setting_value = 2 WHERE setting = 'podcasts_order' ");
+    print('Changed order');
+  }
+  
+  updateOrderSetting(int value) async{
+      var dbClient = await database;
+      await dbClient.rawUpdate(
+        "UPDATE OR IGNORE Setting SET setting_value = ? WHERE setting = 'podcasts_order'",[value]);
+      
+  }
+
   Future savePodcastLocal(PodcastLocal podcastLocal) async {
-    print('save');
+    print('podcast saved in sqllite');
     int _milliseconds = DateTime.now().millisecondsSinceEpoch;
     var dbClient = await database;
     await dbClient.transaction((txn) async {
@@ -106,10 +145,10 @@ class DBHelper {
     try {
       date = DateFormat('EEE, dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);
     } catch (e) {
-      try{
-      print('e');
-      date = DateFormat('dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);}
-      catch(e) {
+      try {
+        print('e');
+        date = DateFormat('dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);
+      } catch (e) {
         print('e');
         date = DateTime(0);
       }
@@ -162,9 +201,9 @@ class DBHelper {
         final _pubDate = _p.items[i].pubDate;
         final _date = _parsePubDate(_pubDate);
         final _milliseconds = _date.millisecondsSinceEpoch;
-        (_p.items[i].itunes.duration != null )
-        ? _duration = _p.items[i].itunes.duration.inMinutes
-        :  _duration = 0;
+        (_p.items[i].itunes.duration != null)
+            ? _duration = _p.items[i].itunes.duration.inMinutes
+            : _duration = 0;
         final _explicit = getExplicit(_p.items[i].itunes.explicit);
         if (_p.items[i].enclosure.url != null) {
           await dbClient.transaction((txn) {
@@ -213,8 +252,7 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit']));
     }
-    print(episodes.length);
-    print(title);
+    print('Loaded' + title);
     return episodes;
   }
 
@@ -242,7 +280,6 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit']));
     }
-    print(episodes.length);
     print(title);
     return episodes;
   }
@@ -297,7 +334,6 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit']));
     }
-    print(episodes.length);
     return episodes;
   }
 
@@ -323,7 +359,6 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit']));
     }
-    print(episodes.length);
     return episodes;
   }
 
@@ -383,7 +418,6 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit']));
     }
-    print(episodes.length);
     return episodes;
   }
 
@@ -403,26 +437,26 @@ class DBHelper {
     return description;
   }
 
-    Future<EpisodeBrief> getRssItemWithUrl(String url) async {
+  Future<EpisodeBrief> getRssItemWithUrl(String url) async {
     var dbClient = await database;
     EpisodeBrief episode;
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.pubDate, 
         E.feed_title, E.duration, E.explicit, E.liked, E.downloaded, P.imageUrl, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_title = P.title 
-        WHERE E.enclosure_url = ?""",[url]);
-      episode = EpisodeBrief(
-          list.first['title'],
-          list.first['enclosure_url'],
-          list.first['enclosure_length'],
-          list.first['pubDate'],
-          list.first['feed_title'],
-          list.first['imageUrl'],
-          list.first['primaryColor'],
-          list.first['liked'],
-          list.first['downloaded'],
-          list.first['duration'],
-          list.first['explicit']);
+        WHERE E.enclosure_url = ?""", [url]);
+    episode = EpisodeBrief(
+        list.first['title'],
+        list.first['enclosure_url'],
+        list.first['enclosure_length'],
+        list.first['pubDate'],
+        list.first['feed_title'],
+        list.first['imageUrl'],
+        list.first['primaryColor'],
+        list.first['liked'],
+        list.first['downloaded'],
+        list.first['duration'],
+        list.first['explicit']);
     return episode;
   }
 }

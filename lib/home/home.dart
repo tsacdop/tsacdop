@@ -7,6 +7,7 @@ import 'package:tsacdop/home/appbar/importompl.dart';
 import 'package:tsacdop/home/audio_player.dart';
 import 'homescroll.dart';
 import 'package:tsacdop/util/pageroute.dart';
+import 'package:tsacdop/podcasts/podcastmanage.dart';
 
 class Home extends StatelessWidget {
 
@@ -26,7 +27,7 @@ class Home extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  SlideLeftRoute(page: Podcast()),
+                  SlideLeftRoute(page: PodcastManage()),
                 );
               },
               child: Container(

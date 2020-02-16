@@ -14,7 +14,9 @@ import 'package:tsacdop/class/sqflite_localpodcast.dart';
 
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
+import 'package:tsacdop/podcasts/podcastlist.dart';
 import 'package:tsacdop/util/pageroute.dart';
+import 'package:tsacdop/class/settingstate.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -23,31 +25,50 @@ class ScrollPodcasts extends StatefulWidget {
 
 class _ScrollPodcastsState extends State<ScrollPodcasts> {
   var dir;
-  Future<List<PodcastLocal>> getPodcastLocal() async {
+  bool _loading;
+  List<PodcastLocal> podcastList;
+
+  getPodcastLocal() async {
     var dbHelper = DBHelper();
-    List<PodcastLocal> podcastList = await dbHelper.getPodcastLocal();
+    podcastList = await dbHelper.getPodcastLocal();
     dir = await getApplicationDocumentsDirectory();
-    return podcastList;
+    setState(() {
+      _loading = true;
+    });
   }
 
   ImportState importState;
-  didChangeDependencies() {
+  Setting subscribeUpdate;
+
+  @override
+  void didChangeDependencies() {
     super.didChangeDependencies();
     final importState = Provider.of<ImportOmpl>(context).importState;
-    if (importState == ImportState.complete) {
-      setState(() {});
+    final subscribeUpdate = Provider.of<SettingState>(context).subscribeupdate;
+    if (importState == ImportState.complete ||
+        subscribeUpdate == Setting.start) {
+      setState(() {
+         getPodcastLocal();
+      });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loading = false;
+    getPodcastLocal();
   }
 
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    return FutureBuilder<List<PodcastLocal>>(
-      future: getPodcastLocal(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return DefaultTabController(
-            length: snapshot.data.length,
+    return !_loading
+        ? Container(
+            height: (_width - 20) / 3 + 110,
+          )
+        : DefaultTabController(
+            length: podcastList.length,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -61,7 +82,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                     indicator:
                         CircleTabIndicator(color: Colors.blue, radius: 3),
                     isScrollable: true,
-                    tabs: snapshot.data.map<Tab>((PodcastLocal podcastLocal) {
+                    tabs: podcastList.map<Tab>((PodcastLocal podcastLocal) {
                       return Tab(
                         child: ClipRRect(
                           borderRadius: BorderRadius.all(Radius.circular(25.0)),
@@ -77,14 +98,14 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                   ),
                 ),
                 Container(
-                  height: (_width-20)/3+40,
+                  height: (_width - 20) / 3 + 40,
                   margin: EdgeInsets.only(left: 10, right: 10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                   ),
                   child: TabBarView(
                     children:
-                        snapshot.data.map<Widget>((PodcastLocal podcastLocal) {
+                        podcastList.map<Widget>((PodcastLocal podcastLocal) {
                       return Container(
                         decoration: BoxDecoration(color: Colors.grey[100]),
                         margin: EdgeInsets.symmetric(horizontal: 5.0),
@@ -99,12 +120,6 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
               ],
             ),
           );
-        }
-        return Container(
-          height: 250.0,
-        );
-      },
-    );
   }
 }
 
@@ -267,11 +282,11 @@ class ShowEpisode extends StatelessWidget {
                                 tag: podcast[index].enclosureUrl + 'scroll',
                                 child: Container(
                                   child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(_width/36)),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(_width / 36)),
                                     child: Container(
-                                      height: _width/18,
-                                      width: _width/18,
+                                      height: _width / 18,
+                                      width: _width / 18,
                                       child: Image.file(File(
                                           "$path/${podcastLocal.title}.png")),
                                     ),
@@ -290,7 +305,7 @@ class ShowEpisode extends StatelessWidget {
                             child: Text(
                               podcast[index].title,
                               style: TextStyle(
-                                fontSize: _width/32,
+                                fontSize: _width / 32,
                               ),
                               maxLines: 4,
                               overflow: TextOverflow.fade,
@@ -304,7 +319,7 @@ class ShowEpisode extends StatelessWidget {
                             child: Text(
                               podcast[index].pubDate.substring(4, 16),
                               style: TextStyle(
-                                fontSize: _width/35,
+                                fontSize: _width / 35,
                                 color: _c,
                                 fontStyle: FontStyle.italic,
                               ),

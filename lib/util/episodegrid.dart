@@ -27,7 +27,6 @@ class EpisodeGrid extends StatelessWidget {
       : super(key: key);
   double _width;
   Future<String> _getPath() async {
-    print(_width);
     var dir = await getApplicationDocumentsDirectory();
     return dir.path;
   }

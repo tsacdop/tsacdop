@@ -90,7 +90,7 @@ class PopupMenu extends StatelessWidget {
 
         await dbHelper.savePodcastRss(_p);
       } catch (e) {
-        print(e);
+        importOmpl.importState = ImportState.error;
       }
     }
 
@@ -114,7 +114,6 @@ class PopupMenu extends StatelessWidget {
         importOmpl.importState = ImportState.stop;
         print('Import fisnished');
       } catch (e) {
-        print(e);
         importOmpl.importState = ImportState.error;
       }
     }

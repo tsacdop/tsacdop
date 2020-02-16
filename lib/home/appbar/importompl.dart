@@ -46,7 +46,8 @@ class Import extends StatelessWidget {
                               height: 20.0,
                               padding: EdgeInsets.symmetric(horizontal: 20.0),
                               alignment: Alignment.centerLeft,
-                              child: Text('Fetch data:  ' + (importOmpl.rsstitle)),
+                              child:
+                                  Text('Fetch data:  ' + (importOmpl.rsstitle)),
                             ),
                           ],
                         )
