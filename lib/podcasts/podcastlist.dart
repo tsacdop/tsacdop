@@ -5,11 +5,10 @@ import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/class/podcast_group.dart';
 
 import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/settingstate.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
 import 'package:tsacdop/util/pageroute.dart';
@@ -23,12 +22,6 @@ class AboutPodcast extends StatefulWidget {
 }
 
 class _AboutPodcastState extends State<AboutPodcast> {
-  void _unSubscribe(String t) async {
-    var dbHelper = DBHelper();
-    dbHelper.delPodcastLocal(t);
-    print('Unsubscribe');
-  }
-
   String _description;
   bool _load;
 
@@ -50,14 +43,13 @@ class _AboutPodcastState extends State<AboutPodcast> {
 
   @override
   Widget build(BuildContext context) {
-    var _settingState = Provider.of<SettingState>(context);
+    var _groupList = Provider.of<GroupList>(context, listen: false);
     return AlertDialog(
       actions: <Widget>[
         FlatButton(
           padding: EdgeInsets.all(10.0),
           onPressed: () {
-            _unSubscribe(widget.podcastLocal.title);
-            _settingState.subscribeUpdate = Update.justupdate;
+            _groupList.removePodcast(widget.podcastLocal.id);
             Navigator.of(context).pop();
           },
           color: Colors.grey[200],
@@ -91,10 +83,8 @@ class PodcastList extends StatefulWidget {
 }
 
 class _PodcastListState extends State<PodcastList> {
-  var dir;
 
   Future<List<PodcastLocal>> getPodcastLocal() async {
-    dir = await getApplicationDocumentsDirectory();
     var dbHelper = DBHelper();
     var podcastList = await dbHelper.getPodcastLocalAll();
     return podcastList;
@@ -160,7 +150,7 @@ class _PodcastListState extends State<PodcastList> {
                                       height: _width / 4,
                                       width: _width / 4,
                                       child: Image.file(File(
-                                          "${dir.path}/${snapshot.data[index].title}.png")),
+                                          "${snapshot.data[index].imagePath}")),
                                     ),
                                   ),
                                   Container(

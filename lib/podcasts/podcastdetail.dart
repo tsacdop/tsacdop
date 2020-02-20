@@ -1,13 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'dart:async';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
-import 'package:tsacdop/webfeed/webfeed.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, this.podcastLocal}) : super(key: key);
@@ -22,16 +20,23 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
-    final response = await Dio().get(podcastLocal.rssUrl);
-    var _p = RssFeed.parse(response.data);
-    final result = await dbHelper.savePodcastRss(_p);
-    if (result == 0 && mounted) setState(() {});
+    final result = await dbHelper.updatePodcastRss(podcastLocal);
+    result == 0 ? 
+    Fluttertoast.showToast(
+      msg: 'No Update',
+      gravity: ToastGravity.BOTTOM,
+    )
+    : Fluttertoast.showToast(
+      msg: 'Updated $result Episodes',
+      gravity: ToastGravity.BOTTOM,
+    );
+    if(mounted) setState(() {});
   }
 
   Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await
-        dbHelper.getRssItem(podcastLocal.title);
+        dbHelper.getRssItem(podcastLocal.id);
     return episodes;
   }
 

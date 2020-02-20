@@ -9,12 +9,12 @@ import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/class/searchpodcast.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/settingstate.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/home/home.dart';
 import 'package:tsacdop/home/appbar/popupmenu.dart';
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 class _MyHomePageDelegate extends SearchDelegate<int> {
   static Future<List> getList(String searchText) async {
     String url =
-        "https://listennotes.p.mashape.com/api/v1/search?only_in=title&q=" +
+        "https://listennotes.p.mashape.com/api/v1/search?only_in=title%2Cdescription&q=" +
             searchText +
             "&sort_by_date=0&type=podcast";
     Response response = await Dio().get(url,
@@ -189,12 +189,14 @@ class SearchResult extends StatefulWidget {
 class _SearchResultState extends State<SearchResult> {
   bool _issubscribe;
   bool _adding;
+  bool _showDes;
 
   @override
   void initState() {
     super.initState();
     _issubscribe = false;
     _adding = false;
+    _showDes = false;
   }
 
   @override
@@ -212,92 +214,122 @@ class _SearchResultState extends State<SearchResult> {
 
   @override
   Widget build(BuildContext context) {
-    ImportOmpl importOmpl = Provider.of<ImportOmpl>(context);
-    var groupList = Provider.of<GroupList>(context);
-     var _settingState = Provider.of<SettingState>(context);
+    var importOmpl = Provider.of<ImportOmpl>(context, listen: false);
+    var groupList = Provider.of<GroupList>(context, listen: false);
     savePodcast(String rss) async {
       print(rss);
       if (mounted) setState(() => _adding = true);
 
       importOmpl.importState = ImportState.import;
-
+      try {
       Response response = await Dio().get(rss);
+      
+      String _realUrl = response.realUri.toString();
       if (mounted) setState(() => _issubscribe = true);
 
       var _p = RssFeed.parse(response.data);
 
       print(_p.title);
+
       var dir = await getApplicationDocumentsDirectory();
-      try {
+      
         Response<List<int>> imageResponse = await Dio().get<List<int>>(
             _p.itunes.image.href,
             options: Options(responseType: ResponseType.bytes));
 
         img.Image image = img.decodeImage(imageResponse.data);
         img.Image thumbnail = img.copyResize(image, width: 300);
-        File("${dir.path}/${_p.title}.png")
+        String _uuid = Uuid().v4();
+        File("${dir.path}/$_uuid.png")
           ..writeAsBytesSync(img.encodePng(thumbnail));
-
+        String _imagePath = "${dir.path}/$_uuid.png";
         String _primaryColor =
-            await getColor(File("${dir.path}/${_p.title}.png"));
+            await getColor(File("${dir.path}/$_uuid.png"));
         PodcastLocal podcastLocal = PodcastLocal(
-            _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
+            _p.title, _p.itunes.image.href, _realUrl, _primaryColor, _p.author, _uuid, _imagePath);
         podcastLocal.description = _p.description;
         groupList.subscribe(podcastLocal);
 
         importOmpl.importState = ImportState.parse;
         var dbHelper = DBHelper();
-        await dbHelper.savePodcastRss(_p);
+        await dbHelper.savePodcastRss(_p, _uuid);
 
         importOmpl.importState = ImportState.complete;
 
-        _settingState.subscribeUpdate = Update.backhome;
-
-        print('fatch data');
       } catch (e) {
         importOmpl.importState = ImportState.error;
         Fluttertoast.showToast(
           msg: 'Network error, Subscribe failed',
           gravity: ToastGravity.BOTTOM,
         );
+        await Future.delayed(Duration(seconds: 10));
+        importOmpl.importState = ImportState.stop;
       }
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.0),
-      child: ListTile(
-        leading: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-          child: Image.network(
-            widget.onlinePodcast.image,
-            height: 40.0,
-            width: 40.0,
-            fit: BoxFit.fitWidth,
-            alignment: Alignment.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+          ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: 30.0),
+            onTap: (){setState(() {
+              _showDes = !_showDes;
+            });},
+            leading: ClipRRect(
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              child: Image.network(
+                widget.onlinePodcast.image,
+                height: 40.0,
+                width: 40.0,
+                fit: BoxFit.fitWidth,
+                alignment: Alignment.center,
+              ),
+            ),
+            title: Text(widget.onlinePodcast.title),
+            subtitle: Text(widget.onlinePodcast.publisher),
+            trailing: 
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                 Icon(_showDes ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                 Padding(padding: EdgeInsets.only(right: 10.0)),
+                 !_issubscribe
+                ? !_adding
+                    ? OutlineButton(
+                        child:
+                            Text('Subscribe', style: TextStyle(color: Colors.blue)),
+                        onPressed: () {
+                          importOmpl.rssTitle = widget.onlinePodcast.title;
+                          savePodcast(widget.onlinePodcast.rss);
+                        })
+                    : OutlineButton(
+                        child: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation(Colors.blue),
+                            )),
+                        onPressed: () {},
+                      )
+                : OutlineButton(child: Text('Subscribe'), onPressed: (){}),
+              ],
+            ),
           ),
-        ),
-        title: Text(widget.onlinePodcast.title),
-        subtitle: Text(widget.onlinePodcast.publisher),
-        trailing: !_issubscribe
-            ? !_adding
-                ? OutlineButton(
-                    child:
-                        Text('Subscribe', style: TextStyle(color: Colors.blue)),
-                    onPressed: () {
-                      importOmpl.rssTitle = widget.onlinePodcast.title;
-                      savePodcast(widget.onlinePodcast.rss);
-                    })
-                : OutlineButton(
-                    child: SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(Colors.blue),
-                        )),
-                    onPressed: () {},
-                  )
-            : OutlineButton(child: Text('Subscribe'), onPressed: null),
+          _showDes ? Container(
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            margin: EdgeInsets.only(left: 70, right: 50),
+            padding: EdgeInsets.all(10.0),
+            child: Text(widget.onlinePodcast.description, maxLines: 3, overflow: TextOverflow.ellipsis,),
+          ) : Center(),
+        ],
       ),
     );
   }

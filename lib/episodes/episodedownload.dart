@@ -8,7 +8,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tsacdop/class/downloadstate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
@@ -237,7 +236,7 @@ class _DownloadButtonState extends State<DownloadButton> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            (task.progress > 0) ? _pauseDownload(task) : null;
+            if(task.progress > 0) _pauseDownload(task);
           },
           child: Container(
             height: 50.0,

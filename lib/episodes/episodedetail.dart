@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
@@ -15,8 +14,7 @@ import 'episodedownload.dart';
 class EpisodeDetail extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
-  final String path;
-  EpisodeDetail({this.episodeItem, this.heroTag, this.path, Key key})
+  EpisodeDetail({this.episodeItem, this.heroTag, Key key})
       : super(key: key);
 
   @override
@@ -28,11 +26,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   double downloadProgress;
   bool _loaddes;
   String path;
-  Future getSDescription(String title) async {
-    var dir = await getApplicationDocumentsDirectory();
-    path = dir.path;
+  Future getSDescription(String url) async {
     var dbHelper = DBHelper();
-    widget.episodeItem.description = await dbHelper.getDescription(title);
+    widget.episodeItem.description = await dbHelper.getDescription(url);
     if (mounted)
       setState(() {
         _loaddes = true;
@@ -51,7 +47,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   void initState() {
     super.initState();
     _loaddes = false;
-    getSDescription(widget.episodeItem.title);
+    getSDescription(widget.episodeItem.enclosureUrl);
   }
 
   @override
@@ -167,7 +163,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
             MenuBar(
                 episodeItem: widget.episodeItem,
                 heroTag: widget.heroTag,
-                path: widget.path),
+                ),
           ],
         ),
       ),
@@ -176,10 +172,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 }
 
 class MenuBar extends StatefulWidget {
-  final String path;
   final EpisodeBrief episodeItem;
   final String heroTag;
-  MenuBar({this.episodeItem, this.heroTag, this.path, Key key})
+  MenuBar({this.episodeItem, this.heroTag, Key key})
       : super(key: key);
   @override
   _MenuBarState createState() => _MenuBarState();
@@ -189,16 +184,16 @@ class _MenuBarState extends State<MenuBar> {
   bool _liked;
   int _like;
 
-  Future<int> saveLiked(String title) async {
+  Future<int> saveLiked(String url) async {
     var dbHelper = DBHelper();
-    int result = await dbHelper.setLiked(title);
+    int result = await dbHelper.setLiked(url);
     if (result == 1 && mounted) setState(() => _liked = true);
     return result;
   }
 
-  Future<int> setUnliked(String title) async {
+  Future<int> setUnliked(String url) async {
     var dbHelper = DBHelper();
-    int result = await dbHelper.setUniked(title);
+    int result = await dbHelper.setUniked(url);
     if (result == 1 && mounted)
       setState(() {
         _liked = false;
@@ -227,9 +222,8 @@ class _MenuBarState extends State<MenuBar> {
 
   @override
   Widget build(BuildContext context) {
-    final urlChange = Provider.of<Urlchange>(context);
-    return Consumer<Urlchange>(
-      builder: (context, urlchange, _) => Container(
+    final audioplay = Provider.of<AudioPlay>(context);
+    return  Container(
         height: 50.0,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -239,11 +233,11 @@ class _MenuBarState extends State<MenuBar> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            (widget.episodeItem.title == urlChange.title &&
-                    urlChange.audioState == AudioState.play)
+            (widget.episodeItem.title == audioplay.episode?.title &&
+                    audioplay.audioState == AudioState.play)
                 ? ImageRotate(
                     title: widget.episodeItem.feedTitle,
-                    path: widget.path,
+                    path: widget.episodeItem.imagePath,
                   )
                 : Hero(
                     tag: widget.episodeItem.enclosureUrl + widget.heroTag,
@@ -256,7 +250,7 @@ class _MenuBarState extends State<MenuBar> {
                           width: 30.0,
                           color: Colors.white,
                           child: Image.file(File(
-                              "${widget.path}/${widget.episodeItem.feedTitle}.png")),
+                              "${widget.episodeItem.imagePath}")),
                         ),
                       ),
                     ),
@@ -267,7 +261,7 @@ class _MenuBarState extends State<MenuBar> {
                       Icons.favorite_border,
                       color: Colors.grey[700],
                     ),
-                    () => saveLiked(widget.episodeItem.title))
+                    () => saveLiked(widget.episodeItem.enclosureUrl))
                 : Stack(
                     alignment: Alignment.center,
                     children: <Widget>[
@@ -277,7 +271,7 @@ class _MenuBarState extends State<MenuBar> {
                             Icons.favorite,
                             color: Colors.red,
                           ),
-                          () => setUnliked(widget.episodeItem.title)),
+                          () => setUnliked(widget.episodeItem.enclosureUrl)),
                     ],
                   ),
             DownloadButton(episodeBrief: widget.episodeItem),
@@ -290,7 +284,7 @@ class _MenuBarState extends State<MenuBar> {
               /*TODO*/
             }),
             Spacer(),
-            (widget.episodeItem.title != urlchange.title)
+            (widget.episodeItem.title != audioplay.episode?.title)
                 ? Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -298,11 +292,7 @@ class _MenuBarState extends State<MenuBar> {
                           topRight: Radius.circular(5.0),
                           bottomRight: Radius.circular(5.0)),
                       onTap: () {
-                        urlChange.audioUrl = widget.episodeItem.enclosureUrl;
-                        urlChange.rssTitle = widget.episodeItem.title;
-                        urlChange.feedTitle = widget.episodeItem.feedTitle;
-                        urlChange.primaryColor =
-                            widget.episodeItem.primaryColor;
+                       audioplay.episodeLoad = widget.episodeItem;
                       },
                       child: Container(
                         alignment: Alignment.center,
@@ -325,8 +315,8 @@ class _MenuBarState extends State<MenuBar> {
                       ),
                     ),
                   )
-                : (widget.episodeItem.title == urlchange.title &&
-                        urlchange.audioState == AudioState.play)
+                : (widget.episodeItem.title == audioplay.episode?.title &&
+                        audioplay.audioState == AudioState.play)
                     ? Container(
                         padding: EdgeInsets.only(right: 30),
                         child: SizedBox(
@@ -341,7 +331,6 @@ class _MenuBarState extends State<MenuBar> {
                       ),
           ],
         ),
-      ),
     );
   }
 }
@@ -560,7 +549,7 @@ class _ImageRotateState extends State<ImageRotate>
             height: 30.0,
             width: 30.0,
             color: Colors.white,
-            child: Image.file(File("${widget.path}/${widget.title}.png")),
+            child: Image.file(File("${widget.path}")),
           ),
         ),
       ),
@@ -614,7 +603,7 @@ class _LoveOpenState extends State<LoveOpen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 100),
+      duration: Duration(milliseconds: 300),
     );
 
     _animationA = Tween(begin: 0.0, end: 1.0).animate(_controller)

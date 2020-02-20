@@ -4,13 +4,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/class/settingstate.dart';
+import 'package:tsacdop/class/podcast_group.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'package:image/image.dart' as img;
+import 'package:uuid/uuid.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'about.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
@@ -43,22 +45,19 @@ class PopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ImportOmpl importOmpl = Provider.of<ImportOmpl>(context);
-    var _settingState = Provider.of<SettingState>(context);
-    _refreshAll() async {
+    ImportOmpl importOmpl = Provider.of<ImportOmpl>(context, listen: false);
+    GroupList groupList = Provider.of<GroupList>(context, listen: false);
+    _refreshAll() async{
       var dbHelper = DBHelper();
       List<PodcastLocal> podcastList =
           await dbHelper.getPodcastLocalAll();
       await Future.forEach(podcastList, (podcastLocal) async {
         importOmpl.rssTitle = podcastLocal.title;
         importOmpl.importState = ImportState.parse;
-        Response response = await Dio().get(podcastLocal.rssUrl);
-        var _p = RssFeed.parse(response.data);
-        await dbHelper.savePodcastRss(_p);
+        await dbHelper.updatePodcastRss(podcastLocal);
         print('Refresh ' + podcastLocal.title);
       });
       importOmpl.importState = ImportState.complete;
-      importOmpl.importState = ImportState.stop;
     }
 
     saveOmpl(String rss) async {
@@ -75,28 +74,34 @@ class PopupMenu extends StatelessWidget {
             options: Options(responseType: ResponseType.bytes));
         img.Image image = img.decodeImage(imageResponse.data);
         img.Image thumbnail = img.copyResize(image, width: 300);
-        File("${dir.path}/${_p.title}.png")
+        String _uuid = Uuid().v4();
+        String _realUrl = response.realUri.toString();
+        File("${dir.path}/$_uuid.png")
           ..writeAsBytesSync(img.encodePng(thumbnail));
-
+        String _imagePath = "${dir.path}/$_uuid.png";
         String _primaryColor =
-            await getColor(File("${dir.path}/${_p.title}.png"));
+            await getColor(File("${dir.path}/$_uuid.png"));
 
         PodcastLocal podcastLocal = PodcastLocal(
-            _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
+            _p.title, _p.itunes.image.href, _realUrl, _primaryColor, _p.author, _uuid, _imagePath);
 
         podcastLocal.description = _p.description;
         
-        await dbHelper.savePodcastLocal(podcastLocal);
+        groupList.subscribe(podcastLocal);
 
         importOmpl.importState = ImportState.parse;
 
-        await dbHelper.savePodcastRss(_p);
+        await dbHelper.savePodcastRss(_p, _uuid);
 
         importOmpl.importState = ImportState.complete;
-
-        _settingState.subscribeUpdate = Update.backhome;
       } catch (e) {
         importOmpl.importState = ImportState.error;
+        Fluttertoast.showToast(
+          msg: 'Network error, Subscribe failed',
+          gravity: ToastGravity.BOTTOM,
+        );
+        await Future.delayed(Duration(seconds: 10));
+        importOmpl.importState = ImportState.stop;
       }
     }
 

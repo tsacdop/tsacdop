@@ -171,7 +171,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     child: !_loaded
                                         ? CircularProgressIndicator()
                                         : Image.file(File(
-                                            "$dir/${podcastLocal.title}.png")),
+                                            "${podcastLocal.imagePath}")),
                                   ),
                                 ),
                               );
@@ -216,13 +216,11 @@ class PodcastPreview extends StatefulWidget {
 }
 
 class _PodcastPreviewState extends State<PodcastPreview> {
-  String path;
+
   Future<List<EpisodeBrief>> _getRssItemTop(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
-    var dir = await getApplicationDocumentsDirectory();
-    path = dir.path;
     Future<List<EpisodeBrief>> episodes =
-        dbHelper.getRssItemTop(podcastLocal.title);
+        dbHelper.getRssItemTop(podcastLocal.id);
     return episodes;
   }
 
@@ -254,7 +252,6 @@ class _PodcastPreviewState extends State<PodcastPreview> {
                     ? ShowEpisode(
                         podcast: snapshot.data,
                         podcastLocal: widget.podcastLocal,
-                        path: path,
                       )
                     : Center(child: CircularProgressIndicator());
               },
@@ -299,8 +296,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
 class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> podcast;
   final PodcastLocal podcastLocal;
-  final String path;
-  ShowEpisode({Key key, this.podcast, this.podcastLocal, this.path})
+  ShowEpisode({Key key, this.podcast, this.podcastLocal})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -335,7 +331,6 @@ class ShowEpisode extends StatelessWidget {
                         episodeItem: podcast[index],
                         heroTag: 'scroll',
                         //unique hero tag
-                        path: path,
                       )),
                     );
                   },
@@ -374,7 +369,7 @@ class ShowEpisode extends StatelessWidget {
                                       height: _width / 18,
                                       width: _width / 18,
                                       child: Image.file(File(
-                                          "$path/${podcastLocal.title}.png")),
+                                          "${podcastLocal.imagePath}")),
                                     ),
                                   ),
                                 ),

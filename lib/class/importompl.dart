@@ -15,7 +15,9 @@ class ImportOmpl extends ChangeNotifier{
   ImportState get importState => _importState;
   
   set importState(ImportState state){
-    _importState = state;
+    if(_importState != state)
+    {_importState = state;
     notifyListeners();
+    }
   }
 }

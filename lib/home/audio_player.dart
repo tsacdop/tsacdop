@@ -9,13 +9,11 @@ import 'package:audiofileplayer/audio_system.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/home/audiopanel.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/pageroute.dart';
 
 final Logger _logger = Logger('audiofileplayer');
@@ -40,13 +38,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String _remoteErrorMessage;
   double _seekSliderValue = 0.0;
   String url;
-  String _title;
-  String _feedtitle;
   bool _isLoading;
-  String _primaryColor;
   Color _c;
-  String _imagePath;
-  bool _loadDir;
+  EpisodeBrief episode;
 
   @override
   void initState() {
@@ -54,27 +48,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     AudioSystem.instance.addMediaEventListener(_mediaEventListener);
     _isLoading = false;
     _remoteAudioLoading = true;
-    _loadDir = false;
-    getPath();
-  }
-
-  //get path to load podcast image in expanded panel
-  getPath() async {
-    var dir = await getApplicationDocumentsDirectory();
-    _imagePath = dir.path;
-    setState(() {
-      _loadDir = true;
-    });
   }
 
   //open episoddetail page
   _gotoEpisode() async {
-    var dbHelper = DBHelper();
-    EpisodeBrief episodeBrief = await dbHelper.getRssItemWithUrl(url);
     Navigator.push(
       context,
       SlideUptRoute(
-          page: EpisodeDetail(episodeItem: episodeBrief, heroTag: 'playpanel')),
+          page: EpisodeDetail(episodeItem: episode, heroTag: 'playpanel')),
     );
   }
 
@@ -82,7 +63,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void _initbackgroundAudioPlayer(String url) {
     _remoteErrorMessage = null;
     _remoteAudioLoading = true;
-    Provider.of<Urlchange>(context, listen: false).audioState = AudioState.load;
+    Provider.of<AudioPlay>(context, listen: false).audioState = AudioState.load;
 
     if (_backgroundAudioPlaying == true)
     { _backgroundAudio?.pause();
@@ -93,7 +74,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           setState(() {
             _backgroundAudioDurationSeconds = durationSeconds;
             _remoteAudioLoading = false;
-            Provider.of<Urlchange>(context, listen: false).audioState =
+            Provider.of<AudioPlay>(context, listen: false).audioState =
                 AudioState.play;
           });
           _setNotification();
@@ -117,13 +98,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               _backgroundAudio = null;
               _backgroundAudioPlaying = false;
               _remoteAudioLoading = false;
-              Provider.of<Urlchange>(context, listen: false).audioState =
+              Provider.of<AudioPlay>(context, listen: false).audioState =
                   AudioState.error;
             }),
         onComplete: () => setState(() {
               _backgroundAudioPlaying = false;
               _remoteAudioLoading = false;
-              Provider.of<Urlchange>(context, listen: false).audioState =
+              Provider.of<AudioPlay>(context, listen: false).audioState =
                   AudioState.complete;
             }),
         looping: false,
@@ -136,7 +117,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _remoteErrorMessage = null;
     _remoteAudioLoading = true;
     ByteData audio = getAudio(path);
-    Provider.of<Urlchange>(context, listen: false).audioState = AudioState.load;
+    Provider.of<AudioPlay>(context, listen: false).audioState = AudioState.load;
     if (_backgroundAudioPlaying == true) 
     {_backgroundAudio?.pause();
     AudioSystem.instance.stopBackgroundDisplay();}
@@ -148,7 +129,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             _remoteAudioLoading = false;
           });
           _setNotification();
-          Provider.of<Urlchange>(context, listen: false).audioState =
+          Provider.of<AudioPlay>(context, listen: false).audioState =
               AudioState.play;
         },
         onPosition: (double positionSeconds) {
@@ -170,13 +151,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               _backgroundAudio = null;
               _backgroundAudioPlaying = false;
               _remoteAudioLoading = false;
-              Provider.of<Urlchange>(context, listen: false).audioState =
+              Provider.of<AudioPlay>(context, listen: false).audioState =
                   AudioState.error;
             }),
         onComplete: () => setState(() {
               _backgroundAudioPlaying = false;
               _remoteAudioLoading = false;
-              Provider.of<Urlchange>(context, listen: false).audioState =
+              Provider.of<AudioPlay>(context, listen: false).audioState =
                   AudioState.complete;
             }),
         looping: false,
@@ -205,14 +186,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final url = Provider.of<Urlchange>(context).audiourl;
+
+    final url = Provider.of<AudioPlay>(context).episode?.enclosureUrl;
     if (url != this.url) {
       setState(() {
         this.url = url;
-        _title = Provider.of<Urlchange>(context).title;
-        _feedtitle = Provider.of<Urlchange>(context).feedtitle;
-        _primaryColor = Provider.of<Urlchange>(context).primarycolor;
-        var color = json.decode(_primaryColor);
+        episode = Provider.of<AudioPlay>(context).episode;
+        var color = json.decode(episode?.primaryColor);
         (color[0] > 200 && color[1] > 200 && color[2] > 200)
             ? _c = Color.fromRGBO(
                 (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
@@ -290,13 +270,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       'playnow', likeButtonId, 'ic_stat_play_circle_filled');
 
   Future<void> _setNotification() async {
-    var dir = await getApplicationDocumentsDirectory();
     final Uint8List imageBytes =
-        File('${dir.path}/$_feedtitle.png').readAsBytesSync();
+        File('${episode.imagePath}').readAsBytesSync();
     AudioSystem.instance.setMetadata(AudioMetadata(
-        title: _title,
-        artist: _feedtitle,
-        album: _feedtitle,
+        title: episode.title,
+        artist:episode.feedTitle,
+        album: episode.feedTitle,
         genre: "Podcast",
         durationSeconds: _backgroundAudioDurationSeconds,
         artBytes: imageBytes));
@@ -327,16 +306,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _backgroundAudio.resume();
     setState(() {
       _backgroundAudioPlaying = true;
-      Provider.of<Urlchange>(context, listen: false).audioState =
+      Provider.of<AudioPlay>(context, listen: false).audioState =
           AudioState.play;
     });
-    var dir = await getApplicationDocumentsDirectory();
     final Uint8List imageBytes =
-        File('${dir.path}/$_feedtitle.png').readAsBytesSync();
+        File('${episode.imagePath}').readAsBytesSync();
     AudioSystem.instance.setMetadata(AudioMetadata(
-        title: _title,
-        artist: _feedtitle,
-        album: _feedtitle,
+        title: episode.title,
+        artist: episode.feedTitle,
+        album: episode.feedTitle,
         genre: "Podcast",
         durationSeconds: _backgroundAudioDurationSeconds,
         artBytes: imageBytes));
@@ -369,7 +347,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _backgroundAudio.pause();
     setState(() {
       _backgroundAudioPlaying = false;
-      Provider.of<Urlchange>(context, listen: false).audioState =
+      Provider.of<AudioPlay>(context, listen: false).audioState =
           AudioState.pause;
     });
 
@@ -417,9 +395,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 height: 80.0,
                 padding: EdgeInsets.all(20),
                 alignment: Alignment.center,
-                child: (_title.length > 10)
+                child: (episode.title.length > 10)
                     ? Marquee(
-                        text: _title,
+                        text: episode.title,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 18),
                         scrollAxis: Axis.horizontal,
@@ -434,7 +412,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         decelerationCurve: Curves.easeOut,
                       )
                     : Text(
-                        _title,
+                        episode.title,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20),
                       ),
@@ -570,10 +548,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             height: 30.0,
                             width: 30.0,
                             color: Colors.white,
-                            child: _loadDir
-                                ? Image.file(
-                                    File("$_imagePath/$_feedtitle.png"))
-                                : Center(),
+                            child: Image.file(
+                                    File("${episode.imagePath}"))
                           ),
                         ),
                       ),
@@ -615,9 +591,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 5),
                           alignment: Alignment.centerLeft,
-                          child: (_title.length > 55)
+                          child: (episode.title.length > 55)
                               ? Marquee(
-                                  text: _title,
+                                  text: episode.title,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                   scrollAxis: Axis.vertical,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -632,7 +608,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                   decelerationCurve: Curves.easeOut,
                                 )
                               : Text(
-                                  _title,
+                                  episode.title,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                   maxLines: 2,
                                 ),

@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/home/appbar/addpodcast.dart';
 import 'package:tsacdop/class/audiostate.dart';
@@ -16,7 +13,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => Urlchange()),
+        ChangeNotifierProvider(create: (context) => AudioPlay()),
         ChangeNotifierProvider(create: (context) => ImportOmpl()),
         ChangeNotifierProvider(create: (context) => SettingState()),
         ChangeNotifierProvider(create: (context) => GroupList()),

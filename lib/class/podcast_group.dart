@@ -35,7 +35,7 @@ class PodcastGroup {
   final String name;
   final String id;
   final String color;
-  final List<String> podcastList;
+  List<String> podcastList;
 
   PodcastGroup(this.name,
       {this.color = '#000000', String id, List<String> podcastList})
@@ -45,7 +45,7 @@ class PodcastGroup {
   Future getPodcasts() async {
     var dbHelper = DBHelper();
     if (podcastList != []) {
-      _podcasts = await dbHelper.getPodcastLocal(podcastList, 0);
+      _podcasts = await dbHelper.getPodcastLocal(podcastList);
     }
   }
 
@@ -141,18 +141,38 @@ class GroupList extends ChangeNotifier {
     return result;
   }
 
-  changeGroup(String id, List<String> l) {
+  changeGroup(String id, List<String> list) async{
     _groups.forEach((group) {
       if (group.podcastList.contains(id)) {
         group.podcastList.remove(id);
       }
     });
-    l.forEach((s) {
-      _groups.forEach((group) {
+    await Future.forEach(list, (s) {
+      _groups.forEach((group) async{
         if (group.name == s) group.podcastList.add(id);
+        await group.getPodcasts();
       });
     });
-    notifyListeners();
     _saveGroup();
+    notifyListeners();
+  }
+
+  removePodcast(String id) async{
+    await Future.forEach(_groups, (group) async{
+      if (group.podcastList.contains(id)) {
+        group.podcastList.remove(id);
+        await group.getPodcasts();
+      }
+    });
+    _saveGroup();
+    await dbHelper.delPodcastLocal(id);
+   notifyListeners(); 
+  }
+
+  saveOrder(PodcastGroup group, List<PodcastLocal> podcasts) async{
+      group.podcastList = podcasts.map((e) => e.id).toList();
+      _saveGroup();
+      await group.getPodcasts();
+      notifyListeners();
   }
 }
