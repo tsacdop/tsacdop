@@ -25,7 +25,6 @@ class EpisodeGrid extends StatelessWidget {
       this.showNumber,
       this.heroTag})
       : super(key: key);
-  double _width;
   Future<String> _getPath() async {
     var dir = await getApplicationDocumentsDirectory();
     return dir.path;
@@ -33,7 +32,7 @@ class EpisodeGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _width = MediaQuery.of(context).size.width;
+    double _width = MediaQuery.of(context).size.width;
     return FutureBuilder(
         future: _getPath(),
         builder: (context, snapshot) {
@@ -67,7 +66,8 @@ class EpisodeGrid extends StatelessWidget {
                               ScaleRoute(
                                   page: EpisodeDetail(
                                       episodeItem: podcast[index],
-                                      heroTag: heroTag)),
+                                      heroTag: heroTag,
+                                      path: snapshot.data,)),
                             );
                           },
                           child: Container(

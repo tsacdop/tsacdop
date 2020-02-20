@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
 
 class MainTab extends StatefulWidget {

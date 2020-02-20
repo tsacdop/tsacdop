@@ -1,19 +1,13 @@
 import 'package:flutter/foundation.dart';
 
-enum Setting {start, stop}
+//two types podcast update, backhome nedd to back to default grooup.
+enum Update {backhome, justupdate}
 class SettingState extends ChangeNotifier{
-  Setting _subscribeupdate;
-  Setting get subscribeupdate => _subscribeupdate;
-  set subscribeUpdate(Setting s){
+  Update _subscribeupdate;
+  Update get subscribeupdate => _subscribeupdate;
+  set subscribeUpdate(Update s){
     _subscribeupdate = s;
     notifyListeners();
   }
-  Setting _themeupdate;
-  Setting get themeUpdate => _themeupdate;
-  set themeUpdate(Setting s){
-    _themeupdate = s;
-    notifyListeners();
-  }
-
 }
 

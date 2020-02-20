@@ -8,8 +8,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tsacdop/class/downloadstate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
 class DownloadButton extends StatefulWidget {
   final EpisodeBrief episodeBrief;
@@ -150,9 +151,9 @@ class _DownloadButtonState extends State<DownloadButton> {
     final tasks = await FlutterDownloader.loadTasks();
 
     _task = _TaskInfo(
-        name: widget.episodeBrief.title,
-        link: widget.episodeBrief.enclosureUrl);
-
+      name: widget.episodeBrief.title,
+      link: widget.episodeBrief.enclosureUrl,
+    );
     tasks?.forEach((task) {
       if (_task.link == task.url) {
         _task.taskId = task.taskId;
@@ -203,13 +204,28 @@ class _DownloadButtonState extends State<DownloadButton> {
 
   @override
   Widget build(BuildContext context) {
-    return _downloadButton(_task);
+    return _isLoading
+        ? Center()
+        : Row(
+            children: <Widget>[
+              _downloadButton(_task),
+              AnimatedContainer(
+                  duration: Duration(seconds: 1),
+                  decoration: BoxDecoration(
+                      color: Colors.cyan[300],
+                      borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                  height: 20.0,
+                  width:
+                      (_task.status == DownloadTaskStatus.running) ? 50.0 : 0,
+                  alignment: Alignment.center,
+                  child: Text('${_task.progress}%',
+                      style: TextStyle(color: Colors.white))),
+            ],
+          );
   }
 
   Widget _downloadButton(_TaskInfo task) {
-    if (_isLoading)
-      return Center();
-    else if (task.status == DownloadTaskStatus.undefined) {
+    if (task.status == DownloadTaskStatus.undefined) {
       return _buttonOnMenu(
           Icon(
             Icons.arrow_downward,
@@ -217,33 +233,28 @@ class _DownloadButtonState extends State<DownloadButton> {
           ),
           () => _requestDownload(task));
     } else if (task.status == DownloadTaskStatus.running) {
-      return Row(
-        children: <Widget>[
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                _pauseDownload(task);
-              },
-              child: Container(
-                height: 50.0,
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 18.0),
-                child: SizedBox(
-                  height: 18,
-                  width: 18,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.grey[500],
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                    value: task.progress / 100,
-                  ),
-                ),
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            (task.progress > 0) ? _pauseDownload(task) : null;
+          },
+          child: Container(
+            height: 50.0,
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(horizontal: 18.0),
+            child: SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.grey[500],
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan[300]),
+                value: task.progress / 100,
               ),
             ),
           ),
-          Text('${task.progress}%', style: TextStyle(color: Colors.blue,),),
-        ],
+        ),
       );
     } else if (task.status == DownloadTaskStatus.paused) {
       return Material(

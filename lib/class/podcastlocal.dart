@@ -1,4 +1,6 @@
 
+import 'package:uuid/uuid.dart';
+
 class PodcastLocal {
   final String title;
   final String imageUrl;
@@ -6,5 +8,7 @@ class PodcastLocal {
   final String author;
   String description;
   final String primaryColor;
-  PodcastLocal(this.title, this.imageUrl, this.rssUrl, this.primaryColor, this.author);
+  final String id; 
+  PodcastLocal(this.title, this.imageUrl, this.rssUrl, this.primaryColor, this.author,{String id}) : id = id ?? Uuid().v4();
 }
+

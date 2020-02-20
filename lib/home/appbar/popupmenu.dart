@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/class/settingstate.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +14,7 @@ import 'package:image/image.dart' as img;
 
 import 'about.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
 
@@ -43,10 +44,11 @@ class PopupMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ImportOmpl importOmpl = Provider.of<ImportOmpl>(context);
-
+    var _settingState = Provider.of<SettingState>(context);
     _refreshAll() async {
       var dbHelper = DBHelper();
-      List<PodcastLocal> podcastList = await dbHelper.getPodcastLocal();
+      List<PodcastLocal> podcastList =
+          await dbHelper.getPodcastLocalAll();
       await Future.forEach(podcastList, (podcastLocal) async {
         importOmpl.rssTitle = podcastLocal.title;
         importOmpl.importState = ImportState.parse;
@@ -83,12 +85,16 @@ class PopupMenu extends StatelessWidget {
             _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
 
         podcastLocal.description = _p.description;
-        print('_p.description');
+        
         await dbHelper.savePodcastLocal(podcastLocal);
 
         importOmpl.importState = ImportState.parse;
 
         await dbHelper.savePodcastRss(_p);
+
+        importOmpl.importState = ImportState.complete;
+
+        _settingState.subscribeUpdate = Update.backhome;
       } catch (e) {
         importOmpl.importState = ImportState.error;
       }
@@ -110,8 +116,6 @@ class PopupMenu extends StatelessWidget {
             print(total[i].text);
           }
         }
-        importOmpl.importState = ImportState.complete;
-        importOmpl.importState = ImportState.stop;
         print('Import fisnished');
       } catch (e) {
         importOmpl.importState = ImportState.error;

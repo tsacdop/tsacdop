@@ -11,9 +11,11 @@ import 'package:image/image.dart' as img;
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:tsacdop/class/importompl.dart';
+import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/class/searchpodcast.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/class/settingstate.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/home/home.dart';
 import 'package:tsacdop/home/appbar/popupmenu.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
@@ -211,7 +213,8 @@ class _SearchResultState extends State<SearchResult> {
   @override
   Widget build(BuildContext context) {
     ImportOmpl importOmpl = Provider.of<ImportOmpl>(context);
-
+    var groupList = Provider.of<GroupList>(context);
+     var _settingState = Provider.of<SettingState>(context);
     savePodcast(String rss) async {
       print(rss);
       if (mounted) setState(() => _adding = true);
@@ -240,17 +243,19 @@ class _SearchResultState extends State<SearchResult> {
         PodcastLocal podcastLocal = PodcastLocal(
             _p.title, _p.itunes.image.href, rss, _primaryColor, _p.author);
         podcastLocal.description = _p.description;
-        var dbHelper = DBHelper();
-        await dbHelper.savePodcastLocal(podcastLocal);
+        groupList.subscribe(podcastLocal);
 
         importOmpl.importState = ImportState.parse;
-
+        var dbHelper = DBHelper();
         await dbHelper.savePodcastRss(_p);
 
         importOmpl.importState = ImportState.complete;
-        importOmpl.importState = ImportState.stop;
+
+        _settingState.subscribeUpdate = Update.backhome;
+
         print('fatch data');
       } catch (e) {
+        importOmpl.importState = ImportState.error;
         Fluttertoast.showToast(
           msg: 'Network error, Subscribe failed',
           gravity: ToastGravity.BOTTOM,

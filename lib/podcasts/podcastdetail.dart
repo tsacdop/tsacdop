@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
 

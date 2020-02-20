@@ -45,7 +45,7 @@ class RssItunes {
     }
     return RssItunes(
       author: findElementOrNull(element, "itunes:author")?.text?.trim(),
-      summary: findElementOrNull(element, "itunes:summary")?.text?.trim(),
+      summary: findElementOrNull(element, "itunes:summary")?.text?.trim() ?? '',
       explicit: parseBoolLiteral(element, "itunes:explicit"),
       title: findElementOrNull(element, "itunes:title")?.text?.trim(),
      // subtitle: findElementOrNull(element, "itunes:subtitle")?.text?.trim(),

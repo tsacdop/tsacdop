@@ -1,22 +1,23 @@
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'episodedownload.dart';
-
-enum DownloadState { stop, load, donwload, complete, error }
 
 class EpisodeDetail extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
-  EpisodeDetail({this.episodeItem, this.heroTag, Key key}) : super(key: key);
+  final String path;
+  EpisodeDetail({this.episodeItem, this.heroTag, this.path, Key key})
+      : super(key: key);
 
   @override
   _EpisodeDetailState createState() => _EpisodeDetailState();
@@ -26,7 +27,10 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
   double downloadProgress;
   bool _loaddes;
+  String path;
   Future getSDescription(String title) async {
+    var dir = await getApplicationDocumentsDirectory();
+    path = dir.path;
     var dbHelper = DBHelper();
     widget.episodeItem.description = await dbHelper.getDescription(title);
     if (mounted)
@@ -62,7 +66,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
       ),
       body: Container(
         color: Colors.grey[100],
-        padding: EdgeInsets.all(12.0),
+        padding: EdgeInsets.all(10.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -77,7 +81,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     alignment: Alignment.topLeft,
                     child: Text(
                       widget.episodeItem.title,
-                      style: Theme.of(context).textTheme.title,
+                      style: Theme.of(context).textTheme.headline5,
                     ),
                   ),
                   Container(
@@ -144,22 +148,26 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
               child: Container(
                 padding: EdgeInsets.only(left: 12.0, right: 12.0, top: 5.0),
                 child: SingleChildScrollView(
-                  child: (widget.episodeItem.description != null && _loaddes)
-                      ? Html(
-                          data: widget.episodeItem.description,
-                          onLinkTap: (url) {
-                            _launchUrl(url);
-                          },
-                          useRichText: true,
-                        )
+                  child:  _loaddes
+                      ? (widget.episodeItem.description.contains('<'))
+                          ? Html(
+                              data: widget.episodeItem.description,
+                              onLinkTap: (url) {
+                                _launchUrl(url);
+                              },
+                              useRichText: true,
+                            )
+                          : Container(
+                              alignment: Alignment.topLeft,
+                              child: Text(widget.episodeItem.description))
                       : Center(),
                 ),
               ),
             ),
             MenuBar(
-              episodeItem: widget.episodeItem,
-              heroTag: widget.heroTag,
-            ),
+                episodeItem: widget.episodeItem,
+                heroTag: widget.heroTag,
+                path: widget.path),
           ],
         ),
       ),
@@ -168,9 +176,11 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 }
 
 class MenuBar extends StatefulWidget {
+  final String path;
   final EpisodeBrief episodeItem;
   final String heroTag;
-  MenuBar({this.episodeItem, this.heroTag, Key key}) : super(key: key);
+  MenuBar({this.episodeItem, this.heroTag, this.path, Key key})
+      : super(key: key);
   @override
   _MenuBarState createState() => _MenuBarState();
 }
@@ -204,7 +214,7 @@ class _MenuBarState extends State<MenuBar> {
     _like = widget.episodeItem.liked;
   }
 
-  Widget _buttonOnMenu(Widget widget, Function() onTap) => Material(
+  Widget _buttonOnMenu(Widget widget, VoidCallback onTap) => Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
@@ -232,7 +242,8 @@ class _MenuBarState extends State<MenuBar> {
             (widget.episodeItem.title == urlChange.title &&
                     urlChange.audioState == AudioState.play)
                 ? ImageRotate(
-                    url: widget.episodeItem.imageUrl,
+                    title: widget.episodeItem.feedTitle,
+                    path: widget.path,
                   )
                 : Hero(
                     tag: widget.episodeItem.enclosureUrl + widget.heroTag,
@@ -244,9 +255,8 @@ class _MenuBarState extends State<MenuBar> {
                           height: 30.0,
                           width: 30.0,
                           color: Colors.white,
-                          child: CachedNetworkImage(
-                            imageUrl: widget.episodeItem.imageUrl,
-                          ),
+                          child: Image.file(File(
+                              "${widget.path}/${widget.episodeItem.feedTitle}.png")),
                         ),
                       ),
                     ),
@@ -298,10 +308,18 @@ class _MenuBarState extends State<MenuBar> {
                         alignment: Alignment.center,
                         height: 50.0,
                         padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child:Row(
+                        child: Row(
                           children: <Widget>[
-                            Text('Play Now', style: TextStyle(color: Colors.blue, fontSize: 15, fontWeight: FontWeight.bold,)),
-                            Icon(Icons.play_arrow, color: Colors.blue,),
+                            Text('Play Now',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                )),
+                            Icon(
+                              Icons.play_arrow,
+                              color: Colors.blue,
+                            ),
                           ],
                         ),
                       ),
@@ -487,8 +505,9 @@ class _WaveLoaderState extends State<WaveLoader>
 }
 
 class ImageRotate extends StatefulWidget {
-  final String url;
-  ImageRotate({this.url, Key key}) : super(key: key);
+  final String title;
+  final String path;
+  ImageRotate({this.title, this.path, Key key}) : super(key: key);
   @override
   _ImageRotateState createState() => _ImageRotateState();
 }
@@ -541,9 +560,7 @@ class _ImageRotateState extends State<ImageRotate>
             height: 30.0,
             width: 30.0,
             color: Colors.white,
-            child: CachedNetworkImage(
-              imageUrl: widget.url,
-            ),
+            child: Image.file(File("${widget.path}/${widget.title}.png")),
           ),
         ),
       ),
@@ -590,35 +607,26 @@ class LoveOpen extends StatefulWidget {
 class _LoveOpenState extends State<LoveOpen>
     with SingleTickerProviderStateMixin {
   Animation _animationA;
-  Animation _animationB;
   AnimationController _controller;
-
-  var rect = RelativeRect.fromLTRB(100, 100, 100, 100);
-  var rectend = RelativeRect.fromLTRB(0, 0, 0, 0);
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500),
+      duration: Duration(milliseconds: 100),
     );
 
     _animationA = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
         if (mounted) setState(() {});
       });
-    _animationB =
-        RelativeRectTween(begin: rect, end: rectend).animate(_controller)
-          ..addListener(() {
-            if (mounted) setState(() {});
-          });
 
     _controller.forward();
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _controller.reset();
-      } 
+      }
     });
   }
 
@@ -635,8 +643,8 @@ class _LoveOpenState extends State<LoveOpen>
           scale: _animationA,
           alignment: Alignment.center,
           child: Transform.rotate(
-               angle: angle,
-                      child: SizedBox(
+            angle: angle,
+            child: SizedBox(
               height: 5 * scale,
               width: 6 * scale,
               child: CustomPaint(
@@ -658,22 +666,22 @@ class _LoveOpenState extends State<LoveOpen>
         children: <Widget>[
           Row(
             children: <Widget>[
-              _littleHeart(1.3, 10, -math.pi/6),
-              _littleHeart(1.5, 3, 0),
+              _littleHeart(0.5, 10, -math.pi / 6),
+              _littleHeart(1.2, 3, 0),
             ],
           ),
           Row(
             children: <Widget>[
-              _littleHeart(0.8, 6, math.pi*1.5), 
-              _littleHeart(1.2, 24, math.pi/2),
+              _littleHeart(0.8, 6, math.pi * 1.5),
+              _littleHeart(0.9, 24, math.pi / 2),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              _littleHeart(1, 8,-math.pi*0.7),
-              _littleHeart(1.3, 8, math.pi),
-              _littleHeart(1.1, 3, -math.pi*1.2)
+              _littleHeart(1, 8, -math.pi * 0.7),
+              _littleHeart(0.8, 8, math.pi),
+              _littleHeart(0.6, 3, -math.pi * 1.2)
             ],
           ),
         ],

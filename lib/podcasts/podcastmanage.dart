@@ -1,13 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
-import 'package:tsacdop/class/settingstate.dart';
+import 'package:tsacdop/class/podcast_group.dart';
+import 'package:tsacdop/podcasts/podcastgroup.dart';
+import 'package:tsacdop/podcasts/podcastlist.dart';
+import 'package:tsacdop/util/pageroute.dart';
 
 class PodcastManage extends StatefulWidget {
   @override
@@ -15,152 +11,208 @@ class PodcastManage extends StatefulWidget {
 }
 
 class _PodcastManageState extends State<PodcastManage> {
-  var dir;
-  bool _loading;
-  bool _loadSave;
-  Color _c;
-  double _width;
-  List<PodcastLocal> podcastList;
-  getPodcastLocal() async {
-    dir = await getApplicationDocumentsDirectory();
-    var dbHelper = DBHelper();
-    podcastList = await dbHelper.getPodcastLocal();
-    setState(() {
-      _loading = true;
-    });
-  }
-
-  _unSubscribe(String title) async {
-    var dbHelper = DBHelper();
-    await dbHelper.delPodcastLocal(title);
-    print('Unsubscribe');
+  Decoration getIndicator() {
+    return const UnderlineTabIndicator(
+        borderSide: BorderSide(color: Colors.red, width: 2),
+        insets: EdgeInsets.only(
+          top: 10.0,
+        ));
   }
 
   @override
   void initState() {
     super.initState();
-    _loading = false;
-    _loadSave = false;
-    getPodcastLocal();
-  }
-
-  void _onReorder(int oldIndex, int newIndex) {
-    setState(() {
-      if (newIndex > oldIndex) {
-        newIndex -= 1;
-      }
-      final PodcastLocal podcast = podcastList.removeAt(oldIndex);
-      podcastList.insert(newIndex, podcast);
-      _loadSave = true;
-    });
-  }
-
-  _saveOrder(List<PodcastLocal> podcastList) async {
-    var dbHelper = DBHelper();
-    await dbHelper.saveOrder(podcastList);
-  }
-
-  Widget _podcastCard(BuildContext context, PodcastLocal podcastLocal) {
-    var _settingState = Provider.of<SettingState>(context);
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      height: 100,
-      child: Row(children: <Widget>[
-        Container(
-          child: Icon(
-            Icons.unfold_more,
-            color: _c,
-          ),
-        ),
-        Container(
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(30)),
-            child: Container(
-              height: 60,
-              width: 60,
-              child: Image.file(File("${dir.path}/${podcastLocal.title}.png")),
-            ),
-          ),
-        ),
-        Container(
-            width: _width / 2,
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              podcastLocal.title,
-              maxLines: 2,
-              overflow: TextOverflow.fade,
-            )),
-        Spacer(),
-        OutlineButton(
-          child: Text('Unsubscribe'),
-          onPressed: () {
-            _unSubscribe(podcastLocal.title);
-            _settingState.subscribeUpdate = Setting.start;
-            setState(() {
-              getPodcastLocal();
-            });
-          },
-        ),
-      ]),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    _width = MediaQuery.of(context).size.width;
-    var _settingState = Provider.of<SettingState>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Podcasts'),
-        backgroundColor: Colors.grey[100],
         elevation: 0,
         centerTitle: true,
+        backgroundColor: Colors.grey[100],
+        title: Text('Groups'),
         actions: <Widget>[
-          !_loadSave
-              ? Center()
-              : InkWell(
-                  child: Container(
-                      padding: EdgeInsets.all(20.0),
-                      alignment: Alignment.center,
-                      child: Text('Save')),
-                  onTap: () async{
-                    await _saveOrder(podcastList);
-                    Fluttertoast.showToast(
-                      msg: 'Saved',
-                      gravity: ToastGravity.BOTTOM,
-                    );
-                    _settingState.subscribeUpdate = Setting.start;
-                    setState(() {
-                      _loadSave = false;
-                    });
-                  },
-                ),
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {},
-          ),
+          OrderMenu(),
         ],
       ),
-      body: Container(
-        color: Colors.grey[100],
-        child: !_loading
-            ? CircularProgressIndicator()
-            : ReorderableListView(
-                onReorder: _onReorder,
-                children: podcastList.map<Widget>((PodcastLocal podcastLocal) {
-                  var color = json.decode(podcastLocal.primaryColor);
-                  (color[0] > 200 && color[1] > 200 && color[2] > 200)
-                      ? _c = Color.fromRGBO(
-                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-                  return Container(
-                    decoration: BoxDecoration(color: Colors.grey[100]),
-                    margin: EdgeInsets.symmetric(horizontal: 5.0),
-                    key: ObjectKey(podcastLocal.title),
-                    child: _podcastCard(context, podcastLocal),
-                  );
-                }).toList(),
+      body: Consumer<GroupList>(builder: (_, groupList, __) {
+        bool _isLoading = groupList.isLoading;
+        List<PodcastGroup> _groups = groupList.groups;
+        return _isLoading
+            ? Center()
+            : DefaultTabController(
+                length: _groups.length,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            height: 50,
+                            padding: EdgeInsets.symmetric(horizontal: 10.0),
+                            alignment: Alignment.centerLeft,
+                            child: TabBar(
+                              labelPadding: EdgeInsets.only(
+                                  top: 5.0,
+                                  bottom: 6.0,
+                                  left: 10.0,
+                                  right: 10.0),
+                              indicator: getIndicator(),
+                              isScrollable: true,
+                              tabs: _groups.map<Tab>((group) {
+                                return Tab(
+                                  child: Text(group.name),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          child: FlatButton(
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      AddGroup()),
+                              child: Icon(Icons.add)),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: Container(
+                        child: TabBarView(
+                            children: _groups.map<Widget>((group) {
+                          return Container(
+                              key: ObjectKey(group),
+                              child: PodcastGroupList(group: group));
+                        }).toList(),),
+                      ),
+                    )
+                  ],
+                ));
+      }),
+    );
+  }
+}
+
+class OrderMenu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      elevation: 3,
+      tooltip: 'Menu',
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 1,
+          child: Text('All Podcasts'),
+        ),
+        PopupMenuItem(
+          value: 2,
+          child: Text('New group'),
+        )
+      ],
+      onSelected: (value) {
+        if (value == 1) {
+          Navigator.push(context, ScaleRoute(page: PodcastList()));
+        }
+        if (value == 2) {
+          showDialog(
+              context: context, builder: (BuildContext context) => AddGroup());
+        }
+      },
+    );
+  }
+}
+
+class AddGroup extends StatefulWidget {
+  @override
+  _AddGroupState createState() => _AddGroupState();
+}
+
+class _AddGroupState extends State<AddGroup> {
+  TextEditingController _controller;
+  String _newGroup;
+  int _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _error = 0;
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var groupList = Provider.of<GroupList>(context);
+    List list = groupList.groups.map((e) => e.name).toList();
+    return AlertDialog(
+      elevation: 1,
+      contentPadding: EdgeInsets.symmetric(horizontal: 20),
+      titlePadding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
+      actionsPadding: EdgeInsets.all(0),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            'CANCEL',
+            style: TextStyle(color: Colors.grey[700]),
+          ),
+        ),
+        FlatButton(
+          onPressed: () async {
+            if (list.contains(_newGroup)) {
+              setState(() => _error = 1);
+            } else {
+              groupList.addGroup(PodcastGroup(_newGroup));
+              Navigator.of(context).pop();
+            }
+          },
+          child: Text('DONE'),
+        )
+      ],
+      title: Text('Create new group'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+              hintText: 'New Group',
+              hintStyle: TextStyle(fontSize: 18),
+              filled: true,
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 2.0),
               ),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+              ),
+            ),
+            cursorRadius: Radius.circular(2),
+            autofocus: true,
+            maxLines: 1,
+            controller: _controller,
+            onChanged: (value) {
+              _newGroup = value;
+            },
+          ),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: (_error == 1)
+                ? Text(
+                    'Group existed',
+                    style: TextStyle(color: Colors.red[400]),
+                  )
+                : Center(),
+          ),
+        ],
       ),
     );
   }

@@ -46,14 +46,14 @@ class RssItem {
   factory RssItem.parse(XmlElement element) {
     return RssItem(
       title: findElementOrNull(element, "title")?.text,
-      description: findElementOrNull(element, "description")?.text,
-      link: findElementOrNull(element, "link")?.text,
+      description: findElementOrNull(element, "description")?.text?.trim() ?? 'No shownote provided for this episode',
+      link: findElementOrNull(element, "link")?.text?.trim(),
       categories: element.findElements("category").map((element) {
         return RssCategory.parse(element);
       }).toList(),
-      guid: findElementOrNull(element, "guid")?.text,
-      pubDate: findElementOrNull(element, "pubDate")?.text,
-      author: findElementOrNull(element, "author")?.text,
+     //guid: findElementOrNull(element, "guid")?.text,
+      pubDate: findElementOrNull(element, "pubDate")?.text?.trim(),
+      author: findElementOrNull(element, "author")?.text?.trim(),
      // comments: findElementOrNull(element, "comments")?.text,
      // source: RssSource.parse(findElementOrNull(element, "source")),
      // content: RssContent.parse(findElementOrNull(element, "content:encoded")),

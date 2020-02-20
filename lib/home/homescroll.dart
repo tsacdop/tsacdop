@@ -6,15 +6,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/importompl.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
-import 'package:tsacdop/podcasts/podcastlist.dart';
+import 'package:tsacdop/podcasts/podcastmanage.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/class/settingstate.dart';
 
@@ -25,101 +27,184 @@ class ScrollPodcasts extends StatefulWidget {
 
 class _ScrollPodcastsState extends State<ScrollPodcasts> {
   var dir;
-  bool _loading;
-  List<PodcastLocal> podcastList;
-
-  getPodcastLocal() async {
-    var dbHelper = DBHelper();
-    podcastList = await dbHelper.getPodcastLocal();
-    dir = await getApplicationDocumentsDirectory();
-    setState(() {
-      _loading = true;
-    });
-  }
+  int _groupIndex;
+  bool _loaded;
 
   ImportState importState;
-  Setting subscribeUpdate;
+  Update subscribeUpdate;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final importState = Provider.of<ImportOmpl>(context).importState;
-    final subscribeUpdate = Provider.of<SettingState>(context).subscribeupdate;
-    if (importState == ImportState.complete ||
-        subscribeUpdate == Setting.start) {
+    subscribeUpdate = Provider.of<SettingState>(context).subscribeupdate;
+    if (subscribeUpdate == Update.backhome) {
       setState(() {
-         getPodcastLocal();
+        _groupIndex = 0;
       });
+    } else if (subscribeUpdate == Update.justupdate) {
+      setState(() {});
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _loading = false;
-    getPodcastLocal();
+    _loaded = false;
+    _groupIndex = 0;
+    getApplicationDocumentsDirectory().then((value) {
+      dir = value.path;
+      setState(() => _loaded = true);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    return !_loading
-        ? Container(
-            height: (_width - 20) / 3 + 110,
-          )
-        : DefaultTabController(
-            length: podcastList.length,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  height: 70,
-                  alignment: Alignment.centerLeft,
-                  child: TabBar(
-                    labelPadding: EdgeInsets.only(
-                        top: 5.0, bottom: 10.0, left: 6.0, right: 6.0),
-                    indicator:
-                        CircleTabIndicator(color: Colors.blue, radius: 3),
-                    isScrollable: true,
-                    tabs: podcastList.map<Tab>((PodcastLocal podcastLocal) {
-                      return Tab(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                          child: LimitedBox(
-                            maxHeight: 50,
-                            maxWidth: 50,
-                            child: Image.file(
-                                File("${dir.path}/${podcastLocal.title}.png")),
+    return Consumer<GroupList>(builder: (_, groupList, __) {
+      var groups = groupList.groups;
+      bool isLoading = groupList.isLoading;
+      return isLoading
+          ? Container(
+              height: (_width - 20) / 3 + 110,
+              child: SizedBox(
+                height: 20.0,
+                width: 20.0,
+                child: CircularProgressIndicator()),
+            )
+          : DefaultTabController(
+              length: groups[_groupIndex].podcastList.length,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  GestureDetector(
+                    onVerticalDragEnd: (event) {
+                      if (event.primaryVelocity > 200) {
+                        if (groups.length == 1) {
+                          Fluttertoast.showToast(
+                            msg: 'Add some groups',
+                            gravity: ToastGravity.BOTTOM,
+                          );
+                        } else {
+                          if (mounted)
+                            setState(() {
+                              (_groupIndex != 0)
+                                  ? _groupIndex--
+                                  : _groupIndex = groups.length - 1;
+                            });
+                        }
+                      } else if (event.primaryVelocity < -200) {
+                        if (groups.length == 1) {
+                          Fluttertoast.showToast(
+                            msg: 'Add some groups',
+                            gravity: ToastGravity.BOTTOM,
+                          );
+                        } else {
+                          setState(() {
+                            (_groupIndex < groups.length - 1)
+                                ? _groupIndex++
+                                : _groupIndex = 0;
+                          });
+                        }
+                      }
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 15.0),
+                                  child: Text(
+                                    groups[_groupIndex].name,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red[300]),
+                                  )),
+                              Spacer(),
+                              Container(
+                                height: 30,
+                                padding: EdgeInsets.symmetric(horizontal: 15),
+                                alignment: Alignment.bottomRight,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      SlideLeftRoute(page: PodcastManage()),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 30,
+                                    padding: EdgeInsets.all(5.0),
+                                    child: Text('See All',
+                                        style: TextStyle(
+                                          color: Colors.red[300],
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Container(
-                  height: (_width - 20) / 3 + 40,
-                  margin: EdgeInsets.only(left: 10, right: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                  child: TabBarView(
-                    children:
-                        podcastList.map<Widget>((PodcastLocal podcastLocal) {
-                      return Container(
-                        decoration: BoxDecoration(color: Colors.grey[100]),
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
-                        key: ObjectKey(podcastLocal.title),
-                        child: PodcastPreview(
-                          podcastLocal: podcastLocal,
+                        Container(
+                          color: Colors.white10,
+                          height: 70,
+                          width: _width,
+                          alignment: Alignment.centerLeft,
+                          child: TabBar(
+                            labelPadding: EdgeInsets.only(
+                                top: 5.0, bottom: 10.0, left: 6.0, right: 6.0),
+                            indicator: CircleTabIndicator(
+                                color: Colors.blue, radius: 3),
+                            isScrollable: true,
+                            tabs: groups[_groupIndex].podcasts
+                                .map<Tab>((PodcastLocal podcastLocal) {
+                              return Tab(
+                                child: ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(25.0)),
+                                  child: LimitedBox(
+                                    maxHeight: 50,
+                                    maxWidth: 50,
+                                    child: !_loaded
+                                        ? CircularProgressIndicator()
+                                        : Image.file(File(
+                                            "$dir/${podcastLocal.title}.png")),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
-                      );
-                    }).toList(),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
+                  Container(
+                    height: (_width - 20) / 3 + 40,
+                    margin: EdgeInsets.only(left: 10, right: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: TabBarView(
+                      children: groups[_groupIndex].podcasts
+                          .map<Widget>((PodcastLocal podcastLocal) {
+                        return Container(
+                          decoration: BoxDecoration(color: Colors.grey[100]),
+                          margin: EdgeInsets.symmetric(horizontal: 5.0),
+                          key: ObjectKey(podcastLocal.title),
+                          child: PodcastPreview(
+                            podcastLocal: podcastLocal,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            );
+    });
   }
 }
 
@@ -250,6 +335,7 @@ class ShowEpisode extends StatelessWidget {
                         episodeItem: podcast[index],
                         heroTag: 'scroll',
                         //unique hero tag
+                        path: path,
                       )),
                     );
                   },

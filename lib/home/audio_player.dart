@@ -15,7 +15,7 @@ import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/home/audiopanel.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/pageroute.dart';
 
 final Logger _logger = Logger('audiofileplayer');
@@ -84,7 +84,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _remoteAudioLoading = true;
     Provider.of<Urlchange>(context, listen: false).audioState = AudioState.load;
 
-    if (_backgroundAudioPlaying == true) _backgroundAudio?.pause();
+    if (_backgroundAudioPlaying == true)
+    { _backgroundAudio?.pause();
+    AudioSystem.instance.stopBackgroundDisplay();}
     _backgroundAudio?.dispose();
     _backgroundAudio = Audio.loadFromRemoteUrl(url,
         onDuration: (double durationSeconds) {
@@ -135,7 +137,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _remoteAudioLoading = true;
     ByteData audio = getAudio(path);
     Provider.of<Urlchange>(context, listen: false).audioState = AudioState.load;
-    if (_backgroundAudioPlaying == true) _backgroundAudio?.pause();
+    if (_backgroundAudioPlaying == true) 
+    {_backgroundAudio?.pause();
+    AudioSystem.instance.stopBackgroundDisplay();}
     _backgroundAudio?.dispose();
     _backgroundAudio = Audio.loadFromByteData(audio,
         onDuration: (double durationSeconds) {

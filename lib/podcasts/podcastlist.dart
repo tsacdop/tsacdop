@@ -6,9 +6,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/sqflite_localpodcast.dart';
+import 'package:tsacdop/class/settingstate.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
 import 'package:tsacdop/util/pageroute.dart';
 
@@ -48,12 +50,14 @@ class _AboutPodcastState extends State<AboutPodcast> {
 
   @override
   Widget build(BuildContext context) {
+    var _settingState = Provider.of<SettingState>(context);
     return AlertDialog(
       actions: <Widget>[
         FlatButton(
           padding: EdgeInsets.all(10.0),
           onPressed: () {
             _unSubscribe(widget.podcastLocal.title);
+            _settingState.subscribeUpdate = Update.justupdate;
             Navigator.of(context).pop();
           },
           color: Colors.grey[200],
@@ -88,95 +92,104 @@ class PodcastList extends StatefulWidget {
 
 class _PodcastListState extends State<PodcastList> {
   var dir;
+
   Future<List<PodcastLocal>> getPodcastLocal() async {
     dir = await getApplicationDocumentsDirectory();
     var dbHelper = DBHelper();
-    var podcastList = await dbHelper.getPodcastLocal();
+    var podcastList = await dbHelper.getPodcastLocalAll();
     return podcastList;
   }
 
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    return Container(
-      color: Colors.grey[100],
-      child: FutureBuilder<List<PodcastLocal>>(
-        future: getPodcastLocal(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return CustomScrollView(
-              primary: false,
-              slivers: <Widget>[
-                SliverPadding(
-                  padding: const EdgeInsets.all(10.0),
-                  sliver: SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      childAspectRatio: 0.8,
-                      crossAxisCount: 3,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              ScaleRoute(
-                                  page: PodcastDetail(
-                                podcastLocal: snapshot.data[index],
-                              )),
-                            );
-                          },
-                          onLongPress: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) => AboutPodcast(
-                                  podcastLocal: snapshot.data[index]),
-                            ).then((_) => setState(() {}));
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                  height: 10.0,
-                                ),
-                                ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(_width/8)),
-                                  child: Container(
-                                    height: _width/4,
-                                    width: _width/4,
-                                    child: Image.file(File(
-                                        "${dir.path}/${snapshot.data[index].title}.png")),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Podcasts'),
+        centerTitle: true,
+        backgroundColor: Colors.grey[100],
+        elevation: 0,
+      ),
+      body: Container(
+        color: Colors.grey[100],
+        child: FutureBuilder<List<PodcastLocal>>(
+          future: getPodcastLocal(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return CustomScrollView(
+                primary: false,
+                slivers: <Widget>[
+                  SliverPadding(
+                    padding: const EdgeInsets.all(10.0),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        childAspectRatio: 0.8,
+                        crossAxisCount: 3,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                ScaleRoute(
+                                    page: PodcastDetail(
+                                  podcastLocal: snapshot.data[index],
+                                )),
+                              );
+                            },
+                            onLongPress: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AboutPodcast(
+                                    podcastLocal: snapshot.data[index]),
+                              ).then((_) => setState(() {}));
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    height: 10.0,
                                   ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.all(4.0),
-                                  child: Text(
-                                    snapshot.data[index].title,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      color: Colors.black.withOpacity(0.5),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(_width / 8)),
+                                    child: Container(
+                                      height: _width / 4,
+                                      width: _width / 4,
+                                      child: Image.file(File(
+                                          "${dir.path}/${snapshot.data[index].title}.png")),
                                     ),
-                                    maxLines: 2,
                                   ),
-                                ),
-                              ],
+                                  Container(
+                                    padding: EdgeInsets.all(4.0),
+                                    child: Text(
+                                      snapshot.data[index].title,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.black.withOpacity(0.5),
+                                      ),
+                                      maxLines: 2,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      childCount: snapshot.data.length,
+                          );
+                        },
+                        childCount: snapshot.data.length,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          }
-          return Text('NoData');
-        },
+                ],
+              );
+            }
+            return Text('NoData');
+          },
+        ),
       ),
     );
   }
