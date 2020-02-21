@@ -62,8 +62,10 @@ class DBHelper {
   Future<List<PodcastLocal>> getPodcastLocalAll() async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT title, imageUrl, rssUrl, primaryColor, author, imagePath FROM PodcastLocal ORDER BY add_date DESC');
+        'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath FROM PodcastLocal ORDER BY add_date DESC');
+    
     List<PodcastLocal> podcastLocal = List();
+
     for (int i = 0; i < list.length; i++) {
       podcastLocal.add(PodcastLocal(
           list[i]['title'],
@@ -75,6 +77,13 @@ class DBHelper {
           list[i]['imagePath']));
     }
     return podcastLocal;
+  }
+
+  Future<bool> checkPodcast(String url) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT id FROM PodcastLocal WHERE rssUrl = ?', [url]);
+    return list.length == 0;
   }
 
   Future savePodcastLocal(PodcastLocal podcastLocal) async {
@@ -115,14 +124,36 @@ class DBHelper {
   }
 
   DateTime _parsePubDate(String pubDate) {
-    if (pubDate == null) return null;
+    if (pubDate == null) return DateTime.now();
+    print(pubDate);
     DateTime date;
+    RegExp yyyy = RegExp(r'[1-2][0-9]{3}');
+    RegExp hhmm = RegExp(r'[0-2][0-9]\:[0-5][0-9]');
+    RegExp ddmmm = RegExp(r'[0-3][0-9]\s[A-Z][a-z]{2}');
+    RegExp mmDd = RegExp(r'([0-1]|\s)[0-9]\-[0-3][0-9]');
     try {
-      print('e');
-      date = DateFormat('dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);
+      date = DateFormat('EEE, dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);
     } catch (e) {
-      print('e');
-      date = DateTime(0);
+      try {
+        date = DateFormat('dd MMM yyyy HH:mm:ss Z', 'en_US').parse(pubDate);
+      } catch (e) {
+        try {
+          date = DateFormat('EEE, dd MMM yyyy HH:mm Z', 'en_US').parse(pubDate);
+        } catch (e) {
+          //parse date using regex, bug in parse maonth/day
+          String year = yyyy.stringMatch(pubDate);
+          String time = hhmm.stringMatch(pubDate);
+          String month = ddmmm.stringMatch(pubDate);
+          if (year != null && time != null && month != null) {
+            date = DateFormat('dd MMM yyyy HH:mm', 'en_US')
+                .parse(month + year + time);
+          } else if(year!=null && time!=null && month == null){
+            String month = mmDd.stringMatch(pubDate);
+            date = DateFormat('mm-dd yyyy HH:mm', 'en_US')
+                .parse(month +' ' + year +' '+ time);
+          }  else {date = DateTime.now();}
+        }
+      }
     }
     return date;
   }
@@ -144,32 +175,33 @@ class DBHelper {
   }
 
   Future<int> savePodcastRss(RssFeed _p, String id) async {
-    String _title;
-    String _url;
-    String _description;
-    int _duration;
     int _result = _p.items.length;
     var dbClient = await database;
+    String _description, _url;
     for (int i = 0; i < _result; i++) {
       print(_p.items[i].title);
-      _title = _p.items[i].itunes.title ?? _p.items[i].title;
-      _p.items[i].itunes.summary.contains('<')
-          ? _description = _p.items[i].itunes.summary
-          : _description = _p.items[i].description;
+      if (_p.items[i].itunes.summary != null) {
+        _p.items[i].itunes.summary.contains('<')
+            ? _description = _p.items[i].itunes.summary
+            : _description = _p.items[i].description;
+      } else {
+        _description = _p.items[i].description;
+      }
 
       isXimalaya(_p.items[i].enclosure.url)
           ? _url = _p.items[i].enclosure.url.split('=').last
           : _url = _p.items[i].enclosure.url;
 
+      final _title = _p.items[i].itunes.title ?? _p.items[i].title;
       final _length = _p.items[i].enclosure.length;
       final _pubDate = _p.items[i].pubDate;
+      print(_pubDate);
       final _date = _parsePubDate(_pubDate);
       final _milliseconds = _date.millisecondsSinceEpoch;
-
-      _duration = _p.items[i].itunes.duration?.inMinutes ?? 0;
-
+      final _duration = _p.items[i].itunes.duration?.inMinutes ?? 0;
       final _explicit = getExplicit(_p.items[i].itunes.explicit);
-      if (_p.items[i].enclosure.url != null) {
+
+      if (_url != null) {
         await dbClient.transaction((txn) {
           return txn.rawInsert(
               """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
@@ -194,10 +226,7 @@ class DBHelper {
   Future<int> updatePodcastRss(PodcastLocal podcastLocal) async {
     Response response = await Dio().get(podcastLocal.rssUrl);
     var _p = RssFeed.parse(response.data);
-    String _title;
-    String _url;
-    String _description;
-    int _duration;
+    String _url, _description;
     int _result = _p.items.length;
     var dbClient = await database;
     int _count = Sqflite.firstIntValue(await dbClient.rawQuery(
@@ -209,24 +238,27 @@ class DBHelper {
     } else {
       for (int i = 0; i < (_result - _count); i++) {
         print(_p.items[i].title);
-        _title = _p.items[i].itunes.title ?? _p.items[i].title;
-        _p.items[i].itunes.summary.contains('<')
-            ? _description = _p.items[i].itunes.summary
-            : _description = _p.items[i].description;
+        if (_p.items[i].itunes.summary != null) {
+          _p.items[i].itunes.summary.contains('<')
+              ? _description = _p.items[i].itunes.summary
+              : _description = _p.items[i].description;
+        } else {
+          _description = _p.items[i].description;
+        }
 
         isXimalaya(_p.items[i].enclosure.url)
             ? _url = _p.items[i].enclosure.url.split('=').last
             : _url = _p.items[i].enclosure.url;
 
+        final _title = _p.items[i].itunes.title ?? _p.items[i].title;
         final _length = _p.items[i].enclosure.length;
         final _pubDate = _p.items[i].pubDate;
         final _date = _parsePubDate(_pubDate);
         final _milliseconds = _date.millisecondsSinceEpoch;
-
-        _duration = _p.items[i].itunes.duration?.inMinutes ?? 0;
-
+        final _duration = _p.items[i].itunes.duration?.inMinutes ?? 0;
         final _explicit = getExplicit(_p.items[i].itunes.explicit);
-        if (_p.items[i].enclosure.url != null) {
+
+        if (_url != null) {
           await dbClient.transaction((txn) {
             return txn.rawInsert(
                 """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
@@ -251,20 +283,20 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getRssItem(String id) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = List();
+    List<EpisodeBrief> episodes = [];
     List<Map> list = await dbClient
         .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.pubDate,  P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
+        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, E.liked, 
         E.downloaded,  P.primaryColor 
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        where E.feed_id = ? ORDER BY E.milliseconds DESC""", [id]);
+        WHERE P.id = ? ORDER BY E.milliseconds DESC""", [id]);
     for (int x = 0; x < list.length; x++) {
       episodes.add(EpisodeBrief(
           list[x]['title'],
           list[x]['enclosure_url'],
           list[x]['enclosure_length'],
-          list[x]['pubDate'],
-          list[x]['feed_title'],
+          list[x]['milliseconds'],
+          list[x]['feedTitle'],
           list[x]['primaryColor'],
           list[x]['liked'],
           list[x]['downloaded'],
@@ -280,7 +312,7 @@ class DBHelper {
     List<EpisodeBrief> episodes = List();
     List<Map> list = await dbClient
         .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.pubDate, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
         E.downloaded, P.primaryColor 
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         where E.feed_id = ? ORDER BY E.milliseconds DESC LIMIT 3""", [id]);
@@ -289,7 +321,7 @@ class DBHelper {
           list[x]['title'],
           list[x]['enclosure_url'],
           list[x]['enclosure_length'],
-          list[x]['pubDate'],
+          list[x]['milliseconds'],
           list[x]['feed_title'],
           list[x]['primaryColor'],
           list[x]['liked'],
@@ -306,7 +338,7 @@ class DBHelper {
     EpisodeBrief episode;
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.pubDate, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
         E.downloaded,  P.primaryColor 
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         where E.enclosure_url = ? ORDER BY E.milliseconds DESC LIMIT 3""",
@@ -317,7 +349,7 @@ class DBHelper {
           list.first['title'],
           list.first['enclosure_url'],
           list.first['enclosure_length'],
-          list.first['pubDate'],
+          list.first['milliseconds'],
           list.first['feed_title'],
           list.first['primaryColor'],
           list.first['liked'],
@@ -333,7 +365,7 @@ class DBHelper {
     List<EpisodeBrief> episodes = List();
     List<Map> list = await dbClient
         .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.pubDate, P.title as feed_title, E.duration, E.explicit, E.liked, 
+        E.milliseconds, P.title as feed_title, E.duration, E.explicit, E.liked, 
         E.downloaded, P.imagePath, P.primaryColor 
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         ORDER BY E.milliseconds DESC LIMIT 99""");
@@ -342,15 +374,14 @@ class DBHelper {
           list[x]['title'],
           list[x]['enclosure_url'],
           list[x]['enclosure_length'],
-          list[x]['pubDate'],
+          list[x]['milliseconds'],
           list[x]['feed_title'],
           list[x]['primaryColor'],
           list[x]['liked'],
           list[x]['doanloaded'],
           list[x]['duration'],
           list[x]['explicit'],
-          list[x]['imagePath']
-        ));
+          list[x]['imagePath']));
     }
     return episodes;
   }
@@ -359,7 +390,7 @@ class DBHelper {
     var dbClient = await database;
     List<EpisodeBrief> episodes = List();
     List<Map> list = await dbClient.rawQuery(
-        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.pubDate, P.imagePath,
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE E.liked = 1 ORDER BY E.milliseconds DESC LIMIT 99""");
@@ -368,7 +399,7 @@ class DBHelper {
           list[x]['title'],
           list[x]['enclosure_url'],
           list[x]['enclosure_length'],
-          list[x]['pubDate'],
+          list[x]['milliseconds'],
           list[x]['feed_title'],
           list[x]['primaryColor'],
           list[x]['liked'],
@@ -417,7 +448,7 @@ class DBHelper {
     var dbClient = await database;
     List<EpisodeBrief> episodes = List();
     List<Map> list = await dbClient.rawQuery(
-        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.pubDate, P.imagePath,
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE E.downloaded != 'ND' ORDER BY E.download_date DESC LIMIT 99""");
@@ -426,7 +457,7 @@ class DBHelper {
           list[x]['title'],
           list[x]['enclosure_url'],
           list[x]['enclosure_length'],
-          list[x]['pubDate'],
+          list[x]['milliseconds'],
           list[x]['feed_title'],
           list[x]['primaryColor'],
           list[x]['liked'],
@@ -446,10 +477,10 @@ class DBHelper {
     return description;
   }
 
-  Future<String> getFeedDescription(String url) async {
+  Future<String> getFeedDescription(String id) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT description FROM PodcastLocal WHERE enclosure_url = ?', [url]);
+        'SELECT description FROM PodcastLocal WHERE id = ?', [id]);
     String description = list[0]['description'];
     return description;
   }
@@ -458,7 +489,7 @@ class DBHelper {
     var dbClient = await database;
     EpisodeBrief episode;
     List<Map> list = await dbClient.rawQuery(
-        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.pubDate, P.imagePath,
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.enclosure_url = ?""", [url]);
@@ -466,7 +497,7 @@ class DBHelper {
         list.first['title'],
         list.first['enclosure_url'],
         list.first['enclosure_length'],
-        list.first['pubDate'],
+        list.first['milliseconds'],
         list.first['feed_title'],
         list.first['primaryColor'],
         list.first['liked'],

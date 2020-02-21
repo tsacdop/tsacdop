@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
@@ -86,7 +87,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     height: 30.0,
                     child: Text(
                         'Published ' +
-                            widget.episodeItem.pubDate.substring(0, 16),
+                        DateFormat.yMMMd().format( DateTime.fromMillisecondsSinceEpoch(widget.episodeItem.pubDate)),
                         style: TextStyle(color: Colors.blue[500])),
                   ),
                   Container(

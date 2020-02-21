@@ -24,16 +24,17 @@ class _PodcastDetailState extends State<PodcastDetail> {
     result == 0 ? 
     Fluttertoast.showToast(
       msg: 'No Update',
-      gravity: ToastGravity.BOTTOM,
+      gravity: ToastGravity.TOP,
     )
     : Fluttertoast.showToast(
       msg: 'Updated $result Episodes',
-      gravity: ToastGravity.BOTTOM,
+      gravity: ToastGravity.TOP,
     );
     if(mounted) setState(() {});
   }
 
   Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal) async {
+    print(podcastLocal.id);
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await
         dbHelper.getRssItem(podcastLocal.id);
@@ -43,25 +44,25 @@ class _PodcastDetailState extends State<PodcastDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.podcastLocal.title,),
-        elevation: 0.0,
-        backgroundColor: Colors.grey[100],
-        centerTitle: true,
-      ),
-      body: RefreshIndicator(
-          key: _refreshIndicatorKey,
-          color: Colors.blue[500],
-          onRefresh: () => _updateRssItem(widget.podcastLocal),
-          child: FutureBuilder<List<EpisodeBrief>>(
-            future: _getRssItem(widget.podcastLocal),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
-              return (snapshot.hasData)
-                  ? EpisodeGrid(podcast: snapshot.data, showDownload: true, showFavorite: true, showNumber: true, heroTag: 'podcast',)
-                  : Center(child: CircularProgressIndicator());
-            },
-          )),
+        appBar: AppBar(
+          title: Text(widget.podcastLocal.title,),
+          elevation: 0.0,
+          backgroundColor: Colors.grey[100],
+          centerTitle: true,
+        ),
+        body: RefreshIndicator(
+            key: _refreshIndicatorKey,
+            color: Colors.blue[500],
+            onRefresh: () => _updateRssItem(widget.podcastLocal),
+            child: FutureBuilder<List<EpisodeBrief>>(
+              future: _getRssItem(widget.podcastLocal),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) print(snapshot.error);
+                return (snapshot.hasData)
+                    ? EpisodeGrid(podcast: snapshot.data, showDownload: true, showFavorite: true, showNumber: true, heroTag: 'podcast',)
+                    : Center(child: CircularProgressIndicator());
+              },
+            )),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
@@ -31,12 +32,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.grey[100],
+        statusBarColor: Colors.green,
+      ),
+      child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
           elevation: 0,
           centerTitle: true,
           backgroundColor: Colors.grey[100],
+          brightness: Brightness.light,
           leading: IconButton(
             tooltip: 'Add',
             icon: const Icon(Icons.add_circle_outline),
@@ -56,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         body: Home(),
+      ),
     );
   }
 }
@@ -217,50 +225,66 @@ class _SearchResultState extends State<SearchResult> {
     var importOmpl = Provider.of<ImportOmpl>(context, listen: false);
     var groupList = Provider.of<GroupList>(context, listen: false);
     savePodcast(String rss) async {
-      print(rss);
       if (mounted) setState(() => _adding = true);
 
       importOmpl.importState = ImportState.import;
       try {
-      Response response = await Dio().get(rss);
-      
-      String _realUrl = response.realUri.toString();
-      if (mounted) setState(() => _issubscribe = true);
-
-      var _p = RssFeed.parse(response.data);
-
-      print(_p.title);
-
-      var dir = await getApplicationDocumentsDirectory();
-      
-        Response<List<int>> imageResponse = await Dio().get<List<int>>(
-            _p.itunes.image.href,
-            options: Options(responseType: ResponseType.bytes));
-
-        img.Image image = img.decodeImage(imageResponse.data);
-        img.Image thumbnail = img.copyResize(image, width: 300);
-        String _uuid = Uuid().v4();
-        File("${dir.path}/$_uuid.png")
-          ..writeAsBytesSync(img.encodePng(thumbnail));
-        String _imagePath = "${dir.path}/$_uuid.png";
-        String _primaryColor =
-            await getColor(File("${dir.path}/$_uuid.png"));
-        PodcastLocal podcastLocal = PodcastLocal(
-            _p.title, _p.itunes.image.href, _realUrl, _primaryColor, _p.author, _uuid, _imagePath);
-        podcastLocal.description = _p.description;
-        groupList.subscribe(podcastLocal);
-
-        importOmpl.importState = ImportState.parse;
+        Response response = await Dio().get(rss);
         var dbHelper = DBHelper();
-        await dbHelper.savePodcastRss(_p, _uuid);
+        String _realUrl =
+            response.isRedirect ? response.realUri.toString() : rss;
+        bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
+        if (_checkUrl) {
+          if (mounted) setState(() => _issubscribe = true);
 
-        importOmpl.importState = ImportState.complete;
+          var _p = RssFeed.parse(response.data);
 
+          print(_p.title);
+
+          var dir = await getApplicationDocumentsDirectory();
+
+          Response<List<int>> imageResponse = await Dio().get<List<int>>(
+              _p.itunes.image.href,
+              options: Options(responseType: ResponseType.bytes));
+
+          img.Image image = img.decodeImage(imageResponse.data);
+          img.Image thumbnail = img.copyResize(image, width: 300);
+
+          String _uuid = Uuid().v4();
+          File("${dir.path}/$_uuid.png")
+            ..writeAsBytesSync(img.encodePng(thumbnail));
+          String _imagePath = "${dir.path}/$_uuid.png";
+          String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
+          PodcastLocal podcastLocal = PodcastLocal(
+              _p.title,
+              _p.itunes.image.href,
+              _realUrl,
+              _primaryColor,
+              _p.author,
+              _uuid,
+              _imagePath);
+          podcastLocal.description = _p.description;
+          groupList.subscribe(podcastLocal);
+
+          importOmpl.importState = ImportState.parse;
+
+          await dbHelper.savePodcastRss(_p, _uuid);
+
+          importOmpl.importState = ImportState.complete;
+        } else {
+          importOmpl.importState = ImportState.error;
+          Fluttertoast.showToast(
+            msg: 'POdcast Subscribed Already',
+            gravity: ToastGravity.TOP,
+          );
+          await Future.delayed(Duration(seconds: 10));
+          importOmpl.importState = ImportState.stop;
+        }
       } catch (e) {
         importOmpl.importState = ImportState.error;
         Fluttertoast.showToast(
           msg: 'Network error, Subscribe failed',
-          gravity: ToastGravity.BOTTOM,
+          gravity: ToastGravity.TOP,
         );
         await Future.delayed(Duration(seconds: 10));
         importOmpl.importState = ImportState.stop;
@@ -271,12 +295,14 @@ class _SearchResultState extends State<SearchResult> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
+        children: <Widget>[
           ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: 30.0),
-            onTap: (){setState(() {
-              _showDes = !_showDes;
-            });},
+            contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+            onTap: () {
+              setState(() {
+                _showDes = !_showDes;
+              });
+            },
             leading: ClipRRect(
               borderRadius: BorderRadius.all(Radius.circular(20.0)),
               child: Image.network(
@@ -289,46 +315,57 @@ class _SearchResultState extends State<SearchResult> {
             ),
             title: Text(widget.onlinePodcast.title),
             subtitle: Text(widget.onlinePodcast.publisher),
-            trailing: 
-            Row(
+            trailing: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                 Icon(_showDes ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
-                 Padding(padding: EdgeInsets.only(right: 10.0)),
-                 !_issubscribe
-                ? !_adding
-                    ? OutlineButton(
-                        child:
-                            Text('Subscribe', style: TextStyle(color: Colors.blue)),
-                        onPressed: () {
-                          importOmpl.rssTitle = widget.onlinePodcast.title;
-                          savePodcast(widget.onlinePodcast.rss);
-                        })
-                    : OutlineButton(
-                        child: SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation(Colors.blue),
-                            )),
-                        onPressed: () {},
-                      )
-                : OutlineButton(child: Text('Subscribe'), onPressed: (){}),
+                Icon(_showDes
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down),
+                Padding(padding: EdgeInsets.only(right: 10.0)),
+                !_issubscribe
+                    ? !_adding
+                        ? OutlineButton(
+                            child: Text('Subscribe',
+                                style: TextStyle(color: Colors.blue)),
+                            onPressed: () {
+                              importOmpl.rssTitle = widget.onlinePodcast.title;
+                              savePodcast(widget.onlinePodcast.rss);
+                            })
+                        : OutlineButton(
+                            child: SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor:
+                                      AlwaysStoppedAnimation(Colors.blue),
+                                )),
+                            onPressed: () {},
+                          )
+                    : OutlineButton(child: Text('Subscribe'), onPressed: () {}),
               ],
             ),
           ),
-          _showDes ? Container(
-            alignment: Alignment.centerLeft,
-            decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.all(Radius.circular(10.0))
-            ),
-            margin: EdgeInsets.only(left: 70, right: 50),
-            padding: EdgeInsets.all(10.0),
-            child: Text(widget.onlinePodcast.description, maxLines: 3, overflow: TextOverflow.ellipsis,),
-          ) : Center(),
+          _showDes
+              ? Container(
+                  alignment: Alignment.centerLeft,
+                  decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(15.0),
+                        bottomLeft: Radius.circular(15.0),
+                        bottomRight: Radius.circular(15.0),
+                      )),
+                  margin: EdgeInsets.only(left: 70, right: 50),
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    widget.onlinePodcast.description.trim(),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
+              : Center(),
         ],
       ),
     );

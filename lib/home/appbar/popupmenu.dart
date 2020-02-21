@@ -47,10 +47,9 @@ class PopupMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     ImportOmpl importOmpl = Provider.of<ImportOmpl>(context, listen: false);
     GroupList groupList = Provider.of<GroupList>(context, listen: false);
-    _refreshAll() async{
+    _refreshAll() async {
       var dbHelper = DBHelper();
-      List<PodcastLocal> podcastList =
-          await dbHelper.getPodcastLocalAll();
+      List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
       await Future.forEach(podcastList, (podcastLocal) async {
         importOmpl.rssTitle = podcastLocal.title;
         importOmpl.importState = ImportState.parse;
@@ -62,10 +61,10 @@ class PopupMenu extends StatelessWidget {
 
     saveOmpl(String rss) async {
       var dbHelper = DBHelper();
-      try {
-        importOmpl.importState = ImportState.import;
-        Response response = await Dio().get(rss);
+      importOmpl.importState = ImportState.import;
 
+      Response response = await Dio().get(rss);
+      if (response.statusCode == 200) {
         var _p = RssFeed.parse(response.data);
         var dir = await getApplicationDocumentsDirectory();
 
@@ -75,55 +74,84 @@ class PopupMenu extends StatelessWidget {
         img.Image image = img.decodeImage(imageResponse.data);
         img.Image thumbnail = img.copyResize(image, width: 300);
         String _uuid = Uuid().v4();
-        String _realUrl = response.realUri.toString();
-        File("${dir.path}/$_uuid.png")
-          ..writeAsBytesSync(img.encodePng(thumbnail));
-        String _imagePath = "${dir.path}/$_uuid.png";
-        String _primaryColor =
-            await getColor(File("${dir.path}/$_uuid.png"));
+        String _realUrl =
+            response.isRedirect ? response.realUri.toString() : rss;
+        print(_realUrl);
 
-        PodcastLocal podcastLocal = PodcastLocal(
-            _p.title, _p.itunes.image.href, _realUrl, _primaryColor, _p.author, _uuid, _imagePath);
+        bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
+        if (_checkUrl) {
+          File("${dir.path}/$_uuid.png")
+            ..writeAsBytesSync(img.encodePng(thumbnail));
+          String _imagePath = "${dir.path}/$_uuid.png";
+          String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
 
-        podcastLocal.description = _p.description;
-        
-        groupList.subscribe(podcastLocal);
+          PodcastLocal podcastLocal = PodcastLocal(
+              _p.title,
+              _p.itunes.image.href,
+              _realUrl,
+              _primaryColor,
+              _p.author,
+              _uuid,
+              _imagePath);
 
-        importOmpl.importState = ImportState.parse;
+          podcastLocal.description = _p.description;
 
-        await dbHelper.savePodcastRss(_p, _uuid);
+          groupList.subscribe(podcastLocal);
 
-        importOmpl.importState = ImportState.complete;
-      } catch (e) {
+          importOmpl.importState = ImportState.parse;
+
+          await dbHelper.savePodcastRss(_p, _uuid);
+
+          importOmpl.importState = ImportState.complete;
+        } else {
+          importOmpl.importState = ImportState.error;
+
+          Fluttertoast.showToast(
+            msg: 'Podcast Subscribed Already',
+            gravity: ToastGravity.TOP,
+          );
+          await Future.delayed(Duration(seconds: 5));
+          importOmpl.importState = ImportState.stop;
+        }
+      }
+      else {
         importOmpl.importState = ImportState.error;
-        Fluttertoast.showToast(
-          msg: 'Network error, Subscribe failed',
-          gravity: ToastGravity.BOTTOM,
-        );
-        await Future.delayed(Duration(seconds: 10));
-        importOmpl.importState = ImportState.stop;
+
+          Fluttertoast.showToast(
+            msg: 'Network error, Subscribe failed',
+            gravity: ToastGravity.TOP,
+          );
+          await Future.delayed(Duration(seconds: 5));
+          importOmpl.importState = ImportState.stop;
       }
     }
 
     void _saveOmpl(String path) async {
       File file = File(path);
       String opml = file.readAsStringSync();
-      try {
-        var content = xml.parse(opml);
-        var total = content
-            .findAllElements('outline')
-            .map((ele) => OmplOutline.parse(ele))
-            .toList();
+
+      var content = xml.parse(opml);
+      var total = content
+          .findAllElements('outline')
+          .map((ele) => OmplOutline.parse(ele))
+          .toList();
+      if (total.length == 0) {
+        Fluttertoast.showToast(
+          msg: 'File Not Valid',
+          gravity: ToastGravity.BOTTOM,
+        );
+      } else {
         for (int i = 0; i < total.length; i++) {
           if (total[i].xmlUrl != null) {
             importOmpl.rssTitle = total[i].text;
-            await saveOmpl(total[i].xmlUrl);
+             try{await saveOmpl(total[i].xmlUrl);}
+             catch (e){
+               print(e.toString());
+             }
             print(total[i].text);
           }
         }
         print('Import fisnished');
-      } catch (e) {
-        importOmpl.importState = ImportState.error;
       }
     }
 

@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:    
     docker:
-      - image: cirrusci/flutter:v1.13.6
+      - image: cirrusci/flutter:v1.14.6
 
     branches:
       only: master

@@ -7,6 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:tsacdop/podcasts/podcastdetail.dart';
+import 'package:tsacdop/util/pageroute.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;
@@ -32,10 +34,15 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
         child: AnimatedContainer(
             duration: Duration(milliseconds: 800),
             width: _loadSave ? 70 : 0,
-            height: 40,
+            height: 60,
             decoration: BoxDecoration(
               color: Colors.blue,
               shape: BoxShape.circle,
+              boxShadow: [BoxShadow(
+                color: Colors.grey[700],
+                  blurRadius: 5,
+                  offset: Offset(1, 1),
+              ),]
             ),
             alignment: Alignment.center,
             child: Text(
@@ -86,7 +93,7 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
                       key: ObjectKey(podcastLocal.title),
                       child: PodcastCard(
                         podcastLocal: podcastLocal,
-                        group: widget.group.name,
+                        group: widget.group,
                       ),
                     );
                   }).toList(),
@@ -105,7 +112,7 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
 
 class PodcastCard extends StatefulWidget {
   final PodcastLocal podcastLocal;
-  final String group;
+  final PodcastGroup group;
   PodcastCard({this.podcastLocal, this.group, Key key}) : super(key: key);
   @override
   _PodcastCardState createState() => _PodcastCardState();
@@ -114,8 +121,8 @@ class PodcastCard extends StatefulWidget {
 class _PodcastCardState extends State<PodcastCard> {
   bool _loadMenu;
   bool _addGroup;
-  List<String> _selectedGroups;
-  List<String> _belongGroups;
+  List<PodcastGroup> _selectedGroups;
+  List<PodcastGroup> _belongGroups;
   Color _c;
 
   @override
@@ -146,11 +153,8 @@ class _PodcastCardState extends State<PodcastCard> {
         : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
     double _width = MediaQuery.of(context).size.width;
     var _groupList = Provider.of<GroupList>(context);
-    _belongGroups = _groupList
-        .getPodcastGroup(widget.podcastLocal.id)
-        .map((e) => e.name)
-        .toList();
-    
+    _belongGroups = _groupList.getPodcastGroup(widget.podcastLocal.id);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -198,7 +202,7 @@ class _PodcastCardState extends State<PodcastCard> {
                         children: _belongGroups.map((group) {
                           return Container(
                               padding: EdgeInsets.only(right: 5.0),
-                              child: Text(group));
+                              child: Text(group.name));
                         }).toList(),
                       ),
                     ],
@@ -263,21 +267,20 @@ class _PodcastCardState extends State<PodcastCard> {
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
                                     children: _groupList.groups
-                                        .map<Widget>((PodcastGroup group){
+                                        .map<Widget>((PodcastGroup group) {
                                   return Container(
                                     padding: EdgeInsets.only(left: 5.0),
                                     child: FilterChip(
                                       key: ValueKey<String>(group.id),
                                       label: Text(group.name),
-                                      selected: 
-                                          _selectedGroups.contains(group.name),
+                                      selected: _selectedGroups.contains(group),
                                       onSelected: (bool value) {
                                         setState(() {
                                           if (!value) {
-                                            _selectedGroups.remove(group.name);
+                                            _selectedGroups.remove(group);
                                             print(group.name);
                                           } else {
-                                            _selectedGroups.add(group.name);
+                                            _selectedGroups.add(group);
                                           }
                                         });
                                       },
@@ -327,7 +330,15 @@ class _PodcastCardState extends State<PodcastCard> {
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            _buttonOnMenu(Icon(Icons.fullscreen), () {}),
+                            _buttonOnMenu(
+                                Icon(Icons.fullscreen),
+                                () => Navigator.push(
+                                      context,
+                                      ScaleRoute(
+                                          page: PodcastDetail(
+                                        podcastLocal: widget.podcastLocal,
+                                      )),
+                                    )),
                             _buttonOnMenu(Icon(Icons.add), () {
                               setState(() {
                                 _addGroup = true;

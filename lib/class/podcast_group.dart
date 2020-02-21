@@ -22,12 +22,8 @@ class GroupEntity {
   static GroupEntity fromJson(Map<String, Object> json) {
     List<String> list = List.from(json['podcastList']);
     print(json['[podcastList']);
-    return 
-    GroupEntity(
-        json['name'] as String, 
-        json['id'] as String,
-        json['color'] as String, 
-        list);
+    return GroupEntity(json['name'] as String, json['id'] as String,
+        json['color'] as String, list);
   }
 }
 
@@ -91,11 +87,11 @@ class GroupList extends ChangeNotifier {
     notifyListeners();
     storage.getGroups().then((loadgroups) async {
       _groups.addAll(loadgroups.map((e) => PodcastGroup.fromEntity(e)));
-    await Future.forEach(_groups, (group) async {
+      await Future.forEach(_groups, (group) async {
         await group.getPodcasts();
       });
-   _isLoading = false;
-    notifyListeners();
+      _isLoading = false;
+      notifyListeners();
     });
   }
 
@@ -124,7 +120,7 @@ class GroupList extends ChangeNotifier {
   }
 
   Future subscribe(PodcastLocal podcastLocal) async {
-    _groups[0].podcastList.add(podcastLocal.id);
+    _groups[0].podcastList.insert(0, podcastLocal.id);
     _saveGroup();
     await dbHelper.savePodcastLocal(podcastLocal);
     await _groups[0].getPodcasts();
@@ -132,7 +128,7 @@ class GroupList extends ChangeNotifier {
   }
 
   List<PodcastGroup> getPodcastGroup(String id) {
-    List<PodcastGroup> result =[];
+    List<PodcastGroup> result = [];
     _groups.forEach((group) {
       if (group.podcastList.contains(id)) {
         result.add(group);
@@ -141,38 +137,42 @@ class GroupList extends ChangeNotifier {
     return result;
   }
 
-  changeGroup(String id, List<String> list) async{
-    _groups.forEach((group) {
-      if (group.podcastList.contains(id)) {
-        group.podcastList.remove(id);
-      }
+  changeGroup(String id, List<PodcastGroup> list) async {
+    _isLoading = true;
+    notifyListeners();
+    getPodcastGroup(id).forEach((group) {
+      group.podcastList.remove(id);
     });
-    await Future.forEach(list, (s) {
-      _groups.forEach((group) async{
-        if (group.name == s) group.podcastList.add(id);
-        await group.getPodcasts();
-      });
+    list.forEach((s) {
+      s.podcastList.insert(0, id);
     });
     _saveGroup();
+    await Future.forEach(_groups, (group) async {
+      await group.getPodcasts();
+    });
+    _isLoading = false;
     notifyListeners();
   }
 
-  removePodcast(String id) async{
-    await Future.forEach(_groups, (group) async{
-      if (group.podcastList.contains(id)) {
+  removePodcast(String id) async {
+    _isLoading = true;
+    notifyListeners();
+    _groups.forEach((group) async {
         group.podcastList.remove(id);
-        await group.getPodcasts();
-      }
     });
     _saveGroup();
     await dbHelper.delPodcastLocal(id);
-   notifyListeners(); 
+     await Future.forEach(_groups, (group) async {
+      await group.getPodcasts();
+    });
+    _isLoading = false;
+    notifyListeners();
   }
 
-  saveOrder(PodcastGroup group, List<PodcastLocal> podcasts) async{
-      group.podcastList = podcasts.map((e) => e.id).toList();
-      _saveGroup();
-      await group.getPodcasts();
-      notifyListeners();
+  saveOrder(PodcastGroup group, List<PodcastLocal> podcasts) async {
+    group.podcastList = podcasts.map((e) => e.id).toList();
+    _saveGroup();
+    await group.getPodcasts();
+    notifyListeners();
   }
 }

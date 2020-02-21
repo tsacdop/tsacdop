@@ -5,20 +5,17 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
 import 'package:tsacdop/podcasts/podcastmanage.dart';
 import 'package:tsacdop/util/pageroute.dart';
-import 'package:tsacdop/class/settingstate.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -26,35 +23,11 @@ class ScrollPodcasts extends StatefulWidget {
 }
 
 class _ScrollPodcastsState extends State<ScrollPodcasts> {
-  var dir;
   int _groupIndex;
-  bool _loaded;
-
-  ImportState importState;
-  Update subscribeUpdate;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    subscribeUpdate = Provider.of<SettingState>(context).subscribeupdate;
-    if (subscribeUpdate == Update.backhome) {
-      setState(() {
-        _groupIndex = 0;
-      });
-    } else if (subscribeUpdate == Update.justupdate) {
-      setState(() {});
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _loaded = false;
     _groupIndex = 0;
-    getApplicationDocumentsDirectory().then((value) {
-      dir = value.path;
-      setState(() => _loaded = true);
-    });
   }
 
   @override
@@ -66,10 +39,6 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
       return isLoading
           ? Container(
               height: (_width - 20) / 3 + 110,
-              child: SizedBox(
-                height: 20.0,
-                width: 20.0,
-                child: CircularProgressIndicator()),
             )
           : DefaultTabController(
               length: groups[_groupIndex].podcastList.length,
@@ -159,7 +128,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                             indicator: CircleTabIndicator(
                                 color: Colors.blue, radius: 3),
                             isScrollable: true,
-                            tabs: groups[_groupIndex].podcasts
+                            tabs: groups[_groupIndex]
+                                .podcasts
                                 .map<Tab>((PodcastLocal podcastLocal) {
                               return Tab(
                                 child: ClipRRect(
@@ -168,10 +138,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                   child: LimitedBox(
                                     maxHeight: 50,
                                     maxWidth: 50,
-                                    child: !_loaded
-                                        ? CircularProgressIndicator()
-                                        : Image.file(File(
-                                            "${podcastLocal.imagePath}")),
+                                    child: Image.file(
+                                        File("${podcastLocal.imagePath}")),
                                   ),
                                 ),
                               );
@@ -188,7 +156,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                       color: Colors.white,
                     ),
                     child: TabBarView(
-                      children: groups[_groupIndex].podcasts
+                      children: groups[_groupIndex]
+                          .podcasts
                           .map<Widget>((PodcastLocal podcastLocal) {
                         return Container(
                           decoration: BoxDecoration(color: Colors.grey[100]),
@@ -216,7 +185,6 @@ class PodcastPreview extends StatefulWidget {
 }
 
 class _PodcastPreviewState extends State<PodcastPreview> {
-
   Future<List<EpisodeBrief>> _getRssItemTop(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     Future<List<EpisodeBrief>> episodes =
@@ -265,24 +233,33 @@ class _PodcastPreviewState extends State<PodcastPreview> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Text(widget.podcastLocal.title,
-                  style: TextStyle(fontWeight: FontWeight.bold, color: _c)),
-              Spacer(),
-              Material(
-                color: Colors.transparent,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_forward),
-                  splashColor: Colors.transparent,
-                  tooltip: 'See All',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      SlideLeftRoute(
-                          page: PodcastDetail(
-                        podcastLocal: widget.podcastLocal,
-                      )),
-                    );
-                  },
+              Expanded(
+                flex: 4,
+                child: Text(widget.podcastLocal.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(fontWeight: FontWeight.bold, color: _c)),
+              ),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_forward),
+                      tooltip: 'See All',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          SlideLeftRoute(
+                              page: PodcastDetail(
+                            podcastLocal: widget.podcastLocal,
+                          )),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -296,8 +273,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
 class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> podcast;
   final PodcastLocal podcastLocal;
-  ShowEpisode({Key key, this.podcast, this.podcastLocal})
-      : super(key: key);
+  ShowEpisode({Key key, this.podcast, this.podcastLocal}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
@@ -368,8 +344,8 @@ class ShowEpisode extends StatelessWidget {
                                     child: Container(
                                       height: _width / 18,
                                       width: _width / 18,
-                                      child: Image.file(File(
-                                          "${podcastLocal.imagePath}")),
+                                      child: Image.file(
+                                          File("${podcastLocal.imagePath}")),
                                     ),
                                   ),
                                 ),
@@ -398,7 +374,8 @@ class ShowEpisode extends StatelessWidget {
                           child: Container(
                             alignment: Alignment.bottomLeft,
                             child: Text(
-                              podcast[index].pubDate.substring(4, 16),
+                              podcast[index].dateToString(),
+                              //podcast[index].pubDate.substring(4, 16),
                               style: TextStyle(
                                 fontSize: _width / 35,
                                 color: _c,

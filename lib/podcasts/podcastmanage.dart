@@ -13,7 +13,7 @@ class PodcastManage extends StatefulWidget {
 class _PodcastManageState extends State<PodcastManage> {
   Decoration getIndicator() {
     return const UnderlineTabIndicator(
-        borderSide: BorderSide(color: Colors.red, width: 2),
+        borderSide: BorderSide(color: Colors.red, width: 0),
         insets: EdgeInsets.only(
           top: 10.0,
         ));
@@ -50,44 +50,57 @@ class _PodcastManageState extends State<PodcastManage> {
                     Row(
                       children: <Widget>[
                         Expanded(
+                          flex: 4,
                           child: Container(
                             height: 50,
                             padding: EdgeInsets.symmetric(horizontal: 10.0),
                             alignment: Alignment.centerLeft,
                             child: TabBar(
-                              labelPadding: EdgeInsets.only(
-                                  top: 5.0,
-                                  bottom: 6.0,
-                                  left: 10.0,
-                                  right: 10.0),
+                              labelColor: Colors.black,
+                              unselectedLabelColor: Colors.grey[500],
+                              labelPadding: EdgeInsets.all(5.0),
                               indicator: getIndicator(),
                               isScrollable: true,
                               tabs: _groups.map<Tab>((group) {
                                 return Tab(
-                                  child: Text(group.name),
+                                  child: Container(
+                                      height: 30.0,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                      ),
+                                      child: Text(
+                                        group.name,
+                                      )),
                                 );
                               }).toList(),
                             ),
                           ),
                         ),
-                        Container(
-                          child: FlatButton(
+                        Expanded(
+                          flex: 1,
+                          child: IconButton(
                               onPressed: () => showDialog(
                                   context: context,
                                   builder: (BuildContext context) =>
                                       AddGroup()),
-                              child: Icon(Icons.add)),
+                              icon: Icon(Icons.add)),
                         ),
                       ],
                     ),
                     Expanded(
                       child: Container(
                         child: TabBarView(
-                            children: _groups.map<Widget>((group) {
-                          return Container(
-                              key: ObjectKey(group),
-                              child: PodcastGroupList(group: group));
-                        }).toList(),),
+                          children: _groups.map<Widget>((group) {
+                            return Container(
+                                key: ObjectKey(group),
+                                child: PodcastGroupList(group: group));
+                          }).toList(),
+                        ),
                       ),
                     )
                   ],

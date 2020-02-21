@@ -27,7 +27,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_statusbarcolor: ^0.2.3
   json_annotation: any
   sqflite: any
   flutter_html: ^0.11.1 

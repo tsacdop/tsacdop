@@ -25,9 +25,9 @@ class _AboutPodcastState extends State<AboutPodcast> {
   String _description;
   bool _load;
 
-  void getDescription(String title) async {
+  void getDescription(String id) async {
     var dbHelper = DBHelper();
-    String description = await dbHelper.getFeedDescription(title);
+    String description = await dbHelper.getFeedDescription(id);
     _description = description;
     setState(() {
       _load = true;
@@ -38,7 +38,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
   void initState() {
     super.initState();
     _load = false;
-    getDescription(widget.podcastLocal.title);
+    getDescription(widget.podcastLocal.id);
   }
 
   @override

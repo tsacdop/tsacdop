@@ -1,7 +1,9 @@
+import 'package:intl/intl.dart';
+
 class EpisodeBrief {
   final String title;
   String description;
-  final String pubDate;
+  final int pubDate;
   final int enclosureLength;
   final String enclosureUrl;
   final String feedTitle;
@@ -24,5 +26,16 @@ class EpisodeBrief {
       this.explicit,
       this.imagePath
       );
-  
+
+  String dateToString(){
+    DateTime date =  DateTime.fromMillisecondsSinceEpoch(pubDate);
+    var diffrence = DateTime.now().difference(date);
+    if(diffrence.inHours < 24) {
+      return '${diffrence.inHours} hours ago';
+    } else if (diffrence.inDays < 7){
+      return '${diffrence.inDays} days ago';}
+        else {
+          return DateFormat.yMMMd().format( DateTime.fromMillisecondsSinceEpoch(pubDate));
+        }
+    }
 }
