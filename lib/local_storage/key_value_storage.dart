@@ -31,4 +31,15 @@ class KeyValueStorage {
         json.encode(
             {'groups': groupList.map((group) => group.toJson()).toList()}));
   }
+
+  Future<bool> saveTheme(int setting) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setInt(key, setting);
+  }
+
+  Future<int> getTheme() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getInt(key) == null) await prefs.setInt(key, 0);
+    return prefs.getInt(key);
+  }
 }

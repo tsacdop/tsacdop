@@ -65,9 +65,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _remoteAudioLoading = true;
     Provider.of<AudioPlay>(context, listen: false).audioState = AudioState.load;
 
-    if (_backgroundAudioPlaying == true)
-    { _backgroundAudio?.pause();
-    AudioSystem.instance.stopBackgroundDisplay();}
+    if (_backgroundAudioPlaying == true) {
+      _backgroundAudio?.pause();
+      AudioSystem.instance.stopBackgroundDisplay();
+    }
     _backgroundAudio?.dispose();
     _backgroundAudio = Audio.loadFromRemoteUrl(url,
         onDuration: (double durationSeconds) {
@@ -118,9 +119,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _remoteAudioLoading = true;
     ByteData audio = getAudio(path);
     Provider.of<AudioPlay>(context, listen: false).audioState = AudioState.load;
-    if (_backgroundAudioPlaying == true) 
-    {_backgroundAudio?.pause();
-    AudioSystem.instance.stopBackgroundDisplay();}
+    if (_backgroundAudioPlaying == true) {
+      _backgroundAudio?.pause();
+      AudioSystem.instance.stopBackgroundDisplay();
+    }
     _backgroundAudio?.dispose();
     _backgroundAudio = Audio.loadFromByteData(audio,
         onDuration: (double durationSeconds) {
@@ -192,11 +194,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       setState(() {
         this.url = url;
         episode = Provider.of<AudioPlay>(context).episode;
-        var color = json.decode(episode?.primaryColor);
-        (color[0] > 200 && color[1] > 200 && color[2] > 200)
-            ? _c = Color.fromRGBO(
-                (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-            : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
         _backgroundAudioPlaying = true;
         _isLoading = true;
         _getFile(url).then((result) {
@@ -270,11 +267,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       'playnow', likeButtonId, 'ic_stat_play_circle_filled');
 
   Future<void> _setNotification() async {
-    final Uint8List imageBytes =
-        File('${episode.imagePath}').readAsBytesSync();
+    final Uint8List imageBytes = File('${episode.imagePath}').readAsBytesSync();
     AudioSystem.instance.setMetadata(AudioMetadata(
         title: episode.title,
-        artist:episode.feedTitle,
+        artist: episode.feedTitle,
         album: episode.feedTitle,
         genre: "Podcast",
         durationSeconds: _backgroundAudioDurationSeconds,
@@ -309,8 +305,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       Provider.of<AudioPlay>(context, listen: false).audioState =
           AudioState.play;
     });
-    final Uint8List imageBytes =
-        File('${episode.imagePath}').readAsBytesSync();
+    final Uint8List imageBytes = File('${episode.imagePath}').readAsBytesSync();
     AudioSystem.instance.setMetadata(AudioMetadata(
         title: episode.title,
         artist: episode.feedTitle,
@@ -383,9 +378,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     AudioSystem.instance.setPlaybackState(true, forwardposition);
   }
 
-  Widget _expandedPanel() => Container(
+  Widget _expandedPanel(BuildContext context) => Container(
         height: 300,
-        color: Colors.grey[100],
+        color: Theme.of(context).primaryColor,
         padding: EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -459,7 +454,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                     color: const Color(0xFFFF0000)))
                             : Text(
                                 _remoteAudioLoading ? 'Buffring...' : '',
-                                style: TextStyle(color: Colors.blue),
+                                style: TextStyle(
+                                    color: Theme.of(context).accentColor),
                               ),
                       ),
                     ),
@@ -474,6 +470,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 height: 100,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Material(
                       color: Colors.transparent,
@@ -484,7 +481,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               : null,
                           iconSize: 32.0,
                           icon: Icon(Icons.replay_10),
-                          color: Colors.black),
+                          color: Theme.of(context).tabBarTheme.labelColor),
                     ),
                     _backgroundAudioPlaying
                         ? Material(
@@ -498,7 +495,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                     : null,
                                 iconSize: 40.0,
                                 icon: Icon(Icons.pause_circle_filled),
-                                color: Colors.black),
+                                color:
+                                    Theme.of(context).tabBarTheme.labelColor),
                           )
                         : Material(
                             color: Colors.transparent,
@@ -511,7 +509,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                       },
                                 iconSize: 40.0,
                                 icon: Icon(Icons.play_circle_filled),
-                                color: Colors.black),
+                                color:
+                                    Theme.of(context).tabBarTheme.labelColor),
                           ),
                     Material(
                       color: Colors.transparent,
@@ -522,7 +521,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               : null,
                           iconSize: 32.0,
                           icon: Icon(Icons.forward_30),
-                          color: Colors.black),
+                          color: Theme.of(context).tabBarTheme.labelColor),
                     ),
                   ],
                 ),
@@ -533,7 +532,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   margin: EdgeInsets.symmetric(vertical: 10.0),
                   padding: EdgeInsets.symmetric(horizontal: 10.0),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   ),
                   child: Row(
@@ -545,12 +544,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.all(Radius.circular(15.0)),
                           child: Container(
-                            height: 30.0,
-                            width: 30.0,
-                            color: Colors.white,
-                            child: Image.file(
-                                    File("${episode.imagePath}"))
-                          ),
+                              height: 30.0,
+                              width: 30.0,
+                              child: Image.file(File("${episode.imagePath}"))),
                         ),
                       ),
                       Spacer(),
@@ -565,138 +561,158 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   ))
             ]),
       );
-  Widget _miniPanel(double width) => Container(
-        height: 60,
-        color: Colors.grey[100],
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                  height: 2,
-                  child: LinearProgressIndicator(
-                    value: _seekSliderValue,
-                    backgroundColor: Colors.grey[100],
-                    valueColor: AlwaysStoppedAnimation<Color>(_c),
-                  )),
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.only(left: 15, right: 10),
-                  alignment: Alignment.center,
+  Widget _miniPanel(double width, BuildContext context) {
+    var color = json.decode(episode?.primaryColor);
+    if (color) {
+      if (Theme.of(context).brightness == Brightness.light) {
+        _c = (color[0] > 200 && color[1] > 200 && color[2] > 200)
+            ? Color.fromRGBO(
+                (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+            : Color.fromRGBO(color[0], color[1], color[2], 1.0);
+      } else {
+        _c = (color[0] < 50 && color[1] < 50 && color[2] < 50)
+            ? Color.fromRGBO(
+                (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+            : Color.fromRGBO(color[0], color[1], color[2], 1.0);
+      }
+    }
+    return Container(
+      height: 60,
+      color: Theme.of(context).primaryColor,
+      child:
+          Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+        SizedBox(
+            height: 2,
+            child: LinearProgressIndicator(
+              value: _seekSliderValue,
+              backgroundColor: Theme.of(context).primaryColor,
+              valueColor: AlwaysStoppedAnimation<Color>(_c),
+            )),
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.only(left: 15, right: 10),
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  flex: 4,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    alignment: Alignment.centerLeft,
+                    child: (episode.title.length > 55)
+                        ? Marquee(
+                            text: episode.title,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            scrollAxis: Axis.vertical,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            blankSpace: 30.0,
+                            velocity: 50.0,
+                            pauseAfterRound: Duration(seconds: 1),
+                            startPadding: 30.0,
+                            accelerationDuration: Duration(seconds: 1),
+                            accelerationCurve: Curves.linear,
+                            decelerationDuration: Duration(milliseconds: 500),
+                            decelerationCurve: Curves.easeOut,
+                          )
+                        : Text(
+                            episode.title,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            maxLines: 2,
+                          ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    alignment: Alignment.center,
+                    child: _remoteAudioLoading
+                        ? Text(
+                            'Buffring...',
+                            style:
+                                TextStyle(color: Theme.of(context).accentColor),
+                          )
+                        : Row(
+                            children: <Widget>[
+                              Text(
+                                _stringForSeconds(
+                                        _backgroundAudioDurationSeconds -
+                                            _backgroundAudioPositionSeconds) ??
+                                    '',
+                                style: TextStyle(color: _c),
+                              ),
+                              Text(
+                                '  Left',
+                                style: TextStyle(color: _c),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Expanded(
-                        flex: 4,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 5),
-                          alignment: Alignment.centerLeft,
-                          child: (episode.title.length > 55)
-                              ? Marquee(
-                                  text: episode.title,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                  scrollAxis: Axis.vertical,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  blankSpace: 30.0,
-                                  velocity: 50.0,
-                                  pauseAfterRound: Duration(seconds: 1),
-                                  startPadding: 30.0,
-                                  accelerationDuration: Duration(seconds: 1),
-                                  accelerationCurve: Curves.linear,
-                                  decelerationDuration:
-                                      Duration(milliseconds: 500),
-                                  decelerationCurve: Curves.easeOut,
-                                )
-                              : Text(
-                                  episode.title,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                  maxLines: 2,
-                                ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          alignment: Alignment.center,
-                          child: _remoteAudioLoading
-                              ? Text(
-                                  'Buffring...',
-                                  style: TextStyle(color: Colors.blue),
-                                )
-                              : Row(
-                                  children: <Widget>[
-                                    Text(
-                                      _stringForSeconds(
-                                              _backgroundAudioDurationSeconds -
-                                                  _backgroundAudioPositionSeconds)  ??
-                                          '',
-                                      style: TextStyle(color: _c),
-                                    ),
-                                    Text(
-                                      '  Left',
-                                      style: TextStyle(color: _c),
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _backgroundAudioPlaying
-                                ? Material(
-                                    color: Colors.transparent,
-                                    child: IconButton(
-                                        onPressed: _backgroundAudioPlaying
-                                            ? () {
-                                                _pauseBackgroundAudio();
-                                              }
-                                            : null,
-                                        iconSize: 25.0,
-                                        icon: Icon(Icons.pause_circle_filled),
-                                        color: Colors.black),
-                                  )
-                                : Material(
-                                    color: Colors.transparent,
-                                    child: IconButton(
-                                        onPressed: _backgroundAudioPlaying
-                                            ? null
-                                            : () {
-                                                _resumeBackgroundAudio();
-                                              },
-                                        iconSize: 25.0,
-                                        icon: Icon(Icons.play_circle_filled),
-                                        color: Colors.black),
-                                  ),
-                            Material(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _backgroundAudioPlaying
+                          ? Material(
                               color: Colors.transparent,
                               child: IconButton(
                                   onPressed: _backgroundAudioPlaying
-                                      ? () => _forwardBackgroundAudio(30)
+                                      ? () {
+                                          _pauseBackgroundAudio();
+                                        }
                                       : null,
                                   iconSize: 25.0,
-                                  icon: Icon(Icons.forward_30),
-                                  color: Colors.black),
+                                  icon: Icon(Icons.pause_circle_filled),
+                                  color:
+                                      Theme.of(context).tabBarTheme.labelColor),
+                            )
+                          : Material(
+                              color: Colors.transparent,
+                              child: IconButton(
+                                  onPressed: _backgroundAudioPlaying
+                                      ? null
+                                      : () {
+                                          _resumeBackgroundAudio();
+                                        },
+                                  iconSize: 25.0,
+                                  icon: Icon(Icons.play_circle_filled),
+                                  color:
+                                      Theme.of(context).tabBarTheme.labelColor),
                             ),
-                          ],
-                        ),
+                      Material(
+                        color: Colors.transparent,
+                        child: IconButton(
+                            onPressed: _backgroundAudioPlaying
+                                ? () => _forwardBackgroundAudio(30)
+                                : null,
+                            iconSize: 25.0,
+                            icon: Icon(Icons.forward_30),
+                            color: Theme.of(context).tabBarTheme.labelColor),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ]),
-      );
+              ],
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
+
     return !_isLoading
         ? Center()
         : AudioPanel(
-            miniPanel: _miniPanel(_width), expandedPanel: _expandedPanel());
+            miniPanel: _miniPanel(_width, context),
+            expandedPanel: _expandedPanel(context));
   }
 }

@@ -12,11 +12,16 @@ class MainTab extends StatefulWidget {
 
 class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
   TabController _controller;
-  Decoration getIndicator() {
-      return const UnderlineTabIndicator(
-        borderSide: BorderSide(color: Colors.red, width: 2),
-        insets: EdgeInsets.only(left:10.0,right: 10.0, top:10.0,)
-          );}
+  Decoration getIndicator(BuildContext context) {
+    return UnderlineTabIndicator(
+        borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+        insets: EdgeInsets.only(
+          left: 10.0,
+          right: 10.0,
+          top: 10.0,
+        ));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -41,17 +46,23 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
           alignment: Alignment.centerLeft,
           child: TabBar(
             isScrollable: true,
-            labelPadding:
-                EdgeInsets.all(10.0),
+            labelPadding: EdgeInsets.all(10.0),
             controller: _controller,
-            labelColor: Colors.red,
-            unselectedLabelColor: Colors.black,
-            indicator: getIndicator(),
+            indicator: getIndicator(context),
             tabs: <Widget>[
-              Text('Recent Update',style: TextStyle(fontWeight: FontWeight.bold),), 
-              Text('Favorites',style: TextStyle(fontWeight: FontWeight.bold),),
-              Text('Downloads',style: TextStyle(fontWeight: FontWeight.bold),),
-              ],
+              Text(
+                'Recent Update',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Favorites',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Downloads',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
         ),
         Expanded(
@@ -96,7 +107,13 @@ class _RecentUpdateState extends State<RecentUpdate> {
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
-            ? EpisodeGrid(podcast: snapshot.data, showDownload: false, showFavorite: false, showNumber: false, heroTag: 'recent',) 
+            ? EpisodeGrid(
+                podcast: snapshot.data,
+                showDownload: false,
+                showFavorite: false,
+                showNumber: false,
+                heroTag: 'recent',
+              )
             : Center(child: CircularProgressIndicator());
       },
     );
@@ -111,7 +128,7 @@ class MyFavorite extends StatefulWidget {
 class _MyFavoriteState extends State<MyFavorite> {
   Future<List<EpisodeBrief>> _getLikedRssItem() async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes =await dbHelper.getLikedRssItem();
+    List<EpisodeBrief> episodes = await dbHelper.getLikedRssItem();
     return episodes;
   }
 
@@ -122,26 +139,31 @@ class _MyFavoriteState extends State<MyFavorite> {
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
-            ? EpisodeGrid(podcast: snapshot.data, showDownload: false, showFavorite: false, showNumber: false, heroTag: 'favorite',) 
+            ? EpisodeGrid(
+                podcast: snapshot.data,
+                showDownload: false,
+                showFavorite: false,
+                showNumber: false,
+                heroTag: 'favorite',
+              )
             : Center(child: CircularProgressIndicator());
       },
     );
   }
 }
 
- class MyDownload extends StatefulWidget {
+class MyDownload extends StatefulWidget {
   @override
   _MyDownloadState createState() => _MyDownloadState();
 }
 
-
 class _MyDownloadState extends State<MyDownload> {
   Future<List<EpisodeBrief>> _getDownloadedRssItem() async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes =await dbHelper.getDownloadedRssItem();
+    List<EpisodeBrief> episodes = await dbHelper.getDownloadedRssItem();
     return episodes;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<EpisodeBrief>>(
@@ -149,10 +171,15 @@ class _MyDownloadState extends State<MyDownload> {
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
-            ? EpisodeGrid(podcast: snapshot.data, showDownload: true, showFavorite: false, showNumber: false, heroTag: 'download',)
+            ? EpisodeGrid(
+                podcast: snapshot.data,
+                showDownload: true,
+                showFavorite: false,
+                showNumber: false,
+                heroTag: 'download',
+              )
             : Center(child: CircularProgressIndicator());
       },
     );
   }
 }
-

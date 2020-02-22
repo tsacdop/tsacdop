@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/podcast_group.dart';
@@ -52,7 +53,6 @@ class _AboutPodcastState extends State<AboutPodcast> {
             _groupList.removePodcast(widget.podcastLocal.id);
             Navigator.of(context).pop();
           },
-          color: Colors.grey[200],
           textColor: Colors.red,
           child: Text(
             'UNSUBSCRIBE',
@@ -83,7 +83,6 @@ class PodcastList extends StatefulWidget {
 }
 
 class _PodcastListState extends State<PodcastList> {
-
   Future<List<PodcastLocal>> getPodcastLocal() async {
     var dbHelper = DBHelper();
     var podcastList = await dbHelper.getPodcastLocalAll();
@@ -93,109 +92,100 @@ class _PodcastListState extends State<PodcastList> {
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Podcasts'),
-        centerTitle: true,
-        backgroundColor: Colors.grey[100],
-        elevation: 0,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+        statusBarColor: Theme.of(context).primaryColor,
       ),
-      body: Container(
-        color: Colors.grey[100],
-        child: FutureBuilder<List<PodcastLocal>>(
-          future: getPodcastLocal(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return CustomScrollView(
-                primary: false,
-                slivers: <Widget>[
-                  SliverPadding(
-                    padding: const EdgeInsets.all(10.0),
-                    sliver: SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio: 0.8,
-                        crossAxisCount: 3,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                ScaleRoute(
-                                    page: PodcastDetail(
-                                  podcastLocal: snapshot.data[index],
-                                )),
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Podcasts'),
+            centerTitle: true,
+          ),
+          body: Container(
+            color: Theme.of(context).primaryColor,
+            child: FutureBuilder<List<PodcastLocal>>(
+              future: getPodcastLocal(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return CustomScrollView(
+                    primary: false,
+                    slivers: <Widget>[
+                      SliverPadding(
+                        padding: const EdgeInsets.all(10.0),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            childAspectRatio: 0.8,
+                            crossAxisCount: 3,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    ScaleRoute(
+                                        page: PodcastDetail(
+                                      podcastLocal: snapshot.data[index],
+                                    )),
+                                  );
+                                },
+                                onLongPress: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        AboutPodcast(
+                                            podcastLocal: snapshot.data[index]),
+                                  ).then((_) => setState(() {}));
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                        height: 10.0,
+                                      ),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(_width / 8)),
+                                        child: Container(
+                                          height: _width / 4,
+                                          width: _width / 4,
+                                          child: Image.file(File(
+                                              "${snapshot.data[index].imagePath}")),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(4.0),
+                                        child: Text(
+                                          snapshot.data[index].title,
+                                          textAlign: TextAlign.center,
+                                          style: Theme.of(context).textTheme.bodyText1, 
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               );
                             },
-                            onLongPress: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) => AboutPodcast(
-                                    podcastLocal: snapshot.data[index]),
-                              ).then((_) => setState(() {}));
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    height: 10.0,
-                                  ),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(_width / 8)),
-                                    child: Container(
-                                      height: _width / 4,
-                                      width: _width / 4,
-                                      child: Image.file(File(
-                                          "${snapshot.data[index].imagePath}")),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(4.0),
-                                    child: Text(
-                                      snapshot.data[index].title,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 16.0,
-                                        color: Colors.black.withOpacity(0.5),
-                                      ),
-                                      maxLines: 2,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                        childCount: snapshot.data.length,
+                            childCount: snapshot.data.length,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              );
-            }
-            return Text('NoData');
-          },
+                    ],
+                  );
+                }
+                return Text('NoData');
+              },
+            ),
+          ),
         ),
       ),
-    );
-  }
-}
-
-class Podcast extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.grey[100],
-        elevation: 0,
-        centerTitle: true,
-        title: Text('Podcasts'),
-      ),
-      body: Container(child: PodcastList()),
     );
   }
 }

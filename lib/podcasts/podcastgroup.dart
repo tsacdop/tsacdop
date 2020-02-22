@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/podcast_group.dart';
@@ -36,14 +37,15 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
             width: _loadSave ? 70 : 0,
             height: 60,
             decoration: BoxDecoration(
-              color: Colors.blue,
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(
-                color: Colors.grey[700],
-                  blurRadius: 5,
-                  offset: Offset(1, 1),
-              ),]
-            ),
+                color: Colors.blue,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey[700],
+                    blurRadius: 5,
+                    offset: Offset(1, 1),
+                  ),
+                ]),
             alignment: Alignment.center,
             child: Text(
               'Save',
@@ -68,10 +70,10 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
   Widget build(BuildContext context) {
     return widget.group.podcastList.length == 0
         ? Container(
-            color: Colors.grey[100],
+            color: Theme.of(context).primaryColor,
           )
         : Container(
-            color: Colors.grey[100],
+            color: Theme.of(context).primaryColor,
             child: Stack(
               children: <Widget>[
                 ReorderableListView(
@@ -89,7 +91,8 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
                   children: widget.group.podcasts
                       .map<Widget>((PodcastLocal podcastLocal) {
                     return Container(
-                      decoration: BoxDecoration(color: Colors.grey[100]),
+                      decoration:
+                          BoxDecoration(color: Theme.of(context).primaryColor),
                       key: ObjectKey(podcastLocal.title),
                       child: PodcastCard(
                         podcastLocal: podcastLocal,
@@ -147,10 +150,17 @@ class _PodcastCardState extends State<PodcastCard> {
   @override
   Widget build(BuildContext context) {
     var color = json.decode(widget.podcastLocal.primaryColor);
-    (color[0] > 200 && color[1] > 200 && color[2] > 200)
-        ? _c = Color.fromRGBO(
-            (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-        : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+    if (Theme.of(context).brightness == Brightness.light) {
+      (color[0] > 200 && color[1] > 200 && color[2] > 200)
+          ? _c = Color.fromRGBO(
+              (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+          : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+    } else {
+      (color[0] < 50 && color[1] < 50 && color[2] < 50)
+          ? _c = Color.fromRGBO(
+              (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+          : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+    }
     double _width = MediaQuery.of(context).size.width;
     var _groupList = Provider.of<GroupList>(context);
     _belongGroups = _groupList.getPodcastGroup(widget.podcastLocal.id);
@@ -219,27 +229,35 @@ class _PodcastCardState extends State<PodcastCard> {
                 onPressed: () {
                   showDialog(
                       context: context,
-                      child: AlertDialog(
-                        elevation: 2.0,
-                        title: Text('Remove confirm'),
-                        content: Text(
-                            '${widget.podcastLocal.title} will be removed from device.'),
-                        actions: <Widget>[
-                          FlatButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: Text('CANCEL'),
-                          ),
-                          FlatButton(
-                            onPressed: () {
-                              _groupList.removePodcast(widget.podcastLocal.id);
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              'CONFIRM',
-                              style: TextStyle(color: Colors.red),
+                      child: AnnotatedRegion<SystemUiOverlayStyle>(
+                        value: SystemUiOverlayStyle(
+                          systemNavigationBarColor:
+                              Colors.black.withOpacity(0.5),
+                          statusBarColor: Colors.red,
+                        ),
+                        child: AlertDialog(
+                          elevation: 2.0,
+                          title: Text('Remove confirm'),
+                          content: Text(
+                              '${widget.podcastLocal.title} will be removed from device.'),
+                          actions: <Widget>[
+                            FlatButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text('CANCEL'),
                             ),
-                          )
-                        ],
+                            FlatButton(
+                              onPressed: () {
+                                _groupList
+                                    .removePodcast(widget.podcastLocal.id);
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                'CONFIRM',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            )
+                          ],
+                        ),
                       ));
                 },
               ),
@@ -251,10 +269,12 @@ class _PodcastCardState extends State<PodcastCard> {
             : Container(
                 child: Container(
                   decoration: BoxDecoration(
-                      color: Colors.grey[100],
+                      color: Theme.of(context).primaryColor,
                       border: Border(
-                          bottom: BorderSide(color: Colors.grey[300]),
-                          top: BorderSide(color: Colors.grey[300]))),
+                          bottom: BorderSide(
+                              color: Theme.of(context).primaryColorDark),
+                          top: BorderSide(
+                              color: Theme.of(context).primaryColorDark))),
                   height: 50,
                   child: _addGroup
                       ? Row(

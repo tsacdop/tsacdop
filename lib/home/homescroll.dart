@@ -87,9 +87,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                       EdgeInsets.symmetric(horizontal: 15.0),
                                   child: Text(
                                     groups[_groupIndex].name,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red[300]),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        .copyWith(color: Colors.red[300]),
                                   )),
                               Spacer(),
                               Container(
@@ -104,21 +105,24 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     );
                                   },
                                   child: Container(
-                                    height: 30,
-                                    padding: EdgeInsets.all(5.0),
-                                    child: Text('See All',
-                                        style: TextStyle(
-                                          color: Colors.red[300],
-                                          fontWeight: FontWeight.bold,
-                                        )),
-                                  ),
+                                      height: 30,
+                                      padding: EdgeInsets.all(5.0),
+                                      child: Text(
+                                        'See All',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .accentColor),
+                                      )),
                                 ),
                               ),
                             ],
                           ),
                         ),
                         Container(
-                          color: Colors.white10,
+                          // color: Colors.white10,
                           height: 70,
                           width: _width,
                           alignment: Alignment.centerLeft,
@@ -153,14 +157,15 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                     height: (_width - 20) / 3 + 40,
                     margin: EdgeInsets.only(left: 10, right: 10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                     ),
                     child: TabBarView(
                       children: groups[_groupIndex]
                           .podcasts
                           .map<Widget>((PodcastLocal podcastLocal) {
                         return Container(
-                          decoration: BoxDecoration(color: Colors.grey[100]),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor),
                           margin: EdgeInsets.symmetric(horizontal: 5.0),
                           key: ObjectKey(podcastLocal.title),
                           child: PodcastPreview(
@@ -193,18 +198,21 @@ class _PodcastPreviewState extends State<PodcastPreview> {
   }
 
   Color _c;
-  @override
-  void initState() {
-    super.initState();
-    var color = json.decode(widget.podcastLocal.primaryColor);
-    (color[0] > 200 && color[1] > 200 && color[2] > 200)
-        ? _c = Color.fromRGBO(
-            (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-        : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-  }
 
   @override
   Widget build(BuildContext context) {
+    var color = json.decode(widget.podcastLocal.primaryColor);
+    if (Theme.of(context).brightness == Brightness.light) {
+      (color[0] > 200 && color[1] > 200 && color[2] > 200)
+          ? _c = Color.fromRGBO(
+              (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+          : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+    } else {
+      (color[0] < 50 && color[1] < 50 && color[2] < 50)
+          ? _c = Color.fromRGBO(
+              (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+          : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+    }
     return Column(
       children: <Widget>[
         Expanded(
@@ -294,10 +302,18 @@ class ShowEpisode extends StatelessWidget {
               (BuildContext context, int index) {
                 Color _c;
                 var color = json.decode(podcast[index].primaryColor);
-                (color[0] > 200 && color[1] > 200 && color[2] > 200)
-                    ? _c = Color.fromRGBO(
-                        (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-                    : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+
+                if (Theme.of(context).brightness == Brightness.light) {
+                  (color[0] > 200 && color[1] > 200 && color[2] > 200)
+                      ? _c = Color.fromRGBO(
+                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+                } else {
+                  (color[0] < 50 && color[1] < 50 && color[2] < 50)
+                      ? _c = Color.fromRGBO(
+                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+                }
                 return InkWell(
                   onTap: () {
                     Navigator.push(
@@ -315,12 +331,12 @@ class ShowEpisode extends StatelessWidget {
                         borderRadius: BorderRadius.all(Radius.circular(5.0)),
                         color: Theme.of(context).scaffoldBackgroundColor,
                         border: Border.all(
-                          color: Colors.grey[100],
+                          color: Theme.of(context).primaryColor,
                           width: 3.0,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey[100],
+                            color: Theme.of(context).primaryColor,
                             blurRadius: 1.0,
                             spreadRadius: 0.5,
                           ),

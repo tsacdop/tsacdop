@@ -45,10 +45,17 @@ class EpisodeGrid extends StatelessWidget {
               (BuildContext context, int index) {
                 Color _c;
                 var color = json.decode(podcast[index].primaryColor);
-                (color[0] > 200 && color[1] > 200 && color[2] > 200)
-                    ? _c = Color.fromRGBO(
-                        (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-                    : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+                if (Theme.of(context).brightness == Brightness.light) {
+                  (color[0] > 200 && color[1] > 200 && color[2] > 200)
+                      ? _c = Color.fromRGBO(
+                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+                } else {
+                  (color[0] < 50 && color[1] < 50 && color[2] < 50)
+                      ? _c = Color.fromRGBO(
+                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
+                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+                }
                 return Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -67,13 +74,16 @@ class EpisodeGrid extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(5.0)),
                           color: Theme.of(context).scaffoldBackgroundColor,
                           border: Border.all(
-                            color: Colors.grey[100],
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).scaffoldBackgroundColor,
                             width: 3.0,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey[100],
-                              blurRadius: 1.0,
+                              color: Theme.of(context).primaryColor,
+                              blurRadius: 0.5,
                               spreadRadius: 0.5,
                             ),
                           ]),

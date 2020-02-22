@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,8 +16,7 @@ import 'episodedownload.dart';
 class EpisodeDetail extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
-  EpisodeDetail({this.episodeItem, this.heroTag, Key key})
-      : super(key: key);
+  EpisodeDetail({this.episodeItem, this.heroTag, Key key}) : super(key: key);
 
   @override
   _EpisodeDetailState createState() => _EpisodeDetailState();
@@ -53,119 +53,130 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(widget.episodeItem.feedTitle),
-        elevation: 0.0,
-        centerTitle: true,
-        backgroundColor: Colors.grey[100],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+        statusBarColor: Theme.of(context).primaryColor,
       ),
-      body: Container(
-        color: Colors.grey[100],
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      widget.episodeItem.title,
-                      style: Theme.of(context).textTheme.headline5,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Theme.of(context).primaryColor,
+          appBar: AppBar(
+            title: Text(widget.episodeItem.feedTitle),
+            centerTitle: true,
+          ),
+          body: Container(
+            color: Theme.of(context).primaryColor,
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          widget.episodeItem.title,
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        height: 30.0,
+                        child: Text(
+                            'Published ' +
+                                DateFormat.yMMMd().format(
+                                    DateTime.fromMillisecondsSinceEpoch(
+                                        widget.episodeItem.pubDate)),
+                            style: TextStyle(color: Colors.blue[500])),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(12.0),
+                        height: 50.0,
+                        child: Row(
+                          children: <Widget>[
+                            (widget.episodeItem.explicit == 1)
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.red[800],
+                                        shape: BoxShape.circle),
+                                    height: 25.0,
+                                    width: 25.0,
+                                    margin: EdgeInsets.only(right: 10.0),
+                                    alignment: Alignment.center,
+                                    child: Text('E',
+                                        style: TextStyle(color: Colors.white)))
+                                : Center(),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.cyan[300],
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.0))),
+                              height: 30.0,
+                              margin: EdgeInsets.only(right: 10.0),
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                  (widget.episodeItem.duration).toString() +
+                                      'mins',
+                                  style: textstyle),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.lightBlue[300],
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.0))),
+                              height: 30.0,
+                              margin: EdgeInsets.only(right: 10.0),
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                  ((widget.episodeItem.enclosureLength) ~/
+                                              1000000)
+                                          .toString() +
+                                      'MB',
+                                  style: textstyle),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 12.0, right: 12.0, top: 5.0),
+                    child: SingleChildScrollView(
+                      child: _loaddes
+                          ? (widget.episodeItem.description.contains('<'))
+                              ? Html(
+                                  data: widget.episodeItem.description,
+                                  onLinkTap: (url) {
+                                    _launchUrl(url);
+                                  },
+                                  useRichText: true,
+                                )
+                              : Container(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(widget.episodeItem.description))
+                          : Center(),
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    height: 30.0,
-                    child: Text(
-                        'Published ' +
-                        DateFormat.yMMMd().format( DateTime.fromMillisecondsSinceEpoch(widget.episodeItem.pubDate)),
-                        style: TextStyle(color: Colors.blue[500])),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(12.0),
-                    height: 50.0,
-                    child: Row(
-                      children: <Widget>[
-                        (widget.episodeItem.explicit == 1)
-                            ? Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.red[800],
-                                    shape: BoxShape.circle),
-                                height: 25.0,
-                                width: 25.0,
-                                margin: EdgeInsets.only(right: 10.0),
-                                alignment: Alignment.center,
-                                child: Text('E',
-                                    style: TextStyle(color: Colors.white)))
-                            : Center(),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.cyan[300],
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0))),
-                          height: 30.0,
-                          margin: EdgeInsets.only(right: 10.0),
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                              (widget.episodeItem.duration).toString() + 'mins',
-                              style: textstyle),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.lightBlue[300],
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0))),
-                          height: 30.0,
-                          margin: EdgeInsets.only(right: 10.0),
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                              ((widget.episodeItem.enclosureLength) ~/ 1000000)
-                                      .toString() +
-                                  'MB',
-                              style: textstyle),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.only(left: 12.0, right: 12.0, top: 5.0),
-                child: SingleChildScrollView(
-                  child:  _loaddes
-                      ? (widget.episodeItem.description.contains('<'))
-                          ? Html(
-                              data: widget.episodeItem.description,
-                              onLinkTap: (url) {
-                                _launchUrl(url);
-                              },
-                              useRichText: true,
-                            )
-                          : Container(
-                              alignment: Alignment.topLeft,
-                              child: Text(widget.episodeItem.description))
-                      : Center(),
                 ),
-              ),
-            ),
-            MenuBar(
-                episodeItem: widget.episodeItem,
-                heroTag: widget.heroTag,
+                MenuBar(
+                  episodeItem: widget.episodeItem,
+                  heroTag: widget.heroTag,
                 ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -175,8 +186,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 class MenuBar extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
-  MenuBar({this.episodeItem, this.heroTag, Key key})
-      : super(key: key);
+  MenuBar({this.episodeItem, this.heroTag, Key key}) : super(key: key);
   @override
   _MenuBarState createState() => _MenuBarState();
 }
@@ -224,114 +234,113 @@ class _MenuBarState extends State<MenuBar> {
   @override
   Widget build(BuildContext context) {
     final audioplay = Provider.of<AudioPlay>(context);
-    return  Container(
-        height: 50.0,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            (widget.episodeItem.title == audioplay.episode?.title &&
-                    audioplay.audioState == AudioState.play)
-                ? ImageRotate(
-                    title: widget.episodeItem.feedTitle,
-                    path: widget.episodeItem.imagePath,
-                  )
-                : Hero(
-                    tag: widget.episodeItem.enclosureUrl + widget.heroTag,
-                    child: Container(
-                      padding: EdgeInsets.all(10.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                        child: Container(
-                          height: 30.0,
-                          width: 30.0,
-                          color: Colors.white,
-                          child: Image.file(File(
-                              "${widget.episodeItem.imagePath}")),
-                        ),
-                      ),
-                    ),
-                  ),
-            (_like == 0 && !_liked)
-                ? _buttonOnMenu(
-                    Icon(
-                      Icons.favorite_border,
-                      color: Colors.grey[700],
-                    ),
-                    () => saveLiked(widget.episodeItem.enclosureUrl))
-                : Stack(
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      LoveOpen(),
-                      _buttonOnMenu(
-                          Icon(
-                            Icons.favorite,
-                            color: Colors.red,
-                          ),
-                          () => setUnliked(widget.episodeItem.enclosureUrl)),
-                    ],
-                  ),
-            DownloadButton(episodeBrief: widget.episodeItem),
-            _buttonOnMenu(Icon(Icons.playlist_add, color: Colors.grey[700]),
-                () {
-              Fluttertoast.showToast(
-                msg: 'Not support yet',
-                gravity: ToastGravity.BOTTOM,
-              );
-              /*TODO*/
-            }),
-            Spacer(),
-            (widget.episodeItem.title != audioplay.episode?.title)
-                ? Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(5.0),
-                          bottomRight: Radius.circular(5.0)),
-                      onTap: () {
-                       audioplay.episodeLoad = widget.episodeItem;
-                      },
+    return Container(
+      height: 50.0,
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          (widget.episodeItem.title == audioplay.episode?.title &&
+                  audioplay.audioState == AudioState.play)
+              ? ImageRotate(
+                  title: widget.episodeItem.feedTitle,
+                  path: widget.episodeItem.imagePath,
+                )
+              : Hero(
+                  tag: widget.episodeItem.enclosureUrl + widget.heroTag,
+                  child: Container(
+                    padding: EdgeInsets.all(10.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
                       child: Container(
-                        alignment: Alignment.center,
-                        height: 50.0,
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Row(
-                          children: <Widget>[
-                            Text('Play Now',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                )),
-                            Icon(
-                              Icons.play_arrow,
-                              color: Colors.blue,
-                            ),
-                          ],
-                        ),
+                        height: 30.0,
+                        width: 30.0,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        child:
+                            Image.file(File("${widget.episodeItem.imagePath}")),
                       ),
                     ),
-                  )
-                : (widget.episodeItem.title == audioplay.episode?.title &&
-                        audioplay.audioState == AudioState.play)
-                    ? Container(
-                        padding: EdgeInsets.only(right: 30),
-                        child: SizedBox(
-                            width: 20, height: 15, child: WaveLoader()))
-                    : Container(
-                        padding: EdgeInsets.only(right: 30),
-                        child: SizedBox(
-                          width: 20,
-                          height: 15,
-                          child: LineLoader(),
+                  ),
+                ),
+          (_like == 0 && !_liked)
+              ? _buttonOnMenu(
+                  Icon(
+                    Icons.favorite_border,
+                    color: Colors.grey[700],
+                  ),
+                  () => saveLiked(widget.episodeItem.enclosureUrl))
+              : Stack(
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    LoveOpen(),
+                    _buttonOnMenu(
+                        Icon(
+                          Icons.favorite,
+                          color: Colors.red,
                         ),
+                        () => setUnliked(widget.episodeItem.enclosureUrl)),
+                  ],
+                ),
+          DownloadButton(episodeBrief: widget.episodeItem),
+          _buttonOnMenu(Icon(Icons.playlist_add, color: Colors.grey[700]), () {
+            Fluttertoast.showToast(
+              msg: 'Not support yet',
+              gravity: ToastGravity.BOTTOM,
+            );
+            /*TODO*/
+          }),
+          Spacer(),
+          (widget.episodeItem.title != audioplay.episode?.title)
+              ? Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(5.0),
+                        bottomRight: Radius.circular(5.0)),
+                    onTap: () {
+                      audioplay.episodeLoad = widget.episodeItem;
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 50.0,
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        children: <Widget>[
+                          Text('Play Now',
+                              style: TextStyle(
+                                color: Theme.of(context).accentColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              )),
+                          Icon(
+                            Icons.play_arrow,
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ],
                       ),
-          ],
-        ),
+                    ),
+                  ),
+                )
+              : (widget.episodeItem.title == audioplay.episode?.title &&
+                      audioplay.audioState == AudioState.play)
+                  ? Container(
+                      padding: EdgeInsets.only(right: 30),
+                      child:
+                          SizedBox(width: 20, height: 15, child: WaveLoader()))
+                  : Container(
+                      padding: EdgeInsets.only(right: 30),
+                      child: SizedBox(
+                        width: 20,
+                        height: 15,
+                        child: LineLoader(),
+                      ),
+                    ),
+        ],
+      ),
     );
   }
 }

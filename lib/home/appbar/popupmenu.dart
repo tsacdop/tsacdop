@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/podcast_group.dart';
+import 'package:tsacdop/class/settingstate.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -47,6 +48,7 @@ class PopupMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     ImportOmpl importOmpl = Provider.of<ImportOmpl>(context, listen: false);
     GroupList groupList = Provider.of<GroupList>(context, listen: false);
+    SettingState setting = Provider.of<SettingState>(context);
     _refreshAll() async {
       var dbHelper = DBHelper();
       List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
@@ -113,16 +115,15 @@ class PopupMenu extends StatelessWidget {
           await Future.delayed(Duration(seconds: 5));
           importOmpl.importState = ImportState.stop;
         }
-      }
-      else {
+      } else {
         importOmpl.importState = ImportState.error;
 
-          Fluttertoast.showToast(
-            msg: 'Network error, Subscribe failed',
-            gravity: ToastGravity.TOP,
-          );
-          await Future.delayed(Duration(seconds: 5));
-          importOmpl.importState = ImportState.stop;
+        Fluttertoast.showToast(
+          msg: 'Network error, Subscribe failed',
+          gravity: ToastGravity.TOP,
+        );
+        await Future.delayed(Duration(seconds: 5));
+        importOmpl.importState = ImportState.stop;
       }
     }
 
@@ -144,10 +145,11 @@ class PopupMenu extends StatelessWidget {
         for (int i = 0; i < total.length; i++) {
           if (total[i].xmlUrl != null) {
             importOmpl.rssTitle = total[i].text;
-             try{await saveOmpl(total[i].xmlUrl);}
-             catch (e){
-               print(e.toString());
-             }
+            try {
+              await saveOmpl(total[i].xmlUrl);
+            } catch (e) {
+              print(e.toString());
+            }
             print(total[i].text);
           }
         }
@@ -183,17 +185,23 @@ class PopupMenu extends StatelessWidget {
         ),
         PopupMenuItem(
           value: 3,
+          child: setting.theme != 2 ? Text('Night Mode') : Text('Light Mode'),
+        ),
+        PopupMenuItem(
+          value: 4,
           child: Text('About'),
         ),
       ],
       onSelected: (value) {
-        if (value == 3) {
+        if (value == 4) {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => AboutApp()));
         } else if (value == 2) {
           _getFilePath();
         } else if (value == 1) {
           _refreshAll();
+        } else if (value == 3) {
+          setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
         }
       },
     );

@@ -28,14 +28,35 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Colors.grey[100]));
+    var theme = Provider.of<SettingState>(context).theme;
     return MaterialApp(
+      themeMode: theme == 0
+          ? ThemeMode.system
+          : theme == 1 ? ThemeMode.dark : ThemeMode.light,
       debugShowCheckedModeBanner: false,
       title: 'TsacDop',
       theme: ThemeData(
-        primaryColor: Colors.white,
+        accentColorBrightness: Brightness.dark,
+        primaryColor: Colors.grey[100],
+        accentColor: Colors.blue[400],
+        primaryColorLight: Colors.white,
+        primaryColorDark: Colors.grey[300],
+        dialogBackgroundColor: Colors.white,
+        backgroundColor: Colors.grey[100],
+        appBarTheme: AppBarTheme(
+          color: Colors.grey[100],
+          elevation: 0,
+        ),
+        textTheme: TextTheme(
+          headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+          bodyText2: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
+        ),
+        tabBarTheme: TabBarTheme(
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.grey[400],
+        ),
       ),
+      darkTheme: ThemeData.dark(),
       home: MyHomePage(),
     );
   }

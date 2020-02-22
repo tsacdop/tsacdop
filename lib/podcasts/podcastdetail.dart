@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
@@ -21,48 +22,62 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final result = await dbHelper.updatePodcastRss(podcastLocal);
-    result == 0 ? 
-    Fluttertoast.showToast(
-      msg: 'No Update',
-      gravity: ToastGravity.TOP,
-    )
-    : Fluttertoast.showToast(
-      msg: 'Updated $result Episodes',
-      gravity: ToastGravity.TOP,
-    );
-    if(mounted) setState(() {});
+    result == 0
+        ? Fluttertoast.showToast(
+            msg: 'No Update',
+            gravity: ToastGravity.TOP,
+          )
+        : Fluttertoast.showToast(
+            msg: 'Updated $result Episodes',
+            gravity: ToastGravity.TOP,
+          );
+    if (mounted) setState(() {});
   }
 
   Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal) async {
     print(podcastLocal.id);
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await
-        dbHelper.getRssItem(podcastLocal.id);
+    List<EpisodeBrief> episodes = await dbHelper.getRssItem(podcastLocal.id);
     return episodes;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.podcastLocal.title,),
-          elevation: 0.0,
-          backgroundColor: Colors.grey[100],
-          centerTitle: true,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+       statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+        statusBarColor: Theme.of(context).primaryColor, 
+      ),
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              widget.podcastLocal.title,
+            ),
+            centerTitle: true,
+          ),
+          body: RefreshIndicator(
+              key: _refreshIndicatorKey,
+              color: Colors.blue[500],
+              onRefresh: () => _updateRssItem(widget.podcastLocal),
+              child: FutureBuilder<List<EpisodeBrief>>(
+                future: _getRssItem(widget.podcastLocal),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  return (snapshot.hasData)
+                      ? EpisodeGrid(
+                          podcast: snapshot.data,
+                          showDownload: true,
+                          showFavorite: true,
+                          showNumber: true,
+                          heroTag: 'podcast',
+                        )
+                      : Center(child: CircularProgressIndicator());
+                },
+              )),
         ),
-        body: RefreshIndicator(
-            key: _refreshIndicatorKey,
-            color: Colors.blue[500],
-            onRefresh: () => _updateRssItem(widget.podcastLocal),
-            child: FutureBuilder<List<EpisodeBrief>>(
-              future: _getRssItem(widget.podcastLocal),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) print(snapshot.error);
-                return (snapshot.hasData)
-                    ? EpisodeGrid(podcast: snapshot.data, showDownload: true, showFavorite: true, showNumber: true, heroTag: 'podcast',)
-                    : Center(child: CircularProgressIndicator());
-              },
-            )),
+      ),
     );
   }
 }

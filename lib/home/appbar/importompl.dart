@@ -7,7 +7,7 @@ class Import extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ImportOmpl>(
       builder: (context, importOmpl, _) => Container(
-          color: Colors.grey[300],
+          color: Theme.of(context).primaryColorDark,
           child: importOmpl.importState == ImportState.start
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.start,

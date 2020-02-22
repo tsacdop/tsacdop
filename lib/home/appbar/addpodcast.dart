@@ -34,35 +34,35 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.grey[100],
-        statusBarColor: Colors.green,
+        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+        statusBarColor: Theme.of(context).primaryColor,  
       ),
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          elevation: 0,
-          centerTitle: true,
-          backgroundColor: Colors.grey[100],
-          brightness: Brightness.light,
-          leading: IconButton(
-            tooltip: 'Add',
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: () async {
-              await showSearch<int>(
-                context: context,
-                delegate: _delegate,
-              );
-            },
+      child: SafeArea(
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            centerTitle: true,
+            leading: IconButton(
+              tooltip: 'Add',
+              icon: const Icon(Icons.add_circle_outline),
+              onPressed: () async {
+                await showSearch<int>(
+                  context: context,
+                  delegate: _delegate,
+                );
+              },
+            ),
+            title: Image(
+              image: AssetImage('assets/text.png'),
+              height: 30,
+            ),
+            actions: <Widget>[
+              PopupMenu(),
+            ],
           ),
-          title: Image(
-            image: AssetImage('assets/text.png'),
-            height: 30,
-          ),
-          actions: <Widget>[
-            PopupMenu(),
-          ],
+          body: Home(),
         ),
-        body: Home(),
       ),
     );
   }
@@ -83,6 +83,9 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
     var searchResult = SearchPodcast.fromJson(searchResultMap);
     return searchResult.results;
   }
+  
+  @override
+   ThemeData appBarTheme(BuildContext context) => Theme.of(context);
 
   @override
   Widget buildLeading(BuildContext context) {
@@ -327,7 +330,7 @@ class _SearchResultState extends State<SearchResult> {
                     ? !_adding
                         ? OutlineButton(
                             child: Text('Subscribe',
-                                style: TextStyle(color: Colors.blue)),
+                                style: TextStyle(color: Theme.of(context).accentColor)),
                             onPressed: () {
                               importOmpl.rssTitle = widget.onlinePodcast.title;
                               savePodcast(widget.onlinePodcast.rss);
@@ -351,7 +354,7 @@ class _SearchResultState extends State<SearchResult> {
               ? Container(
                   alignment: Alignment.centerLeft,
                   decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: Theme.of(context).primaryColorDark,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(15.0),
                         bottomLeft: Radius.circular(15.0),
