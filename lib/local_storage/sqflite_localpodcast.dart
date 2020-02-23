@@ -29,7 +29,7 @@ class DBHelper {
     await db
         .execute("""CREATE TABLE PodcastLocal(id TEXT PRIMARY KEY,title TEXT, 
         imageUrl TEXT,rssUrl TEXT UNIQUE,primaryColor TEXT,author TEXT, 
-        description TEXT, add_date INTEGER, imagePath TEXT)""");
+        description TEXT, add_date INTEGER, imagePath TEXT, email TEXT, provider TEXT, link TEXT)""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
@@ -45,7 +45,7 @@ class DBHelper {
     await Future.forEach(podcasts, (s) async {
       List<Map> list;
       list = await dbClient.rawQuery(
-          'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath FROM PodcastLocal WHERE id = ?',
+          'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , email, provider, link FROM PodcastLocal WHERE id = ?',
           [s]);
       podcastLocal.add(PodcastLocal(
           list.first['title'],
@@ -54,7 +54,10 @@ class DBHelper {
           list.first['primaryColor'],
           list.first['author'],
           list.first['id'],
-          list.first['imagePath']));
+          list.first['imagePath'],
+          list.first['email'],
+          list.first['provider'],
+          list.first['link']));
     });
     return podcastLocal;
   }
@@ -62,7 +65,7 @@ class DBHelper {
   Future<List<PodcastLocal>> getPodcastLocalAll() async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath FROM PodcastLocal ORDER BY add_date DESC');
+        'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath, email, provider, link FROM PodcastLocal ORDER BY add_date DESC');
     
     List<PodcastLocal> podcastLocal = List();
 
@@ -74,7 +77,10 @@ class DBHelper {
           list[i]['primaryColor'],
           list[i]['author'],
           list[i]['id'],
-          list[i]['imagePath']));
+          list[i]['imagePath'],
+           list.first['email'],
+          list.first['provider'],
+          list.first['link']));
     }
     return podcastLocal;
   }
@@ -93,7 +99,7 @@ class DBHelper {
     await dbClient.transaction((txn) async {
       return await txn.rawInsert(
           """INSERT OR IGNORE INTO PodcastLocal (id, title, imageUrl, rssUrl, 
-          primaryColor, author, description, add_date, imagePath) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+          primaryColor, author, description, add_date, imagePath, email, provider, link) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
           [
             podcastLocal.id,
             podcastLocal.title,
@@ -103,7 +109,10 @@ class DBHelper {
             podcastLocal.author,
             podcastLocal.description,
             _milliseconds,
-            podcastLocal.imagePath
+            podcastLocal.imagePath,
+            podcastLocal.email,
+            podcastLocal.provider,
+            podcastLocal.link
           ]);
     });
   }

@@ -28,7 +28,8 @@ class EpisodeGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    return CustomScrollView(
+    return 
+      CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       primary: false,
       slivers: <Widget>[

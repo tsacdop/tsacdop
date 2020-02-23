@@ -86,15 +86,21 @@ class PopupMenu extends StatelessWidget {
             ..writeAsBytesSync(img.encodePng(thumbnail));
           String _imagePath = "${dir.path}/$_uuid.png";
           String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
-
+          String _author = _p.itunes.author ?? _p.author??'';
+          String _email = _p.itunes.owner.email?? '';
+          String _provider = _p.generator??'';
+          String _link = _p.link??'';
           PodcastLocal podcastLocal = PodcastLocal(
               _p.title,
               _p.itunes.image.href,
               _realUrl,
               _primaryColor,
-              _p.author,
+              _author,
               _uuid,
-              _imagePath);
+              _imagePath,
+              _email,
+              _provider,
+              _link);
 
           podcastLocal.description = _p.description;
 

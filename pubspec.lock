@@ -92,6 +92,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.8"
+  expandable:
+    dependency: "direct dev"
+    description:
+      name: expandable
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.1.2"
   file_picker:
     dependency: "direct dev"
     description:
@@ -442,5 +449,5 @@ packages:
     source: hosted
     version: "3.5.0"
 sdks:
-  dart: ">=2.6.0 <3.0.0"
+  dart: ">=2.7.0 <3.0.0"
   flutter: ">=1.12.13+hotfix.4 <2.0.0"

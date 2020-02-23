@@ -48,6 +48,7 @@ dev_dependencies:
   image: ^2.1.4
   shared_preferences: ^0.5.6+1
   uuid: ^2.0.4
+  expandable: ^4.1.2
 
 
 

@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
           unselectedLabelColor: Colors.grey[400],
         ),
       ),
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData.dark().copyWith(accentColor: Colors.blue[400],),
       home: MyHomePage(),
     );
   }

@@ -173,95 +173,62 @@ class _PodcastCardState extends State<PodcastCard> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 12),
             height: 100,
-            child: Row(children: <Widget>[
-              Container(
-                child: Icon(
-                  Icons.unfold_more,
-                  color: _c,
-                ),
-              ),
-              Container(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  child: Container(
-                    height: 60,
-                    width: 60,
-                    child: Image.file(File("${widget.podcastLocal.imagePath}")),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    child: Icon(
+                      Icons.unfold_more,
+                      color: _c,
+                    ),
                   ),
-                ),
-              ),
-              Container(
-                  width: _width / 2,
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  alignment: Alignment.centerLeft,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          widget.podcastLocal.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.fade,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
+                  Container(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        child: Image.file(
+                            File("${widget.podcastLocal.imagePath}")),
                       ),
-                      Row(
-                        children: _belongGroups.map((group) {
-                          return Container(
-                              padding: EdgeInsets.only(right: 5.0),
-                              child: Text(group.name));
-                        }).toList(),
-                      ),
-                    ],
-                  )),
-              Spacer(),
-              Icon(_loadMenu
-                  ? Icons.keyboard_arrow_up
-                  : Icons.keyboard_arrow_down),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
-              ),
-              OutlineButton(
-                child: Text('Remove'),
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      child: AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: SystemUiOverlayStyle(
-                          systemNavigationBarColor:
-                              Colors.black.withOpacity(0.5),
-                          statusBarColor: Colors.red,
-                        ),
-                        child: AlertDialog(
-                          elevation: 2.0,
-                          title: Text('Remove confirm'),
-                          content: Text(
-                              '${widget.podcastLocal.title} will be removed from device.'),
-                          actions: <Widget>[
-                            FlatButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text('CANCEL'),
+                    ),
+                  ),
+                  Container(
+                      width: _width / 2,
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              widget.podcastLocal.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.fade,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
                             ),
-                            FlatButton(
-                              onPressed: () {
-                                _groupList
-                                    .removePodcast(widget.podcastLocal.id);
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                'CONFIRM',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            )
-                          ],
-                        ),
-                      ));
-                },
-              ),
-            ]),
+                          ),
+                          Row(
+                            children: _belongGroups.map((group) {
+                              return Container(
+                                  padding: EdgeInsets.only(right: 5.0),
+                                  child: Text(group.name));
+                            }).toList(),
+                          ),
+                        ],
+                      )),
+                  Spacer(),
+                  Icon(_loadMenu
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                ]),
           ),
         ),
         !_loadMenu
@@ -364,7 +331,42 @@ class _PodcastCardState extends State<PodcastCard> {
                                 _addGroup = true;
                               });
                             }),
-                            _buttonOnMenu(Icon(Icons.notifications), () {})
+                            _buttonOnMenu(Icon(Icons.notifications), () {}),
+                            _buttonOnMenu(Icon(Icons.remove_circle), () {
+                              showDialog(
+                                  context: context,
+                                  child: AnnotatedRegion<SystemUiOverlayStyle>(
+                                    value: SystemUiOverlayStyle(
+                                      systemNavigationBarColor:
+                                          Colors.black.withOpacity(0.5),
+                                      statusBarColor: Colors.red,
+                                    ),
+                                    child: AlertDialog(
+                                      elevation: 2.0,
+                                      title: Text('Remove confirm'),
+                                      content: Text(
+                                          '${widget.podcastLocal.title} will be removed from device.'),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text('CANCEL'),
+                                        ),
+                                        FlatButton(
+                                          onPressed: () {
+                                            _groupList.removePodcast(
+                                                widget.podcastLocal.id);
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text(
+                                            'CONFIRM',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ));
+                            }),
                           ],
                         ),
                 ),

@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        statusBarColor: Theme.of(context).primaryColor,  
+        statusBarColor: Theme.of(context).primaryColor,
       ),
       child: SafeArea(
         child: Scaffold(
@@ -83,9 +83,9 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
     var searchResult = SearchPodcast.fromJson(searchResultMap);
     return searchResult.results;
   }
-  
+
   @override
-   ThemeData appBarTheme(BuildContext context) => Theme.of(context);
+  ThemeData appBarTheme(BuildContext context) => Theme.of(context);
 
   @override
   Widget buildLeading(BuildContext context) {
@@ -256,16 +256,24 @@ class _SearchResultState extends State<SearchResult> {
           String _uuid = Uuid().v4();
           File("${dir.path}/$_uuid.png")
             ..writeAsBytesSync(img.encodePng(thumbnail));
+          
           String _imagePath = "${dir.path}/$_uuid.png";
           String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
+          String _author = _p.itunes.author ?? _p.author ?? '';
+          String _email = _p.itunes.owner?.email ?? '';
+          String _provider = _p.generator ?? '';
+          String _link = _p.link ?? '';
           PodcastLocal podcastLocal = PodcastLocal(
               _p.title,
               _p.itunes.image.href,
               _realUrl,
               _primaryColor,
-              _p.author,
+              _author,
               _uuid,
-              _imagePath);
+              _imagePath,
+              _email,
+              _provider,
+              _link);
           podcastLocal.description = _p.description;
           groupList.subscribe(podcastLocal);
 
@@ -277,7 +285,7 @@ class _SearchResultState extends State<SearchResult> {
         } else {
           importOmpl.importState = ImportState.error;
           Fluttertoast.showToast(
-            msg: 'POdcast Subscribed Already',
+            msg: 'Podcast Subscribed Already',
             gravity: ToastGravity.TOP,
           );
           await Future.delayed(Duration(seconds: 10));
@@ -289,7 +297,7 @@ class _SearchResultState extends State<SearchResult> {
           msg: 'Network error, Subscribe failed',
           gravity: ToastGravity.TOP,
         );
-        await Future.delayed(Duration(seconds: 10));
+        await Future.delayed(Duration(seconds: 5));
         importOmpl.importState = ImportState.stop;
       }
     }
@@ -330,7 +338,8 @@ class _SearchResultState extends State<SearchResult> {
                     ? !_adding
                         ? OutlineButton(
                             child: Text('Subscribe',
-                                style: TextStyle(color: Theme.of(context).accentColor)),
+                                style: TextStyle(
+                                    color: Theme.of(context).accentColor)),
                             onPressed: () {
                               importOmpl.rssTitle = widget.onlinePodcast.title;
                               savePodcast(widget.onlinePodcast.rss);
