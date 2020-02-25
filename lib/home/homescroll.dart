@@ -263,7 +263,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                               .map<Widget>((PodcastLocal podcastLocal) {
                             return Container(
                               decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor),
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.black12),
                               margin: EdgeInsets.symmetric(horizontal: 5.0),
                               key: ObjectKey(podcastLocal.title),
                               child: PodcastPreview(
@@ -426,19 +429,23 @@ class ShowEpisode extends StatelessWidget {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        border: Border.all(
-                          color: Theme.of(context).primaryColor,
-                          width: 3.0,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context).primaryColor,
-                            blurRadius: 1.0,
-                            spreadRadius: 0.5,
-                          ),
-                        ]),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      border: Border.all(
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? Theme.of(context).primaryColor
+                            : Theme.of(context).scaffoldBackgroundColor,
+                        //  color: Theme.of(context).primaryColor,
+                        width: 3.0,
+                      ),
+                      //   boxShadow: [
+                      //     BoxShadow(
+                      //       color: Theme.of(context).primaryColor,
+                      //       blurRadius: 1.0,
+                      //       spreadRadius: 0.5,
+                      //     ),
+                      //  ]
+                    ),
                     alignment: Alignment.center,
                     padding: EdgeInsets.all(10.0),
                     child: Column(

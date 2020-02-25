@@ -256,7 +256,7 @@ class _SearchResultState extends State<SearchResult> {
           String _uuid = Uuid().v4();
           File("${dir.path}/$_uuid.png")
             ..writeAsBytesSync(img.encodePng(thumbnail));
-          
+
           String _imagePath = "${dir.path}/$_uuid.png";
           String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
           String _author = _p.itunes.author ?? _p.author ?? '';
@@ -303,6 +303,11 @@ class _SearchResultState extends State<SearchResult> {
     }
 
     return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: Divider.createBorderSide(context),
+        ),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -363,18 +368,19 @@ class _SearchResultState extends State<SearchResult> {
               ? Container(
                   alignment: Alignment.centerLeft,
                   decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColorDark,
+                      color: Theme.of(context).accentColor,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(15.0),
                         bottomLeft: Radius.circular(15.0),
                         bottomRight: Radius.circular(15.0),
                       )),
-                  margin: EdgeInsets.only(left: 70, right: 50),
-                  padding: EdgeInsets.all(10.0),
+                  margin: EdgeInsets.only(left: 70, right: 50, bottom: 10.0),
+                  padding: EdgeInsets.all(15.0),
                   child: Text(
                     widget.onlinePodcast.description.trim(),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyText1.copyWith(color: Colors.white),
                   ),
                 )
               : Center(),

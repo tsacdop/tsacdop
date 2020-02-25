@@ -12,7 +12,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => AudioPlay()),
+        ChangeNotifierProvider(create: (context) => AudioPlayer()),
         ChangeNotifierProvider(create: (context) => ImportOmpl()),
         ChangeNotifierProvider(create: (context) => SettingState()),
         ChangeNotifierProvider(create: (context) => GroupList()),
@@ -29,10 +29,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Provider.of<SettingState>(context).theme;
+    print(theme);
     return MaterialApp(
       themeMode: theme == 0
           ? ThemeMode.system
-          : theme == 1 ? ThemeMode.dark : ThemeMode.light,
+          : theme == 1 ? ThemeMode.light: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       title: 'TsacDop',
       theme: ThemeData(

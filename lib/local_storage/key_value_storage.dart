@@ -42,4 +42,16 @@ class KeyValueStorage {
     if(prefs.getInt(key) == null) await prefs.setInt(key, 0);
     return prefs.getInt(key);
   }
+
+  Future<bool> savePlaylist(List<String> playList) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setStringList(key, playList);
+  }
+
+  Future<List<String>> getPlayList() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getStringList(key) == null) {await prefs.setStringList(key, []);}
+    print(prefs.getStringList(key).toString());
+    return prefs.getStringList(key);
+  }
 }

@@ -7,6 +7,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
 
@@ -36,12 +37,14 @@ class DBHelper {
         description TEXT, feed_id TEXT, feed_link TEXT, milliseconds INTEGER, 
         duration INTEGER DEFAULT 0, explicit INTEGER DEFAULT 0, liked INTEGER DEFAULT 0, 
         downloaded TEXT DEFAULT 'ND', download_date INTEGER DEFAULT 0)""");
+    await db.execute(
+        """CREATE TABLE PlayHistory(id INTEGER PRIMARY KEY, title TEXT, enclosure_url TEXT UNIQUE,
+        seconds INTEGER, seek_value INTEGER, add_date INTEGER)""");
   }
 
   Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts) async {
     var dbClient = await database;
     List<PodcastLocal> podcastLocal = List();
-
     await Future.forEach(podcasts, (s) async {
       List<Map> list;
       list = await dbClient.rawQuery(
@@ -66,7 +69,7 @@ class DBHelper {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath, email, provider, link FROM PodcastLocal ORDER BY add_date DESC');
-    
+
     List<PodcastLocal> podcastLocal = List();
 
     for (int i = 0; i < list.length; i++) {
@@ -78,7 +81,7 @@ class DBHelper {
           list[i]['author'],
           list[i]['id'],
           list[i]['imagePath'],
-           list.first['email'],
+          list.first['email'],
           list.first['provider'],
           list.first['link']));
     }
@@ -132,6 +135,24 @@ class DBHelper {
     await dbClient.rawDelete('DELETE FROM Episodes WHERE feed_id=?', [id]);
   }
 
+  Future<int> saveHistory(PlayHistory history) async {
+    var dbClient = await database;
+    int _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    int result = await dbClient.transaction((txn) async {
+      return await txn.rawInsert(
+          """REPLACE INTO PlayHistory (title, enclosure_url, seconds, seek_value, add_date)
+       VALUES (?, ?, ?, ?, ?) """,
+          [
+            history.title,
+            history.url,
+            history.seconds,
+            history.seekValue,
+            _milliseconds
+          ]);
+    });
+    return result;
+  }
+
   DateTime _parsePubDate(String pubDate) {
     if (pubDate == null) return DateTime.now();
     print(pubDate);
@@ -156,11 +177,13 @@ class DBHelper {
           if (year != null && time != null && month != null) {
             date = DateFormat('dd MMM yyyy HH:mm', 'en_US')
                 .parse(month + year + time);
-          } else if(year!=null && time!=null && month == null){
+          } else if (year != null && time != null && month == null) {
             String month = mmDd.stringMatch(pubDate);
             date = DateFormat('mm-dd yyyy HH:mm', 'en_US')
-                .parse(month +' ' + year +' '+ time);
-          }  else {date = DateTime.now();}
+                .parse(month + ' ' + year + ' ' + time);
+          } else {
+            date = DateTime.now();
+          }
         }
       }
     }
@@ -488,8 +511,8 @@ class DBHelper {
 
   Future<String> getFeedDescription(String id) async {
     var dbClient = await database;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT description FROM PodcastLocal WHERE id = ?', [id]);
+    List<Map> list = await dbClient
+        .rawQuery('SELECT description FROM PodcastLocal WHERE id = ?', [id]);
     String description = list[0]['description'];
     return description;
   }

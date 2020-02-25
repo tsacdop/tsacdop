@@ -8,10 +8,10 @@ class SettingState extends ChangeNotifier {
   int _theme;
 
   int get theme => _theme;
-  void setTheme(int theme) {
+  setTheme(int theme) async{
     _theme = theme;
     notifyListeners();
-    _saveTheme(theme);
+    await _saveTheme(theme);
   }
 
   @override

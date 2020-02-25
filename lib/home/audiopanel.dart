@@ -46,7 +46,9 @@ class _AudioPanelState extends State<AudioPanel>
                 child: GestureDetector(
                   onTap: () => _backToMini(),
                   child: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+                    color: Theme.of(context)
+                        .scaffoldBackgroundColor
+                        .withOpacity(0.5),
                   ),
                 ),
               )
@@ -75,7 +77,16 @@ class _AudioPanelState extends State<AudioPanel>
                     ),
                   )
                 : Container(
-                   color: Theme.of(context).primaryColor, 
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, -1),
+                          blurRadius: 4,
+                          color: Colors.grey[400],
+                        ),
+                      ],
+                    ),
                     child: SingleChildScrollView(
                       child: Opacity(
                         opacity: _animation.value < (maxSize - 50)
@@ -99,7 +110,7 @@ class _AudioPanelState extends State<AudioPanel>
     setState(() {
       _animation =
           Tween<double>(begin: initSize, end: minSize).animate(_controller);
-      initSize = minSize;  
+      initSize = minSize;
     });
     _controller.forward();
   }

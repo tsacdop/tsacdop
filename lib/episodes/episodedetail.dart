@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:tsacdop/home/audioplayer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:tuple/tuple.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
@@ -66,116 +68,137 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
             title: Text(widget.episodeItem.feedTitle),
             centerTitle: true,
           ),
-          body: Container(
-            color: Theme.of(context).primaryColor,
-            padding: EdgeInsets.all(10.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.0),
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          widget.episodeItem.title,
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.symmetric(horizontal: 12.0),
-                        height: 30.0,
-                        child: Text(
-                            'Published ' +
-                                DateFormat.yMMMd().format(
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                        widget.episodeItem.pubDate)),
-                            style: TextStyle(color: Colors.blue[500])),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(12.0),
-                        height: 50.0,
-                        child: Row(
-                          children: <Widget>[
-                            (widget.episodeItem.explicit == 1)
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.red[800],
-                                        shape: BoxShape.circle),
-                                    height: 25.0,
-                                    width: 25.0,
-                                    margin: EdgeInsets.only(right: 10.0),
-                                    alignment: Alignment.center,
-                                    child: Text('E',
-                                        style: TextStyle(color: Colors.white)))
-                                : Center(),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.cyan[300],
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15.0))),
-                              height: 30.0,
-                              margin: EdgeInsets.only(right: 10.0),
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              alignment: Alignment.center,
-                              child: Text(
-                                  (widget.episodeItem.duration).toString() +
-                                      'mins',
-                                  style: textstyle),
+          body: Stack(
+            children: <Widget>[
+              Container(
+                color: Theme.of(context).primaryColor,
+                padding: EdgeInsets.all(10.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12.0),
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              widget.episodeItem.title,
+                              style: Theme.of(context).textTheme.headline5,
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.lightBlue[300],
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15.0))),
-                              height: 30.0,
-                              margin: EdgeInsets.only(right: 10.0),
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              alignment: Alignment.center,
-                              child: Text(
-                                  ((widget.episodeItem.enclosureLength) ~/
-                                              1000000)
-                                          .toString() +
-                                      'MB',
-                                  style: textstyle),
+                          ),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            padding: EdgeInsets.symmetric(horizontal: 12.0),
+                            height: 30.0,
+                            child: Text(
+                                'Published ' +
+                                    DateFormat.yMMMd().format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            widget.episodeItem.pubDate)),
+                                style: TextStyle(color: Colors.blue[500])),
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(12.0),
+                            height: 50.0,
+                            child: Row(
+                              children: <Widget>[
+                                (widget.episodeItem.explicit == 1)
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.red[800],
+                                            shape: BoxShape.circle),
+                                        height: 25.0,
+                                        width: 25.0,
+                                        margin: EdgeInsets.only(right: 10.0),
+                                        alignment: Alignment.center,
+                                        child: Text('E',
+                                            style:
+                                                TextStyle(color: Colors.white)))
+                                    : Center(),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.cyan[300],
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(15.0))),
+                                  height: 30.0,
+                                  margin: EdgeInsets.only(right: 10.0),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.0),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      (widget.episodeItem.duration).toString() +
+                                          'mins',
+                                      style: textstyle),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.lightBlue[300],
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(15.0))),
+                                  height: 30.0,
+                                  margin: EdgeInsets.only(right: 10.0),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.0),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      ((widget.episodeItem.enclosureLength) ~/
+                                                  1000000)
+                                              .toString() +
+                                          'MB',
+                                      style: textstyle),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(left: 12.0, right: 12.0, top: 5.0),
-                    child: SingleChildScrollView(
-                      child: _loaddes
-                          ? (widget.episodeItem.description.contains('<'))
-                              ? Html(
-                                  data: widget.episodeItem.description,
-                                  onLinkTap: (url) {
-                                    _launchUrl(url);
-                                  },
-                                  useRichText: true,
-                                )
-                              : Container(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(widget.episodeItem.description))
-                          : Center(),
                     ),
-                  ),
+                    Expanded(
+                      child: Container(
+                        padding:
+                            EdgeInsets.only(left: 12.0, right: 12.0, top: 5.0),
+                        child: SingleChildScrollView(
+                          child: _loaddes
+                              ? (widget.episodeItem.description.contains('<'))
+                                  ? Html(
+                                      data: widget.episodeItem.description,
+                                      onLinkTap: (url) {
+                                        _launchUrl(url);
+                                      },
+                                      useRichText: true,
+                                    )
+                                  : Container(
+                                      alignment: Alignment.topLeft,
+                                      child:
+                                          Text(widget.episodeItem.description))
+                              : Center(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                MenuBar(
-                  episodeItem: widget.episodeItem,
-                  heroTag: widget.heroTag,
-                ),
-              ],
-            ),
+              ),
+              Selector<AudioPlayer, bool>(
+                  selector: (_, audio) => audio.playerRunning,
+                  builder: (_, data, __) {
+                    return Container(
+                      alignment: Alignment.bottomCenter,
+                      padding: EdgeInsets.only(
+                          left: 5.0,
+                          right: 5.0,
+                          bottom: data == true ? 80.0 : 10.0),
+                      child: MenuBar(
+                        episodeItem: widget.episodeItem,
+                        heroTag: widget.heroTag,
+                      ),
+                    );
+                  }),
+              Container(child: PlayerWidget()),
+            ],
           ),
         ),
       ),
@@ -233,39 +256,37 @@ class _MenuBarState extends State<MenuBar> {
 
   @override
   Widget build(BuildContext context) {
-    final audioplay = Provider.of<AudioPlay>(context);
+    var audio = Provider.of<AudioPlayer>(context, listen: false);
     return Container(
       height: 50.0,
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.light
+              ? Colors.grey[200]
+              : Theme.of(context).scaffoldBackgroundColor,
+        ),
         borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          (widget.episodeItem.title == audioplay.episode?.title &&
-                  audioplay.audioState == AudioState.play)
-              ? ImageRotate(
-                  title: widget.episodeItem.feedTitle,
-                  path: widget.episodeItem.imagePath,
-                )
-              : Hero(
-                  tag: widget.episodeItem.enclosureUrl + widget.heroTag,
-                  child: Container(
-                    padding: EdgeInsets.all(10.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                      child: Container(
-                        height: 30.0,
-                        width: 30.0,
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        child:
-                            Image.file(File("${widget.episodeItem.imagePath}")),
-                      ),
-                    ),
-                  ),
+          Hero(
+            tag: widget.episodeItem.enclosureUrl + widget.heroTag,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal:10.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                child: Container(
+                  height: 30.0,
+                  width: 30.0,
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: Image.file(File("${widget.episodeItem.imagePath}")),
                 ),
+              ),
+            ),
+          ),
           (_like == 0 && !_liked)
               ? _buttonOnMenu(
                   Icon(
@@ -273,72 +294,86 @@ class _MenuBarState extends State<MenuBar> {
                     color: Colors.grey[700],
                   ),
                   () => saveLiked(widget.episodeItem.enclosureUrl))
-              : Stack(
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    LoveOpen(),
-                    _buttonOnMenu(
-                        Icon(
-                          Icons.favorite,
-                          color: Colors.red,
-                        ),
-                        () => setUnliked(widget.episodeItem.enclosureUrl)),
-                  ],
-                ),
+              : (_like == 1 && !_liked)
+                  ? _buttonOnMenu(
+                      Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                      ),
+                      () => setUnliked(widget.episodeItem.enclosureUrl))
+                  : Stack(
+                      alignment: Alignment.center,
+                      children: <Widget>[
+                        LoveOpen(),
+                        _buttonOnMenu(
+                            Icon(
+                              Icons.favorite,
+                              color: Colors.red,
+                            ),
+                            () => setUnliked(widget.episodeItem.enclosureUrl)),
+                      ],
+                    ),
           DownloadButton(episodeBrief: widget.episodeItem),
           _buttonOnMenu(Icon(Icons.playlist_add, color: Colors.grey[700]), () {
             Fluttertoast.showToast(
-              msg: 'Not support yet',
+              msg: 'Added to playlist',
               gravity: ToastGravity.BOTTOM,
             );
-            /*TODO*/
+            audio.addToPlaylist(widget.episodeItem);
           }),
           Spacer(),
-          (widget.episodeItem.title != audioplay.episode?.title)
-              ? Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(5.0),
-                        bottomRight: Radius.circular(5.0)),
-                    onTap: () {
-                      audioplay.episodeLoad = widget.episodeItem;
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 50.0,
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Row(
-                        children: <Widget>[
-                          Text('Play Now',
-                              style: TextStyle(
+          // Text(audio.audioState.toString()),
+          Selector<AudioPlayer, Tuple2<EpisodeBrief, bool>>(
+            selector: (_, audio) =>
+                Tuple2(audio.episode, audio.backgroundAudioPlaying),
+            builder: (_, data, __) {
+              return (widget.episodeItem.title != data.item1?.title)
+                  ? Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(5.0),
+                            bottomRight: Radius.circular(5.0)),
+                        onTap: () {
+                          audio.episodeLoad(widget.episodeItem);
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 50.0,
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Row(
+                            children: <Widget>[
+                              Text('Play Now',
+                                  style: TextStyle(
+                                    color: Theme.of(context).accentColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              Icon(
+                                Icons.play_arrow,
                                 color: Theme.of(context).accentColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              )),
-                          Icon(
-                            Icons.play_arrow,
-                            color: Theme.of(context).accentColor,
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                )
-              : (widget.episodeItem.title == audioplay.episode?.title &&
-                      audioplay.audioState == AudioState.play)
-                  ? Container(
-                      padding: EdgeInsets.only(right: 30),
-                      child:
-                          SizedBox(width: 20, height: 15, child: WaveLoader()))
-                  : Container(
-                      padding: EdgeInsets.only(right: 30),
-                      child: SizedBox(
-                        width: 20,
-                        height: 15,
-                        child: LineLoader(),
-                      ),
-                    ),
+                    )
+                  : (widget.episodeItem.title == data.item1?.title &&
+                          data.item2 == true)
+                      ? Container(
+                          padding: EdgeInsets.only(right: 30),
+                          child: SizedBox(
+                              width: 20, height: 15, child: WaveLoader()))
+                      : Container(
+                          padding: EdgeInsets.only(right: 30),
+                          child: SizedBox(
+                            width: 20,
+                            height: 15,
+                            child: LineLoader(),
+                          ),
+                        );
+            },
+          ),
         ],
       ),
     );

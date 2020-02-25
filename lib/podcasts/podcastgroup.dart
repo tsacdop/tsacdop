@@ -165,213 +165,223 @@ class _PodcastCardState extends State<PodcastCard> {
     var _groupList = Provider.of<GroupList>(context);
     _belongGroups = _groupList.getPodcastGroup(widget.podcastLocal.id);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        InkWell(
-          onTap: () => setState(() => _loadMenu = !_loadMenu),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            height: 100,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    child: Icon(
-                      Icons.unfold_more,
-                      color: _c,
-                    ),
-                  ),
-                  Container(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(30)),
-                      child: Container(
-                        height: 60,
-                        width: 60,
-                        child: Image.file(
-                            File("${widget.podcastLocal.imagePath}")),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: Divider.createBorderSide(context),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          InkWell(
+            onTap: () => setState(() => _loadMenu = !_loadMenu),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              height: 100,
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.unfold_more,
+                        color: _c,
                       ),
                     ),
-                  ),
-                  Container(
-                      width: _width / 2,
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              widget.podcastLocal.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.fade,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          Row(
-                            children: _belongGroups.map((group) {
-                              return Container(
-                                  padding: EdgeInsets.only(right: 5.0),
-                                  child: Text(group.name));
-                            }).toList(),
-                          ),
-                        ],
-                      )),
-                  Spacer(),
-                  Icon(_loadMenu
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                  ),
-                ]),
-          ),
-        ),
-        !_loadMenu
-            ? Center()
-            : Container(
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      border: Border(
-                          bottom: BorderSide(
-                              color: Theme.of(context).primaryColorDark),
-                          top: BorderSide(
-                              color: Theme.of(context).primaryColorDark))),
-                  height: 50,
-                  child: _addGroup
-                      ? Row(
+                    Container(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        child: Container(
+                          height: 60,
+                          width: 60,
+                          child: Image.file(
+                              File("${widget.podcastLocal.imagePath}")),
+                        ),
+                      ),
+                    ),
+                    Container(
+                        width: _width / 2,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        alignment: Alignment.centerLeft,
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Expanded(
-                              flex: 4,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                    children: _groupList.groups
-                                        .map<Widget>((PodcastGroup group) {
-                                  return Container(
-                                    padding: EdgeInsets.only(left: 5.0),
-                                    child: FilterChip(
-                                      key: ValueKey<String>(group.id),
-                                      label: Text(group.name),
-                                      selected: _selectedGroups.contains(group),
-                                      onSelected: (bool value) {
-                                        setState(() {
-                                          if (!value) {
-                                            _selectedGroups.remove(group);
-                                            print(group.name);
-                                          } else {
-                                            _selectedGroups.add(group);
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  );
-                                }).toList()),
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                widget.podcastLocal.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.fade,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 15),
                               ),
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: Row(
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(Icons.clear),
-                                    onPressed: () => setState(() {
-                                      _addGroup = false;
-                                    }),
-                                  ),
-                                  IconButton(
-                                    onPressed: () async {
-                                      print(_selectedGroups);
-                                      if (_selectedGroups.length > 0) {
-                                        setState(() {
-                                          _addGroup = false;
-                                        });
-                                        await _groupList.changeGroup(
-                                          widget.podcastLocal.id,
-                                          _selectedGroups,
-                                        );
-                                        Fluttertoast.showToast(
-                                          msg: 'Setting Saved',
-                                          gravity: ToastGravity.BOTTOM,
-                                        );
-                                      } else
-                                        Fluttertoast.showToast(
-                                          msg: 'At least select one group',
-                                          gravity: ToastGravity.BOTTOM,
-                                        );
-                                    },
-                                    icon: Icon(Icons.done),
-                                  ),
-                                ],
+                            Row(
+                              children: _belongGroups.map((group) {
+                                return Container(
+                                    padding: EdgeInsets.only(right: 5.0),
+                                    child: Text(group.name));
+                              }).toList(),
+                            ),
+                          ],
+                        )),
+                    Spacer(),
+                    Icon(_loadMenu
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    ),
+                  ]),
+            ),
+          ),
+          !_loadMenu
+              ? Center()
+              : Container(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        border: Border(
+                            bottom: BorderSide(
+                                color: Theme.of(context).primaryColorDark),
+                            top: BorderSide(
+                                color: Theme.of(context).primaryColorDark))),
+                    height: 50,
+                    child: _addGroup
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 4,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                      children: _groupList.groups
+                                          .map<Widget>((PodcastGroup group) {
+                                    return Container(
+                                      padding: EdgeInsets.only(left: 5.0),
+                                      child: FilterChip(
+                                        key: ValueKey<String>(group.id),
+                                        label: Text(group.name),
+                                        selected:
+                                            _selectedGroups.contains(group),
+                                        onSelected: (bool value) {
+                                          setState(() {
+                                            if (!value) {
+                                              _selectedGroups.remove(group);
+                                              print(group.name);
+                                            } else {
+                                              _selectedGroups.add(group);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  }).toList()),
+                                ),
                               ),
-                            )
-                          ],
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            _buttonOnMenu(
-                                Icon(Icons.fullscreen),
-                                () => Navigator.push(
-                                      context,
-                                      ScaleRoute(
-                                          page: PodcastDetail(
-                                        podcastLocal: widget.podcastLocal,
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  children: <Widget>[
+                                    IconButton(
+                                      icon: Icon(Icons.clear),
+                                      onPressed: () => setState(() {
+                                        _addGroup = false;
+                                      }),
+                                    ),
+                                    IconButton(
+                                      onPressed: () async {
+                                        print(_selectedGroups);
+                                        if (_selectedGroups.length > 0) {
+                                          setState(() {
+                                            _addGroup = false;
+                                          });
+                                          await _groupList.changeGroup(
+                                            widget.podcastLocal.id,
+                                            _selectedGroups,
+                                          );
+                                          Fluttertoast.showToast(
+                                            msg: 'Setting Saved',
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        } else
+                                          Fluttertoast.showToast(
+                                            msg: 'At least select one group',
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                      },
+                                      icon: Icon(Icons.done),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              _buttonOnMenu(
+                                  Icon(Icons.fullscreen),
+                                  () => Navigator.push(
+                                        context,
+                                        ScaleRoute(
+                                            page: PodcastDetail(
+                                          podcastLocal: widget.podcastLocal,
+                                        )),
                                       )),
-                                    )),
-                            _buttonOnMenu(Icon(Icons.add), () {
-                              setState(() {
-                                _addGroup = true;
-                              });
-                            }),
-                            _buttonOnMenu(Icon(Icons.notifications), () {}),
-                            _buttonOnMenu(Icon(Icons.remove_circle), () {
-                              showDialog(
-                                  context: context,
-                                  child: AnnotatedRegion<SystemUiOverlayStyle>(
-                                    value: SystemUiOverlayStyle(
-                                      systemNavigationBarColor:
-                                          Colors.black.withOpacity(0.5),
-                                      statusBarColor: Colors.red,
-                                    ),
-                                    child: AlertDialog(
-                                      elevation: 2.0,
-                                      title: Text('Remove confirm'),
-                                      content: Text(
-                                          '${widget.podcastLocal.title} will be removed from device.'),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                          child: Text('CANCEL'),
-                                        ),
-                                        FlatButton(
-                                          onPressed: () {
-                                            _groupList.removePodcast(
-                                                widget.podcastLocal.id);
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text(
-                                            'CONFIRM',
-                                            style: TextStyle(color: Colors.red),
+                              _buttonOnMenu(Icon(Icons.add), () {
+                                setState(() {
+                                  _addGroup = true;
+                                });
+                              }),
+                              _buttonOnMenu(Icon(Icons.notifications), () {}),
+                              _buttonOnMenu(Icon(Icons.remove_circle), () {
+                                showDialog(
+                                    context: context,
+                                    child:
+                                        AnnotatedRegion<SystemUiOverlayStyle>(
+                                      value: SystemUiOverlayStyle(
+                                        systemNavigationBarColor:
+                                            Colors.black.withOpacity(0.5),
+                                        statusBarColor: Colors.red,
+                                      ),
+                                      child: AlertDialog(
+                                        elevation: 2.0,
+                                        title: Text('Remove confirm'),
+                                        content: Text(
+                                            '${widget.podcastLocal.title} will be removed from device.'),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: Text('CANCEL'),
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                  ));
-                            }),
-                          ],
-                        ),
+                                          FlatButton(
+                                            onPressed: () {
+                                              _groupList.removePodcast(
+                                                  widget.podcastLocal.id);
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text(
+                                              'CONFIRM',
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ));
+                              }),
+                            ],
+                          ),
+                  ),
                 ),
-              ),
-      ],
+        ],
+      ),
     );
   }
 }
