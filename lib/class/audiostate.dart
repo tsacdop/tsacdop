@@ -97,6 +97,12 @@ class AudioPlayer extends ChangeNotifier {
   AudioState get audioState => _audioState;
 
   EpisodeBrief get episode => _episode;
+  
+  @override
+  void addListener(VoidCallback listener) {
+    super.addListener(listener);
+    _queue.getPlaylist();
+  }
 
   episodeLoad(EpisodeBrief episode) async {
     AudioSystem.instance.addMediaEventListener(_mediaEventListener);
@@ -409,8 +415,8 @@ class AudioPlayer extends ChangeNotifier {
   }
 
   void _stopBackgroundAudio() {
-    _backgroundAudio..pause();
-    _backgroundAudio..dispose();
+    _backgroundAudio?.pause();
+    _backgroundAudio?.dispose();
     _backgroundAudioPlaying = false;
     AudioSystem.instance.stopBackgroundDisplay();
   }

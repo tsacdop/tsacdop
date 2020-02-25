@@ -275,7 +275,7 @@ class _MenuBarState extends State<MenuBar> {
           Hero(
             tag: widget.episodeItem.enclosureUrl + widget.heroTag,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal:10.0),
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
               child: ClipRRect(
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
                 child: Container(
@@ -314,13 +314,24 @@ class _MenuBarState extends State<MenuBar> {
                       ],
                     ),
           DownloadButton(episodeBrief: widget.episodeItem),
-          _buttonOnMenu(Icon(Icons.playlist_add, color: Colors.grey[700]), () {
-            Fluttertoast.showToast(
-              msg: 'Added to playlist',
-              gravity: ToastGravity.BOTTOM,
-            );
-            audio.addToPlaylist(widget.episodeItem);
-          }),
+          Selector<AudioPlayer, List<String>>(
+            selector: (_, audio) => audio.queue.playlist.map((e)=>e.enclosureUrl).toList(),
+            builder: (_, data, __) {
+              print(data.length);
+              return data.contains(widget.episodeItem.enclosureUrl)
+                  ? _buttonOnMenu(
+                      Icon(Icons.playlist_add_check, color: Theme.of(context).accentColor),
+                      (){})
+                  : _buttonOnMenu(
+                      Icon(Icons.playlist_add, color: Colors.grey[700]), () {
+                      Fluttertoast.showToast(
+                        msg: 'Added to playlist',
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                      audio.addToPlaylist(widget.episodeItem);
+                    });
+            },
+          ),
           Spacer(),
           // Text(audio.audioState.toString()),
           Selector<AudioPlayer, Tuple2<EpisodeBrief, bool>>(

@@ -31,9 +31,7 @@ class MyApp extends StatelessWidget {
     var theme = Provider.of<SettingState>(context).theme;
     print(theme);
     return MaterialApp(
-      themeMode: theme == 0
-          ? ThemeMode.system
-          : theme == 1 ? ThemeMode.light: ThemeMode.dark,
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       title: 'TsacDop',
       theme: ThemeData(
