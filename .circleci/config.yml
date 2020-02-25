@@ -19,7 +19,7 @@ jobs:
 
       - run:
           name: Build the Android version
-          command: flutter build apk --split-per-abi 
+          command: flutter build apk --split-per-abi --no-shrink 
 
       - store_artifacts:
           path: build/app/outputs/apk/release/
