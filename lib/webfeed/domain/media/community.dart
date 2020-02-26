@@ -1,7 +1,7 @@
-import 'package:webfeed/domain/media/star_rating.dart';
-import 'package:webfeed/domain/media/statistics.dart';
-import 'package:webfeed/domain/media/tags.dart';
-import 'package:webfeed/util/helpers.dart';
+import 'package:tsacdop/webfeed/domain/media/star_rating.dart';
+import 'package:tsacdop/webfeed/domain/media/statistics.dart';
+import 'package:tsacdop/webfeed/domain/media/tags.dart';
+import 'package:tsacdop/webfeed/util/helpers.dart';
 import 'package:xml/xml.dart';
 
 class Community {

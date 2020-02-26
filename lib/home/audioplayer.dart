@@ -359,13 +359,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
-        boxShadow: [
-          BoxShadow(
-            offset: Offset(0, -1),
-            blurRadius: 4,
-            color: Colors.grey[400],
-          ),
-        ],
+      //  boxShadow: [
+      //    BoxShadow(
+      //      offset: Offset(0, -1),
+      //      blurRadius: 4,
+      //      color: Colors.grey[400],
+      //    ),
+      //  ],
       ),
       height: 60,
       child:

@@ -188,9 +188,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     return Container(
                       alignment: Alignment.bottomCenter,
                       padding: EdgeInsets.only(
-                          left: 5.0,
-                          right: 5.0,
-                          bottom: data == true ? 80.0 : 10.0),
+                          bottom: data == true ? 60.0 : 10.0),
                       child: MenuBar(
                         episodeItem: widget.episodeItem,
                         heroTag: widget.heroTag,
@@ -264,9 +262,9 @@ class _MenuBarState extends State<MenuBar> {
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.light
               ? Colors.grey[200]
-              : Theme.of(context).scaffoldBackgroundColor,
+              : Theme.of(context).primaryColor,
         ),
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+     //   borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,

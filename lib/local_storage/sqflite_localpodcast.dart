@@ -30,7 +30,8 @@ class DBHelper {
     await db
         .execute("""CREATE TABLE PodcastLocal(id TEXT PRIMARY KEY,title TEXT, 
         imageUrl TEXT,rssUrl TEXT UNIQUE,primaryColor TEXT,author TEXT, 
-        description TEXT, add_date INTEGER, imagePath TEXT, email TEXT, provider TEXT, link TEXT)""");
+        description TEXT, add_date INTEGER, imagePath TEXT, email TEXT, provider TEXT, link TEXT, 
+        background_image TEXT DEFAULT '',hosts TEXT DEFAULT '')""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
@@ -118,6 +119,24 @@ class DBHelper {
             podcastLocal.link
           ]);
     });
+  }
+
+  Future<int> saveFiresideData(List<String> list)async{
+    var dbClient = await database;
+    int result = await dbClient.rawUpdate(
+        'UPDATE PodcastLocal SET background_image = ? , hosts = ? WHERE id = ?',[list[1],list[2],list[0]]
+    );
+    print('Fireside data save in sqllite');
+    return result;
+  }
+
+  Future<List<String>> getFiresideData(String id)async{
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+      'SELECT background_image, hosts FROM PodcastLocal WHERE id = ?', [id]
+    );
+    List<String> data = [list.first['background_image]'],list.first['hosts']];
+    return data;
   }
 
   Future delPodcastLocal(String id) async {

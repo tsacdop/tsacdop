@@ -43,12 +43,12 @@ class KeyValueStorage {
     return prefs.getInt(key);
   }
 
-  Future<bool> savePlaylist(List<String> playList) async{
+  Future<bool> saveStringlist(List<String> playList) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setStringList(key, playList);
   }
 
-  Future<List<String>> getPlayList() async{
+  Future<List<String>> getStringList() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(prefs.getStringList(key) == null) {await prefs.setStringList(key, []);}
     print(prefs.getStringList(key).toString());

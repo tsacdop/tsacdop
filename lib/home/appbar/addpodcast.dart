@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tsacdop/class/fireside_data.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:tsacdop/class/importompl.dart';
@@ -275,7 +276,12 @@ class _SearchResultState extends State<SearchResult> {
               _provider,
               _link);
           podcastLocal.description = _p.description;
-          groupList.subscribe(podcastLocal);
+          await groupList.subscribe(podcastLocal);
+          if(_provider.contains('fireside'))
+          {
+            FiresideData data = FiresideData(_uuid, _link);
+            await data.fatchData();
+          }
 
           importOmpl.importState = ImportState.parse;
 

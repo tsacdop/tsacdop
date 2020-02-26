@@ -31,7 +31,7 @@ class Playlist {
   Playlist(this.name, {List<String> urls}) : urls = urls ?? [];
 
   getPlaylist() async{
-    List<String> _urls = await storage.getPlayList();
+    List<String> _urls = await storage.getStringList();
     if (_urls.length == 0) {
       _playlist = [];
     } else {
@@ -49,7 +49,7 @@ class Playlist {
     urls = [];
     urls.addAll(_playlist.map((e) => e.enclosureUrl));
     print(urls);
-    await storage.savePlaylist(urls);
+    await storage.saveStringlist(urls);
   }
 
   addToPlayList(EpisodeBrief episodeBrief) async {
@@ -134,6 +134,7 @@ class AudioPlayer extends ChangeNotifier {
     } else {
       _backgroundAudioPlaying = false;
       _remoteAudioLoading = false;
+      _playerRunning = false;
       notifyListeners();
     }
   }
@@ -207,9 +208,7 @@ class AudioPlayer extends ChangeNotifier {
     _remoteErrorMessage = null;
     _remoteAudioLoading = true;
     ByteData audio = _getAudio(path);
-    if (_backgroundAudioPlaying == true) {
-      _stopBackgroundAudio();
-    }
+    _backgroundAudio?.pause();
     _backgroundAudioPositionSeconds = 0;
     _setNotification(false);
     _backgroundAudio =
@@ -246,9 +245,7 @@ class AudioPlayer extends ChangeNotifier {
     _remoteErrorMessage = null;
     _remoteAudioLoading = true;
     notifyListeners();
-    if (_backgroundAudioPlaying == true) {
-      _stopBackgroundAudio();
-    }
+   _backgroundAudio?.pause(); 
     _backgroundAudioPositionSeconds = 0;
     _setNotification(false);
     _backgroundAudio =
@@ -415,8 +412,8 @@ class AudioPlayer extends ChangeNotifier {
   }
 
   void _stopBackgroundAudio() {
-    _backgroundAudio?.pause();
-    _backgroundAudio?.dispose();
+    _backgroundAudio.pause();
+    _backgroundAudio.dispose();
     _backgroundAudioPlaying = false;
     AudioSystem.instance.stopBackgroundDisplay();
   }
@@ -424,7 +421,7 @@ class AudioPlayer extends ChangeNotifier {
   void _forwardBackgroundAudio(double seconds) {
     final double forwardposition = _backgroundAudioPositionSeconds + seconds;
     _backgroundAudio.seek(forwardposition);
-    //AudioSystem.instance.setPlaybackState(true, _backgroundAudioDurationSeconds);
+    AudioSystem.instance.setPlaybackState(true, _backgroundAudioPositionSeconds);
   }
 
   final _pauseButton = AndroidCustomMediaButton(

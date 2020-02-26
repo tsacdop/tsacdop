@@ -9,6 +9,7 @@ import 'package:html/parser.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/episodes/episodedetail.dart';
@@ -16,6 +17,7 @@ import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/home/audioplayer.dart';
+import 'package:tsacdop/class/fireside_data.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, this.podcastLocal}) : super(key: key);
@@ -27,7 +29,8 @@ class PodcastDetail extends StatefulWidget {
 class _PodcastDetailState extends State<PodcastDetail> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-
+  String background;
+  List<PodcastHost> hosts;
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final result = await dbHelper.updatePodcastRss(podcastLocal);
@@ -44,9 +47,14 @@ class _PodcastDetailState extends State<PodcastDetail> {
   }
 
   Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal) async {
-    print(podcastLocal.id);
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await dbHelper.getRssItem(podcastLocal.id);
+    if (podcastLocal.provider.contains('fireside')) {
+      FiresideData data = FiresideData(podcastLocal.id, podcastLocal.link);
+      await data.getData();
+      background = data.background;
+      hosts = data.hosts;
+    }
     return episodes;
   }
 
@@ -140,7 +148,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                         color:
                                                             Colors.grey[300])),
                                             Text(
-                                                widget.podcastLocal.provider ??
+                                                'Hosted on ' +
+                                                        widget.podcastLocal
+                                                            .provider ??
                                                     '',
                                                 style: Theme.of(context)
                                                     .textTheme
@@ -176,24 +186,61 @@ class _PodcastDetailState extends State<PodcastDetail> {
                             SliverList(
                               delegate: SliverChildBuilderDelegate(
                                 (BuildContext context, int index) {
-                                  return Container(
-                                    padding: EdgeInsets.only(
-                                        left: 10.0,
-                                        right: 10.0,
-                                        top: 20.0,
-                                        bottom: 10.0),
-                                    alignment: Alignment.topLeft,
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    child: AboutPodcast(
-                                        podcastLocal: widget.podcastLocal),
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: EdgeInsets.all(10.0),
+                                      ),
+                                      Container(
+                                        alignment: Alignment.centerRight,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.0),
+                                        child: hosts != null
+                                            ? Wrap(
+                                                children: hosts
+                                                    .map((host) => Container(
+                                                        padding:
+                                                            EdgeInsets.all(5.0),
+                                                        width: 60.0,
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: <Widget>[
+                                                            CachedNetworkImage(
+                                                                imageUrl:
+                                                                    host.image),
+                                                            Text(host.name),
+                                                          ],
+                                                        )))
+                                                    .toList()
+                                                    .cast<Widget>(),
+                                              )
+                                            : Center(),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(
+                                            left: 15.0,
+                                            right: 15.0,
+                                            bottom: 10.0),
+                                        alignment: Alignment.topLeft,
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        child: AboutPodcast(
+                                            podcastLocal: widget.podcastLocal),
+                                      ),
+                                    ],
                                   );
                                 },
                                 childCount: 1,
                               ),
                             ),
                             SliverPadding(
-                              padding: const EdgeInsets.all(5.0),
+                              padding: const EdgeInsets.symmetric(horizontal:15.0),
                               sliver: SliverGrid(
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
@@ -480,7 +527,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
                       : Text(_description),
                 );
               } else {
-                return Text(_description);
+                return SelectableText(_description, toolbarOptions: ToolbarOptions(copy: true),);
               }
             },
           );

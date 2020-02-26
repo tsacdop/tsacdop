@@ -1,9 +1,9 @@
-import 'package:webfeed/domain/atom_category.dart';
-import 'package:webfeed/domain/atom_link.dart';
-import 'package:webfeed/domain/atom_person.dart';
-import 'package:webfeed/domain/atom_source.dart';
-import 'package:webfeed/domain/media/media.dart';
-import 'package:webfeed/util/helpers.dart';
+import 'package:tsacdop/webfeed/domain/atom_category.dart';
+import 'package:tsacdop/webfeed/domain/atom_link.dart';
+import 'package:tsacdop/webfeed/domain/atom_person.dart';
+import 'package:tsacdop/webfeed/domain/atom_source.dart';
+import 'package:tsacdop/webfeed/domain/media/media.dart';
+import 'package:tsacdop/webfeed/util/helpers.dart';
 import 'package:xml/xml.dart';
 
 class AtomItem {

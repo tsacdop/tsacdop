@@ -30,7 +30,6 @@ dev_dependencies:
   json_annotation: any
   sqflite: any
   flutter_html: ^0.11.1 
-  webfeed: any
   path_provider: any
   color_thief_flutter: ^1.0.1
   provider: ^4.0.1
@@ -49,6 +48,7 @@ dev_dependencies:
   shared_preferences: ^0.5.6+1
   uuid: ^2.0.4
   tuple: ^1.0.3
+  cached_network_image: ^2.0.0
 
 
 
