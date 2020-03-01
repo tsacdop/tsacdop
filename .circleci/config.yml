@@ -13,7 +13,13 @@ jobs:
       - run:
           name: Run Flutter doctor
           command: flutter doctor
-
+      - run:
+          name: flutter pub get
+          command: flutter pub get
+      -run:
+          name: flutter run
+          command: flutter run
+      
       - run: echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
       - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
 

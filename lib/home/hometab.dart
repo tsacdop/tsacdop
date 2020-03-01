@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/home/paly_history.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
 
@@ -22,6 +23,39 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
         ));
   }
 
+  Widget playHistory() {
+    return PopupMenuButton<int>(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      elevation: 1,
+      icon: Icon(Icons.history),
+      tooltip: "Menu",
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 0,
+          child: Container(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.history),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                ),
+                Text('Play History'),
+              ],
+            ),
+          ),
+        ),
+      ],
+      onSelected: (value) {
+        if (value == 0) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PlayedHistory()));
+        }
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -40,30 +74,36 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.0),
-          height: 50,
-          alignment: Alignment.centerLeft,
-          child: TabBar(
-            isScrollable: true,
-            labelPadding: EdgeInsets.all(10.0),
-            controller: _controller,
-            indicator: getIndicator(context),
-            tabs: <Widget>[
-              Text(
-                'Recent Update',
-                style: TextStyle(fontWeight: FontWeight.bold),
+        Row(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              height: 50,
+              alignment: Alignment.centerLeft,
+              child: TabBar(
+                isScrollable: true,
+                labelPadding: EdgeInsets.all(10.0),
+                controller: _controller,
+                indicator: getIndicator(context),
+                tabs: <Widget>[
+                  Text(
+                    'Recent Update',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Favorites',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Downloads',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
-              Text(
-                'Favorites',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Downloads',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
+            ),
+            Spacer(),
+            playHistory(),
+          ],
         ),
         Expanded(
           child: Container(

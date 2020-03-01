@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
@@ -9,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/util/pageroute.dart';
+import 'package:tsacdop/util/colorize.dart';
 
 class EpisodeGrid extends StatelessWidget {
   final List<EpisodeBrief> podcast;
@@ -28,8 +28,7 @@ class EpisodeGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    return 
-      CustomScrollView(
+    return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       primary: false,
       slivers: <Widget>[
@@ -44,19 +43,10 @@ class EpisodeGrid extends StatelessWidget {
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                Color _c;
-                var color = json.decode(podcast[index].primaryColor);
-                if (Theme.of(context).brightness == Brightness.light) {
-                  (color[0] > 200 && color[1] > 200 && color[2] > 200)
-                      ? _c = Color.fromRGBO(
-                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-                } else {
-                  (color[0] < 50 && color[1] < 50 && color[2] < 50)
-                      ? _c = Color.fromRGBO(
-                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-                }
+                  Color _c = 
+                (Theme.of(context).brightness == Brightness.light)
+                    ?  podcast[index].primaryColor.colorizedark()
+                    :  podcast[index].primaryColor.colorizeLight();
                 return Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -101,15 +91,11 @@ class EpisodeGrid extends StatelessWidget {
                                 Hero(
                                   tag: podcast[index].enclosureUrl + heroTag,
                                   child: Container(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(_width / 32)),
-                                      child: Container(
-                                        height: _width / 16,
-                                        width: _width / 16,
-                                        child: Image.file(File(
-                                            "${podcast[index].imagePath}")),
-                                      ),
+                                    height: _width / 16,
+                                    width: _width / 16,
+                                    child: CircleAvatar(
+                                      backgroundImage: FileImage(
+                                          File("${podcast[index].imagePath}")),
                                     ),
                                   ),
                                 ),

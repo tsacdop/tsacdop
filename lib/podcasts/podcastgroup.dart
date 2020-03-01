@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -10,6 +9,7 @@ import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
 import 'package:tsacdop/util/pageroute.dart';
+import 'package:tsacdop/util/colorize.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;
@@ -126,7 +126,6 @@ class _PodcastCardState extends State<PodcastCard> {
   bool _addGroup;
   List<PodcastGroup> _selectedGroups;
   List<PodcastGroup> _belongGroups;
-  Color _c;
 
   @override
   void initState() {
@@ -149,18 +148,10 @@ class _PodcastCardState extends State<PodcastCard> {
 
   @override
   Widget build(BuildContext context) {
-    var color = json.decode(widget.podcastLocal.primaryColor);
-    if (Theme.of(context).brightness == Brightness.light) {
-      (color[0] > 200 && color[1] > 200 && color[2] > 200)
-          ? _c = Color.fromRGBO(
-              (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-          : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-    } else {
-      (color[0] < 50 && color[1] < 50 && color[2] < 50)
-          ? _c = Color.fromRGBO(
-              (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-          : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-    }
+    Color _c = (Theme.of(context).brightness == Brightness.light)
+        ? widget.podcastLocal.primaryColor.colorizedark()
+        : widget.podcastLocal.primaryColor.colorizeLight();
+
     double _width = MediaQuery.of(context).size.width;
     var _groupList = Provider.of<GroupList>(context);
     _belongGroups = _groupList.getPodcastGroup(widget.podcastLocal.id);
@@ -340,25 +331,51 @@ class _PodcastCardState extends State<PodcastCard> {
                               }),
                               _buttonOnMenu(Icon(Icons.notifications), () {}),
                               _buttonOnMenu(Icon(Icons.remove_circle), () {
-                                showDialog(
-                                    context: context,
-                                    child:
-                                        AnnotatedRegion<SystemUiOverlayStyle>(
-                                      value: SystemUiOverlayStyle(
-                                        systemNavigationBarColor:
-                                            Colors.black.withOpacity(0.5),
-                                        statusBarColor: Colors.red,
-                                      ),
+                                showGeneralDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  barrierLabel:
+                                      MaterialLocalizations.of(context)
+                                          .modalBarrierDismissLabel,
+                                  barrierColor: Colors.black54,
+                                  transitionDuration:
+                                      const Duration(milliseconds: 200),
+                                  pageBuilder: (BuildContext context,
+                                          Animation animaiton,
+                                          Animation secondaryAnimation) =>
+                                      AnnotatedRegion<SystemUiOverlayStyle>(
+                                    value: SystemUiOverlayStyle(
+                                      statusBarIconBrightness: Brightness.light,
+                                      systemNavigationBarColor:
+                                          Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Color.fromRGBO(113, 113, 113, 1)
+                                              : Color.fromRGBO(15, 15, 15, 1),
+                                      statusBarColor:
+                                          Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Color.fromRGBO(113, 113, 113, 1)
+                                              : Color.fromRGBO(5, 5, 5, 1),
+                                    ),
+                                    child: SafeArea(
                                       child: AlertDialog(
-                                        elevation: 2.0,
+                                        elevation: 1,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10.0))),
+                                        titlePadding: EdgeInsets.only(
+                                            top: 20,
+                                            left: 20,
+                                            right: 200,
+                                            bottom: 20),
                                         title: Text('Remove confirm'),
                                         content: Text(
-                                            '${widget.podcastLocal.title} will be removed from device.'),
+                                            'Are you sure you want  to unsubscribe?'),
                                         actions: <Widget>[
                                           FlatButton(
                                             onPressed: () =>
                                                 Navigator.of(context).pop(),
-                                            child: Text('CANCEL'),
+                                            child: Text('CANCEL', style: TextStyle(color: Colors.grey[600]),),
                                           ),
                                           FlatButton(
                                             onPressed: () {
@@ -374,7 +391,9 @@ class _PodcastCardState extends State<PodcastCard> {
                                           )
                                         ],
                                       ),
-                                    ));
+                                    ),
+                                  ),
+                                );
                               }),
                             ],
                           ),

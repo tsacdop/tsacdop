@@ -211,14 +211,17 @@ class _DownloadButtonState extends State<DownloadButton> {
               AnimatedContainer(
                   duration: Duration(seconds: 1),
                   decoration: BoxDecoration(
-                      color: Colors.cyan[300],
+                      color: Theme.of(context).accentColor,
                       borderRadius: BorderRadius.all(Radius.circular(15.0))),
                   height: 20.0,
                   width:
                       (_task.status == DownloadTaskStatus.running) ? 50.0 : 0,
                   alignment: Alignment.center,
-                  child: Text('${_task.progress}%',
-                      style: TextStyle(color: Colors.white))),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Text('${_task.progress}%',
+                        style: TextStyle(color: Colors.white)),
+                  )),
             ],
           );
   }
@@ -236,7 +239,7 @@ class _DownloadButtonState extends State<DownloadButton> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            if(task.progress > 0) _pauseDownload(task);
+            if (task.progress > 0) _pauseDownload(task);
           },
           child: Container(
             height: 50.0,
@@ -248,7 +251,8 @@ class _DownloadButtonState extends State<DownloadButton> {
               child: CircularProgressIndicator(
                 backgroundColor: Colors.grey[500],
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan[300]),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).accentColor),
                 value: task.progress / 100,
               ),
             ),
@@ -283,7 +287,7 @@ class _DownloadButtonState extends State<DownloadButton> {
       return _buttonOnMenu(
           Icon(
             Icons.done_all,
-            color: Colors.blue,
+            color: Theme.of(context).accentColor,
           ),
           () => _deleteDownload(task));
     } else if (task.status == DownloadTaskStatus.failed) {

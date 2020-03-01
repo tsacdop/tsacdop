@@ -7,7 +7,6 @@ class PodcastLocal {
   final String primaryColor;
   final String id;
   final String imagePath;
-  final String email;
   final String provider;
   final String link;
   PodcastLocal(
@@ -18,7 +17,6 @@ class PodcastLocal {
       this.author,
       this.id,
       this.imagePath,
-      this.email,
       this.provider,
       this.link);
 }

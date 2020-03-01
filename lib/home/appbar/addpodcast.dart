@@ -10,8 +10,10 @@ import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/fireside_data.dart';
 import 'package:uuid/uuid.dart';
+import 'package:tuple/tuple.dart';
 
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/podcast_group.dart';
@@ -30,9 +32,30 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _MyHomePageDelegate _delegate = _MyHomePageDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _loadPlay;
+
+   static String _stringForSeconds(int seconds) {
+    if (seconds == null) return null;
+    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlay = false;
+    _getPlaylist();
+  }
+
+  _getPlaylist() async {
+    await Provider.of<AudioPlayer>(context, listen: false).loadPlaylist();
+    setState(() {
+      _loadPlay = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    var audio = Provider.of<AudioPlayer>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -61,6 +84,37 @@ class _MyHomePageState extends State<MyHomePage> {
             actions: <Widget>[
               PopupMenu(),
             ],
+          ),
+          floatingActionButton: Selector<AudioPlayer, Tuple3<bool, Playlist, int>>(
+            selector: (_, audio) => Tuple3(audio.playerRunning, audio.queue, audio.lastPositin),
+            builder: (_, data, __) => !_loadPlay
+                ? Center()
+                : data.item1 || data.item2.playlist.length == 0
+                    ? Center()
+                    : FloatingActionButton.extended(
+                        tooltip: 'Play from playlist',
+                        highlightElevation: 2,
+                        hoverElevation: 2,
+                        onPressed: () => audio.playlistLoad(),
+                        elevation: 1,
+                        backgroundColor: Theme.of(context).accentColor,
+                        label: Text(_stringForSeconds(data.item3), style: TextStyle(color: Colors.white)),
+                        icon: Stack(
+                          alignment: Alignment.center,
+                          children: <Widget>[
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundImage: FileImage(File(
+                                  "${data.item2.playlist.first.imagePath}")),
+                            ),
+                            Container(
+                              height: 30.0,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black38),
+                            ),
+                          ],
+                        )),
           ),
           body: Home(),
         ),
@@ -235,9 +289,10 @@ class _SearchResultState extends State<SearchResult> {
       try {
         Response response = await Dio().get(rss);
         var dbHelper = DBHelper();
-        String _realUrl =
-            response.isRedirect ? response.realUri.toString() : rss;
+        String _realUrl = response.realUri.toString();
+
         bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
+
         if (_checkUrl) {
           if (mounted) setState(() => _issubscribe = true);
 
@@ -261,7 +316,6 @@ class _SearchResultState extends State<SearchResult> {
           String _imagePath = "${dir.path}/$_uuid.png";
           String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
           String _author = _p.itunes.author ?? _p.author ?? '';
-          String _email = _p.itunes.owner?.email ?? '';
           String _provider = _p.generator ?? '';
           String _link = _p.link ?? '';
           PodcastLocal podcastLocal = PodcastLocal(
@@ -272,13 +326,12 @@ class _SearchResultState extends State<SearchResult> {
               _author,
               _uuid,
               _imagePath,
-              _email,
               _provider,
               _link);
           podcastLocal.description = _p.description;
           await groupList.subscribe(podcastLocal);
-          if(_provider.contains('fireside'))
-          {
+
+          if (_provider.contains('fireside')) {
             FiresideData data = FiresideData(_uuid, _link);
             await data.fatchData();
           }
@@ -386,7 +439,10 @@ class _SearchResultState extends State<SearchResult> {
                     widget.onlinePodcast.description.trim(),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyText1.copyWith(color: Colors.white),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        .copyWith(color: Colors.white),
                   ),
                 )
               : Center(),

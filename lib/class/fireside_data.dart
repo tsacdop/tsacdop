@@ -33,7 +33,13 @@ class FiresideData {
         String name = element.text.trim();
         String image =
             element.children.first.children.first.attributes.toString();
-        host = PodcastHost(name, reg.stringMatch(image));
+        print(reg.stringMatch(image));
+
+        host = PodcastHost(
+            name,
+            reg.stringMatch(image) ??
+                'http://xuanmei.us/assets/default/avatar_small-170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg');
+
         hosts.add(host);
       });
       List<String> data = [
@@ -45,7 +51,7 @@ class FiresideData {
     }
   }
 
-  Future getData() async{
+  Future getData() async {
     List<String> data = await dbHelper.getFiresideData(id);
     _background = data[0];
     _hosts = json

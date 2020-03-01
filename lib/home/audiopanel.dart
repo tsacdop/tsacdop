@@ -83,7 +83,9 @@ class _AudioPanelState extends State<AudioPanel>
                         BoxShadow(
                           offset: Offset(0, -1),
                           blurRadius: 4,
-                          color: Colors.grey[400],
+                          color: Theme.of(context).brightness == Brightness.light
+                         ? Colors.grey[400]
+                         : Colors.grey[800],
                         ),
                       ],
                     ),

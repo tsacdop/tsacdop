@@ -99,7 +99,7 @@ class _PodcastListState extends State<PodcastList> {
         statusBarColor: Theme.of(context).primaryColor,
       ),
       child: SafeArea(
-        child: Scaffold(
+              child: Scaffold(
           appBar: AppBar(
             title: Text('Podcasts'),
             centerTitle: true,
@@ -116,8 +116,7 @@ class _PodcastListState extends State<PodcastList> {
                       SliverPadding(
                         padding: const EdgeInsets.all(10.0),
                         sliver: SliverGrid(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             childAspectRatio: 0.8,
                             crossAxisCount: 3,
                           ),
@@ -164,7 +163,9 @@ class _PodcastListState extends State<PodcastList> {
                                         child: Text(
                                           snapshot.data[index].title,
                                           textAlign: TextAlign.center,
-                                          style: Theme.of(context).textTheme.bodyText1, 
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1,
                                           maxLines: 2,
                                         ),
                                       ),

@@ -28,6 +28,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
   double downloadProgress;
   bool _loaddes;
+  bool _showMenu;
   String path;
   Future getSDescription(String url) async {
     var dbHelper = DBHelper();
@@ -35,6 +36,18 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     if (mounted)
       setState(() {
         _loaddes = true;
+      });
+  }
+
+  ScrollController _controller;
+  _scrollListener() {
+    if (_controller.offset > _controller.position.maxScrollExtent * 0.8) {
+      setState(() {
+        _showMenu = true;
+      });
+    } else
+      setState(() {
+        _showMenu = false;
       });
   }
 
@@ -50,7 +63,16 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   void initState() {
     super.initState();
     _loaddes = false;
+    _showMenu = false;
     getSDescription(widget.episodeItem.enclosureUrl);
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -119,38 +141,44 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                             style:
                                                 TextStyle(color: Colors.white)))
                                     : Center(),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.cyan[300],
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(15.0))),
-                                  height: 30.0,
-                                  margin: EdgeInsets.only(right: 10.0),
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 10.0),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                      (widget.episodeItem.duration).toString() +
-                                          'mins',
-                                      style: textstyle),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.lightBlue[300],
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(15.0))),
-                                  height: 30.0,
-                                  margin: EdgeInsets.only(right: 10.0),
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 10.0),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                      ((widget.episodeItem.enclosureLength) ~/
-                                                  1000000)
-                                              .toString() +
-                                          'MB',
-                                      style: textstyle),
-                                ),
+                                widget.episodeItem.duration != 0
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.cyan[300],
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15.0))),
+                                        height: 30.0,
+                                        margin: EdgeInsets.only(right: 10.0),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.0),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                            (widget.episodeItem.duration)
+                                                    .toString() +
+                                                'mins',
+                                            style: textstyle),
+                                      )
+                                    : Center(),
+                                widget.episodeItem.enclosureLength != null
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.lightBlue[300],
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15.0))),
+                                        height: 30.0,
+                                        margin: EdgeInsets.only(right: 10.0),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.0),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                            ((widget.episodeItem
+                                                            .enclosureLength) ~/
+                                                        1000000)
+                                                    .toString() +
+                                                'MB',
+                                            style: textstyle),
+                                      )
+                                    : Center(),
                               ],
                             ),
                           ),
@@ -162,6 +190,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                         padding:
                             EdgeInsets.only(left: 12.0, right: 12.0, top: 5.0),
                         child: SingleChildScrollView(
+                          controller: _controller,
                           child: _loaddes
                               ? (widget.episodeItem.description.contains('<'))
                                   ? Html(
@@ -187,11 +216,18 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                   builder: (_, data, __) {
                     return Container(
                       alignment: Alignment.bottomCenter,
-                      padding: EdgeInsets.only(
-                          bottom: data == true ? 60.0 : 10.0),
-                      child: MenuBar(
-                        episodeItem: widget.episodeItem,
-                        heroTag: widget.heroTag,
+                      padding:
+                          EdgeInsets.only(bottom: data == true ? 60.0 : 10.0),
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 400),
+                        height: !_showMenu ? 50 : 0,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: MenuBar(
+                            episodeItem: widget.episodeItem,
+                            heroTag: widget.heroTag,
+                          ),
+                        ),
                       ),
                     );
                   }),
@@ -264,7 +300,6 @@ class _MenuBarState extends State<MenuBar> {
               ? Colors.grey[200]
               : Theme.of(context).primaryColor,
         ),
-     //   borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -274,14 +309,13 @@ class _MenuBarState extends State<MenuBar> {
             tag: widget.episodeItem.enclosureUrl + widget.heroTag,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                child: Container(
-                  height: 30.0,
-                  width: 30.0,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: Image.file(File("${widget.episodeItem.imagePath}")),
-                ),
+              child: Container(
+                height: 30.0,
+                width: 30.0,
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: CircleAvatar(
+                    backgroundImage:
+                        FileImage(File("${widget.episodeItem.imagePath}"))),
               ),
             ),
           ),
@@ -313,13 +347,14 @@ class _MenuBarState extends State<MenuBar> {
                     ),
           DownloadButton(episodeBrief: widget.episodeItem),
           Selector<AudioPlayer, List<String>>(
-            selector: (_, audio) => audio.queue.playlist.map((e)=>e.enclosureUrl).toList(),
+            selector: (_, audio) =>
+                audio.queue.playlist.map((e) => e.enclosureUrl).toList(),
             builder: (_, data, __) {
-              print(data.length);
               return data.contains(widget.episodeItem.enclosureUrl)
                   ? _buttonOnMenu(
-                      Icon(Icons.playlist_add_check, color: Theme.of(context).accentColor),
-                      (){})
+                      Icon(Icons.playlist_add_check,
+                          color: Theme.of(context).accentColor),
+                      () {})
                   : _buttonOnMenu(
                       Icon(Icons.playlist_add, color: Colors.grey[700]), () {
                       Fluttertoast.showToast(
@@ -340,9 +375,6 @@ class _MenuBarState extends State<MenuBar> {
                   ? Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(5.0),
-                            bottomRight: Radius.circular(5.0)),
                         onTap: () {
                           audio.episodeLoad(widget.episodeItem);
                         },

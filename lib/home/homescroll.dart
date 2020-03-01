@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 
@@ -8,14 +7,15 @@ import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/podcasts/podcastdetail.dart';
 import 'package:tsacdop/podcasts/podcastmanage.dart';
 import 'package:tsacdop/util/pageroute.dart';
+import 'package:tsacdop/util/colorize.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -228,7 +228,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     left: 6.0,
                                     right: 6.0),
                                 indicator: CircleTabIndicator(
-                                    color: Colors.blue, radius: 3),
+                                    color: Theme.of(context).accentColor,
+                                    radius: 3),
                                 isScrollable: true,
                                 tabs: groups[_groupIndex]
                                     .podcasts
@@ -251,29 +252,31 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                           ],
                         ),
                       ),
-                      Container(
-                        height: (_width - 20) / 3 + 40,
-                        margin: EdgeInsets.only(left: 10, right: 10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                        ),
-                        child: TabBarView(
-                          children: groups[_groupIndex]
-                              .podcasts
-                              .map<Widget>((PodcastLocal podcastLocal) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.black12),
-                              margin: EdgeInsets.symmetric(horizontal: 5.0),
-                              key: ObjectKey(podcastLocal.title),
-                              child: PodcastPreview(
-                                podcastLocal: podcastLocal,
-                              ),
-                            );
-                          }).toList(),
+                      Consumer<ImportOmpl>(
+                        builder: (_, ompl, __) => Container(
+                          height: (_width - 20) / 3 + 40,
+                          margin: EdgeInsets.only(left: 10, right: 10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                          child: TabBarView(
+                            children: groups[_groupIndex]
+                                .podcasts
+                                .map<Widget>((PodcastLocal podcastLocal) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.black12),
+                                margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                key: ObjectKey(podcastLocal.title),
+                                child: PodcastPreview(
+                                  podcastLocal: podcastLocal,
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ],
@@ -293,27 +296,15 @@ class PodcastPreview extends StatefulWidget {
 class _PodcastPreviewState extends State<PodcastPreview> {
   Future<List<EpisodeBrief>> _getRssItemTop(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
-    Future<List<EpisodeBrief>> episodes =
-        dbHelper.getRssItemTop(podcastLocal.id);
+    List<EpisodeBrief> episodes = await dbHelper.getRssItemTop(podcastLocal.id);
     return episodes;
   }
 
-  Color _c;
-
   @override
   Widget build(BuildContext context) {
-    var color = json.decode(widget.podcastLocal.primaryColor);
-    if (Theme.of(context).brightness == Brightness.light) {
-      (color[0] > 200 && color[1] > 200 && color[2] > 200)
-          ? _c = Color.fromRGBO(
-              (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-          : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-    } else {
-      (color[0] < 50 && color[1] < 50 && color[2] < 50)
-          ? _c = Color.fromRGBO(
-              (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-          : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-    }
+    Color _c = (Theme.of(context).brightness == Brightness.light)
+        ?  widget.podcastLocal.primaryColor.colorizedark()
+        : widget.podcastLocal.primaryColor.colorizeLight();
     return Column(
       children: <Widget>[
         Expanded(
@@ -401,20 +392,10 @@ class ShowEpisode extends StatelessWidget {
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                Color _c;
-                var color = json.decode(podcast[index].primaryColor);
-
-                if (Theme.of(context).brightness == Brightness.light) {
-                  (color[0] > 200 && color[1] > 200 && color[2] > 200)
-                      ? _c = Color.fromRGBO(
-                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-                } else {
-                  (color[0] < 50 && color[1] < 50 && color[2] < 50)
-                      ? _c = Color.fromRGBO(
-                          (255 - color[0]), 255 - color[1], 255 - color[2], 1.0)
-                      : _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
-                }
+                Color _c = 
+                (Theme.of(context).brightness == Brightness.light)
+                    ?  podcastLocal.primaryColor.colorizedark()
+                    :  podcastLocal.primaryColor.colorizeLight();
                 return InkWell(
                   onTap: () {
                     Navigator.push(
@@ -438,13 +419,6 @@ class ShowEpisode extends StatelessWidget {
                         //  color: Theme.of(context).primaryColor,
                         width: 3.0,
                       ),
-                      //   boxShadow: [
-                      //     BoxShadow(
-                      //       color: Theme.of(context).primaryColor,
-                      //       blurRadius: 1.0,
-                      //       spreadRadius: 0.5,
-                      //     ),
-                      //  ]
                     ),
                     alignment: Alignment.center,
                     padding: EdgeInsets.all(10.0),
@@ -459,15 +433,11 @@ class ShowEpisode extends StatelessWidget {
                               Hero(
                                 tag: podcast[index].enclosureUrl + 'scroll',
                                 child: Container(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(_width / 36)),
-                                    child: Container(
-                                      height: _width / 18,
-                                      width: _width / 18,
-                                      child: Image.file(
-                                          File("${podcastLocal.imagePath}")),
-                                    ),
+                                  height: _width / 18,
+                                  width: _width / 18,
+                                  child: CircleAvatar(
+                                    backgroundImage: FileImage(
+                                        File("${podcastLocal.imagePath}")),
                                   ),
                                 ),
                               ),

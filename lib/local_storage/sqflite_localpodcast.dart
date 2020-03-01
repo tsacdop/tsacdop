@@ -30,7 +30,7 @@ class DBHelper {
     await db
         .execute("""CREATE TABLE PodcastLocal(id TEXT PRIMARY KEY,title TEXT, 
         imageUrl TEXT,rssUrl TEXT UNIQUE,primaryColor TEXT,author TEXT, 
-        description TEXT, add_date INTEGER, imagePath TEXT, email TEXT, provider TEXT, link TEXT, 
+        description TEXT, add_date INTEGER, imagePath TEXT, provider TEXT, link TEXT, 
         background_image TEXT DEFAULT '',hosts TEXT DEFAULT '')""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
@@ -40,7 +40,7 @@ class DBHelper {
         downloaded TEXT DEFAULT 'ND', download_date INTEGER DEFAULT 0)""");
     await db.execute(
         """CREATE TABLE PlayHistory(id INTEGER PRIMARY KEY, title TEXT, enclosure_url TEXT UNIQUE,
-        seconds INTEGER, seek_value INTEGER, add_date INTEGER)""");
+        seconds REAL, seek_value REAL, add_date INTEGER)""");
   }
 
   Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts) async {
@@ -49,7 +49,7 @@ class DBHelper {
     await Future.forEach(podcasts, (s) async {
       List<Map> list;
       list = await dbClient.rawQuery(
-          'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , email, provider, link FROM PodcastLocal WHERE id = ?',
+          'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, link FROM PodcastLocal WHERE id = ?',
           [s]);
       podcastLocal.add(PodcastLocal(
           list.first['title'],
@@ -59,7 +59,6 @@ class DBHelper {
           list.first['author'],
           list.first['id'],
           list.first['imagePath'],
-          list.first['email'],
           list.first['provider'],
           list.first['link']));
     });
@@ -69,7 +68,7 @@ class DBHelper {
   Future<List<PodcastLocal>> getPodcastLocalAll() async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath, email, provider, link FROM PodcastLocal ORDER BY add_date DESC');
+        'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath, provider, link FROM PodcastLocal ORDER BY add_date DESC');
 
     List<PodcastLocal> podcastLocal = List();
 
@@ -82,7 +81,6 @@ class DBHelper {
           list[i]['author'],
           list[i]['id'],
           list[i]['imagePath'],
-          list.first['email'],
           list.first['provider'],
           list.first['link']));
     }
@@ -103,7 +101,7 @@ class DBHelper {
     await dbClient.transaction((txn) async {
       return await txn.rawInsert(
           """INSERT OR IGNORE INTO PodcastLocal (id, title, imageUrl, rssUrl, 
-          primaryColor, author, description, add_date, imagePath, email, provider, link) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+          primaryColor, author, description, add_date, imagePath, provider, link) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
           [
             podcastLocal.id,
             podcastLocal.title,
@@ -114,28 +112,26 @@ class DBHelper {
             podcastLocal.description,
             _milliseconds,
             podcastLocal.imagePath,
-            podcastLocal.email,
             podcastLocal.provider,
             podcastLocal.link
           ]);
     });
   }
 
-  Future<int> saveFiresideData(List<String> list)async{
+  Future<int> saveFiresideData(List<String> list) async {
     var dbClient = await database;
     int result = await dbClient.rawUpdate(
-        'UPDATE PodcastLocal SET background_image = ? , hosts = ? WHERE id = ?',[list[1],list[2],list[0]]
-    );
+        'UPDATE PodcastLocal SET background_image = ? , hosts = ? WHERE id = ?',
+        [list[1], list[2], list[0]]);
     print('Fireside data save in sqllite');
     return result;
   }
 
-  Future<List<String>> getFiresideData(String id)async{
+  Future<List<String>> getFiresideData(String id) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
-      'SELECT background_image, hosts FROM PodcastLocal WHERE id = ?', [id]
-    );
-    List<String> data = [list.first['background_image]'],list.first['hosts']];
+        'SELECT background_image, hosts FROM PodcastLocal WHERE id = ?', [id]);
+    List<String> data = [list.first['background_image'], list.first['hosts']];
     return data;
   }
 
@@ -170,6 +166,32 @@ class DBHelper {
           ]);
     });
     return result;
+  }
+
+  Future<List<PlayHistory>> getPlayHistory() async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory
+         ORDER BY add_date DESC 
+     """);
+    List<PlayHistory> playHistory = [];
+    list.forEach((record) {
+      playHistory.add(PlayHistory(
+        record['title'],
+        record['enclosure_url'],
+        record['seconds'],
+        record['seek_value'],
+      ));
+    });
+    return playHistory;
+  }
+
+  Future<int> getPosition(EpisodeBrief episodeBrief) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        "SELECT seconds FROM PlayHistory Where enclosure_url = ?",
+        [episodeBrief.enclosureUrl]);
+    return list.length > 0 ? list.first['seconds'] : 0;
   }
 
   DateTime _parsePubDate(String pubDate) {

@@ -6,7 +6,7 @@ class Import extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ImportOmpl>(
-      builder: (context, importOmpl, _) => Container(
+      builder: (_, importOmpl, __) => Container(
           color: Theme.of(context).primaryColorDark,
           child: importOmpl.importState == ImportState.start
               ? Column(

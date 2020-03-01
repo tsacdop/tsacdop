@@ -32,12 +32,13 @@ class KeyValueStorage {
             {'groups': groupList.map((group) => group.toJson()).toList()}));
   }
 
-  Future<bool> saveTheme(int setting) async{
+  Future<bool> saveInt(int setting) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(setting.toString());
     return prefs.setInt(key, setting);
   }
 
-  Future<int> getTheme() async{
+  Future<int> getInt() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(prefs.getInt(key) == null) await prefs.setInt(key, 0);
     return prefs.getInt(key);
@@ -51,7 +52,18 @@ class KeyValueStorage {
   Future<List<String>> getStringList() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(prefs.getStringList(key) == null) {await prefs.setStringList(key, []);}
-    print(prefs.getStringList(key).toString());
     return prefs.getStringList(key);
   }
+
+  Future<bool> saveString(String string) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString(key, string);
+  }
+
+   Future<String> getString() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getString(key) == null) {await prefs.setString(key, '');}
+    return prefs.getString(key);
+  }
+
 }

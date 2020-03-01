@@ -14,11 +14,18 @@ import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 enum AudioState { load, play, pause, complete, error, stop }
 
 class PlayHistory {
+  DBHelper dbHelper = DBHelper();
   String title;
   String url;
   double seconds;
   double seekValue;
   PlayHistory(this.title, this.url, this.seconds, this.seekValue);
+  EpisodeBrief _episode;
+  EpisodeBrief get episode => _episode;
+
+  getEpisode() async {
+    _episode = await dbHelper.getRssItemWithUrl(url);
+  }
 }
 
 class Playlist {
@@ -30,13 +37,13 @@ class Playlist {
   KeyValueStorage storage = KeyValueStorage('playlist');
   Playlist(this.name, {List<String> urls}) : urls = urls ?? [];
 
-  getPlaylist() async{
+  getPlaylist() async {
     List<String> _urls = await storage.getStringList();
     if (_urls.length == 0) {
       _playlist = [];
     } else {
       _playlist = [];
-      await Future.forEach(_urls, (url) async{
+      await Future.forEach(_urls, (url) async {
         EpisodeBrief episode = await dbHelper.getRssItemWithUrl(url);
         print(episode.title);
         _playlist.add(episode);
@@ -57,9 +64,10 @@ class Playlist {
     await savePlaylist();
   }
 
-  delFromPlaylist(EpisodeBrief episodeBrief) {
-    _playlist.remove(episodeBrief);
-    savePlaylist();
+  delFromPlaylist(EpisodeBrief episodeBrief) async {
+    _playlist
+        .removeWhere((item) => item.enclosureUrl == episodeBrief.enclosureUrl);
+    await savePlaylist();
   }
 }
 
@@ -71,6 +79,7 @@ class AudioPlayer extends ChangeNotifier {
   static const String forwardButtonId = 'forwardButtonId';
 
   DBHelper dbHelper = DBHelper();
+  KeyValueStorage storage = KeyValueStorage('audioposition');
   EpisodeBrief _episode;
   Playlist _queue = Playlist('now');
   bool _playerRunning = false;
@@ -90,34 +99,43 @@ class AudioPlayer extends ChangeNotifier {
   double get seekSliderValue => _seekSliderValue;
   String get remoteErrorMessage => _remoteErrorMessage;
   bool get playerRunning => _playerRunning;
-
+  int _lastPostion;
+  int get lastPositin => _lastPostion;
   Playlist get queue => _queue;
 
-  AudioState _audioState = AudioState.stop;
-  AudioState get audioState => _audioState;
-
   EpisodeBrief get episode => _episode;
-  
-  @override
-  void addListener(VoidCallback listener) {
-    super.addListener(listener);
-    _queue.getPlaylist();
+
+  loadPlaylist() async {
+    await _queue.getPlaylist();
+    _lastPostion = await storage.getInt();
+    print(_lastPostion);
   }
 
   episodeLoad(EpisodeBrief episode) async {
+    if (_playerRunning && _episode != null) {
+      PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
+          backgroundAudioDuration, seekSliderValue);
+      await dbHelper.saveHistory(history);
+    }
     AudioSystem.instance.addMediaEventListener(_mediaEventListener);
+    _backgroundAudioPlaying = false;
     _episode = episode;
     await _queue.getPlaylist();
-    if (_queue.playlist.contains(_episode)) {
-      _queue.playlist.remove(_episode);
-      _queue.playlist.insert(0, _episode);
-    } else {
-      _queue.playlist.insert(0, _episode);
-    }
+    _queue.playlist
+        .removeWhere((item) => item.enclosureUrl == _episode.enclosureUrl);
+    _queue.playlist.insert(0, _episode);
     await _queue.savePlaylist();
     await _play(_episode);
     _playerRunning = true;
-    _backgroundAudioPlaying = true;
+    notifyListeners();
+  }
+
+  playlistLoad() async {
+    _backgroundAudioPlaying = false;
+    await _queue.getPlaylist();
+    _episode = _queue.playlist.first;
+    await _play(_episode);
+    _playerRunning = true;
     notifyListeners();
   }
 
@@ -127,10 +145,7 @@ class AudioPlayer extends ChangeNotifier {
     await dbHelper.saveHistory(history);
     await _queue.delFromPlaylist(_episode);
     if (_queue.playlist.length > 0) {
-      _episode = _queue.playlist.first;
-      _play(_episode);
-      _backgroundAudioPlaying = true;
-      notifyListeners();
+      playlistLoad();
     } else {
       _backgroundAudioPlaying = false;
       _remoteAudioLoading = false;
@@ -145,19 +160,22 @@ class AudioPlayer extends ChangeNotifier {
     notifyListeners();
   }
 
+  delFromPlaylist(EpisodeBrief episode) async {
+    _queue.delFromPlaylist(episode);
+    await _queue.getPlaylist();
+    notifyListeners();
+  }
+
   pauseAduio() async {
     _pauseBackgroundAudio();
-    _audioState = AudioState.pause;
     notifyListeners();
     PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
         backgroundAudioDuration, seekSliderValue);
     await dbHelper.saveHistory(history);
-    await _queue.delFromPlaylist(_episode);
   }
 
   resumeAudio() {
     _resumeBackgroundAudio();
-    _audioState = AudioState.play;
     notifyListeners();
   }
 
@@ -173,10 +191,13 @@ class AudioPlayer extends ChangeNotifier {
     _backgroundAudio.seek(positionSeconds);
     AudioSystem.instance.setPlaybackState(true, positionSeconds);
   }
-
-  disopse() {
+  
+  @override
+  dispose() {
+    pauseAduio();
     AudioSystem.instance.removeMediaEventListener(_mediaEventListener);
     _backgroundAudio?.dispose();
+    super.dispose();
   }
 
   _play(EpisodeBrief episodeBrief) async {
@@ -229,6 +250,7 @@ class AudioPlayer extends ChangeNotifier {
         _backgroundAudioPositionSeconds = _backgroundAudioDurationSeconds;
         notifyListeners();
       }
+      storage.saveInt(positionSeconds.toInt());
     }, onError: (String message) {
       _remoteErrorMessage = message;
       _backgroundAudio.dispose();
@@ -245,7 +267,7 @@ class AudioPlayer extends ChangeNotifier {
     _remoteErrorMessage = null;
     _remoteAudioLoading = true;
     notifyListeners();
-   _backgroundAudio?.pause(); 
+    _backgroundAudio?.pause();
     _backgroundAudioPositionSeconds = 0;
     _setNotification(false);
     _backgroundAudio =
@@ -266,6 +288,7 @@ class AudioPlayer extends ChangeNotifier {
         _backgroundAudioPositionSeconds = _backgroundAudioDurationSeconds;
         notifyListeners();
       }
+      storage.saveInt(positionSeconds.toInt());
     }, onError: (String message) {
       _remoteErrorMessage = message;
       _backgroundAudio.dispose();
@@ -390,7 +413,7 @@ class AudioPlayer extends ChangeNotifier {
   }
 
   void _pauseBackgroundAudio() {
-    _backgroundAudio.pause();
+    _backgroundAudio?.pause();
     _backgroundAudioPlaying = false;
     AudioSystem.instance
         .setPlaybackState(false, _backgroundAudioPositionSeconds);
@@ -421,7 +444,8 @@ class AudioPlayer extends ChangeNotifier {
   void _forwardBackgroundAudio(double seconds) {
     final double forwardposition = _backgroundAudioPositionSeconds + seconds;
     _backgroundAudio.seek(forwardposition);
-    AudioSystem.instance.setPlaybackState(true, _backgroundAudioPositionSeconds);
+    AudioSystem.instance
+        .setPlaybackState(true, _backgroundAudioPositionSeconds);
   }
 
   final _pauseButton = AndroidCustomMediaButton(

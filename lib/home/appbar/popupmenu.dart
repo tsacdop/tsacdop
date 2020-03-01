@@ -4,8 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/class/podcast_group.dart';
-import 'package:tsacdop/class/settingstate.dart';
+import 'package:tsacdop/class/fireside_data.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +14,8 @@ import 'package:image/image.dart' as img;
 import 'package:uuid/uuid.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'package:tsacdop/class/podcast_group.dart';
+import 'package:tsacdop/settings/settting.dart';
 import 'about.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
@@ -48,7 +49,6 @@ class PopupMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     ImportOmpl importOmpl = Provider.of<ImportOmpl>(context, listen: false);
     GroupList groupList = Provider.of<GroupList>(context, listen: false);
-    SettingState setting = Provider.of<SettingState>(context);
     _refreshAll() async {
       var dbHelper = DBHelper();
       List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
@@ -68,28 +68,29 @@ class PopupMenu extends StatelessWidget {
       Response response = await Dio().get(rss);
       if (response.statusCode == 200) {
         var _p = RssFeed.parse(response.data);
+        
         var dir = await getApplicationDocumentsDirectory();
-
-        Response<List<int>> imageResponse = await Dio().get<List<int>>(
-            _p.itunes.image.href,
-            options: Options(responseType: ResponseType.bytes));
-        img.Image image = img.decodeImage(imageResponse.data);
-        img.Image thumbnail = img.copyResize(image, width: 300);
-        String _uuid = Uuid().v4();
-        String _realUrl =
-            response.isRedirect ? response.realUri.toString() : rss;
+        
+        String _realUrl = response.redirects.isEmpty ? rss : response.realUri.toString();
+          
         print(_realUrl);
-
         bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
+
         if (_checkUrl) {
+          Response<List<int>> imageResponse = await Dio().get<List<int>>(
+              _p.itunes.image.href,
+              options: Options(responseType: ResponseType.bytes));
+          img.Image image = img.decodeImage(imageResponse.data);
+          img.Image thumbnail = img.copyResize(image, width: 300);
+          String _uuid = Uuid().v4();
           File("${dir.path}/$_uuid.png")
             ..writeAsBytesSync(img.encodePng(thumbnail));
+          
           String _imagePath = "${dir.path}/$_uuid.png";
           String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
-          String _author = _p.itunes.author ?? _p.author??'';
-          String _email = _p.itunes.owner.email?? '';
-          String _provider = _p.generator??'';
-          String _link = _p.link??'';
+          String _author = _p.itunes.author ?? _p.author ?? '';
+          String _provider = _p.generator ?? '';
+          String _link = _p.link ?? '';
           PodcastLocal podcastLocal = PodcastLocal(
               _p.title,
               _p.itunes.image.href,
@@ -98,13 +99,18 @@ class PopupMenu extends StatelessWidget {
               _author,
               _uuid,
               _imagePath,
-              _email,
               _provider,
               _link);
 
           podcastLocal.description = _p.description;
 
-          groupList.subscribe(podcastLocal);
+          await groupList.subscribe(podcastLocal);
+
+          if (_provider.contains('fireside')) 
+          {
+            FiresideData data = FiresideData(_uuid, _link);
+            await data.fatchData();
+          }
 
           importOmpl.importState = ImportState.parse;
 
@@ -178,28 +184,70 @@ class PopupMenu extends StatelessWidget {
     }
 
     return PopupMenuButton<int>(
-      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+      elevation: 1,
       tooltip: 'Menu',
       itemBuilder: (context) => [
         PopupMenuItem(
           value: 1,
-          child: Text('Refresh All'),
+          child: Container(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.refresh),
+                Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
+                Text('Refresh All'),
+              ],
+            ),
+          ),
         ),
-        PopupMenuItem(
-          value: 2,
-          child: Text('Impoer OMPL'),
-        ),
-        PopupMenuItem(
-          value: 3,
-          child: setting.theme != 2 ? Text('Night Mode') : Text('Light Mode'),
-        ),
-        PopupMenuItem(
+      PopupMenuItem(
+            value: 2,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.attachment),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
+                  Text('Import OMPL'),
+                ],
+              ),
+            ),
+          ),
+        
+      //  PopupMenuItem(
+      //    value: 3,
+      //    child: setting.theme != 2 ? Text('Night Mode') : Text('Light Mode'),
+      //  ),
+         PopupMenuItem(
           value: 4,
-          child: Text('About'),
+          child: Container(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.swap_calls),
+                Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
+                Text('Settings'),
+              ],
+            ),
+          ),
+        ),
+        PopupMenuItem(
+          value: 5,
+          child: Container(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.info_outline),
+                Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
+                Text('About'),
+              ],
+            ),
+          ),
         ),
       ],
       onSelected: (value) {
-        if (value == 4) {
+        if (value == 5) {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => AboutApp()));
         } else if (value == 2) {
@@ -207,8 +255,11 @@ class PopupMenu extends StatelessWidget {
         } else if (value == 1) {
           _refreshAll();
         } else if (value == 3) {
-          setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
-        }
+        //  setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
+        }  else if (value == 4) {
+            Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Settings()));
+        } 
       },
     );
   }
