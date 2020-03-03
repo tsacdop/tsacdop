@@ -45,6 +45,15 @@ class PodcastGroup {
     }
   }
 
+  Color getColor() {
+    if (color != '#000000') {
+      int colorInt = int.parse('FF' + color.toUpperCase(), radix: 16);
+      return Color(colorInt).withOpacity(1.0);
+    } else {
+      return Colors.blue[400];
+    }
+  }
+
   List<PodcastLocal> _podcasts;
 
   List<PodcastLocal> get podcasts => _podcasts;
@@ -102,15 +111,25 @@ class GroupList extends ChangeNotifier {
   }
 
   Future delGroup(PodcastGroup podcastGroup) async {
-    _groups.remove(podcastGroup);
+    _isLoading = true;
     notifyListeners();
+    podcastGroup.podcastList.forEach((podcast) {
+      if (!_groups.first.podcastList.contains(podcast)) {
+        _groups[0].podcastList.insert(0, podcast);
+      }
+    });
     _saveGroup();
+    _groups.remove(podcastGroup);
+    await _groups[0].getPodcasts();
+   _isLoading = false;
+    notifyListeners();
   }
 
-  void updateGroup(PodcastGroup podcastGroup) {
+  updateGroup(PodcastGroup podcastGroup) async{
     var oldGroup = _groups.firstWhere((it) => it.id == podcastGroup.id);
     var index = _groups.indexOf(oldGroup);
     _groups.replaceRange(index, index + 1, [podcastGroup]);
+    await podcastGroup.getPodcasts();
     notifyListeners();
     _saveGroup();
   }
@@ -137,6 +156,7 @@ class GroupList extends ChangeNotifier {
     return result;
   }
 
+  //Change podcast groups
   changeGroup(String id, List<PodcastGroup> list) async {
     _isLoading = true;
     notifyListeners();
@@ -154,15 +174,16 @@ class GroupList extends ChangeNotifier {
     notifyListeners();
   }
 
+  //Unsubscribe podcast
   removePodcast(String id) async {
     _isLoading = true;
     notifyListeners();
     _groups.forEach((group) async {
-        group.podcastList.remove(id);
+      group.podcastList.remove(id);
     });
     _saveGroup();
     await dbHelper.delPodcastLocal(id);
-     await Future.forEach(_groups, (group) async {
+    await Future.forEach(_groups, (group) async {
       await group.getPodcasts();
     });
     _isLoading = false;

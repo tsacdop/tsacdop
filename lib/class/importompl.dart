@@ -10,6 +10,7 @@ class ImportOmpl extends ChangeNotifier{
 
   set rssTitle(String title){
     _rssTitle = title;
+    notifyListeners();
   }
 
   ImportState get importState => _importState;

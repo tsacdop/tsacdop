@@ -11,7 +11,7 @@ import 'package:audiofileplayer/audio_system.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
-enum AudioState { load, play, pause, complete, error, stop }
+//enum AudioState { load, play, pause, complete, error, stop }
 
 class PlayHistory {
   DBHelper dbHelper = DBHelper();
@@ -90,6 +90,14 @@ class AudioPlayer extends ChangeNotifier {
   bool _remoteAudioLoading = false;
   String _remoteErrorMessage;
   double _seekSliderValue = 0.0;
+  int _lastPostion;
+  bool _skip = false;
+  bool _stopOnComplete = false;
+  Timer _stopTimer;
+  //Show stopwatch after user setting timer.
+  bool  _showStopWatch = false;
+  
+  
   final Logger _logger = Logger('audiofileplayer');
 
   bool get backgroundAudioPlaying => _backgroundAudioPlaying;
@@ -99,16 +107,20 @@ class AudioPlayer extends ChangeNotifier {
   double get seekSliderValue => _seekSliderValue;
   String get remoteErrorMessage => _remoteErrorMessage;
   bool get playerRunning => _playerRunning;
-  int _lastPostion;
   int get lastPositin => _lastPostion;
   Playlist get queue => _queue;
-
   EpisodeBrief get episode => _episode;
+  bool get stopOnComplete => _stopOnComplete;
+  bool get showStopWatch => _showStopWatch;
+
+
+  set setStopOnComplete(bool boo) {
+    _stopOnComplete = boo;
+  }
 
   loadPlaylist() async {
     await _queue.getPlaylist();
     _lastPostion = await storage.getInt();
-    print(_lastPostion);
   }
 
   episodeLoad(EpisodeBrief episode) async {
@@ -134,22 +146,27 @@ class AudioPlayer extends ChangeNotifier {
     _backgroundAudioPlaying = false;
     await _queue.getPlaylist();
     _episode = _queue.playlist.first;
+    _skip = true;
     await _play(_episode);
     _playerRunning = true;
     notifyListeners();
   }
 
   playNext() async {
+    storage.saveInt(0);
+    _lastPostion = 0;
     PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
         backgroundAudioDuration, seekSliderValue);
     await dbHelper.saveHistory(history);
     await _queue.delFromPlaylist(_episode);
-    if (_queue.playlist.length > 0) {
+    if (_queue.playlist.length > 0 && !_stopOnComplete) {
       playlistLoad();
     } else {
+      _stopOnComplete = false;
       _backgroundAudioPlaying = false;
       _remoteAudioLoading = false;
       _playerRunning = false;
+      _disposeAudio();
       notifyListeners();
     }
   }
@@ -170,7 +187,7 @@ class AudioPlayer extends ChangeNotifier {
     _pauseBackgroundAudio();
     notifyListeners();
     PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
-        backgroundAudioDuration, seekSliderValue);
+        backgroundAudioPosition, seekSliderValue);
     await dbHelper.saveHistory(history);
   }
 
@@ -191,16 +208,42 @@ class AudioPlayer extends ChangeNotifier {
     _backgroundAudio.seek(positionSeconds);
     AudioSystem.instance.setPlaybackState(true, positionSeconds);
   }
-  
+ //Set sleep time 
+  sleepTimer(int mins) {
+    _showStopWatch = true;
+    notifyListeners();
+   _stopTimer = Timer(Duration(minutes: mins),(){
+      _stopOnComplete = false;
+      _backgroundAudioPlaying = false;
+      _remoteAudioLoading = false;
+      _playerRunning = false;
+      _showStopWatch = false;
+      _disposeAudio();
+      notifyListeners();
+    });
+  }
+//Cancel sleep timer
+  cancelTimer(){
+    _stopTimer.cancel();
+    _showStopWatch = false;
+    notifyListeners();
+  }
+
+  _disposeAudio() {
+    pauseAduio();
+    AudioSystem.instance?.stopBackgroundDisplay();
+    AudioSystem.instance?.removeMediaEventListener(_mediaEventListener);
+    _backgroundAudio?.dispose();
+  }
+
   @override
   dispose() {
-    pauseAduio();
-    AudioSystem.instance.removeMediaEventListener(_mediaEventListener);
-    _backgroundAudio?.dispose();
+    _disposeAudio();
     super.dispose();
   }
 
   _play(EpisodeBrief episodeBrief) async {
+    AudioSystem.instance.addMediaEventListener(_mediaEventListener);
     String url = _queue.playlist.first.enclosureUrl;
     _getFile(url).then((result) {
       result == 'NotDownload'
@@ -225,6 +268,42 @@ class AudioPlayer extends ChangeNotifier {
     return ByteData.view(audio.buffer);
   }
 
+  onDuration(double durationSeconds) {
+    _backgroundAudioDurationSeconds = durationSeconds;
+    _remoteAudioLoading = false;
+    _backgroundAudioPlaying = true;
+    if (_skip) {
+      _forwardBackgroundAudio(_lastPostion.toDouble());
+      _backgroundAudioPositionSeconds = _lastPostion.toDouble();
+    }
+    _skip = false;
+    _setNotification(true);
+    notifyListeners();
+  }
+
+  onPosition(double positionSeconds) {
+    if (_backgroundAudioPositionSeconds < _backgroundAudioDurationSeconds) {
+      _seekSliderValue =
+          _backgroundAudioPositionSeconds / _backgroundAudioDurationSeconds;
+      _backgroundAudioPositionSeconds = positionSeconds;
+      notifyListeners();
+    } else {
+      _seekSliderValue = 1;
+      _backgroundAudioPositionSeconds = _backgroundAudioDurationSeconds;
+      notifyListeners();
+    }
+    _lastPostion = positionSeconds.toInt();
+    storage.saveInt(_lastPostion);
+  }
+
+  onError(String message) {
+    _remoteErrorMessage = message;
+    _backgroundAudio.dispose();
+    _backgroundAudio = null;
+    _backgroundAudioPlaying = false;
+    _remoteAudioLoading = false;
+  }
+
   void _initbackgroundAudioPlayerLocal(String path) {
     _remoteErrorMessage = null;
     _remoteAudioLoading = true;
@@ -232,35 +311,14 @@ class AudioPlayer extends ChangeNotifier {
     _backgroundAudio?.pause();
     _backgroundAudioPositionSeconds = 0;
     _setNotification(false);
-    _backgroundAudio =
-        Audio.loadFromByteData(audio, onDuration: (double durationSeconds) {
-      _backgroundAudioDurationSeconds = durationSeconds;
-      _remoteAudioLoading = false;
-      _backgroundAudioPlaying = true;
-      _setNotification(true);
-      notifyListeners();
-    }, onPosition: (double positionSeconds) {
-      if (_backgroundAudioPositionSeconds < _backgroundAudioDurationSeconds) {
-        _seekSliderValue =
-            _backgroundAudioPositionSeconds / _backgroundAudioDurationSeconds;
-        _backgroundAudioPositionSeconds = positionSeconds;
-        notifyListeners();
-      } else {
-        _seekSliderValue = 1;
-        _backgroundAudioPositionSeconds = _backgroundAudioDurationSeconds;
-        notifyListeners();
-      }
-      storage.saveInt(positionSeconds.toInt());
-    }, onError: (String message) {
-      _remoteErrorMessage = message;
-      _backgroundAudio.dispose();
-      _backgroundAudio = null;
-      _backgroundAudioPlaying = false;
-      _remoteAudioLoading = false;
-    }, onComplete: () {
-      playNext();
-    }, looping: false, playInBackground: true)
-          ..play();
+    _backgroundAudio = Audio.loadFromByteData(audio,
+        onDuration: (double durationSeconds) => onDuration(durationSeconds),
+        onPosition: (double positionSeconds) => onPosition(positionSeconds),
+        onError: (String message) => onError(message),
+        onComplete: () => playNext(),
+        looping: false,
+        playInBackground: true)
+      ..play();
   }
 
   void _initbackgroundAudioPlayer(String url) {
@@ -270,35 +328,14 @@ class AudioPlayer extends ChangeNotifier {
     _backgroundAudio?.pause();
     _backgroundAudioPositionSeconds = 0;
     _setNotification(false);
-    _backgroundAudio =
-        Audio.loadFromRemoteUrl(url, onDuration: (double durationSeconds) {
-      _backgroundAudioDurationSeconds = durationSeconds;
-      _remoteAudioLoading = false;
-      _backgroundAudioPlaying = true;
-      _setNotification(true);
-      notifyListeners();
-    }, onPosition: (double positionSeconds) {
-      if (_backgroundAudioPositionSeconds < _backgroundAudioDurationSeconds) {
-        _seekSliderValue =
-            _backgroundAudioPositionSeconds / _backgroundAudioDurationSeconds;
-        _backgroundAudioPositionSeconds = positionSeconds;
-        notifyListeners();
-      } else {
-        _seekSliderValue = 1;
-        _backgroundAudioPositionSeconds = _backgroundAudioDurationSeconds;
-        notifyListeners();
-      }
-      storage.saveInt(positionSeconds.toInt());
-    }, onError: (String message) {
-      _remoteErrorMessage = message;
-      _backgroundAudio.dispose();
-      _backgroundAudio = null;
-      _backgroundAudioPlaying = false;
-      _remoteAudioLoading = false;
-    }, onComplete: () {
-      playNext();
-    }, looping: false, playInBackground: true)
-          ..resume();
+    _backgroundAudio = Audio.loadFromRemoteUrl(url,
+        onDuration: (double durationSeconds) => onDuration(durationSeconds),
+        onPosition: (double positionSeconds) => onPosition(positionSeconds),
+        onError: (String message) => onError(message),
+        onComplete: () => playNext(),
+        looping: false,
+        playInBackground: true)
+      ..resume();
   }
 
   void _mediaEventListener(MediaEvent mediaEvent) {
@@ -341,7 +378,7 @@ class AudioPlayer extends ChangeNotifier {
     }
   }
 
-  Future<void> _setNotification(bool b) async {
+  Future<void> _setNotification(bool boo) async {
     final Uint8List imageBytes =
         File('${_episode.imagePath}').readAsBytesSync();
     AudioSystem.instance.setMetadata(AudioMetadata(
@@ -351,7 +388,7 @@ class AudioPlayer extends ChangeNotifier {
         genre: "Podcast",
         durationSeconds: _backgroundAudioDurationSeconds,
         artBytes: imageBytes));
-    AudioSystem.instance.setPlaybackState(b, _backgroundAudioPositionSeconds);
+    AudioSystem.instance.setPlaybackState(boo, _backgroundAudioPositionSeconds);
     AudioSystem.instance.setAndroidNotificationButtons(<dynamic>[
       AndroidMediaButtonType.pause,
       _forwardButton,

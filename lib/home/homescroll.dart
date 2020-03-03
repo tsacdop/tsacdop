@@ -303,7 +303,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
   @override
   Widget build(BuildContext context) {
     Color _c = (Theme.of(context).brightness == Brightness.light)
-        ?  widget.podcastLocal.primaryColor.colorizedark()
+        ? widget.podcastLocal.primaryColor.colorizedark()
         : widget.podcastLocal.primaryColor.colorizeLight();
     return Column(
       children: <Widget>[
@@ -374,9 +374,41 @@ class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> podcast;
   final PodcastLocal podcastLocal;
   ShowEpisode({Key key, this.podcast, this.podcastLocal}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
+    _showPopupMenu(Offset offset) async {
+      print(offset.dx);
+      double left = offset.dx;
+      double top = offset.dy;
+      await showMenu(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        context: context,
+        position: RelativeRect.fromLTRB(left, top, _width - left, 0),
+        items: [
+          PopupMenuItem(
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.play_circle_outline),
+                 Padding(padding: EdgeInsets.symmetric(horizontal: 2),),
+                Text('Play')
+              ],
+            ),
+          ),
+          PopupMenuItem(child: Row(
+            children: <Widget>[
+              Icon(Icons.favorite_border),
+              Padding(padding: EdgeInsets.symmetric(horizontal: 2),),
+              Text('Like')
+            ],
+          )),
+        ],
+        elevation: 8.0,
+      );
+    }
+
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       primary: false,
@@ -392,11 +424,12 @@ class ShowEpisode extends StatelessWidget {
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                Color _c = 
-                (Theme.of(context).brightness == Brightness.light)
-                    ?  podcastLocal.primaryColor.colorizedark()
-                    :  podcastLocal.primaryColor.colorizeLight();
-                return InkWell(
+                Color _c = (Theme.of(context).brightness == Brightness.light)
+                    ? podcastLocal.primaryColor.colorizedark()
+                    : podcastLocal.primaryColor.colorizeLight();
+                return GestureDetector(
+                  onLongPressStart: (details) => _showPopupMenu(Offset(
+                      details.globalPosition.dx, details.globalPosition.dy)),
                   onTap: () {
                     Navigator.push(
                       context,

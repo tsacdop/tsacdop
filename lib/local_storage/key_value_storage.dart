@@ -34,7 +34,6 @@ class KeyValueStorage {
 
   Future<bool> saveInt(int setting) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(setting.toString());
     return prefs.setInt(key, setting);
   }
 

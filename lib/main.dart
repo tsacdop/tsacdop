@@ -32,15 +32,12 @@ Future main() async {
     callbackDispatcher,
     isInDebugMode: true,
   );
-  Workmanager.registerPeriodicTask("update", "simplePeriodicTask",
-      frequency: Duration(hours: 1),
-      initialDelay: Duration(seconds: 10),
+  Workmanager.registerPeriodicTask("2", "update_podcasts",
+      frequency: Duration(minutes: 1),
+      initialDelay: Duration(seconds: 5),
       constraints: Constraints(
           networkType: NetworkType.connected,
-          requiresBatteryNotLow: true,
-          requiresCharging: false,
-          requiresDeviceIdle: true,
-          requiresStorageNotLow: true));
+       ));
 
   await FlutterDownloader.initialize();
   await SystemChrome.setPreferredOrientations(
@@ -55,7 +52,7 @@ void callbackDispatcher() {
       await dbHelper.updatePodcastRss(podcastLocal);
       print('Refresh ' + podcastLocal.title);
     });
-    return Future.value(true);
+    return true;
   });
 }
 

@@ -20,12 +20,6 @@ class _PodcastManageState extends State<PodcastManage> {
         ));
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -34,85 +28,85 @@ class _PodcastManageState extends State<PodcastManage> {
         statusBarColor: Theme.of(context).primaryColor,
       ),
       child: SafeArea(
-        child: SafeArea(
-          child: Scaffold(
-            appBar: AppBar(
-              centerTitle: true,
-              title: Text('Groups'),
-              actions: <Widget>[
-                IconButton(
-                    onPressed: () => showGeneralDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        barrierLabel: MaterialLocalizations.of(context)
-                            .modalBarrierDismissLabel,
-                        barrierColor: Colors.black54,
-                        transitionDuration: const Duration(milliseconds: 200),
-                        pageBuilder: (BuildContext context, Animation animaiton,
-                                Animation secondaryAnimation) =>
-                            AddGroup()),
-                    icon: Icon(Icons.add)),
-                OrderMenu(),
-              ],
-            ),
-            body: Consumer<GroupList>(builder: (_, groupList, __) {
-              bool _isLoading = groupList.isLoading;
-              List<PodcastGroup> _groups = groupList.groups;
-              return _isLoading
-                  ? Center()
-                  : DefaultTabController(
-                      length: _groups.length,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Container(
-                            height: 50,
-                            padding: EdgeInsets.symmetric(horizontal: 10.0),
-                            alignment: Alignment.centerLeft,
-                            child: TabBar(
-                              // labelColor: Colors.black,
-                              //  unselectedLabelColor: Colors.grey[500],
-                              labelPadding: EdgeInsets.all(5.0),
-                              indicator: getIndicator(),
-                              isScrollable: true,
-                              tabs: _groups.map<Tab>((group) {
-                                return Tab(
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text('Groups'),
+            actions: <Widget>[
+              IconButton(
+                  onPressed: () => showGeneralDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      barrierLabel: MaterialLocalizations.of(context)
+                          .modalBarrierDismissLabel,
+                      barrierColor: Colors.black54,
+                      transitionDuration: const Duration(milliseconds: 200),
+                      pageBuilder: (BuildContext context, Animation animaiton,
+                              Animation secondaryAnimation) =>
+                          AddGroup()),
+                  icon: Icon(Icons.add)),
+              OrderMenu(),
+            ],
+          ),
+          body: Consumer<GroupList>(builder: (_, groupList, __) {
+            bool _isLoading = groupList.isLoading;
+            List<PodcastGroup> _groups = groupList.groups;
+            return _isLoading
+                ? Center()
+                : DefaultTabController(
+                    length: _groups.length,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          height: 50,
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          alignment: Alignment.centerLeft,
+                          child: TabBar(
+                            labelColor: Colors.white,
+                            unselectedLabelColor: Colors.black,
+                            labelPadding: EdgeInsets.all(5.0),
+                            indicator: getIndicator(),
+                            isScrollable: true,
+                            tabs: _groups.map<Tab>((group) {
+                              return  Tab(
                                   child: Container(
                                       height: 30.0,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.0),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10.0),
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? Theme.of(context).primaryColorDark
-                                            : Colors.grey[800],
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
+                                        color: group.getColor(),
+                                       // Theme.of(context).brightness ==
+                                       //         Brightness.light
+                                       //     ? Theme.of(context).primaryColorDark
+                                       //     : Colors.grey[800],
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(15)),
                                       ),
                                       child: Text(
                                         group.name,
                                       )),
                                 );
+                              
+                            }).toList(),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            child: TabBarView(
+                              children: _groups.map<Widget>((group) {
+                                return Container(
+                                    key: ObjectKey(group),
+                                    child: PodcastGroupList(group: group));
                               }).toList(),
                             ),
                           ),
-                          Expanded(
-                            child: Container(
-                              child: TabBarView(
-                                children: _groups.map<Widget>((group) {
-                                  return Container(
-                                      key: ObjectKey(group),
-                                      child: PodcastGroupList(group: group));
-                                }).toList(),
-                              ),
-                            ),
-                          )
-                        ],
-                      ));
-            }),
-          ),
+                        )
+                      ],
+                    ));
+          }),
         ),
       ),
     );
@@ -214,7 +208,8 @@ class _AddGroupState extends State<AddGroup> {
                     Navigator.of(context).pop();
                   }
                 },
-                child: Text('DONE',style: TextStyle(color: Theme.of(context).accentColor)),
+                child: Text('DONE',
+                    style: TextStyle(color: Theme.of(context).accentColor)),
               )
             ],
             title: Text('Create new group'),
@@ -228,10 +223,12 @@ class _AddGroupState extends State<AddGroup> {
                     hintStyle: TextStyle(fontSize: 18),
                     filled: true,
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2.0),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).accentColor, width: 2.0),
                     ),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2.0),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).accentColor, width: 2.0),
                     ),
                   ),
                   cursorRadius: Radius.circular(2),

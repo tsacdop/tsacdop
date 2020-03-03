@@ -29,7 +29,7 @@ class AboutApp extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Icon(icons, color: Colors.grey[700]),
+              Icon(icons, color: Theme.of(context).accentColor),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
               ),

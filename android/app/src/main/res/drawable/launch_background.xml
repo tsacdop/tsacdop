@@ -14,4 +14,6 @@
             android:gravity="bottom"
             android:src="@mipmap/text" />
     </item>
+   <!-- <item name="android:navigationBarColor">@android:color/white</item>
+    <item name="android:windowLightNavigationBar">true</item> -->
 </layer-list>

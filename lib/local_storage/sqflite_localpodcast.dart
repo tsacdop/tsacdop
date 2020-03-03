@@ -1,10 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
-import 'dart:io' as io;
 import 'package:path/path.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/audiostate.dart';
@@ -20,8 +18,8 @@ class DBHelper {
   }
 
   initDb() async {
-    io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "podcasts.db");
+    var documentsDirectory = await getDatabasesPath();
+    String path = join(documentsDirectory, "podcasts.db");
     Database theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
     return theDb;
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -25,12 +26,118 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
+  List minsToSelect = [1, 5, 10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
+  //Show playlist widget.
   bool _showlist;
+  //Show timer choose widget.
+  bool _showTimer;
+  //Store selected timer mins.
+  int _minSelected;
+  //Left time after user setting timer.
+  int _timeLeft;
+  Timer _timer;
 
   @override
   void initState() {
     super.initState();
     _showlist = false;
+    _showTimer = false;
+    _minSelected = 5;
+    _timeLeft = 0;
+  }
+
+  setTimer() {
+    _timeLeft = _minSelected;
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+      setState(() {
+        if(_timeLeft < 1){
+          _timer.cancel();
+        } else{
+          _timeLeft = _timeLeft - 1;
+        }
+      });
+     });
+  }
+
+  Widget _sleepTimer(BuildContext context) {
+    var audio = Provider.of<AudioPlayer>(context);
+    return Container(
+      height: 50,
+      margin: EdgeInsets.all(10.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: minsToSelect
+                    .map((e) => InkWell(
+                          onTap: () => setState(() => _minSelected = e),
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.elasticOut,
+                            margin: EdgeInsets.symmetric(horizontal: 10.0),
+                            decoration: BoxDecoration(
+                              color: (e == _minSelected)
+                                  ? Theme.of(context).accentColor
+                                  : Colors.grey[400],
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            height: (e == _minSelected) ? 40 : 30,
+                            width: (e == _minSelected) ? 40 : 30,
+                            child: Text(e.toString(),
+                                style: TextStyle(
+                                    color: (e == _minSelected)
+                                        ? Colors.white
+                                        : Colors.black)),
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+          ),
+          Container(
+            width: 100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Material(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      setState(() => _showTimer = false);
+                    },
+                  ),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    icon: Icon(Icons.done),
+                    onPressed: () {
+                      setState(() {
+                        _showTimer = false;
+                      });
+                      audio.sleepTimer(_minSelected);
+                      setTimer();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _expandedPanel(BuildContext context) {
@@ -104,13 +211,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           padding: EdgeInsets.only(left: 30, right: 30),
                           child: SliderTheme(
                             data: SliderTheme.of(context).copyWith(
-                              activeTrackColor: Colors.blue[100],
+                              activeTrackColor: Theme.of(context)
+                                  .accentColor
+                                  .withOpacity(0.5),
                               inactiveTrackColor: Colors.grey[300],
                               trackHeight: 3.0,
-                              thumbColor: Colors.blue[400],
+                              thumbColor: Theme.of(context).accentColor,
                               thumbShape: RoundSliderThumbShape(
                                   enabledThumbRadius: 6.0),
-                              overlayColor: Colors.blue.withAlpha(32),
+                              overlayColor:
+                                  Theme.of(context).accentColor.withAlpha(32),
                               overlayShape:
                                   RoundSliderOverlayShape(overlayRadius: 14.0),
                             ),
@@ -167,113 +277,192 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   child: Selector<AudioPlayer, bool>(
                     selector: (_, audio) => audio.backgroundAudioPlaying,
                     builder: (_, backplay, __) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                              padding: EdgeInsets.symmetric(horizontal: 30.0),
-                              onPressed: backplay
-                                  ? () => audio.forwardAudio(-10)
-                                  : null,
-                              iconSize: 32.0,
-                              icon: Icon(Icons.replay_10),
-                              color: Theme.of(context).tabBarTheme.labelColor),
-                          backplay
-                              ? IconButton(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 30.0),
-                                  onPressed: backplay
-                                      ? () {
-                                          audio.pauseAduio();
-                                        }
-                                      : null,
-                                  iconSize: 40.0,
-                                  icon: Icon(Icons.pause_circle_filled),
-                                  color:
-                                      Theme.of(context).tabBarTheme.labelColor)
-                              : IconButton(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 30.0),
-                                  onPressed: backplay
-                                      ? null
-                                      : () {
-                                          audio.resumeAudio();
-                                        },
-                                  iconSize: 40.0,
-                                  icon: Icon(Icons.play_circle_filled),
-                                  color:
-                                      Theme.of(context).tabBarTheme.labelColor),
-                          IconButton(
-                              padding: EdgeInsets.symmetric(horizontal: 30.0),
-                              onPressed: backplay
-                                  ? () => audio.forwardAudio(30)
-                                  : null,
-                              iconSize: 32.0,
-                              icon: Icon(Icons.forward_30),
-                              color: Theme.of(context).tabBarTheme.labelColor),
-                        ],
+                      return Material(
+                        color: Colors.transparent,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                onPressed: backplay
+                                    ? () => audio.forwardAudio(-10)
+                                    : null,
+                                iconSize: 32.0,
+                                icon: Icon(Icons.replay_10),
+                                color:
+                                    Theme.of(context).tabBarTheme.labelColor),
+                            backplay
+                                ? IconButton(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 30.0),
+                                    onPressed: backplay
+                                        ? () {
+                                            audio.pauseAduio();
+                                          }
+                                        : null,
+                                    iconSize: 40.0,
+                                    icon: Icon(Icons.pause_circle_filled),
+                                    color: Theme.of(context)
+                                        .tabBarTheme
+                                        .labelColor)
+                                : IconButton(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 30.0),
+                                    onPressed: backplay
+                                        ? null
+                                        : () {
+                                            audio.resumeAudio();
+                                          },
+                                    iconSize: 40.0,
+                                    icon: Icon(Icons.play_circle_filled),
+                                    color: Theme.of(context)
+                                        .tabBarTheme
+                                        .labelColor),
+                            IconButton(
+                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                onPressed: backplay
+                                    ? () => audio.forwardAudio(30)
+                                    : null,
+                                iconSize: 32.0,
+                                icon: Icon(Icons.forward_30),
+                                color:
+                                    Theme.of(context).tabBarTheme.labelColor),
+                          ],
+                        ),
                       );
                     },
                   ),
                 ),
                 Spacer(),
-                Container(
-                  height: 50.0,
-                  margin: EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  child: Selector<AudioPlayer, EpisodeBrief>(
-                    selector: (_, audio) => audio.episode,
-                    builder: (_, episode, __) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.all(5.0),
-                          ),
-                          Container(
-                            height: 30.0,
-                            width: 30.0,
-                            child: CircleAvatar(
-                              backgroundImage:
-                                  FileImage(File("${episode.imagePath}")),
-                            ),
-                          ),
-                          Spacer(),
-                          Material(
-                            color: Colors.transparent,
-                            child: IconButton(
-                              onPressed: () => Navigator.push(
-                                context,
-                                SlideUptRoute(
-                                    page: EpisodeDetail(
-                                        episodeItem: episode,
-                                        heroTag: 'playpanel')),
-                              ),
-                              icon: Icon(Icons.info),
-                            ),
-                          ),
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(10.0),
-                                    bottomRight: Radius.circular(10.0)),
-                                child: Container(
-                                    height: 50.0,
-                                    width: 50.0,
-                                    child: Icon(Icons.keyboard_arrow_up)),
-                                onTap: () => setState(() => _showlist = true)),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
+                !_showTimer
+                    // Setting sleep timer
+                    ? Container(
+                        height: 50.0,
+                        margin: EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        ),
+                        child: Selector<AudioPlayer,
+                            Tuple3<EpisodeBrief, bool, bool>>(
+                          selector: (_, audio) => Tuple3(audio.episode,
+                              audio.stopOnComplete, audio.showStopWatch),
+                          builder: (_, data, __) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.all(5.0),
+                                ),
+                                Container(
+                                  height: 30.0,
+                                  width: 30.0,
+                                  child: CircleAvatar(
+                                    backgroundImage: FileImage(
+                                        File("${data.item1.imagePath}")),
+                                  ),
+                                ),
+                                Spacer(),
+                                Material(
+                                  color: Colors.transparent,
+                                  child: !data.item3
+                                      ? PopupMenuButton(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10))),
+                                          elevation: 1,
+                                          tooltip: 'Sleep Timer',
+                                          icon: Icon(
+                                            Icons.brightness_2,
+                                            color: data.item2
+                                                ? Theme.of(context).accentColor
+                                                : Theme.of(context)
+                                                    .iconTheme
+                                                    .color,
+                                          ),
+                                          itemBuilder: (context) => [
+                                                PopupMenuItem(
+                                                    value: 1,
+                                                    child: Text(
+                                                        'End of this episode')),
+                                                PopupMenuItem(
+                                                  value: 2,
+                                                  child: Text('Timer'),
+                                                ),
+                                              ],
+                                          onSelected: (value) {
+                                            if (value == 1) {
+                                              audio.setStopOnComplete = true;
+                                            } else if (value == 2) {
+                                              setState(() => _showTimer = true);
+                                            }
+                                          })
+                                      : PopupMenuButton(
+                                          tooltip: 'Time Left',
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10))),
+                                          elevation: 1,
+                                          icon: Container(
+                                            alignment: Alignment.center,
+                                            height: 25,
+                                            width: 25,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color:
+                                                  Theme.of(context).accentColor,
+                                            ),
+                                            child: Text(
+                                                _timeLeft.toString(),
+                                                style: TextStyle(
+                                                    color: Colors.white)),
+                                          ),
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem(
+                                                value: 1,
+                                                child: Text('Cancel')),
+                                          ],
+                                          onSelected: (value) {
+                                            audio.cancelTimer();
+                                            _timer.cancel();
+                                            setState(() => _timeLeft = 0);
+                                          },
+                                        ),
+                                ),
+                                Material(
+                                  color: Colors.transparent,
+                                  child: IconButton(
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      SlideUptRoute(
+                                          page: EpisodeDetail(
+                                              episodeItem: data.item1,
+                                              heroTag: 'playpanel')),
+                                    ),
+                                    icon: Icon(Icons.info),
+                                  ),
+                                ),
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(10.0),
+                                          bottomRight: Radius.circular(10.0)),
+                                      child: Container(
+                                          height: 50.0,
+                                          width: 50.0,
+                                          child: Icon(Icons.keyboard_arrow_up)),
+                                      onTap: () =>
+                                          setState(() => _showlist = true)),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      )
+                    : _sleepTimer(context),
               ]),
         ),
         Container(
@@ -283,8 +472,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             height: _showlist ? 300 : 0,
             width: MediaQuery.of(context).size.width,
             alignment: Alignment.center,
-            margin: EdgeInsets.all(20),
-            padding: EdgeInsets.only(bottom: 10.0),
+            // margin: EdgeInsets.all(20),
+            //padding: EdgeInsets.only(bottom: 10.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10.0)),
               color: Theme.of(context).scaffoldBackgroundColor,

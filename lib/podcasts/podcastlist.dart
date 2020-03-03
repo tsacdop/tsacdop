@@ -46,6 +46,9 @@ class _AboutPodcastState extends State<AboutPodcast> {
   Widget build(BuildContext context) {
     var _groupList = Provider.of<GroupList>(context, listen: false);
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0))),
+      titlePadding: EdgeInsets.only(top: 20, left: 20, right: 200, bottom: 20),
       actions: <Widget>[
         FlatButton(
           padding: EdgeInsets.all(10.0),
@@ -99,7 +102,7 @@ class _PodcastListState extends State<PodcastList> {
         statusBarColor: Theme.of(context).primaryColor,
       ),
       child: SafeArea(
-              child: Scaffold(
+        child: Scaffold(
           appBar: AppBar(
             title: Text('Podcasts'),
             centerTitle: true,
@@ -116,7 +119,8 @@ class _PodcastListState extends State<PodcastList> {
                       SliverPadding(
                         padding: const EdgeInsets.all(10.0),
                         sliver: SliverGrid(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
                             childAspectRatio: 0.8,
                             crossAxisCount: 3,
                           ),
@@ -133,12 +137,43 @@ class _PodcastListState extends State<PodcastList> {
                                   );
                                 },
                                 onLongPress: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        AboutPodcast(
-                                            podcastLocal: snapshot.data[index]),
-                                  ).then((_) => setState(() {}));
+                                  showGeneralDialog(
+                                      context: context,
+                                      barrierDismissible: true,
+                                      barrierLabel:
+                                          MaterialLocalizations.of(context)
+                                              .modalBarrierDismissLabel,
+                                      barrierColor: Colors.black54,
+                                      transitionDuration:
+                                          const Duration(milliseconds: 200),
+                                      pageBuilder: (BuildContext context,
+                                              Animation animaiton,
+                                              Animation secondaryAnimation) =>
+                                          AnnotatedRegion<SystemUiOverlayStyle>(
+                                            value: SystemUiOverlayStyle(
+                                              statusBarIconBrightness:
+                                                  Brightness.light,
+                                              systemNavigationBarColor:
+                                                  Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.light
+                                                      ? Color.fromRGBO(
+                                                          113, 113, 113, 1)
+                                                      : Color.fromRGBO(
+                                                          15, 15, 15, 1),
+                                              statusBarColor: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.light
+                                                  ? Color.fromRGBO(
+                                                      113, 113, 113, 1)
+                                                  : Color.fromRGBO(5, 5, 5, 1),
+                                            ),
+                                            child: SafeArea(
+                                              child: AboutPodcast(
+                                                  podcastLocal:
+                                                      snapshot.data[index]),
+                                            ),
+                                          ));
                                 },
                                 child: Container(
                                   alignment: Alignment.center,

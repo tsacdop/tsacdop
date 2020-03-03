@@ -10,10 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/fireside_data.dart';
 import 'package:uuid/uuid.dart';
-import 'package:tuple/tuple.dart';
 
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/podcast_group.dart';
@@ -32,30 +30,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _MyHomePageDelegate _delegate = _MyHomePageDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool _loadPlay;
-
-   static String _stringForSeconds(int seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPlay = false;
-    _getPlaylist();
-  }
-
-  _getPlaylist() async {
-    await Provider.of<AudioPlayer>(context, listen: false).loadPlaylist();
-    setState(() {
-      _loadPlay = true;
-    });
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
-    var audio = Provider.of<AudioPlayer>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -78,43 +55,13 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             title: Image(
-              image: AssetImage('assets/text.png'),
+              image: Theme.of(context).brightness == Brightness.light
+             ? AssetImage('assets/text.png') : AssetImage('assets/text_light.png'),
               height: 30,
             ),
             actions: <Widget>[
               PopupMenu(),
             ],
-          ),
-          floatingActionButton: Selector<AudioPlayer, Tuple3<bool, Playlist, int>>(
-            selector: (_, audio) => Tuple3(audio.playerRunning, audio.queue, audio.lastPositin),
-            builder: (_, data, __) => !_loadPlay
-                ? Center()
-                : data.item1 || data.item2.playlist.length == 0
-                    ? Center()
-                    : FloatingActionButton.extended(
-                        tooltip: 'Play from playlist',
-                        highlightElevation: 2,
-                        hoverElevation: 2,
-                        onPressed: () => audio.playlistLoad(),
-                        elevation: 1,
-                        backgroundColor: Theme.of(context).accentColor,
-                        label: Text(_stringForSeconds(data.item3), style: TextStyle(color: Colors.white)),
-                        icon: Stack(
-                          alignment: Alignment.center,
-                          children: <Widget>[
-                            CircleAvatar(
-                              radius: 15,
-                              backgroundImage: FileImage(File(
-                                  "${data.item2.playlist.first.imagePath}")),
-                            ),
-                            Container(
-                              height: 30.0,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.black38),
-                            ),
-                          ],
-                        )),
           ),
           body: Home(),
         ),
@@ -163,7 +110,8 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
           child: Container(
         padding: EdgeInsets.only(top: 400),
         child: Image(
-          image: AssetImage('assets/listennotes.png'),
+          image: Theme.of(context).brightness == Brightness.light
+         ? AssetImage('assets/listennotes.png') :  AssetImage('assets/listennotes_light.png'),
           height: 20,
         ),
       ));
