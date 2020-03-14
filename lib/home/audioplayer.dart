@@ -16,6 +16,7 @@ import 'package:tsacdop/home/audiopanel.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
 
+//Custom slider 
 class MyRoundSliderThumpShape extends SliderComponentShape {
   const MyRoundSliderThumpShape({
     this.enabledThumbRadius = 10.0,

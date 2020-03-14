@@ -5,7 +5,7 @@
 <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" art = "Logo"/>
 </br>
 <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/text.png" art = "Tsacdop"/>
-</p>
+t p</p>
 
 Enjoy podcasts with Tsacdop.
 
