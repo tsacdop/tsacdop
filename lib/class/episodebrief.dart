@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:audio_service/audio_service.dart';
 
 class EpisodeBrief {
   final String title;
@@ -13,6 +14,7 @@ class EpisodeBrief {
   final int duration;
   final int explicit;
   final String imagePath;
+  final String mediaId;
   EpisodeBrief(
       this.title,
       this.enclosureUrl,
@@ -21,21 +23,31 @@ class EpisodeBrief {
       this.feedTitle,
       this.primaryColor,
       this.liked,
-      this.downloaded, 
+      this.downloaded,
       this.duration,
       this.explicit,
-      this.imagePath
-      );
+      this.imagePath,
+      this.mediaId);
 
-  String dateToString(){
-    DateTime date =  DateTime.fromMillisecondsSinceEpoch(pubDate);
+  String dateToString() {
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
     var diffrence = DateTime.now().difference(date);
-    if(diffrence.inHours < 24) {
+    if (diffrence.inHours < 24) {
       return '${diffrence.inHours} hours ago';
-    } else if (diffrence.inDays < 7){
-      return '${diffrence.inDays} days ago';}
-        else {
-          return DateFormat.yMMMd().format( DateTime.fromMillisecondsSinceEpoch(pubDate));
-        }
+    } else if (diffrence.inDays < 7) {
+      return '${diffrence.inDays} days ago';
+    } else {
+      return DateFormat.yMMMd()
+          .format(DateTime.fromMillisecondsSinceEpoch(pubDate));
     }
+  }
+
+  MediaItem toMediaItem() {
+    return MediaItem(
+        id: mediaId,
+        title: title,
+        artist: feedTitle,
+        album: feedTitle,
+        artUri: 'file://$imagePath');
+  }
 }

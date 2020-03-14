@@ -31,7 +31,7 @@ class _HomeState extends State<Home> {
   }
 
   _getPlaylist() async {
-    await Provider.of<AudioPlayer>(context, listen: false).loadPlaylist();
+    await Provider.of<AudioPlayerNotifier>(context, listen: false).loadPlaylist();
     setState(() {
       _loadPlay = true;
     });
@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    var audio = Provider.of<AudioPlayer>(context, listen: false);
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Stack(children: <Widget>[
       Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -58,7 +58,7 @@ class _HomeState extends State<Home> {
         bottom: 50,
         right: _loadPlay ? 5 : -25,
         child: Container(
-          child: Selector<AudioPlayer, Tuple3<bool, Playlist, int>>(
+          child: Selector<AudioPlayerNotifier, Tuple3<bool, Playlist, int>>(
             selector: (_, audio) =>
                 Tuple3(audio.playerRunning, audio.queue, audio.lastPositin),
             builder: (_, data, __) => !_loadPlay
@@ -90,7 +90,7 @@ class _HomeState extends State<Home> {
                                         offset: Offset(1, 1)),
                                   ]),
                               height: 40,
-                              child: Text(_stringForSeconds(data.item3) + '...',
+                              child: Text(_stringForSeconds(data.item3~/1000) + '...',
                                   style: TextStyle(color: Colors.white)),
                             ),
                             CircleAvatar(

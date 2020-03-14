@@ -7,7 +7,7 @@ import 'package:tsacdop/class/settingstate.dart';
 class ThemeSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var settings = Provider.of<SettingState>(context);
+    var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
           statusBarIconBrightness: Theme.of(context).accentColorBrightness,

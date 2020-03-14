@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
@@ -211,7 +212,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                   ],
                 ),
               ),
-              Selector<AudioPlayer, bool>(
+              Selector<AudioPlayerNotifier, bool>(
                   selector: (_, audio) => audio.playerRunning,
                   builder: (_, data, __) {
                     return Container(
@@ -290,7 +291,7 @@ class _MenuBarState extends State<MenuBar> {
 
   @override
   Widget build(BuildContext context) {
-    var audio = Provider.of<AudioPlayer>(context, listen: false);
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Container(
       height: 50.0,
       decoration: BoxDecoration(
@@ -346,7 +347,7 @@ class _MenuBarState extends State<MenuBar> {
                       ],
                     ),
           DownloadButton(episodeBrief: widget.episodeItem),
-          Selector<AudioPlayer, List<String>>(
+          Selector<AudioPlayerNotifier, List<String>>(
             selector: (_, audio) =>
                 audio.queue.playlist.map((e) => e.enclosureUrl).toList(),
             builder: (_, data, __) {
@@ -367,9 +368,9 @@ class _MenuBarState extends State<MenuBar> {
           ),
           Spacer(),
           // Text(audio.audioState.toString()),
-          Selector<AudioPlayer, Tuple2<EpisodeBrief, bool>>(
+          Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, BasicPlaybackState>>(
             selector: (_, audio) =>
-                Tuple2(audio.episode, audio.backgroundAudioPlaying),
+                Tuple2(audio.episode, audio.audioState),
             builder: (_, data, __) {
               return (widget.episodeItem.title != data.item1?.title)
                   ? Material(
@@ -400,7 +401,7 @@ class _MenuBarState extends State<MenuBar> {
                       ),
                     )
                   : (widget.episodeItem.title == data.item1?.title &&
-                          data.item2 == true)
+                          data.item2 == BasicPlaybackState.playing)
                       ? Container(
                           padding: EdgeInsets.only(right: 30),
                           child: SizedBox(
@@ -424,9 +425,10 @@ class _MenuBarState extends State<MenuBar> {
 class LinePainter extends CustomPainter {
   double _fraction;
   Paint _paint;
-  LinePainter(this._fraction) {
+  Color _maincolor;
+  LinePainter(this._fraction, this._maincolor) {
     _paint = Paint()
-      ..color = Colors.blue
+      ..color = _maincolor
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
   }
@@ -483,14 +485,15 @@ class _LineLoaderState extends State<LineLoader>
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(painter: LinePainter(_fraction));
+    return CustomPaint(painter: LinePainter(_fraction, Theme.of(context).accentColor));
   }
 }
 
 class WavePainter extends CustomPainter {
   double _fraction;
   double _value;
-  WavePainter(this._fraction);
+  Color _color;
+  WavePainter(this._fraction, this._color);
   @override
   void paint(Canvas canvas, Size size) {
     if (_fraction < 0.5) {
@@ -500,7 +503,7 @@ class WavePainter extends CustomPainter {
     }
     Path _path = Path();
     Paint _paint = Paint()
-      ..color = Colors.blue
+      ..color = _color
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -575,7 +578,7 @@ class _WaveLoaderState extends State<WaveLoader>
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(painter: WavePainter(_fraction));
+    return CustomPaint(painter: WavePainter(_fraction, Theme.of(context).accentColor));
   }
 }
 

@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'package:tsacdop/class/audiostate.dart';
+import 'package:tuple/tuple.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/podcast_group.dart';
@@ -89,7 +91,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyText1
-                                            .copyWith(color: Colors.red[300]),
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .accentColor),
                                       )),
                                   Spacer(),
                                   Container(
@@ -184,7 +188,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyText1
-                                            .copyWith(color: Colors.red[300]),
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .accentColor),
                                       )),
                                   Spacer(),
                                   Container(
@@ -374,43 +380,78 @@ class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> podcast;
   final PodcastLocal podcastLocal;
   ShowEpisode({Key key, this.podcast, this.podcastLocal}) : super(key: key);
-
+  Offset offset;
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    _showPopupMenu(Offset offset) async {
-      print(offset.dx);
+    _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
+        bool isPlaying, bool isInPlaylist) async {
+      var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
       double left = offset.dx;
       double top = offset.dy;
-      await showMenu(
+      await showMenu<int>(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
         context: context,
         position: RelativeRect.fromLTRB(left, top, _width - left, 0),
-        items: [
+        items: <PopupMenuEntry<int>>[
           PopupMenuItem(
+            value: 0,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Icon(Icons.play_circle_outline),
-                 Padding(padding: EdgeInsets.symmetric(horizontal: 2),),
-                Text('Play')
+                Icon(
+                  LineIcons.play_circle_solid,
+                  color: Theme.of(context).accentColor,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 2),
+                ),
+                !isPlaying ? Text('Play') : Text('Playing'),
               ],
             ),
           ),
-          PopupMenuItem(child: Row(
-            children: <Widget>[
-              Icon(Icons.favorite_border),
-              Padding(padding: EdgeInsets.symmetric(horizontal: 2),),
-              Text('Like')
-            ],
-          )),
+          PopupMenuItem(
+              value: 1,
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    LineIcons.clock_solid,
+                    color: Colors.red,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 2),
+                  ),
+                  !isInPlaylist ? Text('Later') : Text('Remove')
+                ],
+              )),
         ],
-        elevation: 8.0,
-      );
+        elevation: 5.0,
+      ).then((value) {
+        if (value == 0) {
+          if (!isPlaying) audio.episodeLoad(episode);
+        } else if (value == 1) {
+          if (isInPlaylist) {
+            audio.addToPlaylist(episode);
+            Fluttertoast.showToast(
+              msg: 'Added to playlist',
+              gravity: ToastGravity.BOTTOM,
+            );
+          } else {
+            audio.delFromPlaylist(episode);
+            Fluttertoast.showToast(
+              msg: 'Removed from playlist',
+              gravity: ToastGravity.BOTTOM,
+            );
+          }
+        }
+      });
     }
 
     return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
+      // physics: const AlwaysScrollableScrollPhysics(),
+      physics: ClampingScrollPhysics(),
       primary: false,
       slivers: <Widget>[
         SliverPadding(
@@ -427,88 +468,110 @@ class ShowEpisode extends StatelessWidget {
                 Color _c = (Theme.of(context).brightness == Brightness.light)
                     ? podcastLocal.primaryColor.colorizedark()
                     : podcastLocal.primaryColor.colorizeLight();
-                return GestureDetector(
-                  onLongPressStart: (details) => _showPopupMenu(Offset(
-                      details.globalPosition.dx, details.globalPosition.dy)),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      ScaleRoute(
-                          page: EpisodeDetail(
-                        episodeItem: podcast[index],
-                        heroTag: 'scroll',
-                        //unique hero tag
-                      )),
-                    );
-                  },
-                  child: Container(
+                return Selector<AudioPlayerNotifier,
+                    Tuple2<EpisodeBrief, List<String>>>(
+                  selector: (_, audio) => Tuple2(
+                    audio?.episode,
+                    audio.queue.playlist.map((e) => e.enclosureUrl).toList(),
+                  ),
+                  builder: (_, data, __) => Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5.0)),
                       color: Theme.of(context).scaffoldBackgroundColor,
-                      border: Border.all(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? Theme.of(context).primaryColor
-                            : Theme.of(context).scaffoldBackgroundColor,
-                        //  color: Theme.of(context).primaryColor,
-                        width: 3.0,
-                      ),
                     ),
                     alignment: Alignment.center,
-                    padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        onTapDown: (details) => offset = Offset(
+                            details.globalPosition.dx,
+                            details.globalPosition.dy),
+                        onLongPress: () => _showPopupMenu(
+                            offset,
+                            podcast[index],
+                            context,
+                            data.item1 == podcast[index],
+                            data.item2.contains(podcast[index].enclosureUrl)),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            ScaleRoute(
+                                page: EpisodeDetail(
+                              episodeItem: podcast[index],
+                              heroTag: 'scroll',
+                              //unique hero tag
+                            )),
+                          );
+                        },
+                        child: Container(
+                          // decoration: BoxDecoration(
+                          //   border: Border.all(
+                          //     color: Theme.of(context).brightness ==
+                          //             Brightness.light
+                          //         ? Theme.of(context).primaryColor
+                          //         : Theme.of(context).scaffoldBackgroundColor,
+                          //     width: 0.0,
+                          //   ),
+                          // ),
+                          padding: EdgeInsets.all(10.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Hero(
-                                tag: podcast[index].enclosureUrl + 'scroll',
+                              Expanded(
+                                flex: 2,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Hero(
+                                      tag: podcast[index].enclosureUrl +
+                                          'scroll',
+                                      child: Container(
+                                        height: _width / 18,
+                                        width: _width / 18,
+                                        child: CircleAvatar(
+                                          backgroundImage: FileImage(File(
+                                              "${podcastLocal.imagePath}")),
+                                        ),
+                                      ),
+                                    ),
+                                    Spacer(),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 5,
                                 child: Container(
-                                  height: _width / 18,
-                                  width: _width / 18,
-                                  child: CircleAvatar(
-                                    backgroundImage: FileImage(
-                                        File("${podcastLocal.imagePath}")),
+                                  padding: EdgeInsets.only(top: 2.0),
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    podcast[index].title,
+                                    style: TextStyle(
+                                      fontSize: _width / 32,
+                                    ),
+                                    maxLines: 4,
+                                    overflow: TextOverflow.fade,
                                   ),
                                 ),
                               ),
-                              Spacer(),
+                              Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    alignment: Alignment.bottomLeft,
+                                    child: Text(
+                                      podcast[index].dateToString(),
+                                      //podcast[index].pubDate.substring(4, 16),
+                                      style: TextStyle(
+                                        fontSize: _width / 35,
+                                        color: _c,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  )),
                             ],
                           ),
                         ),
-                        Expanded(
-                          flex: 5,
-                          child: Container(
-                            padding: EdgeInsets.only(top: 2.0),
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              podcast[index].title,
-                              style: TextStyle(
-                                fontSize: _width / 32,
-                              ),
-                              maxLines: 4,
-                              overflow: TextOverflow.fade,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            alignment: Alignment.bottomLeft,
-                            child: Text(
-                              podcast[index].dateToString(),
-                              //podcast[index].pubDate.substring(4, 16),
-                              style: TextStyle(
-                                fontSize: _width / 35,
-                                color: _c,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 );

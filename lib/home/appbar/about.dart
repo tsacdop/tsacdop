@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:line_icons/line_icons.dart';
 class AboutApp extends StatelessWidget {
   _launchUrl(String url) async {
     if (await canLaunch(url)) {
@@ -71,7 +70,7 @@ class AboutApp extends StatelessWidget {
                           image: AssetImage('assets/logo.png'),
                           height: 80,
                         ),
-                        Text('Version: 0.1.1'),
+                        Text('Version: 0.1.2'),
                       ],
                     ),
                   ),
@@ -79,7 +78,7 @@ class AboutApp extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 50),
                     height: 50,
                     child: Text(
-                      'Tsacdop is a podcast client developed with flutter, a simple, beautiful, and easy-use player.',
+                      'Tsacdop is a podcasts client developed influtter, a simple, beautiful, and easy-use player.',
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -111,17 +110,17 @@ class AboutApp extends StatelessWidget {
                         _listItem(
                             context,
                             'GitHub',
-                            FontAwesomeIcons.githubSquare,
-                            'https://github.com/stonaga/tsacdop'),
+                            LineIcons.github,
+                            'https://github.com/stonaga/'),
                         _listItem(
                             context,
                             'Twitter',
-                            FontAwesomeIcons.twitterSquare,
+                            LineIcons.twitter,
                             'https://twitter.com'),
                         _listItem(
                             context,
-                            'Gmail',
-                            FontAwesomeIcons.envelopeSquare,
+                            'Stone Gate',
+                             LineIcons.hat_cowboy_solid,
                             'mailto:<xijieyin@gmail.com>?subject=Tsacdop Feedback'),
                       ],
                     ),

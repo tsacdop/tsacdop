@@ -13,9 +13,7 @@ jobs:
       - run:
           name: Run Flutter doctor
           command: flutter doctor
-      - run:
-          name: flutter pub get
-          command: flutter pub get
+   
       -run:
           name: flutter run
           command: flutter run

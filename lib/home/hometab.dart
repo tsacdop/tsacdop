@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/home/paly_history.dart';
+import 'package:tsacdop/settings/history.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
 
@@ -49,8 +49,8 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
       ],
       onSelected: (value) {
         if (value == 0) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => PlayedHistory()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => PlayedHistory()));
         }
       },
     );
@@ -81,6 +81,7 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
               height: 50,
               alignment: Alignment.centerLeft,
               child: TabBar(
+                indicatorSize: TabBarIndicatorSize.tab,
                 isScrollable: true,
                 labelPadding: EdgeInsets.all(10.0),
                 controller: _controller,
@@ -134,26 +135,73 @@ class RecentUpdate extends StatefulWidget {
 }
 
 class _RecentUpdateState extends State<RecentUpdate> {
-  Future<List<EpisodeBrief>> _getRssItem() async {
+  Future<List<EpisodeBrief>> _getRssItem(int top) async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await dbHelper.getRecentRssItem();
+    List<EpisodeBrief> episodes = await dbHelper.getRecentRssItem(top);
     return episodes;
+  }
+
+  ScrollController _controller;
+  int _top;
+  bool _loadMore;
+  _scrollListener() async {
+    if (_controller.offset == _controller.position.maxScrollExtent) {
+      if (mounted) setState(() => _loadMore = true);
+      await Future.delayed(Duration(seconds: 3));
+      if (mounted)
+        setState(() {
+          _top = _top + 33;
+          _loadMore = false;
+        });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMore = false;
+    _top = 33;
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<EpisodeBrief>>(
-      future: _getRssItem(),
+      future: _getRssItem(_top),
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
-            ? EpisodeGrid(
-                podcast: snapshot.data,
-                showDownload: false,
-                showFavorite: false,
-                showNumber: false,
-                heroTag: 'recent',
-              )
+            ? CustomScrollView(
+                controller: _controller,
+                physics: const AlwaysScrollableScrollPhysics(),
+                primary: false,
+                slivers: <Widget>[
+                    EpisodeGrid(
+                      podcast: snapshot.data,
+                      showDownload: false,
+                      showFavorite: false,
+                      showNumber: false,
+                      heroTag: 'recent',
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          return _loadMore
+                              ? Container(
+                                  height: 2, child: LinearProgressIndicator())
+                              : Center();
+                        },
+                        childCount: 1,
+                      ),
+                    ),
+                  ])
             : Center(child: CircularProgressIndicator());
       },
     );
@@ -179,12 +227,18 @@ class _MyFavoriteState extends State<MyFavorite> {
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
-            ? EpisodeGrid(
-                podcast: snapshot.data,
-                showDownload: false,
-                showFavorite: false,
-                showNumber: false,
-                heroTag: 'favorite',
+            ? CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                primary: false,
+                slivers: <Widget>[
+                  EpisodeGrid(
+                    podcast: snapshot.data,
+                    showDownload: false,
+                    showFavorite: false,
+                    showNumber: false,
+                    heroTag: 'favorite',
+                  )
+                ],
               )
             : Center(child: CircularProgressIndicator());
       },
@@ -211,12 +265,19 @@ class _MyDownloadState extends State<MyDownload> {
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
-            ? EpisodeGrid(
-                podcast: snapshot.data,
-                showDownload: true,
-                showFavorite: false,
-                showNumber: false,
-                heroTag: 'download',
+            ? CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                primary: false,
+                slivers: <Widget>[
+                  EpisodeGrid(
+                    podcast: snapshot.data,
+                    showDownload: true,
+                    showFavorite: false,
+                    showNumber: false,
+                    heroTag: 'download',
+                  )
+                ],
+                
               )
             : Center(child: CircularProgressIndicator());
       },

@@ -13,6 +13,7 @@ import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'package:image/image.dart' as img;
 import 'package:uuid/uuid.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:line_icons/line_icons.dart';
 
 import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/settings/settting.dart';
@@ -142,7 +143,7 @@ class PopupMenu extends StatelessWidget {
 
     void _saveOmpl(String path) async {
       File file = File(path);
-      String opml = file.readAsStringSync();
+     try{String opml = file.readAsStringSync();
 
       var content = xml.parse(opml);
       var total = content
@@ -167,6 +168,15 @@ class PopupMenu extends StatelessWidget {
           }
         }
         print('Import fisnished');
+      }}
+      catch(e){
+        print(e);
+        Fluttertoast.showToast(
+          msg: 'File error, Subscribe failed',
+          gravity: ToastGravity.TOP,
+        );
+        await Future.delayed(Duration(seconds: 5));
+        importOmpl.importState = ImportState.stop;
       }
     }
 
@@ -195,7 +205,7 @@ class PopupMenu extends StatelessWidget {
             padding: EdgeInsets.only(left: 10),
             child: Row(
               children: <Widget>[
-                Icon(Icons.refresh),
+                Icon(LineIcons.cloud_download_alt_solid),
                 Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
                 Text('Refresh All'),
               ],
@@ -208,7 +218,7 @@ class PopupMenu extends StatelessWidget {
               padding: EdgeInsets.only(left: 10),
               child: Row(
                 children: <Widget>[
-                  Icon(Icons.attachment),
+                  Icon(LineIcons.paperclip_solid),
                   Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
                   Text('Import OMPL'),
                 ],
@@ -226,7 +236,7 @@ class PopupMenu extends StatelessWidget {
             padding: EdgeInsets.only(left: 10),
             child: Row(
               children: <Widget>[
-                Icon(Icons.swap_calls),
+                Icon(LineIcons.cog_solid),
                 Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
                 Text('Settings'),
               ],
@@ -239,7 +249,7 @@ class PopupMenu extends StatelessWidget {
             padding: EdgeInsets.only(left: 10),
             child: Row(
               children: <Widget>[
-                Icon(Icons.info_outline),
+                Icon(LineIcons.info_circle_solid),
                 Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
                 Text('About'),
               ],

@@ -5,6 +5,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
+import 'package:line_icons/line_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/util/pageroute.dart';
@@ -24,32 +29,119 @@ class EpisodeGrid extends StatelessWidget {
       this.showNumber,
       this.heroTag})
       : super(key: key);
-
+  Offset offset;
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      primary: false,
-      slivers: <Widget>[
-        SliverPadding(
-          padding: const EdgeInsets.all(5.0),
-          sliver: SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 1.0,
-              crossAxisCount: 3,
-              mainAxisSpacing: 6.0,
-              crossAxisSpacing: 6.0,
+
+    _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
+        bool isPlaying, bool isInPlaylist) async {
+      var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+      double left = offset.dx;
+      double top = offset.dy;
+      await showMenu<int>(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        context: context,
+        position: RelativeRect.fromLTRB(left, top, _width - left, 0),
+        
+        items: <PopupMenuEntry<int>>[
+          PopupMenuItem(
+            value: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Icon(
+                  LineIcons.play_circle_solid,
+                  color: Theme.of(context).accentColor,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 2),
+                ),
+                !isPlaying ? Text('Play') : Text('Playing'),
+              ],
             ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                  Color _c = 
-                (Theme.of(context).brightness == Brightness.light)
-                    ?  podcast[index].primaryColor.colorizedark()
-                    :  podcast[index].primaryColor.colorizeLight();
-                return Material(
+          ),
+          PopupMenuItem(
+              value: 1,
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    LineIcons.clock_solid,
+                    color: Colors.red,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 2),
+                  ),
+                  !isInPlaylist ? Text('Later') : Text('Remove')
+                ],
+              )),
+        ],
+        elevation: 5.0,
+      ).then((value) {
+        if (value == 0) {
+          if (!isPlaying) audio.episodeLoad(episode);
+        } else if (value == 1) {
+         if (isInPlaylist) {
+            audio.addToPlaylist(episode);
+            Fluttertoast.showToast(
+              msg: 'Added to playlist',
+              gravity: ToastGravity.BOTTOM,
+            );
+          } else {
+            audio.delFromPlaylist(episode);
+            Fluttertoast.showToast(
+              msg: 'Removed from playlist',
+              gravity: ToastGravity.BOTTOM,
+            );
+          } 
+        }
+      });
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.all(5.0),
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          childAspectRatio: 1.0,
+          crossAxisCount: 3,
+          mainAxisSpacing: 6.0,
+          crossAxisSpacing: 6.0,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            Color _c = (Theme.of(context).brightness == Brightness.light)
+                ? podcast[index].primaryColor.colorizedark()
+                : podcast[index].primaryColor.colorizeLight();
+            return Selector<AudioPlayerNotifier,
+                Tuple2<EpisodeBrief, List<String>>>(
+              selector: (_, audio) => Tuple2(audio?.episode,
+                  audio.queue.playlist.map((e) => e.enclosureUrl).toList()),
+              builder: (_, data, __) => Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).primaryColor,
+                        blurRadius: 0.5,
+                        spreadRadius: 0.5,
+                      ),
+                    ]),
+                alignment: Alignment.center,
+                child: Material(
                   color: Colors.transparent,
                   child: InkWell(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    onTapDown: (details) => offset = Offset(
+                        details.globalPosition.dx, details.globalPosition.dy),
+                    onLongPress: () => _showPopupMenu(
+                        offset,
+                        podcast[index],
+                        context,
+                        data.item1 == podcast[index],
+                        data.item2.contains(podcast[index].enclosureUrl)),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -61,25 +153,17 @@ class EpisodeGrid extends StatelessWidget {
                       );
                     },
                     child: Container(
+                      padding: const EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          border: Border.all(
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                    ? Theme.of(context).primaryColor
-                                    : Theme.of(context).scaffoldBackgroundColor,
-                            width: 3.0,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).primaryColor,
-                              blurRadius: 0.5,
-                              spreadRadius: 0.5,
-                            ),
-                          ]),
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(8.0),
+                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        border: Border.all(
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).scaffoldBackgroundColor,
+                          width: 1.0,
+                        ),
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
@@ -94,6 +178,7 @@ class EpisodeGrid extends StatelessWidget {
                                     height: _width / 16,
                                     width: _width / 16,
                                     child: CircleAvatar(
+                                      backgroundColor: _c.withOpacity(0.5),
                                       backgroundImage: FileImage(
                                           File("${podcast[index].imagePath}")),
                                     ),
@@ -140,7 +225,6 @@ class EpisodeGrid extends StatelessWidget {
                                   alignment: Alignment.bottomLeft,
                                   child: Text(
                                     podcast[index].dateToString(),
-                                    //podcast[index].pubDate.substring(4, 16),
                                     style: TextStyle(
                                         fontSize: _width / 35,
                                         color: _c,
@@ -175,13 +259,13 @@ class EpisodeGrid extends StatelessWidget {
                       ),
                     ),
                   ),
-                );
-              },
-              childCount: podcast.length,
-            ),
-          ),
+                ),
+              ),
+            );
+          },
+          childCount: podcast.length,
         ),
-      ],
+      ),
     );
   }
 }

@@ -1,14 +1,17 @@
 import 'dart:isolate';
 import 'dart:ui';
 import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tsacdop/class/episodebrief.dart';
+import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
 class DownloadButton extends StatefulWidget {
@@ -74,6 +77,7 @@ class _DownloadButtonState extends State<DownloadButton> {
     });
   }
 
+
   void _unbindBackgroundIsolate() {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
   }
@@ -96,12 +100,14 @@ class _DownloadButtonState extends State<DownloadButton> {
         openFileFromNotification: false,
       );
     var dbHelper = DBHelper();
+
     await dbHelper.saveDownloaded(task.link, task.taskId);
     Fluttertoast.showToast(
       msg: 'Downloading',
       gravity: ToastGravity.BOTTOM,
     );
   }
+
 
   void _deleteDownload(_TaskInfo task) async {
     await FlutterDownloader.remove(
@@ -146,6 +152,16 @@ class _DownloadButtonState extends State<DownloadButton> {
     );
   }
 
+  _saveMediaId(_TaskInfo task) async{
+    final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
+        query: "SELECT * FROM task WHERE url = '${task.link}'"); 
+    String filePath = 'file://' + path.join(completeTask.first.savedDir, completeTask.first.filename);
+    var dbHelper = DBHelper();
+    await dbHelper.saveMediaId(task.link, filePath);
+    EpisodeBrief episode = await dbHelper.getRssItemWithUrl(task.link);
+    await Provider.of<AudioPlayerNotifier>(context, listen: false).updateMediaItem(episode);
+  }
+
   Future<Null> _prepare() async {
     final tasks = await FlutterDownloader.loadTasks();
 
@@ -161,7 +177,7 @@ class _DownloadButtonState extends State<DownloadButton> {
       }
     });
 
-    _localPath = (await _getPath()) + '/' + widget.episodeBrief.feedTitle;
+    _localPath = path.join((await _getPath()) ,widget.episodeBrief.feedTitle);
     print(_localPath);
     final saveDir = Directory(_localPath);
     bool hasExisted = await saveDir.exists();
@@ -172,6 +188,8 @@ class _DownloadButtonState extends State<DownloadButton> {
       _isLoading = false;
     });
   }
+
+
 
   Future<bool> _checkPermmison() async {
     PermissionStatus permission = await PermissionHandler()
@@ -284,6 +302,7 @@ class _DownloadButtonState extends State<DownloadButton> {
         ),
       );
     } else if (task.status == DownloadTaskStatus.complete) {
+      _saveMediaId(task); 
       return _buttonOnMenu(
           Icon(
             Icons.done_all,

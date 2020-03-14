@@ -22,7 +22,8 @@ extension Colorize on String {
       _c =
           Color.fromRGBO((255 - color[0]), 255 - color[1], 255 - color[2], 1.0);
     } else {
-      _c = Color.fromRGBO(color[0], color[1], color[2], 1.0);
+      _c = Color.fromRGBO(color[0] < 50 ? 100 : color[0],
+          color[1] < 50 ? 100 : color[1], color[2] < 50 ? 100 : color[2], 1.0);
     }
     return _c;
   }

@@ -55,8 +55,12 @@ class PodcastGroup {
   }
 
   List<PodcastLocal> _podcasts;
-
+  List<PodcastLocal> _orderedPodcasts;
+  List<PodcastLocal> get ordereddPodcasts => _orderedPodcasts;
   List<PodcastLocal> get podcasts => _podcasts;
+  set setOrderedPodcasts(List<PodcastLocal> list) {
+    _orderedPodcasts = list;
+  }
 
   GroupEntity toEntity() {
     return GroupEntity(name, id, color, podcastList);
@@ -82,8 +86,19 @@ class GroupList extends ChangeNotifier {
   GroupList({List<PodcastGroup> groups}) : _groups = groups ?? [];
 
   bool _isLoading = false;
-
   bool get isLoading => _isLoading;
+
+  List<String> _orderChanged = [];
+  List<String> get orderChanged => _orderChanged;
+  void addToOrderChanged(String name) {
+    _orderChanged.add(name);
+    notifyListeners();
+  }
+
+  void drlFromOrderChanged(String name) {
+    _orderChanged.remove(name);
+    notifyListeners();
+  }
 
   @override
   void addListener(VoidCallback listener) {
@@ -105,14 +120,15 @@ class GroupList extends ChangeNotifier {
   }
 
   Future addGroup(PodcastGroup podcastGroup) async {
+    _isLoading = true;
     _groups.add(podcastGroup);
     _saveGroup();
+    _isLoading = false;
     notifyListeners();
   }
 
   Future delGroup(PodcastGroup podcastGroup) async {
     _isLoading = true;
-    notifyListeners();
     podcastGroup.podcastList.forEach((podcast) {
       if (!_groups.first.podcastList.contains(podcast)) {
         _groups[0].podcastList.insert(0, podcast);
@@ -121,11 +137,11 @@ class GroupList extends ChangeNotifier {
     _saveGroup();
     _groups.remove(podcastGroup);
     await _groups[0].getPodcasts();
-   _isLoading = false;
+    _isLoading = false;
     notifyListeners();
   }
 
-  updateGroup(PodcastGroup podcastGroup) async{
+  updateGroup(PodcastGroup podcastGroup) async {
     var oldGroup = _groups.firstWhere((it) => it.id == podcastGroup.id);
     var index = _groups.indexOf(oldGroup);
     _groups.replaceRange(index, index + 1, [podcastGroup]);
@@ -161,7 +177,11 @@ class GroupList extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     getPodcastGroup(id).forEach((group) {
-      group.podcastList.remove(id);
+      if (list.contains(group)) {
+        list.remove(group);
+      } else {
+        group.podcastList.remove(id);
+      }
     });
     list.forEach((s) {
       s.podcastList.insert(0, id);
@@ -190,8 +210,8 @@ class GroupList extends ChangeNotifier {
     notifyListeners();
   }
 
-  saveOrder(PodcastGroup group, List<PodcastLocal> podcasts) async {
-    group.podcastList = podcasts.map((e) => e.id).toList();
+  saveOrder(PodcastGroup group) async {
+    group.podcastList = group.ordereddPodcasts.map((e) => e.id).toList();
     _saveGroup();
     await group.getPodcasts();
     notifyListeners();

@@ -43,7 +43,7 @@ class KeyValueStorage {
     return prefs.getInt(key);
   }
 
-  Future<bool> saveStringlist(List<String> playList) async{
+  Future<bool> saveStringList(List<String> playList) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setStringList(key, playList);
   }

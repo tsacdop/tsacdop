@@ -1,17 +1,46 @@
-import 'dart:typed_data';
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:audiofileplayer/audiofileplayer.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:logging/logging.dart';
-import 'package:audiofileplayer/audio_system.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
-//enum AudioState { load, play, pause, complete, error, stop }
+MediaControl playControl = MediaControl(
+  androidIcon: 'drawable/ic_stat_play_circle_filled',
+  label: 'Play',
+  action: MediaAction.play,
+);
+MediaControl pauseControl = MediaControl(
+  androidIcon: 'drawable/ic_stat_pause_circle_filled',
+  label: 'Pause',
+  action: MediaAction.pause,
+);
+MediaControl skipToNextControl = MediaControl(
+  androidIcon: 'drawable/baseline_skip_next_white_24',
+  label: 'Next',
+  action: MediaAction.skipToNext,
+);
+MediaControl skipToPreviousControl = MediaControl(
+  androidIcon: 'drawable/ic_action_skip_previous',
+  label: 'Previous',
+  action: MediaAction.skipToPrevious,
+);
+MediaControl stopControl = MediaControl(
+  androidIcon: 'drawable/baseline_close_white_24',
+  label: 'Stop',
+  action: MediaAction.stop,
+);
+MediaControl forward30 = MediaControl(
+  androidIcon: 'drawable/ic_stat_forward_30',
+  label: 'forward30',
+  action: MediaAction.fastForward,
+);
+
+void _audioPlayerTaskEntrypoint() async {
+  AudioServiceBackground.run(() => AudioPlayerTask());
+}
 
 class PlayHistory {
   DBHelper dbHelper = DBHelper();
@@ -19,7 +48,9 @@ class PlayHistory {
   String url;
   double seconds;
   double seekValue;
-  PlayHistory(this.title, this.url, this.seconds, this.seekValue);
+  DateTime playdate;
+  PlayHistory(this.title, this.url, this.seconds, this.seekValue,
+      {this.playdate});
   EpisodeBrief _episode;
   EpisodeBrief get episode => _episode;
 
@@ -31,36 +62,45 @@ class PlayHistory {
 class Playlist {
   String name;
   DBHelper dbHelper = DBHelper();
-  List<String> urls;
+  // list of urls
+  //List<String> _urls;
+  //list of episodes
   List<EpisodeBrief> _playlist;
+  //list of miediaitem
+
   List<EpisodeBrief> get playlist => _playlist;
   KeyValueStorage storage = KeyValueStorage('playlist');
-  Playlist(this.name, {List<String> urls}) : urls = urls ?? [];
 
   getPlaylist() async {
-    List<String> _urls = await storage.getStringList();
-    if (_urls.length == 0) {
+    List<String> urls = await storage.getStringList();
+    print(urls);
+    if (urls.length == 0) {
       _playlist = [];
     } else {
       _playlist = [];
-      await Future.forEach(_urls, (url) async {
+      await Future.forEach(urls, (url) async {
         EpisodeBrief episode = await dbHelper.getRssItemWithUrl(url);
         print(episode.title);
         _playlist.add(episode);
       });
     }
-    print(_playlist.length);
+    print('Playlist: ' + _playlist.length.toString());
   }
 
   savePlaylist() async {
-    urls = [];
+    List<String> urls = [];
     urls.addAll(_playlist.map((e) => e.enclosureUrl));
     print(urls);
-    await storage.saveStringlist(urls);
+    await storage.saveStringList(urls);
   }
 
   addToPlayList(EpisodeBrief episodeBrief) async {
     _playlist.add(episodeBrief);
+    await savePlaylist();
+  }
+
+  addToPlayListAt(EpisodeBrief episodeBrief, int index) async {
+    _playlist.insert(index, episodeBrief);
     await savePlaylist();
   }
 
@@ -71,39 +111,32 @@ class Playlist {
   }
 }
 
-class AudioPlayer extends ChangeNotifier {
-  static const String replay10ButtonId = 'replay10ButtonId';
-  static const String newReleasesButtonId = 'newReleasesButtonId';
-  static const String likeButtonId = 'likeButtonId';
-  static const String pausenowButtonId = 'pausenowButtonId';
-  static const String forwardButtonId = 'forwardButtonId';
-
+class AudioPlayerNotifier extends ChangeNotifier {
   DBHelper dbHelper = DBHelper();
   KeyValueStorage storage = KeyValueStorage('audioposition');
   EpisodeBrief _episode;
-  Playlist _queue = Playlist('now');
+  Playlist _queue = Playlist();
+  BasicPlaybackState _audioState = BasicPlaybackState.none;
   bool _playerRunning = false;
-  Audio _backgroundAudio;
-  bool _backgroundAudioPlaying = false;
-  double _backgroundAudioDurationSeconds = 0;
-  double _backgroundAudioPositionSeconds = 0;
-  bool _remoteAudioLoading = false;
+  bool _noSlide = true;
+  int _backgroundAudioDuration = 0;
+  int _backgroundAudioPosition = 0;
   String _remoteErrorMessage;
+
   double _seekSliderValue = 0.0;
-  int _lastPostion;
-  bool _skip = false;
+  int _lastPostion = 0;
   bool _stopOnComplete = false;
   Timer _stopTimer;
   //Show stopwatch after user setting timer.
-  bool  _showStopWatch = false;
-  
-  
-  final Logger _logger = Logger('audiofileplayer');
+  bool _showStopWatch = false;
+  bool _autoPlay = true;
+  DateTime _current;
+  int _currentPosition;
 
-  bool get backgroundAudioPlaying => _backgroundAudioPlaying;
-  bool get remoteAudioLoading => _remoteAudioLoading;
-  double get backgroundAudioDuration => _backgroundAudioDurationSeconds;
-  double get backgroundAudioPosition => _backgroundAudioPositionSeconds;
+  BasicPlaybackState get audioState => _audioState;
+
+  int get backgroundAudioDuration => _backgroundAudioDuration;
+  int get backgroundAudioPosition => _backgroundAudioPosition;
   double get seekSliderValue => _seekSliderValue;
   String get remoteErrorMessage => _remoteErrorMessage;
   bool get playerRunning => _playerRunning;
@@ -112,10 +145,21 @@ class AudioPlayer extends ChangeNotifier {
   EpisodeBrief get episode => _episode;
   bool get stopOnComplete => _stopOnComplete;
   bool get showStopWatch => _showStopWatch;
-
+  bool get autoPlay => _autoPlay;
 
   set setStopOnComplete(bool boo) {
     _stopOnComplete = boo;
+  }
+
+  set autoPlaySwitch(bool boo) {
+    _autoPlay = boo;
+    notifyListeners();
+  }
+
+  @override
+  void addListener(VoidCallback listener) async {
+    super.addListener(listener);
+    await AudioService.connect();
   }
 
   loadPlaylist() async {
@@ -124,373 +168,447 @@ class AudioPlayer extends ChangeNotifier {
   }
 
   episodeLoad(EpisodeBrief episode) async {
-    if (_playerRunning && _episode != null) {
+    if (_playerRunning) {
       PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
-          backgroundAudioDuration, seekSliderValue);
+          backgroundAudioPosition / 1000, seekSliderValue);
       await dbHelper.saveHistory(history);
+      AudioService.addQueueItemAt(episode.toMediaItem(), 0);
+      _queue.playlist
+          .removeWhere((item) => item.enclosureUrl == episode.enclosureUrl);
+      _queue.playlist.insert(0, episode);
+      notifyListeners();
+      await _queue.savePlaylist();
+    } else {
+      await _queue.getPlaylist();
+      _queue.playlist
+          .removeWhere((item) => item.enclosureUrl == episode.enclosureUrl);
+      _queue.playlist.insert(0, episode);
+      _queue.savePlaylist();
+      _backgroundAudioDuration = 0;
+      _backgroundAudioPosition = 0;
+      _seekSliderValue = 0;
+      _episode = episode;
+      _playerRunning = true;
+      notifyListeners();
+      await _queue.savePlaylist();
+      _startAudioService(0);
     }
-    AudioSystem.instance.addMediaEventListener(_mediaEventListener);
-    _backgroundAudioPlaying = false;
-    _episode = episode;
-    await _queue.getPlaylist();
-    _queue.playlist
-        .removeWhere((item) => item.enclosureUrl == _episode.enclosureUrl);
-    _queue.playlist.insert(0, _episode);
-    await _queue.savePlaylist();
-    await _play(_episode);
+  }
+
+  _startAudioService(int position) async {
+    if (!AudioService.connected) {
+      await AudioService.connect();
+    }
+    await AudioService.start(
+      backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
+      androidNotificationChannelName: 'Tsacdop',
+      notificationColor: 0xFF2196f3,
+      androidNotificationIcon: 'mipmap/ic_launcher',
+      enableQueue: true,
+      androidStopOnRemoveTask: true,
+    );
     _playerRunning = true;
-    notifyListeners();
+    if (autoPlay) {
+      await Future.forEach(_queue.playlist, (episode) async {
+        await AudioService.addQueueItem(episode.toMediaItem());
+      });
+    } else {
+      await AudioService.addQueueItem(_queue.playlist.first.toMediaItem());
+    }
+    await AudioService.play();
+    AudioService.currentMediaItemStream.listen((item) async {
+      print(position);
+      print(_backgroundAudioDuration);
+      if (item != null) {
+        _episode = await dbHelper.getRssItemWithMediaId(item.id);
+        _backgroundAudioDuration = item?.duration ?? 0;
+        if (position > 0 && _backgroundAudioDuration > 0) {
+          AudioService.seekTo(position);
+          position = 0;
+        }
+        // _playerRunning = true;
+      }
+      notifyListeners();
+    });
+    AudioService.playbackStateStream.listen((event) async {
+      _current = DateTime.now();
+      _audioState = event?.basicState;
+      if (_audioState == BasicPlaybackState.skippingToNext &&
+          _episode != null) {
+        _queue.delFromPlaylist(_episode);
+      }
+      if (_audioState == BasicPlaybackState.paused ||
+          _audioState == BasicPlaybackState.skippingToNext &&
+              _episode != null) {
+        PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
+            backgroundAudioPosition / 1000, seekSliderValue);
+        await dbHelper.saveHistory(history);
+      }
+      if (_audioState == BasicPlaybackState.stopped) {
+        _playerRunning = false;
+      }
+      _currentPosition = event?.currentPosition ?? 0;
+      notifyListeners();
+    });
+    Timer.periodic(Duration(milliseconds: 500), (timer) {
+      if (_noSlide) {
+        _audioState == BasicPlaybackState.playing
+            ? (_backgroundAudioPosition < _backgroundAudioDuration)
+                ? _backgroundAudioPosition = _currentPosition +
+                    DateTime.now().difference(_current).inMilliseconds
+                : _backgroundAudioPosition = _backgroundAudioDuration
+            : _backgroundAudioPosition = _currentPosition;
+
+        if (_backgroundAudioDuration != null &&
+            _backgroundAudioDuration != 0 &&
+            _backgroundAudioPosition != null) {
+          _seekSliderValue =
+              _backgroundAudioPosition / _backgroundAudioDuration ?? 0;
+        }
+        if (_backgroundAudioPosition > 0) {
+          _lastPostion = _backgroundAudioPosition;
+          storage.saveInt(_lastPostion);
+        }
+        notifyListeners();
+      }
+      if (_audioState == BasicPlaybackState.stopped) {
+        timer.cancel();
+      }
+    });
   }
 
   playlistLoad() async {
-    _backgroundAudioPlaying = false;
     await _queue.getPlaylist();
+    _backgroundAudioDuration = 0;
+    _backgroundAudioPosition = 0;
+    _seekSliderValue = 0;
     _episode = _queue.playlist.first;
-    _skip = true;
-    await _play(_episode);
     _playerRunning = true;
     notifyListeners();
+    _startAudioService(_lastPostion ?? 0);
   }
 
   playNext() async {
-    storage.saveInt(0);
-    _lastPostion = 0;
-    PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
-        backgroundAudioDuration, seekSliderValue);
-    await dbHelper.saveHistory(history);
-    await _queue.delFromPlaylist(_episode);
-    if (_queue.playlist.length > 0 && !_stopOnComplete) {
-      playlistLoad();
-    } else {
-      _stopOnComplete = false;
-      _backgroundAudioPlaying = false;
-      _remoteAudioLoading = false;
-      _playerRunning = false;
-      _disposeAudio();
-      notifyListeners();
-    }
+    AudioService.skipToNext();
   }
 
   addToPlaylist(EpisodeBrief episode) async {
-    _queue.addToPlayList(episode);
-    await _queue.getPlaylist();
+    if (_playerRunning) {
+      await AudioService.addQueueItem(episode.toMediaItem());
+    }
+    print('add to playlist when not rnnning');
+    await _queue.addToPlayList(episode);
     notifyListeners();
   }
 
+  addToPlaylistAt(EpisodeBrief episode, int index) async {
+    if (_playerRunning) {
+      await AudioService.addQueueItemAt(episode.toMediaItem(), index);
+    }
+    print('add to playlist when not rnnning');
+    await _queue.addToPlayListAt(episode, index);
+    notifyListeners();
+  }
+
+  updateMediaItem(EpisodeBrief episode) async {
+    int index = _queue.playlist
+        .indexWhere((item) => item.enclosureUrl == episode.enclosureUrl);
+    if (index > 0) {
+      await delFromPlaylist(episode);
+      await addToPlaylistAt(episode, index);
+    }
+  }
+
   delFromPlaylist(EpisodeBrief episode) async {
-    _queue.delFromPlaylist(episode);
-    await _queue.getPlaylist();
+    if (_playerRunning) {
+      await AudioService.removeQueueItem(episode.toMediaItem());
+    }
+    await _queue.delFromPlaylist(episode);
     notifyListeners();
   }
 
   pauseAduio() async {
-    _pauseBackgroundAudio();
-    notifyListeners();
-    PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
-        backgroundAudioPosition, seekSliderValue);
-    await dbHelper.saveHistory(history);
+    AudioService.pause();
   }
 
-  resumeAudio() {
-    _resumeBackgroundAudio();
-    notifyListeners();
+  resumeAudio() async {
+    AudioService.play();
   }
 
-  forwardAudio(double s) {
-    _forwardBackgroundAudio(s);
-    notifyListeners();
+  forwardAudio(int s) {
+    int pos = _backgroundAudioPosition + s * 1000;
+    AudioService.seekTo(pos);
   }
 
-  sliderSeek(double val) {
+  sliderSeek(double val) async {
+    print(val.toString());
+    _noSlide = false;
     _seekSliderValue = val;
     notifyListeners();
-    final double positionSeconds = val * _backgroundAudioDurationSeconds;
-    _backgroundAudio.seek(positionSeconds);
-    AudioSystem.instance.setPlaybackState(true, positionSeconds);
+    _currentPosition = (val * _backgroundAudioDuration).toInt();
+    await AudioService.seekTo(_currentPosition);
+    _noSlide = true;
   }
- //Set sleep time 
+
+  //Set sleep time
   sleepTimer(int mins) {
     _showStopWatch = true;
     notifyListeners();
-   _stopTimer = Timer(Duration(minutes: mins),(){
+    _stopTimer = Timer(Duration(minutes: mins), () {
       _stopOnComplete = false;
-      _backgroundAudioPlaying = false;
-      _remoteAudioLoading = false;
-      _playerRunning = false;
       _showStopWatch = false;
-      _disposeAudio();
+      AudioService.stop();
       notifyListeners();
     });
   }
+
 //Cancel sleep timer
-  cancelTimer(){
+  cancelTimer() {
     _stopTimer.cancel();
     _showStopWatch = false;
     notifyListeners();
   }
 
-  _disposeAudio() {
-    pauseAduio();
-    AudioSystem.instance?.stopBackgroundDisplay();
-    AudioSystem.instance?.removeMediaEventListener(_mediaEventListener);
-    _backgroundAudio?.dispose();
+  @override
+  void dispose() async {
+    await AudioService.stop();
+    await AudioService.disconnect();
+    super.dispose();
+  }
+}
+
+class AudioPlayerTask extends BackgroundAudioTask {
+  List<MediaItem> _queue = [];
+  AudioPlayer _audioPlayer = AudioPlayer();
+  Completer _completer = Completer();
+  BasicPlaybackState _skipState;
+  bool _playing;
+
+  bool get hasNext => _queue.length > 0;
+
+  MediaItem get mediaItem => _queue.first;
+
+  BasicPlaybackState _stateToBasicState(AudioPlaybackState state) {
+    switch (state) {
+      case AudioPlaybackState.none:
+        return BasicPlaybackState.none;
+      case AudioPlaybackState.stopped:
+        return BasicPlaybackState.stopped;
+      case AudioPlaybackState.paused:
+        return BasicPlaybackState.paused;
+      case AudioPlaybackState.playing:
+        return BasicPlaybackState.playing;
+      case AudioPlaybackState.connecting:
+        return _skipState ?? BasicPlaybackState.connecting;
+      case AudioPlaybackState.completed:
+        return BasicPlaybackState.stopped;
+      default:
+        throw Exception("Illegal state");
+    }
   }
 
   @override
-  dispose() {
-    _disposeAudio();
-    super.dispose();
-  }
-
-  _play(EpisodeBrief episodeBrief) async {
-    AudioSystem.instance.addMediaEventListener(_mediaEventListener);
-    String url = _queue.playlist.first.enclosureUrl;
-    _getFile(url).then((result) {
-      result == 'NotDownload'
-          ? _initbackgroundAudioPlayer(url)
-          : _initbackgroundAudioPlayerLocal(result);
+  Future<void> onStart() async {
+    print('start background task');
+    var playerStateSubscription = _audioPlayer.playbackStateStream
+        .where((state) => state == AudioPlaybackState.completed)
+        .listen((state) {
+      _handlePlaybackCompleted();
     });
-  }
-
-  Future<String> _getFile(String url) async {
-    final task = await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE url = '$url' AND status = 3");
-    if (task.length != 0) {
-      String _filePath = task.first.savedDir + '/' + task.first.filename;
-      return _filePath;
-    }
-    return 'NotDownload';
-  }
-
-  ByteData _getAudio(String path) {
-    File audioFile = File(path);
-    Uint8List audio = audioFile.readAsBytesSync();
-    return ByteData.view(audio.buffer);
-  }
-
-  onDuration(double durationSeconds) {
-    _backgroundAudioDurationSeconds = durationSeconds;
-    _remoteAudioLoading = false;
-    _backgroundAudioPlaying = true;
-    if (_skip) {
-      _forwardBackgroundAudio(_lastPostion.toDouble());
-      _backgroundAudioPositionSeconds = _lastPostion.toDouble();
-    }
-    _skip = false;
-    _setNotification(true);
-    notifyListeners();
-  }
-
-  onPosition(double positionSeconds) {
-    if (_backgroundAudioPositionSeconds < _backgroundAudioDurationSeconds) {
-      _seekSliderValue =
-          _backgroundAudioPositionSeconds / _backgroundAudioDurationSeconds;
-      _backgroundAudioPositionSeconds = positionSeconds;
-      notifyListeners();
-    } else {
-      _seekSliderValue = 1;
-      _backgroundAudioPositionSeconds = _backgroundAudioDurationSeconds;
-      notifyListeners();
-    }
-    _lastPostion = positionSeconds.toInt();
-    storage.saveInt(_lastPostion);
-  }
-
-  onError(String message) {
-    _remoteErrorMessage = message;
-    _backgroundAudio.dispose();
-    _backgroundAudio = null;
-    _backgroundAudioPlaying = false;
-    _remoteAudioLoading = false;
-  }
-
-  void _initbackgroundAudioPlayerLocal(String path) {
-    _remoteErrorMessage = null;
-    _remoteAudioLoading = true;
-    ByteData audio = _getAudio(path);
-    _backgroundAudio?.pause();
-    _backgroundAudioPositionSeconds = 0;
-    _setNotification(false);
-    _backgroundAudio = Audio.loadFromByteData(audio,
-        onDuration: (double durationSeconds) => onDuration(durationSeconds),
-        onPosition: (double positionSeconds) => onPosition(positionSeconds),
-        onError: (String message) => onError(message),
-        onComplete: () => playNext(),
-        looping: false,
-        playInBackground: true)
-      ..play();
-  }
-
-  void _initbackgroundAudioPlayer(String url) {
-    _remoteErrorMessage = null;
-    _remoteAudioLoading = true;
-    notifyListeners();
-    _backgroundAudio?.pause();
-    _backgroundAudioPositionSeconds = 0;
-    _setNotification(false);
-    _backgroundAudio = Audio.loadFromRemoteUrl(url,
-        onDuration: (double durationSeconds) => onDuration(durationSeconds),
-        onPosition: (double positionSeconds) => onPosition(positionSeconds),
-        onError: (String message) => onError(message),
-        onComplete: () => playNext(),
-        looping: false,
-        playInBackground: true)
-      ..resume();
-  }
-
-  void _mediaEventListener(MediaEvent mediaEvent) {
-    _logger.info('App received media event of type: ${mediaEvent.type}');
-    final MediaActionType type = mediaEvent.type;
-    if (type == MediaActionType.play) {
-      _resumeBackgroundAudio();
-    } else if (type == MediaActionType.pause) {
-      _pauseBackgroundAudio();
-    } else if (type == MediaActionType.playPause) {
-      _backgroundAudioPlaying
-          ? _pauseBackgroundAudio()
-          : _resumeBackgroundAudio();
-    } else if (type == MediaActionType.stop) {
-      _stopBackgroundAudio();
-    } else if (type == MediaActionType.seekTo) {
-      _backgroundAudio.seek(mediaEvent.seekToPositionSeconds);
-      AudioSystem.instance
-          .setPlaybackState(true, mediaEvent.seekToPositionSeconds);
-    } else if (type == MediaActionType.skipForward) {
-      final double skipIntervalSeconds = mediaEvent.skipIntervalSeconds;
-      _forwardBackgroundAudio(skipIntervalSeconds);
-      _logger.info(
-          'Skip-forward event had skipIntervalSeconds $skipIntervalSeconds.');
-    } else if (type == MediaActionType.skipBackward) {
-      final double skipIntervalSeconds = mediaEvent.skipIntervalSeconds;
-      _forwardBackgroundAudio(skipIntervalSeconds);
-      _logger.info(
-          'Skip-backward event had skipIntervalSeconds $skipIntervalSeconds.');
-    } else if (type == MediaActionType.custom) {
-      if (mediaEvent.customEventId == replay10ButtonId) {
-        _forwardBackgroundAudio(-10.0);
-      } else if (mediaEvent.customEventId == likeButtonId) {
-        _resumeBackgroundAudio();
-      } else if (mediaEvent.customEventId == forwardButtonId) {
-        _forwardBackgroundAudio(30.0);
-      } else if (mediaEvent.customEventId == pausenowButtonId) {
-        _pauseBackgroundAudio();
+    var eventSubscription = _audioPlayer.playbackEventStream.listen((event) {
+      BasicPlaybackState state;
+      if (event.buffering) {
+        state = BasicPlaybackState.buffering;
+      } else {
+        state = _stateToBasicState(event.state);
       }
+      if (state != BasicPlaybackState.stopped) {
+        _setState(
+          state: state,
+          position: event.position.inMilliseconds,
+        );
+      }
+    });
+    await _completer.future;
+    playerStateSubscription.cancel();
+    eventSubscription.cancel();
+  }
+
+  void _handlePlaybackCompleted() {
+    if (hasNext) {
+      onSkipToNext();
+    } else {
+      onStop();
     }
   }
 
-  Future<void> _setNotification(bool boo) async {
-    final Uint8List imageBytes =
-        File('${_episode.imagePath}').readAsBytesSync();
-    AudioSystem.instance.setMetadata(AudioMetadata(
-        title: episode.title,
-        artist: episode.feedTitle,
-        album: episode.feedTitle,
-        genre: "Podcast",
-        durationSeconds: _backgroundAudioDurationSeconds,
-        artBytes: imageBytes));
-    AudioSystem.instance.setPlaybackState(boo, _backgroundAudioPositionSeconds);
-    AudioSystem.instance.setAndroidNotificationButtons(<dynamic>[
-      AndroidMediaButtonType.pause,
-      _forwardButton,
-      AndroidMediaButtonType.stop,
-    ], androidCompactIndices: <int>[
-      0,
-      1
-    ]);
-
-    AudioSystem.instance.setSupportedMediaActions(<MediaActionType>{
-      MediaActionType.playPause,
-      MediaActionType.pause,
-      MediaActionType.next,
-      MediaActionType.previous,
-      MediaActionType.skipForward,
-      MediaActionType.skipBackward,
-      MediaActionType.seekTo,
-      MediaActionType.custom,
-    }, skipIntervalSeconds: 30);
+  void playPause() {
+    if (AudioServiceBackground.state.basicState == BasicPlaybackState.playing)
+      onPause();
+    else
+      onPlay();
   }
 
-  Future<void> _resumeBackgroundAudio() async {
-    _backgroundAudio.resume();
-
-    _backgroundAudioPlaying = true;
-
-    final Uint8List imageBytes =
-        File('${_episode.imagePath}').readAsBytesSync();
-    AudioSystem.instance.setMetadata(AudioMetadata(
-        title: _episode.title,
-        artist: _episode.feedTitle,
-        album: _episode.feedTitle,
-        genre: "Podcast",
-        durationSeconds: _backgroundAudioDurationSeconds,
-        artBytes: imageBytes));
-
-    AudioSystem.instance
-        .setPlaybackState(true, _backgroundAudioPositionSeconds);
-
-    AudioSystem.instance.setAndroidNotificationButtons(<dynamic>[
-      AndroidMediaButtonType.pause,
-      _forwardButton,
-      AndroidMediaButtonType.stop,
-    ], androidCompactIndices: <int>[
-      0,
-      1
-    ]);
-
-    AudioSystem.instance.setSupportedMediaActions(<MediaActionType>{
-      MediaActionType.playPause,
-      MediaActionType.pause,
-      MediaActionType.next,
-      MediaActionType.previous,
-      MediaActionType.skipForward,
-      MediaActionType.skipBackward,
-      MediaActionType.seekTo,
-      MediaActionType.custom,
-    }, skipIntervalSeconds: 30);
+  @override
+  Future<void> onSkipToNext() async {
+    if (_playing == null) {
+      // First time, we want to start playing
+      _playing = true;
+    } else {
+      // Stop current item
+      await _audioPlayer.stop();
+      _queue.removeAt(0);
+    }
+    AudioServiceBackground.setQueue(_queue);
+    AudioServiceBackground.setMediaItem(mediaItem);
+    _skipState = BasicPlaybackState.skippingToNext;
+    await _audioPlayer.setUrl(mediaItem.id);
+    print(mediaItem.id);
+    Duration duration = await _audioPlayer.durationFuture;
+    AudioServiceBackground.setMediaItem(
+        mediaItem.copyWith(duration: duration.inMilliseconds));
+    _skipState = null;
+    // Resume playback if we were playing
+    if (_playing) {
+      onPlay();
+    } else {
+      _setState(state: BasicPlaybackState.paused);
+    }
   }
 
-  void _pauseBackgroundAudio() {
-    _backgroundAudio?.pause();
-    _backgroundAudioPlaying = false;
-    AudioSystem.instance
-        .setPlaybackState(false, _backgroundAudioPositionSeconds);
-    AudioSystem.instance.setAndroidNotificationButtons(<dynamic>[
-      AndroidMediaButtonType.play,
-      _forwardButton,
-      AndroidMediaButtonType.stop,
-    ], androidCompactIndices: <int>[
-      0,
-      1,
-    ]);
-
-    AudioSystem.instance.setSupportedMediaActions(<MediaActionType>{
-      MediaActionType.playPause,
-      MediaActionType.play,
-      MediaActionType.next,
-      MediaActionType.previous,
-    });
+  @override
+  void onPlay() async {
+    if (_skipState == null) {
+      if (_playing == null) {
+        _playing = true;
+        AudioServiceBackground.setQueue(_queue);
+        await _audioPlayer.setUrl(mediaItem.id);
+        Duration duration = await _audioPlayer.durationFuture;
+        AudioServiceBackground.setMediaItem(
+            mediaItem.copyWith(duration: duration.inMilliseconds));
+      }
+      _playing = true;
+      _audioPlayer.play();
+    }
   }
 
-  void _stopBackgroundAudio() {
-    _backgroundAudio.pause();
-    _backgroundAudio.dispose();
-    _backgroundAudioPlaying = false;
-    AudioSystem.instance.stopBackgroundDisplay();
+  @override
+  void onPause() {
+    if (_skipState == null) {
+      if (_playing == null) {}
+      _playing = false;
+      _audioPlayer.pause();
+    }
   }
 
-  void _forwardBackgroundAudio(double seconds) {
-    final double forwardposition = _backgroundAudioPositionSeconds + seconds;
-    _backgroundAudio.seek(forwardposition);
-    AudioSystem.instance
-        .setPlaybackState(true, _backgroundAudioPositionSeconds);
+  @override
+  void onSeekTo(int position) {
+    _audioPlayer.seek(Duration(milliseconds: position));
   }
 
-  final _pauseButton = AndroidCustomMediaButton(
-      'pausenow', pausenowButtonId, 'ic_stat_pause_circle_filled');
-  final _replay10Button = AndroidCustomMediaButton(
-      'replay10', replay10ButtonId, 'ic_stat_replay_10');
-  final _forwardButton = AndroidCustomMediaButton(
-      'forward', forwardButtonId, 'ic_stat_forward_30');
-  final _playnowButton = AndroidCustomMediaButton(
-      'playnow', likeButtonId, 'ic_stat_play_circle_filled');
+  @override
+  void onClick(MediaButton button) {
+    playPause();
+  }
+
+  @override
+  void onStop() async {
+    await _audioPlayer.stop();
+    _setState(state: BasicPlaybackState.stopped);
+    _completer.complete();
+  }
+
+  @override
+  void onAddQueueItem(MediaItem mediaItem) async {
+    _queue.add(mediaItem);
+    AudioServiceBackground.setQueue(_queue);
+  }
+
+  @override
+  void onRemoveQueueItem(MediaItem mediaItem) async {
+    _queue.removeWhere((item) => item.id == mediaItem.id);
+    await AudioServiceBackground.setQueue(_queue);
+  }
+
+  @override
+  void onAddQueueItemAt(MediaItem mediaItem, int index) async {
+    if (index == 0) {
+      await _audioPlayer.stop();
+      _queue.removeWhere((item) => item.id == mediaItem.id);
+      _queue.insert(0, mediaItem);
+      AudioServiceBackground.setQueue(_queue);
+      AudioServiceBackground.setMediaItem(mediaItem);
+      await _audioPlayer.setUrl(mediaItem.id);
+      Duration duration = await _audioPlayer.durationFuture;
+      AudioServiceBackground.setMediaItem(
+          mediaItem.copyWith(duration: duration.inMilliseconds));
+      onPlay();
+    } else {
+      _queue.insert(index, mediaItem);
+      AudioServiceBackground.setQueue(_queue);
+    }
+  }
+
+  @override
+  void onFastForward() {
+    _audioPlayer.seek(Duration(
+        milliseconds: AudioServiceBackground.state.position + 30 * 1000));
+  }
+
+  @override
+  void onAudioFocusLost() {
+    if (_skipState == null) {
+      if (_playing == null) {}
+      _playing = false;
+      _audioPlayer.pause();
+    }
+  }
+
+  @override
+  void onAudioBecomingNoisy() {
+    if (_skipState == null) {
+      if (_playing == null) {}
+      _playing = false;
+      _audioPlayer.pause();
+    }
+  }
+
+  @override
+  void onAudioFocusGained() {
+    if (_skipState == null) {
+      if (_playing == null) {}
+      _playing = true;
+      _audioPlayer.play();
+    }
+  }
+
+  @override
+  void onCustomAction(funtion, argument) {
+    switch (funtion) {
+      case 'addQueue':
+        break;
+      case 'updateMedia':
+        break;
+    }
+  }
+
+  void _setState({@required BasicPlaybackState state, int position}) {
+    if (position == null) {
+      position = _audioPlayer.playbackEvent.position.inMilliseconds;
+    }
+    AudioServiceBackground.setState(
+      controls: getControls(state),
+      systemActions: [MediaAction.seekTo],
+      basicState: state,
+      position: position,
+    );
+  }
+
+  List<MediaControl> getControls(BasicPlaybackState state) {
+    if (_playing) {
+      return [pauseControl, forward30, skipToNextControl, stopControl];
+    } else {
+      return [playControl, forward30, skipToNextControl, stopControl];
+    }
+  }
 }

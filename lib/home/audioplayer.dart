@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:marquee/marquee.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tuple/tuple.dart';
+import 'package:audio_service/audio_service.dart';
 
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/audiostate.dart';
@@ -14,6 +15,97 @@ import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/home/audiopanel.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
+
+class MyRoundSliderThumpShape extends SliderComponentShape {
+  const MyRoundSliderThumpShape({
+    this.enabledThumbRadius = 10.0,
+    this.disabledThumbRadius,
+    this.thumbCenterColor,
+  });
+  final Color thumbCenterColor;
+
+  /// The preferred radius of the round thumb shape when the slider is enabled.
+  ///
+  /// If it is not provided, then the material default of 10 is used.
+  final double enabledThumbRadius;
+
+  /// The preferred radius of the round thumb shape when the slider is disabled.
+  ///
+  /// If no disabledRadius is provided, then it is equal to the
+  /// [enabledThumbRadius]
+  final double disabledThumbRadius;
+  double get _disabledThumbRadius => disabledThumbRadius ?? enabledThumbRadius;
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size.fromRadius(
+        isEnabled == true ? enabledThumbRadius : _disabledThumbRadius);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    Animation<double> activationAnimation,
+    @required Animation<double> enableAnimation,
+    bool isDiscrete,
+    TextPainter labelPainter,
+    RenderBox parentBox,
+    @required SliderThemeData sliderTheme,
+    TextDirection textDirection,
+    double value,
+  }) {
+    assert(context != null);
+    assert(center != null);
+    assert(enableAnimation != null);
+    assert(sliderTheme != null);
+    assert(sliderTheme.disabledThumbColor != null);
+    assert(sliderTheme.thumbColor != null);
+
+    final Canvas canvas = context.canvas;
+    final Tween<double> radiusTween = Tween<double>(
+      begin: _disabledThumbRadius,
+      end: enabledThumbRadius,
+    );
+    final ColorTween colorTween = ColorTween(
+      begin: sliderTheme.disabledThumbColor,
+      end: sliderTheme.thumbColor,
+    );
+
+    canvas.drawCircle(
+      center,
+      radiusTween.evaluate(enableAnimation),
+      Paint()
+        ..color = thumbCenterColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+    canvas.drawLine(
+      Offset(center.dx - 6, center.dy),
+      Offset(center.dx + 6, center.dy),
+      Paint()
+        ..color = Colors.grey[300]
+        ..style = PaintingStyle.fill
+        ..strokeWidth = 2,
+    );
+    canvas.drawCircle(
+      center,
+      radiusTween.evaluate(enableAnimation) - 2,
+      Paint()
+        ..color = colorTween.evaluate(enableAnimation)
+        ..style = PaintingStyle.fill
+        ..strokeWidth = 2,
+    );
+    canvas.drawLine(
+      Offset(center.dx - 5, center.dy - 2),
+      Offset(center.dx + 5, center.dy + 2),
+      Paint()
+        ..color = Colors.transparent
+        ..style = PaintingStyle.fill
+        ..strokeWidth = 2,
+    );
+  }
+}
 
 class PlayerWidget extends StatefulWidget {
   @override
@@ -50,17 +142,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _timeLeft = _minSelected;
     _timer = Timer.periodic(Duration(minutes: 1), (timer) {
       setState(() {
-        if(_timeLeft < 1){
+        if (_timeLeft < 1) {
           _timer.cancel();
-        } else{
+        } else {
           _timeLeft = _timeLeft - 1;
         }
       });
-     });
+    });
   }
 
   Widget _sleepTimer(BuildContext context) {
-    var audio = Provider.of<AudioPlayer>(context);
+    var audio = Provider.of<AudioPlayerNotifier>(context);
     return Container(
       height: 50,
       margin: EdgeInsets.all(10.0),
@@ -141,7 +233,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget _expandedPanel(BuildContext context) {
-    var audio = Provider.of<AudioPlayer>(context, listen: false);
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Stack(
       children: <Widget>[
         Container(
@@ -156,7 +248,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   height: 80.0,
                   padding: EdgeInsets.all(20),
                   alignment: Alignment.center,
-                  child: Selector<AudioPlayer, String>(
+                  child: Selector<AudioPlayerNotifier, String>(
                     selector: (_, audio) => audio.episode.title,
                     builder: (_, title, __) {
                       return Container(
@@ -201,8 +293,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     },
                   ),
                 ),
-                Consumer<AudioPlayer>(
+                Consumer<AudioPlayerNotifier>(
                   builder: (_, data, __) {
+                    Color _c =
+                        (Theme.of(context).brightness == Brightness.light)
+                            ? data.episode.primaryColor.colorizedark()
+                            : data.episode.primaryColor.colorizeLight();
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -215,10 +311,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                   .accentColor
                                   .withOpacity(0.5),
                               inactiveTrackColor: Colors.grey[300],
-                              trackHeight: 3.0,
+                              trackHeight: 2.0,
                               thumbColor: Theme.of(context).accentColor,
-                              thumbShape: RoundSliderThumbShape(
-                                  enabledThumbRadius: 6.0),
+                              thumbShape: MyRoundSliderThumpShape(
+                                  enabledThumbRadius: 5.0,
+                                  disabledThumbRadius: 5.0,
+                                  thumbCenterColor: _c),
                               overlayColor:
                                   Theme.of(context).accentColor.withAlpha(32),
                               overlayShape:
@@ -238,7 +336,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             children: <Widget>[
                               Text(
                                 _stringForSeconds(
-                                        data.backgroundAudioPosition) ??
+                                        data.backgroundAudioPosition / 1000) ??
                                     '',
                                 style: TextStyle(fontSize: 10),
                               ),
@@ -250,7 +348,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                           style: const TextStyle(
                                               color: const Color(0xFFFF0000)))
                                       : Text(
-                                          data.remoteAudioLoading
+                                          data.audioState ==
+                                                      BasicPlaybackState
+                                                          .buffering ||
+                                                  data.audioState ==
+                                                      BasicPlaybackState
+                                                          .connecting
                                               ? 'Buffring...'
                                               : '',
                                           style: TextStyle(
@@ -261,7 +364,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               ),
                               Text(
                                 _stringForSeconds(
-                                        data.backgroundAudioDuration) ??
+                                        data.backgroundAudioDuration / 1000) ??
                                     '',
                                 style: TextStyle(fontSize: 10),
                               ),
@@ -274,8 +377,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ),
                 Container(
                   height: 100,
-                  child: Selector<AudioPlayer, bool>(
-                    selector: (_, audio) => audio.backgroundAudioPlaying,
+                  child: Selector<AudioPlayerNotifier, BasicPlaybackState>(
+                    selector: (_, audio) => audio.audioState,
                     builder: (_, backplay, __) {
                       return Material(
                         color: Colors.transparent,
@@ -285,22 +388,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           children: [
                             IconButton(
                                 padding: EdgeInsets.symmetric(horizontal: 30.0),
-                                onPressed: backplay
-                                    ? () => audio.forwardAudio(-10)
-                                    : null,
+                                onPressed:
+                                    backplay == BasicPlaybackState.playing
+                                        ? () => audio.forwardAudio(-10)
+                                        : null,
                                 iconSize: 32.0,
                                 icon: Icon(Icons.replay_10),
                                 color:
                                     Theme.of(context).tabBarTheme.labelColor),
-                            backplay
+                            backplay == BasicPlaybackState.playing
                                 ? IconButton(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 30.0),
-                                    onPressed: backplay
-                                        ? () {
-                                            audio.pauseAduio();
-                                          }
-                                        : null,
+                                    onPressed:
+                                        backplay == BasicPlaybackState.playing
+                                            ? () {
+                                                audio.pauseAduio();
+                                              }
+                                            : null,
                                     iconSize: 40.0,
                                     icon: Icon(Icons.pause_circle_filled),
                                     color: Theme.of(context)
@@ -309,11 +414,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                 : IconButton(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 30.0),
-                                    onPressed: backplay
-                                        ? null
-                                        : () {
-                                            audio.resumeAudio();
-                                          },
+                                    onPressed:
+                                        backplay == BasicPlaybackState.playing
+                                            ? null
+                                            : () {
+                                                audio.resumeAudio();
+                                              },
                                     iconSize: 40.0,
                                     icon: Icon(Icons.play_circle_filled),
                                     color: Theme.of(context)
@@ -321,9 +427,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                         .labelColor),
                             IconButton(
                                 padding: EdgeInsets.symmetric(horizontal: 30.0),
-                                onPressed: backplay
-                                    ? () => audio.forwardAudio(30)
-                                    : null,
+                                onPressed:
+                                    backplay == BasicPlaybackState.playing
+                                        ? () => audio.forwardAudio(30)
+                                        : null,
                                 iconSize: 32.0,
                                 icon: Icon(Icons.forward_30),
                                 color:
@@ -344,7 +451,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           color: Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.all(Radius.circular(10.0)),
                         ),
-                        child: Selector<AudioPlayer,
+                        child: Selector<AudioPlayerNotifier,
                             Tuple3<EpisodeBrief, bool, bool>>(
                           selector: (_, audio) => Tuple3(audio.episode,
                               audio.stopOnComplete, audio.showStopWatch),
@@ -394,6 +501,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                               ],
                                           onSelected: (value) {
                                             if (value == 1) {
+                                              audio.sleepTimer(_minSelected);
                                               audio.setStopOnComplete = true;
                                             } else if (value == 2) {
                                               setState(() => _showTimer = true);
@@ -414,8 +522,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                               color:
                                                   Theme.of(context).accentColor,
                                             ),
-                                            child: Text(
-                                                _timeLeft.toString(),
+                                            child: Text(_timeLeft.toString(),
                                                 style: TextStyle(
                                                     color: Colors.white)),
                                           ),
@@ -475,7 +582,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             // margin: EdgeInsets.all(20),
             //padding: EdgeInsets.only(bottom: 10.0),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              //   borderRadius: BorderRadius.all(Radius.circular(10.0)),
               color: Theme.of(context).scaffoldBackgroundColor,
             ),
             child: Column(
@@ -511,7 +618,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   ),
                 ),
                 Expanded(
-                  child: Selector<AudioPlayer, List<EpisodeBrief>>(
+                  child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
                     selector: (_, audio) => audio.queue.playlist,
                     builder: (_, playlist, __) {
                       return ListView.builder(
@@ -623,7 +730,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget _miniPanel(double width, BuildContext context) {
-    var audio = Provider.of<AudioPlayer>(context, listen: false);
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
@@ -631,7 +738,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       height: 60,
       child:
           Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-        Selector<AudioPlayer, Tuple2<String, double>>(
+        Selector<AudioPlayerNotifier, Tuple2<String, double>>(
           selector: (_, audio) =>
               Tuple2(audio.episode?.primaryColor, audio.seekSliderValue),
           builder: (_, data, __) {
@@ -657,58 +764,33 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               children: <Widget>[
                 Expanded(
                   flex: 4,
-                  child: Selector<AudioPlayer, String>(
+                  child: Selector<AudioPlayerNotifier, String>(
                     selector: (_, audio) => audio.episode.title,
                     builder: (_, title, __) {
-                      return LayoutBuilder(
-                        builder: (context, size) {
-                          var span = TextSpan(
-                            text: title,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          );
-                          var tp = TextPainter(
-                              text: span,
-                              maxLines: 2,
-                              textDirection: TextDirection.ltr);
-                          tp.layout(maxWidth: size.maxWidth);
-                          if (tp.didExceedMaxLines) {
-                            return Marquee(
-                              text: title,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              scrollAxis: Axis.vertical,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              blankSpace: 30.0,
-                              velocity: 50.0,
-                              pauseAfterRound: Duration(seconds: 1),
-                              startPadding: 30.0,
-                              accelerationDuration: Duration(seconds: 1),
-                              accelerationCurve: Curves.linear,
-                              decelerationDuration: Duration(milliseconds: 500),
-                              decelerationCurve: Curves.easeOut,
-                            );
-                          } else {
-                            return Text(
-                              title,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            );
-                          }
-                        },
+                      return Text(
+                        title,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        maxLines: 2,
+                        overflow: TextOverflow.clip,
                       );
                     },
                   ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Selector<AudioPlayer, Tuple2<bool, double>>(
+                  child: Selector<AudioPlayerNotifier,
+                      Tuple2<BasicPlaybackState, double>>(
                     selector: (_, audio) => Tuple2(
-                        audio.remoteAudioLoading,
+                        audio.audioState,
                         (audio.backgroundAudioDuration -
-                            audio.backgroundAudioPosition)),
+                                audio.backgroundAudioPosition) /
+                            1000),
                     builder: (_, data, __) {
                       return Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         alignment: Alignment.center,
-                        child: data.item1
+                        child: data.item1 == BasicPlaybackState.buffering ||
+                                data.item1 == BasicPlaybackState.connecting
                             ? Text(
                                 'Buffring...',
                                 style: TextStyle(
@@ -730,30 +812,32 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ),
                 Expanded(
                   flex: 2,
-                  child: Selector<AudioPlayer, bool>(
-                      selector: (_, audio) => audio.backgroundAudioPlaying,
+                  child: Selector<AudioPlayerNotifier, BasicPlaybackState>(
+                      selector: (_, audio) => audio.audioState,
                       builder: (_, audioplay, __) {
                         return Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            audioplay
+                            audioplay == BasicPlaybackState.playing
                                 ? InkWell(
-                                    onTap: audioplay
-                                        ? () {
-                                            audio.pauseAduio();
-                                          }
-                                        : null,
+                                    onTap:
+                                        audioplay == BasicPlaybackState.playing
+                                            ? () {
+                                                audio.pauseAduio();
+                                              }
+                                            : null,
                                     child: ImageRotate(
                                         title: audio.episode.title,
                                         path: audio.episode.imagePath),
                                   )
                                 : InkWell(
-                                    onTap: audioplay
-                                        ? null
-                                        : () {
-                                            audio.resumeAudio();
-                                          },
+                                    onTap:
+                                        audioplay == BasicPlaybackState.playing
+                                            ? null
+                                            : () {
+                                                audio.resumeAudio();
+                                              },
                                     child: Stack(
                                       alignment: Alignment.center,
                                       children: <Widget>[
@@ -781,11 +865,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                     ),
                                   ),
                             IconButton(
-                                onPressed: audioplay
-                                    ? () => audio.forwardAudio(30)
-                                    : null,
+                                onPressed:
+                                    () => audio.playNext(),
                                 iconSize: 25.0,
-                                icon: Icon(Icons.forward_30),
+                                icon: Icon(Icons.skip_next),
                                 color:
                                     Theme.of(context).tabBarTheme.labelColor),
                           ],
@@ -803,7 +886,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-    return Selector<AudioPlayer, bool>(
+    return Selector<AudioPlayerNotifier, bool>(
       selector: (_, audio) => audio.playerRunning,
       builder: (_, playerrunning, __) {
         return !playerrunning

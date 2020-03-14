@@ -10,57 +10,61 @@ import 'package:tsacdop/home/appbar/addpodcast.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/settingstate.dart';
-import 'local_storage/sqflite_localpodcast.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+
+void callbackDispatcher() {
+  Workmanager.executeTask((task, inputData) async {
+    var dbHelper = DBHelper();
+    print('Start task');
+    List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
+    await Future.forEach(podcastList, (podcastLocal) async {
+      await dbHelper.updatePodcastRss(podcastLocal);
+      print('Refresh ' + podcastLocal.title);
+    });
+    return Future.value(true);
+  });
+}
 
 final SettingState themeSetting = SettingState();
-
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await themeSetting.initData();
+  await FlutterDownloader.initialize();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => themeSetting),
-        ChangeNotifierProvider(create: (_) => AudioPlayer()),
+        ChangeNotifierProvider(create: (_) => AudioPlayerNotifier()),
         ChangeNotifierProvider(create: (_) => GroupList()),
         ChangeNotifierProvider(create: (_) => ImportOmpl()),
       ],
       child: MyApp(),
     ),
   );
-  Workmanager.initialize(
-    callbackDispatcher,
-    isInDebugMode: true,
-  );
-  Workmanager.registerPeriodicTask("2", "update_podcasts",
-      frequency: Duration(minutes: 1),
-      initialDelay: Duration(seconds: 5),
-      constraints: Constraints(
-          networkType: NetworkType.connected,
-       ));
-
-  await FlutterDownloader.initialize();
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 }
 
-void callbackDispatcher() {
-  Workmanager.executeTask((task, inputData) async {
-    var dbHelper = DBHelper();
-    List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-    await Future.forEach(podcastList, (podcastLocal) async {
-      await dbHelper.updatePodcastRss(podcastLocal);
-      print('Refresh ' + podcastLocal.title);
-    });
-    return true;
-  });
-}
-
 class MyApp extends StatelessWidget {
+  void setWorkManager() {
+    Workmanager.initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+    
+    Workmanager.registerPeriodicTask("1", "update_podcasts",
+        frequency: Duration(hours: 12),
+        initialDelay: Duration(seconds: 5),
+        constraints: Constraints(
+          networkType: NetworkType.connected,
+          requiresBatteryNotLow: true,
+        ));
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingState>(
       builder: (_, setting, __) {
+        if (setting.autoUpdate) setWorkManager();
         return MaterialApp(
           themeMode: setting.theme,
           debugShowCheckedModeBanner: false,
@@ -78,7 +82,6 @@ class MyApp extends StatelessWidget {
               elevation: 0,
             ),
             textTheme: TextTheme(
-              headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
               bodyText2:
                   TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
             ),
@@ -89,6 +92,7 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData.dark().copyWith(
             accentColor: setting.accentSetColor,
+            appBarTheme: AppBarTheme(elevation: 0),
           ),
           home: MyHomePage(),
         );

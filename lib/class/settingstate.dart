@@ -6,16 +6,17 @@ import 'package:tsacdop/local_storage/key_value_storage.dart';
 class SettingState extends ChangeNotifier {
   KeyValueStorage themestorage = KeyValueStorage('themes');
   KeyValueStorage accentstorage = KeyValueStorage('accents');
-  bool _isLoading;
-  bool get isLoagding => _isLoading;
+  KeyValueStorage autoupdatestorage = KeyValueStorage('autoupdate');
 
   Future initData() async {
     await _getTheme();
     await _getAccentSetColor();
+    await _getAutoUpdate();
   }
 
   ThemeMode _theme;
   ThemeMode get theme => _theme;
+
   set setTheme(ThemeMode mode) {
     _theme = mode;
     _saveTheme();
@@ -31,11 +32,20 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _autoUpdate;
+  bool get autoUpdate => _autoUpdate;
+  set autoUpdate(bool boo) {
+    _autoUpdate = boo;
+    _saveAutoUpdate();
+    notifyListeners();
+  }
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
     _getTheme();
     _getAccentSetColor();
+    _getAutoUpdate();
   }
 
   _getTheme() async {
@@ -62,6 +72,14 @@ class SettingState extends ChangeNotifier {
   _saveAccentSetColor() async {
     await accentstorage
         .saveString(_accentSetColor.toString().substring(10, 16));
-    print(_accentSetColor.toString());
+  }
+
+  _getAutoUpdate() async {
+    int i = await autoupdatestorage.getInt();
+    _autoUpdate = i == 0 ? false : true;
+  }
+
+  _saveAutoUpdate() async {
+    await autoupdatestorage.saveInt(_autoUpdate ? 1 : 0);
   }
 }
