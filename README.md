@@ -15,7 +15,10 @@ Credit to flutter team and  involved plugin developers, especially [webfeed](htt
 
 The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 ## Preview
-![homepage](https://raw.githubusercontent.com/stonega/tsacdop/master/preview/Screenshot_homepage.png) ![podcast](https://raw.githubusercontent.com/stonega/tsacdop/master/preview/Screenshot_podcast.png) ![episode](https://raw.githubusercontent.com/stonega/tsacdop/master/preview/Screenshot_episode.png) ![data](https://raw.githubusercontent.com/stonega/tsacdop/master/preview/Screenshot_data.png)
+<p align="left">
+<img height=100 src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" art = "Logo"/> </br>
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/Screenshot_podcast.png" art = "Podcast"/>
+</p>
 ## License
 
 Tsacdop is licensed under the [MIT](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
