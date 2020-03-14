@@ -2,7 +2,7 @@
 [![CircleCI](https://circleci.com/gh/stonega/tsacdop.svg?style=svg)](https://circleci.com/gh/stonega/workflows/tsacdop/)
 ## About
 <p align="center">
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" art = "Logo"/>
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" art = "Logo"/> </br>
 <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xxhdpi/text.png" art = "Tsacdop"/>
 </p>
 
