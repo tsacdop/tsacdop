@@ -1,11 +1,11 @@
-import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:marquee/marquee.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:tuple/tuple.dart';
 import 'package:audio_service/audio_service.dart';
 
@@ -15,8 +15,26 @@ import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/home/audiopanel.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
+import 'package:tsacdop/util/day_night_switch.dart';
 
-//Custom slider 
+//Custom slider
+class MyRectangularTrackShape extends RectangularSliderTrackShape {
+  Rect getPreferredRect({
+    @required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    @required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    final double trackHeight = sliderTheme.trackHeight;
+    final double trackLeft = offset.dx;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final double trackWidth = parentBox.size.width;
+    return Rect.fromLTWH(trackLeft - 5, trackTop, trackWidth, trackHeight);
+  }
+}
+
 class MyRoundSliderThumpShape extends SliderComponentShape {
   const MyRoundSliderThumpShape({
     this.enabledThumbRadius = 10.0,
@@ -24,16 +42,7 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
     this.thumbCenterColor,
   });
   final Color thumbCenterColor;
-
-  /// The preferred radius of the round thumb shape when the slider is enabled.
-  ///
-  /// If it is not provided, then the material default of 10 is used.
   final double enabledThumbRadius;
-
-  /// The preferred radius of the round thumb shape when the slider is disabled.
-  ///
-  /// If no disabledRadius is provided, then it is equal to the
-  /// [enabledThumbRadius]
   final double disabledThumbRadius;
   double get _disabledThumbRadius => disabledThumbRadius ?? enabledThumbRadius;
 
@@ -56,13 +65,6 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
     TextDirection textDirection,
     double value,
   }) {
-    assert(context != null);
-    assert(center != null);
-    assert(enableAnimation != null);
-    assert(sliderTheme != null);
-    assert(sliderTheme.disabledThumbColor != null);
-    assert(sliderTheme.thumbColor != null);
-
     final Canvas canvas = context.canvas;
     final Tween<double> radiusTween = Tween<double>(
       begin: _disabledThumbRadius,
@@ -78,24 +80,16 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
       radiusTween.evaluate(enableAnimation),
       Paint()
         ..color = thumbCenterColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
-    );
-    canvas.drawLine(
-      Offset(center.dx - 6, center.dy),
-      Offset(center.dx + 6, center.dy),
-      Paint()
-        ..color = Colors.grey[300]
         ..style = PaintingStyle.fill
         ..strokeWidth = 2,
     );
-    canvas.drawCircle(
-      center,
-      radiusTween.evaluate(enableAnimation) - 2,
+    canvas.drawRect(
+      Rect.fromLTRB(
+          center.dx - 10, center.dy + 10, center.dx + 10, center.dy - 10),
       Paint()
         ..color = colorTween.evaluate(enableAnimation)
         ..style = PaintingStyle.fill
-        ..strokeWidth = 2,
+        ..strokeWidth = 10,
     );
     canvas.drawLine(
       Offset(center.dx - 5, center.dy - 2),
@@ -120,613 +114,596 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   List minsToSelect = [1, 5, 10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
-  //Show playlist widget.
-  bool _showlist;
-  //Show timer choose widget.
-  bool _showTimer;
-  //Store selected timer mins.
   int _minSelected;
-  //Left time after user setting timer.
-  int _timeLeft;
-  Timer _timer;
 
   @override
   void initState() {
     super.initState();
-    _showlist = false;
-    _showTimer = false;
-    _minSelected = 5;
-    _timeLeft = 0;
+    _minSelected = 30;
   }
 
-  setTimer() {
-    _timeLeft = _minSelected;
-    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
-      setState(() {
-        if (_timeLeft < 1) {
-          _timer.cancel();
-        } else {
-          _timeLeft = _timeLeft - 1;
-        }
-      });
-    });
+  @override
+  void didUpdateWidget(Widget oldWidget) {
+    super.didUpdateWidget(oldWidget);
   }
 
-  Widget _sleepTimer(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context);
+  Widget _sleppMode(BuildContext context) {
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    return Selector<AudioPlayerNotifier, Tuple3<bool, int, double>>(
+      selector: (_, audio) =>
+          Tuple3(audio.showStopWatch, audio.timeLeft, audio.switchValue),
+      builder: (_, data, __) {
+        // if (!data.item1 && _outValue == 1)  _outValue = 0;
+        return Container(
+          height: 300,
+          color: data.item3 > 0
+              ? Colors.black.withOpacity(data.item3)
+              : Theme.of(context).scaffoldBackgroundColor,
+          child: Stack(
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: minsToSelect
+                          .map((e) => InkWell(
+                                onTap: () => setState(() => _minSelected = e),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: <Widget>[
+                                    AnimatedContainer(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.elasticOut,
+                                      margin: EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.grey[800],
+                                              blurRadius: 0,
+                                              offset: Offset(0, 0)),
+                                        ],
+                                        color: (e == _minSelected)
+                                            ? Theme.of(context).accentColor
+                                            : Colors.grey[400],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      alignment: Alignment.center,
+                                      height: (e == _minSelected) ? 40 : 30,
+                                      width: (e == _minSelected) ? 40 : 30,
+                                      child: Text(e.toString(),
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white)),
+                                    ),
+                                    Container(
+                                      height: (e == _minSelected)
+                                          ? 40 * data.item3
+                                          : 30 * data.item3,
+                                      width: (e == _minSelected)
+                                          ? 40 * data.item3
+                                          : 30 * data.item3,
+                                      decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          shape: BoxShape.circle),
+                                    ),
+                                  ],
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                  Container(
+                    height: 100,
+                    alignment: Alignment.center,
+                    child: Transform.scale(
+                      scale: 0.5,
+                      child: DayNightSwitch(
+                        height: 10,
+                        value: data.item1,
+                        //moonImage: AssetImage('assets/moon.png'),
+                        //sunImage: AssetImage('assets/sun.png'),
+                        sunColor: Colors.yellow[700],
+                        moonColor: Colors.grey[600],
+                        dayColor: Colors.grey[300],
+                        nightColor: Colors.black,
+                        onDrag: (value) => audio.setSwitchValue = value,
+                        onChanged: (value) {
+                          if (value) {
+                            audio.sleepTimer(_minSelected);
+                          } else {
+                            audio.cancelTimer();
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 70,
+                    alignment: Alignment.center,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.center,
+                          height: 25,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              //  color: Theme.of(context).accentColor,
+                              ),
+                          child: Text(_stringForSeconds(data.item2.toDouble()),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: data.item1
+                                      ? Colors.white
+                                      : Colors.black)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                bottom: 60 + 20 * data.item3,
+                left: MediaQuery.of(context).size.width / 2 - 100,
+                width: 200,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Good Night',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color:  Colors.white.withOpacity(data.item3))),
+                ),
+              ),
+              Positioned(
+                bottom:  100 * (1 - data.item3) - 30,
+                left: MediaQuery.of(context).size.width / 2 - 100,
+                width: 200,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Sleep Timer',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ),
+              ),
+              data.item1 ? CustomPaint(painter: StarSky()) : Center(),
+              data.item1 ? MeteorLoader() : Center(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _controlPanel(BuildContext context) {
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Container(
-      height: 50,
-      margin: EdgeInsets.all(10.0),
+      color: Theme.of(context).primaryColor,
+      height: 300,
       padding: EdgeInsets.symmetric(horizontal: 10.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: minsToSelect
-                    .map((e) => InkWell(
-                          onTap: () => setState(() => _minSelected = e),
-                          child: AnimatedContainer(
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.elasticOut,
-                            margin: EdgeInsets.symmetric(horizontal: 10.0),
-                            decoration: BoxDecoration(
-                              color: (e == _minSelected)
-                                  ? Theme.of(context).accentColor
-                                  : Colors.grey[400],
-                              shape: BoxShape.circle,
-                            ),
-                            alignment: Alignment.center,
-                            height: (e == _minSelected) ? 40 : 30,
-                            width: (e == _minSelected) ? 40 : 30,
-                            child: Text(e.toString(),
-                                style: TextStyle(
-                                    color: (e == _minSelected)
-                                        ? Colors.white
-                                        : Colors.black)),
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Consumer<AudioPlayerNotifier>(
+              builder: (_, data, __) {
+                Color _c = (Theme.of(context).brightness == Brightness.light)
+                    ? data.episode.primaryColor.colorizedark()
+                    : data.episode.primaryColor.colorizeLight();
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                      child: SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: Colors.grey[400],
+                          inactiveTrackColor: Colors.grey[300],
+                          trackHeight: 20.0,
+                          trackShape: MyRectangularTrackShape(),
+                          thumbColor: Theme.of(context).accentColor,
+                          thumbShape: MyRoundSliderThumpShape(
+                              enabledThumbRadius: 10.0,
+                              disabledThumbRadius: 10.0,
+                              thumbCenterColor: _c),
+                          overlayColor:
+                              Theme.of(context).accentColor.withAlpha(32),
+                          overlayShape:
+                              RoundSliderOverlayShape(overlayRadius: 14.0),
+                        ),
+                        child: Slider(
+                            value: data.seekSliderValue,
+                            onChanged: (double val) {
+                              audio.sliderSeek(val);
+                            }),
+                      ),
+                    ),
+                    Container(
+                      height: 20.0,
+                      padding: EdgeInsets.symmetric(horizontal: 30.0),
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            _stringForSeconds(
+                                    data.backgroundAudioPosition / 1000) ??
+                                '',
+                            style: TextStyle(fontSize: 10),
                           ),
-                        ))
-                    .toList(),
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: data.remoteErrorMessage != null
+                                  ? Text(data.remoteErrorMessage,
+                                      style: const TextStyle(
+                                          color: const Color(0xFFFF0000)))
+                                  : Text(
+                                      data.audioState ==
+                                                  BasicPlaybackState
+                                                      .buffering ||
+                                              data.audioState ==
+                                                  BasicPlaybackState.connecting
+                                          ? 'Buffring...'
+                                          : '',
+                                      style: TextStyle(
+                                          color: Theme.of(context).accentColor),
+                                    ),
+                            ),
+                          ),
+                          Text(
+                            _stringForSeconds(
+                                    data.backgroundAudioDuration / 1000) ??
+                                '',
+                            style: TextStyle(fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            Container(
+              height: 100,
+              child: Selector<AudioPlayerNotifier, BasicPlaybackState>(
+                selector: (_, audio) => audio.audioState,
+                builder: (_, backplay, __) {
+                  return Material(
+                    color: Colors.transparent,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                            padding: EdgeInsets.symmetric(horizontal: 30.0),
+                            onPressed: backplay == BasicPlaybackState.playing
+                                ? () => audio.forwardAudio(-10)
+                                : null,
+                            iconSize: 32.0,
+                            icon: Icon(Icons.replay_10),
+                            color: Colors.grey[500]),
+                        backplay == BasicPlaybackState.playing
+                            ? IconButton(
+                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                onPressed:
+                                    backplay == BasicPlaybackState.playing
+                                        ? () {
+                                            audio.pauseAduio();
+                                          }
+                                        : null,
+                                iconSize: 60.0,
+                                icon: Icon(
+                                  LineIcons.pause_circle,
+                                  size: 40,
+                                ),
+                                color: Colors.grey[500])
+                            : IconButton(
+                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                onPressed:
+                                    backplay == BasicPlaybackState.playing
+                                        ? null
+                                        : () {
+                                            audio.resumeAudio();
+                                          },
+                                iconSize: 60.0,
+                                icon: Icon(LineIcons.play_circle, size: 40),
+                                color: Colors.grey[500]),
+                        IconButton(
+                            padding: EdgeInsets.symmetric(horizontal: 30.0),
+                            onPressed: backplay == BasicPlaybackState.playing
+                                ? () => audio.forwardAudio(30)
+                                : null,
+                            iconSize: 32.0,
+                            icon: Icon(Icons.forward_30),
+                            color: Colors.grey[500]),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
-          ),
-          Container(
-            width: 100,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Material(
-                  color: Colors.transparent,
-                  child: IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      setState(() => _showTimer = false);
-                    },
-                  ),
-                ),
-                Material(
-                  color: Colors.transparent,
-                  child: IconButton(
-                    icon: Icon(Icons.done),
-                    onPressed: () {
-                      setState(() {
-                        _showTimer = false;
-                      });
-                      audio.sleepTimer(_minSelected);
-                      setTimer();
-                    },
-                  ),
-                ),
-              ],
+            Container(
+              height: 70.0,
+              padding: EdgeInsets.all(20),
+              alignment: Alignment.center,
+              child: Selector<AudioPlayerNotifier, String>(
+                selector: (_, audio) => audio.episode.title,
+                builder: (_, title, __) {
+                  return Container(
+                    child: LayoutBuilder(
+                      builder: (context, size) {
+                        var span = TextSpan(
+                            text: title,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20));
+                        var tp = TextPainter(
+                            text: span,
+                            maxLines: 1,
+                            textDirection: TextDirection.ltr);
+                        tp.layout(maxWidth: size.maxWidth);
+                        if (tp.didExceedMaxLines) {
+                          return Marquee(
+                            text: title,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                            scrollAxis: Axis.horizontal,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            blankSpace: 30.0,
+                            velocity: 50.0,
+                            pauseAfterRound: Duration(seconds: 1),
+                            startPadding: 30.0,
+                            accelerationDuration: Duration(seconds: 1),
+                            accelerationCurve: Curves.linear,
+                            decelerationDuration: Duration(milliseconds: 500),
+                            decelerationCurve: Curves.easeOut,
+                          );
+                        } else {
+                          return Text(
+                            title,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20),
+                          );
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+            Spacer(),
+            Selector<AudioPlayerNotifier, Tuple3<EpisodeBrief, bool, bool>>(
+              selector: (_, audio) => Tuple3(
+                  audio.episode, audio.stopOnComplete, audio.showStopWatch),
+              builder: (_, data, __) {
+                return Container(
+                  padding: EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(5.0),
+                      ),
+                      Container(
+                        height: 30.0,
+                        width: 30.0,
+                        child: CircleAvatar(
+                          backgroundImage:
+                              FileImage(File("${data.item1.imagePath}")),
+                        ),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          SlideUptRoute(
+                              page: EpisodeDetail(
+                                  episodeItem: data.item1,
+                                  heroTag: 'playpanel')),
+                        ),
+                        icon: Icon(Icons.info),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ]),
+    );
+  }
+
+  Widget _playlist(BuildContext context) {
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    return Container(
+      alignment: Alignment.bottomLeft,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 400),
+        height: 300,
+        width: MediaQuery.of(context).size.width,
+        alignment: Alignment.center,
+        // margin: EdgeInsets.all(20),
+        //padding: EdgeInsets.only(bottom: 10.0),
+        decoration: BoxDecoration(
+          //   borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          color: Theme.of(context).scaffoldBackgroundColor,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Container(
+                height: 50,
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      'NEXT TO PLAY',
+                      style: TextStyle(
+                          color: Theme.of(context).accentColor,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Spacer(),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
+                selector: (_, audio) => audio.queue.playlist,
+                builder: (_, playlist, __) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: playlist.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      print(playlist.length);
+                      return index == 0
+                          ? Center()
+                          : Column(
+                              children: <Widget>[
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      audio.episodeLoad(playlist[index]);
+                                    },
+                                    child: Container(
+                                      height: 60,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      alignment: Alignment.centerLeft,
+                                      //  decoration: BoxDecoration(
+                                      //    color: Theme.of(context)
+                                      //        .scaffoldBackgroundColor,
+                                      //  ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.all(10.0),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(15.0)),
+                                              child: Container(
+                                                  height: 30.0,
+                                                  width: 30.0,
+                                                  child: Image.file(File(
+                                                      "${playlist[index].imagePath}"))),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                playlist[index].title,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Divider(height: 2),
+                              ],
+                            );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _expandedPanel(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    return Stack(
-      children: <Widget>[
-        Container(
-          color: Theme.of(context).primaryColor,
-          height: 300,
-          padding: EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  height: 80.0,
-                  padding: EdgeInsets.all(20),
-                  alignment: Alignment.center,
-                  child: Selector<AudioPlayerNotifier, String>(
-                    selector: (_, audio) => audio.episode.title,
-                    builder: (_, title, __) {
-                      return Container(
-                        child: LayoutBuilder(
-                          builder: (context, size) {
-                            var span = TextSpan(
-                                text: title,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20));
-                            var tp = TextPainter(
-                                text: span,
-                                maxLines: 1,
-                                textDirection: TextDirection.ltr);
-                            tp.layout(maxWidth: size.maxWidth);
-                            if (tp.didExceedMaxLines) {
-                              return Marquee(
-                                text: title,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18),
-                                scrollAxis: Axis.horizontal,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                blankSpace: 30.0,
-                                velocity: 50.0,
-                                pauseAfterRound: Duration(seconds: 1),
-                                startPadding: 30.0,
-                                accelerationDuration: Duration(seconds: 1),
-                                accelerationCurve: Curves.linear,
-                                decelerationDuration:
-                                    Duration(milliseconds: 500),
-                                decelerationCurve: Curves.easeOut,
-                              );
-                            } else {
-                              return Text(
-                                title,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              );
-                            }
-                          },
-                        ),
-                      );
-                    },
+    return DefaultTabController(
+      initialIndex: 1,
+      length: 3,
+      child: Stack(
+        children: <Widget>[
+          TabBarView(
+            children: <Widget>[
+              _sleppMode(context),
+              _controlPanel(context),
+              _playlist(context),
+            ],
+          ),
+          Positioned(
+            bottom: 10,
+            left: MediaQuery.of(context).size.width / 2 - 25,
+            child: Container(
+              alignment: Alignment.center,
+              width: 50.0,
+              height: 10.0,
+              //color: Colors.blue,
+              child: TabBar(
+                  labelPadding: EdgeInsets.only(top: 0),
+                  indicatorPadding: EdgeInsets.all(0),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicatorWeight: 0,
+                  indicator: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).accentColor,
                   ),
-                ),
-                Consumer<AudioPlayerNotifier>(
-                  builder: (_, data, __) {
-                    Color _c =
-                        (Theme.of(context).brightness == Brightness.light)
-                            ? data.episode.primaryColor.colorizedark()
-                            : data.episode.primaryColor.colorizeLight();
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.only(left: 30, right: 30),
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              activeTrackColor: Theme.of(context)
-                                  .accentColor
-                                  .withOpacity(0.5),
-                              inactiveTrackColor: Colors.grey[300],
-                              trackHeight: 2.0,
-                              thumbColor: Theme.of(context).accentColor,
-                              thumbShape: MyRoundSliderThumpShape(
-                                  enabledThumbRadius: 5.0,
-                                  disabledThumbRadius: 5.0,
-                                  thumbCenterColor: _c),
-                              overlayColor:
-                                  Theme.of(context).accentColor.withAlpha(32),
-                              overlayShape:
-                                  RoundSliderOverlayShape(overlayRadius: 14.0),
-                            ),
-                            child: Slider(
-                                value: data.seekSliderValue,
-                                onChanged: (double val) {
-                                  audio.sliderSeek(val);
-                                }),
-                          ),
-                        ),
-                        Container(
-                          height: 20.0,
-                          padding: EdgeInsets.symmetric(horizontal: 50.0),
-                          child: Row(
-                            children: <Widget>[
-                              Text(
-                                _stringForSeconds(
-                                        data.backgroundAudioPosition / 1000) ??
-                                    '',
-                                style: TextStyle(fontSize: 10),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  child: data.remoteErrorMessage != null
-                                      ? Text(data.remoteErrorMessage,
-                                          style: const TextStyle(
-                                              color: const Color(0xFFFF0000)))
-                                      : Text(
-                                          data.audioState ==
-                                                      BasicPlaybackState
-                                                          .buffering ||
-                                                  data.audioState ==
-                                                      BasicPlaybackState
-                                                          .connecting
-                                              ? 'Buffring...'
-                                              : '',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .accentColor),
-                                        ),
-                                ),
-                              ),
-                              Text(
-                                _stringForSeconds(
-                                        data.backgroundAudioDuration / 1000) ??
-                                    '',
-                                style: TextStyle(fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                Container(
-                  height: 100,
-                  child: Selector<AudioPlayerNotifier, BasicPlaybackState>(
-                    selector: (_, audio) => audio.audioState,
-                    builder: (_, backplay, __) {
-                      return Material(
-                        color: Colors.transparent,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                padding: EdgeInsets.symmetric(horizontal: 30.0),
-                                onPressed:
-                                    backplay == BasicPlaybackState.playing
-                                        ? () => audio.forwardAudio(-10)
-                                        : null,
-                                iconSize: 32.0,
-                                icon: Icon(Icons.replay_10),
-                                color:
-                                    Theme.of(context).tabBarTheme.labelColor),
-                            backplay == BasicPlaybackState.playing
-                                ? IconButton(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 30.0),
-                                    onPressed:
-                                        backplay == BasicPlaybackState.playing
-                                            ? () {
-                                                audio.pauseAduio();
-                                              }
-                                            : null,
-                                    iconSize: 40.0,
-                                    icon: Icon(Icons.pause_circle_filled),
-                                    color: Theme.of(context)
-                                        .tabBarTheme
-                                        .labelColor)
-                                : IconButton(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 30.0),
-                                    onPressed:
-                                        backplay == BasicPlaybackState.playing
-                                            ? null
-                                            : () {
-                                                audio.resumeAudio();
-                                              },
-                                    iconSize: 40.0,
-                                    icon: Icon(Icons.play_circle_filled),
-                                    color: Theme.of(context)
-                                        .tabBarTheme
-                                        .labelColor),
-                            IconButton(
-                                padding: EdgeInsets.symmetric(horizontal: 30.0),
-                                onPressed:
-                                    backplay == BasicPlaybackState.playing
-                                        ? () => audio.forwardAudio(30)
-                                        : null,
-                                iconSize: 32.0,
-                                icon: Icon(Icons.forward_30),
-                                color:
-                                    Theme.of(context).tabBarTheme.labelColor),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Spacer(),
-                !_showTimer
-                    // Setting sleep timer
-                    ? Container(
-                        height: 50.0,
-                        margin: EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        ),
-                        child: Selector<AudioPlayerNotifier,
-                            Tuple3<EpisodeBrief, bool, bool>>(
-                          selector: (_, audio) => Tuple3(audio.episode,
-                              audio.stopOnComplete, audio.showStopWatch),
-                          builder: (_, data, __) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                ),
-                                Container(
-                                  height: 30.0,
-                                  width: 30.0,
-                                  child: CircleAvatar(
-                                    backgroundImage: FileImage(
-                                        File("${data.item1.imagePath}")),
-                                  ),
-                                ),
-                                Spacer(),
-                                Material(
-                                  color: Colors.transparent,
-                                  child: !data.item3
-                                      ? PopupMenuButton(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10))),
-                                          elevation: 1,
-                                          tooltip: 'Sleep Timer',
-                                          icon: Icon(
-                                            Icons.brightness_2,
-                                            color: data.item2
-                                                ? Theme.of(context).accentColor
-                                                : Theme.of(context)
-                                                    .iconTheme
-                                                    .color,
-                                          ),
-                                          itemBuilder: (context) => [
-                                                PopupMenuItem(
-                                                    value: 1,
-                                                    child: Text(
-                                                        'End of this episode')),
-                                                PopupMenuItem(
-                                                  value: 2,
-                                                  child: Text('Timer'),
-                                                ),
-                                              ],
-                                          onSelected: (value) {
-                                            if (value == 1) {
-                                              audio.sleepTimer(_minSelected);
-                                              audio.setStopOnComplete = true;
-                                            } else if (value == 2) {
-                                              setState(() => _showTimer = true);
-                                            }
-                                          })
-                                      : PopupMenuButton(
-                                          tooltip: 'Time Left',
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10))),
-                                          elevation: 1,
-                                          icon: Container(
-                                            alignment: Alignment.center,
-                                            height: 25,
-                                            width: 25,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color:
-                                                  Theme.of(context).accentColor,
-                                            ),
-                                            child: Text(_timeLeft.toString(),
-                                                style: TextStyle(
-                                                    color: Colors.white)),
-                                          ),
-                                          itemBuilder: (context) => [
-                                            PopupMenuItem(
-                                                value: 1,
-                                                child: Text('Cancel')),
-                                          ],
-                                          onSelected: (value) {
-                                            audio.cancelTimer();
-                                            _timer.cancel();
-                                            setState(() => _timeLeft = 0);
-                                          },
-                                        ),
-                                ),
-                                Material(
-                                  color: Colors.transparent,
-                                  child: IconButton(
-                                    onPressed: () => Navigator.push(
-                                      context,
-                                      SlideUptRoute(
-                                          page: EpisodeDetail(
-                                              episodeItem: data.item1,
-                                              heroTag: 'playpanel')),
-                                    ),
-                                    icon: Icon(Icons.info),
-                                  ),
-                                ),
-                                Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(10.0),
-                                          bottomRight: Radius.circular(10.0)),
-                                      child: Container(
-                                          height: 50.0,
-                                          width: 50.0,
-                                          child: Icon(Icons.keyboard_arrow_up)),
-                                      onTap: () =>
-                                          setState(() => _showlist = true)),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      )
-                    : _sleepTimer(context),
-              ]),
-        ),
-        Container(
-          alignment: Alignment.bottomLeft,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 400),
-            height: _showlist ? 300 : 0,
-            width: MediaQuery.of(context).size.width,
-            alignment: Alignment.center,
-            // margin: EdgeInsets.all(20),
-            //padding: EdgeInsets.only(bottom: 10.0),
-            decoration: BoxDecoration(
-              //   borderRadius: BorderRadius.all(Radius.circular(10.0)),
-              color: Theme.of(context).scaffoldBackgroundColor,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          'NEXT',
-                          style: TextStyle(
+                  tabs: <Widget>[
+                    Container(
+                      // child: Text('p'),
+                      height: 10.0,
+                      width: 10.0,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                          border: Border.all(
                               color: Theme.of(context).accentColor,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Spacer(),
-                        Container(
-                          height: 40.0,
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            icon: Icon(Icons.keyboard_arrow_down),
-                            onPressed: () => setState(() => _showlist = false),
-                          ),
-                        ),
-                      ],
+                              width: 2.0)),
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
-                    selector: (_, audio) => audio.queue.playlist,
-                    builder: (_, playlist, __) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        itemCount: playlist.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          print(playlist.length);
-                          return index == 0
-                              ? Center()
-                              : Dismissible(
-                                  background: Container(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 20.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.delete,
-                                          color: Theme.of(context).accentColor,
-                                        ),
-                                        Icon(
-                                          Icons.delete,
-                                          color: Theme.of(context).accentColor,
-                                        ),
-                                      ],
-                                    ),
-                                    height: 50,
-                                    color: Colors.grey[400],
-                                  ),
-                                  key: Key(playlist[index].enclosureUrl),
-                                  onDismissed: (direction) async {
-                                    await audio
-                                        .delFromPlaylist(playlist[index]);
-                                    Fluttertoast.showToast(
-                                      msg: 'Removed From Playlist',
-                                      gravity: ToastGravity.BOTTOM,
-                                    );
-                                  },
-                                  child: Column(
-                                    children: <Widget>[
-                                      Container(
-                                        height: 50,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        alignment: Alignment.centerLeft,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                        ),
-                                        child: InkWell(
-                                          onTap: () {
-                                            audio.episodeLoad(playlist[index]);
-                                            setState(() => _showlist = false);
-                                          },
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Container(
-                                                padding: EdgeInsets.all(10.0),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              15.0)),
-                                                  child: Container(
-                                                      height: 30.0,
-                                                      width: 30.0,
-                                                      child: Image.file(File(
-                                                          "${playlist[index].imagePath}"))),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                    playlist[index].title,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Divider(height: 2),
-                                    ],
-                                  ),
-                                );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
+                    Container(
+                      height: 10.0,
+                      width: 10.0,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                          border: Border.all(
+                              color: Theme.of(context).accentColor,
+                              width: 2.0)),
+                    ),
+                    Container(
+                      height: 10.0,
+                      width: 10.0,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                          border: Border.all(
+                              color: Theme.of(context).accentColor,
+                              width: 2.0)),
+                    ),
+                  ]),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -866,8 +843,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                     ),
                                   ),
                             IconButton(
-                                onPressed:
-                                    () => audio.playNext(),
+                                onPressed: () => audio.playNext(),
                                 iconSize: 25.0,
                                 icon: Icon(Icons.skip_next),
                                 color:
@@ -960,6 +936,140 @@ class _ImageRotateState extends State<ImageRotate>
           ),
         ),
       ),
+    );
+  }
+}
+
+class StarSky extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final points = [
+      Offset(50, 100),
+      Offset(150, 75),
+      Offset(250, 250),
+      Offset(130, 200),
+      Offset(270, 150),
+    ];
+    final pisces = [
+      Offset(9, 4),
+      Offset(11, 5),
+      Offset(7, 6),
+      Offset(10, 7),
+      Offset(8, 8),
+      Offset(9, 13),
+      Offset(12, 17),
+      Offset(5, 19),
+      Offset(7, 19)
+    ].map((e) => e * 10).toList();
+    final orion = [
+      Offset(3, 1),
+      Offset(6, 1),
+      Offset(1, 4),
+      Offset(2, 4),
+      Offset(2, 7),
+      Offset(10, 8),
+      Offset(3, 10),
+      Offset(8, 10),
+      Offset(19, 11),
+      Offset(11, 13),
+      Offset(18, 14),
+      Offset(5, 19),
+      Offset(7, 19),
+      Offset(9, 18),
+      Offset(15, 19),
+      Offset(16, 18),
+      Offset(2, 25),
+      Offset(10, 26)
+    ].map((e) => Offset(e.dx * 10 + 250, e.dy * 10)).toList();
+
+    Paint paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+    canvas.drawPoints(ui.PointMode.points, pisces, paint);
+    canvas.drawPoints(ui.PointMode.points, points, paint);
+    canvas.drawPoints(ui.PointMode.points, orion, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class Meteor extends CustomPainter {
+  Paint _paint;
+  Meteor() {
+    _paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), _paint);
+  }
+
+  @override
+  bool shouldRepaint(Meteor oldDelegate) {
+    return false;
+  }
+}
+
+class MeteorLoader extends StatefulWidget {
+  @override
+  _MeteorLoaderState createState() => _MeteorLoaderState();
+}
+
+class _MeteorLoaderState extends State<MeteorLoader>
+    with SingleTickerProviderStateMixin {
+  double _fraction = 0.0;
+  double _move = 0.0;
+  Animation animation;
+  AnimationController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    animation = Tween(begin: 0.0, end: 1.0).animate(controller)
+      ..addListener(() {
+        if (mounted)
+          setState(() {
+            _move = animation.value;
+            if (animation.value <= 0.5) {
+              _fraction = animation.value * 2;
+            } else {
+              _fraction = 2 - (animation.value) * 2;
+            }
+          });
+      });
+    controller.forward();
+    //  controller.addStatusListener((status) {
+    //    if (status == AnimationStatus.completed) {
+    //      controller.reset();
+    //    } else if (status == AnimationStatus.dismissed) {
+    //      controller.forward();
+    //    }
+    //  });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 300 * _move + 10,
+      left: 150 * _move + 50,
+      child: SizedBox(
+          width: 50 * _fraction,
+          height: 100 * _fraction,
+          child: CustomPaint(painter: Meteor())),
     );
   }
 }

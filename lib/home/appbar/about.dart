@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
+
 class AboutApp extends StatelessWidget {
   _launchUrl(String url) async {
     if (await canLaunch(url)) {
@@ -44,15 +45,16 @@ class AboutApp extends StatelessWidget {
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-         statusBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
       ),
-      child: SafeArea(
-              child: Scaffold(
-            backgroundColor: Theme.of(context).primaryColor,
-            appBar: AppBar(
-              title: Text('About'),
-            ),
-            body: Container(
+      child: Scaffold(
+          backgroundColor: Theme.of(context).primaryColor,
+          appBar: AppBar(
+            title: Text('About'),
+          ),
+          body: SafeArea(
+            child: Container(
               padding: EdgeInsets.all(20),
               alignment: Alignment.topLeft,
               child: Column(
@@ -70,7 +72,7 @@ class AboutApp extends StatelessWidget {
                           image: AssetImage('assets/logo.png'),
                           height: 80,
                         ),
-                        Text('Version: 0.1.2'),
+                        Text('Version: 0.1.4'),
                       ],
                     ),
                   ),
@@ -78,7 +80,7 @@ class AboutApp extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 50),
                     height: 50,
                     child: Text(
-                      'Tsacdop is a podcasts client developed influtter, a simple, beautiful, and easy-use player.',
+                      'Tsacdop is a podcasts client developed in flutter, a simple, beautiful, and easy-use application.',
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -86,13 +88,11 @@ class AboutApp extends StatelessWidget {
                     padding: EdgeInsets.all(5.0),
                   ),
                   Container(
-                    padding: EdgeInsets.only(
-                      top: 20.0,
-                      bottom: 10.0
-                    ),
+                    padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      border: Border.all(color: Theme.of(context).accentColor, width: 1),
+                      border: Border.all(
+                          color: Theme.of(context).accentColor, width: 1),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -107,20 +107,14 @@ class AboutApp extends StatelessWidget {
                                 TextStyle(color: Theme.of(context).accentColor),
                           ),
                         ),
-                        _listItem(
-                            context,
-                            'GitHub',
-                            LineIcons.github,
+                        _listItem(context, 'GitHub', LineIcons.github,
                             'https://github.com/stonaga/'),
-                        _listItem(
-                            context,
-                            'Twitter',
-                            LineIcons.twitter,
+                        _listItem(context, 'Twitter', LineIcons.twitter,
                             'https://twitter.com'),
                         _listItem(
                             context,
                             'Stone Gate',
-                             LineIcons.hat_cowboy_solid,
+                            LineIcons.hat_cowboy_solid,
                             'mailto:<xijieyin@gmail.com>?subject=Tsacdop Feedback'),
                       ],
                     ),
@@ -155,8 +149,8 @@ class AboutApp extends StatelessWidget {
                   ),
                 ],
               ),
-            )),
-      ),
+            ),
+          )),
     );
   }
 }

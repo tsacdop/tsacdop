@@ -65,74 +65,79 @@ class _PlayedHistoryState extends State<PlayedHistory>
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        statusBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
+        //statusBarColor: Theme.of(context).primaryColor,
       ),
-      child: SafeArea(
-        child: Scaffold(
-          body: NestedScrollView(
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxScrolled) {
-                return <Widget>[
-                  SliverAppBar(
-                    elevation: 0,
-                    expandedHeight: 260,
-                    floating: false,
-                    pinned: true,
-                    flexibleSpace: LayoutBuilder(
-                      builder:
-                          (BuildContext context, BoxConstraints constraints) {
-                        top = constraints.biggest.height;
-                        return FlexibleSpaceBar(
-                          title: top < 70
-                              ? Text(
-                                  'History',
-                                )
-                              : Center(),
-                          background: Padding(
-                            padding: EdgeInsets.only(
-                                top: 50, left: 50, right: 50, bottom: 30),
-                            child: FutureBuilder<List<FlSpot>>(
-                                future: getData(),
-                                builder: (context, snapshot) {
-                                  return snapshot.hasData
-                                      ? HistoryChart(snapshot.data)
-                                      : Center();
-                                }),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SliverPersistentHeader(
-                    delegate: _SliverAppBarDelegate(
-                        TabBar(
-                          controller: _controller,
-                          tabs: <Widget>[
-                            Tab(
-                              child: Text('Listen'),
-                            ),
-                            Tab(
-                              child: Text('Subscribe'),
-                            )
-                          ],
+      child: Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxScrolled) {
+              return <Widget>[
+                SliverAppBar(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  elevation: 0,
+                  expandedHeight: 260,
+                  floating: false,
+                  pinned: true,
+                  flexibleSpace: LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      top = constraints.biggest.height;
+                      return FlexibleSpaceBar(
+                        title: top < 70 + MediaQuery.of(context).padding.top
+                            ? Text(
+                                'History',
+                              )
+                            : Center(),
+                        background: Padding(
+                          padding: EdgeInsets.only(
+                              top: 50, left: 50, right: 50, bottom: 30),
+                          child: FutureBuilder<List<FlSpot>>(
+                              future: getData(),
+                              builder: (context, snapshot) {
+                                return snapshot.hasData
+                                    ? HistoryChart(snapshot.data)
+                                    : Center();
+                              }),
                         ),
-                        Theme.of(context).primaryColor),
-                    pinned: true,
+                      );
+                    },
                   ),
-                ];
-              },
-              body: TabBarView(controller: _controller, children: <Widget>[
-                FutureBuilder<List<PlayHistory>>(
-                  future: getPlayHistory(),
-                  builder: (context, snapshot) {
-                    double _width = MediaQuery.of(context).size.width;
-                    return snapshot.hasData
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: snapshot.data.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Column(
+                ),
+                SliverPersistentHeader(
+                  delegate: _SliverAppBarDelegate(
+                      TabBar(
+                        controller: _controller,
+                        tabs: <Widget>[
+                          Tab(
+                            child: Text('Listen'),
+                          ),
+                          Tab(
+                            child: Text('Subscribe'),
+                          )
+                        ],
+                      ),
+                      Theme.of(context).primaryColor),
+                  pinned: true,
+                ),
+              ];
+            },
+            body: TabBarView(controller: _controller, children: <Widget>[
+              FutureBuilder<List<PlayHistory>>(
+                future: getPlayHistory(),
+                builder: (context, snapshot) {
+                  double _width = MediaQuery.of(context).size.width;
+                  return snapshot.hasData
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              child: Column(
                                 children: <Widget>[
                                   ListTile(
                                     title: Column(
@@ -160,12 +165,17 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                       width: _width,
                                       child: Row(
                                         children: <Widget>[
-                                          Icon(Icons.timelapse, color: Colors.grey[400],),
+                                          Icon(
+                                            Icons.timelapse,
+                                            color: Colors.grey[400],
+                                          ),
                                           Container(
                                             height: 2,
                                             decoration: BoxDecoration(
-                                              border: Border(bottom: BorderSide(color: Colors.grey[400], width: 2.0))
-                                            ),
+                                                border: Border(
+                                                    bottom: BorderSide(
+                                                        color: Colors.grey[400],
+                                                        width: 2.0))),
                                             width: _width *
                                                         snapshot.data[index]
                                                             .seekValue <
@@ -201,24 +211,27 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                   ),
                                   //  Divider(height: 2),
                                 ],
-                              );
-                            })
-                        : Center(
-                            child: CircularProgressIndicator(),
-                          );
-                  },
-                ),
-                FutureBuilder<List<SubHistory>>(
-                  future: getSubHistory(),
-                  builder: (context, snapshot) {
-                    return snapshot.hasData
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: snapshot.data.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              bool _status = snapshot.data[index].status;
-                              return Column(
+                              ),
+                            );
+                          })
+                      : Center(
+                          child: CircularProgressIndicator(),
+                        );
+                },
+              ),
+              FutureBuilder<List<SubHistory>>(
+                future: getSubHistory(),
+                builder: (context, snapshot) {
+                  return snapshot.hasData
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            bool _status = snapshot.data[index].status;
+                            return Container(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              child: Column(
                                 children: <Widget>[
                                   ListTile(
                                     enabled: _status,
@@ -274,14 +287,16 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                     height: 2,
                                   )
                                 ],
-                              );
-                            })
-                        : Center(
-                            child: CircularProgressIndicator(),
-                          );
-                  },
-                ),
-              ])),
+                              ),
+                            );
+                          })
+                      : Center(
+                          child: CircularProgressIndicator(),
+                        );
+                },
+              ),
+            ]),
+          ),
         ),
       ),
     );
@@ -318,72 +333,74 @@ class HistoryChart extends StatelessWidget {
   HistoryChart(this.stats);
   @override
   Widget build(BuildContext context) {
-    return LineChart(
-      LineChartData(
-        backgroundColor: Colors.transparent,
-        gridData: FlGridData(
-          show: true,
-          drawHorizontalLine: true,
-          getDrawingHorizontalLine: (value) {
-            return value % 60 == 0
-                ? FlLine(
-                    color: Theme.of(context).brightness == Brightness.light
-                        ? Colors.grey[400]
-                        : Colors.grey[700],
-                    strokeWidth: 1,
-                  )
-                : FlLine(color: Colors.transparent);
-          },
-        ),
-        titlesData: FlTitlesData(
-          show: true,
-          bottomTitles: SideTitles(
-            textStyle: TextStyle(
-              color: const Color(0xff67727d),
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
-            showTitles: true,
-            reservedSize: 10,
-            getTitles: (value) {
-              return DateFormat.E().format(
-                  DateTime.now().subtract(Duration(days: (7 - value.toInt()))));
+    return SafeArea(
+      child: LineChart(
+        LineChartData(
+          backgroundColor: Colors.transparent,
+          gridData: FlGridData(
+            show: true,
+            drawHorizontalLine: true,
+            getDrawingHorizontalLine: (value) {
+              return value % 60 == 0
+                  ? FlLine(
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? Colors.grey[400]
+                          : Colors.grey[700],
+                      strokeWidth: 1,
+                    )
+                  : FlLine(color: Colors.transparent);
             },
-            margin: 5,
           ),
-          leftTitles: SideTitles(
-            showTitles: true,
-            textStyle: TextStyle(
-              color: const Color(0xff67727d),
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
+          titlesData: FlTitlesData(
+            show: true,
+            bottomTitles: SideTitles(
+              textStyle: TextStyle(
+                color: const Color(0xff67727d),
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+              showTitles: true,
+              reservedSize: 10,
+              getTitles: (value) {
+                return DateFormat.E().format(DateTime.now()
+                    .subtract(Duration(days: (7 - value.toInt()))));
+              },
+              margin: 5,
             ),
-            getTitles: (value) {
-              return value % 60 == 0 && value > 0 ? '${value ~/ 60}h' : '';
-            },
-            reservedSize: 20,
-            margin: 5,
+            leftTitles: SideTitles(
+              showTitles: true,
+              textStyle: TextStyle(
+                color: const Color(0xff67727d),
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+              getTitles: (value) {
+                return value % 60 == 0 && value > 0 ? '${value ~/ 60}h' : '';
+              },
+              reservedSize: 20,
+              margin: 5,
+            ),
           ),
+          borderData: FlBorderData(
+              show: false,
+              border: Border(
+                left: BorderSide(color: Colors.red, width: 2),
+              )),
+          lineBarsData: [
+            LineChartBarData(
+              spots: this.stats,
+              isCurved: false,
+              colors: [Theme.of(context).accentColor],
+              barWidth: 3,
+              isStrokeCapRound: true,
+              dotData: FlDotData(
+                show: true,
+                dotSize: 5,
+                dotColor: Theme.of(context).accentColor,
+              ),
+            ),
+          ],
         ),
-        borderData: FlBorderData(
-            show: false,
-            border: Border(
-              left: BorderSide(color: Colors.red, width: 2),
-            )),
-        lineBarsData: [
-          LineChartBarData(
-            spots: this.stats,
-            isCurved: false,
-            colors: [Theme.of(context).accentColor],
-            barWidth: 3,
-            isStrokeCapRound: true,
-            dotData: FlDotData(
-              show: true,
-              dotSize: 5,
-              dotColor: Theme.of(context).accentColor,
-            ),
-          ),
-        ],
       ),
     );
   }

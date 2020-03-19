@@ -137,330 +137,322 @@ class _PodcastManageState extends State<PodcastManage>
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        statusBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
+        // statusBarColor: Theme.of(context).primaryColor,
       ),
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            title: Text('Groups'),
-            actions: <Widget>[
-              IconButton(
-                  onPressed: () => showGeneralDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      barrierLabel: MaterialLocalizations.of(context)
-                          .modalBarrierDismissLabel,
-                      barrierColor: Colors.black54,
-                      transitionDuration: const Duration(milliseconds: 200),
-                      pageBuilder: (BuildContext context, Animation animaiton,
-                              Animation secondaryAnimation) =>
-                          AddGroup()),
-                  icon: Icon(Icons.add)),
-              OrderMenu(),
-            ],
-          ),
-          body: Consumer<GroupList>(builder: (_, groupList, __) {
-            bool _isLoading = groupList.isLoading;
-            List<PodcastGroup> _groups = groupList.groups;
-            return _isLoading
-                ? Center()
-                : Stack(
-                    children: <Widget>[
-                      CustomTabView(
-                        itemCount: _groups.length,
-                        tabBuilder: (context, index) => Tab(
-                          child: Container(
-                              height: 30.0,
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: (_scroll - index).abs() > 1
-                                    ? Colors.grey[300]
-                                    : Colors.grey[300]
-                                        .withOpacity((_scroll - index).abs()),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              child: Text(
-                                _groups[index].name,
-                              )),
-                        ),
-                        pageBuilder: (context, index) => Container(
-                            key: ObjectKey(_groups[index].name),
-                            child: PodcastGroupList(group: _groups[index])),
-                        onPositionChange: (value) =>
-                            setState(() => _index = value),
-                        onScroll: (value) => setState(() => _scroll = value),
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text('Groups'),
+          actions: <Widget>[
+            IconButton(
+                onPressed: () => showGeneralDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    barrierLabel: MaterialLocalizations.of(context)
+                        .modalBarrierDismissLabel,
+                    barrierColor: Colors.black54,
+                    transitionDuration: const Duration(milliseconds: 200),
+                    pageBuilder: (BuildContext context, Animation animaiton,
+                            Animation secondaryAnimation) =>
+                        AddGroup()),
+                icon: Icon(Icons.add)),
+            OrderMenu(),
+          ],
+        ),
+        body: Consumer<GroupList>(builder: (_, groupList, __) {
+          bool _isLoading = groupList.isLoading;
+          List<PodcastGroup> _groups = groupList.groups;
+          return _isLoading
+              ? Center()
+              : Stack(
+                  children: <Widget>[
+                    CustomTabView(
+                      itemCount: _groups.length,
+                      tabBuilder: (context, index) => Tab(
+                        child: Container(
+                            height: 30.0,
+                            padding: EdgeInsets.symmetric(horizontal: 10.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: (_scroll - index).abs() > 1
+                                  ? Colors.grey[300]
+                                  : Colors.grey[300]
+                                      .withOpacity((_scroll - index).abs()),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
+                            child: Text(
+                              _groups[index].name,
+                            )),
                       ),
-                      _showSetting
-                          ? Positioned.fill(
-                              child: GestureDetector(
-                                onTap: () async {
-                                  await _menuController.reverse();
-                                  setState(() => _showSetting = false);
-                                },
-                                child: Container(
-                                  color: Theme.of(context)
-                                      .scaffoldBackgroundColor
-                                      .withOpacity(0.5 * _menuController.value),
-                                ),
-                              ),
-                            )
-                          : Center(),
-                      Positioned(
-                        right: 30,
-                        bottom: 30,
-                        child: _saveButton(context),
-                      ),
-                      _showSetting
-                          ? Positioned(
-                              right: 30 * _menuValue,
-                              bottom: 100,
+                      pageBuilder: (context, index) => Container(
+                          key: ObjectKey(_groups[index].name),
+                          child: PodcastGroupList(group: _groups[index])),
+                      onPositionChange: (value) =>
+                          setState(() => _index = value),
+                      onScroll: (value) => setState(() => _scroll = value),
+                    ),
+                    _showSetting
+                        ? Positioned.fill(
+                            top: 50,
+                            child: GestureDetector(
+                              onTap: () async {
+                                await _menuController.reverse();
+                                setState(() => _showSetting = false);
+                              },
                               child: Container(
-                                alignment: Alignment.centerRight,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          _menuController.reverse();
-                                          setState(() => _showSetting = false);
-                                          _index == 0
-                                              ? Fluttertoast.showToast(
-                                                  msg:
-                                                      'Home group is not supported',
-                                                  gravity: ToastGravity.BOTTOM,
-                                                )
-                                              : showGeneralDialog(
-                                                  context: context,
-                                                  barrierDismissible: true,
-                                                  barrierLabel:
-                                                      MaterialLocalizations.of(
-                                                              context)
-                                                          .modalBarrierDismissLabel,
-                                                  barrierColor: Colors.black54,
-                                                  transitionDuration:
-                                                      const Duration(
-                                                          milliseconds: 300),
-                                                  pageBuilder: (BuildContext
-                                                              context,
-                                                          Animation animaiton,
-                                                          Animation
-                                                              secondaryAnimation) =>
-                                                      RenameGroup(
-                                                        group: _groups[_index],
-                                                      ));
-                                        },
-                                        child: Container(
-                                          height: 30.0,
-                                          decoration: BoxDecoration(
-                                              color: Colors.grey[700],
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10.0))),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.text_fields,
-                                                color: Colors.white,
-                                                size: 15.0,
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 5.0),
-                                              ),
-                                              Text('Edit Name',
-                                                  style: TextStyle(
-                                                      color: Colors.white)),
-                                            ],
-                                          ),
+                                color: Theme.of(context)
+                                    .scaffoldBackgroundColor
+                                    .withOpacity(0.5 * _menuController.value),
+                              ),
+                            ),
+                          )
+                        : Center(),
+                    Positioned(
+                      right: 30,
+                      bottom: 30,
+                      child: _saveButton(context),
+                    ),
+                    _showSetting
+                        ? Positioned(
+                            right: 30 * _menuValue,
+                            bottom: 100,
+                            child: Container(
+                              alignment: Alignment.centerRight,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        _menuController.reverse();
+                                        setState(() => _showSetting = false);
+                                        _index == 0
+                                            ? Fluttertoast.showToast(
+                                                msg:
+                                                    'Home group is not supported',
+                                                gravity: ToastGravity.BOTTOM,
+                                              )
+                                            : showGeneralDialog(
+                                                context: context,
+                                                barrierDismissible: true,
+                                                barrierLabel:
+                                                    MaterialLocalizations.of(
+                                                            context)
+                                                        .modalBarrierDismissLabel,
+                                                barrierColor: Colors.black54,
+                                                transitionDuration:
+                                                    const Duration(
+                                                        milliseconds: 300),
+                                                pageBuilder: (BuildContext
+                                                            context,
+                                                        Animation animaiton,
+                                                        Animation
+                                                            secondaryAnimation) =>
+                                                    RenameGroup(
+                                                      group: _groups[_index],
+                                                    ));
+                                      },
+                                      child: Container(
+                                        height: 30.0,
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey[700],
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10.0))),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.text_fields,
+                                              color: Colors.white,
+                                              size: 15.0,
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 5.0),
+                                            ),
+                                            Text('Edit Name',
+                                                style: TextStyle(
+                                                    color: Colors.white)),
+                                          ],
                                         ),
                                       ),
                                     ),
-                                    Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 10.0)),
-                                    Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          _menuController.reverse();
-                                          setState(() => _showSetting = false);
-                                          _index == 0
-                                              ? Fluttertoast.showToast(
-                                                  msg:
-                                                      'Home group is not supported',
-                                                  gravity: ToastGravity.BOTTOM,
-                                                )
-                                              : showGeneralDialog(
-                                                  context: context,
-                                                  barrierDismissible: true,
-                                                  barrierLabel:
-                                                      MaterialLocalizations.of(
-                                                              context)
-                                                          .modalBarrierDismissLabel,
-                                                  barrierColor: Colors.black54,
-                                                  transitionDuration:
-                                                      const Duration(
-                                                          milliseconds: 300),
-                                                  pageBuilder: (BuildContext
-                                                              context,
-                                                          Animation animaiton,
-                                                          Animation
-                                                              secondaryAnimation) =>
-                                                      AnnotatedRegion<
-                                                          SystemUiOverlayStyle>(
-                                                        value:
-                                                            SystemUiOverlayStyle(
-                                                          statusBarIconBrightness:
-                                                              Brightness.light,
-                                                          systemNavigationBarColor:
-                                                              Theme.of(context)
-                                                                          .brightness ==
-                                                                      Brightness
-                                                                          .light
-                                                                  ? Color
-                                                                      .fromRGBO(
-                                                                          113,
-                                                                          113,
-                                                                          113,
-                                                                          1)
-                                                                  : Color
-                                                                      .fromRGBO(
-                                                                          15,
-                                                                          15,
-                                                                          15,
-                                                                          1),
-                                                          statusBarColor:
-                                                              Theme.of(context)
-                                                                          .brightness ==
-                                                                      Brightness
-                                                                          .light
-                                                                  ? Color
-                                                                      .fromRGBO(
-                                                                          113,
-                                                                          113,
-                                                                          113,
-                                                                          1)
-                                                                  : Color
-                                                                      .fromRGBO(
-                                                                          5,
-                                                                          5,
-                                                                          5,
-                                                                          1),
-                                                        ),
-                                                        child: SafeArea(
-                                                          child: AlertDialog(
-                                                            elevation: 1,
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            10.0))),
-                                                            titlePadding:
-                                                                EdgeInsets.only(
-                                                                    top: 20,
-                                                                    left: 20,
-                                                                    right: 200,
-                                                                    bottom: 20),
-                                                            title: Text(
-                                                                'Delete confirm'),
-                                                            content: Text(
-                                                                'Are you sure you want to delete this group? Podcasts will be moved to Home group.'),
-                                                            actions: <Widget>[
-                                                              FlatButton(
-                                                                onPressed: () =>
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                child: Text(
-                                                                  'CANCEL',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                              .grey[
-                                                                          600]),
-                                                                ),
-                                                              ),
-                                                              FlatButton(
-                                                                onPressed: () {
-                                                                  if (_index ==
-                                                                      groupList
-                                                                              .groups
-                                                                              .length -
-                                                                          1) {
-                                                                    setState(
-                                                                        () {
-                                                                      _index =
-                                                                          _index -
-                                                                              1;
-                                                                      _scroll =
-                                                                          0;
-                                                                    });
-                                                                    groupList.delGroup(_groups[
+                                  ),
+                                  Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10.0)),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        _menuController.reverse();
+                                        setState(() => _showSetting = false);
+                                        _index == 0
+                                            ? Fluttertoast.showToast(
+                                                msg:
+                                                    'Home group is not supported',
+                                                gravity: ToastGravity.BOTTOM,
+                                              )
+                                            : showGeneralDialog(
+                                                context: context,
+                                                barrierDismissible: true,
+                                                barrierLabel:
+                                                    MaterialLocalizations.of(
+                                                            context)
+                                                        .modalBarrierDismissLabel,
+                                                barrierColor: Colors.black54,
+                                                transitionDuration:
+                                                    const Duration(
+                                                        milliseconds: 300),
+                                                pageBuilder: (BuildContext
+                                                            context,
+                                                        Animation animaiton,
+                                                        Animation
+                                                            secondaryAnimation) =>
+                                                    AnnotatedRegion<
+                                                        SystemUiOverlayStyle>(
+                                                      value:
+                                                          SystemUiOverlayStyle(
+                                                        statusBarIconBrightness:
+                                                            Brightness.light,
+                                                        systemNavigationBarColor:
+                                                            Theme.of(context)
+                                                                        .brightness ==
+                                                                    Brightness
+                                                                        .light
+                                                                ? Color
+                                                                    .fromRGBO(
+                                                                        113,
+                                                                        113,
+                                                                        113,
+                                                                        1)
+                                                                : Color
+                                                                    .fromRGBO(
+                                                                        15,
+                                                                        15,
+                                                                        15,
+                                                                        1),
+                                                        //   statusBarColor: Theme.of(
+                                                        //                   context)
+                                                        //               .brightness ==
+                                                        //           Brightness.light
+                                                        //       ? Color.fromRGBO(
+                                                        //           113,
+                                                        //           113,
+                                                        //           113,
+                                                        //           1)
+                                                        //       : Color.fromRGBO(
+                                                        //           5, 5, 5, 1),
+                                                      ),
+                                                      child: AlertDialog(
+                                                        elevation: 1,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                    Radius.circular(
+                                                                        10.0))),
+                                                        titlePadding:
+                                                            EdgeInsets.only(
+                                                                top: 20,
+                                                                left: 20,
+                                                                right: 200,
+                                                                bottom: 20),
+                                                        title: Text(
+                                                            'Delete confirm'),
+                                                        content: Text(
+                                                            'Are you sure you want to delete this group? Podcasts will be moved to Home group.'),
+                                                        actions: <Widget>[
+                                                          FlatButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
+                                                            child: Text(
+                                                              'CANCEL',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      600]),
+                                                            ),
+                                                          ),
+                                                          FlatButton(
+                                                            onPressed: () {
+                                                              if (_index ==
+                                                                  groupList
+                                                                          .groups
+                                                                          .length -
+                                                                      1) {
+                                                                setState(() {
+                                                                  _index =
+                                                                      _index -
+                                                                          1;
+                                                                  _scroll = 0;
+                                                                });
+                                                                groupList.delGroup(
+                                                                    _groups[
                                                                         _index +
                                                                             1]);
-                                                                  } else {
-                                                                    groupList.delGroup(
-                                                                        _groups[
-                                                                            _index]);
-                                                                  }
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
-                                                                },
-                                                                child: Text(
-                                                                  'CONFIRM',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .red),
-                                                                ),
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ));
-                                        },
-                                        child: Container(
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                              color: Colors.grey[700],
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10.0))),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.delete_outline,
-                                                color: Colors.red,
-                                                size: 15.0,
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 5.0),
-                                              ),
-                                              Text('Delete',
-                                                  style: TextStyle(
-                                                      color: Colors.red)),
-                                            ],
-                                          ),
+                                                              } else {
+                                                                groupList.delGroup(
+                                                                    _groups[
+                                                                        _index]);
+                                                              }
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: Text(
+                                                              'CONFIRM',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ));
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey[700],
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10.0))),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.delete_outline,
+                                              color: Colors.red,
+                                              size: 15.0,
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 5.0),
+                                            ),
+                                            Text('Delete',
+                                                style: TextStyle(
+                                                    color: Colors.red)),
+                                          ],
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            )
-                          : Center(),
-                    ],
-                  );
-          }),
-        ),
+                            ),
+                          )
+                        : Center(),
+                  ],
+                );
+        }),
       ),
     );
   }
@@ -525,85 +517,84 @@ class _AddGroupState extends State<AddGroup> {
     var groupList = Provider.of<GroupList>(context);
     List list = groupList.groups.map((e) => e.name).toList();
     return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor:
-              Theme.of(context).brightness == Brightness.light
-                  ? Color.fromRGBO(113, 113, 113, 1)
-                  : Color.fromRGBO(5, 5, 5, 1),
-          statusBarColor: Theme.of(context).brightness == Brightness.light
-              ? Color.fromRGBO(113, 113, 113, 1)
-              : Color.fromRGBO(15, 15, 15, 1),
-        ),
-        child: SafeArea(
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-            elevation: 1,
-            contentPadding: EdgeInsets.symmetric(horizontal: 20),
-            titlePadding:
-                EdgeInsets.only(top: 20, left: 20, right: 200, bottom: 20),
-            actionsPadding: EdgeInsets.all(0),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'CANCEL',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ),
-              FlatButton(
-                onPressed: () async {
-                  if (list.contains(_newGroup)) {
-                    setState(() => _error = 1);
-                  } else {
-                    groupList.addGroup(PodcastGroup(_newGroup));
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: Text('DONE',
-                    style: TextStyle(color: Theme.of(context).accentColor)),
-              )
-            ],
-            title: Text('Create new group'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                    hintText: 'New Group',
-                    hintStyle: TextStyle(fontSize: 18),
-                    filled: true,
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Theme.of(context).accentColor, width: 2.0),
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Theme.of(context).accentColor, width: 2.0),
-                    ),
-                  ),
-                  cursorRadius: Radius.circular(2),
-                  autofocus: true,
-                  maxLines: 1,
-                  controller: _controller,
-                  onChanged: (value) {
-                    _newGroup = value;
-                  },
-                ),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: (_error == 1)
-                      ? Text(
-                          'Group existed',
-                          style: TextStyle(color: Colors.red[400]),
-                        )
-                      : Center(),
-                ),
-              ],
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor:
+            Theme.of(context).brightness == Brightness.light
+                ? Color.fromRGBO(113, 113, 113, 1)
+                : Color.fromRGBO(5, 5, 5, 1),
+        //  statusBarColor: Theme.of(context).brightness == Brightness.light
+        //      ? Color.fromRGBO(113, 113, 113, 1)
+        //      : Color.fromRGBO(15, 15, 15, 1),
+      ),
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        elevation: 1,
+        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+        titlePadding:
+            EdgeInsets.only(top: 20, left: 20, right: 200, bottom: 20),
+        actionsPadding: EdgeInsets.all(0),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'CANCEL',
+              style: TextStyle(color: Colors.grey[600]),
             ),
           ),
-        ));
+          FlatButton(
+            onPressed: () async {
+              if (list.contains(_newGroup)) {
+                setState(() => _error = 1);
+              } else {
+                groupList.addGroup(PodcastGroup(_newGroup));
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text('DONE',
+                style: TextStyle(color: Theme.of(context).accentColor)),
+          )
+        ],
+        title: Text('Create new group'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                hintText: 'New Group',
+                hintStyle: TextStyle(fontSize: 18),
+                filled: true,
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Theme.of(context).accentColor, width: 2.0),
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Theme.of(context).accentColor, width: 2.0),
+                ),
+              ),
+              cursorRadius: Radius.circular(2),
+              autofocus: true,
+              maxLines: 1,
+              controller: _controller,
+              onChanged: (value) {
+                _newGroup = value;
+              },
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              child: (_error == 1)
+                  ? Text(
+                      'Group existed',
+                      style: TextStyle(color: Colors.red[400]),
+                    )
+                  : Center(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -3,12 +3,15 @@ class PodcastLocal {
   final String imageUrl;
   final String rssUrl;
   final String author;
-  String description;
+ 
   final String primaryColor;
   final String id;
   final String imagePath;
   final String provider;
   final String link;
+
+  final String description;
+  final int upateCount;
   PodcastLocal(
       this.title,
       this.imageUrl,
@@ -18,5 +21,10 @@ class PodcastLocal {
       this.id,
       this.imagePath,
       this.provider,
-      this.link);
+      this.link,
+      {
+        this.description ='',
+        this.upateCount = 0,
+      }
+      );
 }

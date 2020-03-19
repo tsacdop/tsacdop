@@ -7,7 +7,7 @@
         <bitmap
             android:gravity="center"
             android:tileMode="disabled"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@mipmap/ic_splash" />
     </item> 
     <item android:bottom="100dp">
         <bitmap

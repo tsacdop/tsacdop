@@ -21,19 +21,21 @@ class EpisodeGrid extends StatelessWidget {
   final bool showDownload;
   final bool showNumber;
   final String heroTag;
+  final int updateCount;
   EpisodeGrid(
       {Key key,
       this.podcast,
       this.showDownload,
       this.showFavorite,
       this.showNumber,
-      this.heroTag})
+      this.heroTag,
+      this.updateCount = 0})
       : super(key: key);
-  Offset offset;
+  
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-
+    Offset _offset;
     _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
         bool isPlaying, bool isInPlaylist) async {
       var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
@@ -83,7 +85,7 @@ class EpisodeGrid extends StatelessWidget {
         if (value == 0) {
           if (!isPlaying) audio.episodeLoad(episode);
         } else if (value == 1) {
-         if (isInPlaylist) {
+         if (!isInPlaylist) {
             audio.addToPlaylist(episode);
             Fluttertoast.showToast(
               msg: 'Added to playlist',
@@ -134,10 +136,10 @@ class EpisodeGrid extends StatelessWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    onTapDown: (details) => offset = Offset(
+                    onTapDown: (details) => _offset = Offset(
                         details.globalPosition.dx, details.globalPosition.dy),
                     onLongPress: () => _showPopupMenu(
-                        offset,
+                        _offset,
                         podcast[index],
                         context,
                         data.item1 == podcast[index],
@@ -185,6 +187,7 @@ class EpisodeGrid extends StatelessWidget {
                                   ),
                                 ),
                                 Spacer(),
+                                index < updateCount ? Text('New', style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)) : Center(),
                                 showNumber
                                     ? Container(
                                         alignment: Alignment.topRight,

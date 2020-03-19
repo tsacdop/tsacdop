@@ -81,10 +81,10 @@ class _AudioPanelState extends State<AudioPanel>
                       color: Theme.of(context).primaryColor,
                       boxShadow: [
                         BoxShadow(
-                          offset: Offset(0, -1),
-                          blurRadius: 4,
+                          offset: Offset(0, -0.5),
+                          blurRadius: 1,
                           color: Theme.of(context).brightness == Brightness.light
-                         ? Colors.grey[400]
+                         ? Colors.grey[400].withOpacity(0.5)
                          : Colors.grey[800],
                         ),
                       ],

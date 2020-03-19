@@ -4,28 +4,31 @@ import 'package:url_launcher/url_launcher.dart';
 import 'licenses.dart';
 
 class Libries extends StatelessWidget {
-   _launchUrl(String url) async {
+  _launchUrl(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
       throw 'Could not launch $url';
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-          statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-          systemNavigationBarColor: Theme.of(context).primaryColor,
-          statusBarColor: Theme.of(context).primaryColor),
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Libraies'),
-            elevation: 0,
-            backgroundColor: Theme.of(context).primaryColor,
-          ),
-          body: SingleChildScrollView(
+        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Libraies'),
+          elevation: 0,
+          backgroundColor: Theme.of(context).primaryColor,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,

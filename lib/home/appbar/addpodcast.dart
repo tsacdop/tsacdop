@@ -21,6 +21,7 @@ import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/home/home.dart';
 import 'package:tsacdop/home/appbar/popupmenu.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
+import 'package:tsacdop/.env.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -30,42 +31,47 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _MyHomePageDelegate _delegate = _MyHomePageDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
- 
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        statusBarColor: Theme.of(context).primaryColor,
+        // statusBarColor: Theme.of(context).primaryColor,
       ),
-      child: SafeArea(
-        child: Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            centerTitle: true,
-            leading: IconButton(
-              tooltip: 'Add',
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: () async {
-                await showSearch<int>(
-                  context: context,
-                  delegate: _delegate,
-                );
-              },
-            ),
-            title: Image(
-              image: Theme.of(context).brightness == Brightness.light
-             ? AssetImage('assets/text.png') : AssetImage('assets/text_light.png'),
-              height: 30,
-            ),
-            actions: <Widget>[
-              PopupMenu(),
-            ],
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          centerTitle: true,
+          leading: IconButton(
+            tooltip: 'Add',
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () async {
+              await showSearch<int>(
+                context: context,
+                delegate: _delegate,
+              );
+            },
           ),
-          body: Home(),
+          title: Image(
+            image: Theme.of(context).brightness == Brightness.light
+                ? AssetImage('assets/text.png')
+                : AssetImage('assets/text_light.png'),
+            height: 30,
+          ),
+          actions: <Widget>[
+            PopupMenu(),
+          ],
         ),
+        body: Home(),
       ),
     );
   }
@@ -73,13 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class _MyHomePageDelegate extends SearchDelegate<int> {
   static Future<List> getList(String searchText) async {
+    String apiKey = environment['apiKey'];
+    print(apiKey);
     String url =
         "https://listennotes.p.mashape.com/api/v1/search?only_in=title%2Cdescription&q=" +
             searchText +
             "&sort_by_date=0&type=podcast";
     Response response = await Dio().get(url,
         options: Options(headers: {
-          'X-Mashape-Key': "UtSwKG4afSmshZfglwsXylLKJZHgp1aZHi2jsnSYK5mZi0A32T",
+          'X-Mashape-Key': "$apiKey",
           'Accept': "application/json"
         }));
     Map searchResultMap = jsonDecode(response.toString());
@@ -112,7 +120,8 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
         padding: EdgeInsets.only(top: 400),
         child: Image(
           image: Theme.of(context).brightness == Brightness.light
-         ? AssetImage('assets/listennotes.png') :  AssetImage('assets/listennotes_light.png'),
+              ? AssetImage('assets/listennotes.png')
+              : AssetImage('assets/listennotes_light.png'),
           height: 20,
         ),
       ));
@@ -236,7 +245,11 @@ class _SearchResultState extends State<SearchResult> {
 
       importOmpl.importState = ImportState.import;
       try {
-        Response response = await Dio().get(rss);
+        BaseOptions options = new BaseOptions(
+          connectTimeout: 30000,
+          receiveTimeout: 30000,
+        );
+        Response response = await Dio(options).get(rss);
         var dbHelper = DBHelper();
         String _realUrl = response.realUri.toString();
 
@@ -276,8 +289,8 @@ class _SearchResultState extends State<SearchResult> {
               _uuid,
               _imagePath,
               _provider,
-              _link);
-          podcastLocal.description = _p.description;
+              _link,
+              description: _p.description);
           await groupList.subscribe(podcastLocal);
 
           if (_provider.contains('fireside')) {
@@ -347,28 +360,48 @@ class _SearchResultState extends State<SearchResult> {
                     ? Icons.keyboard_arrow_up
                     : Icons.keyboard_arrow_down),
                 Padding(padding: EdgeInsets.only(right: 10.0)),
-                !_issubscribe
-                    ? !_adding
-                        ? OutlineButton(
-                            child: Text('Subscribe',
-                                style: TextStyle(
-                                    color: Theme.of(context).accentColor)),
-                            onPressed: () {
-                              importOmpl.rssTitle = widget.onlinePodcast.title;
-                              savePodcast(widget.onlinePodcast.rss);
-                            })
-                        : OutlineButton(
-                            child: SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.blue),
-                                )),
-                            onPressed: () {},
-                          )
-                    : OutlineButton(child: Text('Subscribe'), onPressed: () {}),
+                Container(
+                  width: 100,
+                  height: 35,
+                  child: !_issubscribe
+                      ? !_adding
+                          ? OutlineButton(
+                              highlightedBorderColor:
+                                  Theme.of(context).accentColor,
+                              splashColor: Theme.of(context)
+                                  .accentColor
+                                  .withOpacity(0.8),
+                              child: Text('Subscribe',
+                                  style: TextStyle(
+                                      color: Theme.of(context).accentColor)),
+                              onPressed: () {
+                                importOmpl.rssTitle =
+                                    widget.onlinePodcast.title;
+                                savePodcast(widget.onlinePodcast.rss);
+                              })
+                          : OutlineButton(
+                              highlightedBorderColor:
+                                  Theme.of(context).accentColor,
+                              splashColor: Theme.of(context)
+                                  .accentColor
+                                  .withOpacity(0.8),
+                              child: SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation(
+                                        Theme.of(context).accentColor),
+                                  )),
+                              onPressed: () {},
+                            )
+                      : OutlineButton(
+                          highlightedBorderColor: Colors.grey[500],
+                          disabledTextColor: Colors.grey[500],
+                          child: Text('Subscribe'),
+                          disabledBorderColor: Colors.grey[500],
+                          onPressed: () {}),
+                ),
               ],
             ),
           ),

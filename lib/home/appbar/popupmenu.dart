@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/fireside_data.dart';
+import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,7 @@ import 'package:image/image.dart' as img;
 import 'package:uuid/uuid.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:intl/intl.dart';
 
 import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/settings/settting.dart';
@@ -37,8 +39,13 @@ class OmplOutline {
   }
 }
 
-class PopupMenu extends StatelessWidget {
-  Future<String> getColor(File file) async {
+class PopupMenu extends StatefulWidget {
+  @override
+  _PopupMenuState createState() => _PopupMenuState();
+}
+
+class _PopupMenuState extends State<PopupMenu> {
+  Future<String> _getColor(File file) async {
     final imageProvider = FileImage(file);
     var colorImage = await getImageFromProvider(imageProvider);
     var color = await getColorFromImage(colorImage);
@@ -46,35 +53,85 @@ class PopupMenu extends StatelessWidget {
     return primaryColor;
   }
 
+  bool _showDate;
+  String _refreshDate;
+  _getRefreshDate() async {
+    int refreshDate;
+    KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
+    int i = await refreshstorage.getInt();
+    if (i == 0) {
+      KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
+      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+      refreshDate = DateTime.now().millisecondsSinceEpoch;
+    } else {
+      refreshDate = i;
+    }
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
+    var diffrence = DateTime.now().difference(date);
+    if (diffrence.inMinutes < 10) {
+      _refreshDate = 'Just now';
+    } else if (diffrence.inHours < 1) {
+      _refreshDate = '1 hour ago';
+    } else if (diffrence.inHours < 24) {
+      _refreshDate = '${diffrence.inHours} hours ago';
+    } else if (diffrence.inHours == 24) {
+      _refreshDate = '1 day ago';
+    } else if (diffrence.inDays < 7) {
+      _refreshDate = '${diffrence.inDays} days ago';
+    } else {
+      _refreshDate = DateFormat.yMMMd()
+          .format(DateTime.fromMillisecondsSinceEpoch(refreshDate));
+    }
+    setState(() {
+      _showDate = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _showDate = false;
+    _getRefreshDate();
+  }
+
   @override
   Widget build(BuildContext context) {
     ImportOmpl importOmpl = Provider.of<ImportOmpl>(context, listen: false);
     GroupList groupList = Provider.of<GroupList>(context, listen: false);
-    
+
     _refreshAll() async {
       var dbHelper = DBHelper();
       List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
+      int i = 0;
       await Future.forEach(podcastList, (podcastLocal) async {
         importOmpl.rssTitle = podcastLocal.title;
         importOmpl.importState = ImportState.parse;
-        await dbHelper.updatePodcastRss(podcastLocal);
+        i += await dbHelper.updatePodcastRss(podcastLocal);
         print('Refresh ' + podcastLocal.title);
       });
+      KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
+      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+      KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
+      await refreshcountstorage.saveInt(i);
       importOmpl.importState = ImportState.complete;
     }
 
     saveOmpl(String rss) async {
       var dbHelper = DBHelper();
       importOmpl.importState = ImportState.import;
-
-      Response response = await Dio().get(rss);
+      BaseOptions options = new BaseOptions(
+        connectTimeout: 20000,
+        receiveTimeout: 20000,
+      );
+      Response response = await Dio(options).get(rss);
       if (response.statusCode == 200) {
         var _p = RssFeed.parse(response.data);
-        
+
         var dir = await getApplicationDocumentsDirectory();
-        
-        String _realUrl = response.redirects.isEmpty ? rss : response.realUri.toString();
-          
+
+        String _realUrl =
+            response.redirects.isEmpty ? rss : response.realUri.toString();
+
         print(_realUrl);
         bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
 
@@ -87,9 +144,10 @@ class PopupMenu extends StatelessWidget {
           String _uuid = Uuid().v4();
           File("${dir.path}/$_uuid.png")
             ..writeAsBytesSync(img.encodePng(thumbnail));
-          
+
           String _imagePath = "${dir.path}/$_uuid.png";
-          String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
+          String _primaryColor =
+              await _getColor(File("${dir.path}/$_uuid.png"));
           String _author = _p.itunes.author ?? _p.author ?? '';
           String _provider = _p.generator ?? '';
           String _link = _p.link ?? '';
@@ -102,14 +160,12 @@ class PopupMenu extends StatelessWidget {
               _uuid,
               _imagePath,
               _provider,
-              _link);
-
-          podcastLocal.description = _p.description;
+              _link,
+              description: _p.description);
 
           await groupList.subscribe(podcastLocal);
 
-          if (_provider.contains('fireside')) 
-          {
+          if (_provider.contains('fireside')) {
             FiresideData data = FiresideData(_uuid, _link);
             await data.fatchData();
           }
@@ -143,33 +199,34 @@ class PopupMenu extends StatelessWidget {
 
     void _saveOmpl(String path) async {
       File file = File(path);
-     try{String opml = file.readAsStringSync();
+      try {
+        String opml = file.readAsStringSync();
 
-      var content = xml.parse(opml);
-      var total = content
-          .findAllElements('outline')
-          .map((ele) => OmplOutline.parse(ele))
-          .toList();
-      if (total.length == 0) {
-        Fluttertoast.showToast(
-          msg: 'File Not Valid',
-          gravity: ToastGravity.BOTTOM,
-        );
-      } else {
-        for (int i = 0; i < total.length; i++) {
-          if (total[i].xmlUrl != null) {
-            importOmpl.rssTitle = total[i].text;
-            try {
-              await saveOmpl(total[i].xmlUrl);
-            } catch (e) {
-              print(e.toString());
+        var content = xml.parse(opml);
+        var total = content
+            .findAllElements('outline')
+            .map((ele) => OmplOutline.parse(ele))
+            .toList();
+        if (total.length == 0) {
+          Fluttertoast.showToast(
+            msg: 'File Not Valid',
+            gravity: ToastGravity.BOTTOM,
+          );
+        } else {
+          for (int i = 0; i < total.length; i++) {
+            if (total[i].xmlUrl != null) {
+              importOmpl.rssTitle = total[i].text;
+              try {
+                await saveOmpl(total[i].xmlUrl);
+              } catch (e) {
+                print(e.toString());
+              }
+              print(total[i].text);
             }
-            print(total[i].text);
           }
+          print('Import fisnished');
         }
-        print('Import fisnished');
-      }}
-      catch(e){
+      } catch (e) {
         print(e);
         Fluttertoast.showToast(
           msg: 'File error, Subscribe failed',
@@ -195,7 +252,8 @@ class PopupMenu extends StatelessWidget {
     }
 
     return PopupMenuButton<int>(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
       elevation: 1,
       tooltip: 'Menu',
       itemBuilder: (context) => [
@@ -204,40 +262,60 @@ class PopupMenu extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.only(left: 10),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Icon(LineIcons.cloud_download_alt_solid),
-                Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
-                Text('Refresh All'),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Refresh All',
+                    ),
+                    _showDate
+                        ? Text(
+                            _refreshDate,
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          )
+                        : Center(),
+                  ],
+                ),
               ],
             ),
           ),
         ),
-      PopupMenuItem(
-            value: 2,
-            child: Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Row(
-                children: <Widget>[
-                  Icon(LineIcons.paperclip_solid),
-                  Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
-                  Text('Import OMPL'),
-                ],
-              ),
+        PopupMenuItem(
+          value: 2,
+          child: Container(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(LineIcons.paperclip_solid),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                ),
+                Text('Import OMPL'),
+              ],
             ),
           ),
-        
-      //  PopupMenuItem(
-      //    value: 3,
-      //    child: setting.theme != 2 ? Text('Night Mode') : Text('Light Mode'),
-      //  ),
-         PopupMenuItem(
+        ),
+
+        //  PopupMenuItem(
+        //    value: 3,
+        //    child: setting.theme != 2 ? Text('Night Mode') : Text('Light Mode'),
+        //  ),
+        PopupMenuItem(
           value: 4,
           child: Container(
             padding: EdgeInsets.only(left: 10),
             child: Row(
               children: <Widget>[
                 Icon(LineIcons.cog_solid),
-                Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                ),
                 Text('Settings'),
               ],
             ),
@@ -250,7 +328,9 @@ class PopupMenu extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Icon(LineIcons.info_circle_solid),
-                Padding(padding: EdgeInsets.symmetric(horizontal: 5.0),),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                ),
                 Text('About'),
               ],
             ),
@@ -266,11 +346,11 @@ class PopupMenu extends StatelessWidget {
         } else if (value == 1) {
           _refreshAll();
         } else if (value == 3) {
-        //  setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
-        }  else if (value == 4) {
-            Navigator.push(
+          //  setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
+        } else if (value == 4) {
+          Navigator.push(
               context, MaterialPageRoute(builder: (context) => Settings()));
-        } 
+        }
       },
     );
   }

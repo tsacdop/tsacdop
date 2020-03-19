@@ -1,17 +1,38 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:workmanager/workmanager.dart';
 
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
+
+void callbackDispatcher() {
+  Workmanager.executeTask((task, inputData) async {
+    var dbHelper = DBHelper();
+    print('Start task');
+    List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
+    int i = 0;
+    await Future.forEach(podcastList, (podcastLocal) async {
+      i += await dbHelper.updatePodcastRss(podcastLocal);
+      print('Refresh ' + podcastLocal.title);
+    });
+    KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
+    await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+    KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
+    await refreshcountstorage.saveInt(i);
+    return Future.value(true);
+  });
+}
 
 class SettingState extends ChangeNotifier {
   KeyValueStorage themestorage = KeyValueStorage('themes');
   KeyValueStorage accentstorage = KeyValueStorage('accents');
   KeyValueStorage autoupdatestorage = KeyValueStorage('autoupdate');
+  KeyValueStorage intervalstorage = KeyValueStorage('updateInterval');
 
   Future initData() async {
     await _getTheme();
     await _getAccentSetColor();
-    await _getAutoUpdate();
   }
 
   ThemeMode _theme;
@@ -23,6 +44,28 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setWorkManager(int hour) {
+    _updateInterval = hour;
+    notifyListeners();
+    _saveUpdateInterval();
+    Workmanager.initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+    Workmanager.registerPeriodicTask("1", "update_podcasts",
+        frequency: Duration(hours: hour),
+        initialDelay: Duration(seconds: 10),
+        constraints: Constraints(
+          networkType: NetworkType.connected,
+        ));
+    print('work manager init done + ');
+  }
+
+  void cancelWork() {
+    Workmanager.cancelAll();
+    print('work job cancelled');
+  }
+
   Color _accentSetColor;
   Color get accentSetColor => _accentSetColor;
 
@@ -32,6 +75,10 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  int _updateInterval;
+  int get updateInterval => _updateInterval;
+
+  int _initUpdateTag;
   bool _autoUpdate;
   bool get autoUpdate => _autoUpdate;
   set autoUpdate(bool boo) {
@@ -46,18 +93,21 @@ class SettingState extends ChangeNotifier {
     _getTheme();
     _getAccentSetColor();
     _getAutoUpdate();
+    _getUpdateInterval().then((value) {
+      if (_initUpdateTag == 0) setWorkManager(24);
+    });
   }
 
-  _getTheme() async {
+  Future _getTheme() async {
     int mode = await themestorage.getInt();
     _theme = ThemeMode.values[mode];
   }
 
-  _saveTheme() async {
+  Future _saveTheme() async {
     await themestorage.saveInt(_theme.index);
   }
 
-  _getAccentSetColor() async {
+  Future _getAccentSetColor() async {
     String colorString = await accentstorage.getString();
     print(colorString);
     if (colorString.isNotEmpty) {
@@ -69,17 +119,26 @@ class SettingState extends ChangeNotifier {
     }
   }
 
-  _saveAccentSetColor() async {
+  Future _saveAccentSetColor() async {
     await accentstorage
         .saveString(_accentSetColor.toString().substring(10, 16));
   }
 
-  _getAutoUpdate() async {
+  Future _getAutoUpdate() async {
     int i = await autoupdatestorage.getInt();
-    _autoUpdate = i == 0 ? false : true;
+    _autoUpdate = i == 0 ? true : false;
   }
 
-  _saveAutoUpdate() async {
-    await autoupdatestorage.saveInt(_autoUpdate ? 1 : 0);
+  Future _saveAutoUpdate() async {
+    await autoupdatestorage.saveInt(_autoUpdate ? 0 : 1);
+  }
+
+  Future _getUpdateInterval() async {
+    _initUpdateTag = await intervalstorage.getInt();
+    _updateInterval = _initUpdateTag == 0 ? 24 : _initUpdateTag;
+  }
+
+  Future _saveUpdateInterval() async {
+    await intervalstorage.saveInt(_updateInterval);
   }
 }

@@ -1,15 +1,22 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:path/path.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:tsacdop/class/podcastlocal.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
 import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/settingstate.dart';
-import 'package:tsacdop/settings/theme.dart';
-import 'package:tsacdop/settings/storage.dart';
-import 'package:tsacdop/settings/history.dart';
+import 'package:tsacdop/util/ompl_build.dart';
+import 'theme.dart';
+import 'storage.dart';
+import 'history.dart';
+import 'syncing.dart';
 import 'libries.dart';
 
 class Settings extends StatelessWidget {
@@ -21,24 +28,38 @@ class Settings extends StatelessWidget {
     }
   }
 
+  _exportOmpl() async {
+    var dbHelper = DBHelper();
+    List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
+    var ompl = omplBuilder(podcastList);
+    var tempdir = await getTemporaryDirectory();
+    var file = File(join(tempdir.path, 'tsacdop_ompl.xml'));
+    print(file.path);
+    await file.writeAsString(ompl.toString());
+    final params = SaveFileDialogParams(sourceFilePath: file.path);
+    final filePath = await FlutterFileDialog.saveFile(params: params);
+    print(filePath);
+    print(ompl.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        statusBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
       ),
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Settings'),
-            elevation: 0,
-            backgroundColor: Theme.of(context).primaryColor,
-          ),
-          body: SingleChildScrollView(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Settings'),
+          elevation: 0,
+          backgroundColor: Theme.of(context).primaryColor,
+        ),
+        body: SafeArea(
+                  child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             child: Column(
@@ -72,16 +93,14 @@ class Settings extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ThemeSetting())),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.adjust_solid),
                           title: Text('Appearance'),
                           subtitle: Text('Colors and themes'),
                         ),
                         Divider(height: 2),
                         ListTile(
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.play_circle),
                           title: Text('AutoPlay'),
                           subtitle: Text('Autoplay next episode in playlist'),
@@ -94,20 +113,14 @@ class Settings extends StatelessWidget {
                         ),
                         Divider(height: 2),
                         ListTile(
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SyncingSetting())),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.cloud_download_alt_solid),
-                          title: Text('AutoUpdate'),
-                          subtitle: Text('Auto update feed every day'),
-                          trailing: Selector<SettingState, bool>(
-                            selector: (_, settings) => settings.autoUpdate,
-                            builder: (_, data, __) => Switch(
-                                value: data,
-                                onChanged: (boo) async {
-                                  settings.autoUpdate = boo;
-                                  if (!boo) await Workmanager.cancelAll();
-                                }),
-                          ),
+                          title: Text('Syncing'),
+                          subtitle: Text('Refresh podcasts in the background'),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -115,8 +128,7 @@ class Settings extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => StorageSetting())),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.save),
                           title: Text('Storage'),
                           subtitle: Text('Manage cache and download storage'),
@@ -127,11 +139,20 @@ class Settings extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => PlayedHistory())),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(Icons.update),
                           title: Text('History'),
                           subtitle: Text('Listen data'),
+                        ),
+                        Divider(height: 2),
+                        ListTile(
+                          onTap: () {
+                            _exportOmpl();
+                          },
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          leading: Icon(LineIcons.file_code_solid),
+                          title: Text('Export'),
+                          subtitle: Text('Export ompl file'),
                         ),
                         Divider(height: 2),
                       ],
@@ -163,31 +184,25 @@ class Settings extends StatelessWidget {
                         ListTile(
                           onTap: () => _launchUrl(
                               'https://github.com/stonega/tsacdop/releases'),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.map_signs_solid),
                           title: Text('Changelog'),
                           subtitle: Text('List of chagnes'),
                         ),
                         Divider(height: 2),
                         ListTile(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Libries())),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
+                          onTap: () => Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Libries())),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.book_open_solid),
                           title: Text('Libraries'),
-                          subtitle:
-                              Text('Open source libraried in application'),
+                          subtitle: Text('Open source libraries in application'),
                         ),
                         Divider(height: 2),
                         ListTile(
                           onTap: () => _launchUrl(
                               'mailto:<xijieyin@gmail.com>?subject=Tsacdop Feedback'),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.bug_solid),
                           title: Text('Feedback'),
                           subtitle: Text('Bugs and feature requests'),

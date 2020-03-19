@@ -8,17 +8,19 @@ class StorageSetting extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-          statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-          systemNavigationBarColor: Theme.of(context).primaryColor,
-          statusBarColor: Theme.of(context).primaryColor),
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Storage'),
-            elevation: 0,
-            backgroundColor: Theme.of(context).primaryColor,
-          ),
-          body: Column(
+        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Storage'),
+          elevation: 0,
+          backgroundColor: Theme.of(context).primaryColor,
+        ),
+        body: SafeArea(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[

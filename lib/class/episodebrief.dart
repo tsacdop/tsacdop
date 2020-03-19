@@ -32,8 +32,12 @@ class EpisodeBrief {
   String dateToString() {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
     var diffrence = DateTime.now().difference(date);
-    if (diffrence.inHours < 24) {
+    if (diffrence.inHours < 1) {
+      return '1 hour ago';
+    } else if (diffrence.inHours < 24) {
       return '${diffrence.inHours} hours ago';
+    } else if (diffrence.inHours == 24) {
+      return '1 day ago';
     } else if (diffrence.inDays < 7) {
       return '${diffrence.inDays} days ago';
     } else {

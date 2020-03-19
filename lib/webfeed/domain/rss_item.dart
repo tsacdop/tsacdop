@@ -44,20 +44,24 @@ class RssItem {
   });
 
   factory RssItem.parse(XmlElement element) {
+    if (RssEnclosure.parse(findElementOrNull(element, "enclosure")) == null) {
+      return null;
+    }
     return RssItem(
       title: findElementOrNull(element, "title")?.text,
-      description: findElementOrNull(element, "description")?.text?.trim() ?? 'No shownote provided for this episode',
+      description: findElementOrNull(element, "description")?.text?.trim()
+          ,
       link: findElementOrNull(element, "link")?.text?.trim(),
       categories: element.findElements("category").map((element) {
         return RssCategory.parse(element);
       }).toList(),
-     //guid: findElementOrNull(element, "guid")?.text,
+      //guid: findElementOrNull(element, "guid")?.text,
       pubDate: findElementOrNull(element, "pubDate")?.text?.trim(),
       author: findElementOrNull(element, "author")?.text?.trim(),
-     // comments: findElementOrNull(element, "comments")?.text,
-     // source: RssSource.parse(findElementOrNull(element, "source")),
-     // content: RssContent.parse(findElementOrNull(element, "content:encoded")),
-     // media: Media.parse(element),
+      // comments: findElementOrNull(element, "comments")?.text,
+      // source: RssSource.parse(findElementOrNull(element, "source")),
+       content: RssContent.parse(findElementOrNull(element, "content:encoded")),
+      // media: Media.parse(element),
       enclosure: RssEnclosure.parse(findElementOrNull(element, "enclosure")),
       //dc: DublinCore.parse(element),
       itunes: RssItemItunes.parse(element),

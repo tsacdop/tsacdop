@@ -16,7 +16,7 @@ jobs:
       
       - run: echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
       - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
-
+      - run: dart tool/env.dart
       - run:
           name: Build the Android version
           command: flutter build apk --split-per-abi --no-shrink 

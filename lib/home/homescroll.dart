@@ -244,11 +244,30 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(25.0)),
-                                      child: LimitedBox(
-                                        maxHeight: 50,
-                                        maxWidth: 50,
-                                        child: Image.file(
-                                            File("${podcastLocal.imagePath}")),
+                                      child: Stack(
+                                        alignment: Alignment.bottomCenter,
+                                        children: <Widget>[
+                                          LimitedBox(
+                                            maxHeight: 50,
+                                            maxWidth: 50,
+                                            child: Image.file(File(
+                                                "${podcastLocal.imagePath}")),
+                                          ),
+                                          podcastLocal.upateCount > 0
+                                              ? Container(
+                                                  alignment: Alignment.center,
+                                                  height: 10,
+                                                  width: 40,
+                                                  color: Colors.black54,
+                                                  child: Text('New',
+                                                      style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontSize: 8,
+                                                          fontStyle: FontStyle
+                                                              .italic)),
+                                                )
+                                              : Center(),
+                                        ],
                                       ),
                                     ),
                                   );
@@ -380,10 +399,11 @@ class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> podcast;
   final PodcastLocal podcastLocal;
   ShowEpisode({Key key, this.podcast, this.podcastLocal}) : super(key: key);
-  Offset offset;
+
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
+    Offset offset;
     _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
         bool isPlaying, bool isInPlaylist) async {
       var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
@@ -432,7 +452,7 @@ class ShowEpisode extends StatelessWidget {
         if (value == 0) {
           if (!isPlaying) audio.episodeLoad(episode);
         } else if (value == 1) {
-          if (isInPlaylist) {
+          if (!isInPlaylist) {
             audio.addToPlaylist(episode);
             Fluttertoast.showToast(
               msg: 'Added to playlist',
@@ -536,6 +556,14 @@ class ShowEpisode extends StatelessWidget {
                                       ),
                                     ),
                                     Spacer(),
+                                    index < podcastLocal.upateCount
+                                        ? Text(
+                                            'New',
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontStyle: FontStyle.italic),
+                                          )
+                                        : Center(),
                                   ],
                                 ),
                               ),

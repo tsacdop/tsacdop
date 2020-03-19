@@ -1,10 +1,16 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tsacdop/local_storage/key_value_storage.dart';
+import 'package:tuple/tuple.dart';
+import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/settings/history.dart';
+import 'package:tsacdop/home/playlist.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
+import 'package:tsacdop/util/mypopupmenu.dart';
 
 class MainTab extends StatefulWidget {
   @override
@@ -13,6 +19,12 @@ class MainTab extends StatefulWidget {
 
 class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
   TabController _controller;
+  bool _loadPlay;
+  static String _stringForSeconds(int seconds) {
+    if (seconds == null) return null;
+    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  }
+
   Decoration getIndicator(BuildContext context) {
     return UnderlineTabIndicator(
         borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
@@ -23,25 +35,121 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
         ));
   }
 
-  Widget playHistory() {
-    return PopupMenuButton<int>(
+  _getPlaylist() async {
+    await Provider.of<AudioPlayerNotifier>(context, listen: false)
+        .loadPlaylist();
+    setState(() {
+      _loadPlay = true;
+    });
+  }
+
+  Widget playlist(BuildContext context) {
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    return MyPopupMenuButton<int>(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
       elevation: 1,
-      icon: Icon(Icons.history),
+      icon: Icon(Icons.playlist_play),
       tooltip: "Menu",
       itemBuilder: (context) => [
+        MyPopupMenuItem(
+          height: 50,
+          value: 1,
+          child: Container(
+            decoration: BoxDecoration(
+              //  color: Theme.of(context).accentColor,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10.0),
+                  topRight: Radius.circular(10.0)),
+            ),
+            child: Selector<AudioPlayerNotifier, Tuple3<bool, Playlist, int>>(
+              selector: (_, audio) =>
+                  Tuple3(audio.playerRunning, audio.queue, audio.lastPositin),
+              builder: (_, data, __) => !_loadPlay
+                  ? Container(
+                      height: 8.0,
+                    )
+                  : data.item1 || data.item2.playlist.length == 0
+                      ? Container(
+                          height: 8.0,
+                        )
+                      : InkWell(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10.0),
+                              topRight: Radius.circular(10.0)),
+                          onTap: () {
+                            audio.playlistLoad();
+                            Navigator.pop<int>(context);
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                              ),
+                              Stack(
+                                alignment: Alignment.center,
+                                children: <Widget>[
+                                  CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage: FileImage(File(
+                                        "${data.item2.playlist.first.imagePath}")),
+                                  ),
+                                  Container(
+                                    height: 40.0,
+                                    width: 40.0,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.black12),
+                                    child: Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 2),
+                              ),
+                              Container(
+                                height: 70,
+                                width: 140,
+                                child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      _stringForSeconds(data.item3 ~/ 1000),
+                                      // style:
+                                      // TextStyle(color: Colors.white)
+                                    ),
+                                    Text(
+                                      data.item2.playlist.first.title,
+                                      maxLines: 2,
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.fade,
+                                      // style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(
+                                height: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+            ),
+          ),
+        ),
         PopupMenuItem(
           value: 0,
           child: Container(
             padding: EdgeInsets.only(left: 10),
             child: Row(
               children: <Widget>[
-                Icon(Icons.history),
+                Icon(Icons.playlist_play),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
                 ),
-                Text('Play History'),
+                Text('Playlist'),
               ],
             ),
           ),
@@ -49,9 +157,9 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
       ],
       onSelected: (value) {
         if (value == 0) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => PlayedHistory()));
-        }
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PlaylistPage()));
+        } else if (value == 1) {}
       },
     );
   }
@@ -60,6 +168,8 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = TabController(length: 3, vsync: this);
+    _loadPlay = false;
+    _getPlaylist();
   }
 
   @override
@@ -103,7 +213,7 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
               ),
             ),
             Spacer(),
-            playHistory(),
+            playlist(context),
           ],
         ),
         Expanded(
@@ -135,9 +245,12 @@ class RecentUpdate extends StatefulWidget {
 }
 
 class _RecentUpdateState extends State<RecentUpdate> {
+  int _updateCount = 0;
   Future<List<EpisodeBrief>> _getRssItem(int top) async {
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await dbHelper.getRecentRssItem(top);
+    KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
+    _updateCount = await refreshcountstorage.getInt();
     return episodes;
   }
 
@@ -189,6 +302,7 @@ class _RecentUpdateState extends State<RecentUpdate> {
                       showFavorite: false,
                       showNumber: false,
                       heroTag: 'recent',
+                      updateCount: _updateCount,
                     ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
@@ -277,7 +391,6 @@ class _MyDownloadState extends State<MyDownload> {
                     heroTag: 'download',
                   )
                 ],
-                
               )
             : Center(child: CircularProgressIndicator());
       },

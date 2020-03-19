@@ -41,30 +41,20 @@ Future main() async {
       child: MyApp(),
     ),
   );
+
+  SystemUiOverlayStyle systemUiOverlayStyle =
+      SystemUiOverlayStyle(statusBarColor: Colors.transparent, systemNavigationBarColor: Colors.transparent);
+  SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 }
 
 class MyApp extends StatelessWidget {
-  void setWorkManager() {
-    Workmanager.initialize(
-      callbackDispatcher,
-      isInDebugMode: true,
-    );
-    
-    Workmanager.registerPeriodicTask("1", "update_podcasts",
-        frequency: Duration(hours: 12),
-        initialDelay: Duration(seconds: 5),
-        constraints: Constraints(
-          networkType: NetworkType.connected,
-          requiresBatteryNotLow: true,
-        ));
-  }
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingState>(
       builder: (_, setting, __) {
-        if (setting.autoUpdate) setWorkManager();
         return MaterialApp(
           themeMode: setting.theme,
           debugShowCheckedModeBanner: false,
@@ -92,6 +82,7 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData.dark().copyWith(
             accentColor: setting.accentSetColor,
+           // scaffoldBackgroundColor: Colors.black87,
             appBarTheme: AppBarTheme(elevation: 0),
           ),
           home: MyHomePage(),

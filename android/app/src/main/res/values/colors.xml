@@ -3,4 +3,7 @@
     <color name = "blackGrey">
         #121212
     </color>
+	<color name="ic_launcher_background">
+        #ffffff
+    </color>
 </resources>

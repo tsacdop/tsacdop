@@ -18,9 +18,9 @@ class RssContent {
 
   factory RssContent.parse(XmlElement element) {
     if (element == null) {
-      return null;
+      return RssContent('', ['']);
     }
-    final content = element.text;
+    final content = element.text.trim();
     final images = <String>[];
     _imagesRegExp.allMatches(content).forEach((match) {
       images.add(match.group(1));

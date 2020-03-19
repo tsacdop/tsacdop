@@ -99,17 +99,19 @@ class _DownloadsManageState extends State<DownloadsManage> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-          statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-          systemNavigationBarColor: Theme.of(context).primaryColor,
-          statusBarColor: Theme.of(context).primaryColor),
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Downloads'),
-            elevation: 0,
-            backgroundColor: Theme.of(context).primaryColor,
-          ),
-          body: Stack(
+        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Downloads'),
+          elevation: 0,
+          backgroundColor: Theme.of(context).primaryColor,
+        ),
+        body: SafeArea(
+          child: Stack(
             children: <Widget>[
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -138,7 +140,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   fontSize: 40,
                                   fontWeight: FontWeight.bold)),
                           TextSpan(
-                              text: ' episodes ',
+                              text: _fileNum < 2 ? ' episode' : ' episodes ',
                               style: TextStyle(
                                 color: Theme.of(context).accentColor,
                                 fontSize: 20,

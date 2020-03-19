@@ -29,35 +29,31 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
           )
         : Container(
             color: Theme.of(context).primaryColor,
-            child: Stack(
-              children: <Widget>[
-                ReorderableListView(
-                  onReorder: (int oldIndex, int newIndex) {
-                    setState(() {
-                      if (newIndex > oldIndex) {
-                        newIndex -= 1;
-                      }
-                      final PodcastLocal podcast =
-                       widget.group.podcasts.removeAt(oldIndex);
-                      widget.group.podcasts.insert(newIndex, podcast);
-                    });
-                    widget.group.setOrderedPodcasts = widget.group.podcasts;
-                    groupList.addToOrderChanged(widget.group.name);
-                  },
-                  children: widget.group.podcasts
-                      .map<Widget>((PodcastLocal podcastLocal) {
-                    return Container(
-                      decoration:
-                          BoxDecoration(color: Theme.of(context).primaryColor),
-                      key: ObjectKey(podcastLocal.title),
-                      child: PodcastCard(
-                        podcastLocal: podcastLocal,
-                        group: widget.group,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
+            child: ReorderableListView(
+              onReorder: (int oldIndex, int newIndex) {
+                setState(() {
+                  if (newIndex > oldIndex) {
+                    newIndex -= 1;
+                  }
+                  final PodcastLocal podcast =
+                      widget.group.podcasts.removeAt(oldIndex);
+                  widget.group.podcasts.insert(newIndex, podcast);
+                });
+                widget.group.setOrderedPodcasts = widget.group.podcasts;
+                groupList.addToOrderChanged(widget.group.name);
+              },
+              children: widget.group.podcasts
+                  .map<Widget>((PodcastLocal podcastLocal) {
+                return Container(
+                  decoration:
+                      BoxDecoration(color: Theme.of(context).primaryColor),
+                  key: ObjectKey(podcastLocal.title),
+                  child: PodcastCard(
+                    podcastLocal: podcastLocal,
+                    group: widget.group,
+                  ),
+                );
+              }).toList(),
             ),
           );
   }
@@ -393,89 +389,88 @@ class _RenameGroupState extends State<RenameGroup> {
     var groupList = Provider.of<GroupList>(context, listen: false);
     List list = groupList.groups.map((e) => e.name).toList();
     return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor:
-              Theme.of(context).brightness == Brightness.light
-                  ? Color.fromRGBO(113, 113, 113, 1)
-                  : Color.fromRGBO(5, 5, 5, 1),
-          statusBarColor: Theme.of(context).brightness == Brightness.light
-              ? Color.fromRGBO(113, 113, 113, 1)
-              : Color.fromRGBO(15, 15, 15, 1),
-        ),
-        child: SafeArea(
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-            elevation: 1,
-            contentPadding: EdgeInsets.symmetric(horizontal: 20),
-            titlePadding:
-                EdgeInsets.only(top: 20, left: 20, right: 200, bottom: 20),
-            actionsPadding: EdgeInsets.all(0),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'CANCEL',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ),
-              FlatButton(
-                onPressed: () async {
-                  if (list.contains(_newName)) {
-                    setState(() => _error = 1);
-                  } else {
-                    PodcastGroup newGroup = PodcastGroup(_newName,
-                        color: widget.group.color,
-                        id: widget.group.id,
-                        podcastList: widget.group.podcastList);
-                    groupList.updateGroup(newGroup);
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: Text('DONE',
-                    style: TextStyle(color: Theme.of(context).accentColor)),
-              )
-            ],
-            title: Text('Edit group name'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                    hintText: widget.group.name,
-                    hintStyle: TextStyle(fontSize: 18),
-                    filled: true,
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Theme.of(context).accentColor, width: 2.0),
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Theme.of(context).accentColor, width: 2.0),
-                    ),
-                  ),
-                  cursorRadius: Radius.circular(2),
-                  autofocus: true,
-                  maxLines: 1,
-                  controller: _controller,
-                  onChanged: (value) {
-                    _newName = value;
-                  },
-                ),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: (_error == 1)
-                      ? Text(
-                          'Group existed',
-                          style: TextStyle(color: Colors.red[400]),
-                        )
-                      : Center(),
-                ),
-              ],
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor:
+            Theme.of(context).brightness == Brightness.light
+                ? Color.fromRGBO(113, 113, 113, 1)
+                : Color.fromRGBO(5, 5, 5, 1),
+        // statusBarColor: Theme.of(context).brightness == Brightness.light
+        //     ? Color.fromRGBO(113, 113, 113, 1)
+        //     : Color.fromRGBO(15, 15, 15, 1),
+      ),
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        elevation: 1,
+        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+        titlePadding:
+            EdgeInsets.only(top: 20, left: 20, right: 200, bottom: 20),
+        actionsPadding: EdgeInsets.all(0),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'CANCEL',
+              style: TextStyle(color: Colors.grey[600]),
             ),
           ),
-        ));
+          FlatButton(
+            onPressed: () async {
+              if (list.contains(_newName)) {
+                setState(() => _error = 1);
+              } else {
+                PodcastGroup newGroup = PodcastGroup(_newName,
+                    color: widget.group.color,
+                    id: widget.group.id,
+                    podcastList: widget.group.podcastList);
+                groupList.updateGroup(newGroup);
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text('DONE',
+                style: TextStyle(color: Theme.of(context).accentColor)),
+          )
+        ],
+        title: Text('Edit group name'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                hintText: widget.group.name,
+                hintStyle: TextStyle(fontSize: 18),
+                filled: true,
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Theme.of(context).accentColor, width: 2.0),
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Theme.of(context).accentColor, width: 2.0),
+                ),
+              ),
+              cursorRadius: Radius.circular(2),
+              autofocus: true,
+              maxLines: 1,
+              controller: _controller,
+              onChanged: (value) {
+                _newName = value;
+              },
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              child: (_error == 1)
+                  ? Text(
+                      'Group existed',
+                      style: TextStyle(color: Colors.red[400]),
+                    )
+                  : Center(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

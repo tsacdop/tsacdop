@@ -99,15 +99,16 @@ class _PodcastListState extends State<PodcastList> {
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        statusBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
       ),
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Podcasts'),
-            centerTitle: true,
-          ),
-          body: Container(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Podcasts'),
+          centerTitle: true,
+        ),
+        body: SafeArea(
+          child: Container(
             color: Theme.of(context).primaryColor,
             child: FutureBuilder<List<PodcastLocal>>(
               future: getPodcastLocal(),
@@ -161,18 +162,16 @@ class _PodcastListState extends State<PodcastList> {
                                                           113, 113, 113, 1)
                                                       : Color.fromRGBO(
                                                           15, 15, 15, 1),
-                                              statusBarColor: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.light
-                                                  ? Color.fromRGBO(
-                                                      113, 113, 113, 1)
-                                                  : Color.fromRGBO(5, 5, 5, 1),
+                                              //   statusBarColor: Theme.of(context)
+                                              //               .brightness ==
+                                              //           Brightness.light
+                                              //       ? Color.fromRGBO(
+                                              //           113, 113, 113, 1)
+                                              //       : Color.fromRGBO(5, 5, 5, 1),
                                             ),
-                                            child: SafeArea(
-                                              child: AboutPodcast(
-                                                  podcastLocal:
-                                                      snapshot.data[index]),
-                                            ),
+                                            child: AboutPodcast(
+                                                podcastLocal:
+                                                    snapshot.data[index]),
                                           ));
                                 },
                                 child: Container(
