@@ -239,7 +239,7 @@ class _PopupMenuState extends State<PopupMenu> {
 
     void _getFilePath() async {
       try {
-        String filePath = await FilePicker.getFilePath(type: FileType.ANY);
+        String filePath = await FilePicker.getFilePath(type: FileType.any);
         if (filePath == '') {
           return;
         }
