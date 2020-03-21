@@ -40,7 +40,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
       bool isLoading = groupList.isLoading;
       return isLoading
           ? Container(
-              height: (_width - 20) / 3 + 110,
+              height: (_width - 20) / 3 + 140,
             )
           : groups[_groupIndex].podcastList.length == 0
               ? Column(

@@ -32,6 +32,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final _MyHomePageDelegate _delegate = _MyHomePageDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  var _androidAppRetain = MethodChannel("android_app_retain");
+
   @override
   void initState() {
     super.initState();
@@ -71,7 +73,16 @@ class _MyHomePageState extends State<MyHomePage> {
             PopupMenu(),
           ],
         ),
-        body: Home(),
+        body: WillPopScope(
+            onWillPop: () async {
+              if (Platform.isAndroid) {
+                _androidAppRetain.invokeMethod('sendToBackground');
+                return false;
+              } else {
+                return true;
+              }
+            },
+            child: Home()),
       ),
     );
   }

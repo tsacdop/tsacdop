@@ -59,8 +59,8 @@ class Settings extends StatelessWidget {
           backgroundColor: Theme.of(context).primaryColor,
         ),
         body: SafeArea(
-                  child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
+          child: SingleChildScrollView(
+            //physics: const AlwaysScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -93,14 +93,16 @@ class Settings extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ThemeSetting())),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.adjust_solid),
                           title: Text('Appearance'),
                           subtitle: Text('Colors and themes'),
                         ),
                         Divider(height: 2),
                         ListTile(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.play_circle),
                           title: Text('AutoPlay'),
                           subtitle: Text('Autoplay next episode in playlist'),
@@ -117,7 +119,8 @@ class Settings extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => SyncingSetting())),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.cloud_download_alt_solid),
                           title: Text('Syncing'),
                           subtitle: Text('Refresh podcasts in the background'),
@@ -128,7 +131,8 @@ class Settings extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => StorageSetting())),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.save),
                           title: Text('Storage'),
                           subtitle: Text('Manage cache and download storage'),
@@ -139,7 +143,8 @@ class Settings extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => PlayedHistory())),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(Icons.update),
                           title: Text('History'),
                           subtitle: Text('Listen data'),
@@ -149,7 +154,8 @@ class Settings extends StatelessWidget {
                           onTap: () {
                             _exportOmpl();
                           },
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.file_code_solid),
                           title: Text('Export'),
                           subtitle: Text('Export ompl file'),
@@ -184,25 +190,31 @@ class Settings extends StatelessWidget {
                         ListTile(
                           onTap: () => _launchUrl(
                               'https://github.com/stonega/tsacdop/releases'),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.map_signs_solid),
                           title: Text('Changelog'),
                           subtitle: Text('List of chagnes'),
                         ),
                         Divider(height: 2),
                         ListTile(
-                          onTap: () => Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Libries())),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Libries())),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.book_open_solid),
                           title: Text('Libraries'),
-                          subtitle: Text('Open source libraries in application'),
+                          subtitle:
+                              Text('Open source libraries in application'),
                         ),
                         Divider(height: 2),
                         ListTile(
                           onTap: () => _launchUrl(
                               'mailto:<xijieyin@gmail.com>?subject=Tsacdop Feedback'),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.bug_solid),
                           title: Text('Feedback'),
                           subtitle: Text('Bugs and feature requests'),

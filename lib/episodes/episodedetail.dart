@@ -11,6 +11,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
@@ -31,10 +33,11 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   bool _loaddes;
   bool _showMenu;
   String path;
+  String _description;
   Future getSDescription(String url) async {
     var dbHelper = DBHelper();
-    widget.episodeItem.description = (await dbHelper.getDescription(url))
-        .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '');
+    _description = (await dbHelper.getDescription(url))
+        .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '').replaceAll('\r', '');
     if (mounted)
       setState(() {
         _loaddes = true;
@@ -85,12 +88,11 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
         systemNavigationBarColor: Theme.of(context).primaryColor,
         systemNavigationBarIconBrightness:
             Theme.of(context).accentColorBrightness,
-        //  statusBarColor: Theme.of(context).primaryColor,
       ),
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-          title: Text(widget.episodeItem.feedTitle),
+        //  title: Text(widget.episodeItem.feedTitle),
           centerTitle: true,
         ),
         body: Stack(
@@ -162,7 +164,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                           style: textstyle),
                                     )
                                   : Center(),
-                              widget.episodeItem.enclosureLength != null
+                              widget.episodeItem.enclosureLength != null &&
+                                      widget.episodeItem.enclosureLength != 0
                                   ? Container(
                                       decoration: BoxDecoration(
                                           color: Colors.lightBlue[300],
@@ -193,15 +196,15 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       padding: EdgeInsets.only(top: 5.0),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
-                        //physics: const AlwaysScrollableScrollPhysics(),
+                        physics: AlwaysScrollableScrollPhysics(),
                         controller: _controller,
                         child: _loaddes
-                            ? (widget.episodeItem.description.contains('<'))
+                            ? (_description.contains('<'))
                                 ? Html(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 20.0),
                                     defaultTextStyle: TextStyle(height: 1.8),
-                                    data: widget.episodeItem.description,
+                                    data: _description,
                                     linkStyle: TextStyle(
                                         color: Theme.of(context).accentColor,
                                         decoration: TextDecoration.underline,
@@ -215,12 +218,20 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 20.0),
                                     alignment: Alignment.topLeft,
-                                    child: Text(
-                                      widget.episodeItem.description,
+                                    child: SelectableLinkify(
+                                      onOpen: (link) {
+                                        _launchUrl(link.url);
+                                      },
+                                      text: _description,
                                       style: TextStyle(
                                         height: 1.8,
                                       ),
-                                    ))
+                                      linkStyle: TextStyle(
+                                        color: Theme.of(context).accentColor,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  )
                             : Center(),
                       ),
                     ),

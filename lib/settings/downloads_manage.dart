@@ -136,9 +136,9 @@ class _DownloadsManageState extends State<DownloadsManage> {
                           TextSpan(
                               text: _fileNum.toString(),
                               style: TextStyle(
-                                  color: Theme.of(context).accentColor,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold)),
+                                color: Theme.of(context).accentColor,
+                                fontSize: 40,
+                              )),
                           TextSpan(
                               text: _fileNum < 2 ? ' episode' : ' episodes ',
                               style: TextStyle(
@@ -148,9 +148,9 @@ class _DownloadsManageState extends State<DownloadsManage> {
                           TextSpan(
                               text: (_size ~/ 1000000).toString(),
                               style: TextStyle(
-                                  color: Theme.of(context).accentColor,
-                                  fontSize: 60,
-                                  fontWeight: FontWeight.bold)),
+                                color: Theme.of(context).accentColor,
+                                fontSize: 60,
+                              )),
                           TextSpan(
                               text: ' Mb',
                               style: TextStyle(

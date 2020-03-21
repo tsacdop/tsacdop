@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
@@ -389,6 +389,14 @@ class _AboutPodcastState extends State<AboutPodcast> {
     setState(() => _load = true);
   }
 
+  _launchUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -419,8 +427,15 @@ class _AboutPodcastState extends State<AboutPodcast> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              _description,
+                            Linkify(
+                              onOpen: (link) {
+                                _launchUrl(link.url);
+                              },
+                              text: _description,
+                              linkStyle: TextStyle(
+                                  color: Theme.of(context).accentColor,
+                                  decoration: TextDecoration.underline,
+                                  textBaseline: TextBaseline.ideographic),
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -432,12 +447,27 @@ class _AboutPodcastState extends State<AboutPodcast> {
                             ),
                           ],
                         )
-                      : Text(_description),
+                      : Linkify(
+                          onOpen: (link) {
+                            _launchUrl(link.url);
+                          },
+                          text: _description,
+                          linkStyle: TextStyle(
+                              color: Theme.of(context).accentColor,
+                              decoration: TextDecoration.underline,
+                              textBaseline: TextBaseline.ideographic),
+                        ),
                 );
               } else {
-                return SelectableText(
-                  _description,
-                  toolbarOptions: ToolbarOptions(copy: true),
+                return Linkify(
+                  text: _description,
+                  onOpen: (link) {
+                    _launchUrl(link.url);
+                  },
+                  linkStyle: TextStyle(
+                      color: Theme.of(context).accentColor,
+                      decoration: TextDecoration.underline,
+                      textBaseline: TextBaseline.ideographic),
                 );
               }
             },

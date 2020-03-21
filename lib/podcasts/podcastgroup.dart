@@ -301,50 +301,47 @@ class _PodcastCardState extends State<PodcastCard> {
                                                   Brightness.light
                                               ? Color.fromRGBO(113, 113, 113, 1)
                                               : Color.fromRGBO(15, 15, 15, 1),
-                                      statusBarColor:
-                                          Theme.of(context).brightness ==
-                                                  Brightness.light
-                                              ? Color.fromRGBO(113, 113, 113, 1)
-                                              : Color.fromRGBO(5, 5, 5, 1),
+                                      //  statusBarColor:
+                                      //      Theme.of(context).brightness ==
+                                      //              Brightness.light
+                                      //          ? Color.fromRGBO(113, 113, 113, 1)
+                                      //          : Color.fromRGBO(5, 5, 5, 1),
                                     ),
-                                    child: SafeArea(
-                                      child: AlertDialog(
-                                        elevation: 1,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10.0))),
-                                        titlePadding: EdgeInsets.only(
-                                            top: 20,
-                                            left: 20,
-                                            right: 200,
-                                            bottom: 20),
-                                        title: Text('Remove confirm'),
-                                        content: Text(
-                                            'Are you sure you want  to unsubscribe?'),
-                                        actions: <Widget>[
-                                          FlatButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                            child: Text(
-                                              'CANCEL',
-                                              style: TextStyle(
-                                                  color: Colors.grey[600]),
-                                            ),
+                                    child: AlertDialog(
+                                      elevation: 1,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10.0))),
+                                      titlePadding: EdgeInsets.only(
+                                          top: 20,
+                                          left: 20,
+                                          right: 200,
+                                          bottom: 20),
+                                      title: Text('Remove confirm'),
+                                      content: Text(
+                                          'Are you sure you want  to unsubscribe?'),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text(
+                                            'CANCEL',
+                                            style: TextStyle(
+                                                color: Colors.grey[600]),
                                           ),
-                                          FlatButton(
-                                            onPressed: () {
-                                              _groupList.removePodcast(
-                                                  widget.podcastLocal.id);
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text(
-                                              'CONFIRM',
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                        ),
+                                        FlatButton(
+                                          onPressed: () {
+                                            _groupList.removePodcast(
+                                                widget.podcastLocal.id);
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text(
+                                            'CONFIRM',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 );

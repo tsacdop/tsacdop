@@ -2,28 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:workmanager/workmanager.dart';
 
-import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/home/appbar/addpodcast.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/settingstate.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-
-void callbackDispatcher() {
-  Workmanager.executeTask((task, inputData) async {
-    var dbHelper = DBHelper();
-    print('Start task');
-    List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-    await Future.forEach(podcastList, (podcastLocal) async {
-      await dbHelper.updatePodcastRss(podcastLocal);
-      print('Refresh ' + podcastLocal.title);
-    });
-    return Future.value(true);
-  });
-}
 
 final SettingState themeSetting = SettingState();
 Future main() async {

@@ -9,7 +9,6 @@ import 'package:tsacdop/local_storage/key_value_storage.dart';
 void callbackDispatcher() {
   Workmanager.executeTask((task, inputData) async {
     var dbHelper = DBHelper();
-    print('Start task');
     List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
     int i = 0;
     await Future.forEach(podcastList, (podcastLocal) async {
@@ -135,7 +134,7 @@ class SettingState extends ChangeNotifier {
 
   Future _getUpdateInterval() async {
     _initUpdateTag = await intervalstorage.getInt();
-    _updateInterval = _initUpdateTag == 0 ? 24 : _initUpdateTag;
+    _updateInterval =  _initUpdateTag;
   }
 
   Future _saveUpdateInterval() async {

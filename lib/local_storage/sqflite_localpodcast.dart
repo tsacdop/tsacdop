@@ -417,7 +417,7 @@ class DBHelper {
         }
 
         final title = feed.items[i].itunes.title ?? feed.items[i].title;
-        final length = feed.items[i]?.enclosure?.length;
+        final length = feed.items[i]?.enclosure?.length ?? 0;
         final pubDate = feed.items[i].pubDate;
         final date = _parsePubDate(pubDate);
         final milliseconds = date.millisecondsSinceEpoch;

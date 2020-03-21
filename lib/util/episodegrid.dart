@@ -31,7 +31,7 @@ class EpisodeGrid extends StatelessWidget {
       this.heroTag,
       this.updateCount = 0})
       : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
@@ -46,7 +46,6 @@ class EpisodeGrid extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         context: context,
         position: RelativeRect.fromLTRB(left, top, _width - left, 0),
-        
         items: <PopupMenuEntry<int>>[
           PopupMenuItem(
             value: 0,
@@ -85,7 +84,7 @@ class EpisodeGrid extends StatelessWidget {
         if (value == 0) {
           if (!isPlaying) audio.episodeLoad(episode);
         } else if (value == 1) {
-         if (!isInPlaylist) {
+          if (!isInPlaylist) {
             audio.addToPlaylist(episode);
             Fluttertoast.showToast(
               msg: 'Added to playlist',
@@ -97,7 +96,7 @@ class EpisodeGrid extends StatelessWidget {
               msg: 'Removed from playlist',
               gravity: ToastGravity.BOTTOM,
             );
-          } 
+          }
         }
       });
     }
@@ -187,7 +186,15 @@ class EpisodeGrid extends StatelessWidget {
                                   ),
                                 ),
                                 Spacer(),
-                                index < updateCount ? Text('New', style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)) : Center(),
+                                index < updateCount
+                                    ? Text('New',
+                                        style: TextStyle(
+                                            color: Colors.red,
+                                            fontStyle: FontStyle.italic))
+                                    : Center(),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 2),
+                                ),
                                 showNumber
                                     ? Container(
                                         alignment: Alignment.topRight,
@@ -371,7 +378,7 @@ class _DownloadIconState extends State<DownloadIcon> {
         child: CircularProgressIndicator(
           backgroundColor: Colors.grey[200],
           strokeWidth: 1,
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).accentColor),
           value: task.progress / 100,
         ),
       );
@@ -391,7 +398,7 @@ class _DownloadIconState extends State<DownloadIcon> {
         data: IconThemeData(size: 15),
         child: Icon(
           Icons.done_all,
-          color: Colors.blue,
+          color: Theme.of(context).accentColor,
         ),
       );
     } else if (task.status == DownloadTaskStatus.failed) {

@@ -48,6 +48,7 @@ class SyncingSetting extends StatelessWidget {
                               .copyWith(color: Theme.of(context).accentColor)),
                     ),
                     ListView(
+                      physics: const BouncingScrollPhysics(),
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
                       children: <Widget>[
