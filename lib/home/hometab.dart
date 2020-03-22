@@ -189,7 +189,7 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10.0),
               height: 50,
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.bottomLeft,
               child: TabBar(
                 indicatorSize: TabBarIndicatorSize.tab,
                 isScrollable: true,
@@ -216,19 +216,17 @@ class _MainTabState extends State<MainTab> with TickerProviderStateMixin {
             playlist(context),
           ],
         ),
+        Container(height: 2, color: Theme.of(context).primaryColorDark),
         Expanded(
           child: Container(
             child: TabBarView(
               controller: _controller,
               children: <Widget>[
                 Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: RecentUpdate()),
                 Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: MyFavorite()),
                 Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: MyDownload()),
               ],
             ),
@@ -298,10 +296,6 @@ class _RecentUpdateState extends State<RecentUpdate> {
                 slivers: <Widget>[
                     EpisodeGrid(
                       podcast: snapshot.data,
-                      showDownload: false,
-                      showFavorite: false,
-                      showNumber: false,
-                      heroTag: 'recent',
                       updateCount: _updateCount,
                     ),
                     SliverList(
@@ -347,10 +341,6 @@ class _MyFavoriteState extends State<MyFavorite> {
                 slivers: <Widget>[
                   EpisodeGrid(
                     podcast: snapshot.data,
-                    showDownload: false,
-                    showFavorite: false,
-                    showNumber: false,
-                    heroTag: 'favorite',
                   )
                 ],
               )
@@ -386,9 +376,6 @@ class _MyDownloadState extends State<MyDownload> {
                   EpisodeGrid(
                     podcast: snapshot.data,
                     showDownload: true,
-                    showFavorite: false,
-                    showNumber: false,
-                    heroTag: 'download',
                   )
                 ],
               )

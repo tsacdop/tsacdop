@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - checkout
-
+      - run: flutter upgrade
       - run:
           name: Run Flutter doctor
           command: flutter doctor

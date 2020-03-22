@@ -133,7 +133,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       selector: (_, audio) =>
           Tuple3(audio.showStopWatch, audio.timeLeft, audio.switchValue),
       builder: (_, data, __) {
-        // if (!data.item1 && _outValue == 1)  _outValue = 0;
         return Container(
           height: 300,
           color: data.item3 > 0
@@ -172,7 +171,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                         ],
                                         color: (e == _minSelected)
                                             ? Theme.of(context).accentColor
-                                            : Colors.grey[400],
+                                            : Theme.of(context).primaryColorDark,
                                         shape: BoxShape.circle,
                                       ),
                                       alignment: Alignment.center,
@@ -208,8 +207,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       child: DayNightSwitch(
                         height: 10,
                         value: data.item1,
-                        //moonImage: AssetImage('assets/moon.png'),
-                        //sunImage: AssetImage('assets/sun.png'),
                         sunColor: Colors.yellow[700],
                         moonColor: Colors.grey[600],
                         dayColor: Colors.grey[300],
@@ -239,11 +236,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               ),
                           child: Text(_stringForSeconds(data.item2.toDouble()),
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: data.item1
-                                      ? Colors.white
-                                      : Colors.black)),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.white,
+                              )),
                         ),
                       ],
                     ),
@@ -260,11 +256,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
-                          color:  Colors.white.withOpacity(data.item3))),
+                          color: Colors.white.withOpacity(data.item3))),
                 ),
               ),
               Positioned(
-                bottom:  100 * (1 - data.item3) - 30,
+                bottom: 100 * (1 - data.item3) - 30,
                 left: MediaQuery.of(context).size.width / 2 - 100,
                 width: 200,
                 child: Container(
@@ -307,7 +303,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       child: SliderTheme(
                         data: SliderTheme.of(context).copyWith(
                           activeTrackColor: Colors.grey[400],
-                          inactiveTrackColor: Colors.grey[300],
+                          inactiveTrackColor:
+                              Theme.of(context).primaryColorDark,
                           trackHeight: 20.0,
                           trackShape: MyRectangularTrackShape(),
                           thumbColor: Theme.of(context).accentColor,

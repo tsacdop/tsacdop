@@ -339,17 +339,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   childCount: 1,
                                 ),
                               ),
-                              SliverPadding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  sliver: EpisodeGrid(
-                                    podcast: snapshot.data,
-                                    showDownload: false,
-                                    showFavorite: true,
-                                    showNumber: true,
-                                    heroTag: 'podcast',
-                                    updateCount: widget.podcastLocal.upateCount,
-                                  )),
+                              EpisodeGrid(
+                                podcast: snapshot.data,
+                                showFavorite: true,
+                                showNumber: true,
+                                updateCount: widget.podcastLocal.upateCount,
+                              ),
                             ],
                           )
                         : Center(child: CircularProgressIndicator());

@@ -77,7 +77,6 @@ class _DownloadButtonState extends State<DownloadButton> {
     });
   }
 
-
   void _unbindBackgroundIsolate() {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
   }
@@ -107,7 +106,6 @@ class _DownloadButtonState extends State<DownloadButton> {
       gravity: ToastGravity.BOTTOM,
     );
   }
-
 
   void _deleteDownload(_TaskInfo task) async {
     await FlutterDownloader.remove(
@@ -152,14 +150,15 @@ class _DownloadButtonState extends State<DownloadButton> {
     );
   }
 
-  _saveMediaId(_TaskInfo task) async{
+  Future<EpisodeBrief> _saveMediaId(_TaskInfo task) async {
     final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE url = '${task.link}'"); 
-    String filePath = 'file://' + path.join(completeTask.first.savedDir, completeTask.first.filename);
+        query: "SELECT * FROM task WHERE url = '${task.link}'");
+    String filePath = 'file://' +
+        path.join(completeTask.first.savedDir, completeTask.first.filename);
     var dbHelper = DBHelper();
     await dbHelper.saveMediaId(task.link, filePath);
     EpisodeBrief episode = await dbHelper.getRssItemWithUrl(task.link);
-    await Provider.of<AudioPlayerNotifier>(context, listen: false).updateMediaItem(episode);
+    return episode;
   }
 
   Future<Null> _prepare() async {
@@ -177,7 +176,7 @@ class _DownloadButtonState extends State<DownloadButton> {
       }
     });
 
-    _localPath = path.join((await _getPath()) ,widget.episodeBrief.feedTitle);
+    _localPath = path.join((await _getPath()), widget.episodeBrief.feedTitle);
     print(_localPath);
     final saveDir = Directory(_localPath);
     bool hasExisted = await saveDir.exists();
@@ -188,8 +187,6 @@ class _DownloadButtonState extends State<DownloadButton> {
       _isLoading = false;
     });
   }
-
-
 
   Future<bool> _checkPermmison() async {
     PermissionStatus permission = await PermissionHandler()
@@ -302,7 +299,10 @@ class _DownloadButtonState extends State<DownloadButton> {
         ),
       );
     } else if (task.status == DownloadTaskStatus.complete) {
-      _saveMediaId(task); 
+      if(!widget.episodeBrief.mediaId.contains('file://'))
+      {_saveMediaId(task).then((episode) =>
+          Provider.of<AudioPlayerNotifier>(context, listen: false)
+              .updateMediaItem(episode));}
       return _buttonOnMenu(
           Icon(
             Icons.done_all,

@@ -28,7 +28,10 @@
 .packages
 .pub-cache/
 .pub/
+/lib/.env.dart
 /build/
+pubspec.lock
+.vscode
 
 # Web related
 lib/generated_plugin_registrant.dart

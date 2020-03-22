@@ -21,7 +21,8 @@ import 'episodedownload.dart';
 class EpisodeDetail extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
-  EpisodeDetail({this.episodeItem, this.heroTag, Key key}) : super(key: key);
+  final bool hide;
+  EpisodeDetail({this.episodeItem, this.heroTag = '',this.hide = false,  Key key}) : super(key: key);
 
   @override
   _EpisodeDetailState createState() => _EpisodeDetailState();
@@ -260,6 +261,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                         child: MenuBar(
                           episodeItem: widget.episodeItem,
                           heroTag: widget.heroTag,
+                          hide: widget.hide
                         ),
                       ),
                     ),
@@ -276,7 +278,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 class MenuBar extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
-  MenuBar({this.episodeItem, this.heroTag, Key key}) : super(key: key);
+  final bool hide;
+  MenuBar({this.episodeItem, this.heroTag, this.hide, Key key}) : super(key: key);
   @override
   _MenuBarState createState() => _MenuBarState();
 }
@@ -346,7 +349,8 @@ class _MenuBarState extends State<MenuBar> {
                 height: 30.0,
                 width: 30.0,
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: CircleAvatar(
+                child: widget.hide ? Center() :
+                 CircleAvatar(
                     backgroundImage:
                         FileImage(File("${widget.episodeItem.imagePath}"))),
               ),

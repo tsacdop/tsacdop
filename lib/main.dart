@@ -66,6 +66,7 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData.dark().copyWith(
             accentColor: setting.accentSetColor,
+            primaryColorDark: Colors.grey[800],
            // scaffoldBackgroundColor: Colors.black87,
             appBarTheme: AppBarTheme(elevation: 0),
           ),

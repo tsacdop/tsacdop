@@ -9,10 +9,11 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'open_container.dart';
+
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/episodes/episodedetail.dart';
-import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
 
 class EpisodeGrid extends StatelessWidget {
@@ -20,15 +21,15 @@ class EpisodeGrid extends StatelessWidget {
   final bool showFavorite;
   final bool showDownload;
   final bool showNumber;
-  final String heroTag;
   final int updateCount;
+  final String heroTag;
   EpisodeGrid(
       {Key key,
-      this.podcast,
-      this.showDownload,
-      this.showFavorite,
-      this.showNumber,
-      this.heroTag,
+      @required this.podcast,
+      this.heroTag = '',
+      this.showDownload = false,
+      this.showFavorite = false,
+      this.showNumber = false,
       this.updateCount = 0})
       : super(key: key);
 
@@ -102,7 +103,8 @@ class EpisodeGrid extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.all(5.0),
+      padding:
+          const EdgeInsets.only(top: 5.0, bottom: 5.0, left: 15.0, right: 15.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           childAspectRatio: 1.0,
@@ -119,153 +121,159 @@ class EpisodeGrid extends StatelessWidget {
                 Tuple2<EpisodeBrief, List<String>>>(
               selector: (_, audio) => Tuple2(audio?.episode,
                   audio.queue.playlist.map((e) => e.enclosureUrl).toList()),
-              builder: (_, data, __) => Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).primaryColor,
-                        blurRadius: 0.5,
-                        spreadRadius: 0.5,
-                      ),
-                    ]),
-                alignment: Alignment.center,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    onTapDown: (details) => _offset = Offset(
-                        details.globalPosition.dx, details.globalPosition.dy),
-                    onLongPress: () => _showPopupMenu(
-                        _offset,
-                        podcast[index],
-                        context,
-                        data.item1 == podcast[index],
-                        data.item2.contains(podcast[index].enclosureUrl)),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        ScaleRoute(
-                            page: EpisodeDetail(
-                          episodeItem: podcast[index],
-                          heroTag: heroTag,
-                        )),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                        border: Border.all(
-                          color:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? Theme.of(context).primaryColor
-                                  : Theme.of(context).scaffoldBackgroundColor,
-                          width: 1.0,
+              builder: (_, data, __) => OpenContainerWrapper(
+                episode: podcast[index],
+                closedBuilder: (context, action, boo) => Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).primaryColor,
+                          blurRadius: 0.5,
+                          spreadRadius: 0.5,
                         ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 2,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Hero(
-                                  tag: podcast[index].enclosureUrl + heroTag,
-                                  child: Container(
+                      ]),
+                  alignment: Alignment.center,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                      onTapDown: (details) => _offset = Offset(
+                          details.globalPosition.dx, details.globalPosition.dy),
+                      onLongPress: () => _showPopupMenu(
+                          _offset,
+                          podcast[index],
+                          context,
+                          data.item1 == podcast[index],
+                          data.item2.contains(podcast[index].enclosureUrl)),
+                      onTap: action,
+                      //    {
+                      //         Navigator.push(
+                      //           context,
+                      //           ScaleRoute(
+                      //               page: EpisodeDetail(
+                      //             episodeItem: podcast[index],
+                      //             heroTag: heroTag,
+                      //           )),
+                      //         )
+                      //       },
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                          border: Border.all(
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).scaffoldBackgroundColor,
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Expanded(
+                              flex: 2,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
                                     height: _width / 16,
                                     width: _width / 16,
-                                    child: CircleAvatar(
-                                      backgroundColor: _c.withOpacity(0.5),
-                                      backgroundImage: FileImage(
-                                          File("${podcast[index].imagePath}")),
-                                    ),
+                                    child: boo
+                                        ? Center()
+                                        : CircleAvatar(
+                                            backgroundColor:
+                                                _c.withOpacity(0.5),
+                                            backgroundImage: FileImage(File(
+                                                "${podcast[index].imagePath}")),
+                                          ),
                                   ),
-                                ),
-                                Spacer(),
-                                index < updateCount
-                                    ? Text('New',
-                                        style: TextStyle(
-                                            color: Colors.red,
-                                            fontStyle: FontStyle.italic))
-                                    : Center(),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 2),
-                                ),
-                                showNumber
-                                    ? Container(
-                                        alignment: Alignment.topRight,
-                                        child: Text(
-                                          (podcast.length - index).toString(),
-                                          style: GoogleFonts.teko(
-                                            textStyle: TextStyle(
-                                              fontSize: _width / 24,
-                                              color: _c,
+                                  Spacer(),
+                                  index < updateCount
+                                      ? Text('New',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontStyle: FontStyle.italic))
+                                      : Center(),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2),
+                                  ),
+                                  showNumber
+                                      ? Container(
+                                          alignment: Alignment.topRight,
+                                          child: Text(
+                                            (podcast.length - index).toString(),
+                                            style: GoogleFonts.teko(
+                                              textStyle: TextStyle(
+                                                fontSize: _width / 24,
+                                                color: _c,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      )
-                                    : Center(),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: Container(
-                              alignment: Alignment.topLeft,
-                              padding: EdgeInsets.only(top: 2.0),
-                              child: Text(
-                                podcast[index].title,
-                                style: TextStyle(
-                                  fontSize: _width / 32,
-                                ),
-                                maxLines: 4,
-                                overflow: TextOverflow.fade,
+                                        )
+                                      : Center(),
+                                ],
                               ),
                             ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Row(
-                              children: <Widget>[
-                                Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: Text(
-                                    podcast[index].dateToString(),
-                                    style: TextStyle(
-                                        fontSize: _width / 35,
-                                        color: _c,
-                                        fontStyle: FontStyle.italic),
+                            Expanded(
+                              flex: 5,
+                              child: Container(
+                                alignment: Alignment.topLeft,
+                                padding: EdgeInsets.only(top: 2.0),
+                                child: Text(
+                                  podcast[index].title,
+                                  style: TextStyle(
+                                    fontSize: _width / 32,
                                   ),
+                                  maxLines: 4,
+                                  overflow: TextOverflow.fade,
                                 ),
-                                Spacer(),
-                                showDownload
-                                    ? DownloadIcon(episodeBrief: podcast[index])
-                                    : Center(),
-                                Padding(
-                                  padding: EdgeInsets.all(1),
-                                ),
-                                showFavorite
-                                    ? Container(
-                                        alignment: Alignment.bottomRight,
-                                        child: (podcast[index].liked == 0)
-                                            ? Center()
-                                            : IconTheme(
-                                                data: IconThemeData(size: 15),
-                                                child: Icon(
-                                                  Icons.favorite,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                      )
-                                    : Center(),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              flex: 1,
+                              child: Row(
+                                children: <Widget>[
+                                  Align(
+                                    alignment: Alignment.bottomLeft,
+                                    child: Text(
+                                      podcast[index].dateToString(),
+                                      style: TextStyle(
+                                          fontSize: _width / 35,
+                                          color: _c,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  showDownload
+                                      ? DownloadIcon(
+                                          episodeBrief: podcast[index])
+                                      : Center(),
+                                  Padding(
+                                    padding: EdgeInsets.all(1),
+                                  ),
+                                  showFavorite
+                                      ? Container(
+                                          alignment: Alignment.bottomRight,
+                                          child: (podcast[index].liked == 0)
+                                              ? Center()
+                                              : IconTheme(
+                                                  data: IconThemeData(size: 15),
+                                                  child: Icon(
+                                                    Icons.favorite,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                        )
+                                      : Center(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -378,7 +386,8 @@ class _DownloadIconState extends State<DownloadIcon> {
         child: CircularProgressIndicator(
           backgroundColor: Colors.grey[200],
           strokeWidth: 1,
-          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).accentColor),
+          valueColor:
+              AlwaysStoppedAnimation<Color>(Theme.of(context).accentColor),
           value: task.progress / 100,
         ),
       );
@@ -420,4 +429,51 @@ class _TaskInfo {
   DownloadTaskStatus status = DownloadTaskStatus.undefined;
 
   _TaskInfo({this.name, this.link});
+}
+
+class OpenContainerWrapper extends StatelessWidget {
+  const OpenContainerWrapper({
+    this.closedBuilder,
+    this.episode,
+    this.playerRunning,
+  });
+
+  final OpenContainerBuilder closedBuilder;
+  final EpisodeBrief episode;
+  final bool playerRunning;
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<AudioPlayerNotifier, bool>(
+      selector: (_, audio) => audio.playerRunning,
+      builder: (_, data, __) => OpenContainer(
+        playerRunning: data,
+        flightWidget: CircleAvatar(
+          backgroundImage: FileImage(File("${episode.imagePath}")),
+        ),
+        transitionDuration: Duration(milliseconds: 400),
+        beginColor: Theme.of(context).primaryColor,
+        endColor: Theme.of(context).primaryColor,
+        closedColor: Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).primaryColor
+            : Theme.of(context).scaffoldBackgroundColor,
+        openColor: Theme.of(context).scaffoldBackgroundColor,
+        openElevation: 0,
+        closedElevation: 0,
+        openShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        closedShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5.0))),
+        transitionType: ContainerTransitionType.fadeThrough,
+        openBuilder: (BuildContext context, VoidCallback _, bool boo) {
+          return EpisodeDetail(
+            episodeItem: episode,
+            hide: boo,
+          );
+        },
+        tappable: true,
+        closedBuilder: closedBuilder,
+      ),
+    );
+  }
 }
