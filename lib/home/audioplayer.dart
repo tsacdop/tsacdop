@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:marquee/marquee.dart';
 import 'package:tuple/tuple.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/audiostate.dart';

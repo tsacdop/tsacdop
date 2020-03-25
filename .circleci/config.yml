@@ -2,15 +2,13 @@ version: 2
 jobs:
   build:    
     docker:
-      - image: cirrusci/flutter:beta
+      - image: cirrusci/flutter:v1.15.17
 
     branches:
       only: master
 
     steps:
       - checkout
-      - run: cd /home/cirrus/sdks/flutter && git remote add origin https://github.com/flutter/flutter
-      - run: flutter upgrade && cd /home/cirrus/project/tsacdop
       - run:
           name: Run Flutter doctor
           command: flutter doctor
