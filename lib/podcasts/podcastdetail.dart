@@ -5,9 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
+import 'package:tsacdop/class/audiostate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:provider/provider.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
@@ -45,9 +47,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
     if (mounted) setState(() {});
   }
 
-  Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal) async {
+  Future<List<EpisodeBrief>> _getRssItem(
+      PodcastLocal podcastLocal, int i) async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await dbHelper.getRssItem(podcastLocal.id);
+    List<EpisodeBrief> episodes = await dbHelper.getRssItem(podcastLocal.id, i);
     if (podcastLocal.provider.contains('fireside')) {
       FiresideData data = FiresideData(podcastLocal.id, podcastLocal.link);
       await data.getData();
@@ -156,7 +159,25 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
-  double top = 0;
+  double _topHeight = 0;
+
+  ScrollController _controller;
+  int _top;
+  bool _loadMore;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMore = false;
+    _top = 33;
+    _controller = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,177 +199,239 @@ class _PodcastDetailState extends State<PodcastDetail> {
             onRefresh: () => _updateRssItem(widget.podcastLocal),
             child: Stack(
               children: <Widget>[
-                FutureBuilder<List<EpisodeBrief>>(
-                  future: _getRssItem(widget.podcastLocal),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) print(snapshot.error);
-                    return (snapshot.hasData)
-                        ? CustomScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            primary: true,
-                            slivers: <Widget>[
-                              SliverAppBar(
-                                brightness: Brightness.dark,
-                                actions: <Widget>[
-                                  PopupMenuButton<String>(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))),
-                                    elevation: 2,
-                                    tooltip: 'Menu',
-                                    itemBuilder: (context) => [
-                                      widget.podcastLocal.link != null
-                                          ? PopupMenuItem(
-                                              value: widget.podcastLocal.link,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: FutureBuilder<List<EpisodeBrief>>(
+                        future: _getRssItem(widget.podcastLocal, _top),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) print(snapshot.error);
+                          return (snapshot.hasData)
+                              ? CustomScrollView(
+                                  controller: _controller
+                                    ..addListener(() async {
+                                      if (_controller.offset ==
+                                              _controller
+                                                  .position.maxScrollExtent &&
+                                          snapshot.data.length == _top) {
+                                        if (mounted)
+                                          setState(() => _loadMore = true);
+                                        await Future.delayed(
+                                            Duration(seconds: 3));
+                                        if (mounted)
+                                          setState(() {
+                                            _top = _top + 33;
+                                            _loadMore = false;
+                                          });
+                                      }
+                                    }),
+                                  physics: const ClampingScrollPhysics(),
+                                  //primary: true,
+                                  slivers: <Widget>[
+                                    SliverAppBar(
+                                      brightness: Brightness.dark,
+                                      actions: <Widget>[
+                                        PopupMenuButton<String>(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10))),
+                                          elevation: 2,
+                                          tooltip: 'Menu',
+                                          itemBuilder: (context) => [
+                                            widget.podcastLocal.link != null
+                                                ? PopupMenuItem(
+                                                    value: widget
+                                                        .podcastLocal.link,
+                                                    child: Container(
+                                                      padding: EdgeInsets.only(
+                                                          left: 10),
+                                                      child: Row(
+                                                        children: <Widget>[
+                                                          Icon(Icons.link,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .tabBarTheme
+                                                                  .labelColor),
+                                                          Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        5.0),
+                                                          ),
+                                                          Text('Visit Site'),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Center(),
+                                            PopupMenuItem(
+                                              value: widget.podcastLocal.rssUrl,
                                               child: Container(
                                                 padding:
                                                     EdgeInsets.only(left: 10),
                                                 child: Row(
                                                   children: <Widget>[
-                                                    Icon(Icons.link,
-                                                        color: Theme.of(context)
-                                                            .tabBarTheme
-                                                            .labelColor),
+                                                    Icon(
+                                                      Icons.rss_feed,
+                                                      color: Theme.of(context)
+                                                          .tabBarTheme
+                                                          .labelColor,
+                                                    ),
                                                     Padding(
                                                       padding:
                                                           EdgeInsets.symmetric(
                                                               horizontal: 5.0),
                                                     ),
-                                                    Text('Visit Site'),
+                                                    Text('View Rss Feed'),
                                                   ],
                                                 ),
                                               ),
-                                            )
-                                          : Center(),
-                                      PopupMenuItem(
-                                        value: widget.podcastLocal.rssUrl,
-                                        child: Container(
-                                          padding: EdgeInsets.only(left: 10),
-                                          child: Row(
+                                            ),
+                                          ],
+                                          onSelected: (url) {
+                                            _launchUrl(url);
+                                          },
+                                        )
+                                      ],
+                                      elevation: 0,
+                                      iconTheme: IconThemeData(
+                                        color: Colors.white,
+                                      ),
+                                      expandedHeight: 150 +
+                                          MediaQuery.of(context).padding.top,
+                                      backgroundColor: _color,
+                                      floating: true,
+                                      pinned: true,
+                                      flexibleSpace: LayoutBuilder(builder:
+                                          (BuildContext context,
+                                              BoxConstraints constraints) {
+                                        _topHeight = constraints.biggest.height;
+                                        return FlexibleSpaceBar(
+                                          background: Stack(
                                             children: <Widget>[
-                                              Icon(
-                                                Icons.rss_feed,
-                                                color: Theme.of(context)
-                                                    .tabBarTheme
-                                                    .labelColor,
+                                              Container(
+                                                margin: EdgeInsets.only(
+                                                    top: 120 +
+                                                        MediaQuery.of(context)
+                                                            .padding
+                                                            .top),
+                                                padding: EdgeInsets.only(
+                                                    left: 80, right: 120),
+                                                color: Colors.white10,
+                                                alignment: Alignment.centerLeft,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Text(
+                                                        widget.podcastLocal
+                                                                .author ??
+                                                            '',
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white)),
+                                                    widget.podcastLocal.provider
+                                                            .isNotEmpty
+                                                        ? Text(
+                                                            'Hosted on ' +
+                                                                widget
+                                                                    .podcastLocal
+                                                                    .provider,
+                                                            maxLines: 1,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          )
+                                                        : Center(),
+                                                  ],
+                                                ),
                                               ),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 5.0),
+                                              Container(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                padding:
+                                                    EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  height: 120,
+                                                  child: Image.file(File(
+                                                      "${widget.podcastLocal.imagePath}")),
+                                                ),
                                               ),
-                                              Text('View Rss Feed'),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                child: podcastInfo(context),
+                                              ),
                                             ],
                                           ),
-                                        ),
-                                      ),
-                                    ],
-                                    onSelected: (url) {
-                                      _launchUrl(url);
-                                    },
-                                  )
-                                ],
-                                elevation: 0,
-                                iconTheme: IconThemeData(
-                                  color: Colors.white,
-                                ),
-                                expandedHeight:
-                                    150 + MediaQuery.of(context).padding.top,
-                                backgroundColor: _color,
-                                floating: true,
-                                pinned: true,
-                                flexibleSpace: LayoutBuilder(builder:
-                                    (BuildContext context,
-                                        BoxConstraints constraints) {
-                                  top = constraints.biggest.height;
-                                  return FlexibleSpaceBar(
-                                    background: Stack(
-                                      children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              top: 120 +
-                                                  MediaQuery.of(context)
-                                                      .padding
-                                                      .top),
-                                          padding: EdgeInsets.only(
-                                              left: 80, right: 120),
-                                          color: Colors.white10,
-                                          alignment: Alignment.centerLeft,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                  widget.podcastLocal.author ??
-                                                      '',
+                                          title: _topHeight <
+                                                  70 +
+                                                      MediaQuery.of(context)
+                                                          .padding
+                                                          .top
+                                              ? Text(widget.podcastLocal.title,
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                      color: Colors.white)),
-                                              widget.podcastLocal.provider
-                                                      .isNotEmpty
-                                                  ? Text(
-                                                      'Hosted on ' +
-                                                          widget.podcastLocal
-                                                              .provider,
-                                                      maxLines: 1,
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    )
-                                                  : Center(),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          alignment: Alignment.centerRight,
-                                          padding: EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            height: 120,
-                                            child: Image.file(File(
-                                                "${widget.podcastLocal.imagePath}")),
-                                          ),
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          child: podcastInfo(context),
-                                        ),
-                                      ],
+                                                      color: Colors.white))
+                                              : Center(),
+                                        );
+                                      }),
                                     ),
-                                    title: top <
-                                            70 +
-                                                MediaQuery.of(context)
-                                                    .padding
-                                                    .top
-                                        ? Text(widget.podcastLocal.title,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style:
-                                                TextStyle(color: Colors.white))
-                                        : Center(),
-                                  );
-                                }),
-                              ),
-                              SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, int index) {
-                                    return hostsList(context, hosts);
-                                  },
-                                  childCount: 1,
-                                ),
-                              ),
-                              EpisodeGrid(
-                                podcast: snapshot.data,
-                                showFavorite: true,
-                                showNumber: true,
-                                updateCount: widget.podcastLocal.upateCount,
-                              ),
-                            ],
-                          )
-                        : Center(child: CircularProgressIndicator());
-                  },
+                                    SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                        (BuildContext context, int index) {
+                                          return hostsList(context, hosts);
+                                        },
+                                        childCount: 1,
+                                      ),
+                                    ),
+                                    EpisodeGrid(
+                                      episodes: snapshot.data,
+                                      showFavorite: true,
+                                      showNumber: true,
+                                      updateCount:
+                                          widget.podcastLocal.upateCount,
+                                      episodeCount:
+                                          widget.podcastLocal.episodeCount,
+                                    ),
+                                    SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                        (BuildContext context, int index) {
+                                          return _loadMore
+                                              ? Container(
+                                                  height: 2,
+                                                  child:
+                                                      LinearProgressIndicator())
+                                              : Center();
+                                        },
+                                        childCount: 1,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Center(child: CircularProgressIndicator());
+                        },
+                      ),
+                    ),
+                    Selector<AudioPlayerNotifier, bool>(
+                        selector: (_, audio) => audio.playerRunning,
+                        builder: (_, data, __) {
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
+                          );
+                        }),
+                  ],
                 ),
                 Container(child: PlayerWidget()),
               ],

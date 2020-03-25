@@ -72,7 +72,7 @@ class AboutApp extends StatelessWidget {
                           image: AssetImage('assets/logo.png'),
                           height: 80,
                         ),
-                        Text('Version: 0.1.4'),
+                        Text('Version: 0.1.5'),
                       ],
                     ),
                   ),

@@ -49,7 +49,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
   ScrollController _controller;
   _scrollListener() {
     double value = _controller.offset;
-    setState(() => _topHeight = (100 - value) > 0 ? 100 - value : 0);
+    setState(() => _topHeight = (100 - value) > 60 ? 100 - value : 60);
   }
 
   double _topHeight;
@@ -58,12 +58,12 @@ class _PlaylistPageState extends State<PlaylistPage> {
   void initState() {
     super.initState();
     _topHeight = 100;
-    _controller = ScrollController();
-    _controller.addListener(_scrollListener);
+    _controller = ScrollController()..addListener(_scrollListener);
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_scrollListener);
     _controller.dispose();
     super.dispose();
   }
@@ -81,7 +81,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-          title: _topHeight == 0 ? Text('Playlist') : Center(),
+          title: _topHeight == 60 ? Text('Playlist') : Center(),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
@@ -95,55 +95,88 @@ class _PlaylistPageState extends State<PlaylistPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Transform.scale(
-                    alignment: Alignment.topLeft,
-                    scale: _topHeight / 100,
-                    child: Container(
-                      height: _topHeight,
-                      padding: EdgeInsets.only(
-                          bottom: (_topHeight - 60) > 0 ? _topHeight - 60 : 0,
-                          left: 60),
-                      alignment: Alignment.bottomLeft,
-                      child: RichText(
-                        text: TextSpan(
-                          text: 'Total  ',
-                          style: TextStyle(
-                            color: Theme.of(context).accentColor,
-                            fontSize: 20,
+                  Container(
+                    height: _topHeight,
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          height: _topHeight,
+                          padding: EdgeInsets.only(
+                            left: 70,
                           ),
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: data.item1.length.toString(),
-                                style: TextStyle(
-                                  color: Theme.of(context).accentColor,
-                                  fontSize: 40,
-                                )),
-                            TextSpan(
-                                text: data.item1.length < 2
-                                    ? ' episode'
-                                    : ' episodes ',
-                                style: TextStyle(
-                                  color: Theme.of(context).accentColor,
-                                  fontSize: 20,
-                                )),
-                            TextSpan(
-                              text: _sumPlaylistLength(data.item1).toString(),
-                              style: GoogleFonts.teko(
-                                  textStyle: TextStyle(
-                                color: Theme.of(context).accentColor,
-                                fontSize: 60,
-                              )),
+                          alignment: Alignment.centerLeft,
+                          child: RichText(
+                            text: TextSpan(
+                              text: _topHeight > 90 ? 'Playlist\n' : '',
+                              style: TextStyle(
+                                color:
+                                    Theme.of(context).textTheme.bodyText1.color,
+                                fontSize: 30,
+                              ),
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: data.item1.length.toString(),
+                                  style: GoogleFonts.cairo(
+                                    textStyle: TextStyle(
+                                      color: Theme.of(context).accentColor,
+                                      fontSize: 30,
+                                    ),
+                                  ),
+                                ),
+                                TextSpan(
+                                    text: data.item1.length < 2
+                                        ? ' episode  '
+                                        : ' episodes  ',
+                                    style: TextStyle(
+                                      color: Theme.of(context).accentColor,
+                                      fontSize: 20,
+                                    )),
+                                TextSpan(
+                                  text:
+                                      _sumPlaylistLength(data.item1).toString(),
+                                  style: GoogleFonts.cairo(
+                                      textStyle: TextStyle(
+                                    color: Theme.of(context).accentColor,
+                                    fontSize: 30,
+                                  )),
+                                ),
+                                TextSpan(
+                                    text: ' mins',
+                                    style: TextStyle(
+                                      color: Theme.of(context).accentColor,
+                                      fontSize: 20,
+                                    )),
+                              ],
                             ),
-                            TextSpan(
-                                text: ' mins',
-                                style: TextStyle(
-                                  color: Theme.of(context).accentColor,
-                                  fontSize: 20,
-                                )),
-                          ],
+                          ),
                         ),
-                      ),
+                        Spacer(),
+                        _topHeight > 65
+                            ? Center()
+                            : Container(
+                                padding: EdgeInsets.only(
+                                    right: 20, bottom: 80 - _topHeight),
+                                child: data.item2
+                                    ? Padding(
+                                        padding: EdgeInsets.only(right: 15),
+                                        child: SizedBox(
+                                            width: 20,
+                                            height: 15,
+                                            child: WaveLoader()),
+                                      )
+                                    : IconButton(
+                                        icon: Icon(Icons.play_circle_filled,
+                                            size: 40,
+                                            color:
+                                                Theme.of(context).accentColor),
+                                        onPressed: () => audio.playlistLoad(),
+                                      ),
+                              ),
+                      ],
                     ),
+                  ),
+                  Divider(
+                    height: 3,
                   ),
                   Expanded(
                     child: AnimatedList(
@@ -224,15 +257,19 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                     trailing: index == 0
                                         ? data.item2
                                             ? Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 12.0),
+                                                padding: EdgeInsets.only(
+                                                    right: 15, top: 20),
                                                 child: SizedBox(
                                                     width: 20,
                                                     height: 15,
                                                     child: WaveLoader()),
                                               )
                                             : IconButton(
-                                                icon: Icon(Icons.play_arrow),
+                                                icon: Icon(
+                                                  Icons.play_arrow,
+                                                  color: Theme.of(context)
+                                                      .accentColor,
+                                                ),
                                                 onPressed: () =>
                                                     audio.playlistLoad())
                                         : Transform.rotate(

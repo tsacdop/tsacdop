@@ -11,7 +11,7 @@ description: An easy-use podacasts player.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.1.4 
+version: 0.1.5 
 
 environment:
   sdk: ">=2.6.0 <3.0.0"
@@ -51,7 +51,7 @@ dev_dependencies:
   workmanager: ^0.2.2
   flutter_colorpicker: ^0.3.2
   app_settings: ^3.0.1
-  fl_chart: ^0.8.3
+  fl_chart: ^0.8.7
   audio_service: ^0.6.2
   just_audio: ^0.1.3
   rxdart: ^0.23.1
@@ -60,8 +60,6 @@ dev_dependencies:
       url: https://github.com/galonsos/line_icons.git 
   flutter_file_dialog: ^0.0.5
   flutter_linkify: ^3.1.0
-  animations: ^1.0.0+5
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

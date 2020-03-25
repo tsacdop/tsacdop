@@ -17,20 +17,22 @@ import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/util/colorize.dart';
 
 class EpisodeGrid extends StatelessWidget {
-  final List<EpisodeBrief> podcast;
+  final List<EpisodeBrief> episodes;
   final bool showFavorite;
   final bool showDownload;
   final bool showNumber;
   final int updateCount;
   final String heroTag;
+  final int episodeCount;
   EpisodeGrid(
       {Key key,
-      @required this.podcast,
+      @required this.episodes,
       this.heroTag = '',
       this.showDownload = false,
       this.showFavorite = false,
       this.showNumber = false,
-      this.updateCount = 0})
+      this.updateCount = 0,
+      this.episodeCount = 0})
       : super(key: key);
 
   @override
@@ -115,14 +117,14 @@ class EpisodeGrid extends StatelessWidget {
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
             Color _c = (Theme.of(context).brightness == Brightness.light)
-                ? podcast[index].primaryColor.colorizedark()
-                : podcast[index].primaryColor.colorizeLight();
+                ? episodes[index].primaryColor.colorizedark()
+                : episodes[index].primaryColor.colorizeLight();
             return Selector<AudioPlayerNotifier,
                 Tuple2<EpisodeBrief, List<String>>>(
               selector: (_, audio) => Tuple2(audio?.episode,
                   audio.queue.playlist.map((e) => e.enclosureUrl).toList()),
               builder: (_, data, __) => OpenContainerWrapper(
-                episode: podcast[index],
+                episode: episodes[index],
                 closedBuilder: (context, action, boo) => Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -143,21 +145,11 @@ class EpisodeGrid extends StatelessWidget {
                           details.globalPosition.dx, details.globalPosition.dy),
                       onLongPress: () => _showPopupMenu(
                           _offset,
-                          podcast[index],
+                          episodes[index],
                           context,
-                          data.item1 == podcast[index],
-                          data.item2.contains(podcast[index].enclosureUrl)),
+                          data.item1 == episodes[index],
+                          data.item2.contains(episodes[index].enclosureUrl)),
                       onTap: action,
-                      //    {
-                      //         Navigator.push(
-                      //           context,
-                      //           ScaleRoute(
-                      //               page: EpisodeDetail(
-                      //             episodeItem: podcast[index],
-                      //             heroTag: heroTag,
-                      //           )),
-                      //         )
-                      //       },
                       child: Container(
                         padding: const EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
@@ -187,7 +179,7 @@ class EpisodeGrid extends StatelessWidget {
                                             backgroundColor:
                                                 _c.withOpacity(0.5),
                                             backgroundImage: FileImage(File(
-                                                "${podcast[index].imagePath}")),
+                                                "${episodes[index].imagePath}")),
                                           ),
                                   ),
                                   Spacer(),
@@ -205,7 +197,7 @@ class EpisodeGrid extends StatelessWidget {
                                       ? Container(
                                           alignment: Alignment.topRight,
                                           child: Text(
-                                            (podcast.length - index).toString(),
+                                            (episodeCount- index).toString(),
                                             style: GoogleFonts.teko(
                                               textStyle: TextStyle(
                                                 fontSize: _width / 24,
@@ -224,7 +216,7 @@ class EpisodeGrid extends StatelessWidget {
                                 alignment: Alignment.topLeft,
                                 padding: EdgeInsets.only(top: 2.0),
                                 child: Text(
-                                  podcast[index].title,
+                                  episodes[index].title,
                                   style: TextStyle(
                                     fontSize: _width / 32,
                                   ),
@@ -240,7 +232,7 @@ class EpisodeGrid extends StatelessWidget {
                                   Align(
                                     alignment: Alignment.bottomLeft,
                                     child: Text(
-                                      podcast[index].dateToString(),
+                                      episodes[index].dateToString(),
                                       style: TextStyle(
                                           fontSize: _width / 35,
                                           color: _c,
@@ -250,7 +242,7 @@ class EpisodeGrid extends StatelessWidget {
                                   Spacer(),
                                   showDownload
                                       ? DownloadIcon(
-                                          episodeBrief: podcast[index])
+                                          episodeBrief: episodes[index])
                                       : Center(),
                                   Padding(
                                     padding: EdgeInsets.all(1),
@@ -258,7 +250,7 @@ class EpisodeGrid extends StatelessWidget {
                                   showFavorite
                                       ? Container(
                                           alignment: Alignment.bottomRight,
-                                          child: (podcast[index].liked == 0)
+                                          child: (episodes[index].liked == 0)
                                               ? Center()
                                               : IconTheme(
                                                   data: IconThemeData(size: 15),
@@ -281,7 +273,7 @@ class EpisodeGrid extends StatelessWidget {
               ),
             );
           },
-          childCount: podcast.length,
+          childCount: episodes.length,
         ),
       ),
     );

@@ -5,9 +5,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:marquee/marquee.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:tuple/tuple.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/audiostate.dart';
@@ -17,7 +17,6 @@ import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
 import 'package:tsacdop/util/day_night_switch.dart';
 
-//Custom slider
 class MyRectangularTrackShape extends RectangularSliderTrackShape {
   Rect getPreferredRect({
     @required RenderBox parentBox,
@@ -83,14 +82,28 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
         ..style = PaintingStyle.fill
         ..strokeWidth = 2,
     );
+
+    // Path _path = Path();
+
+    // _path.moveTo(center.dx - 12, center.dy + 10);
+    // _path.lineTo(center.dx - 12, center.dy - 12);
+    // _path.lineTo(center.dx -12, center.dy - 12);
+    // canvas.drawShadow(_path, Colors.black, 4, false);
+
+    // Path _pathLight = Path();
+    // _pathLight.moveTo(center.dx + 12, center.dy - 12);
+    // _pathLight.lineTo(center.dx + 12, center.dy + 10);
+    //// _pathLight.lineTo(center.dx - 12, center.dy + 10);
+    // canvas.drawShadow(_pathLight, Colors.black, 4, true);
     canvas.drawRect(
       Rect.fromLTRB(
           center.dx - 10, center.dy + 10, center.dx + 10, center.dy - 10),
       Paint()
-        ..color = colorTween.evaluate(enableAnimation)
+        ..color = Colors.white
         ..style = PaintingStyle.fill
         ..strokeWidth = 10,
     );
+
     canvas.drawLine(
       Offset(center.dx - 5, center.dy - 2),
       Offset(center.dx + 5, center.dy + 2),
@@ -112,6 +125,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (seconds == null) return null;
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
+
+  List<BoxShadow> _customShadow = [
+    BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),
+    BoxShadow(
+        blurRadius: 8,
+        offset: Offset(2, 2),
+        color: Colors.grey[600].withOpacity(0.4))
+  ];
+
+  List<BoxShadow> _customShadowNight = [
+    BoxShadow(
+        blurRadius: 6,
+        offset: Offset(-1, -1),
+        color: Colors.grey[100].withOpacity(0.3)),
+    BoxShadow(blurRadius: 8, offset: Offset(2, 2), color: Colors.black)
+  ];
 
   List minsToSelect = [1, 5, 10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
   int _minSelected;
@@ -137,7 +166,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           height: 300,
           color: data.item3 > 0
               ? Colors.black.withOpacity(data.item3)
-              : Theme.of(context).scaffoldBackgroundColor,
+              : Theme.of(context).primaryColor,
           child: Stack(
             children: <Widget>[
               Column(
@@ -149,54 +178,60 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   ),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: minsToSelect
-                          .map((e) => InkWell(
-                                onTap: () => setState(() => _minSelected = e),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: <Widget>[
-                                    AnimatedContainer(
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.elasticOut,
-                                      margin: EdgeInsets.symmetric(
-                                          horizontal: 10.0),
-                                      decoration: BoxDecoration(
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: Colors.grey[800],
-                                              blurRadius: 0,
-                                              offset: Offset(0, 0)),
-                                        ],
-                                        color: (e == _minSelected)
-                                            ? Theme.of(context).accentColor
-                                            : Theme.of(context).primaryColorDark,
-                                        shape: BoxShape.circle,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: minsToSelect
+                            .map((e) => InkWell(
+                                  onTap: () => setState(() => _minSelected = e),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: <Widget>[
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 10.0),
+                                        decoration: BoxDecoration(
+                                          boxShadow: !(e == _minSelected ||
+                                                  data.item3 > 0)
+                                              ? (Theme.of(context).brightness ==
+                                                      Brightness.dark)
+                                                  ? _customShadowNight
+                                                  : _customShadow
+                                              : [
+                                                  BoxShadow(
+                                                      color: Colors.black,
+                                                      blurRadius: 0,
+                                                      offset: Offset(0, 0)),
+                                                ],
+                                          color: (e == _minSelected)
+                                              ? Theme.of(context).accentColor
+                                              : Theme.of(context).primaryColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        alignment: Alignment.center,
+                                        height: 30,
+                                        width: 30,
+                                        child: Text(e.toString(),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: (e == _minSelected)
+                                                    ? Colors.white
+                                                    : null)),
                                       ),
-                                      alignment: Alignment.center,
-                                      height: (e == _minSelected) ? 40 : 30,
-                                      width: (e == _minSelected) ? 40 : 30,
-                                      child: Text(e.toString(),
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white)),
-                                    ),
-                                    Container(
-                                      height: (e == _minSelected)
-                                          ? 40 * data.item3
-                                          : 30 * data.item3,
-                                      width: (e == _minSelected)
-                                          ? 40 * data.item3
-                                          : 30 * data.item3,
-                                      decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          shape: BoxShape.circle),
-                                    ),
-                                  ],
-                                ),
-                              ))
-                          .toList(),
+                                      Container(
+                                        height: 30 * data.item3,
+                                        width: 30 * data.item3,
+                                        decoration: BoxDecoration(
+                                            color: Colors.black
+                                                .withOpacity(data.item3),
+                                            shape: BoxShape.circle),
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ),
                     ),
                   ),
                   Container(
@@ -209,7 +244,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         value: data.item1,
                         sunColor: Colors.yellow[700],
                         moonColor: Colors.grey[600],
-                        dayColor: Colors.grey[300],
+                        dayColor: Theme.of(context).primaryColorDark,
                         nightColor: Colors.black,
                         onDrag: (value) => audio.setSwitchValue = value,
                         onChanged: (value) {
@@ -231,15 +266,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           alignment: Alignment.center,
                           height: 25,
                           width: 100,
-                          decoration: BoxDecoration(
-                              //  color: Theme.of(context).accentColor,
-                              ),
+                          decoration: BoxDecoration(),
                           child: Text(_stringForSeconds(data.item2.toDouble()),
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: Colors.white,
-                              )),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color:
+                                      (data.item3 > 0) ? Colors.white : null)),
                         ),
                       ],
                     ),
@@ -247,7 +280,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ],
               ),
               Positioned(
-                bottom: 60 + 20 * data.item3,
+                bottom: 50 + 20 * data.item3,
                 left: MediaQuery.of(context).size.width / 2 - 100,
                 width: 200,
                 child: Container(
@@ -302,7 +335,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       padding: EdgeInsets.only(top: 10, left: 10, right: 10),
                       child: SliderTheme(
                         data: SliderTheme.of(context).copyWith(
-                          activeTrackColor: Colors.grey[400],
+                          activeTrackColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.black38
+                                  : Colors.grey[400],
                           inactiveTrackColor:
                               Theme.of(context).primaryColorDark,
                           trackHeight: 20.0,
@@ -315,7 +351,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           overlayColor:
                               Theme.of(context).accentColor.withAlpha(32),
                           overlayShape:
-                              RoundSliderOverlayShape(overlayRadius: 14.0),
+                              RoundSliderOverlayShape(overlayRadius: 4.0),
                         ),
                         child: Slider(
                             value: data.seekSliderValue,
@@ -387,32 +423,68 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             iconSize: 32.0,
                             icon: Icon(Icons.replay_10),
                             color: Colors.grey[500]),
-                        backplay == BasicPlaybackState.playing
-                            ? IconButton(
-                                padding: EdgeInsets.symmetric(horizontal: 30.0),
-                                onPressed:
-                                    backplay == BasicPlaybackState.playing
-                                        ? () {
-                                            audio.pauseAduio();
-                                          }
-                                        : null,
-                                iconSize: 60.0,
-                                icon: Icon(
-                                  LineIcons.pause_circle,
-                                  size: 40,
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 30),
+                          height: 60,
+                          width: 60,
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.black12
+                                      : Colors.white10,
+                                  width: 1),
+                              boxShadow: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? _customShadowNight
+                                  : _customShadow),
+                          child: backplay == BasicPlaybackState.playing
+                              ? Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30)),
+                                    onTap:
+                                        backplay == BasicPlaybackState.playing
+                                            ? () {
+                                                audio.pauseAduio();
+                                              }
+                                            : null,
+                                    child: SizedBox(
+                                      height: 60,
+                                      width: 60,
+                                      child: Icon(
+                                        Icons.pause,
+                                        size: 40,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30)),
+                                    onTap:
+                                        backplay == BasicPlaybackState.playing
+                                            ? null
+                                            : () {
+                                                audio.resumeAudio();
+                                              },
+                                    child: SizedBox(
+                                      height: 60,
+                                      width: 60,
+                                      child: Icon(
+                                        Icons.play_arrow,
+                                        size: 40,
+                                        color: Theme.of(context).accentColor,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                color: Colors.grey[500])
-                            : IconButton(
-                                padding: EdgeInsets.symmetric(horizontal: 30.0),
-                                onPressed:
-                                    backplay == BasicPlaybackState.playing
-                                        ? null
-                                        : () {
-                                            audio.resumeAudio();
-                                          },
-                                iconSize: 60.0,
-                                icon: Icon(LineIcons.play_circle, size: 40),
-                                color: Colors.grey[500]),
+                        ),
                         IconButton(
                             padding: EdgeInsets.symmetric(horizontal: 30.0),
                             onPressed: backplay == BasicPlaybackState.playing
@@ -497,6 +569,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               FileImage(File("${data.item1.imagePath}")),
                         ),
                       ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5.0),
+                        width: 200,
+                        child: Text(data.item1.feedTitle, maxLines: 1, overflow: TextOverflow.fade,),
+                      ),
                       Spacer(),
                       IconButton(
                         onPressed: () => Navigator.push(
@@ -530,105 +607,127 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         //padding: EdgeInsets.only(bottom: 10.0),
         decoration: BoxDecoration(
           //   borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: Theme.of(context).primaryColor,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SingleChildScrollView(
+        child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
+          selector: (_, audio) => audio.queue.playlist,
+          builder: (_, playlist, __) {
+            return ListView.builder(
+              shrinkWrap: true,
               scrollDirection: Axis.vertical,
-              child: Container(
-                height: 50,
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      'NEXT TO PLAY',
-                      style: TextStyle(
-                          color: Theme.of(context).accentColor,
-                          fontWeight: FontWeight.bold),
+              itemCount: playlist.length,
+              itemBuilder: (BuildContext context, int index) {
+                print(playlist.length);
+                if (index == 0) {
+                  return Container(
+                    height: 60,
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          'Playlist',
+                          style: TextStyle(
+                              color: Theme.of(context).accentColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16),
+                        ),
+                        Spacer(),
+                        Container(
+                          alignment: Alignment.center,
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 40,
+                            width: 80,
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20)),
+                                border: Border.all(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.black12
+                                        : Colors.white10,
+                                    width: 1),
+                                boxShadow: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? _customShadowNight
+                                    : _customShadow),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20)),
+                                onTap: () => audio.playNext(),
+                                child: SizedBox(
+                                  height: 40,
+                                  width: 80,
+                                  child: Icon(
+                                    Icons.skip_next,
+                                    size: 30,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    Spacer(),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
-                selector: (_, audio) => audio.queue.playlist,
-                builder: (_, playlist, __) {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    itemCount: playlist.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      print(playlist.length);
-                      return index == 0
-                          ? Center()
-                          : Column(
+                  );
+                } else {
+                  return Column(
+                    children: <Widget>[
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            audio.episodeLoad(playlist[index]);
+                          },
+                          child: Container(
+                            height: 60,
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            alignment: Alignment.centerLeft,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      audio.episodeLoad(playlist[index]);
-                                    },
+                                Container(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15.0)),
                                     child: Container(
-                                      height: 60,
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                      alignment: Alignment.centerLeft,
-                                      //  decoration: BoxDecoration(
-                                      //    color: Theme.of(context)
-                                      //        .scaffoldBackgroundColor,
-                                      //  ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.all(10.0),
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(15.0)),
-                                              child: Container(
-                                                  height: 30.0,
-                                                  width: 30.0,
-                                                  child: Image.file(File(
-                                                      "${playlist[index].imagePath}"))),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Container(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                playlist[index].title,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        height: 30.0,
+                                        width: 30.0,
+                                        child: Image.file(File(
+                                            "${playlist[index].imagePath}"))),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      playlist[index].title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ),
-                                Divider(height: 2),
                               ],
-                            );
-                    },
+                            ),
+                          ),
+                        ),
+                      ),
+                      Divider(height: 2),
+                    ],
                   );
-                },
-              ),
-            ),
-          ],
+                }
+              },
+            );
+          },
         ),
       ),
     );

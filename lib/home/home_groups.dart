@@ -43,100 +43,105 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
               height: (_width - 20) / 3 + 140,
             )
           : groups[_groupIndex].podcastList.length == 0
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    GestureDetector(
-                        onVerticalDragEnd: (event) {
-                          if (event.primaryVelocity > 200) {
-                            if (groups.length == 1) {
-                              Fluttertoast.showToast(
-                                msg: 'Add some groups',
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            } else {
-                              if (mounted)
+              ? Container(
+                  height: (_width - 20) / 3 + 140,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      GestureDetector(
+                          onVerticalDragEnd: (event) {
+                            if (event.primaryVelocity > 200) {
+                              if (groups.length == 1) {
+                                Fluttertoast.showToast(
+                                  msg: 'Add some groups',
+                                  gravity: ToastGravity.BOTTOM,
+                                );
+                              } else {
+                                if (mounted)
+                                  setState(() {
+                                    (_groupIndex != 0)
+                                        ? _groupIndex--
+                                        : _groupIndex = groups.length - 1;
+                                  });
+                              }
+                            } else if (event.primaryVelocity < -200) {
+                              if (groups.length == 1) {
+                                Fluttertoast.showToast(
+                                  msg: 'Add some groups',
+                                  gravity: ToastGravity.BOTTOM,
+                                );
+                              } else {
                                 setState(() {
-                                  (_groupIndex != 0)
-                                      ? _groupIndex--
-                                      : _groupIndex = groups.length - 1;
+                                  (_groupIndex < groups.length - 1)
+                                      ? _groupIndex++
+                                      : _groupIndex = 0;
                                 });
+                              }
                             }
-                          } else if (event.primaryVelocity < -200) {
-                            if (groups.length == 1) {
-                              Fluttertoast.showToast(
-                                msg: 'Add some groups',
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            } else {
-                              setState(() {
-                                (_groupIndex < groups.length - 1)
-                                    ? _groupIndex++
-                                    : _groupIndex = 0;
-                              });
-                            }
-                          }
-                        },
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 15.0),
-                                      child: Text(
-                                        groups[_groupIndex].name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .accentColor),
-                                      )),
-                                  Spacer(),
-                                  Container(
-                                    height: 30,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 15),
-                                    alignment: Alignment.bottomRight,
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          SlideLeftRoute(page: PodcastManage()),
-                                        );
-                                      },
-                                      child: Container(
-                                          height: 30,
-                                          padding: EdgeInsets.all(5.0),
-                                          child: Text(
-                                            'See All',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyText1
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .accentColor),
-                                          )),
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Row(
+                                  children: <Widget>[
+                                    Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 15.0),
+                                        child: Text(
+                                          groups[_groupIndex].name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1
+                                              .copyWith(
+                                                  color: Theme.of(context)
+                                                      .accentColor),
+                                        )),
+                                    Spacer(),
+                                    Container(
+                                      height: 30,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 15),
+                                      alignment: Alignment.bottomRight,
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            SlideLeftRoute(
+                                                page: PodcastManage()),
+                                          );
+                                        },
+                                        child: Container(
+                                            height: 30,
+                                            padding: EdgeInsets.all(5.0),
+                                            child: Text(
+                                              'See All',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1
+                                                  .copyWith(
+                                                      color: Theme.of(context)
+                                                          .accentColor),
+                                            )),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            Container(
-                              height: 70,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                            ),
-                          ],
-                        )),
-                    Container(
-                      height: (_width - 20) / 3 + 40,
-                      color: Theme.of(context).primaryColor,
-                      margin: EdgeInsets.symmetric(horizontal: 15),
-                    ),
-                  ],
+                              Container(
+                                height: 70,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                              ),
+                            ],
+                          )),
+                      Container(
+                        height: (_width - 20) / 3 + 40,
+                        color: Theme.of(context).primaryColor,
+                        margin: EdgeInsets.symmetric(horizontal: 15),
+                      ),
+                    ],
+                  ),
                 )
               : DefaultTabController(
                   length: groups[_groupIndex].podcastList.length,
@@ -194,7 +199,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                       )),
                                   Spacer(),
                                   Container(
-                                    height: 30,
+                                    height: 30.0,
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 15),
                                     alignment: Alignment.bottomRight,
@@ -223,7 +228,6 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                               ),
                             ),
                             Container(
-                              // color: Colors.white10,
                               height: 70,
                               width: _width,
                               alignment: Alignment.centerLeft,

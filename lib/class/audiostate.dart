@@ -155,11 +155,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  // set setStopOnComplete(bool boo) {
-  //  _stopOnComplete = boo;
-  //}
-
-  set autoPlaySwitch(bool boo) {
+   set autoPlaySwitch(bool boo) {
     _autoPlay = boo;
     notifyListeners();
   }
@@ -168,6 +164,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
   void addListener(VoidCallback listener) async {
     super.addListener(listener);
     await AudioService.connect();
+    if(await AudioService.running){
+        AudioService.stop();
+    }
   }
 
   loadPlaylist() async {
@@ -515,7 +514,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       _skipState = BasicPlaybackState.skippingToNext;
       await _audioPlayer.setUrl(mediaItem.id);
       print(mediaItem.id);
-      Duration duration = await _audioPlayer.durationFuture;
+      Duration duration = await _audioPlayer.durationFuture ?? 0;
       AudioServiceBackground.setMediaItem(
           mediaItem.copyWith(duration: duration.inMilliseconds));
       _skipState = null;

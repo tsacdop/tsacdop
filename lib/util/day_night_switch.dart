@@ -196,7 +196,7 @@ class _RenderSwitch extends RenderToggleable {
       ..onEnd = _handleDragEnd
       ..dragStartBehavior = dragStartBehavior;
   }
-  
+
   ImageProvider get activeThumbImage => _activeThumbImage;
   ImageProvider _activeThumbImage;
   set activeThumbImage(ImageProvider value) {
@@ -285,7 +285,9 @@ class _RenderSwitch extends RenderToggleable {
           positionController.value += delta;
           break;
       }
-      positionController.addListener(() {onDrag(positionController.value);});
+      positionController.addListener(() {
+        onDrag(positionController.value);
+      });
     }
   }
 
@@ -297,8 +299,6 @@ class _RenderSwitch extends RenderToggleable {
     reactionController.reverse();
   }
 
-
-
   @override
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
@@ -309,7 +309,7 @@ class _RenderSwitch extends RenderToggleable {
   Color _cachedThumbColor;
   ImageProvider _cachedThumbImage;
   BoxPainter _cachedThumbPainter;
-
+  
   BoxDecoration _createDefaultThumbDecoration(
       Color color, ImageProvider image) {
     return BoxDecoration(
@@ -335,9 +335,7 @@ class _RenderSwitch extends RenderToggleable {
     super.describeSemanticsConfiguration(config);
     config.isToggled = value == true;
   }
-  
-  
-    
+
   @override
   void paint(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
@@ -413,7 +411,7 @@ class _RenderSwitch extends RenderToggleable {
     );
 
     var starPaint = Paint()
-      ..strokeWidth = 4 + (6 * (1 - currentValue))
+      ..strokeWidth = 2 + (6 * (1 - currentValue))
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
       ..color = Color.fromARGB((255 * currentValue).floor(), 255, 255, 255);
@@ -450,14 +448,14 @@ class _RenderSwitch extends RenderToggleable {
       _isPainting = false;
     }
 
-    canvas.drawLine(
-      Offset(offset.dx + _kSwitchWidth * 0.3, offset.dy + _kSwitchHeight * 0.5),
-      Offset(
-          offset.dx +
-              (_kSwitchWidth * 0.3) +
-              (_kSwitchWidth / 2 * (1 - currentValue)),
-          offset.dy + _kSwitchHeight * 0.5),
-      linePaint,
-    );
+      canvas.drawLine(
+        Offset(offset.dx + _kSwitchWidth * 0.3, offset.dy + _kSwitchHeight * 0.5),
+        Offset(
+            offset.dx +
+                (_kSwitchWidth * 0.3) +
+                (_kSwitchWidth / 2 * (1 - currentValue)),
+            offset.dy + _kSwitchHeight * 0.5),
+        linePaint,
+      );
   }
 }

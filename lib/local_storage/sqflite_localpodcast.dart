@@ -54,6 +54,8 @@ class DBHelper {
       list = await dbClient.rawQuery(
           'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, link ,update_count FROM PodcastLocal WHERE id = ?',
           [s]);
+      int count = Sqflite.firstIntValue(await dbClient.rawQuery(
+        'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?', [s]));
       podcastLocal.add(PodcastLocal(
           list.first['title'],
           list.first['imageUrl'],
@@ -64,7 +66,8 @@ class DBHelper {
           list.first['imagePath'],
           list.first['provider'],
           list.first['link'],
-          upateCount: list.first['update_count']));
+          upateCount: list.first['update_count'],
+          episodeCount: count));
     });
     return podcastLocal;
   }
@@ -398,13 +401,6 @@ class DBHelper {
     } else {
       for (int i = 0; i < (result - count); i++) {
         print(feed.items[i].title);
-        //  if (feed.items[i].itunes.summary != null) {
-        //    feed.items[i].itunes.summary.contains('<')
-        //        ? description = feed.items[i].itunes.summary
-        //        : description = feed.items[i].description;
-        //  } else {
-        //    description = feed.items[i].description;
-        //  }
         description = _getDescription(
             feed.items[i].content.value ?? '',
             feed.items[i].description ?? '',
@@ -444,11 +440,11 @@ class DBHelper {
           });
         }
       }
-      return result - count;
+      return (result - count) < 0 ? 0 : (result - count);
     }
   }
 
-  Future<List<EpisodeBrief>> getRssItem(String id) async {
+  Future<List<EpisodeBrief>> getRssItem(String id, int i) async {
     var dbClient = await database;
     List<EpisodeBrief> episodes = [];
     List<Map> list = await dbClient
@@ -456,7 +452,7 @@ class DBHelper {
         E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, E.liked, 
         E.downloaded,  P.primaryColor , E.media_id
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE P.id = ? ORDER BY E.milliseconds DESC""", [id]);
+        WHERE P.id = ? ORDER BY E.milliseconds DESC LIMIT ?""", [id, i]);
     for (int x = 0; x < list.length; x++) {
       episodes.add(EpisodeBrief(
           list[x]['title'],
@@ -557,14 +553,14 @@ class DBHelper {
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> getLikedRssItem() async {
+  Future<List<EpisodeBrief>> getLikedRssItem(int i) async {
     var dbClient = await database;
     List<EpisodeBrief> episodes = List();
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded, 
         P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE E.liked = 1 ORDER BY E.milliseconds DESC LIMIT 99""");
+        WHERE E.liked = 1 ORDER BY E.milliseconds DESC LIMIT ?""",[i]);
     for (int x = 0; x < list.length; x++) {
       episodes.add(EpisodeBrief(
           list[x]['title'],

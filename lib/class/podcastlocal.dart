@@ -12,6 +12,7 @@ class PodcastLocal {
 
   final String description;
   final int upateCount;
+  final int episodeCount;
   PodcastLocal(
       this.title,
       this.imageUrl,
@@ -25,6 +26,7 @@ class PodcastLocal {
       {
         this.description ='',
         this.upateCount = 0,
+        this.episodeCount = 0
       }
       );
 }

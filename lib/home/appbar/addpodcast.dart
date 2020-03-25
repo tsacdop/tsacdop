@@ -18,10 +18,10 @@ import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/class/searchpodcast.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/home/home.dart';
 import 'package:tsacdop/home/appbar/popupmenu.dart';
 import 'package:tsacdop/webfeed/webfeed.dart';
 import 'package:tsacdop/.env.dart';
+import '../nested_home.dart';
 
 class MyHomePage extends StatefulWidget {
   @override

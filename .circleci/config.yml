@@ -9,7 +9,8 @@ jobs:
 
     steps:
       - checkout
-      - run: flutter upgrade
+      - run: cd /home/cirrus/sdks/flutter && git remote add origin https://github.com/flutter/flutter
+      - run: flutter upgrade && cd /home/cirrus/project/tsacdop
       - run:
           name: Run Flutter doctor
           command: flutter doctor

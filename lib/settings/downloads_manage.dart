@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
@@ -123,22 +124,24 @@ class _DownloadsManageState extends State<DownloadsManage> {
                   ),
                   Container(
                     height: 100.0,
-                    padding: EdgeInsets.only(bottom: 40, left: 60),
+                    padding: EdgeInsets.only(bottom: 20, left: 60),
                     alignment: Alignment.centerLeft,
                     child: RichText(
                       text: TextSpan(
-                        text: 'Total  ',
+                        text: 'Total ',
                         style: TextStyle(
                           color: Theme.of(context).accentColor,
                           fontSize: 20,
                         ),
                         children: <TextSpan>[
                           TextSpan(
-                              text: _fileNum.toString(),
-                              style: TextStyle(
-                                color: Theme.of(context).accentColor,
-                                fontSize: 40,
-                              )),
+                            text: _fileNum.toString(),
+                            style: GoogleFonts.cairo(
+                                textStyle: TextStyle(
+                              color: Theme.of(context).accentColor,
+                              fontSize: 40,
+                            )),
+                          ),
                           TextSpan(
                               text: _fileNum < 2 ? ' episode' : ' episodes ',
                               style: TextStyle(
@@ -146,11 +149,13 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                 fontSize: 20,
                               )),
                           TextSpan(
-                              text: (_size ~/ 1000000).toString(),
-                              style: TextStyle(
-                                color: Theme.of(context).accentColor,
-                                fontSize: 60,
-                              )),
+                            text: (_size ~/ 1000000).toString(),
+                            style: GoogleFonts.cairo(
+                                textStyle: TextStyle(
+                              color: Theme.of(context).accentColor,
+                              fontSize: 50,
+                            )),
+                          ),
                           TextSpan(
                               text: ' Mb',
                               style: TextStyle(

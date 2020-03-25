@@ -197,13 +197,13 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       padding: EdgeInsets.only(top: 5.0),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
-                        physics: AlwaysScrollableScrollPhysics(),
+                        //physics: AlwaysScrollableScrollPhysics(),
                         controller: _controller,
                         child: _loaddes
                             ? (_description.contains('<'))
                                 ? Html(
                                     padding:
-                                        EdgeInsets.symmetric(horizontal: 20.0),
+                                        EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
                                     defaultTextStyle: TextStyle(height: 1.8),
                                     data: _description,
                                     linkStyle: TextStyle(
@@ -217,7 +217,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                   )
                                 : Container(
                                     padding:
-                                        EdgeInsets.symmetric(horizontal: 20.0),
+                                        EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
                                     alignment: Alignment.topLeft,
                                     child: SelectableLinkify(
                                       onOpen: (link) {
