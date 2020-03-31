@@ -347,7 +347,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
                 }
                 return (snapshot.hasData)
                     ? ShowEpisode(
-                        podcast: snapshot.data,
+                        episodes: snapshot.data,
                         podcastLocal: widget.podcastLocal,
                       )
                     : Center(child: CircularProgressIndicator());
@@ -400,9 +400,9 @@ class _PodcastPreviewState extends State<PodcastPreview> {
 }
 
 class ShowEpisode extends StatelessWidget {
-  final List<EpisodeBrief> podcast;
+  final List<EpisodeBrief> episodes;
   final PodcastLocal podcastLocal;
-  ShowEpisode({Key key, this.podcast, this.podcastLocal}) : super(key: key);
+  ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -513,16 +513,16 @@ class ShowEpisode extends StatelessWidget {
                             details.globalPosition.dy),
                         onLongPress: () => _showPopupMenu(
                             offset,
-                            podcast[index],
+                            episodes[index],
                             context,
-                            data.item1 == podcast[index],
-                            data.item2.contains(podcast[index].enclosureUrl)),
+                            data.item1 == episodes[index],
+                            data.item2.contains(episodes[index].enclosureUrl)),
                         onTap: () {
                           Navigator.push(
                             context,
                             ScaleRoute(
                                 page: EpisodeDetail(
-                              episodeItem: podcast[index],
+                              episodeItem: episodes[index],
                               heroTag: 'scroll',
                               //unique hero tag
                             )),
@@ -548,7 +548,7 @@ class ShowEpisode extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
                                     Hero(
-                                      tag: podcast[index].enclosureUrl +
+                                      tag: episodes[index].enclosureUrl +
                                           'scroll',
                                       child: Container(
                                         height: _width / 18,
@@ -560,7 +560,7 @@ class ShowEpisode extends StatelessWidget {
                                       ),
                                     ),
                                     Spacer(),
-                                    index < podcastLocal.upateCount
+                                    episodes[index].isNew == 1 
                                         ? Text(
                                             'New',
                                             style: TextStyle(
@@ -577,7 +577,7 @@ class ShowEpisode extends StatelessWidget {
                                   padding: EdgeInsets.only(top: 2.0),
                                   alignment: Alignment.topLeft,
                                   child: Text(
-                                    podcast[index].title,
+                                    episodes[index].title,
                                     style: TextStyle(
                                       fontSize: _width / 32,
                                     ),
@@ -591,7 +591,7 @@ class ShowEpisode extends StatelessWidget {
                                   child: Container(
                                     alignment: Alignment.bottomLeft,
                                     child: Text(
-                                      podcast[index].dateToString(),
+                                      episodes[index].dateToString(),
                                       //podcast[index].pubDate.substring(4, 16),
                                       style: TextStyle(
                                         fontSize: _width / 35,
@@ -608,7 +608,7 @@ class ShowEpisode extends StatelessWidget {
                   ),
                 );
               },
-              childCount: (podcast.length > 3) ? 3 : podcast.length,
+              childCount: (episodes.length > 3) ? 3 : episodes.length,
             ),
           ),
         ),

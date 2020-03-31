@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -21,18 +22,15 @@ class EpisodeGrid extends StatelessWidget {
   final bool showFavorite;
   final bool showDownload;
   final bool showNumber;
-  final int updateCount;
-  final String heroTag;
   final int episodeCount;
   EpisodeGrid(
       {Key key,
       @required this.episodes,
-      this.heroTag = '',
       this.showDownload = false,
       this.showFavorite = false,
       this.showNumber = false,
-      this.updateCount = 0,
-      this.episodeCount = 0})
+      this.episodeCount = 0
+     })
       : super(key: key);
 
   @override
@@ -183,7 +181,7 @@ class EpisodeGrid extends StatelessWidget {
                                           ),
                                   ),
                                   Spacer(),
-                                  index < updateCount
+                                  episodes[index].isNew == 1
                                       ? Text('New',
                                           style: TextStyle(
                                               color: Colors.red,
@@ -197,7 +195,7 @@ class EpisodeGrid extends StatelessWidget {
                                       ? Container(
                                           alignment: Alignment.topRight,
                                           child: Text(
-                                            (episodeCount- index).toString(),
+                                            (episodeCount - index).toString(),
                                             style: GoogleFonts.teko(
                                               textStyle: TextStyle(
                                                 fontSize: _width / 24,
@@ -240,10 +238,6 @@ class EpisodeGrid extends StatelessWidget {
                                     ),
                                   ),
                                   Spacer(),
-                                  showDownload
-                                      ? DownloadIcon(
-                                          episodeBrief: episodes[index])
-                                      : Center(),
                                   Padding(
                                     padding: EdgeInsets.all(1),
                                   ),
@@ -280,148 +274,6 @@ class EpisodeGrid extends StatelessWidget {
   }
 }
 
-class DownloadIcon extends StatefulWidget {
-  final EpisodeBrief episodeBrief;
-  DownloadIcon({this.episodeBrief, Key key}) : super(key: key);
-  @override
-  _DownloadIconState createState() => _DownloadIconState();
-}
-
-class _DownloadIconState extends State<DownloadIcon> {
-  _TaskInfo _task;
-  bool _isLoading;
-  ReceivePort _port = ReceivePort();
-
-  @override
-  void initState() {
-    super.initState();
-    _bindBackgroundIsolate();
-
-    FlutterDownloader.registerCallback(downloadCallback);
-
-    _isLoading = true;
-    _prepare();
-  }
-
-  @override
-  void dispose() {
-    _unbindBackgroundIsolate();
-    super.dispose();
-  }
-
-  void _bindBackgroundIsolate() {
-    bool isSuccess = IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
-    if (!isSuccess) {
-      _unbindBackgroundIsolate();
-      _bindBackgroundIsolate();
-      return;
-    }
-
-    _port.listen((dynamic data) {
-      print('UI isolate callback: $data');
-      String id = data[0];
-      DownloadTaskStatus status = data[1];
-      int progress = data[2];
-      if (_task.taskId == id) {
-        setState(() {
-          _task.status = status;
-          _task.progress = progress;
-        });
-      }
-    });
-  }
-
-  void _unbindBackgroundIsolate() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-  }
-
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    print('Background callback task in $id  status ($status) $progress');
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send.send([id, status, progress]);
-  }
-
-  Future<Null> _prepare() async {
-    final tasks = await FlutterDownloader.loadTasks();
-
-    _task = _TaskInfo(
-        name: widget.episodeBrief.title,
-        link: widget.episodeBrief.enclosureUrl);
-
-    tasks?.forEach((task) {
-      if (_task.link == task.url) {
-        _task.taskId = task.taskId;
-        _task.status = task.status;
-        _task.progress = task.progress;
-      }
-    });
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _downloadButton(_task);
-  }
-
-  Widget _downloadButton(_TaskInfo task) {
-    if (_isLoading)
-      return Center();
-    else if (task.status == DownloadTaskStatus.running) {
-      return SizedBox(
-        height: 12,
-        width: 12,
-        child: CircularProgressIndicator(
-          backgroundColor: Colors.grey[200],
-          strokeWidth: 1,
-          valueColor:
-              AlwaysStoppedAnimation<Color>(Theme.of(context).accentColor),
-          value: task.progress / 100,
-        ),
-      );
-    } else if (task.status == DownloadTaskStatus.paused) {
-      return SizedBox(
-        height: 12,
-        width: 12,
-        child: CircularProgressIndicator(
-          backgroundColor: Colors.grey[200],
-          strokeWidth: 1,
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-          value: task.progress / 100,
-        ),
-      );
-    } else if (task.status == DownloadTaskStatus.complete) {
-      return IconTheme(
-        data: IconThemeData(size: 15),
-        child: Icon(
-          Icons.done_all,
-          color: Theme.of(context).accentColor,
-        ),
-      );
-    } else if (task.status == DownloadTaskStatus.failed) {
-      return IconTheme(
-        data: IconThemeData(size: 15),
-        child: Icon(Icons.refresh, color: Colors.red),
-      );
-    }
-    return Center();
-  }
-}
-
-class _TaskInfo {
-  final String name;
-  final String link;
-
-  String taskId;
-  int progress = 0;
-  DownloadTaskStatus status = DownloadTaskStatus.undefined;
-
-  _TaskInfo({this.name, this.link});
-}
 
 class OpenContainerWrapper extends StatelessWidget {
   const OpenContainerWrapper({
@@ -469,3 +321,5 @@ class OpenContainerWrapper extends StatelessWidget {
     );
   }
 }
+
+

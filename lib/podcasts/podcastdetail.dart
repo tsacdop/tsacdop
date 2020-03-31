@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
 import 'package:tsacdop/class/audiostate.dart';
+import 'package:tsacdop/class/podcast_group.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -35,15 +36,18 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final result = await dbHelper.updatePodcastRss(podcastLocal);
-    result == 0
-        ? Fluttertoast.showToast(
+    if(result == 0)
+       { Fluttertoast.showToast(
             msg: 'No Update',
             gravity: ToastGravity.TOP,
-          )
-        : Fluttertoast.showToast(
+          );}
+      else{
+          Fluttertoast.showToast(
             msg: 'Updated $result Episodes',
             gravity: ToastGravity.TOP,
           );
+          Provider.of<GroupList>(context, listen: false).updatePodcast(podcastLocal);
+      }
     if (mounted) setState(() {});
   }
 
@@ -400,8 +404,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       episodes: snapshot.data,
                                       showFavorite: true,
                                       showNumber: true,
-                                      updateCount:
-                                          widget.podcastLocal.upateCount,
                                       episodeCount:
                                           widget.podcastLocal.episodeCount,
                                     ),

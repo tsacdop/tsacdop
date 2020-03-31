@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:tsacdop/class/download_state.dart';
 import 'package:tsacdop/home/audioplayer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -382,7 +383,7 @@ class _MenuBarState extends State<MenuBar> {
                             () => setUnliked(widget.episodeItem.enclosureUrl)),
                       ],
                     ),
-          DownloadButton(episodeBrief: widget.episodeItem),
+          DownloadButton(episode: widget.episodeItem),
           Selector<AudioPlayerNotifier, List<String>>(
             selector: (_, audio) =>
                 audio.queue.playlist.map((e) => e.enclosureUrl).toList(),

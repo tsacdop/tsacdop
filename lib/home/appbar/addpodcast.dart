@@ -91,7 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
 class _MyHomePageDelegate extends SearchDelegate<int> {
   static Future<List> getList(String searchText) async {
     String apiKey = environment['apiKey'];
-    print(apiKey);
     String url =
         "https://listennotes.p.mashape.com/api/v1/search?only_in=title%2Cdescription&q=" +
             searchText +
@@ -312,7 +311,7 @@ class _SearchResultState extends State<SearchResult> {
           importOmpl.importState = ImportState.parse;
 
           await dbHelper.savePodcastRss(_p, _uuid);
-
+          groupList.updatePodcast(podcastLocal);
           importOmpl.importState = ImportState.complete;
         } else {
           importOmpl.importState = ImportState.error;

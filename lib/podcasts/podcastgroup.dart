@@ -40,7 +40,7 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
                   widget.group.podcasts.insert(newIndex, podcast);
                 });
                 widget.group.setOrderedPodcasts = widget.group.podcasts;
-                groupList.addToOrderChanged(widget.group.name);
+                groupList.addToOrderChanged(widget.group);
               },
               children: widget.group.podcasts
                   .map<Widget>((PodcastLocal podcastLocal) {
@@ -319,7 +319,7 @@ class _PodcastCardState extends State<PodcastCard> {
                                           bottom: 20),
                                       title: Text('Remove confirm'),
                                       content: Text(
-                                          'Are you sure you want  to unsubscribe?'),
+                                          'Are you sure you want to unsubscribe?'),
                                       actions: <Widget>[
                                         FlatButton(
                                           onPressed: () =>

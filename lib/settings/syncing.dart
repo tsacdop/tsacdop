@@ -71,11 +71,10 @@ class SyncingSetting extends StatelessWidget {
                               value: data.item1,
                               onChanged: (boo) async {
                                 settings.autoUpdate = boo;
-                                if (boo) {
+                                if (boo)
                                   settings.setWorkManager(data.item2);
-                                } else {
+                                else
                                   settings.cancelWork();
-                                }
                               }),
                         ),
                         Divider(height: 2),
@@ -92,7 +91,8 @@ class SyncingSetting extends StatelessWidget {
                               elevation: 1,
                               value: data.item2,
                               onChanged: data.item1
-                                  ? (value) {
+                                  ? (value) async {
+                                      await settings.cancelWork();
                                       settings.setWorkManager(value);
                                     }
                                   : null,

@@ -11,8 +11,8 @@ class PodcastLocal {
   final String link;
 
   final String description;
-  final int upateCount;
-  final int episodeCount;
+  int upateCount;
+  int episodeCount;
   PodcastLocal(
       this.title,
       this.imageUrl,

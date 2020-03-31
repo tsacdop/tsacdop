@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:tsacdop/class/settingstate.dart';
+import 'package:tsacdop/util/context_extension.dart';
 
 class ThemeSetting extends StatelessWidget {
   @override
@@ -61,11 +62,11 @@ class ThemeSetting extends StatelessWidget {
                               AnnotatedRegion<SystemUiOverlayStyle>(
                                 value: SystemUiOverlayStyle(
                                   statusBarIconBrightness: Brightness.light,
-                                  // systemNavigationBarColor:
-                                  //     Theme.of(context).brightness ==
-                                  //             Brightness.light
-                                  //         ? Color.fromRGBO(113, 113, 113, 1)
-                                  //         : Color.fromRGBO(15, 15, 15, 1),
+                                   systemNavigationBarColor:
+                                       Theme.of(context).brightness ==
+                                               Brightness.light
+                                           ? Color.fromRGBO(113, 113, 113, 1)
+                                           : Color.fromRGBO(15, 15, 15, 1),
                                   //   statusBarColor:
                                   //       Theme.of(context).brightness ==
                                   //               Brightness.light
@@ -138,11 +139,11 @@ class ThemeSetting extends StatelessWidget {
                               AnnotatedRegion<SystemUiOverlayStyle>(
                                   value: SystemUiOverlayStyle(
                                     statusBarIconBrightness: Brightness.light,
-                                    // systemNavigationBarColor:
-                                    //     Theme.of(context).brightness ==
-                                    //             Brightness.light
-                                    //         ? Color.fromRGBO(113, 113, 113, 1)
-                                    //         : Color.fromRGBO(15, 15, 15, 1),
+                                     systemNavigationBarColor:
+                                         Theme.of(context).brightness ==
+                                                 Brightness.light
+                                             ? Color.fromRGBO(113, 113, 113, 1)
+                                             : Color.fromRGBO(15, 15, 15, 1),
                                     //  statusBarColor:
                                     //      Theme.of(context).brightness ==
                                     //              Brightness.light
@@ -155,7 +156,7 @@ class ThemeSetting extends StatelessWidget {
                                         top: 20,
                                         left: 40,
                                         right: 200,
-                                        bottom: 20),
+                                        bottom: 0),
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10.0))),
@@ -165,7 +166,7 @@ class ThemeSetting extends StatelessWidget {
                                         onColorChanged: (value) {
                                           settings.setAccentColor = value;
                                         },
-                                        pickerColor: Colors.blue,
+                                        pickerColor: context.accentColor,
                                       ),
                                     ),
                                   ))),

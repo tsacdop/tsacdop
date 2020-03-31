@@ -13,6 +13,7 @@ import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/util/ompl_build.dart';
+import 'package:tsacdop/util/context_extension.dart';
 import 'theme.dart';
 import 'storage.dart';
 import 'history.dart';
@@ -56,7 +57,7 @@ class Settings extends StatelessWidget {
         appBar: AppBar(
           title: Text('Settings'),
           elevation: 0,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: context.primaryColor,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -81,7 +82,7 @@ class Settings extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1
-                              .copyWith(color: Theme.of(context).accentColor)),
+                              .copyWith(color: context.accentColor)),
                     ),
                     ListView(
                       physics: ClampingScrollPhysics(),

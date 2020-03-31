@@ -28,9 +28,10 @@ class DBHelper {
   void _onCreate(Database db, int version) async {
     await db
         .execute("""CREATE TABLE PodcastLocal(id TEXT PRIMARY KEY,title TEXT, 
-        imageUrl TEXT,rssUrl TEXT UNIQUE,primaryColor TEXT,author TEXT, 
+        imageUrl TEXT,rssUrl TEXT UNIQUE, primaryColor TEXT, author TEXT, 
         description TEXT, add_date INTEGER, imagePath TEXT, provider TEXT, link TEXT, 
-        background_image TEXT DEFAULT '',hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0)""");
+        background_image TEXT DEFAULT '',hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0,
+        episode_count INTEGER DEFAULT 0)""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
@@ -52,10 +53,9 @@ class DBHelper {
     await Future.forEach(podcasts, (s) async {
       List<Map> list;
       list = await dbClient.rawQuery(
-          'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, link ,update_count FROM PodcastLocal WHERE id = ?',
+          """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
+          link ,update_count, episode_count FROM PodcastLocal WHERE id = ?""",
           [s]);
-      int count = Sqflite.firstIntValue(await dbClient.rawQuery(
-        'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?', [s]));
       podcastLocal.add(PodcastLocal(
           list.first['title'],
           list.first['imageUrl'],
@@ -67,7 +67,7 @@ class DBHelper {
           list.first['provider'],
           list.first['link'],
           upateCount: list.first['update_count'],
-          episodeCount: count));
+          episodeCount: list.first['episode_count']));
     });
     return podcastLocal;
   }
@@ -92,6 +92,14 @@ class DBHelper {
           list.first['link']));
     }
     return podcastLocal;
+  }
+
+  Future<List<int>> getPodcastCounts(String id) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT update_count, episode_count FROM PodcastLocal WHERE id = ?',
+        [id]);
+    return [list.first['update_count'], list.first['episode_count']];
   }
 
   Future<bool> checkPodcast(String url) async {
@@ -122,8 +130,6 @@ class DBHelper {
             podcastLocal.provider,
             podcastLocal.link
           ]);
-    });
-    await dbClient.transaction((txn) async {
       await txn.rawInsert(
           """REPLACE INTO SubscribeHistory(id, title, rss_url, add_date) VALUES (?, ?, ?, ?)""",
           [
@@ -240,12 +246,17 @@ class DBHelper {
     return (sum ~/ 60).toDouble();
   }
 
-  Future<int> getPosition(EpisodeBrief episodeBrief) async {
+  Future<PlayHistory> getPosition(EpisodeBrief episodeBrief) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
-        "SELECT seconds FROM PlayHistory Where enclosure_url = ?",
+        "SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory Where enclosure_url = ?",
         [episodeBrief.enclosureUrl]);
-    return list.length > 0 ? list.first['seconds'] : 0;
+    return list.length > 0
+        ? PlayHistory(list.first['title'], list.first['enclosure_url'],
+            list.first['seconds'], list.first['seek_value'],
+            playdate:
+                DateTime.fromMillisecondsSinceEpoch(list.first['add_date']))
+        : PlayHistory(episodeBrief.title, episodeBrief.enclosureUrl, 0, 0);
   }
 
   DateTime _parsePubDate(String pubDate) {
@@ -335,13 +346,6 @@ class DBHelper {
       print(feed.items[i].title);
       description = _getDescription(feed.items[i].content.value ?? '',
           feed.items[i].description ?? '', feed.items[i].itunes.summary ?? '');
-      //  if (feed.items[i].itunes.summary != null) {
-      //      feed.items[i].itunes.summary.contains('<')
-      //          ? description = feed.items[i].itunes.summary
-      //          : description = feed.items[i].description;
-      //    } else {
-      //      description = feed.items[i].description;
-      //    }
       if (feed.items[i].enclosure != null) {
         _isXimalaya(feed.items[i].enclosure.url)
             ? url = feed.items[i].enclosure.url.split('=').last
@@ -377,6 +381,12 @@ class DBHelper {
         });
       }
     }
+    int countUpdate = Sqflite.firstIntValue(await dbClient
+        .rawQuery('SELECT COUNT(*) FROM Episodes WHERE feed_id = ?', [id]));
+
+    await dbClient.rawUpdate(
+        """UPDATE PodcastLocal SET episode_count = ? WHERE id = ?""",
+        [countUpdate, id]);
     return result;
   }
 
@@ -391,57 +401,56 @@ class DBHelper {
     int count = Sqflite.firstIntValue(await dbClient.rawQuery(
         'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?', [podcastLocal.id]));
 
-    print(count);
     await dbClient.rawUpdate(
-        """UPDATE PodcastLocal SET update_count = ?  WHERE id = ?""",
-        [(result - count), podcastLocal.id]);
-    if (count == result) {
-      result = 0;
-      return result;
-    } else {
-      for (int i = 0; i < (result - count); i++) {
-        print(feed.items[i].title);
-        description = _getDescription(
-            feed.items[i].content.value ?? '',
-            feed.items[i].description ?? '',
-            feed.items[i].itunes.summary ?? '');
+        "UPDATE Episodes SET is_new = 0 WHERE feed_id = ?", [podcastLocal.id]);
 
-        if (feed.items[i].enclosure?.url != null) {
-          _isXimalaya(feed.items[i].enclosure.url)
-              ? url = feed.items[i].enclosure.url.split('=').last
-              : url = feed.items[i].enclosure.url;
-        }
+    for (int i = 0; i < result; i++) {
+      print(feed.items[i].title);
+      description = _getDescription(feed.items[i].content.value ?? '',
+          feed.items[i].description ?? '', feed.items[i].itunes.summary ?? '');
 
-        final title = feed.items[i].itunes.title ?? feed.items[i].title;
-        final length = feed.items[i]?.enclosure?.length ?? 0;
-        final pubDate = feed.items[i].pubDate;
-        final date = _parsePubDate(pubDate);
-        final milliseconds = date.millisecondsSinceEpoch;
-        final duration = feed.items[i].itunes.duration?.inMinutes ?? 0;
-        final explicit = _getExplicit(feed.items[i].itunes.explicit);
-
-        if (url != null) {
-          await dbClient.transaction((txn) {
-            return txn.rawInsert(
-                """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
-                description, feed_id, milliseconds, duration, explicit, media_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                [
-                  title,
-                  url,
-                  length,
-                  pubDate,
-                  description,
-                  podcastLocal.id,
-                  milliseconds,
-                  duration,
-                  explicit,
-                  url
-                ]);
-          });
-        }
+      if (feed.items[i].enclosure?.url != null) {
+        _isXimalaya(feed.items[i].enclosure.url)
+            ? url = feed.items[i].enclosure.url.split('=').last
+            : url = feed.items[i].enclosure.url;
       }
-      return (result - count) < 0 ? 0 : (result - count);
+
+      final title = feed.items[i].itunes.title ?? feed.items[i].title;
+      final length = feed.items[i]?.enclosure?.length ?? 0;
+      final pubDate = feed.items[i].pubDate;
+      final date = _parsePubDate(pubDate);
+      final milliseconds = date.millisecondsSinceEpoch;
+      final duration = feed.items[i].itunes.duration?.inMinutes ?? 0;
+      final explicit = _getExplicit(feed.items[i].itunes.explicit);
+
+      if (url != null) {
+        await dbClient.transaction((txn) async {
+          int id = await txn.rawInsert(
+              """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
+                description, feed_id, milliseconds, duration, explicit, media_id, is_new) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)""",
+              [
+                title,
+                url,
+                length,
+                pubDate,
+                description,
+                podcastLocal.id,
+                milliseconds,
+                duration,
+                explicit,
+                url,
+              ]);
+          print("$id");
+        });
+      }
     }
+    int countUpdate = Sqflite.firstIntValue(await dbClient.rawQuery(
+        'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?', [podcastLocal.id]));
+
+    await dbClient.rawUpdate(
+        """UPDATE PodcastLocal SET update_count = ?, episode_count = ? WHERE id = ?""",
+        [countUpdate - count, countUpdate, podcastLocal.id]);
+    return countUpdate - count;
   }
 
   Future<List<EpisodeBrief>> getRssItem(String id, int i) async {
@@ -450,7 +459,7 @@ class DBHelper {
     List<Map> list = await dbClient
         .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, E.liked, 
-        E.downloaded,  P.primaryColor , E.media_id
+        E.downloaded,  P.primaryColor , E.media_id, E.is_new
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? ORDER BY E.milliseconds DESC LIMIT ?""", [id, i]);
     for (int x = 0; x < list.length; x++) {
@@ -466,7 +475,8 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit'],
           list[x]['imagePath'],
-          list[x]['media_id']));
+          list[x]['media_id'],
+          list[x]['is_new']));
     }
     return episodes;
   }
@@ -477,7 +487,7 @@ class DBHelper {
     List<Map> list = await dbClient
         .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
-        E.downloaded, P.primaryColor, E.media_id
+        E.downloaded, P.primaryColor, E.media_id, E.is_new
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         where E.feed_id = ? ORDER BY E.milliseconds DESC LIMIT 3""", [id]);
     for (int x = 0; x < list.length; x++) {
@@ -493,7 +503,8 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit'],
           list[x]['imagePath'],
-          list[x]['media_id']));
+          list[x]['media_id'],
+          list[x]['is_new']));
     }
     return episodes;
   }
@@ -504,7 +515,7 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
-        E.downloaded,  P.primaryColor, E.media_id 
+        E.downloaded,  P.primaryColor, E.media_id, E.is_new
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         where E.enclosure_url = ? ORDER BY E.milliseconds DESC LIMIT 3""",
         [url]);
@@ -522,7 +533,8 @@ class DBHelper {
           list.first['duration'],
           list.first['explicit'],
           list.first['imagePath'],
-          list.first['media_id']);
+          list.first['media_id'],
+          list.first['is_new']);
     return episode;
   }
 
@@ -532,7 +544,7 @@ class DBHelper {
     List<Map> list = await dbClient
         .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, E.liked, 
-        E.downloaded, P.imagePath, P.primaryColor, E.media_id 
+        E.downloaded, P.imagePath, P.primaryColor, E.media_id, E.is_new
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         ORDER BY E.milliseconds DESC LIMIT ? """, [top]);
     for (int x = 0; x < list.length; x++) {
@@ -548,7 +560,8 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit'],
           list[x]['imagePath'],
-          list[x]['media_id']));
+          list[x]['media_id'],
+          list[x]['is_new']));
     }
     return episodes;
   }
@@ -559,8 +572,8 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded, 
-        P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE E.liked = 1 ORDER BY E.milliseconds DESC LIMIT ?""",[i]);
+        P.primaryColor, E.media_id, E.is_new FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE E.liked = 1 ORDER BY E.milliseconds DESC LIMIT ?""", [i]);
     for (int x = 0; x < list.length; x++) {
       episodes.add(EpisodeBrief(
           list[x]['title'],
@@ -574,7 +587,8 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit'],
           list[x]['imagePath'],
-          list[x]['media_id']));
+          list[x]['media_id'],
+          list[x]['is_new']));
     }
     return episodes;
   }
@@ -597,19 +611,19 @@ class DBHelper {
 
   Future<int> saveDownloaded(String url, String id) async {
     var dbClient = await database;
-    int _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    int milliseconds = DateTime.now().millisecondsSinceEpoch;
     int count = await dbClient.rawUpdate(
         "UPDATE Episodes SET downloaded = ?, download_date = ? WHERE enclosure_url = ?",
-        [id, _milliseconds, url]);
+        [id, milliseconds, url]);
     return count;
   }
 
-  Future<int> saveMediaId(String url, String path) async {
+  Future<int> saveMediaId(String url, String path, String id) async {
     var dbClient = await database;
-    int _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    int milliseconds = DateTime.now().millisecondsSinceEpoch;
     int count = await dbClient.rawUpdate(
-        "UPDATE Episodes SET media_id = ?, download_date = ? WHERE enclosure_url = ?",
-        [path, _milliseconds, url]);
+        "UPDATE Episodes SET media_id = ?, download_date = ?, downloaded = ? WHERE enclosure_url = ?",
+        [path, milliseconds, id, url]);
     return count;
   }
 
@@ -628,8 +642,8 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
-        P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE E.downloaded != 'ND' ORDER BY E.download_date DESC LIMIT 99""");
+        P.primaryColor, E.media_id, E.is_new FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE E.downloaded != 'ND' ORDER BY E.download_date DESC""");
     for (int x = 0; x < list.length; x++) {
       episodes.add(EpisodeBrief(
           list[x]['title'],
@@ -643,7 +657,8 @@ class DBHelper {
           list[x]['duration'],
           list[x]['explicit'],
           list[x]['imagePath'],
-          list[x]['media_id']));
+          list[x]['media_id'],
+          list[x]['is_new']));
     }
     return episodes;
   }
@@ -670,7 +685,7 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
-        P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
+        P.primaryColor, E.media_id, E.is_new FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.enclosure_url = ?""", [url]);
     if (list.length == 0) {
       return null;
@@ -687,7 +702,8 @@ class DBHelper {
           list.first['duration'],
           list.first['explicit'],
           list.first['imagePath'],
-          list.first['media_id']);
+          list.first['media_id'],
+          list.first['is_new']);
       return episode;
     }
   }
@@ -698,7 +714,7 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
-        P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
+        P.primaryColor, E.media_id, E.is_new FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.media_id = ?""", [id]);
     episode = EpisodeBrief(
         list.first['title'],
@@ -712,7 +728,8 @@ class DBHelper {
         list.first['duration'],
         list.first['explicit'],
         list.first['imagePath'],
-        list.first['media_id']);
+        list.first['media_id'],
+        list.first['is_new']);
     return episode;
   }
 }

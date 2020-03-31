@@ -173,7 +173,7 @@ class _PopupMenuState extends State<PopupMenu> {
           importOmpl.importState = ImportState.parse;
 
           await dbHelper.savePodcastRss(_p, _uuid);
-
+          groupList.updatePodcast(podcastLocal);
           importOmpl.importState = ImportState.complete;
         } else {
           importOmpl.importState = ImportState.error;

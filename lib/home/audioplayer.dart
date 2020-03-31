@@ -5,8 +5,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:marquee/marquee.dart';
+import 'package:tsacdop/home/playlist.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tuple/tuple.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:line_icons/line_icons.dart';
 
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/audiostate.dart';
@@ -15,6 +18,7 @@ import 'package:tsacdop/home/audiopanel.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
 import 'package:tsacdop/util/day_night_switch.dart';
+import 'package:tsacdop/util/context_extension.dart';
 
 class MyRectangularTrackShape extends RectangularSliderTrackShape {
   Rect getPreferredRect({
@@ -143,16 +147,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   List minsToSelect = [1, 5, 10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
   int _minSelected;
-
+  final GlobalKey<AnimatedListState> _miniPlaylistKey = GlobalKey();
   @override
   void initState() {
     super.initState();
     _minSelected = 30;
-  }
-
-  @override
-  void didUpdateWidget(Widget oldWidget) {
-    super.didUpdateWidget(oldWidget);
   }
 
   Widget _sleppMode(BuildContext context) {
@@ -571,9 +570,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 5.0),
                         width: 200,
-                        child: Text(data.item1.feedTitle, maxLines: 1, overflow: TextOverflow.fade,),
+                        child: Text(
+                          data.item1.feedTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.fade,
+                        ),
                       ),
                       Spacer(),
+                      LastPosition(),
                       IconButton(
                         onPressed: () => Navigator.push(
                           context,
@@ -596,138 +600,252 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget _playlist(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Container(
-      alignment: Alignment.bottomLeft,
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 400),
-        height: 300,
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.center,
-        // margin: EdgeInsets.all(20),
-        //padding: EdgeInsets.only(bottom: 10.0),
-        decoration: BoxDecoration(
-          //   borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          color: Theme.of(context).primaryColor,
-        ),
-        child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
-          selector: (_, audio) => audio.queue.playlist,
-          builder: (_, playlist, __) {
-            return ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              itemCount: playlist.length,
-              itemBuilder: (BuildContext context, int index) {
-                print(playlist.length);
-                if (index == 0) {
-                  return Container(
-                    height: 60,
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+      alignment: Alignment.topLeft,
+      height: 300,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+      ),
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            height: 60.0,
+            // color: context.primaryColorDark,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  height: 20.0,
+                  // color: context.primaryColorDark,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Playlist',
+                    style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
+                  ),
+                ),
+                Spacer(),
+                Container(
+                  height: 60,
+                  alignment: Alignment.center,
+                  child: Container(
                     alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          'Playlist',
-                          style: TextStyle(
-                              color: Theme.of(context).accentColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
-                        ),
-                        Spacer(),
-                        Container(
-                          alignment: Alignment.center,
-                          child: Container(
-                            alignment: Alignment.center,
-                            height: 40,
-                            width: 80,
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                border: Border.all(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Colors.black12
-                                        : Colors.white10,
-                                    width: 1),
-                                boxShadow: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? _customShadowNight
-                                    : _customShadow),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                onTap: () => audio.playNext(),
-                                child: SizedBox(
-                                  height: 40,
-                                  width: 80,
-                                  child: Icon(
-                                    Icons.skip_next,
-                                    size: 30,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return Column(
-                    children: <Widget>[
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            audio.episodeLoad(playlist[index]);
-                          },
-                          child: Container(
-                            height: 60,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10.0),
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15.0)),
-                                    child: Container(
-                                        height: 30.0,
-                                        width: 30.0,
-                                        child: Image.file(File(
-                                            "${playlist[index].imagePath}"))),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      playlist[index].title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                    height: 30,
+                    width: 60,
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        border: Border.all(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.black12
+                                    : Colors.white10,
+                            width: 1),
+                        boxShadow:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? _customShadowNight
+                                : _customShadow),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        onTap: () {
+                          audio.playNext();
+                          _miniPlaylistKey.currentState.removeItem(
+                              0, (context, animation) => Container());
+                          _miniPlaylistKey.currentState.removeItem(
+                              1, (context, animation) => Container());
+                          _miniPlaylistKey.currentState.insertItem(0);
+                        },
+                        child: SizedBox(
+                          height: 30,
+                          width: 60,
+                          child: Icon(
+                            Icons.skip_next,
+                            size: 30,
                           ),
                         ),
                       ),
-                      Divider(height: 2),
-                    ],
-                  );
-                }
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 20),
+                  width: 30.0,
+                  height: 30.0,
+                  decoration: BoxDecoration(
+                    boxShadow: (Theme.of(context).brightness == Brightness.dark)
+                        ? _customShadowNight
+                        : _customShadow,
+                    color: Theme.of(context).primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          SlideLeftRoute(page: PlaylistPage()),
+                        );
+                      },
+                      child: SizedBox(
+                        height: 30.0,
+                        width: 30.0,
+                        child: Transform.rotate(
+                          angle: math.pi,
+                          child: Icon(
+                            LineIcons.database_solid,
+                            size: 20.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
+              selector: (_, audio) => audio.queue.playlist,
+              builder: (_, playlist, __) {
+                return AnimatedList(
+                  key: _miniPlaylistKey,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  initialItemCount: playlist.length,
+                  itemBuilder: (context, index, animation) => ScaleTransition(
+                    alignment: Alignment.centerLeft,
+                    scale: animation,
+                    child: index == 0
+                        ? Center()
+                        : Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          audio.episodeLoad(playlist[index]);
+                                          _miniPlaylistKey.currentState
+                                              .removeItem(
+                                                  index,
+                                                  (context, animation) =>
+                                                      Center());
+                                          _miniPlaylistKey.currentState
+                                              .insertItem(0);
+                                        },
+                                        child: Container(
+                                          height: 60,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          alignment: Alignment.centerLeft,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Container(
+                                                padding: EdgeInsets.all(10.0),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              15.0)),
+                                                  child: Container(
+                                                      height: 30.0,
+                                                      width: 30.0,
+                                                      child: Image.file(File(
+                                                          "${playlist[index].imagePath}"))),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Container(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    playlist[index].title,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    width: 30.0,
+                                    height: 30.0,
+                                    decoration: BoxDecoration(
+                                      boxShadow:
+                                          (Theme.of(context).brightness ==
+                                                  Brightness.dark)
+                                              ? _customShadowNight
+                                              : _customShadow,
+                                      color: Theme.of(context).primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0)),
+                                        onTap: () async {
+                                          await audio
+                                              .moveToTop(playlist[index]);
+                                          _miniPlaylistKey.currentState
+                                              .removeItem(
+                                            index,
+                                            (context, animation) => Center(),
+                                            duration:
+                                                Duration(milliseconds: 500),
+                                          );
+                                          _miniPlaylistKey.currentState
+                                              .insertItem(1,
+                                                  duration: Duration(
+                                                      milliseconds: 200));
+                                        },
+                                        child: SizedBox(
+                                          height: 30.0,
+                                          width: 30.0,
+                                          child: Transform.rotate(
+                                            angle: math.pi,
+                                            child: Icon(
+                                              LineIcons.download_solid,
+                                              size: 20.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Divider(height: 2),
+                            ],
+                          ),
+                  ),
+                );
               },
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -765,8 +883,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   tabs: <Widget>[
                     Container(
                       // child: Text('p'),
-                      height: 10.0,
-                      width: 10.0,
+                      height: 8.0,
+                      width: 8.0,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.transparent,
@@ -775,8 +893,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               width: 2.0)),
                     ),
                     Container(
-                      height: 10.0,
-                      width: 10.0,
+                      height: 8.0,
+                      width: 8.0,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.transparent,
@@ -785,8 +903,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               width: 2.0)),
                     ),
                     Container(
-                      height: 10.0,
-                      width: 10.0,
+                      height: 8.0,
+                      width: 8.0,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.transparent,
@@ -966,6 +1084,83 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             : AudioPanel(
                 miniPanel: _miniPanel(_width, context),
                 expandedPanel: _expandedPanel(context));
+      },
+    );
+  }
+}
+
+class LastPosition extends StatefulWidget {
+  LastPosition({Key key}) : super(key: key);
+
+  @override
+  _LastPositionState createState() => _LastPositionState();
+}
+
+class _LastPositionState extends State<LastPosition> {
+  static String _stringForSeconds(double seconds) {
+    if (seconds == null) return null;
+    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  }
+
+  Future<PlayHistory> getPosition(EpisodeBrief episode) async {
+    var dbHelper = DBHelper();
+    return await dbHelper.getPosition(episode);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    return Selector<AudioPlayerNotifier, EpisodeBrief>(
+      selector: (_, audio) => audio.episode,
+      builder: (context, episode, child) {
+        return FutureBuilder<PlayHistory>(
+            future: getPosition(episode),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+              return snapshot.hasData
+                  ? snapshot.data.seekValue > 0.95
+                      ? Container(
+                          height: 20.0,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  width: 1,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      .color),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
+                          child: Text('Played before'))
+                      : snapshot.data.seconds < 10
+                          ? Center()
+                          : Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10.0)),
+                                onTap: () => audio.seekTo(
+                                    (snapshot.data.seconds * 1000).toInt()),
+                                child: Container(
+                                  width: 120.0,
+                                  height: 20.0,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 1,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1
+                                              .color),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0))),
+                                  child: Text('Last time ' +
+                                      _stringForSeconds(snapshot.data.seconds)),
+                                ),
+                              ),
+                            )
+                  : Center();
+            });
       },
     );
   }

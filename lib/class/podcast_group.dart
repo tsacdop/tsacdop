@@ -21,7 +21,6 @@ class GroupEntity {
 
   static GroupEntity fromJson(Map<String, Object> json) {
     List<String> list = List.from(json['podcastList']);
-    print(json['[podcastList']);
     return GroupEntity(json['name'] as String, json['id'] as String,
         json['color'] as String, list);
   }
@@ -58,6 +57,7 @@ class PodcastGroup {
   List<PodcastLocal> _orderedPodcasts;
   List<PodcastLocal> get ordereddPodcasts => _orderedPodcasts;
   List<PodcastLocal> get podcasts => _podcasts;
+
   set setOrderedPodcasts(List<PodcastLocal> list) {
     _orderedPodcasts = list;
   }
@@ -88,16 +88,27 @@ class GroupList extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  List<String> _orderChanged = [];
-  List<String> get orderChanged => _orderChanged;
-  void addToOrderChanged(String name) {
-    _orderChanged.add(name);
+  List<PodcastGroup> _orderChanged = [];
+  List<PodcastGroup> get orderChanged => _orderChanged;
+
+  void addToOrderChanged(PodcastGroup group) {
+    _orderChanged.add(group);
     notifyListeners();
   }
 
   void drlFromOrderChanged(String name) {
-    _orderChanged.remove(name);
+    _orderChanged.removeWhere((group) => group.name == name);
     notifyListeners();
+  }
+
+  clearOrderChanged() async {
+    if (_orderChanged.length > 0) {
+      await Future.forEach(_orderChanged, (PodcastGroup group) async {
+        await group.getPodcasts();
+      });
+      _orderChanged.clear();
+     // notifyListeners();
+    }
   }
 
   @override
@@ -160,6 +171,18 @@ class GroupList extends ChangeNotifier {
     await dbHelper.savePodcastLocal(podcastLocal);
     await _groups[0].getPodcasts();
     notifyListeners();
+  }
+
+  Future updatePodcast(PodcastLocal podcastLocal) async {
+    List<int> counts = await dbHelper.getPodcastCounts(podcastLocal.id);
+    _groups.forEach((group) {
+      if (group.podcastList.contains(podcastLocal.id)) {
+        group.podcasts.firstWhere((podcast) => podcast.id == podcastLocal.id)
+          ..upateCount = counts[0]
+          ..episodeCount = counts[1];
+        notifyListeners();
+      }
+    });
   }
 
   List<PodcastGroup> getPodcastGroup(String id) {

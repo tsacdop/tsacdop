@@ -1,13 +1,15 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:provider/provider.dart';
+import 'package:tsacdop/class/download_state.dart';
 import 'package:tsacdop/home/playlist.dart';
 import 'package:tuple/tuple.dart';
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
 import 'package:tsacdop/util/mypopupmenu.dart';
@@ -15,6 +17,7 @@ import 'package:tsacdop/util/mypopupmenu.dart';
 import 'package:tsacdop/home/appbar/importompl.dart';
 import 'package:tsacdop/home/audioplayer.dart';
 import 'home_groups.dart';
+import 'download_list.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -58,6 +61,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               Import(),
               Expanded(
                 child: NestedScrollView(
+                  innerScrollPositionKeyBuilder: () {
+                    return Key('tab' + _controller.index.toString());
+                  },
+                  pinnedHeaderSliverHeightBuilder: () => 50,
                   headerSliverBuilder:
                       (BuildContext context, bool innerBoxScrolled) {
                     return <Widget>[
@@ -100,9 +107,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   body: TabBarView(
                     controller: _controller,
                     children: <Widget>[
-                      _RecentUpdate(),
-                      _MyFavorite(),
-                      _MyDownload(),
+                      NestedScrollViewInnerScrollPositionKeyWidget(
+                          Key('tab0'), _RecentUpdate()),
+                      NestedScrollViewInnerScrollPositionKeyWidget(
+                          Key('tab1'), _MyFavorite()),
+                      NestedScrollViewInnerScrollPositionKeyWidget(
+                          Key('tab2'), _MyDownload()),
                     ],
                   ),
                 ),
@@ -317,13 +327,11 @@ class _RecentUpdate extends StatefulWidget {
   _RecentUpdateState createState() => _RecentUpdateState();
 }
 
-class _RecentUpdateState extends State<_RecentUpdate> {
-  int _updateCount = 0;
+class _RecentUpdateState extends State<_RecentUpdate>
+    with AutomaticKeepAliveClientMixin {
   Future<List<EpisodeBrief>> _getRssItem(int top) async {
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await dbHelper.getRecentRssItem(top);
-    KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
-    _updateCount = await refreshcountstorage.getInt();
     return episodes;
   }
 
@@ -337,18 +345,18 @@ class _RecentUpdateState extends State<_RecentUpdate> {
       });
   }
 
-  int _top;
+  int _top = 99;
   bool _loadMore;
 
   @override
   void initState() {
     super.initState();
     _loadMore = false;
-    _top = 33;
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder<List<EpisodeBrief>>(
       future: _getRssItem(_top),
       builder: (context, snapshot) {
@@ -367,7 +375,6 @@ class _RecentUpdateState extends State<_RecentUpdate> {
                     slivers: <Widget>[
                       EpisodeGrid(
                         episodes: snapshot.data,
-                        updateCount: _updateCount,
                       ),
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
@@ -386,6 +393,9 @@ class _RecentUpdateState extends State<_RecentUpdate> {
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class _MyFavorite extends StatefulWidget {
@@ -393,7 +403,8 @@ class _MyFavorite extends StatefulWidget {
   _MyFavoriteState createState() => _MyFavoriteState();
 }
 
-class _MyFavoriteState extends State<_MyFavorite> {
+class _MyFavoriteState extends State<_MyFavorite>
+    with AutomaticKeepAliveClientMixin {
   Future<List<EpisodeBrief>> _getLikedRssItem(_top) async {
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await dbHelper.getLikedRssItem(_top);
@@ -410,18 +421,18 @@ class _MyFavoriteState extends State<_MyFavorite> {
       });
   }
 
-  int _top;
+  int _top = 99;
   bool _loadMore;
 
   @override
   void initState() {
     super.initState();
     _loadMore = false;
-    _top = 33;
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder<List<EpisodeBrief>>(
       future: _getLikedRssItem(_top),
       builder: (context, snapshot) {
@@ -436,7 +447,6 @@ class _MyFavoriteState extends State<_MyFavorite> {
                 },
                 child: CustomScrollView(
                   key: PageStorageKey<String>('favorite'),
-                  physics: const AlwaysScrollableScrollPhysics(),
                   slivers: <Widget>[
                     EpisodeGrid(
                       episodes: snapshot.data,
@@ -459,6 +469,9 @@ class _MyFavoriteState extends State<_MyFavorite> {
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class _MyDownload extends StatefulWidget {
@@ -466,32 +479,45 @@ class _MyDownload extends StatefulWidget {
   _MyDownloadState createState() => _MyDownloadState();
 }
 
-class _MyDownloadState extends State<_MyDownload> {
-  Future<List<EpisodeBrief>> _getDownloadedRssItem() async {
-    var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await dbHelper.getDownloadedRssItem();
-    return episodes;
+class _MyDownloadState extends State<_MyDownload>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return CustomScrollView(
+      key: PageStorageKey<String>('downloas_list'),
+      slivers: <Widget>[
+        DownloadList(),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              return Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(15.0),
+                child: Text('Downloaded'),
+              );
+            },
+            childCount: 1,
+          ),
+        ),
+        Consumer<DownloadState>(
+          builder: (_, downloader, __) {
+            var episodes = downloader.episodeTasks
+                .where((task) => task.status.value == 3)
+                .toList()
+                .map((e) => e.episode)
+                .toList()
+                .reversed
+                .toList();
+            return EpisodeGrid(
+              episodes: episodes,
+            );
+          },
+        ),
+      ],
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<EpisodeBrief>>(
-      future: _getDownloadedRssItem(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-        return (snapshot.hasData)
-            ? CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                primary: false,
-                slivers: <Widget>[
-                  EpisodeGrid(
-                    episodes: snapshot.data,
-                    showDownload: true,
-                  )
-                ],
-              )
-            : Center(child: CircularProgressIndicator());
-      },
-    );
-  }
+  bool get wantKeepAlive => true;
 }

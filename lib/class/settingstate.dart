@@ -10,24 +10,23 @@ void callbackDispatcher() {
   Workmanager.executeTask((task, inputData) async {
     var dbHelper = DBHelper();
     List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-    int i = 0;
     await Future.forEach(podcastList, (podcastLocal) async {
-      i += await dbHelper.updatePodcastRss(podcastLocal);
+     await dbHelper.updatePodcastRss(podcastLocal);
       print('Refresh ' + podcastLocal.title);
     });
     KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
     await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
-    KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
-    await refreshcountstorage.saveInt(i);
     return Future.value(true);
   });
 }
 
 class SettingState extends ChangeNotifier {
-  KeyValueStorage themestorage = KeyValueStorage('themes');
-  KeyValueStorage accentstorage = KeyValueStorage('accents');
-  KeyValueStorage autoupdatestorage = KeyValueStorage('autoupdate');
-  KeyValueStorage intervalstorage = KeyValueStorage('updateInterval');
+  KeyValueStorage themeStorage = KeyValueStorage('themes');
+  KeyValueStorage accentStorage = KeyValueStorage('accents');
+  KeyValueStorage autoupdateStorage = KeyValueStorage('autoupdate');
+  KeyValueStorage intervalStorage = KeyValueStorage('updateInterval');
+  KeyValueStorage downloadUsingDataStorage =
+      KeyValueStorage('downloadUsingData');
 
   Future initData() async {
     await _getTheme();
@@ -49,7 +48,7 @@ class SettingState extends ChangeNotifier {
     _saveUpdateInterval();
     Workmanager.initialize(
       callbackDispatcher,
-      isInDebugMode: true,
+      isInDebugMode: false,
     );
     Workmanager.registerPeriodicTask("1", "update_podcasts",
         frequency: Duration(hours: hour),
@@ -60,8 +59,8 @@ class SettingState extends ChangeNotifier {
     print('work manager init done + ');
   }
 
-  void cancelWork() {
-    Workmanager.cancelAll();
+  Future cancelWork() async{
+    await Workmanager.cancelAll();
     print('work job cancelled');
   }
 
@@ -86,58 +85,74 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _downloadUsingData;
+  bool get downloadUsingData => _downloadUsingData;
+  set downloadUsingData(bool boo) {
+    _downloadUsingData = boo;
+    _saveDownloadUsingData();
+    notifyListeners();
+  }
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
     _getTheme();
     _getAccentSetColor();
     _getAutoUpdate();
+    _getDownloadUsingData();
     _getUpdateInterval().then((value) {
       if (_initUpdateTag == 0) setWorkManager(24);
     });
   }
 
   Future _getTheme() async {
-    int mode = await themestorage.getInt();
+    int mode = await themeStorage.getInt();
     _theme = ThemeMode.values[mode];
   }
 
   Future _saveTheme() async {
-    await themestorage.saveInt(_theme.index);
+    await themeStorage.saveInt(_theme.index);
   }
 
   Future _getAccentSetColor() async {
-    String colorString = await accentstorage.getString();
-    print(colorString);
+    String colorString = await accentStorage.getString();
     if (colorString.isNotEmpty) {
       int color = int.parse('FF' + colorString.toUpperCase(), radix: 16);
       _accentSetColor = Color(color).withOpacity(1.0);
-      print(_accentSetColor.toString());
     } else {
       _accentSetColor = Colors.blue[400];
     }
   }
 
   Future _saveAccentSetColor() async {
-    await accentstorage
+    await accentStorage
         .saveString(_accentSetColor.toString().substring(10, 16));
   }
 
   Future _getAutoUpdate() async {
-    int i = await autoupdatestorage.getInt();
+    int i = await autoupdateStorage.getInt();
     _autoUpdate = i == 0 ? true : false;
   }
 
   Future _saveAutoUpdate() async {
-    await autoupdatestorage.saveInt(_autoUpdate ? 0 : 1);
+    await autoupdateStorage.saveInt(_autoUpdate ? 0 : 1);
   }
 
   Future _getUpdateInterval() async {
-    _initUpdateTag = await intervalstorage.getInt();
-    _updateInterval =  _initUpdateTag;
+    _initUpdateTag = await intervalStorage.getInt();
+    _updateInterval = _initUpdateTag;
   }
 
   Future _saveUpdateInterval() async {
-    await intervalstorage.saveInt(_updateInterval);
+    await intervalStorage.saveInt(_updateInterval);
+  }
+
+  Future _getDownloadUsingData() async {
+    int i = await downloadUsingDataStorage.getInt();
+    _downloadUsingData = i == 0 ? true : false;
+  }
+
+  Future _saveDownloadUsingData() async {
+    await downloadUsingDataStorage.saveInt(_downloadUsingData ? 0 : 1);
   }
 }

@@ -15,6 +15,7 @@ class EpisodeBrief {
   final int explicit;
   final String imagePath;
   final String mediaId;
+  final int isNew;
   EpisodeBrief(
       this.title,
       this.enclosureUrl,
@@ -27,7 +28,8 @@ class EpisodeBrief {
       this.duration,
       this.explicit,
       this.imagePath,
-      this.mediaId);
+      this.mediaId,
+      this.isNew);
 
   String dateToString() {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);

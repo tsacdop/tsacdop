@@ -2,7 +2,7 @@
 [![CircleCI](https://circleci.com/gh/stonega/tsacdop.svg?style=svg)](https://circleci.com/gh/stonega/workflows/tsacdop/)
 ## About
 <p align="center">
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" art = "Logo"/>
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/ic_notification.png" art = "Logo"/>
 </br>
 <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/text.png" art = "Tsacdop"/>
 </p>
@@ -18,7 +18,7 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 
 ## License
 
-Tsacdop is licensed under the [MIT](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
+Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
 
 ## Getting Started
 

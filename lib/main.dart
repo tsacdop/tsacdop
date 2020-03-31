@@ -8,12 +8,13 @@ import 'package:tsacdop/home/appbar/addpodcast.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/settingstate.dart';
+import 'package:tsacdop/class/download_state.dart';
 
 final SettingState themeSetting = SettingState();
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await themeSetting.initData();
-  await FlutterDownloader.initialize();
+
   runApp(
     MultiProvider(
       providers: [
@@ -21,13 +22,16 @@ Future main() async {
         ChangeNotifierProvider(create: (_) => AudioPlayerNotifier()),
         ChangeNotifierProvider(create: (_) => GroupList()),
         ChangeNotifierProvider(create: (_) => ImportOmpl()),
+        ChangeNotifierProvider(create: (_) => DownloadState(),
+        )
       ],
       child: MyApp(),
     ),
   );
-
-  SystemUiOverlayStyle systemUiOverlayStyle =
-      SystemUiOverlayStyle(statusBarColor: Colors.transparent, systemNavigationBarColor: Colors.transparent);
+  await FlutterDownloader.initialize();
+  SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent);
   SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
 
   await SystemChrome.setPreferredOrientations(
@@ -67,7 +71,7 @@ class MyApp extends StatelessWidget {
           darkTheme: ThemeData.dark().copyWith(
             accentColor: setting.accentSetColor,
             primaryColorDark: Colors.grey[800],
-           // scaffoldBackgroundColor: Colors.black87,
+            // scaffoldBackgroundColor: Colors.black87,
             appBarTheme: AppBarTheme(elevation: 0),
           ),
           home: MyHomePage(),

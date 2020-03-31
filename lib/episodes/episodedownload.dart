@@ -1,191 +1,93 @@
-import 'dart:isolate';
 import 'dart:ui';
-import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:tsacdop/class/download_state.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+import 'package:tsacdop/class/settingstate.dart';
 
 class DownloadButton extends StatefulWidget {
-  final EpisodeBrief episodeBrief;
-  DownloadButton({this.episodeBrief, Key key}) : super(key: key);
+  final EpisodeBrief episode;
+  DownloadButton({this.episode, Key key}) : super(key: key);
   @override
   _DownloadButtonState createState() => _DownloadButtonState();
 }
 
 class _DownloadButtonState extends State<DownloadButton> {
-  _TaskInfo _task;
-  bool _isLoading;
   bool _permissionReady;
-  String _localPath;
-  ReceivePort _port = ReceivePort();
-
-  Future<String> _getPath() async {
-    final dir = await getExternalStorageDirectory();
-    return dir.path;
-  }
+  bool _usingData;
+  StreamSubscription _connectivity;
+  EpisodeTask _task;
 
   @override
   void initState() {
     super.initState();
-
-    _bindBackgroundIsolate();
-
-    FlutterDownloader.registerCallback(downloadCallback);
-
-    _isLoading = true;
     _permissionReady = false;
-
-    _prepare();
+    _connectivity = Connectivity().onConnectivityChanged.listen((result) {
+      _usingData = result == ConnectivityResult.mobile;
+    });
   }
 
   @override
   void dispose() {
-    _unbindBackgroundIsolate();
+    _connectivity.cancel();
     super.dispose();
   }
 
-  void _bindBackgroundIsolate() {
-    bool isSuccess = IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
-    if (!isSuccess) {
-      _unbindBackgroundIsolate();
-      _bindBackgroundIsolate();
-      return;
-    }
-
-    _port.listen((dynamic data) {
-      print('UI isolate callback: $data');
-      String id = data[0];
-      DownloadTaskStatus status = data[1];
-      int progress = data[2];
-      if (_task.taskId == id) {
-        print(_task.progress);
-        setState(() {
-          _task.status = status;
-          _task.progress = progress;
-        });
-      }
-    });
-  }
-
-  void _unbindBackgroundIsolate() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-  }
-
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    print('Background callback task in $id  status ($status) $progress');
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send.send([id, status, progress]);
-  }
-
-  void _requestDownload(_TaskInfo task) async {
+  void _requestDownload(EpisodeBrief episode, bool downloadUsingData) async {
     _permissionReady = await _checkPermmison();
-    if (_permissionReady)
-      task.taskId = await FlutterDownloader.enqueue(
-        url: task.link,
-        savedDir: _localPath,
-        showNotification: true,
-        openFileFromNotification: false,
-      );
-    var dbHelper = DBHelper();
-
-    await dbHelper.saveDownloaded(task.link, task.taskId);
-    Fluttertoast.showToast(
-      msg: 'Downloading',
-      gravity: ToastGravity.BOTTOM,
-    );
+    bool _dataConfirm = true;
+    if (_permissionReady) {
+      if (downloadUsingData && _usingData) {
+        _dataConfirm = await _useDataConfirem();
+      }
+      if (_dataConfirm) {
+        Provider.of<DownloadState>(context, listen: false).startTask(episode);
+        Fluttertoast.showToast(
+          msg: 'Downloading',
+          gravity: ToastGravity.BOTTOM,
+        );
+      }
+    }
   }
 
-  void _deleteDownload(_TaskInfo task) async {
-    await FlutterDownloader.remove(
-        taskId: task.taskId, shouldDeleteContent: true);
-    var dbHelper = DBHelper();
-    await dbHelper.delDownloaded(task.link);
-    await _prepare();
-    setState(() {});
+  void _deleteDownload(EpisodeBrief episode) async {
+    Provider.of<DownloadState>(context, listen: false).delTask(episode);
     Fluttertoast.showToast(
       msg: 'Download removed',
       gravity: ToastGravity.BOTTOM,
     );
   }
 
-  void _pauseDownload(_TaskInfo task) async {
-    await FlutterDownloader.pause(taskId: task.taskId);
+  void _pauseDownload(EpisodeBrief episode) async {
+    Provider.of<DownloadState>(context, listen: false).pauseTask(episode);
     Fluttertoast.showToast(
       msg: 'Download paused',
       gravity: ToastGravity.BOTTOM,
     );
   }
 
-  void _resumeDownload(_TaskInfo task) async {
-    String newTaskId = await FlutterDownloader.resume(taskId: task.taskId);
-    task.taskId = newTaskId;
-    var dbHelper = DBHelper();
-    await dbHelper.saveDownloaded(task.taskId, task.link);
+  void _resumeDownload(EpisodeBrief episode) async {
+    Provider.of<DownloadState>(context, listen: false).resumeTask(episode);
     Fluttertoast.showToast(
       msg: 'Download resumed',
       gravity: ToastGravity.BOTTOM,
     );
   }
 
-  void _retryDownload(_TaskInfo task) async {
-    String newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
-    task.taskId = newTaskId;
-    var dbHelper = DBHelper();
-    await dbHelper.saveDownloaded(task.taskId, task.link);
+  void _retryDownload(EpisodeBrief episode) async {
+    Provider.of<DownloadState>(context, listen: false).retryTask(episode);
     Fluttertoast.showToast(
       msg: 'Download again',
       gravity: ToastGravity.BOTTOM,
     );
-  }
-
-  Future<EpisodeBrief> _saveMediaId(_TaskInfo task) async {
-    final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE url = '${task.link}'");
-    String filePath = 'file://' +
-        path.join(completeTask.first.savedDir, completeTask.first.filename);
-    var dbHelper = DBHelper();
-    await dbHelper.saveMediaId(task.link, filePath);
-    EpisodeBrief episode = await dbHelper.getRssItemWithUrl(task.link);
-    return episode;
-  }
-
-  Future<Null> _prepare() async {
-    final tasks = await FlutterDownloader.loadTasks();
-
-    _task = _TaskInfo(
-      name: widget.episodeBrief.title,
-      link: widget.episodeBrief.enclosureUrl,
-    );
-    tasks?.forEach((task) {
-      if (_task.link == task.url) {
-        _task.taskId = task.taskId;
-        _task.status = task.status;
-        _task.progress = task.progress;
-      }
-    });
-
-    _localPath = path.join((await _getPath()), widget.episodeBrief.feedTitle);
-    print(_localPath);
-    final saveDir = Directory(_localPath);
-    bool hasExisted = await saveDir.exists();
-    if (!hasExisted) {
-      saveDir.create();
-    }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<bool> _checkPermmison() async {
@@ -205,6 +107,60 @@ class _DownloadButtonState extends State<DownloadButton> {
     }
   }
 
+  Future<bool> _useDataConfirem() async {
+    bool ifUseData = false;
+    await showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (BuildContext context, Animation animaiton,
+              Animation secondaryAnimation) =>
+          AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor:
+              Theme.of(context).brightness == Brightness.light
+                  ? Color.fromRGBO(113, 113, 113, 1)
+                  : Color.fromRGBO(15, 15, 15, 1),
+        ),
+        child: AlertDialog(
+          elevation: 1,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          titlePadding:
+              EdgeInsets.only(top: 20, left: 20, right: 100, bottom: 20),
+          title: Text('Cellular data warn'),
+          content:
+              Text('Are you sure you want to use cellular data to download?'),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'CANCEL',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+            FlatButton(
+              onPressed: () {
+                ifUseData = true;
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'CONFIRM',
+                style: TextStyle(color: Colors.red),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+    return ifUseData;
+  }
+
   Widget _buttonOnMenu(Widget widget, Function() onTap) => Material(
         color: Colors.transparent,
         child: InkWell(
@@ -218,112 +174,111 @@ class _DownloadButtonState extends State<DownloadButton> {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? Center()
-        : Row(
-            children: <Widget>[
-              _downloadButton(_task),
-              AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).accentColor,
-                      borderRadius: BorderRadius.all(Radius.circular(15.0))),
-                  height: 20.0,
-                  width:
-                      (_task.status == DownloadTaskStatus.running) ? 50.0 : 0,
-                  alignment: Alignment.center,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Text('${_task.progress}%',
-                        style: TextStyle(color: Colors.white)),
-                  )),
-            ],
-          );
+    return Consumer<DownloadState>(builder: (_, downloader, __) {
+      EpisodeTask _task = Provider.of<DownloadState>(context, listen: false)
+          .episodeToTask(widget.episode);
+      return Row(
+        children: <Widget>[
+          _downloadButton(_task, context),
+          AnimatedContainer(
+              duration: Duration(seconds: 1),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
+              height: 20.0,
+              width: (_task.status == DownloadTaskStatus.running) ? 50.0 : 0,
+              alignment: Alignment.center,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Text('${_task.progress}%',
+                    style: TextStyle(color: Colors.white)),
+              )),
+        ],
+      );
+    });
   }
 
-  Widget _downloadButton(_TaskInfo task) {
-    if (task.status == DownloadTaskStatus.undefined) {
-      return _buttonOnMenu(
-          Icon(
-            Icons.arrow_downward,
-            color: Colors.grey[700],
-          ),
-          () => _requestDownload(task));
-    } else if (task.status == DownloadTaskStatus.running) {
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            if (task.progress > 0) _pauseDownload(task);
-          },
-          child: Container(
-            height: 50.0,
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(horizontal: 18.0),
-            child: SizedBox(
-              height: 18,
-              width: 18,
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.grey[500],
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).accentColor),
-                value: task.progress / 100,
+  Widget _downloadButton(EpisodeTask task, BuildContext context) {
+    switch (task.status.value) {
+      case 0:
+        return Selector<SettingState, bool>(
+          selector: (_, settings) => settings.downloadUsingData,
+          builder: (_, data, __) => _buttonOnMenu(
+              Icon(
+                Icons.arrow_downward,
+                color: Colors.grey[700],
+              ),
+              () => _requestDownload(task.episode, data)),
+        );
+        break;
+      case 2:
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              if (task.progress > 0) _pauseDownload(task.episode);
+            },
+            child: Container(
+              height: 50.0,
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(horizontal: 18.0),
+              child: SizedBox(
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.grey[500],
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).accentColor),
+                  value: task.progress / 100,
+                ),
               ),
             ),
           ),
-        ),
-      );
-    } else if (task.status == DownloadTaskStatus.paused) {
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            _resumeDownload(task);
-          },
-          child: Container(
-            height: 50.0,
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(horizontal: 18),
-            child: SizedBox(
-              height: 18,
-              width: 18,
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.grey[500],
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                value: task.progress / 100,
+        );
+        break;
+      case 6:
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              _resumeDownload(task.episode);
+            },
+            child: Container(
+              height: 50.0,
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(horizontal: 18),
+              child: SizedBox(
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.grey[500],
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  value: task.progress / 100,
+                ),
               ),
             ),
           ),
-        ),
-      );
-    } else if (task.status == DownloadTaskStatus.complete) {
-      if(!widget.episodeBrief.mediaId.contains('file://'))
-      {_saveMediaId(task).then((episode) =>
-          Provider.of<AudioPlayerNotifier>(context, listen: false)
-              .updateMediaItem(episode));}
-      return _buttonOnMenu(
-          Icon(
-            Icons.done_all,
-            color: Theme.of(context).accentColor,
-          ),
-          () => _deleteDownload(task));
-    } else if (task.status == DownloadTaskStatus.failed) {
-      return _buttonOnMenu(
-          Icon(Icons.refresh, color: Colors.red), () => _retryDownload(task));
+        );
+        break;
+      case 3:
+        Provider.of<AudioPlayerNotifier>(context, listen: false)
+            .updateMediaItem(task.episode);
+        return _buttonOnMenu(
+            Icon(
+              Icons.done_all,
+              color: Theme.of(context).accentColor,
+            ), () {
+          _deleteDownload(task.episode);
+        });
+        break;
+      case 4:
+        return _buttonOnMenu(Icon(Icons.refresh, color: Colors.red),
+            () => _retryDownload(task.episode));
+        break;
+      default:
+        return Center();
     }
-    return Center();
   }
-}
-
-class _TaskInfo {
-  final String name;
-  final String link;
-
-  String taskId;
-  int progress = 0;
-  DownloadTaskStatus status = DownloadTaskStatus.undefined;
-
-  _TaskInfo({this.name, this.link});
 }
