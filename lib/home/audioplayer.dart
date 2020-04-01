@@ -18,7 +18,6 @@ import 'package:tsacdop/home/audiopanel.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
 import 'package:tsacdop/util/day_night_switch.dart';
-import 'package:tsacdop/util/context_extension.dart';
 
 class MyRectangularTrackShape extends RectangularSliderTrackShape {
   Rect getPreferredRect({

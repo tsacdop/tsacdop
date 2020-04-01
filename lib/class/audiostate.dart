@@ -166,7 +166,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await AudioService.connect();
     bool running = await AudioService.running;
     if (running) {
-      await AudioService.pause();
+      print(AudioService.currentMediaItem.artUri);
     }
   }
 

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,9 +8,9 @@ import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tuple/tuple.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
+
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/util/colorize.dart';
 import 'package:tsacdop/util/context_extension.dart';
 
 class PlaylistPage extends StatefulWidget {
@@ -74,8 +73,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
           backgroundColor: Theme.of(context).primaryColor,
         ),
         body: SafeArea(
-          child:
-            Selector<AudioPlayerNotifier, Tuple3<Playlist, bool, bool>>(
+          child: Selector<AudioPlayerNotifier, Tuple3<Playlist, bool, bool>>(
             selector: (_, audio) =>
                 Tuple3(audio.queue, audio.playerRunning, audio.queueUpdate),
             builder: (_, data, __) {
@@ -123,8 +121,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                       fontSize: 20,
                                     )),
                                 TextSpan(
-                                  text:
-                                      _sumPlaylistLength(episodes).toString(),
+                                  text: _sumPlaylistLength(episodes).toString(),
                                   style: GoogleFonts.cairo(
                                       textStyle: TextStyle(
                                     color: Theme.of(context).accentColor,
@@ -142,27 +139,71 @@ class _PlaylistPageState extends State<PlaylistPage> {
                           ),
                         ),
                         Spacer(),
-                        _topHeight > 65
-                            ? Center()
-                            : Container(
-                                padding: EdgeInsets.only(
-                                    right: 20, bottom: 80 - _topHeight),
-                                child: data.item2
-                                    ? Padding(
-                                        padding: EdgeInsets.only(right: 15),
-                                        child: SizedBox(
-                                            width: 20,
-                                            height: 15,
-                                            child: WaveLoader()),
-                                      )
-                                    : IconButton(
-                                        icon: Icon(Icons.play_circle_filled,
-                                            size: 40,
-                                            color:
-                                                Theme.of(context).accentColor),
-                                        onPressed: () => audio.playlistLoad(),
-                                      ),
-                              ),
+                        Container(
+                          padding: EdgeInsets.only(
+                            right: 20,
+                          ),
+                          child: data.item2
+                              ? _topHeight < 90
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        CircleAvatar(
+                                          radius: 12,
+                                          backgroundImage: FileImage(File(
+                                              "${episodes.first.imagePath}")),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 15),
+                                          child: SizedBox(
+                                              width: 20,
+                                              height: 15,
+                                              child: WaveLoader()),
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        CircleAvatar(
+                                          radius: 15,
+                                          //backgroundColor: _c.withOpacity(0.5),
+                                          backgroundImage: FileImage(File(
+                                              "${episodes.first.imagePath}")),
+                                        ),
+                                        Container(
+                                          width: 150,
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            episodes.first.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.fade,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 15),
+                                          child: SizedBox(
+                                              width: 20,
+                                              height: 15,
+                                              child: WaveLoader()),
+                                        ),
+                                      ],
+                                    )
+                              : IconButton(
+                                  icon: Icon(Icons.play_circle_filled,
+                                      size: 40,
+                                      color: Theme.of(context).accentColor),
+                                  onPressed: () => audio.playlistLoad(),
+                                ),
+                        ),
                       ],
                     ),
                   ),
@@ -171,23 +212,36 @@ class _PlaylistPageState extends State<PlaylistPage> {
                   ),
                   Expanded(
                     child: ReorderableListView(
+                        scrollController: _controller,
                         onReorder: (int oldIndex, int newIndex) {
                           if (newIndex > oldIndex) {
                             newIndex -= 1;
                           }
-                          final EpisodeBrief episodeRemove =
-                              episodes[oldIndex];
+                          final EpisodeBrief episodeRemove = episodes[oldIndex];
                           audio.delFromPlaylist(episodeRemove);
                           audio.addToPlaylistAt(episodeRemove, newIndex);
                           setState(() {});
                         },
                         scrollDirection: Axis.vertical,
-                        children: episodes
-                            .map<Widget>((episode) => DismissibleContainer(
-                                  episode: episode,
-                                  key: ValueKey(episode.enclosureUrl),
-                                ))
-                            .toList()),
+                        children: data.item2
+                            ? episodes.map<Widget>((episode) {
+                                if (episode.enclosureUrl !=
+                                    episodes.first.enclosureUrl)
+                                  return DismissibleContainer(
+                                    episode: episode,
+                                    key: ValueKey(episode.enclosureUrl),
+                                  );
+                                else
+                                  return Container(
+                                    key: ValueKey('sd'),
+                                  );
+                              }).toList()
+                            : episodes
+                                .map<Widget>((episode) => DismissibleContainer(
+                                      episode: episode,
+                                      key: ValueKey(episode.enclosureUrl),
+                                    ))
+                                .toList()),
                   ),
                 ],
               );
@@ -337,6 +391,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                         ],
                       ),
                     ),
+                    trailing: Icon(Icons.menu),
                   ),
                   // Divider(
                   //   height: 2,

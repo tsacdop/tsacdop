@@ -53,9 +53,7 @@ class _PopupMenuState extends State<PopupMenu> {
     return primaryColor;
   }
 
-  bool _showDate;
-  String _refreshDate;
-  _getRefreshDate() async {
+  Future<String> _getRefreshDate() async {
     int refreshDate;
     KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
     int i = await refreshstorage.getInt();
@@ -69,29 +67,19 @@ class _PopupMenuState extends State<PopupMenu> {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
     var diffrence = DateTime.now().difference(date);
     if (diffrence.inMinutes < 10) {
-      _refreshDate = 'Just now';
+      return 'Just now';
     } else if (diffrence.inHours < 1) {
-      _refreshDate = '1 hour ago';
+      return '1 hour ago';
     } else if (diffrence.inHours < 24) {
-      _refreshDate = '${diffrence.inHours} hours ago';
+      return '${diffrence.inHours} hours ago';
     } else if (diffrence.inHours == 24) {
-      _refreshDate = '1 day ago';
+      return '1 day ago';
     } else if (diffrence.inDays < 7) {
-      _refreshDate = '${diffrence.inDays} days ago';
+      return '${diffrence.inDays} days ago';
     } else {
-      _refreshDate = DateFormat.yMMMd()
+      return DateFormat.yMMMd()
           .format(DateTime.fromMillisecondsSinceEpoch(refreshDate));
     }
-    setState(() {
-      _showDate = true;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _showDate = false;
-    _getRefreshDate();
   }
 
   @override
@@ -274,12 +262,17 @@ class _PopupMenuState extends State<PopupMenu> {
                     Text(
                       'Refresh All',
                     ),
-                    _showDate
-                        ? Text(
-                            _refreshDate,
-                            style: TextStyle(color: Colors.red, fontSize: 12),
-                          )
-                        : Center(),
+                    FutureBuilder<String>(
+                        future: _getRefreshDate(),
+                        builder: (_, snapshot) {
+                          if (snapshot.hasData)
+                            return Text(
+                              snapshot.data,
+                              style: TextStyle(color: Colors.red, fontSize: 12),
+                            );
+                          else
+                            return Center();
+                        })
                   ],
                 ),
               ],

@@ -425,7 +425,7 @@ class DBHelper {
 
       if (url != null) {
         await dbClient.transaction((txn) async {
-          int id = await txn.rawInsert(
+          await txn.rawInsert(
               """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
                 description, feed_id, milliseconds, duration, explicit, media_id, is_new) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)""",
               [
@@ -440,7 +440,6 @@ class DBHelper {
                 explicit,
                 url,
               ]);
-          print("$id");
         });
       }
     }

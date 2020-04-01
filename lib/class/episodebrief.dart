@@ -33,7 +33,7 @@ class EpisodeBrief {
 
   String dateToString() {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
-    var diffrence = DateTime.now().difference(date);
+    var diffrence = DateTime.now().toUtc().difference(date);
     if (diffrence.inHours < 1) {
       return '1 hour ago';
     } else if (diffrence.inHours < 24) {
@@ -44,10 +44,10 @@ class EpisodeBrief {
       return '${diffrence.inDays} days ago';
     } else {
       return DateFormat.yMMMd()
-          .format(DateTime.fromMillisecondsSinceEpoch(pubDate));
+          .format(DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
     }
   }
-
+ 
   MediaItem toMediaItem() {
     return MediaItem(
         id: mediaId,
@@ -56,4 +56,5 @@ class EpisodeBrief {
         album: feedTitle,
         artUri: 'file://$imagePath');
   }
+
 }

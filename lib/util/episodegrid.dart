@@ -1,10 +1,7 @@
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
