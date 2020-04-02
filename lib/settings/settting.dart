@@ -213,7 +213,7 @@ class Settings extends StatelessWidget {
                         Divider(height: 2),
                         ListTile(
                           onTap: () => _launchUrl(
-                              'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
+                              'mailto:<tsacdop@stonegate.me>?subject=Tsacdop Feedback'),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.bug_solid),

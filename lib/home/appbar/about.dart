@@ -79,7 +79,7 @@ class AboutApp extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 50),
                     child: Text(
-                      'Tsacdop is a podcast player developed in flutter, a simply beautiful, and friendly app.',
+                      'Tsacdop is a podcast player developed in flutter, a simply beautiful and friendly app.',
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -110,10 +110,7 @@ class AboutApp extends StatelessWidget {
                             'https://github.com/stonaga/'),
                         _listItem(context, 'Twitter', LineIcons.twitter,
                             'https://twitter.com/shimenmen'),
-                        _listItem(
-                            context,
-                            'Medium',
-                            LineIcons.medium,
+                        _listItem(context, 'Medium', LineIcons.medium,
                             'https://medium.com/@stonegate'),
                       ],
                     ),

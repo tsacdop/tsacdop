@@ -101,7 +101,7 @@ class EpisodeGrid extends StatelessWidget {
 
     return SliverPadding(
       padding:
-          const EdgeInsets.only(top: 5.0, bottom: 5.0, left: 15.0, right: 15.0),
+          const EdgeInsets.only(top: 10.0, bottom: 5.0, left: 15.0, right: 15.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           childAspectRatio: 1,
