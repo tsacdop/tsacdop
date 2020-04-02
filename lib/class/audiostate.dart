@@ -222,6 +222,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       androidNotificationIcon: 'drawable/ic_notification',
       enableQueue: true,
       androidStopOnRemoveTask: true,
+      androidStopForegroundOnPause: true
     );
     _playerRunning = true;
     if (_autoPlay) {
