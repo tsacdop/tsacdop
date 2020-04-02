@@ -58,7 +58,7 @@ class StorageSetting extends StatelessWidget {
                               EdgeInsets.only(left: 80.0, right: 25),
                           title: Text('Ask before using cellular data'),
                           subtitle: Text(
-                              'Ask to confirem when using cellular data to download episodes.'),
+                              'Ask to confirm when using cellular data to download episodes.'),
                           trailing: Selector<SettingState, bool>(
                             selector: (_, settings) =>
                                 settings.downloadUsingData,

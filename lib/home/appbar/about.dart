@@ -72,20 +72,19 @@ class AboutApp extends StatelessWidget {
                           image: AssetImage('assets/logo.png'),
                           height: 80,
                         ),
-                        Text('Version: 0.1.5'),
+                        Text('Version: 0.1.6'),
                       ],
                     ),
                   ),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 50),
-                    height: 50,
                     child: Text(
-                      'Tsacdop is a podcast player developed in flutter, a simple, beautiful, and easy-use application.',
+                      'Tsacdop is a podcast player developed in flutter, a simply beautiful, and friendly app.',
                       textAlign: TextAlign.center,
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(5.0),
+                    padding: EdgeInsets.all(10.0),
                   ),
                   Container(
                     padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
@@ -113,7 +112,7 @@ class AboutApp extends StatelessWidget {
                             'https://twitter.com/shimenmen'),
                         _listItem(
                             context,
-                            'Stone Gate',
+                            'Medium',
                             LineIcons.medium,
                             'https://medium.com/@stonegate'),
                       ],

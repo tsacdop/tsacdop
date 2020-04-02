@@ -126,7 +126,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool _stopOnComplete = false;
   Timer _stopTimer;
   int _timeLeft = 0;
-  bool _showStopWatch = false;
+  bool _startSleepTimer = false;
   double _switchValue = 0;
   bool _autoPlay = true;
   DateTime _current;
@@ -144,7 +144,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool get queueUpdate => _queueUpdate;
   EpisodeBrief get episode => _episode;
   bool get stopOnComplete => _stopOnComplete;
-  bool get showStopWatch => _showStopWatch;
+  bool get startSleepTimer => _startSleepTimer;
   bool get autoPlay => _autoPlay;
   int get timeLeft => _timeLeft;
   double get switchValue => _switchValue;
@@ -165,8 +165,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _queueUpdate = false;
     await AudioService.connect();
     bool running = await AudioService.running;
-    if (running) {
-    }
+    if (running) {}
   }
 
   loadPlaylist() async {
@@ -217,13 +216,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
       await AudioService.connect();
     }
     await AudioService.start(
-        backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-        androidNotificationChannelName: 'Tsacdop',
-        notificationColor: 0xFF4d91be,
-        androidNotificationIcon: 'drawable/ic_notification',
-        enableQueue: true,
-        androidStopOnRemoveTask: true,
-        androidStopForegroundOnPause: true);
+      backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
+      androidNotificationChannelName: 'Tsacdop',
+      notificationColor: 0xFF4d91be,
+      androidNotificationIcon: 'drawable/ic_notification',
+      enableQueue: true,
+      androidStopOnRemoveTask: true,
+    );
     _playerRunning = true;
     if (_autoPlay) {
       await Future.forEach(_queue.playlist, (episode) async {
@@ -312,7 +311,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         }
         notifyListeners();
       }
-      if (_audioState == BasicPlaybackState.stopped) {
+      if (_audioState == BasicPlaybackState.stopped || _playerRunning == false) {
         timer.cancel();
       }
     });
@@ -325,6 +324,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _seekSliderValue = 0;
     _episode = _queue.playlist.first;
     _playerRunning = true;
+    _queueUpdate = !_queueUpdate;
     notifyListeners();
     _startAudioService(_lastPostion ?? 0);
   }
@@ -397,9 +397,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
     int pos = _backgroundAudioPosition + s * 1000;
     AudioService.seekTo(pos);
   }
-  
-  seekTo(int position) async{
-     if (_audioState != BasicPlaybackState.connecting &&
+
+  seekTo(int position) async {
+    if (_audioState != BasicPlaybackState.connecting &&
         _audioState != BasicPlaybackState.none)
       await AudioService.seekTo(position);
   }
@@ -417,9 +417,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
   }
 
-  //Set sleep time
+  //Set sleep timer
   sleepTimer(int mins) {
-    _showStopWatch = true;
+    _startSleepTimer= true;
     _switchValue = 1;
     notifyListeners();
     _timeLeft = mins * 60;
@@ -432,12 +432,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
         notifyListeners();
       }
     });
-    _stopTimer = Timer(Duration(minutes: mins), () {
+    _stopTimer = Timer(Duration(minutes: mins), ()  {
       _stopOnComplete = false;
-      _showStopWatch = false;
+      _startSleepTimer= false;
       _switchValue = 0;
+      _playerRunning = false;
+       notifyListeners();
       AudioService.stop();
-      notifyListeners();
+      AudioService.disconnect();
     });
   }
 
@@ -445,7 +447,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   cancelTimer() {
     _stopTimer.cancel();
     _timeLeft = 0;
-    _showStopWatch = false;
+    _startSleepTimer= false;
     _switchValue = 0;
     notifyListeners();
   }

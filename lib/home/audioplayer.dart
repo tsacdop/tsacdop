@@ -71,10 +71,10 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
       begin: _disabledThumbRadius,
       end: enabledThumbRadius,
     );
-    final ColorTween colorTween = ColorTween(
-      begin: sliderTheme.disabledThumbColor,
-      end: sliderTheme.thumbColor,
-    );
+   // final ColorTween colorTween = ColorTween(
+   //   begin: sliderTheme.disabledThumbColor,
+   //   end: sliderTheme.thumbColor,
+   // );
 
     canvas.drawCircle(
       center,
@@ -157,7 +157,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Selector<AudioPlayerNotifier, Tuple3<bool, int, double>>(
       selector: (_, audio) =>
-          Tuple3(audio.showStopWatch, audio.timeLeft, audio.switchValue),
+          Tuple3(audio.startSleepTimer, audio.timeLeft, audio.switchValue),
       builder: (_, data, __) {
         return Container(
           height: 300,
@@ -547,17 +547,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             Spacer(),
             Selector<AudioPlayerNotifier, Tuple3<EpisodeBrief, bool, bool>>(
               selector: (_, audio) => Tuple3(
-                  audio.episode, audio.stopOnComplete, audio.showStopWatch),
+                  audio.episode, audio.stopOnComplete, audio.startSleepTimer),
               builder: (_, data, __) {
                 return Container(
-                  padding: EdgeInsets.all(12.0),
+                  padding: EdgeInsets.all(5.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.all(5.0),
-                      ),
                       Container(
                         height: 30.0,
                         width: 30.0,
@@ -568,7 +565,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       ),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 5.0),
-                        width: 200,
+                        width: 150,
                         child: Text(
                           data.item1.feedTitle,
                           maxLines: 1,
@@ -578,6 +575,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       Spacer(),
                       LastPosition(),
                       IconButton(
+                        padding: EdgeInsets.zero,
                         onPressed: () => Navigator.push(
                           context,
                           SlideUptRoute(
@@ -1007,8 +1005,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       builder: (_, audioplay, __) {
                         return Row(
                           mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
+                            Spacer(),
                             audioplay == BasicPlaybackState.playing
                                 ? InkWell(
                                     onTap:
@@ -1032,7 +1031,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                       alignment: Alignment.center,
                                       children: <Widget>[
                                         Container(
-                                          padding: EdgeInsets.all(10.0),
+                                          padding: EdgeInsets.symmetric(vertical: 10.0),
                                           child: Container(
                                               height: 30.0,
                                               width: 30.0,
@@ -1214,7 +1213,7 @@ class _ImageRotateState extends State<ImageRotate>
     return Transform.rotate(
       angle: 2 * math.pi * _value,
       child: Container(
-        padding: EdgeInsets.all(10.0),
+        padding: EdgeInsets.symmetric(vertical: 10.0),
         child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(15.0)),
           child: Container(

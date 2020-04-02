@@ -41,5 +41,8 @@ List<Libries> plugins = [
   Libries('audio_service', mit, 'https://pub.dev/packages/audio_service'),
   Libries('just_audio', apacheLicense, 'https://pub.dev/packages/just_audio'),
   Libries('line_icons', gpl, 'https://pub.dev/packages/line_icons'),
-  Libries('flutter_file_dialog', bsd, 'https://pub.dev/packages/flutter_file_dialog')
+  Libries('flutter_file_dialog', bsd, 'https://pub.dev/packages/flutter_file_dialog'),
+  Libries('flutter_linkify', mit, 'https://pub.dev/packages/flutter_linkify'),
+  Libries('extended_nested_scroll_view', mit, 'https://pub.dev/packages/extended_nested_scroll_view'),
+  Libries('connectivity', bsd, 'https://pub.dev/packages/connectivity'),
 ];

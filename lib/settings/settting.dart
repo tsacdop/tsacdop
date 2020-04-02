@@ -195,7 +195,7 @@ class Settings extends StatelessWidget {
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.map_signs_solid),
                           title: Text('Changelog'),
-                          subtitle: Text('List of chagnes'),
+                          subtitle: Text('List of changes'),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -213,7 +213,7 @@ class Settings extends StatelessWidget {
                         Divider(height: 2),
                         ListTile(
                           onTap: () => _launchUrl(
-                              'mailto:<xijieyin@gmail.com>?subject=Tsacdop Feedback'),
+                              'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.bug_solid),

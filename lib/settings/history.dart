@@ -13,15 +13,25 @@ class PlayedHistory extends StatefulWidget {
 
 class _PlayedHistoryState extends State<PlayedHistory>
     with SingleTickerProviderStateMixin {
-  Future<List<PlayHistory>> getPlayHistory() async {
+  Future<List<PlayHistory>> getPlayHistory(int top) async {
     DBHelper dbHelper = DBHelper();
     List<PlayHistory> playHistory;
-    playHistory = await dbHelper.getPlayHistory();
+    playHistory = await dbHelper.getPlayHistory(top);
     await Future.forEach(playHistory, (playHistory) async {
       await playHistory.getEpisode();
     });
     return playHistory;
   }
+
+  _loadMoreData() async {
+   // await Future.delayed(Duration(seconds: 3));
+    if (mounted)
+      setState(() {
+        _top = _top + 100;
+      });
+  }
+
+  int _top = 100;
 
   Future<List<SubHistory>> getSubHistory() async {
     DBHelper dbHelper = DBHelper();
@@ -126,94 +136,109 @@ class _PlayedHistoryState extends State<PlayedHistory>
             },
             body: TabBarView(controller: _controller, children: <Widget>[
               FutureBuilder<List<PlayHistory>>(
-                future: getPlayHistory(),
+                future: getPlayHistory(_top),
                 builder: (context, snapshot) {
                   double _width = MediaQuery.of(context).size.width;
                   return snapshot.hasData
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          itemCount: snapshot.data.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Column(
-                                children: <Widget>[
-                                  ListTile(
-                                    title: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          DateFormat.yMd().add_jm().format(
-                                              snapshot.data[index].playdate),
-                                          style: TextStyle(
-                                              color: const Color(0xff67727d),
-                                              fontSize: 15,
-                                              fontStyle: FontStyle.italic),
-                                        ),
-                                        Text(
-                                          snapshot.data[index].title,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                    subtitle: Container(
-                                      width: _width,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Icon(
-                                            Icons.timelapse,
-                                            color: Colors.grey[400],
-                                          ),
-                                          Container(
-                                            height: 2,
-                                            decoration: BoxDecoration(
-                                                border: Border(
-                                                    bottom: BorderSide(
-                                                        color: Colors.grey[400],
-                                                        width: 2.0))),
-                                            width: _width *
-                                                        snapshot.data[index]
-                                                            .seekValue <
-                                                    (_width - 120)
-                                                ? _width *
-                                                    snapshot
-                                                        .data[index].seekValue
-                                                : _width - 120,
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 2),
-                                          ),
-                                          Container(
-                                            width: 50,
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .accentColor,
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10))),
-                                            padding: EdgeInsets.all(2),
-                                            child: Text(
-                                              _stringForSeconds(
-                                                  snapshot.data[index].seconds),
+                      ? NotificationListener<ScrollNotification>(
+                          onNotification: (ScrollNotification scrollInfo) {
+                            if (scrollInfo.metrics.pixels ==
+                                    scrollInfo.metrics.maxScrollExtent &&
+                                snapshot.data.length == _top)
+                              _loadMoreData();
+                            return true;
+                          },
+                          child: ListView.builder(
+                              //shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Container(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              DateFormat.yMd().add_jm().format(
+                                                  snapshot
+                                                      .data[index].playdate),
                                               style: TextStyle(
-                                                  color: Colors.white),
+                                                  color:
+                                                      const Color(0xff67727d),
+                                                  fontSize: 15,
+                                                  fontStyle: FontStyle.italic),
                                             ),
+                                            Text(
+                                              snapshot.data[index].title,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                        subtitle: Container(
+                                          width: _width,
+                                          child: Row(
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.timelapse,
+                                                color: Colors.grey[400],
+                                              ),
+                                              Container(
+                                                height: 2,
+                                                decoration: BoxDecoration(
+                                                    border: Border(
+                                                        bottom: BorderSide(
+                                                            color: Colors
+                                                                .grey[400],
+                                                            width: 2.0))),
+                                                width: _width *
+                                                            snapshot.data[index]
+                                                                .seekValue <
+                                                        (_width - 120)
+                                                    ? _width *
+                                                        snapshot.data[index]
+                                                            .seekValue
+                                                    : _width - 120,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 2),
+                                              ),
+                                              Container(
+                                                width: 50,
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                        .accentColor,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10))),
+                                                padding: EdgeInsets.all(2),
+                                                child: Text(
+                                                  _stringForSeconds(snapshot
+                                                      .data[index].seconds),
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
+                                      //  Divider(height: 2),
+                                    ],
                                   ),
-                                  //  Divider(height: 2),
-                                ],
-                              ),
-                            );
-                          })
+                                );
+                              }),
+                        )
                       : Center(
                           child: CircularProgressIndicator(),
                         );

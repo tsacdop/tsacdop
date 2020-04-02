@@ -16,13 +16,16 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+import 'package:tsacdop/util/context_extension.dart';
 import 'episodedownload.dart';
 
 class EpisodeDetail extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
   final bool hide;
-  EpisodeDetail({this.episodeItem, this.heroTag = '',this.hide = false,  Key key}) : super(key: key);
+  EpisodeDetail(
+      {this.episodeItem, this.heroTag = '', this.hide = false, Key key})
+      : super(key: key);
 
   @override
   _EpisodeDetailState createState() => _EpisodeDetailState();
@@ -38,7 +41,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   Future getSDescription(String url) async {
     var dbHelper = DBHelper();
     _description = (await dbHelper.getDescription(url))
-        .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '').replaceAll('\r', '');
+        .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '')
+        .replaceAll('\r', '');
     if (mounted)
       setState(() {
         _loaddes = true;
@@ -93,7 +97,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-        //  title: Text(widget.episodeItem.feedTitle),
+          //  title: Text(widget.episodeItem.feedTitle),
           centerTitle: true,
         ),
         body: Stack(
@@ -197,13 +201,12 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       padding: EdgeInsets.only(top: 5.0),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
-                        //physics: AlwaysScrollableScrollPhysics(),
                         controller: _controller,
                         child: _loaddes
                             ? (_description.contains('<'))
                                 ? Html(
-                                    padding:
-                                        EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
+                                    padding: EdgeInsets.only(
+                                        left: 20.0, right: 20, bottom: 10),
                                     defaultTextStyle: TextStyle(height: 1.8),
                                     data: _description,
                                     linkStyle: TextStyle(
@@ -215,24 +218,48 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                     },
                                     useRichText: true,
                                   )
-                                : Container(
-                                    padding:
-                                        EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
-                                    alignment: Alignment.topLeft,
-                                    child: SelectableLinkify(
-                                      onOpen: (link) {
-                                        _launchUrl(link.url);
-                                      },
-                                      text: _description,
-                                      style: TextStyle(
-                                        height: 1.8,
-                                      ),
-                                      linkStyle: TextStyle(
-                                        color: Theme.of(context).accentColor,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  )
+                                : _description.length > 0
+                                    ? Container(
+                                        padding: EdgeInsets.only(
+                                            left: 20.0,
+                                            right: 20.0,
+                                            bottom: 10.0),
+                                        alignment: Alignment.topLeft,
+                                        child: SelectableLinkify(
+                                          onOpen: (link) {
+                                            _launchUrl(link.url);
+                                          },
+                                          text: _description,
+                                          style: TextStyle(
+                                            height: 1.8,
+                                          ),
+                                          linkStyle: TextStyle(
+                                            color:
+                                                Theme.of(context).accentColor,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        height: context.width,
+                                        alignment: Alignment.center,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Image(
+                                              image: AssetImage(
+                                                  'assets/shownote.png'),
+                                              height: 100.0,
+                                            ),
+                                            Padding(padding: EdgeInsets.all(5.0)),
+                                            Text(
+                                                'Still no shownote received\n for this episode.', textAlign: TextAlign.center,
+                                                style: TextStyle(color: context.textTheme.bodyText1.color.withOpacity(0.5))),
+                                          ],
+                                        ),
+                                      )
                             : Center(),
                       ),
                     ),
@@ -259,10 +286,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: MenuBar(
-                          episodeItem: widget.episodeItem,
-                          heroTag: widget.heroTag,
-                          hide: widget.hide
-                        ),
+                            episodeItem: widget.episodeItem,
+                            heroTag: widget.heroTag,
+                            hide: widget.hide),
                       ),
                     ),
                   );
@@ -279,7 +305,8 @@ class MenuBar extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
   final bool hide;
-  MenuBar({this.episodeItem, this.heroTag, this.hide, Key key}) : super(key: key);
+  MenuBar({this.episodeItem, this.heroTag, this.hide, Key key})
+      : super(key: key);
   @override
   _MenuBarState createState() => _MenuBarState();
 }
@@ -349,10 +376,11 @@ class _MenuBarState extends State<MenuBar> {
                 height: 30.0,
                 width: 30.0,
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: widget.hide ? Center() :
-                 CircleAvatar(
-                    backgroundImage:
-                        FileImage(File("${widget.episodeItem.imagePath}"))),
+                child: widget.hide
+                    ? Center()
+                    : CircleAvatar(
+                        backgroundImage:
+                            FileImage(File("${widget.episodeItem.imagePath}"))),
               ),
             ),
           ),

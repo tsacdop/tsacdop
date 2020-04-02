@@ -88,121 +88,142 @@ class _PlaylistPageState extends State<PlaylistPage> {
                     height: _topHeight,
                     child: Row(
                       children: <Widget>[
-                        Container(
-                          height: _topHeight,
-                          padding: EdgeInsets.only(
-                            left: 70,
-                          ),
-                          alignment: Alignment.centerLeft,
-                          child: RichText(
-                            text: TextSpan(
-                              text: _topHeight > 90 ? 'Playlist\n' : '',
-                              style: TextStyle(
-                                color:
-                                    Theme.of(context).textTheme.bodyText1.color,
-                                fontSize: 30,
-                              ),
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: episodes.length.toString(),
-                                  style: GoogleFonts.cairo(
-                                    textStyle: TextStyle(
-                                      color: Theme.of(context).accentColor,
-                                      fontSize: 30,
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            height: _topHeight,
+                            padding: EdgeInsets.only(
+                              left: 60,
+                            ),
+                            alignment: Alignment.centerLeft,
+                            child: RichText(
+                              text: TextSpan(
+                                text: _topHeight > 90 ? 'Playlist\n' : '',
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      .color,
+                                  fontSize: 30,
+                                ),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: episodes.length.toString(),
+                                    style: GoogleFonts.cairo(
+                                      textStyle: TextStyle(
+                                        color: Theme.of(context).accentColor,
+                                        fontSize: 25,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                TextSpan(
-                                    text: episodes.length < 2
-                                        ? ' episode  '
-                                        : ' episodes  ',
-                                    style: TextStyle(
+                                  TextSpan(
+                                      text: episodes.length < 2
+                                          ? 'episode'
+                                          : 'episodes',
+                                      style: TextStyle(
+                                        color: Theme.of(context).accentColor,
+                                        fontSize: 15,
+                                      )),
+                                  TextSpan(
+                                    text:
+                                        _sumPlaylistLength(episodes).toString(),
+                                    style: GoogleFonts.cairo(
+                                        textStyle: TextStyle(
                                       color: Theme.of(context).accentColor,
-                                      fontSize: 20,
+                                      fontSize: 25,
                                     )),
-                                TextSpan(
-                                  text: _sumPlaylistLength(episodes).toString(),
-                                  style: GoogleFonts.cairo(
-                                      textStyle: TextStyle(
-                                    color: Theme.of(context).accentColor,
-                                    fontSize: 30,
-                                  )),
-                                ),
-                                TextSpan(
-                                    text: ' mins',
-                                    style: TextStyle(
-                                      color: Theme.of(context).accentColor,
-                                      fontSize: 20,
-                                    )),
-                              ],
+                                  ),
+                                  TextSpan(
+                                      text: 'mins',
+                                      style: TextStyle(
+                                        color: Theme.of(context).accentColor,
+                                        fontSize: 15,
+                                      )),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                        Spacer(),
-                        Container(
-                          padding: EdgeInsets.only(
-                            right: 20,
-                          ),
-                          child: data.item2
-                              ? _topHeight < 90
-                                  ? Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        CircleAvatar(
-                                          radius: 12,
-                                          backgroundImage: FileImage(File(
-                                              "${episodes.first.imagePath}")),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 15),
-                                          child: SizedBox(
-                                              width: 20,
-                                              height: 15,
-                                              child: WaveLoader()),
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        CircleAvatar(
-                                          radius: 15,
-                                          //backgroundColor: _c.withOpacity(0.5),
-                                          backgroundImage: FileImage(File(
-                                              "${episodes.first.imagePath}")),
-                                        ),
-                                        Container(
-                                          width: 150,
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            episodes.first.title,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.fade,
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            padding: EdgeInsets.all(5.0),
+                            margin: EdgeInsets.only(right: 20.0, bottom: 5.0),
+                            decoration: data.item2 ? BoxDecoration(
+                              color: context.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ) :
+                            BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.transparent
+                            ),
+                            child: data.item2
+                                ? _topHeight < 90
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          CircleAvatar(
+                                            radius: 12,
+                                            backgroundImage: FileImage(File(
+                                                "${episodes.first.imagePath}")),
                                           ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 15),
-                                          child: SizedBox(
-                                              width: 20,
-                                              height: 15,
-                                              child: WaveLoader()),
-                                        ),
-                                      ],
-                                    )
-                              : IconButton(
-                                  icon: Icon(Icons.play_circle_filled,
-                                      size: 40,
-                                      color: Theme.of(context).accentColor),
-                                  onPressed: () => audio.playlistLoad(),
-                                ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            child: SizedBox(
+                                                width: 20,
+                                                height: 15,
+                                                child: WaveLoader()),
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          CircleAvatar(
+                                            radius: 15,
+                                            //backgroundColor: _c.withOpacity(0.5),
+                                            backgroundImage: FileImage(File(
+                                                "${episodes.first.imagePath}")),
+                                          ),
+                                          Container(
+                                            width: 150,
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              episodes.first.title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.fade,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            child: SizedBox(
+                                                width: 20,
+                                                height: 15,
+                                                child: WaveLoader()),
+                                          ),
+                                        ],
+                                      )
+                                : IconButton(
+                                  padding: EdgeInsets.all(0),
+                                  alignment: Alignment.center,
+                                    icon: Icon(Icons.play_circle_filled,
+                                        size: 40,
+                                        color: Theme.of(context).accentColor),
+                                    onPressed: () {
+                                      audio.playlistLoad();
+                                      // setState(() {});
+                                    }),
+                          ),
                         ),
                       ],
                     ),
@@ -286,6 +307,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
+      alignment: Alignment.center,
       height: _delete ? 0 : 95.0,
       child: _delete
           ? Container(

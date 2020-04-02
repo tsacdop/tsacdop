@@ -1,4 +1,7 @@
 //Fork from https://github.com/divyanshub024/day_night_switch
+//Copyright https://github.com/divyanshub024
+//Apache License 2.0 https://github.com/divyanshub024/day_night_switch/blob/master/LICENSE
+
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';

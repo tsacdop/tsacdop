@@ -482,8 +482,8 @@ class ShowEpisode extends StatelessWidget {
           padding: const EdgeInsets.all(5.0),
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 1.0,
-              crossAxisCount: 3,
+              childAspectRatio: 1.5,
+              crossAxisCount: 2,
               mainAxisSpacing: 6.0,
               crossAxisSpacing: 6.0,
             ),
@@ -529,15 +529,6 @@ class ShowEpisode extends StatelessWidget {
                           );
                         },
                         child: Container(
-                          // decoration: BoxDecoration(
-                          //   border: Border.all(
-                          //     color: Theme.of(context).brightness ==
-                          //             Brightness.light
-                          //         ? Theme.of(context).primaryColor
-                          //         : Theme.of(context).scaffoldBackgroundColor,
-                          //     width: 0.0,
-                          //   ),
-                          // ),
                           padding: EdgeInsets.all(10.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -560,7 +551,7 @@ class ShowEpisode extends StatelessWidget {
                                       ),
                                     ),
                                     Spacer(),
-                                    episodes[index].isNew == 1 
+                                    episodes[index].isNew == 1
                                         ? Text(
                                             'New',
                                             style: TextStyle(
@@ -579,8 +570,8 @@ class ShowEpisode extends StatelessWidget {
                                   child: Text(
                                     episodes[index].title,
                                     style: TextStyle(
-                                      fontSize: _width / 32,
-                                    ),
+                                        //fontSize: _width / 32,
+                                        ),
                                     maxLines: 4,
                                     overflow: TextOverflow.fade,
                                   ),
@@ -588,17 +579,37 @@ class ShowEpisode extends StatelessWidget {
                               ),
                               Expanded(
                                   flex: 1,
-                                  child: Container(
-                                    alignment: Alignment.bottomLeft,
-                                    child: Text(
-                                      episodes[index].dateToString(),
-                                      //podcast[index].pubDate.substring(4, 16),
-                                      style: TextStyle(
-                                        fontSize: _width / 35,
-                                        color: _c,
-                                        fontStyle: FontStyle.italic,
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Text(
+                                          episodes[index].dateToString(),
+                                          //podcast[index].pubDate.substring(4, 16),
+                                          style: TextStyle(
+                                            fontSize: _width / 35,
+                                            color: _c,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      Spacer(),
+                                      episodes[index].duration != 0
+                                          ? Container(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                (episodes[index].duration)
+                                                        .toString() +
+                                                    'mins',
+                                                style: TextStyle(
+                                                  fontSize: _width / 35,
+                                                 // color: _c,
+                                                 // fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            )
+                                          : Center(),
+                                    ],
                                   )),
                             ],
                           ),
@@ -608,7 +619,7 @@ class ShowEpisode extends StatelessWidget {
                   ),
                 );
               },
-              childCount: (episodes.length > 3) ? 3 : episodes.length,
+              childCount: (episodes.length > 2) ? 2 : episodes.length,
             ),
           ),
         ),

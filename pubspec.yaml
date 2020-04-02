@@ -11,7 +11,7 @@ description: An easy-use podacasts player.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.1.5 
+version: 0.1.6 
 
 environment:
   sdk: ">=2.6.0 <3.0.0"
@@ -56,7 +56,6 @@ dev_dependencies:
   just_audio:
     git:
       url: https://github.com/stonega/just_audio.git 
-  rxdart: ^0.23.1
   line_icons:
     git:
       url: https://github.com/galonsos/line_icons.git 

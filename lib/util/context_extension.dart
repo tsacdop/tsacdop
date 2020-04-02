@@ -8,4 +8,5 @@ extension ContextExtension on BuildContext{
     Brightness get brightness => Theme.of(this).brightness;
     double get width => MediaQuery.of(this).size.width;
     double get height => MediaQuery.of(this).size.width;
+    TextTheme get textTheme => Theme.of(this).textTheme;
 }

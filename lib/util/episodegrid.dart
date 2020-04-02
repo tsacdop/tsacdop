@@ -104,7 +104,7 @@ class EpisodeGrid extends StatelessWidget {
           const EdgeInsets.only(top: 5.0, bottom: 5.0, left: 15.0, right: 15.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          childAspectRatio: 1.0,
+          childAspectRatio: 1,
           crossAxisCount: 3,
           mainAxisSpacing: 6.0,
           crossAxisSpacing: 6.0,
@@ -213,7 +213,7 @@ class EpisodeGrid extends StatelessWidget {
                                 child: Text(
                                   episodes[index].title,
                                   style: TextStyle(
-                                    fontSize: _width / 32,
+                                   // fontSize: _width / 32,
                                   ),
                                   maxLines: 4,
                                   overflow: TextOverflow.fade,

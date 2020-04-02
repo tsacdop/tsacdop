@@ -195,12 +195,12 @@ class DBHelper {
     return result;
   }
 
-  Future<List<PlayHistory>> getPlayHistory() async {
+  Future<List<PlayHistory>> getPlayHistory(int top) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory
-         ORDER BY add_date DESC 
-     """);
+         ORDER BY add_date DESC LIMIT ?
+     """,[top]);
     List<PlayHistory> playHistory = [];
     list.forEach((record) {
       playHistory.add(PlayHistory(record['title'], record['enclosure_url'],

@@ -173,7 +173,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   void initState() {
     super.initState();
     _loadMore = false;
-    _top = 33;
+    _top = 99;
     _controller = ScrollController();
   }
 
