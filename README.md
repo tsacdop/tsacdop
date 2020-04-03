@@ -29,9 +29,9 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 More to come...
 
 ## Preview
-HomePage | DarkMode | Groups | Podcast
--------|--------|--------|------
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893838840.png" art = "HomePage"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png" art = "DarkMode"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585894051734.png" art = "Groups"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png" art = "Podcast"/>
+HomePage | Group | Podcast | Episode |DarkMode
+-------|--------|--------|------| ---
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893838840.png" art = "HomePage"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585894051734.png" art = "Groups"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png" art = "Podcast"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585896237809.png" art = "DarkMode"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png" art = "DarkMode"/>|
 
 ## License
 
