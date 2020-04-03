@@ -9,13 +9,31 @@
 
 Enjoy podcasts with Tsacdop.
 
-Tsacdop is a podcast player developed with flutter, only for Android right now. 
-The development is still on early stage.
+Tsacdop is a podcast player developed with flutter, a clean, simply beautiful and friendly app, only support Android right now. 
 
-Credit to flutter team and  involved plugin developers, especially [webfeed](https://github.com/witochandra/webfeed) and [Just_Audio](https://pub.dev/packages/just_audio).
+
+Credit to flutter team and  all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) and [Just_Audio](https://pub.dev/packages/just_audio).
 
 The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 
+## Features
+* Podcasts group manage
+* Playlist support
+* Sleep timer
+* OMPL file export and import
+* Syncing in background
+* Listen and subscribe history data
+* Dark theme / Accent color 
+* Donwload for offline playing
+More to come...
+
+## Prevoew
+HomePage | DarkMode | Groups | Podcast
+---------|----------|--------|--------
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/preview/1585893838840.png" art = "Logo"/>|
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/preivew/1585893920721.png" art = "Logo"/>|
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/preivew/1585894051734.png" art = "Logo"/>|
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/preivew/1585893877702.png" art = "Logo"/>
 ## License
 
 Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.

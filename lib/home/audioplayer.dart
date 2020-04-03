@@ -144,7 +144,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     BoxShadow(blurRadius: 8, offset: Offset(2, 2), color: Colors.black)
   ];
 
-  List minsToSelect = [1, 5, 10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
+  List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
   int _minSelected;
   final GlobalKey<AnimatedListState> _miniPlaylistKey = GlobalKey();
   @override

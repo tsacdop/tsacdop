@@ -13,6 +13,7 @@ List<Libries> google = [
 ];
 
 List<Libries> plugins = [
+  Libries('webfeed', mit, 'https://pub.dev/packages/webfeed'),
   Libries('json_annotation',bsd, 'https://pub.dev/packages/json_annotation'),
   Libries('sqflite', mit, 'https://pub.dev/packages/sqflite'),
   Libries('flutter_html', mit, 'https://pub.dev/packages/flutter_html'),
