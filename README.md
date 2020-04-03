@@ -24,16 +24,15 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 * Syncing in background
 * Listen and subscribe history data
 * Dark theme / Accent color 
-* Donwload for offline playing
+* Donwload for offline playing 
+
 More to come...
 
-## Prevoew
+## Preview
 HomePage | DarkMode | Groups | Podcast
----------|----------|--------|--------
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/preview/1585893838840.png" art = "Logo"/>|
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/preivew/1585893920721.png" art = "Logo"/>|
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/preivew/1585894051734.png" art = "Logo"/>|
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/preivew/1585893877702.png" art = "Logo"/>
+-------|--------|--------|------
+<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893838840.png" art = "HomePage"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png" art = "DarkMode"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585894051734.png" art = "Groups"/>|<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png" art = "Podcast"/>
+
 ## License
 
 Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
