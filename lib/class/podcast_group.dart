@@ -129,6 +129,13 @@ class GroupList extends ChangeNotifier {
       notifyListeners();
     });
   }
+//update podcasts of each group 
+  Future updateGroups() async{
+    await Future.forEach(_groups, (group) async {
+        await group.getPodcasts();
+      });
+    notifyListeners();
+  }
 
   Future addGroup(PodcastGroup podcastGroup) async {
     _isLoading = true;

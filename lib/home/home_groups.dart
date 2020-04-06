@@ -474,8 +474,7 @@ class ShowEpisode extends StatelessWidget {
     }
 
     return CustomScrollView(
-      // physics: const AlwaysScrollableScrollPhysics(),
-      physics: ClampingScrollPhysics(),
+      physics: NeverScrollableScrollPhysics(),
       primary: false,
       slivers: <Widget>[
         SliverPadding(

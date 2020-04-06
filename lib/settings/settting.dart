@@ -14,6 +14,7 @@ import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/util/ompl_build.dart';
 import 'package:tsacdop/util/context_extension.dart';
+import 'package:tsacdop/intro_slider/app_intro.dart';
 import 'theme.dart';
 import 'storage.dart';
 import 'history.dart';
@@ -219,6 +220,17 @@ class Settings extends StatelessWidget {
                           leading: Icon(LineIcons.bug_solid),
                           title: Text('Feedback'),
                           subtitle: Text('Bugs and feature requests'),
+                        ),
+                        Divider(height: 2),
+                        ListTile(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SlideIntro(goto: Goto.settings))),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
+                          leading: Icon(LineIcons.bug_solid),
+                          title: Text('App Intro'),
                         ),
                         Divider(height: 2),
                       ],

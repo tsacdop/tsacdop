@@ -12,6 +12,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/util/context_extension.dart';
+import 'package:tsacdop/home/audioplayer.dart';
 
 class PlaylistPage extends StatefulWidget {
   @override
@@ -311,7 +312,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
       height: _delete ? 0 : 95.0,
       child: _delete
           ? Container(
-              color: context.accentColor,
+              color: Colors.transparent,
             )
           : Dismissible(
               key: ValueKey(widget.episode.enclosureUrl + 't'),
@@ -353,13 +354,16 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                 });
                 int index = await audio.delFromPlaylist(widget.episode);
                 final episodeRemove = widget.episode;
+                 
                 Fluttertoast.showToast(
                   msg: 'Removed From Playlist',
                   gravity: ToastGravity.BOTTOM,
                 );
                 Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text('1 episode removed'),
+                  backgroundColor: Colors.grey[800],
+                  content: Text('Episode removed', style: TextStyle(color: Colors.white)),
                   action: SnackBarAction(
+                      textColor: context.accentColor,
                       label: 'Undo',
                       onPressed: () {
                         audio.addToPlaylistAt(episodeRemove, index);

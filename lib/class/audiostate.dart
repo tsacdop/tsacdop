@@ -216,14 +216,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
       await AudioService.connect();
     }
     await AudioService.start(
-      backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-      androidNotificationChannelName: 'Tsacdop',
-      notificationColor: 0xFF4d91be,
-      androidNotificationIcon: 'drawable/ic_notification',
-      enableQueue: true,
-      androidStopOnRemoveTask: true,
-      androidStopForegroundOnPause: true
-    );
+        backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
+        androidNotificationChannelName: 'Tsacdop',
+        notificationColor: 0xFF4d91be,
+        androidNotificationIcon: 'drawable/ic_notification',
+        enableQueue: true,
+        androidStopOnRemoveTask: true,
+        androidStopForegroundOnPause: true);
     _playerRunning = true;
     if (_autoPlay) {
       await Future.forEach(_queue.playlist, (episode) async {
@@ -312,7 +311,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
         }
         notifyListeners();
       }
-      if (_audioState == BasicPlaybackState.stopped || _playerRunning == false) {
+      if (_audioState == BasicPlaybackState.stopped ||
+          _playerRunning == false) {
         timer.cancel();
       }
     });
@@ -369,6 +369,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       await AudioService.removeQueueItem(episode.toMediaItem());
     }
     int index = await _queue.delFromPlaylist(episode);
+    _queueUpdate = !_queueUpdate;
     notifyListeners();
     return index;
   }
@@ -420,7 +421,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   //Set sleep timer
   sleepTimer(int mins) {
-    _startSleepTimer= true;
+    _startSleepTimer = true;
     _switchValue = 1;
     notifyListeners();
     _timeLeft = mins * 60;
@@ -433,12 +434,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
         notifyListeners();
       }
     });
-    _stopTimer = Timer(Duration(minutes: mins), ()  {
+    _stopTimer = Timer(Duration(minutes: mins), () {
       _stopOnComplete = false;
-      _startSleepTimer= false;
+      _startSleepTimer = false;
       _switchValue = 0;
       _playerRunning = false;
-       notifyListeners();
+      notifyListeners();
       AudioService.stop();
       AudioService.disconnect();
     });
@@ -448,7 +449,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   cancelTimer() {
     _stopTimer.cancel();
     _timeLeft = 0;
-    _startSleepTimer= false;
+    _startSleepTimer = false;
     _switchValue = 0;
     notifyListeners();
   }
@@ -654,7 +655,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   void onAudioFocusLost() {
     if (_skipState == null) {
-      if (_playing == null) {}
+      if (_playing == null ||
+          _audioPlayer.playbackState == AudioPlaybackState.none ||
+          _audioPlayer.playbackState == AudioPlaybackState.connecting) {}
       _playing = false;
       _audioPlayer.pause();
     }

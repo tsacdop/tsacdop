@@ -102,6 +102,7 @@ class _PopupMenuState extends State<PopupMenu> {
       KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
       await refreshcountstorage.saveInt(i);
       importOmpl.importState = ImportState.complete;
+      groupList.updateGroups();
     }
 
     saveOmpl(String rss) async {

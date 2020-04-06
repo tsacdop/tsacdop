@@ -11,7 +11,7 @@ void callbackDispatcher() {
     var dbHelper = DBHelper();
     List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
     await Future.forEach(podcastList, (podcastLocal) async {
-     await dbHelper.updatePodcastRss(podcastLocal);
+      await dbHelper.updatePodcastRss(podcastLocal);
       print('Refresh ' + podcastLocal.title);
     });
     KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
@@ -27,10 +27,12 @@ class SettingState extends ChangeNotifier {
   KeyValueStorage intervalStorage = KeyValueStorage('updateInterval');
   KeyValueStorage downloadUsingDataStorage =
       KeyValueStorage('downloadUsingData');
+  KeyValueStorage introStorage = KeyValueStorage('intro');
 
   Future initData() async {
     await _getTheme();
     await _getAccentSetColor();
+    await _getShowIntro();
   }
 
   ThemeMode _theme;
@@ -59,7 +61,7 @@ class SettingState extends ChangeNotifier {
     print('work manager init done + ');
   }
 
-  Future cancelWork() async{
+  Future cancelWork() async {
     await Workmanager.cancelAll();
     print('work job cancelled');
   }
@@ -93,6 +95,9 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _showIntro;
+  bool get showIntro => _showIntro;
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
@@ -120,7 +125,7 @@ class SettingState extends ChangeNotifier {
       int color = int.parse('FF' + colorString.toUpperCase(), radix: 16);
       _accentSetColor = Color(color).withOpacity(1.0);
     } else {
-      _accentSetColor = Colors.blue[400];
+      _accentSetColor = Color.fromRGBO(35, 204, 198, 1);
     }
   }
 
@@ -154,5 +159,13 @@ class SettingState extends ChangeNotifier {
 
   Future _saveDownloadUsingData() async {
     await downloadUsingDataStorage.saveInt(_downloadUsingData ? 0 : 1);
+  }
+
+  Future _getShowIntro() async {
+    int i = await introStorage.getInt();
+    _showIntro = i == 0 ? true : false;
+  }
+  Future saveShowIntro() async{
+    await introStorage.saveInt(1);
   }
 }

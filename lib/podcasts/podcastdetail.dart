@@ -232,7 +232,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                           });
                                       }
                                     }),
-                                  physics: const ClampingScrollPhysics(),
+                                  physics: const AlwaysScrollableScrollPhysics(),
                                   //primary: true,
                                   slivers: <Widget>[
                                     SliverAppBar(

@@ -63,6 +63,7 @@ dev_dependencies:
   flutter_linkify: ^3.1.0
   extended_nested_scroll_view: ^0.4.0
   connectivity: ^0.4.8+2
+  flare_flutter: ^2.0.1
   
 
 # For information on the generic Dart part of this file, see the

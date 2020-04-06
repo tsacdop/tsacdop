@@ -71,10 +71,10 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
       begin: _disabledThumbRadius,
       end: enabledThumbRadius,
     );
-   // final ColorTween colorTween = ColorTween(
-   //   begin: sliderTheme.disabledThumbColor,
-   //   end: sliderTheme.thumbColor,
-   // );
+    // final ColorTween colorTween = ColorTween(
+    //   begin: sliderTheme.disabledThumbColor,
+    //   end: sliderTheme.thumbColor,
+    // );
 
     canvas.drawCircle(
       center,
@@ -146,7 +146,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
   int _minSelected;
-  final GlobalKey<AnimatedListState> _miniPlaylistKey = GlobalKey();
+  final GlobalKey<AnimatedListState> miniPlaylistKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -652,11 +652,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                         onTap: () {
                           audio.playNext();
-                          _miniPlaylistKey.currentState.removeItem(
+                          miniPlaylistKey.currentState.removeItem(
                               0, (context, animation) => Container());
-                          _miniPlaylistKey.currentState.removeItem(
+                          miniPlaylistKey.currentState.removeItem(
                               1, (context, animation) => Container());
-                          _miniPlaylistKey.currentState.insertItem(0);
+                          miniPlaylistKey.currentState.insertItem(0);
                         },
                         child: SizedBox(
                           height: 30,
@@ -689,7 +689,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         Navigator.push(
                           context,
                           SlideLeftRoute(page: PlaylistPage()),
-                        );
+                        )..then((value) =>
+                            miniPlaylistKey.currentState.initState());
                       },
                       child: SizedBox(
                         height: 30.0,
@@ -709,18 +710,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             ),
           ),
           Expanded(
-            child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
-              selector: (_, audio) => audio.queue.playlist,
-              builder: (_, playlist, __) {
+            child:
+                Selector<AudioPlayerNotifier, Tuple2<List<EpisodeBrief>, bool>>(
+              selector: (_, audio) =>
+                  Tuple2(audio.queue.playlist, audio.queueUpdate),
+              builder: (_, data, __) {
                 return AnimatedList(
-                  key: _miniPlaylistKey,
+                  key: miniPlaylistKey,
                   shrinkWrap: true,
                   scrollDirection: Axis.vertical,
-                  initialItemCount: playlist.length,
+                  initialItemCount: data.item1.length,
                   itemBuilder: (context, index, animation) => ScaleTransition(
-                    alignment: Alignment.centerLeft,
+                    alignment: Alignment.center,
                     scale: animation,
-                    child: index == 0
+                    child: index == 0 || index > data.item1.length -1 
                         ? Center()
                         : Column(
                             children: <Widget>[
@@ -731,13 +734,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                       color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
-                                          audio.episodeLoad(playlist[index]);
-                                          _miniPlaylistKey.currentState
+                                          audio.episodeLoad(data.item1[index]);
+                                          miniPlaylistKey.currentState
                                               .removeItem(
                                                   index,
                                                   (context, animation) =>
                                                       Center());
-                                          _miniPlaylistKey.currentState
+                                          miniPlaylistKey.currentState
                                               .insertItem(0);
                                         },
                                         child: Container(
@@ -763,7 +766,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                                       height: 30.0,
                                                       width: 30.0,
                                                       child: Image.file(File(
-                                                          "${playlist[index].imagePath}"))),
+                                                          "${data.item1[index].imagePath}"))),
                                                 ),
                                               ),
                                               Expanded(
@@ -771,7 +774,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                                   alignment:
                                                       Alignment.centerLeft,
                                                   child: Text(
-                                                    playlist[index].title,
+                                                    data.item1[index].title,
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
@@ -805,15 +808,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                             Radius.circular(15.0)),
                                         onTap: () async {
                                           await audio
-                                              .moveToTop(playlist[index]);
-                                          _miniPlaylistKey.currentState
+                                              .moveToTop(data.item1[index]);
+                                          miniPlaylistKey.currentState
                                               .removeItem(
                                             index,
                                             (context, animation) => Center(),
                                             duration:
                                                 Duration(milliseconds: 500),
                                           );
-                                          _miniPlaylistKey.currentState
+                                          miniPlaylistKey.currentState
                                               .insertItem(1,
                                                   duration: Duration(
                                                       milliseconds: 200));
@@ -1031,7 +1034,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                       alignment: Alignment.center,
                                       children: <Widget>[
                                         Container(
-                                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10.0),
                                           child: Container(
                                               height: 30.0,
                                               width: 30.0,

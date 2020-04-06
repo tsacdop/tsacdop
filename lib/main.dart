@@ -10,6 +10,8 @@ import 'package:tsacdop/class/importompl.dart';
 import 'package:tsacdop/class/settingstate.dart';
 import 'package:tsacdop/class/download_state.dart';
 
+import 'intro_slider/app_intro.dart';
+
 final SettingState themeSetting = SettingState();
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +35,6 @@ Future main() async {
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent);
   SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 }
@@ -74,7 +75,7 @@ class MyApp extends StatelessWidget {
             // scaffoldBackgroundColor: Colors.black87,
             appBarTheme: AppBarTheme(elevation: 0),
           ),
-          home: MyHomePage(),
+          home: setting.showIntro ? SlideIntro(goto: Goto.home) : MyHomePage(),
         );
       },
     );
