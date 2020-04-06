@@ -354,7 +354,6 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                 });
                 int index = await audio.delFromPlaylist(widget.episode);
                 final episodeRemove = widget.episode;
-                 
                 Fluttertoast.showToast(
                   msg: 'Removed From Playlist',
                   gravity: ToastGravity.BOTTOM,
