@@ -229,7 +229,7 @@ class Settings extends StatelessWidget {
                                   builder: (context) => SlideIntro(goto: Goto.settings))),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.bug_solid),
+                          leading: Icon(LineIcons.columns_solid),
                           title: Text('App Intro'),
                         ),
                         Divider(height: 2),

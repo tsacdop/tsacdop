@@ -275,7 +275,7 @@ class _PodcastCardState extends State<PodcastCard> {
                                   _addGroup = true;
                                 });
                               }),
-                              _buttonOnMenu(Icon(Icons.notifications), () {}),
+                            // _buttonOnMenu(Icon(Icons.notifications), () {}),
                               _buttonOnMenu(
                                   Icon(
                                     Icons.delete,
@@ -392,9 +392,6 @@ class _RenameGroupState extends State<RenameGroup> {
             Theme.of(context).brightness == Brightness.light
                 ? Color.fromRGBO(113, 113, 113, 1)
                 : Color.fromRGBO(5, 5, 5, 1),
-        // statusBarColor: Theme.of(context).brightness == Brightness.light
-        //     ? Color.fromRGBO(113, 113, 113, 1)
-        //     : Color.fromRGBO(15, 15, 15, 1),
       ),
       child: AlertDialog(
         shape: RoundedRectangleBorder(
