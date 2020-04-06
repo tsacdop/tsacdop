@@ -19,7 +19,7 @@ jobs:
       - run:
           name: Build the Android version
           command: flutter build apk --split-per-abi --no-shrink 
-      -run: 
+      - run: 
           name: Build the Android bundle
           command: flutter build appbundle --no-shrink
 
