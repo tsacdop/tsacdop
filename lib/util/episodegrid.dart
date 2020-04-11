@@ -216,17 +216,6 @@ class EpisodeGrid extends StatelessWidget {
                                                 ),
                                         ),
                                         Spacer(),
-                                        episodes[index].isNew == 1
-                                            ? Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 2),
-                                                child: Text('New',
-                                                    style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontStyle:
-                                                            FontStyle.italic)),
-                                              )
-                                            : Center(),
                                         Selector<AudioPlayerNotifier,
                                                 EpisodeBrief>(
                                             selector: (_, audio) =>
@@ -242,15 +231,11 @@ class EpisodeGrid extends StatelessWidget {
                                                           EdgeInsets.symmetric(
                                                               horizontal: 2),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.white,
                                                         shape: BoxShape.circle,
                                                       ),
-                                                      child: SizedBox(
-                                                          height: 8,
-                                                          width: 15,
-                                                          child: WaveLoader(
-                                                              color: context
-                                                                  .accentColor)))
+                                                      child: WaveLoader(
+                                                          color: context
+                                                              .accentColor))
                                                   : layout == Layout.two &&
                                                           snapshot.data > 0
                                                       ? Container(
@@ -267,15 +252,12 @@ class EpisodeGrid extends StatelessWidget {
                                                             shape:
                                                                 BoxShape.circle,
                                                           ),
-                                                          child: SizedBox(
-                                                            height: 10,
-                                                            width: 15,
-                                                            child: CustomPaint(
-                                                                painter:
-                                                                    ListenedPainter(
-                                                              Colors.white,
-                                                            )),
-                                                          ))
+                                                          child: CustomPaint(
+                                                              painter:
+                                                                  ListenedPainter(
+                                                            Colors.white,
+                                                          )),
+                                                        )
                                                       : Center();
                                             }),
                                         showDownload || layout == Layout.two
@@ -306,6 +288,17 @@ class EpisodeGrid extends StatelessWidget {
                                                         ),
                                                       )
                                                     : Center(),
+                                              )
+                                            : Center(),
+                                        episodes[index].isNew == 1
+                                            ? Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 2),
+                                                child: Text('New',
+                                                    style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontStyle:
+                                                            FontStyle.italic)),
                                               )
                                             : Center(),
                                         showNumber

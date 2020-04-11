@@ -467,9 +467,9 @@ class _MenuBarState extends State<MenuBar> {
                 return snapshot.hasData
                     ? snapshot.data.seekValue > 0.95
                         ? Container(
-                          height: 20,
-                          padding: EdgeInsets.symmetric(horizontal:15),
-                          child: SizedBox(
+                            height: 20,
+                            padding: EdgeInsets.symmetric(horizontal: 15),
+                            child: SizedBox(
                               width: 20,
                               height: 20,
                               child: CustomPaint(
@@ -477,41 +477,57 @@ class _MenuBarState extends State<MenuBar> {
                                     stroke: 2.0),
                               ),
                             ),
-                        )
+                          )
                         : snapshot.data.seconds < 0.1
                             ? Center()
-                            : Container(
-                              height: 50,
-                              padding: EdgeInsets.symmetric(horizontal:15),
-                              child: Row(
-                                  children: <Widget>[
-                                    SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CustomPaint(
-                                        painter: ListenedPainter(
-                                            context.accentColor,
-                                            stroke: 2.0),
-                                      ),
+                            : Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => audio.episodeLoad(
+                                      widget.episodeItem,
+                                      startPosition:
+                                          (snapshot.data.seconds * 1000)
+                                              .toInt()),
+                                  child: Container(
+                                    height: 50,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 15),
+                                    child: Row(
+                                      children: <Widget>[
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CustomPaint(
+                                            painter: ListenedPainter(
+                                                context.accentColor,
+                                                stroke: 2.0),
+                                          ),
+                                        ),
+                                        Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 2)),
+                                        Container(
+                                          height: 20,
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10.0)),
+                                            color: context.accentColor,
+                                          ),
+                                          child: Text(
+                                            _stringForSeconds(
+                                                snapshot.data.seconds),
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Padding(padding: EdgeInsets.symmetric(horizontal:2)),
-                                    Container(
-                                      height: 20,
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 2),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10.0)),
-                                        color: context.accentColor,
-                                      ),
-                                      child: Text(
-                                        _stringForSeconds(snapshot.data.seconds),
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                            )
+                              )
                     : Center();
               }),
           Spacer(),

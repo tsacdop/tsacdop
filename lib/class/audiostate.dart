@@ -133,6 +133,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool _autoPlay = true;
   DateTime _current;
   int _currentPosition;
+  BehaviorSubject<List<MediaItem>> queueSubject;
 
   BasicPlaybackState get audioState => _audioState;
 
@@ -189,7 +190,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
   }
 
-  episodeLoad(EpisodeBrief episode) async {
+  episodeLoad(EpisodeBrief episode, {int startPosition = 0}) async {
     final EpisodeBrief episodeNew =
         await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (_playerRunning) {
@@ -216,7 +217,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _audioState = BasicPlaybackState.connecting;
       notifyListeners();
       //await _queue.savePlaylist();
-      _startAudioService(0);
+      _startAudioService(startPosition);
     }
   }
 
@@ -256,7 +257,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
       }
       notifyListeners();
     });
-    var queueSubject = BehaviorSubject<List<MediaItem>>();
+    
+    queueSubject = BehaviorSubject<List<MediaItem>>();
     queueSubject.addStream(
         AudioService.queueStream.distinct().where((event) => event != null));
     queueSubject.stream.listen((event) {
@@ -288,18 +290,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
     AudioService.playbackStateStream.listen((event) async {
       _current = DateTime.now();
       _audioState = event?.basicState;
-      //  if (_audioState == BasicPlaybackState.skippingToNext &&
-      //      _episode != null) {
-      //    print(_episode.title);
-      //    _queue.delFromPlaylist(_episode);
-      //  }
-      //  if (_audioState == BasicPlaybackState.skippingToNext &&
-      //      _episode != null &&
-      //      _backgroundAudioPosition > 0) {
-      //    PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
-      //        _backgroundAudioPosition / 1000, _seekSliderValue);
-      //    await dbHelper.saveHistory(history);
-      //  }
       if (_audioState == BasicPlaybackState.stopped) _playerRunning = false;
 
       if (_audioState == BasicPlaybackState.error) {
@@ -337,21 +327,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
           _lastPostion = _backgroundAudioPosition;
           storage.saveInt(_lastPostion);
         }
-
-        // if ((_queue.playlist.length == 1 || !_autoPlay) &&
-        //     _seekSli;lderValue > 0.9 &&
-        //     _episode != null &&
-        //     _audioState != BasicPlaybackState.connecting) {
-        //   _queue.delFromPlaylist(_episode);
-        //   _lastPostion = 0;
-        //   storage.saveInt(_lastPostion);
-        //   final PlayHistory history = PlayHistory(
-        //       _episode.title,
-        //       _episode.enclosureUrl,
-        //       backgroundAudioPosition / 1000,
-        //       seekSliderValue);
-        //   dbHelper.saveHistory(history);
-        // }
         notifyListeners();
       }
       if (_audioState == BasicPlaybackState.stopped) {

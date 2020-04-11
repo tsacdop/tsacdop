@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tsacdop/class/audiostate.dart';
+import 'package:tsacdop/util/custompaint.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:tsacdop/class/episodebrief.dart';
@@ -556,6 +557,25 @@ class ShowEpisode extends StatelessWidget {
                                       ),
                                     ),
                                     Spacer(),
+                                    Selector<AudioPlayerNotifier, EpisodeBrief>(
+                                        selector: (_, audio) => audio.episode,
+                                        builder: (_, data, __) {
+                                          return (episodes[index]
+                                                      .enclosureUrl ==
+                                                  data?.enclosureUrl)
+                                              ? Container(
+                                                  height: 20,
+                                                  width: 20,
+                                                  margin: EdgeInsets.symmetric(
+                                                      horizontal: 2),
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: WaveLoader(
+                                                      color:
+                                                          context.accentColor))
+                                              : Center();
+                                        }),
                                     episodes[index].isNew == 1
                                         ? Text(
                                             'New',
