@@ -10,6 +10,7 @@ import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/podcasts/podcastgroup.dart';
 import 'package:tsacdop/podcasts/podcastlist.dart';
 import 'package:tsacdop/util/pageroute.dart';
+import 'package:tsacdop/util/context_extension.dart';
 import 'custom_tabview.dart';
 
 class PodcastManage extends StatefulWidget {
@@ -173,31 +174,34 @@ class _PodcastManageState extends State<PodcastManage>
                 ? Center()
                 : Stack(
                     children: <Widget>[
-                      CustomTabView(
-                        itemCount: _groups.length,
-                        tabBuilder: (context, index) => Tab(
-                          child: Container(
-                              height: 30.0,
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: (_scroll - index).abs() > 1
-                                    ? Colors.grey[300]
-                                    : Colors.grey[300]
-                                        .withOpacity((_scroll - index).abs()),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              child: Text(
-                                _groups[index].name,
-                              )),
+                      Container(
+                        color: context.scaffoldBackgroundColor,
+                        child: CustomTabView(
+                          itemCount: _groups.length,
+                          tabBuilder: (context, index) => Tab(
+                            child: Container(
+                                height: 30.0,
+                                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: (_scroll - index).abs() > 1
+                                      ? Colors.grey[300]
+                                      : Colors.grey[300]
+                                          .withOpacity((_scroll - index).abs()),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                ),
+                                child: Text(
+                                  _groups[index].name,
+                                )),
+                          ),
+                          pageBuilder: (context, index) => Container(
+                              key: ValueKey(_groups[index].name),
+                              child: PodcastGroupList(group: _groups[index])),
+                          onPositionChange: (value) =>
+                              setState(() => _index = value),
+                          onScroll: (value) => setState(() => _scroll = value),
                         ),
-                        pageBuilder: (context, index) => Container(
-                            key: ValueKey(_groups[index].name),
-                            child: PodcastGroupList(group: _groups[index])),
-                        onPositionChange: (value) =>
-                            setState(() => _index = value),
-                        onScroll: (value) => setState(() => _scroll = value),
                       ),
                       _showSetting
                           ? Positioned.fill(

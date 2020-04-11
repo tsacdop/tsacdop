@@ -18,6 +18,7 @@ import 'package:tsacdop/podcasts/podcastdetail.dart';
 import 'package:tsacdop/podcasts/podcastmanage.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
+import 'package:tsacdop/util/context_extension.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -231,6 +232,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                               height: 70,
                               width: _width,
                               alignment: Alignment.centerLeft,
+                              color: context.scaffoldBackgroundColor,
                               child: TabBar(
                                 labelPadding: EdgeInsets.only(
                                     top: 5.0,
@@ -243,7 +245,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                 isScrollable: true,
                                 tabs: groups[_groupIndex]
                                     .podcasts
-                                    .map<Tab>((PodcastLocal podcastLocal) {
+                                    .map<Widget>((PodcastLocal podcastLocal) {
                                   return Tab(
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.all(
@@ -403,6 +405,10 @@ class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> episodes;
   final PodcastLocal podcastLocal;
   ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
+  String _stringForSeconds(double seconds) {
+    if (seconds == null) return null;
+    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -597,14 +603,33 @@ class ShowEpisode extends StatelessWidget {
                                           ? Container(
                                               alignment: Alignment.center,
                                               child: Text(
-                                                (episodes[index].duration)
+                                                _stringForSeconds(
+                                                            episodes[index]
+                                                                .duration
+                                                                .toDouble())
                                                         .toString() +
-                                                    'mins',
+                                                    '|',
                                                 style: TextStyle(
                                                   fontSize: _width / 35,
-                                                 // color: _c,
-                                                 // fontStyle: FontStyle.italic,
+                                                  // color: _c,
+                                                  // fontStyle: FontStyle.italic,
                                                 ),
+                                              ),
+                                            )
+                                          : Center(),
+                                      episodes[index].enclosureLength != null &&
+                                              episodes[index].enclosureLength !=
+                                                  0
+                                          ? Container(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                ((episodes[index]
+                                                                .enclosureLength) ~/
+                                                            1000000)
+                                                        .toString() +
+                                                    'MB',
+                                                style: TextStyle(
+                                                    fontSize: _width / 35),
                                               ),
                                             )
                                           : Center(),

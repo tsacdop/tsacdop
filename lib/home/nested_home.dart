@@ -4,15 +4,19 @@ import 'dart:io';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/download_state.dart';
+import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/home/playlist.dart';
 import 'package:tuple/tuple.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:line_icons/line_icons.dart';
 
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/episodegrid.dart';
 import 'package:tsacdop/util/mypopupmenu.dart';
+import 'package:tsacdop/util/context_extension.dart';
+import 'package:tsacdop/util/custompaint.dart';
 
 import 'package:tsacdop/home/appbar/importompl.dart';
 import 'package:tsacdop/home/audioplayer.dart';
@@ -328,10 +332,14 @@ class _RecentUpdate extends StatefulWidget {
 }
 
 class _RecentUpdateState extends State<_RecentUpdate>
-    with AutomaticKeepAliveClientMixin {
-  Future<List<EpisodeBrief>> _getRssItem(int top) async {
+    with AutomaticKeepAliveClientMixin , SingleTickerProviderStateMixin{
+  Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group) async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await dbHelper.getRecentRssItem(top);
+    List<EpisodeBrief> episodes;
+    if (group.first == 'All')
+      episodes = await dbHelper.getRecentRssItem(top);
+    else
+      episodes = await dbHelper.getGroupRssItem(top, group);
     return episodes;
   }
 
@@ -347,18 +355,23 @@ class _RecentUpdateState extends State<_RecentUpdate>
 
   int _top = 99;
   bool _loadMore;
-
+  String _groupName;
+  List<String> _group;
+  Layout _layout;
   @override
   void initState() {
     super.initState();
     _loadMore = false;
+    _groupName = 'All';
+    _group = ['All'];
+    _layout = Layout.three;
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return FutureBuilder<List<EpisodeBrief>>(
-      future: _getRssItem(_top),
+      future: _getRssItem(_top, _group),
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
@@ -373,8 +386,112 @@ class _RecentUpdateState extends State<_RecentUpdate>
                     key: PageStorageKey<String>('update'),
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: <Widget>[
+                      SliverToBoxAdapter(
+                        child: Container(
+                            height: 40,
+                            color: context.primaryColor,
+                            child: Row(
+                              children: <Widget>[
+                                Consumer<GroupList>(
+                                  builder: (context, groupList, child) =>
+                                      Material(
+                                    color: Colors.transparent,
+                                    child: PopupMenuButton<String>(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      elevation: 1,
+                                      tooltip: 'Groups fliter',
+                                      child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          height: 50,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Text(_groupName),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5),
+                                              ),
+                                              Icon(
+                                                LineIcons.filter_solid,
+                                                size: 18,
+                                              )
+                                            ],
+                                          )),
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                            child: Text('All'), value: 'All')
+                                      ]..addAll(groupList.groups
+                                          .map<PopupMenuEntry<String>>((e) =>
+                                              PopupMenuItem(
+                                                  value: e.name,
+                                                  child: Text(e.name)))
+                                          .toList()),
+                                      onSelected: (value) {
+                                        if (value == 'All') {
+                                          setState(() {
+                                            _groupName = 'All';
+                                            _group = ['All'];
+                                          });
+                                        } else {
+                                          groupList.groups.forEach((group) {
+                                            if (group.name == value) {
+                                              setState(() {
+                                                _groupName = value;
+                                                _group = group.podcastList;
+                                              });
+                                            }
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Material(
+                                    color: Colors.transparent,
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        if (_layout == Layout.three)
+                                          setState(() {
+                                            _layout = Layout.two;
+                                          });
+                                        else
+                                          setState(() {
+                                            _layout = Layout.three;
+                                          });
+                                      },
+                                      icon: _layout == Layout.three
+                                          ? SizedBox(
+                                              height: 10,
+                                              width: 30,
+                                              child: CustomPaint(
+                                                painter: LayoutPainter(
+                                                    0,
+                                                    context.textTheme.bodyText1
+                                                        .color),
+                                              ),
+                                            )
+                                          : SizedBox(
+                                              height: 10,
+                                              width: 30,
+                                              child: CustomPaint(
+                                                painter: LayoutPainter(
+                                                    1,
+                                                    context.textTheme.bodyText1
+                                                        .color),
+                                              ),
+                                            ),
+                                    )),
+                              ],
+                            )),
+                      ),
                       EpisodeGrid(
                         episodes: snapshot.data,
+                        layout: _layout,
                       ),
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
@@ -405,9 +522,9 @@ class _MyFavorite extends StatefulWidget {
 
 class _MyFavoriteState extends State<_MyFavorite>
     with AutomaticKeepAliveClientMixin {
-  Future<List<EpisodeBrief>> _getLikedRssItem(_top) async {
+  Future<List<EpisodeBrief>> _getLikedRssItem(int top, int sortBy) async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await dbHelper.getLikedRssItem(_top);
+    List<EpisodeBrief> episodes = await dbHelper.getLikedRssItem(top, sortBy);
     return episodes;
   }
 
@@ -423,18 +540,21 @@ class _MyFavoriteState extends State<_MyFavorite>
 
   int _top = 99;
   bool _loadMore;
-
+  Layout _layout;
+  int _sortBy;
   @override
   void initState() {
     super.initState();
     _loadMore = false;
+    _layout = Layout.three;
+    _sortBy = 0;
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return FutureBuilder<List<EpisodeBrief>>(
-      future: _getLikedRssItem(_top),
+      future: _getLikedRssItem(_top, _sortBy),
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
@@ -448,8 +568,103 @@ class _MyFavoriteState extends State<_MyFavorite>
                 child: CustomScrollView(
                   key: PageStorageKey<String>('favorite'),
                   slivers: <Widget>[
+                    SliverToBoxAdapter(
+                      child: Container(
+                          height: 40,
+                          color: context.primaryColor,
+                          child: Row(
+                            children: <Widget>[
+                              Material(
+                                color: Colors.transparent,
+                                child: PopupMenuButton<int>(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                  elevation: 1,
+                                  tooltip: 'Sort By',
+                                  child: Container(
+                                      height: 50,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 20),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Text('Sory by'),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5),
+                                          ),
+                                          Icon(
+                                            _sortBy == 0
+                                                ? LineIcons
+                                                    .cloud_download_alt_solid
+                                                : LineIcons.heartbeat_solid,
+                                            size: 18,
+                                          )
+                                        ],
+                                      )),
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      value: 0,
+                                      child: Text('Update Date'),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 1,
+                                      child: Text('Like Date'),
+                                    )
+                                  ],
+                                  onSelected: (value) {
+                                    if (value == 0)
+                                      setState(() => _sortBy = 0);
+                                    else if (value == 1)
+                                      setState(() => _sortBy = 1);
+                                  },
+                                ),
+                              ),
+                              Spacer(),
+                              Material(
+                                color: Colors.transparent,
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    if (_layout == Layout.three)
+                                      setState(() {
+                                        _layout = Layout.two;
+                                      });
+                                    else
+                                      setState(() {
+                                        _layout = Layout.three;
+                                      });
+                                  },
+                                  icon: _layout == Layout.three
+                                      ? SizedBox(
+                                          height: 10,
+                                          width: 30,
+                                          child: CustomPaint(
+                                            painter: LayoutPainter(
+                                                0,
+                                                context
+                                                    .textTheme.bodyText1.color),
+                                          ),
+                                        )
+                                      : SizedBox(
+                                          height: 10,
+                                          width: 30,
+                                          child: CustomPaint(
+                                            painter: LayoutPainter(
+                                                1,
+                                                context
+                                                    .textTheme.bodyText1.color),
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ],
+                          )),
+                    ),
                     EpisodeGrid(
                       episodes: snapshot.data,
+                      layout: _layout,
                     ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
@@ -481,24 +696,65 @@ class _MyDownload extends StatefulWidget {
 
 class _MyDownloadState extends State<_MyDownload>
     with AutomaticKeepAliveClientMixin {
+  Layout _layout;
+  @override
+  void initState() {
+    super.initState();
+    _layout = Layout.three;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return CustomScrollView(
-      key: PageStorageKey<String>('downloas_list'),
+      key: PageStorageKey<String>('download_list'),
       slivers: <Widget>[
         DownloadList(),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              return Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.all(15.0),
-                child: Text('Downloaded'),
-              );
-            },
-            childCount: 1,
-          ),
+        SliverToBoxAdapter(
+          child: Container(
+              height: 40,
+              color: context.primaryColor,
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text('Downloaded')),
+                  Spacer(),
+                  Material(
+                    color: Colors.transparent,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        if (_layout == Layout.three)
+                          setState(() {
+                            _layout = Layout.two;
+                          });
+                        else
+                          setState(() {
+                            _layout = Layout.three;
+                          });
+                      },
+                      icon: _layout == Layout.three
+                          ? SizedBox(
+                              height: 10,
+                              width: 30,
+                              child: CustomPaint(
+                                painter: LayoutPainter(
+                                    0, context.textTheme.bodyText1.color),
+                              ),
+                            )
+                          : SizedBox(
+                              height: 10,
+                              width: 30,
+                              child: CustomPaint(
+                                painter: LayoutPainter(
+                                    1, context.textTheme.bodyText1.color),
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              )),
         ),
         Consumer<DownloadState>(
           builder: (_, downloader, __) {
@@ -511,6 +767,7 @@ class _MyDownloadState extends State<_MyDownload>
                 .toList();
             return EpisodeGrid(
               episodes: episodes,
+              layout: _layout,
             );
           },
         ),

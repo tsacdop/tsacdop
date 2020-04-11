@@ -46,4 +46,5 @@ List<Libries> plugins = [
   Libries('flutter_linkify', mit, 'https://pub.dev/packages/flutter_linkify'),
   Libries('extended_nested_scroll_view', mit, 'https://pub.dev/packages/extended_nested_scroll_view'),
   Libries('connectivity', bsd, 'https://pub.dev/packages/connectivity'),
+  Libries('Rxdart', apacheLicense, 'https://pub.dev/packages/rxdart')
 ];

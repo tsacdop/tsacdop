@@ -13,6 +13,11 @@ import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/util/colorize.dart';
+import 'package:tsacdop/util/context_extension.dart';
+import 'package:tsacdop/util/custompaint.dart';
+import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+
+enum Layout { two, three }
 
 class EpisodeGrid extends StatelessWidget {
   final List<EpisodeBrief> episodes;
@@ -20,15 +25,33 @@ class EpisodeGrid extends StatelessWidget {
   final bool showDownload;
   final bool showNumber;
   final int episodeCount;
-  EpisodeGrid(
-      {Key key,
-      @required this.episodes,
-      this.showDownload = false,
-      this.showFavorite = false,
-      this.showNumber = false,
-      this.episodeCount = 0
-     })
-      : super(key: key);
+  final Layout layout;
+  final bool reverse;
+  Future<int> _isListened(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    return await dbHelper.isListened(episode.enclosureUrl);
+  }
+
+  Future<bool> _isLiked(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    return await dbHelper.isLiked(episode.enclosureUrl);
+  }
+
+  String _stringForSeconds(double seconds) {
+    if (seconds == null) return null;
+    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  }
+
+  EpisodeGrid({
+    Key key,
+    @required this.episodes,
+    this.showDownload = false,
+    this.showFavorite = false,
+    this.showNumber = false,
+    this.episodeCount = 0,
+    this.layout = Layout.three,
+    this.reverse,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -100,12 +123,12 @@ class EpisodeGrid extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding:
-          const EdgeInsets.only(top: 10.0, bottom: 5.0, left: 15.0, right: 15.0),
+      padding: const EdgeInsets.only(
+          top: 10.0, bottom: 5.0, left: 15.0, right: 15.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          childAspectRatio: 1,
-          crossAxisCount: 3,
+          childAspectRatio: layout == Layout.three ? 1 : 1.5,
+          crossAxisCount: layout == Layout.three ? 3 : 2,
           mainAxisSpacing: 6.0,
           crossAxisSpacing: 6.0,
         ),
@@ -120,147 +143,291 @@ class EpisodeGrid extends StatelessWidget {
                   audio.queue.playlist.map((e) => e.enclosureUrl).toList()),
               builder: (_, data, __) => OpenContainerWrapper(
                 episode: episodes[index],
-                closedBuilder: (context, action, boo) => Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).primaryColor,
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                        ),
-                      ]),
-                  alignment: Alignment.center,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                      onTapDown: (details) => _offset = Offset(
-                          details.globalPosition.dx, details.globalPosition.dy),
-                      onLongPress: () => _showPopupMenu(
-                          _offset,
-                          episodes[index],
-                          context,
-                          data.item1 == episodes[index],
-                          data.item2.contains(episodes[index].enclosureUrl)),
-                      onTap: action,
-                      child: Container(
-                        padding: const EdgeInsets.all(8.0),
+                closedBuilder: (context, action, boo) => FutureBuilder<int>(
+                    future: _isListened(episodes[index]),
+                    initialData: 0,
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      return Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                          border: Border.all(
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                    ? Theme.of(context).primaryColor
-                                    : Theme.of(context).scaffoldBackgroundColor,
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 2,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    height: _width / 16,
-                                    width: _width / 16,
-                                    child: boo
-                                        ? Center()
-                                        : CircleAvatar(
-                                            backgroundColor:
-                                                _c.withOpacity(0.5),
-                                            backgroundImage: FileImage(File(
-                                                "${episodes[index].imagePath}")),
-                                          ),
-                                  ),
-                                  Spacer(),
-                                  episodes[index].isNew == 1
-                                      ? Text('New',
-                                          style: TextStyle(
-                                              color: Colors.red,
-                                              fontStyle: FontStyle.italic))
-                                      : Center(),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 2),
-                                  ),
-                                  showNumber
-                                      ? Container(
-                                          alignment: Alignment.topRight,
-                                          child: Text(
-                                            (episodeCount - index).toString(),
-                                            style: GoogleFonts.teko(
-                                              textStyle: TextStyle(
-                                                fontSize: _width / 24,
-                                                color: _c,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Center(),
-                                ],
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                            color: snapshot.data > 0
+                                ? context.brightness == Brightness.light
+                                    ? context.primaryColor
+                                    : Color.fromRGBO(40, 40, 40, 1)
+                                : context.scaffoldBackgroundColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: context.brightness == Brightness.light
+                                    ? context.primaryColor
+                                    : Color.fromRGBO(40, 40, 40, 1),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
                               ),
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Container(
-                                alignment: Alignment.topLeft,
-                                padding: EdgeInsets.only(top: 2.0),
-                                child: Text(
-                                  episodes[index].title,
-                                  style: TextStyle(
-                                   // fontSize: _width / 32,
-                                  ),
-                                  maxLines: 4,
-                                  overflow: TextOverflow.fade,
+                            ]),
+                        alignment: Alignment.center,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                            onTapDown: (details) => _offset = Offset(
+                                details.globalPosition.dx,
+                                details.globalPosition.dy),
+                            onLongPress: () => _showPopupMenu(
+                                _offset,
+                                episodes[index],
+                                context,
+                                data.item1 == episodes[index],
+                                data.item2
+                                    .contains(episodes[index].enclosureUrl)),
+                            onTap: action,
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0)),
+                                border: Border.all(
+                                  color: context.brightness == Brightness.light
+                                      ? context.primaryColor
+                                      : context.scaffoldBackgroundColor,
+                                  width: 1.0,
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Row(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: Text(
-                                      episodes[index].dateToString(),
-                                      style: TextStyle(
-                                          fontSize: _width / 35,
-                                          color: _c,
-                                          fontStyle: FontStyle.italic),
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Padding(
-                                    padding: EdgeInsets.all(1),
-                                  ),
-                                  showFavorite
-                                      ? Container(
-                                          alignment: Alignment.bottomRight,
-                                          child: (episodes[index].liked == 0)
+                                  Expanded(
+                                    flex: 2,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Container(
+                                          height: _width / 16,
+                                          width: _width / 16,
+                                          child: boo
                                               ? Center()
-                                              : IconTheme(
-                                                  data: IconThemeData(size: 15),
-                                                  child: Icon(
-                                                    Icons.favorite,
-                                                    color: Colors.red,
+                                              : CircleAvatar(
+                                                  backgroundColor:
+                                                      _c.withOpacity(0.5),
+                                                  backgroundImage: FileImage(File(
+                                                      "${episodes[index].imagePath}")),
+                                                ),
+                                        ),
+                                        Spacer(),
+                                        episodes[index].isNew == 1
+                                            ? Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 2),
+                                                child: Text('New',
+                                                    style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontStyle:
+                                                            FontStyle.italic)),
+                                              )
+                                            : Center(),
+                                        Selector<AudioPlayerNotifier,
+                                                EpisodeBrief>(
+                                            selector: (_, audio) =>
+                                                audio.episode,
+                                            builder: (_, data, __) {
+                                              return (episodes[index]
+                                                          .enclosureUrl ==
+                                                      data?.enclosureUrl)
+                                                  ? Container(
+                                                      height: 20,
+                                                      width: 20,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 2),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: SizedBox(
+                                                          height: 8,
+                                                          width: 15,
+                                                          child: WaveLoader(
+                                                              color: context
+                                                                  .accentColor)))
+                                                  : layout == Layout.two &&
+                                                          snapshot.data > 0
+                                                      ? Container(
+                                                          height: 20,
+                                                          width: 20,
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      2),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: context
+                                                                .accentColor,
+                                                            shape:
+                                                                BoxShape.circle,
+                                                          ),
+                                                          child: SizedBox(
+                                                            height: 10,
+                                                            width: 15,
+                                                            child: CustomPaint(
+                                                                painter:
+                                                                    ListenedPainter(
+                                                              Colors.white,
+                                                            )),
+                                                          ))
+                                                      : Center();
+                                            }),
+                                        showDownload || layout == Layout.two
+                                            ? Container(
+                                                child: (episodes[index]
+                                                            .enclosureUrl !=
+                                                        episodes[index].mediaId)
+                                                    ? Container(
+                                                        height: 20,
+                                                        width: 20,
+                                                        margin: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 5),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 2),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: context
+                                                              .accentColor,
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                        child: Icon(
+                                                          Icons.done_all,
+                                                          size: 15,
+                                                          color: Colors.white,
+                                                        ),
+                                                      )
+                                                    : Center(),
+                                              )
+                                            : Center(),
+                                        showNumber
+                                            ? Container(
+                                                alignment: Alignment.topRight,
+                                                child: Text(
+                                                  reverse
+                                                      ? (index + 1).toString()
+                                                      : (episodeCount - index)
+                                                          .toString(),
+                                                  style: GoogleFonts.teko(
+                                                    textStyle: TextStyle(
+                                                      fontSize: _width / 24,
+                                                      color: _c,
+                                                    ),
                                                   ),
                                                 ),
-                                        )
-                                      : Center(),
+                                              )
+                                            : Center(),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 5,
+                                    child: Container(
+                                      alignment: Alignment.topLeft,
+                                      padding: EdgeInsets.only(top: 2.0),
+                                      child: Text(
+                                        episodes[index].title,
+                                        style: TextStyle(
+                                            // fontSize: _width / 32,
+                                            ),
+                                        maxLines: 4,
+                                        overflow: TextOverflow.fade,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Row(
+                                      children: <Widget>[
+                                        Align(
+                                          alignment: Alignment.bottomLeft,
+                                          child: Text(
+                                            episodes[index].dateToString(),
+                                            style: TextStyle(
+                                                fontSize: _width / 35,
+                                                color: _c,
+                                                fontStyle: FontStyle.italic),
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        layout == Layout.two &&
+                                                episodes[index].duration != 0
+                                            ? Container(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  _stringForSeconds(
+                                                          episodes[index]
+                                                              .duration
+                                                              .toDouble()) +
+                                                      '|',
+                                                  style: TextStyle(
+                                                      fontSize: _width / 35),
+                                                ),
+                                              )
+                                            : Center(),
+                                        layout == Layout.two &&
+                                                episodes[index]
+                                                        .enclosureLength !=
+                                                    null &&
+                                                episodes[index]
+                                                        .enclosureLength !=
+                                                    0
+                                            ? Container(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  ((episodes[index]
+                                                                  .enclosureLength) ~/
+                                                              1000000)
+                                                          .toString() +
+                                                      'MB',
+                                                  style: TextStyle(
+                                                      fontSize: _width / 35),
+                                                ),
+                                              )
+                                            : Center(),
+                                        Padding(
+                                          padding: EdgeInsets.all(1),
+                                        ),
+                                        showFavorite || layout == Layout.two
+                                            ? FutureBuilder<bool>(
+                                                future:
+                                                    _isLiked(episodes[index]),
+                                                initialData: false,
+                                                builder: (context, snapshot) =>
+                                                    Container(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  child: (snapshot.data)
+                                                      ? IconTheme(
+                                                          data: IconThemeData(
+                                                              size: 15),
+                                                          child: Icon(
+                                                            Icons.favorite,
+                                                            color: Colors.red,
+                                                          ),
+                                                        )
+                                                      : Center(),
+                                                ),
+                                              )
+                                            : Center(),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
+                      );
+                    }),
               ),
             );
           },
@@ -270,7 +437,6 @@ class EpisodeGrid extends StatelessWidget {
     );
   }
 }
-
 
 class OpenContainerWrapper extends StatelessWidget {
   const OpenContainerWrapper({
@@ -318,5 +484,3 @@ class OpenContainerWrapper extends StatelessWidget {
     );
   }
 }
-
-

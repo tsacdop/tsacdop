@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -17,7 +16,9 @@ import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tsacdop/home/audiopanel.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'package:tsacdop/util/colorize.dart';
+import 'package:tsacdop/util/context_extension.dart';
 import 'package:tsacdop/util/day_night_switch.dart';
+import 'package:tsacdop/util/custompaint.dart';
 
 class MyRectangularTrackShape extends RectangularSliderTrackShape {
   Rect getPreferredRect({
@@ -85,18 +86,6 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
         ..strokeWidth = 2,
     );
 
-    // Path _path = Path();
-
-    // _path.moveTo(center.dx - 12, center.dy + 10);
-    // _path.lineTo(center.dx - 12, center.dy - 12);
-    // _path.lineTo(center.dx -12, center.dy - 12);
-    // canvas.drawShadow(_path, Colors.black, 4, false);
-
-    // Path _pathLight = Path();
-    // _pathLight.moveTo(center.dx + 12, center.dy - 12);
-    // _pathLight.lineTo(center.dx + 12, center.dy + 10);
-    //// _pathLight.lineTo(center.dx - 12, center.dy + 10);
-    // canvas.drawShadow(_pathLight, Colors.black, 4, true);
     canvas.drawRect(
       Rect.fromLTRB(
           center.dx - 10, center.dy + 10, center.dx + 10, center.dy - 10),
@@ -117,33 +106,33 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
   }
 }
 
+final List<BoxShadow> _customShadow = [
+  BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),
+  BoxShadow(
+      blurRadius: 8,
+      offset: Offset(2, 2),
+      color: Colors.grey[600].withOpacity(0.4))
+];
+
+final List<BoxShadow> _customShadowNight = [
+  BoxShadow(
+      blurRadius: 6,
+      offset: Offset(-1, -1),
+      color: Colors.grey[100].withOpacity(0.3)),
+  BoxShadow(blurRadius: 8, offset: Offset(2, 2), color: Colors.black)
+];
+
+String _stringForSeconds(double seconds) {
+  if (seconds == null) return null;
+  return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+}
+
 class PlayerWidget extends StatefulWidget {
   @override
   _PlayerWidgetState createState() => _PlayerWidgetState();
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  static String _stringForSeconds(double seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
-  }
-
-  List<BoxShadow> _customShadow = [
-    BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),
-    BoxShadow(
-        blurRadius: 8,
-        offset: Offset(2, 2),
-        color: Colors.grey[600].withOpacity(0.4))
-  ];
-
-  List<BoxShadow> _customShadowNight = [
-    BoxShadow(
-        blurRadius: 6,
-        offset: Offset(-1, -1),
-        color: Colors.grey[100].withOpacity(0.3)),
-    BoxShadow(blurRadius: 8, offset: Offset(2, 2), color: Colors.black)
-  ];
-
   List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
   int _minSelected;
   final GlobalKey<AnimatedListState> miniPlaylistKey = GlobalKey();
@@ -243,7 +232,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         moonColor: Colors.grey[600],
                         dayColor: Theme.of(context).primaryColorDark,
                         nightColor: Colors.black,
-                        onDrag: (value) => audio.setSwitchValue = value,
+                        onDrag: (value) {
+                          audio.setSwitchValue = value;
+                        },
                         onChanged: (value) {
                           if (value) {
                             audio.sleepTimer(_minSelected);
@@ -380,7 +371,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                                   BasicPlaybackState
                                                       .buffering ||
                                               data.audioState ==
-                                                  BasicPlaybackState.connecting
+                                                  BasicPlaybackState
+                                                      .connecting ||
+                                              data.audioState ==
+                                                  BasicPlaybackState.none
                                           ? 'Buffring...'
                                           : '',
                                       style: TextStyle(
@@ -618,7 +612,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   // color: context.primaryColorDark,
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Playlist',
+                    'Queue',
                     style: TextStyle(
                         color: Theme.of(context).accentColor,
                         fontWeight: FontWeight.bold,
@@ -654,8 +648,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           audio.playNext();
                           miniPlaylistKey.currentState.removeItem(
                               0, (context, animation) => Container());
-                          miniPlaylistKey.currentState.removeItem(
-                              1, (context, animation) => Container());
                           miniPlaylistKey.currentState.insertItem(0);
                         },
                         child: SizedBox(
@@ -689,8 +681,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         Navigator.push(
                           context,
                           SlideLeftRoute(page: PlaylistPage()),
-                        )..then((value) =>
-                            miniPlaylistKey.currentState.initState());
+                        );
                       },
                       child: SizedBox(
                         height: 30.0,
@@ -723,7 +714,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   itemBuilder: (context, index, animation) => ScaleTransition(
                     alignment: Alignment.center,
                     scale: animation,
-                    child: index == 0 || index > data.item1.length -1 
+                    child: index == 0 || index > data.item1.length - 1
                         ? Center()
                         : Column(
                             children: <Widget>[
@@ -858,7 +849,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         children: <Widget>[
           TabBarView(
             children: <Widget>[
-              _sleppMode(context),
+              SleepMode(),
               _controlPanel(context),
               _playlist(context),
             ],
@@ -1120,10 +1111,11 @@ class _LastPositionState extends State<LastPosition> {
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               return snapshot.hasData
-                  ? snapshot.data.seekValue > 0.95
+                  ? snapshot.data.seekValue > 0.90
                       ? Container(
                           height: 20.0,
                           alignment: Alignment.center,
+                          padding: EdgeInsets.symmetric(horizontal: 5),
                           decoration: BoxDecoration(
                               border: Border.all(
                                   width: 1,
@@ -1232,63 +1224,6 @@ class _ImageRotateState extends State<ImageRotate>
   }
 }
 
-class StarSky extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final points = [
-      Offset(50, 100),
-      Offset(150, 75),
-      Offset(250, 250),
-      Offset(130, 200),
-      Offset(270, 150),
-    ];
-    final pisces = [
-      Offset(9, 4),
-      Offset(11, 5),
-      Offset(7, 6),
-      Offset(10, 7),
-      Offset(8, 8),
-      Offset(9, 13),
-      Offset(12, 17),
-      Offset(5, 19),
-      Offset(7, 19)
-    ].map((e) => e * 10).toList();
-    final orion = [
-      Offset(3, 1),
-      Offset(6, 1),
-      Offset(1, 4),
-      Offset(2, 4),
-      Offset(2, 7),
-      Offset(10, 8),
-      Offset(3, 10),
-      Offset(8, 10),
-      Offset(19, 11),
-      Offset(11, 13),
-      Offset(18, 14),
-      Offset(5, 19),
-      Offset(7, 19),
-      Offset(9, 18),
-      Offset(15, 19),
-      Offset(16, 18),
-      Offset(2, 25),
-      Offset(10, 26)
-    ].map((e) => Offset(e.dx * 10 + 250, e.dy * 10)).toList();
-
-    Paint paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-    canvas.drawPoints(ui.PointMode.points, pisces, paint);
-    canvas.drawPoints(ui.PointMode.points, points, paint);
-    canvas.drawPoints(ui.PointMode.points, orion, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-  }
-}
-
 class Meteor extends CustomPainter {
   Paint _paint;
   Meteor() {
@@ -1362,6 +1297,304 @@ class _MeteorLoaderState extends State<MeteorLoader>
           width: 50 * _fraction,
           height: 100 * _fraction,
           child: CustomPaint(painter: Meteor())),
+    );
+  }
+}
+
+class SleepMode extends StatefulWidget {
+  SleepMode({Key key}) : super(key: key);
+
+  @override
+  SleepModeState createState() => SleepModeState();
+}
+
+class SleepModeState extends State<SleepMode>
+    with SingleTickerProviderStateMixin {
+  int _minSelected;
+  List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
+  AnimationController _controller;
+  Animation<double> _animation;
+  @override
+  void initState() {
+    super.initState();
+    _minSelected = 30;
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        Provider.of<AudioPlayerNotifier>(context, listen: false)
+            .setSwitchValue = _animation.value;
+      });
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        Provider.of<AudioPlayerNotifier>(context, listen: false)
+            .sleepTimer(_minSelected);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  List<BoxShadow> customShadow(double scale) => [
+        BoxShadow(
+            blurRadius: 26 * (1 - scale),
+            offset: Offset(-6, -6) * (1 - scale),
+            color: Colors.white),
+        BoxShadow(
+            blurRadius: 8 * (1 - scale),
+            offset: Offset(2, 2) * (1 - scale),
+            color: Colors.grey[600].withOpacity(0.4))
+      ];
+  List<BoxShadow> customShadowNight(double scale) => [
+        BoxShadow(
+            blurRadius: 6 * (1 - scale),
+            offset: Offset(-1, -1) * (1 - scale),
+            color: Colors.grey[100].withOpacity(0.3)),
+        BoxShadow(
+            blurRadius: 8 * (1 - scale),
+            offset: Offset(2, 2) * (1 - scale),
+            color: Colors.black)
+      ];
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorTween _colorTween =
+        ColorTween(begin: context.primaryColor, end: Colors.black);
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    return Selector<AudioPlayerNotifier, Tuple3<int, double, SleepTimerMode>>(
+      selector: (_, audio) =>
+          Tuple3(audio.timeLeft, audio.switchValue, audio.sleepTimerMode),
+      builder: (_, data, __) {
+        double fraction = data.item2 < 0.5 ? data.item2 * 2 : 1;
+        double move = data.item2 > 0.5 ? data.item2 * 2 - 1 : 0;
+        return Container(
+          height: 300,
+          color: _colorTween.transform(move),
+          child: Stack(
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: minsToSelect
+                            .map((e) => InkWell(
+                                  onTap: () => setState(() => _minSelected = e),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: <Widget>[
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 10.0),
+                                        decoration: BoxDecoration(
+                                          boxShadow: !(e == _minSelected ||
+                                                  fraction > 0)
+                                              ? (Theme.of(context).brightness ==
+                                                      Brightness.dark)
+                                                  ? customShadowNight(fraction)
+                                                  : customShadow(fraction)
+                                              : null,
+                                          color: (e == _minSelected)
+                                              ? Theme.of(context).accentColor
+                                              : Theme.of(context).primaryColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        alignment: Alignment.center,
+                                        height: 30,
+                                        width: 30,
+                                        child: Text(e.toString(),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: (e == _minSelected)
+                                                    ? Colors.white
+                                                    : null)),
+                                      ),
+                                      Container(
+                                        height: 30 * move,
+                                        width: 30 * move,
+                                        decoration: BoxDecoration(
+                                            color:
+                                                _colorTween.transform(fraction),
+                                            shape: BoxShape.circle),
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                  Stack(
+                    children: <Widget>[
+                      Container(
+                        height: 100,
+                        alignment: Alignment.center,
+                      ),
+                      Positioned(
+                        left: data.item3 == SleepTimerMode.timer
+                            ? -context.width * (move) / 4
+                            : context.width * (move) / 4,
+                        child: Container(
+                          height: 100,
+                          width: context.width,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Container(
+                                alignment: Alignment.center,
+                                height: 40,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: context.primaryColor),
+                                  boxShadow:
+                                      context.brightness == Brightness.light
+                                          ? customShadow(fraction)
+                                          : customShadowNight(fraction),
+                                  color: _colorTween.transform(move),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      audio.setSleepTimerMode =
+                                          SleepTimerMode.endOfEpisode;
+                                      if (fraction == 0) {
+                                        _controller.forward();
+                                      } else if (fraction == 1) {
+                                        _controller.reverse();
+                                        audio.cancelTimer();
+                                      }
+                                    },
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20)),
+                                    child: SizedBox(
+                                        height: 40,
+                                        width: 120,
+                                        child: Center(
+                                            child: Text(
+                                          'End of episode',
+                                          style: TextStyle(
+                                              // fontWeight: FontWeight.bold,
+                                              // fontSize: 20,
+                                              color: (move > 0
+                                                  ? Colors.white
+                                                  : null)),
+                                        ))),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 100 * (1 - fraction),
+                                width: 2,
+                                color: context.primaryColorDark,
+                              ),
+                              Container(
+                                height: 40,
+                                width: 120,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: context.primaryColor),
+                                  boxShadow:
+                                      context.brightness == Brightness.light
+                                          ? customShadow(fraction)
+                                          : customShadowNight(fraction),
+                                  color: _colorTween.transform(move),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      audio.setSleepTimerMode =
+                                          SleepTimerMode.timer;
+                                      if (fraction == 0) {
+                                        _controller.forward();
+                                      } else if (fraction == 1) {
+                                        _controller.reverse();
+                                        audio.cancelTimer();
+                                      }
+                                    },
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20)),
+                                    child: SizedBox(
+                                      height: 40,
+                                      width: 120,
+                                      child: Center(
+                                        child: Text(
+                                          data.item2 == 1
+                                              ? _stringForSeconds(
+                                                  data.item1.toDouble())
+                                              : _stringForSeconds(
+                                                  (_minSelected * 60)
+                                                      .toDouble()),
+                                          style: TextStyle(
+                                              // fontWeight: FontWeight.bold,
+                                              // fontSize: 20,
+                                              color: (move > 0
+                                                  ? Colors.white
+                                                  : null)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Positioned(
+                bottom: 50 + 20 * data.item2,
+                left: context.width / 2 - 100,
+                width: 200,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Good Night',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.white.withOpacity(fraction))),
+                ),
+              ),
+              Positioned(
+                bottom: 100 * (1 - data.item2) - 30,
+                left: context.width / 2 - 100,
+                width: 200,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Sleep Timer',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ),
+              ),
+              data.item2 == 1 ? CustomPaint(painter: StarSky()) : Center(),
+              data.item2 == 1 ? MeteorLoader() : Center(),
+            ],
+          ),
+        );
+      },
     );
   }
 }

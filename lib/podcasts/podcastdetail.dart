@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:provider/provider.dart';
+import 'package:line_icons/line_icons.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
@@ -20,6 +21,8 @@ import 'package:tsacdop/util/episodegrid.dart';
 import 'package:tsacdop/home/audioplayer.dart';
 import 'package:tsacdop/class/fireside_data.dart';
 import 'package:tsacdop/util/colorize.dart';
+import 'package:tsacdop/util/context_extension.dart';
+import 'package:tsacdop/util/custompaint.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, this.podcastLocal}) : super(key: key);
@@ -36,25 +39,27 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final result = await dbHelper.updatePodcastRss(podcastLocal);
-    if(result == 0)
-       { Fluttertoast.showToast(
-            msg: 'No Update',
-            gravity: ToastGravity.TOP,
-          );}
-      else{
-          Fluttertoast.showToast(
-            msg: 'Updated $result Episodes',
-            gravity: ToastGravity.TOP,
-          );
-          Provider.of<GroupList>(context, listen: false).updatePodcast(podcastLocal);
-      }
+    if (result == 0) {
+      Fluttertoast.showToast(
+        msg: 'No Update',
+        gravity: ToastGravity.TOP,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: 'Updated $result Episodes',
+        gravity: ToastGravity.TOP,
+      );
+      Provider.of<GroupList>(context, listen: false)
+          .updatePodcast(podcastLocal);
+    }
     if (mounted) setState(() {});
   }
 
   Future<List<EpisodeBrief>> _getRssItem(
-      PodcastLocal podcastLocal, int i) async {
+      PodcastLocal podcastLocal, int i, bool reverse) async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await dbHelper.getRssItem(podcastLocal.id, i);
+    List<EpisodeBrief> episodes =
+        await dbHelper.getRssItem(podcastLocal.id, i, reverse);
     if (podcastLocal.provider.contains('fireside')) {
       FiresideData data = FiresideData(podcastLocal.id, podcastLocal.link);
       await data.getData();
@@ -168,12 +173,15 @@ class _PodcastDetailState extends State<PodcastDetail> {
   ScrollController _controller;
   int _top;
   bool _loadMore;
-
+  Layout _layout;
+  bool _reverse;
   @override
   void initState() {
     super.initState();
     _loadMore = false;
     _top = 99;
+    _layout = Layout.three;
+    _reverse = false;
     _controller = ScrollController();
   }
 
@@ -210,7 +218,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   children: <Widget>[
                     Expanded(
                       child: FutureBuilder<List<EpisodeBrief>>(
-                        future: _getRssItem(widget.podcastLocal, _top),
+                        future:
+                            _getRssItem(widget.podcastLocal, _top, _reverse),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           return (snapshot.hasData)
@@ -232,7 +241,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                           });
                                       }
                                     }),
-                                  physics: const AlwaysScrollableScrollPhysics(),
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
                                   //primary: true,
                                   slivers: <Widget>[
                                     SliverAppBar(
@@ -392,18 +402,121 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         );
                                       }),
                                     ),
-                                    SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                        (BuildContext context, int index) {
-                                          return hostsList(context, hosts);
-                                        },
-                                        childCount: 1,
-                                      ),
+                                    SliverToBoxAdapter(
+                                      child: hostsList(context, hosts),
+                                    ),
+                                    SliverToBoxAdapter(
+                                      child: Container(
+                                          height: 30,
+                                          child: Row(
+                                            children: <Widget>[
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: PopupMenuButton<int>(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  10))),
+                                                  elevation: 1,
+                                                  tooltip: 'Sort By',
+                                                  child: Container(
+                                                      height: 30,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 15),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: <Widget>[
+                                                          Text('Sort by'),
+                                                          Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        5),
+                                                          ),
+                                                          Icon(
+                                                            _reverse
+                                                                ? LineIcons
+                                                                    .hourglass_start_solid
+                                                                : LineIcons
+                                                                    .hourglass_end_solid,
+                                                            size: 18,
+                                                          )
+                                                        ],
+                                                      )),
+                                                  itemBuilder: (context) => [
+                                                    PopupMenuItem(
+                                                      value: 0,
+                                                      child: Text('Newest first'),
+                                                    ),
+                                                    PopupMenuItem(
+                                                      value: 1,
+                                                      child: Text('Oldest first'),
+                                                    )
+                                                  ],
+                                                  onSelected: (value) {
+                                                    if (value == 0)
+                                                      setState(() =>
+                                                          _reverse = false);
+                                                    else if (value == 1)
+                                                      setState(() =>
+                                                          _reverse = true);
+                                                  },
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: IconButton(
+                                                  padding: EdgeInsets.zero,
+                                                  onPressed: () {
+                                                    if (_layout == Layout.three)
+                                                      setState(() {
+                                                        _layout = Layout.two;
+                                                      });
+                                                    else
+                                                      setState(() {
+                                                        _layout = Layout.three;
+                                                      });
+                                                  },
+                                                  icon: _layout == Layout.three
+                                                      ? SizedBox(
+                                                          height: 10,
+                                                          width: 30,
+                                                          child: CustomPaint(
+                                                            painter: LayoutPainter(
+                                                                0,
+                                                                context
+                                                                    .textTheme
+                                                                    .bodyText1
+                                                                    .color),
+                                                          ),
+                                                        )
+                                                      : SizedBox(
+                                                          height: 10,
+                                                          width: 30,
+                                                          child: CustomPaint(
+                                                            painter: LayoutPainter(
+                                                                1,
+                                                                context
+                                                                    .textTheme
+                                                                    .bodyText1
+                                                                    .color),
+                                                          ),
+                                                        ),
+                                                ),
+                                              ),
+                                            ],
+                                          )),
                                     ),
                                     EpisodeGrid(
                                       episodes: snapshot.data,
                                       showFavorite: true,
                                       showNumber: true,
+                                      layout: _layout,
+                                      reverse: _reverse,
                                       episodeCount:
                                           widget.podcastLocal.episodeCount,
                                     ),
@@ -519,12 +632,6 @@ class _AboutPodcastState extends State<AboutPodcast> {
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            Container(
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.keyboard_arrow_down,
-                              ),
-                            ),
                           ],
                         )
                       : Linkify(
@@ -554,3 +661,4 @@ class _AboutPodcastState extends State<AboutPodcast> {
           );
   }
 }
+

@@ -125,7 +125,7 @@ class SettingState extends ChangeNotifier {
       int color = int.parse('FF' + colorString.toUpperCase(), radix: 16);
       _accentSetColor = Color(color).withOpacity(1.0);
     } else {
-      _accentSetColor = Color.fromRGBO(35, 204, 198, 1);
+      _accentSetColor = Colors.teal[500];
     }
   }
 

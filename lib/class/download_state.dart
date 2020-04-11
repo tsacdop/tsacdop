@@ -90,13 +90,16 @@ class DownloadState extends ChangeNotifier {
   Future _saveMediaId(EpisodeTask episodeTask) async {
     episodeTask.status = DownloadTaskStatus.complete;
     final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
-        query:
-            "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
+        query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
     String filePath = 'file://' +
         path.join(completeTask.first.savedDir, completeTask.first.filename);
-    print(filePath);
     dbHelper.saveMediaId(
         episodeTask.episode.enclosureUrl, filePath, episodeTask.taskId);
+    EpisodeBrief episode =
+        await dbHelper.getRssItemWithUrl(episodeTask.episode.enclosureUrl);
+    _removeTask(episodeTask.episode);
+    _episodeTasks.add(EpisodeTask(episode, episodeTask.taskId,
+        progress: 100, status: DownloadTaskStatus.complete));
   }
 
   void _unbindBackgroundIsolate() {

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +16,7 @@ import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tsacdop/util/context_extension.dart';
+import 'package:tsacdop/util/custompaint.dart';
 import 'episodedownload.dart';
 
 class EpisodeDetail extends StatefulWidget {
@@ -163,7 +163,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                           horizontal: 10.0),
                                       alignment: Alignment.center,
                                       child: Text(
-                                          (widget.episodeItem.duration)
+                                          (widget.episodeItem.duration ~/ 60)
                                                   .toString() +
                                               'mins',
                                           style: textstyle),
@@ -253,10 +253,15 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                                   'assets/shownote.png'),
                                               height: 100.0,
                                             ),
-                                            Padding(padding: EdgeInsets.all(5.0)),
+                                            Padding(
+                                                padding: EdgeInsets.all(5.0)),
                                             Text(
-                                                'Still no shownote received\n for this episode.', textAlign: TextAlign.center,
-                                                style: TextStyle(color: context.textTheme.bodyText1.color.withOpacity(0.5))),
+                                                'Still no shownote received\n for this episode.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: context.textTheme
+                                                        .bodyText1.color
+                                                        .withOpacity(0.5))),
                                           ],
                                         ),
                                       )
@@ -313,7 +318,11 @@ class MenuBar extends StatefulWidget {
 
 class _MenuBarState extends State<MenuBar> {
   bool _liked;
-  int _like;
+
+  Future<PlayHistory> getPosition(EpisodeBrief episode) async {
+    var dbHelper = DBHelper();
+    return await dbHelper.getPosition(episode);
+  }
 
   Future<int> saveLiked(String url) async {
     var dbHelper = DBHelper();
@@ -328,16 +337,25 @@ class _MenuBarState extends State<MenuBar> {
     if (result == 1 && mounted)
       setState(() {
         _liked = false;
-        _like = 0;
+        // _like = 0;
       });
     return result;
+  }
+
+  Future<bool> _isLiked(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    return await dbHelper.isLiked(episode.enclosureUrl);
+  }
+
+  static String _stringForSeconds(double seconds) {
+    if (seconds == null) return null;
+    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
   @override
   void initState() {
     super.initState();
     _liked = false;
-    _like = widget.episodeItem.liked;
   }
 
   Widget _buttonOnMenu(Widget widget, VoidCallback onTap) => Material(
@@ -384,32 +402,39 @@ class _MenuBarState extends State<MenuBar> {
               ),
             ),
           ),
-          (_like == 0 && !_liked)
-              ? _buttonOnMenu(
-                  Icon(
-                    Icons.favorite_border,
-                    color: Colors.grey[700],
-                  ),
-                  () => saveLiked(widget.episodeItem.enclosureUrl))
-              : (_like == 1 && !_liked)
+          FutureBuilder<bool>(
+            future: _isLiked(widget.episodeItem),
+            initialData: false,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              return (!snapshot.data && !_liked)
                   ? _buttonOnMenu(
                       Icon(
-                        Icons.favorite,
-                        color: Colors.red,
+                        Icons.favorite_border,
+                        color: Colors.grey[700],
                       ),
-                      () => setUnliked(widget.episodeItem.enclosureUrl))
-                  : Stack(
-                      alignment: Alignment.center,
-                      children: <Widget>[
-                        LoveOpen(),
-                        _buttonOnMenu(
-                            Icon(
-                              Icons.favorite,
-                              color: Colors.red,
-                            ),
-                            () => setUnliked(widget.episodeItem.enclosureUrl)),
-                      ],
-                    ),
+                      () => saveLiked(widget.episodeItem.enclosureUrl))
+                  : (snapshot.data && !_liked)
+                      ? _buttonOnMenu(
+                          Icon(
+                            Icons.favorite,
+                            color: Colors.red,
+                          ),
+                          () => setUnliked(widget.episodeItem.enclosureUrl))
+                      : Stack(
+                          alignment: Alignment.center,
+                          children: <Widget>[
+                            LoveOpen(),
+                            _buttonOnMenu(
+                                Icon(
+                                  Icons.favorite,
+                                  color: Colors.red,
+                                ),
+                                () => setUnliked(
+                                    widget.episodeItem.enclosureUrl)),
+                          ],
+                        );
+            },
+          ),
           DownloadButton(episode: widget.episodeItem),
           Selector<AudioPlayerNotifier, List<String>>(
             selector: (_, audio) =>
@@ -418,8 +443,13 @@ class _MenuBarState extends State<MenuBar> {
               return data.contains(widget.episodeItem.enclosureUrl)
                   ? _buttonOnMenu(
                       Icon(Icons.playlist_add_check,
-                          color: Theme.of(context).accentColor),
-                      () {})
+                          color: Theme.of(context).accentColor), () {
+                      audio.delFromPlaylist(widget.episodeItem);
+                      Fluttertoast.showToast(
+                        msg: 'Removed from playlist',
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                    })
                   : _buttonOnMenu(
                       Icon(Icons.playlist_add, color: Colors.grey[700]), () {
                       Fluttertoast.showToast(
@@ -430,8 +460,61 @@ class _MenuBarState extends State<MenuBar> {
                     });
             },
           ),
+          FutureBuilder<PlayHistory>(
+              future: getPosition(widget.episodeItem),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) print(snapshot.error);
+                return snapshot.hasData
+                    ? snapshot.data.seekValue > 0.95
+                        ? Container(
+                          height: 20,
+                          padding: EdgeInsets.symmetric(horizontal:15),
+                          child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CustomPaint(
+                                painter: ListenedPainter(context.accentColor,
+                                    stroke: 2.0),
+                              ),
+                            ),
+                        )
+                        : snapshot.data.seconds < 0.1
+                            ? Center()
+                            : Container(
+                              height: 50,
+                              padding: EdgeInsets.symmetric(horizontal:15),
+                              child: Row(
+                                  children: <Widget>[
+                                    SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CustomPaint(
+                                        painter: ListenedPainter(
+                                            context.accentColor,
+                                            stroke: 2.0),
+                                      ),
+                                    ),
+                                    Padding(padding: EdgeInsets.symmetric(horizontal:2)),
+                                    Container(
+                                      height: 20,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 2),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0)),
+                                        color: context.accentColor,
+                                      ),
+                                      child: Text(
+                                        _stringForSeconds(snapshot.data.seconds),
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            )
+                    : Center();
+              }),
           Spacer(),
-          // Text(audio.audioState.toString()),
           Selector<AudioPlayerNotifier,
               Tuple2<EpisodeBrief, BasicPlaybackState>>(
             selector: (_, audio) => Tuple2(audio.episode, audio.audioState),
@@ -464,369 +547,13 @@ class _MenuBarState extends State<MenuBar> {
                         ),
                       ),
                     )
-                  : (widget.episodeItem.title == data.item1?.title &&
-                          data.item2 == BasicPlaybackState.playing)
-                      ? Container(
-                          padding: EdgeInsets.only(right: 30),
-                          child: SizedBox(
-                              width: 20, height: 15, child: WaveLoader()))
-                      : Container(
-                          padding: EdgeInsets.only(right: 30),
-                          child: SizedBox(
-                            width: 20,
-                            height: 15,
-                            child: LineLoader(),
-                          ),
-                        );
+                  : Container(
+                      padding: EdgeInsets.only(right: 30),
+                      child: SizedBox(
+                          width: 20,
+                          height: 15,
+                          child: WaveLoader(color: context.accentColor)));
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class LinePainter extends CustomPainter {
-  double _fraction;
-  Paint _paint;
-  Color _maincolor;
-  LinePainter(this._fraction, this._maincolor) {
-    _paint = Paint()
-      ..color = _maincolor
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawLine(Offset(0, size.height / 2.0),
-        Offset(size.width * _fraction, size.height / 2.0), _paint);
-  }
-
-  @override
-  bool shouldRepaint(LinePainter oldDelegate) {
-    return oldDelegate._fraction != _fraction;
-  }
-}
-
-class LineLoader extends StatefulWidget {
-  @override
-  _LineLoaderState createState() => _LineLoaderState();
-}
-
-class _LineLoaderState extends State<LineLoader>
-    with SingleTickerProviderStateMixin {
-  double _fraction = 0.0;
-  Animation animation;
-  AnimationController controller;
-  @override
-  void initState() {
-    super.initState();
-    controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    animation = Tween(begin: 0.0, end: 1.0).animate(controller)
-      ..addListener(() {
-        if (mounted)
-          setState(() {
-            _fraction = animation.value;
-          });
-      });
-    controller.forward();
-    controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        controller.reset();
-      } else if (status == AnimationStatus.dismissed) {
-        controller.forward();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-        painter: LinePainter(_fraction, Theme.of(context).accentColor));
-  }
-}
-
-class WavePainter extends CustomPainter {
-  double _fraction;
-  double _value;
-  Color _color;
-  WavePainter(this._fraction, this._color);
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (_fraction < 0.5) {
-      _value = _fraction;
-    } else {
-      _value = 1 - _fraction;
-    }
-    Path _path = Path();
-    Paint _paint = Paint()
-      ..color = _color
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    _path.moveTo(0, size.height / 2);
-    _path.lineTo(0, size.height / 2 + size.height * _value * 0.2);
-    _path.moveTo(0, size.height / 2);
-    _path.lineTo(0, size.height / 2 - size.height * _value * 0.2);
-    _path.moveTo(size.width / 4, size.height / 2);
-    _path.lineTo(size.width / 4, size.height / 2 + size.height * _value * 0.8);
-    _path.moveTo(size.width / 4, size.height / 2);
-    _path.lineTo(size.width / 4, size.height / 2 - size.height * _value * 0.8);
-    _path.moveTo(size.width / 2, size.height / 2);
-    _path.lineTo(size.width / 2, size.height / 2 + size.height * _value * 0.5);
-    _path.moveTo(size.width / 2, size.height / 2);
-    _path.lineTo(size.width / 2, size.height / 2 - size.height * _value * 0.5);
-    _path.moveTo(size.width * 3 / 4, size.height / 2);
-    _path.lineTo(
-        size.width * 3 / 4, size.height / 2 + size.height * _value * 0.6);
-    _path.moveTo(size.width * 3 / 4, size.height / 2);
-    _path.lineTo(
-        size.width * 3 / 4, size.height / 2 - size.height * _value * 0.6);
-    _path.moveTo(size.width, size.height / 2);
-    _path.lineTo(size.width, size.height / 2 + size.height * _value * 0.2);
-    _path.moveTo(size.width, size.height / 2);
-    _path.lineTo(size.width, size.height / 2 - size.height * _value * 0.2);
-    canvas.drawPath(_path, _paint);
-  }
-
-  @override
-  bool shouldRepaint(WavePainter oldDelegate) {
-    return oldDelegate._fraction != _fraction;
-  }
-}
-
-class WaveLoader extends StatefulWidget {
-  @override
-  _WaveLoaderState createState() => _WaveLoaderState();
-}
-
-class _WaveLoaderState extends State<WaveLoader>
-    with SingleTickerProviderStateMixin {
-  double _fraction = 0.0;
-  Animation animation;
-  AnimationController _controller;
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 1000));
-    animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
-      ..addListener(() {
-        if (mounted)
-          setState(() {
-            _fraction = animation.value;
-          });
-      });
-    _controller.forward();
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.reset();
-      } else if (status == AnimationStatus.dismissed) {
-        _controller.forward();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-        painter: WavePainter(_fraction, Theme.of(context).accentColor));
-  }
-}
-
-class ImageRotate extends StatefulWidget {
-  final String title;
-  final String path;
-  ImageRotate({this.title, this.path, Key key}) : super(key: key);
-  @override
-  _ImageRotateState createState() => _ImageRotateState();
-}
-
-class _ImageRotateState extends State<ImageRotate>
-    with SingleTickerProviderStateMixin {
-  Animation _animation;
-  AnimationController _controller;
-  double _value;
-  @override
-  void initState() {
-    super.initState();
-    _value = 0;
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 2000),
-    );
-    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
-      ..addListener(() {
-        if (mounted)
-          setState(() {
-            _value = _animation.value;
-          });
-      });
-    _controller.forward();
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.reset();
-      } else if (status == AnimationStatus.dismissed) {
-        _controller.forward();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: 2 * math.pi * _value,
-      child: Container(
-        padding: EdgeInsets.all(10.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
-          child: Container(
-            height: 30.0,
-            width: 30.0,
-            color: Colors.white,
-            child: Image.file(File("${widget.path}")),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class LovePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Path _path = Path();
-    Paint _paint = Paint()
-      ..color = Colors.red
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-
-    _path.moveTo(size.width / 2, size.height / 6);
-    _path.quadraticBezierTo(size.width / 4, 0, size.width / 8, size.height / 6);
-    _path.quadraticBezierTo(
-        0, size.height / 3, size.width / 8, size.height * 0.55);
-    _path.quadraticBezierTo(
-        size.width / 4, size.height * 0.8, size.width / 2, size.height);
-    _path.quadraticBezierTo(size.width * 0.75, size.height * 0.8,
-        size.width * 7 / 8, size.height * 0.55);
-    _path.quadraticBezierTo(
-        size.width, size.height / 3, size.width * 7 / 8, size.height / 6);
-    _path.quadraticBezierTo(
-        size.width * 3 / 4, 0, size.width / 2, size.height / 6);
-
-    canvas.drawPath(_path, _paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-  }
-}
-
-class LoveOpen extends StatefulWidget {
-  @override
-  _LoveOpenState createState() => _LoveOpenState();
-}
-
-class _LoveOpenState extends State<LoveOpen>
-    with SingleTickerProviderStateMixin {
-  Animation _animationA;
-  AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 300),
-    );
-
-    _animationA = Tween(begin: 0.0, end: 1.0).animate(_controller)
-      ..addListener(() {
-        if (mounted) setState(() {});
-      });
-
-    _controller.forward();
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.reset();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Widget _littleHeart(double scale, double value, double angle) => Container(
-        alignment: Alignment.centerLeft,
-        padding: EdgeInsets.only(left: value),
-        child: ScaleTransition(
-          scale: _animationA,
-          alignment: Alignment.center,
-          child: Transform.rotate(
-            angle: angle,
-            child: SizedBox(
-              height: 5 * scale,
-              width: 6 * scale,
-              child: CustomPaint(
-                painter: LovePainter(),
-              ),
-            ),
-          ),
-        ),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 50,
-      height: 50,
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              _littleHeart(0.5, 10, -math.pi / 6),
-              _littleHeart(1.2, 3, 0),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              _littleHeart(0.8, 6, math.pi * 1.5),
-              _littleHeart(0.9, 24, math.pi / 2),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              _littleHeart(1, 8, -math.pi * 0.7),
-              _littleHeart(0.8, 8, math.pi),
-              _littleHeart(0.6, 3, -math.pi * 1.2)
-            ],
           ),
         ],
       ),

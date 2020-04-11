@@ -285,7 +285,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                         .data[index].subDate)
                                                     .inDays
                                                     .toString() +
-                                                ' days')
+                                                ' days ago')
                                             : Text(snapshot.data[index].delDate
                                                     .difference(snapshot
                                                         .data[index].subDate)

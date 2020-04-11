@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tsacdop/episodes/episodedetail.dart';
 import 'package:tuple/tuple.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
@@ -12,7 +11,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
 import 'package:tsacdop/util/context_extension.dart';
-import 'package:tsacdop/home/audioplayer.dart';
+import 'package:tsacdop/util/custompaint.dart';
 
 class PlaylistPage extends StatefulWidget {
   @override
@@ -28,7 +27,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
       return sum;
     } else {
       episodes.forEach((episode) {
-        sum += episode.duration;
+        sum += episode.duration ~/ 60;
       });
       return sum;
     }
@@ -78,7 +77,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
             selector: (_, audio) =>
                 Tuple3(audio.queue, audio.playerRunning, audio.queueUpdate),
             builder: (_, data, __) {
-              print('update');
               final List<EpisodeBrief> episodes = data.item1.playlist;
               return Column(
                 mainAxisSize: MainAxisSize.min,
@@ -150,15 +148,17 @@ class _PlaylistPageState extends State<PlaylistPage> {
                           child: Container(
                             padding: EdgeInsets.all(5.0),
                             margin: EdgeInsets.only(right: 20.0, bottom: 5.0),
-                            decoration: data.item2 ? BoxDecoration(
-                              color: context.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                            ) :
-                            BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.transparent
-                            ),
+                            decoration: data.item2
+                                ? BoxDecoration(
+                                    color: context.brightness == Brightness.dark
+                                        ? Colors.grey[800]
+                                        : Colors.grey[200],
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10.0)),
+                                  )
+                                : BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.transparent),
                             child: data.item2
                                 ? _topHeight < 90
                                     ? Row(
@@ -178,7 +178,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             child: SizedBox(
                                                 width: 20,
                                                 height: 15,
-                                                child: WaveLoader()),
+                                                child: WaveLoader(color: context.accentColor,)),
                                           ),
                                         ],
                                       )
@@ -210,13 +210,13 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             child: SizedBox(
                                                 width: 20,
                                                 height: 15,
-                                                child: WaveLoader()),
+                                                child: WaveLoader(color: context.accentColor,)),
                                           ),
                                         ],
                                       )
                                 : IconButton(
-                                  padding: EdgeInsets.all(0),
-                                  alignment: Alignment.center,
+                                    padding: EdgeInsets.all(0),
+                                    alignment: Alignment.center,
                                     icon: Icon(Icons.play_circle_filled,
                                         size: 40,
                                         color: Theme.of(context).accentColor),
@@ -360,7 +360,8 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                 );
                 Scaffold.of(context).showSnackBar(SnackBar(
                   backgroundColor: Colors.grey[800],
-                  content: Text('Episode removed', style: TextStyle(color: Colors.white)),
+                  content: Text('Episode removed',
+                      style: TextStyle(color: Colors.white)),
                   action: SnackBarAction(
                       textColor: context.accentColor,
                       label: 'Undo',
@@ -403,7 +404,8 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                               : Center(),
                           widget.episode.duration != 0
                               ? _episodeTag(
-                                  (widget.episode.duration).toString() + 'mins',
+                                  (widget.episode.duration ~/ 60).toString() +
+                                      'mins',
                                   Colors.cyan[300])
                               : Center(),
                           widget.episode.enclosureLength != null
