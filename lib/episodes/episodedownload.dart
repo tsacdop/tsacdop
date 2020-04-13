@@ -91,13 +91,11 @@ class _DownloadButtonState extends State<DownloadButton> {
   }
 
   Future<bool> _checkPermmison() async {
-    PermissionStatus permission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.storage);
+    PermissionStatus permission = await Permission.storage.status;
     if (permission != PermissionStatus.granted) {
-      Map<PermissionGroup, PermissionStatus> permissions =
-          await PermissionHandler()
-              .requestPermissions([PermissionGroup.storage]);
-      if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
+      Map<Permission, PermissionStatus> permissions =
+          await [Permission.storage].request();
+      if (permissions[Permission.storage] == PermissionStatus.granted) {
         return true;
       } else {
         return false;

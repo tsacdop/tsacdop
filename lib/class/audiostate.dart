@@ -173,7 +173,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     super.addListener(listener);
     _queueUpdate = false;
     await AudioService.connect();
-    bool running = await AudioService.running;
+    bool running =  AudioService.running;
     if (running) {}
   }
 

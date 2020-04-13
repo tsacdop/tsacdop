@@ -421,7 +421,7 @@ class HistoryChart extends StatelessWidget {
               dotData: FlDotData(
                 show: true,
                 dotSize: 5,
-                dotColor: Theme.of(context).accentColor,
+               // getDotColor: Theme.of(context).accentColor,
               ),
             ),
           ],
