@@ -475,13 +475,13 @@ class _MenuBarState extends State<MenuBar> {
                 return snapshot.hasData
                     ? snapshot.data.seekValue > 0.95
                         ? Container(
-                            height: 20,
+                            height: 25,
                             padding: EdgeInsets.symmetric(horizontal: 15),
                             child: SizedBox(
-                              width: 20,
-                              height: 20,
+                              width: 25,
+                              height: 25,
                               child: CustomPaint(
-                                painter: ListenedPainter(context.accentColor,
+                                painter: ListenedAllPainter(context.accentColor,
                                     stroke: 2.0),
                               ),
                             ),

@@ -290,7 +290,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
     AudioService.playbackStateStream.listen((event) async {
       _current = DateTime.now();
       _audioState = event?.basicState;
-      if (_audioState == BasicPlaybackState.stopped) _playerRunning = false;
+      if (_audioState == BasicPlaybackState.stopped) {
+        _playerRunning = false;
+        if (_switchValue > 0) _switchValue = 0;
+      }
 
       if (_audioState == BasicPlaybackState.error) {
         _remoteErrorMessage = 'Network Error';
@@ -648,6 +651,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   void onStop() async {
     await _audioPlayer.stop();
     _setState(state: BasicPlaybackState.stopped);
+    await Future.delayed(Duration(milliseconds: 500));
     _completer.complete();
   }
 

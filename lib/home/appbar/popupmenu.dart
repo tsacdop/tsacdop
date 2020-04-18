@@ -74,10 +74,8 @@ class _PopupMenuState extends State<PopupMenu> {
       return '1 hour ago';
     } else if (diffrence.inHours < 24) {
       return '${diffrence.inHours} hours ago';
-    } else if (diffrence.inHours == 24) {
-      return '1 day ago';
     } else if (diffrence.inDays < 7) {
-      return '${diffrence.inDays} days ago';
+      return '${diffrence.inDays} day ago';
     } else {
       return DateFormat.yMMMd()
           .format(DateTime.fromMillisecondsSinceEpoch(refreshDate));

@@ -23,7 +23,7 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 * OMPL file export and import
 * Auto syncing in background
 * Listen and subscribe history record
-* Dark mode/ Accent color personalization
+* Dark mode / Accent color personalization
 * Download for offline playing 
 
 More to come...
