@@ -62,16 +62,11 @@ class ThemeSetting extends StatelessWidget {
                               AnnotatedRegion<SystemUiOverlayStyle>(
                                 value: SystemUiOverlayStyle(
                                   statusBarIconBrightness: Brightness.light,
-                                   systemNavigationBarColor:
-                                       Theme.of(context).brightness ==
-                                               Brightness.light
-                                           ? Color.fromRGBO(113, 113, 113, 1)
-                                           : Color.fromRGBO(15, 15, 15, 1),
-                                  //   statusBarColor:
-                                  //       Theme.of(context).brightness ==
-                                  //               Brightness.light
-                                  //           ? Color.fromRGBO(113, 113, 113, 1)
-                                  //           : Color.fromRGBO(5, 5, 5, 1),
+                                  systemNavigationBarColor:
+                                      Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Color.fromRGBO(113, 113, 113, 1)
+                                          : Color.fromRGBO(15, 15, 15, 1),
                                 ),
                                 child: AlertDialog(
                                   titlePadding: EdgeInsets.only(
@@ -124,6 +119,22 @@ class ThemeSetting extends StatelessWidget {
                       title: Text('Theme'),
                       subtitle: Text('System default'),
                     ),
+                    ListTile(
+                      contentPadding:
+                          EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
+                      //  leading: Icon(Icons.colorize),
+                      title: Text('Real Dark'),
+                      subtitle: Text(
+                          'Turn on if you think the night is not dark enough'),
+                      trailing: Selector<SettingState, bool>(
+                        selector: (_, setting) => setting.realDark,
+                        builder: (_, data, __) => Switch(
+                            value: data,
+                            onChanged: (boo) async {
+                              settings.setRealDark = boo;
+                            }),
+                      ),
+                    ),
                     Divider(height: 2),
                     ListTile(
                       onTap: () => showGeneralDialog(
@@ -139,16 +150,11 @@ class ThemeSetting extends StatelessWidget {
                               AnnotatedRegion<SystemUiOverlayStyle>(
                                   value: SystemUiOverlayStyle(
                                     statusBarIconBrightness: Brightness.light,
-                                     systemNavigationBarColor:
-                                         Theme.of(context).brightness ==
-                                                 Brightness.light
-                                             ? Color.fromRGBO(113, 113, 113, 1)
-                                             : Color.fromRGBO(15, 15, 15, 1),
-                                    //  statusBarColor:
-                                    //      Theme.of(context).brightness ==
-                                    //              Brightness.light
-                                    //          ? Color.fromRGBO(113, 113, 113, 1)
-                                    //          : Color.fromRGBO(5, 5, 5, 1),
+                                    systemNavigationBarColor:
+                                        Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? Color.fromRGBO(113, 113, 113, 1)
+                                            : Color.fromRGBO(15, 15, 15, 1),
                                   ),
                                   child: AlertDialog(
                                     elevation: 1,

@@ -133,6 +133,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool _autoPlay = true;
   DateTime _current;
   int _currentPosition;
+  double _currentSpeed = 1;
   BehaviorSubject<List<MediaItem>> queueSubject;
 
   BasicPlaybackState get audioState => _audioState;
@@ -152,6 +153,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool get autoPlay => _autoPlay;
   int get timeLeft => _timeLeft;
   double get switchValue => _switchValue;
+  double get currentSpeed => _currentSpeed;
 
   set setSwitchValue(double value) {
     _switchValue = value;
@@ -173,7 +175,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     super.addListener(listener);
     _queueUpdate = false;
     await AudioService.connect();
-    bool running =  AudioService.running;
+    bool running = AudioService.running;
     if (running) {}
   }
 
@@ -205,8 +207,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
       await _queue.savePlaylist();
     } else {
       await _queue.getPlaylist();
-      // _queue.playlist
-      //     .removeWhere((item) => item.enclosureUrl == episode.enclosureUrl);
       await _queue.delFromPlaylist(episode);
       await _queue.addToPlayListAt(episodeNew, 0);
       _backgroundAudioDuration = 0;
@@ -257,7 +257,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       }
       notifyListeners();
     });
-    
+
     queueSubject = BehaviorSubject<List<MediaItem>>();
     queueSubject.addStream(
         AudioService.queueStream.distinct().where((event) => event != null));
@@ -304,14 +304,16 @@ class AudioPlayerNotifier extends ChangeNotifier {
       notifyListeners();
     });
 
+    double s = _currentSpeed ?? 1.0;
+    int getPosition = 0;
     Timer.periodic(Duration(milliseconds: 500), (timer) {
       if (_noSlide) {
         if (_audioState == BasicPlaybackState.playing) {
-          if (_backgroundAudioPosition < _backgroundAudioDuration - 500)
-            _backgroundAudioPosition = _currentPosition +
-                DateTime.now().difference(_current).inMilliseconds;
-          else
-            _backgroundAudioPosition = _backgroundAudioDuration;
+          getPosition = _currentPosition +
+              (DateTime.now().difference(_current).inMilliseconds * s).toInt();
+          _backgroundAudioPosition = getPosition < _backgroundAudioDuration
+              ? getPosition
+              : _backgroundAudioDuration;
         } else
           _backgroundAudioPosition = _currentPosition;
 
@@ -433,6 +435,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
       await AudioService.seekTo(_currentPosition);
       _noSlide = true;
     }
+  }
+
+  setSpeed(double speed) async {
+    await AudioService.customAction('setSpeed', speed);
+    _currentSpeed = speed;
+    notifyListeners();
   }
 
   //Set sleep timer
@@ -710,7 +718,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  void onCustomAction(funtion, argument) {
+  void onCustomAction(funtion, argument) async {
     switch (funtion) {
       case 'stopAtEnd':
         _stopAtEnd = true;
@@ -718,6 +726,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
       case 'cancelStopAtEnd':
         _stopAtEnd = false;
         break;
+      case 'setSpeed':
+        await _audioPlayer.setSpeed(argument);
     }
   }
 

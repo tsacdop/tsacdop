@@ -33,7 +33,7 @@ class Settings extends StatelessWidget {
   _exportOmpl() async {
     var dbHelper = DBHelper();
     List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-    var ompl = omplBuilder(podcastList);
+    var ompl = omplBuilder(podcastList.reversed.toList());
     var tempdir = await getTemporaryDirectory();
     var file = File(join(tempdir.path, 'tsacdop_ompl.xml'));
     print(file.path);
@@ -226,7 +226,8 @@ class Settings extends StatelessWidget {
                           onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SlideIntro(goto: Goto.settings))),
+                                  builder: (context) =>
+                                      SlideIntro(goto: Goto.settings))),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.columns_solid),

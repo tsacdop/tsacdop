@@ -9,17 +9,17 @@ import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/util/custompaint.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/class/importompl.dart';
-import 'package:tsacdop/class/podcast_group.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/episodes/episodedetail.dart';
-import 'package:tsacdop/podcasts/podcastdetail.dart';
-import 'package:tsacdop/podcasts/podcastmanage.dart';
-import 'package:tsacdop/util/pageroute.dart';
-import 'package:tsacdop/util/colorize.dart';
-import 'package:tsacdop/util/context_extension.dart';
+
+import '../class/episodebrief.dart';
+import '../class/podcast_group.dart';
+import '../class/podcastlocal.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../episodes/episodedetail.dart';
+import '../podcasts/podcastdetail.dart';
+import '../podcasts/podcastmanage.dart';
+import '../util/pageroute.dart';
+import '../util/colorize.dart';
+import '../util/context_extension.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -284,31 +284,29 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                           ],
                         ),
                       ),
-                      Consumer<ImportOmpl>(
-                        builder: (_, ompl, __) => Container(
-                          height: (_width - 20) / 3 + 40,
-                          margin: EdgeInsets.only(left: 10, right: 10),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                          ),
-                          child: TabBarView(
-                            children: groups[_groupIndex]
-                                .podcasts
-                                .map<Widget>((PodcastLocal podcastLocal) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.black12),
-                                margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                key: ObjectKey(podcastLocal.title),
-                                child: PodcastPreview(
-                                  podcastLocal: podcastLocal,
-                                ),
-                              );
-                            }).toList(),
-                          ),
+                      Container(
+                        height: (_width - 20) / 3 + 40,
+                        margin: EdgeInsets.only(left: 10, right: 10),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                        ),
+                        child: TabBarView(
+                          children: groups[_groupIndex]
+                              .podcasts
+                              .map<Widget>((PodcastLocal podcastLocal) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.black12),
+                              margin: EdgeInsets.symmetric(horizontal: 5.0),
+                              key: ObjectKey(podcastLocal.title),
+                              child: PodcastPreview(
+                                podcastLocal: podcastLocal,
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
                     ],
@@ -557,12 +555,16 @@ class ShowEpisode extends StatelessWidget {
                                       ),
                                     ),
                                     Spacer(),
-                                    Selector<AudioPlayerNotifier, EpisodeBrief>(
-                                        selector: (_, audio) => audio.episode,
+                                    Selector<AudioPlayerNotifier,
+                                            Tuple2<EpisodeBrief, bool>>(
+                                        selector: (_, audio) => Tuple2(
+                                            audio.episode, audio.playerRunning),
                                         builder: (_, data, __) {
                                           return (episodes[index]
-                                                      .enclosureUrl ==
-                                                  data?.enclosureUrl)
+                                                          .enclosureUrl ==
+                                                      data.item1
+                                                          ?.enclosureUrl &&
+                                                  data.item2)
                                               ? Container(
                                                   height: 20,
                                                   width: 20,
@@ -624,11 +626,10 @@ class ShowEpisode extends StatelessWidget {
                                               alignment: Alignment.center,
                                               child: Text(
                                                 _stringForSeconds(
-                                                            episodes[index]
-                                                                .duration
-                                                                .toDouble())
-                                                        .toString() +
-                                                    '|',
+                                                        episodes[index]
+                                                            .duration
+                                                            .toDouble())
+                                                    .toString(),
                                                 style: TextStyle(
                                                   fontSize: _width / 35,
                                                   // color: _c,
@@ -637,6 +638,20 @@ class ShowEpisode extends StatelessWidget {
                                               ),
                                             )
                                           : Center(),
+                                      episodes[index].duration == 0 ||
+                                              episodes[index].enclosureLength ==
+                                                  null ||
+                                              episodes[index].enclosureLength ==
+                                                  0
+                                          ? Center()
+                                          : Text(
+                                              '|',
+                                              style: TextStyle(
+                                                fontSize: _width / 35,
+                                                // color: _c,
+                                                // fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
                                       episodes[index].enclosureLength != null &&
                                               episodes[index].enclosureLength !=
                                                   0

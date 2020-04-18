@@ -162,7 +162,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               PlaylistButton(),
             ],
           ),
-          Container(height: 2, color: Theme.of(context).primaryColorDark),
+          Container(height: 2, color: context.primaryColor),
         ],
       ),
     );

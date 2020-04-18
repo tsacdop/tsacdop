@@ -28,12 +28,10 @@ class _SlideIntroState extends State<SlideIntro> {
         color: Colors.grey[600].withOpacity(0.4))
   ];
   PageController _controller;
-  int _index;
   double _position;
   @override
   void initState() {
     super.initState();
-    _index = 0;
     _position = 0;
     _controller = PageController()
       ..addListener(() {
@@ -78,7 +76,8 @@ class _SlideIntroState extends State<SlideIntro> {
                   color: Colors.grey[100].withOpacity(0.5),
                   width: MediaQuery.of(context).size.width,
                   //   alignment: Alignment.center,
-                  padding: EdgeInsets.only(left: 40, right: 20, bottom: 30, top: 20),
+                  padding:
+                      EdgeInsets.only(left: 40, right: 20, bottom: 30, top: 20),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
@@ -182,7 +181,7 @@ class _SlideIntroState extends State<SlideIntro> {
                         height: 40,
                         width: 80,
                         decoration: BoxDecoration(
-                          border: Border.all(width:1, color: Colors.white),
+                          border: Border.all(width: 1, color: Colors.white),
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: Colors.white,
                           boxShadow: _customShadow,
@@ -194,7 +193,7 @@ class _SlideIntroState extends State<SlideIntro> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20)),
                                   onTap: () => _controller.animateToPage(
-                                      _index + 1,
+                                      _position.toInt() + 1,
                                       duration: Duration(milliseconds: 200),
                                       curve: Curves.bounceIn),
                                   child: SizedBox(

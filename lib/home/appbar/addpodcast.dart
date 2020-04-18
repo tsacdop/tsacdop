@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:color_thief_flutter/color_thief_flutter.dart';
@@ -10,17 +11,22 @@ import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tsacdop/class/audiostate.dart';
+import 'package:tsacdop/class/download_state.dart';
 import 'package:tsacdop/class/fireside_data.dart';
+import 'package:tsacdop/class/refresh_podcast.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:tsacdop/class/importompl.dart';
-import 'package:tsacdop/class/podcast_group.dart';
-import 'package:tsacdop/class/searchpodcast.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/home/appbar/popupmenu.dart';
-import 'package:tsacdop/webfeed/webfeed.dart';
-import 'package:tsacdop/.env.dart';
+import '../../class/importompl.dart';
+import '../../class/podcast_group.dart';
+import '../../class/searchpodcast.dart';
+import '../../class/podcastlocal.dart';
+import '../../class/subscribe_podcast.dart';
+import '../../local_storage/sqflite_localpodcast.dart';
+import '../../home/appbar/popupmenu.dart';
+import '../../util/context_extension.dart';
+import '../../webfeed/webfeed.dart';
+import '../../.env.dart';
 import '../nested_home.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -52,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
+          //elevation: 1.0,
           centerTitle: true,
           leading: IconButton(
             tooltip: 'Add',
@@ -74,15 +81,16 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         body: WillPopScope(
-            onWillPop: () async {
-              if (Platform.isAndroid) {
-                _androidAppRetain.invokeMethod('sendToBackground');
-                return false;
-              } else {
-                return true;
-              }
-            },
-            child: Home()),
+          onWillPop: () async {
+            if (Platform.isAndroid) {
+              _androidAppRetain.invokeMethod('sendToBackground');
+              return false;
+            } else {
+              return true;
+            }
+          },
+          child: Home(),
+        ),
       ),
     );
   }
@@ -104,6 +112,32 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
     var searchResult = SearchPodcast.fromJson(searchResultMap);
     return searchResult.results;
   }
+
+  static Future getRss(String url) async {
+    try {
+      BaseOptions options = new BaseOptions(
+        connectTimeout: 10000,
+        receiveTimeout: 10000,
+      );
+      Response response = await Dio(options).get(url);
+      var p = RssFeed.parse(response.data);
+      return OnlinePodcast(
+          rss: url,
+          title: p.title,
+          publisher: p.author,
+          description: p.description,
+          image: p.itunes.image.href);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  RegExp rssExp = RegExp(r'^(https?):\/\/(.*)');
+  Widget invalidRss() => Container(
+        height: 50,
+        alignment: Alignment.center,
+        child: Text('Invalid rss link'),
+      );
 
   @override
   ThemeData appBarTheme(BuildContext context) => Theme.of(context);
@@ -135,27 +169,46 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
           height: 20,
         ),
       ));
-    return FutureBuilder(
-      future: getList(query),
-      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-        if (!snapshot.hasData && query != null)
-          return Container(
-            padding: EdgeInsets.only(top: 200),
-            alignment: Alignment.topCenter,
-            child: CircularProgressIndicator(),
-          );
-        List content = snapshot.data;
-        return ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: content.length,
-          itemBuilder: (BuildContext context, int index) {
+    else if (rssExp.stringMatch(query) != null)
+      return FutureBuilder(
+        future: getRss(rssExp.stringMatch(query)),
+        builder: (context, snapshot) {
+          if (snapshot.hasError)
+            return invalidRss();
+          else if (snapshot.hasData)
             return SearchResult(
-              onlinePodcast: content[index],
+              onlinePodcast: snapshot.data,
             );
-          },
-        );
-      },
-    );
+          else
+            return Container(
+              padding: EdgeInsets.only(top: 200),
+              alignment: Alignment.topCenter,
+              child: CircularProgressIndicator(),
+            );
+        },
+      );
+    else
+      return FutureBuilder(
+        future: getList(query),
+        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+          if (!snapshot.hasData && query != null)
+            return Container(
+              padding: EdgeInsets.only(top: 200),
+              alignment: Alignment.topCenter,
+              child: CircularProgressIndicator(),
+            );
+          List content = snapshot.data;
+          return ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: content.length,
+            itemBuilder: (BuildContext context, int index) {
+              return SearchResult(
+                onlinePodcast: content[index],
+              );
+            },
+          );
+        },
+      );
   }
 
   @override
@@ -189,27 +242,46 @@ class _MyHomePageDelegate extends SearchDelegate<int> {
           ),
         ),
       );
-    return FutureBuilder(
-      future: getList(query),
-      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-        if (!snapshot.hasData && query != null)
-          return Container(
-            padding: EdgeInsets.only(top: 200),
-            alignment: Alignment.topCenter,
-            child: CircularProgressIndicator(),
-          );
-        List content = snapshot.data;
-        return ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: content.length,
-          itemBuilder: (BuildContext context, int index) {
+    else if (rssExp.stringMatch(query) != null)
+      return FutureBuilder(
+        future: getRss(rssExp.stringMatch(query)),
+        builder: (context, snapshot) {
+          if (snapshot.hasError)
+            return invalidRss();
+          else if (snapshot.hasData)
             return SearchResult(
-              onlinePodcast: content[index],
+              onlinePodcast: snapshot.data,
             );
-          },
-        );
-      },
-    );
+          else
+            return Container(
+              padding: EdgeInsets.only(top: 200),
+              alignment: Alignment.topCenter,
+              child: CircularProgressIndicator(),
+            );
+        },
+      );
+    else
+      return FutureBuilder(
+        future: getList(query),
+        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+          if (!snapshot.hasData && query != null)
+            return Container(
+              padding: EdgeInsets.only(top: 200),
+              alignment: Alignment.topCenter,
+              child: CircularProgressIndicator(),
+            );
+          List content = snapshot.data;
+          return ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: content.length,
+            itemBuilder: (BuildContext context, int index) {
+              return SearchResult(
+                onlinePodcast: content[index],
+              );
+            },
+          );
+        },
+      );
   }
 }
 
@@ -220,21 +292,32 @@ class SearchResult extends StatefulWidget {
   _SearchResultState createState() => _SearchResultState();
 }
 
-class _SearchResultState extends State<SearchResult> {
+class _SearchResultState extends State<SearchResult>
+    with SingleTickerProviderStateMixin {
   bool _issubscribe;
-  bool _adding;
   bool _showDes;
-
+  AnimationController _controller;
+  Animation _animation;
+  double _value;
   @override
   void initState() {
     super.initState();
     _issubscribe = false;
-    _adding = false;
     _showDes = false;
+    _value = 0;
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        setState(() {
+          _value = _animation.value;
+        });
+      });
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     super.dispose();
   }
 
@@ -248,90 +331,97 @@ class _SearchResultState extends State<SearchResult> {
 
   @override
   Widget build(BuildContext context) {
-    var importOmpl = Provider.of<ImportOmpl>(context, listen: false);
-    var groupList = Provider.of<GroupList>(context, listen: false);
-    savePodcast(String rss) async {
-      if (mounted) setState(() => _adding = true);
+    // var importOmpl = Provider.of<ImportOmpl>(context, listen: false);
+    // var groupList = Provider.of<GroupList>(context, listen: false);
+    var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
 
-      importOmpl.importState = ImportState.import;
-      try {
-        BaseOptions options = new BaseOptions(
-          connectTimeout: 30000,
-          receiveTimeout: 30000,
-        );
-        Response response = await Dio(options).get(rss);
-        var dbHelper = DBHelper();
-        String _realUrl = response.realUri.toString();
-
-        bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
-
-        if (_checkUrl) {
-          if (mounted) setState(() => _issubscribe = true);
-
-          var _p = RssFeed.parse(response.data);
-
-          print(_p.title);
-
-          var dir = await getApplicationDocumentsDirectory();
-
-          Response<List<int>> imageResponse = await Dio().get<List<int>>(
-              _p.itunes.image.href,
-              options: Options(responseType: ResponseType.bytes));
-
-          img.Image image = img.decodeImage(imageResponse.data);
-          img.Image thumbnail = img.copyResize(image, width: 300);
-
-          String _uuid = Uuid().v4();
-          File("${dir.path}/$_uuid.png")
-            ..writeAsBytesSync(img.encodePng(thumbnail));
-
-          String _imagePath = "${dir.path}/$_uuid.png";
-          String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
-          String _author = _p.itunes.author ?? _p.author ?? '';
-          String _provider = _p.generator ?? '';
-          String _link = _p.link ?? '';
-          PodcastLocal podcastLocal = PodcastLocal(
-              _p.title,
-              _p.itunes.image.href,
-              _realUrl,
-              _primaryColor,
-              _author,
-              _uuid,
-              _imagePath,
-              _provider,
-              _link,
-              description: _p.description);
-          await groupList.subscribe(podcastLocal);
-
-          if (_provider.contains('fireside')) {
-            FiresideData data = FiresideData(_uuid, _link);
-            await data.fatchData();
-          }
-
-          importOmpl.importState = ImportState.parse;
-
-          await dbHelper.savePodcastRss(_p, _uuid);
-          groupList.updatePodcast(podcastLocal);
-          importOmpl.importState = ImportState.complete;
-        } else {
-          importOmpl.importState = ImportState.error;
-          Fluttertoast.showToast(
-            msg: 'Podcast Subscribed Already',
-            gravity: ToastGravity.TOP,
-          );
-          await Future.delayed(Duration(seconds: 10));
-          importOmpl.importState = ImportState.stop;
-        }
-      } catch (e) {
-        importOmpl.importState = ImportState.error;
-        Fluttertoast.showToast(
-          msg: 'Network error, Subscribe failed',
-          gravity: ToastGravity.TOP,
-        );
-        await Future.delayed(Duration(seconds: 5));
-        importOmpl.importState = ImportState.stop;
-      }
+    savePodcast(OnlinePodcast podcast) async {
+      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title);
+      subscribeWorker.setSubscribeItem(item);
     }
+
+    // savePodcast(String rss) async {
+    //   if (mounted) setState(() => _adding = true);
+
+    //   importOmpl.importState = ImportState.import;
+    //   try {
+    //     BaseOptions options = new BaseOptions(
+    //       connectTimeout: 30000,
+    //       receiveTimeout: 30000,
+    //     );
+    //     Response response = await Dio(options).get(rss);
+    //     var dbHelper = DBHelper();
+    //     String _realUrl = response.realUri.toString();
+
+    //     bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
+
+    //     if (_checkUrl) {
+    //       if (mounted) setState(() => _issubscribe = true);
+
+    //       var _p = RssFeed.parse(response.data);
+
+    //       print(_p.title);
+
+    //       var dir = await getApplicationDocumentsDirectory();
+
+    //       Response<List<int>> imageResponse = await Dio().get<List<int>>(
+    //           _p.itunes.image.href,
+    //           options: Options(responseType: ResponseType.bytes));
+
+    //       img.Image image = img.decodeImage(imageResponse.data);
+    //       img.Image thumbnail = img.copyResize(image, width: 300);
+
+    //       String _uuid = Uuid().v4();
+    //       File("${dir.path}/$_uuid.png")
+    //         ..writeAsBytesSync(img.encodePng(thumbnail));
+
+    //       String _imagePath = "${dir.path}/$_uuid.png";
+    //       String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
+    //       String _author = _p.itunes.author ?? _p.author ?? '';
+    //       String _provider = _p.generator ?? '';
+    //       String _link = _p.link ?? '';
+    //       PodcastLocal podcastLocal = PodcastLocal(
+    //           _p.title,
+    //           _p.itunes.image.href,
+    //           _realUrl,
+    //           _primaryColor,
+    //           _author,
+    //           _uuid,
+    //           _imagePath,
+    //           _provider,
+    //           _link,
+    //           description: _p.description);
+    //       await groupList.subscribe(podcastLocal);
+
+    //       if (_provider.contains('fireside')) {
+    //         FiresideData data = FiresideData(_uuid, _link);
+    //         await data.fatchData();
+    //       }
+
+    //       importOmpl.importState = ImportState.parse;
+
+    //       await dbHelper.savePodcastRss(_p, _uuid);
+    //       groupList.updatePodcast(podcastLocal.id);
+    //       importOmpl.importState = ImportState.complete;
+    //     } else {
+    //       importOmpl.importState = ImportState.error;
+    //       Fluttertoast.showToast(
+    //         msg: 'Podcast subscribed already',
+    //         gravity: ToastGravity.TOP,
+    //       );
+    //       await Future.delayed(Duration(seconds: 10));
+    //       importOmpl.importState = ImportState.stop;
+    //     }
+    //   } catch (e) {
+    //     importOmpl.importState = ImportState.error;
+    //     Fluttertoast.showToast(
+    //       msg: 'Network error, Subscribe failed',
+    //       gravity: ToastGravity.TOP,
+    //     );
+    //     await Future.delayed(Duration(seconds: 5));
+    //     importOmpl.importState = ImportState.stop;
+    //   }
+    // }
 
     return Container(
       decoration: BoxDecoration(
@@ -348,6 +438,10 @@ class _SearchResultState extends State<SearchResult> {
             onTap: () {
               setState(() {
                 _showDes = !_showDes;
+                if (_value == 0)
+                  _controller.forward();
+                else
+                  _controller.reverse();
               });
             },
             leading: ClipRRect(
@@ -361,51 +455,33 @@ class _SearchResultState extends State<SearchResult> {
               ),
             ),
             title: Text(widget.onlinePodcast.title),
-            subtitle: Text(widget.onlinePodcast.publisher),
+            subtitle: Text(widget.onlinePodcast.publisher ?? ''),
             trailing: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Icon(_showDes
-                    ? Icons.keyboard_arrow_up
-                    : Icons.keyboard_arrow_down),
+                Transform.rotate(
+                  angle: math.pi * _value,
+                  child: Icon(Icons.keyboard_arrow_down),
+                ),
                 Padding(padding: EdgeInsets.only(right: 10.0)),
                 Container(
                   width: 100,
                   height: 35,
                   child: !_issubscribe
-                      ? !_adding
-                          ? OutlineButton(
-                              highlightedBorderColor:
-                                  Theme.of(context).accentColor,
-                              splashColor: Theme.of(context)
-                                  .accentColor
-                                  .withOpacity(0.8),
-                              child: Text('Subscribe',
-                                  style: TextStyle(
-                                      color: Theme.of(context).accentColor)),
-                              onPressed: () {
-                                importOmpl.rssTitle =
-                                    widget.onlinePodcast.title;
-                                savePodcast(widget.onlinePodcast.rss);
-                              })
-                          : OutlineButton(
-                              highlightedBorderColor:
-                                  Theme.of(context).accentColor,
-                              splashColor: Theme.of(context)
-                                  .accentColor
-                                  .withOpacity(0.8),
-                              child: SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation(
-                                        Theme.of(context).accentColor),
-                                  )),
-                              onPressed: () {},
-                            )
+                      ? OutlineButton(
+                          highlightedBorderColor: Theme.of(context).accentColor,
+                          splashColor:
+                              Theme.of(context).accentColor.withOpacity(0.8),
+                          child: Text('Subscribe',
+                              style: TextStyle(
+                                  color: Theme.of(context).accentColor)),
+                          onPressed: () {
+                            savePodcast(widget.onlinePodcast);
+                            setState(() => _issubscribe = true);
+                          })
                       : OutlineButton(
+                          color: context.accentColor.withOpacity(0.8),
                           highlightedBorderColor: Colors.grey[500],
                           disabledTextColor: Colors.grey[500],
                           child: Text('Subscribe'),

@@ -217,13 +217,16 @@ class EpisodeGrid extends StatelessWidget {
                                         ),
                                         Spacer(),
                                         Selector<AudioPlayerNotifier,
-                                                EpisodeBrief>(
-                                            selector: (_, audio) =>
+                                                Tuple2<EpisodeBrief, bool>>(
+                                            selector: (_, audio) => Tuple2(
                                                 audio.episode,
+                                                audio.playerRunning),
                                             builder: (_, data, __) {
                                               return (episodes[index]
-                                                          .enclosureUrl ==
-                                                      data?.enclosureUrl)
+                                                              .enclosureUrl ==
+                                                          data.item1
+                                                              ?.enclosureUrl &&
+                                                      data.item2)
                                                   ? Container(
                                                       height: 20,
                                                       width: 20,
@@ -357,15 +360,31 @@ class EpisodeGrid extends StatelessWidget {
                                                 alignment: Alignment.center,
                                                 child: Text(
                                                   _stringForSeconds(
-                                                          episodes[index]
-                                                              .duration
-                                                              .toDouble()) +
-                                                      '|',
+                                                      episodes[index]
+                                                          .duration
+                                                          .toDouble()),
                                                   style: TextStyle(
                                                       fontSize: _width / 35),
                                                 ),
                                               )
                                             : Center(),
+                                        episodes[index].duration == 0 ||
+                                                episodes[index]
+                                                        .enclosureLength ==
+                                                    null ||
+                                                episodes[index]
+                                                        .enclosureLength ==
+                                                    0 ||
+                                                layout == Layout.three
+                                            ? Center()
+                                            : Text(
+                                                '|',
+                                                style: TextStyle(
+                                                  fontSize: _width / 35,
+                                                  // color: _c,
+                                                  // fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
                                         layout == Layout.two &&
                                                 episodes[index]
                                                         .enclosureLength !=

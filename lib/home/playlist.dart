@@ -405,7 +405,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                           widget.episode.duration != 0
                               ? _episodeTag(
                                   (widget.episode.duration ~/ 60).toString() +
-                                      'mins',
+                                      'min',
                                   Colors.cyan[300])
                               : Center(),
                           widget.episode.enclosureLength != null

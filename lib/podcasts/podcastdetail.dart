@@ -38,19 +38,26 @@ class _PodcastDetailState extends State<PodcastDetail> {
   List<PodcastHost> hosts;
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
-    final result = await dbHelper.updatePodcastRss(podcastLocal);
-    if (result == 0) {
+    try {
+      final result = await dbHelper.updatePodcastRss(podcastLocal);
+      if (result == 0) {
+        Fluttertoast.showToast(
+          msg: 'No Update',
+          gravity: ToastGravity.TOP,
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Updated $result Episodes',
+          gravity: ToastGravity.TOP,
+        );
+        Provider.of<GroupList>(context, listen: false)
+            .updatePodcast(podcastLocal.id);
+      }
+    } catch (e) {
       Fluttertoast.showToast(
-        msg: 'No Update',
+        msg: 'Update failed, network error',
         gravity: ToastGravity.TOP,
       );
-    } else {
-      Fluttertoast.showToast(
-        msg: 'Updated $result Episodes',
-        gravity: ToastGravity.TOP,
-      );
-      Provider.of<GroupList>(context, listen: false)
-          .updatePodcast(podcastLocal);
     }
     if (mounted) setState(() {});
   }
@@ -449,11 +456,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                   itemBuilder: (context) => [
                                                     PopupMenuItem(
                                                       value: 0,
-                                                      child: Text('Newest first'),
+                                                      child:
+                                                          Text('Newest first'),
                                                     ),
                                                     PopupMenuItem(
                                                       value: 1,
-                                                      child: Text('Oldest first'),
+                                                      child:
+                                                          Text('Oldest first'),
                                                     )
                                                   ],
                                                   onSelected: (value) {
@@ -661,4 +670,3 @@ class _AboutPodcastState extends State<AboutPodcast> {
           );
   }
 }
-

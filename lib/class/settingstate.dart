@@ -28,11 +28,13 @@ class SettingState extends ChangeNotifier {
   KeyValueStorage downloadUsingDataStorage =
       KeyValueStorage('downloadUsingData');
   KeyValueStorage introStorage = KeyValueStorage('intro');
+  KeyValueStorage realDarkStorage = KeyValueStorage('realDark');
 
   Future initData() async {
     await _getTheme();
     await _getAccentSetColor();
     await _getShowIntro();
+    await _getRealDark();
   }
 
   ThemeMode _theme;
@@ -98,12 +100,21 @@ class SettingState extends ChangeNotifier {
   bool _showIntro;
   bool get showIntro => _showIntro;
 
+  bool _realDark;
+  bool get realDark => _realDark;
+  set setRealDark(bool boo) {
+    _realDark = boo;
+    _setRealDark();
+    notifyListeners();
+  }
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
     _getTheme();
     _getAccentSetColor();
     _getAutoUpdate();
+    _getRealDark();
     _getDownloadUsingData();
     _getUpdateInterval().then((value) {
       if (_initUpdateTag == 0) setWorkManager(24);
@@ -165,7 +176,17 @@ class SettingState extends ChangeNotifier {
     int i = await introStorage.getInt();
     _showIntro = i == 0 ? true : false;
   }
-  Future saveShowIntro() async{
+
+  Future saveShowIntro() async {
     await introStorage.saveInt(1);
+  }
+
+  Future _getRealDark() async {
+    int i = await realDarkStorage.getInt();
+    _realDark = i == 0 ? false : true;
+  }
+
+  Future _setRealDark() async {
+    await realDarkStorage.saveInt(_realDark ? 1 : 0);
   }
 }

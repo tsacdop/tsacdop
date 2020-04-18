@@ -63,6 +63,28 @@ class Libries extends StatelessWidget {
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 80),
                   alignment: Alignment.centerLeft,
+                  child: Text('Fonts',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(color: Theme.of(context).accentColor)),
+                ),
+                Column(
+                  children: fonts.map<Widget>(
+                    (e) {
+                      return ListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 80),
+                        onTap: () => _launchUrl(e.link),
+                        title: Text(e.name),
+                        subtitle: Text(e.license),
+                      );
+                    },
+                  ).toList(),
+                ),
+                Container(
+                  height: 30.0,
+                  padding: EdgeInsets.symmetric(horizontal: 80),
+                  alignment: Alignment.centerLeft,
                   child: Text('Plugins',
                       style: Theme.of(context)
                           .textTheme

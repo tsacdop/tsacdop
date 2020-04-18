@@ -11,20 +11,21 @@ Enjoy podcasts with Tsacdop.
 
 Tsacdop is a podcast player developed with flutter, a clean, simply beautiful and friendly app, only support Android right now. 
 
-
 Credit to flutter team and  all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) and [Just_Audio](https://pub.dev/packages/just_audio).
 
 The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 
+<a href='https://play.google.com/store/apps/details?id=com.stonegate.tsacdop&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+
 ## Features
-* Podcasts group manage
+* Subscriptoin group management
 * Playlist support
 * Sleep timer
 * OMPL file export and import
-* Syncing in background
-* Listen and subscribe history data
-* Dark theme / Accent color 
-* Donwload for offline playing 
+* Auto syncing in background
+* Listen and subscribe history record
+* Dark mode/ Accent color personalization
+* Download for offline playing 
 
 More to come...
 

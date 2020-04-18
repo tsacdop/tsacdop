@@ -119,7 +119,6 @@ class DBHelper {
   }
 
   Future savePodcastLocal(PodcastLocal podcastLocal) async {
-    print('podcast saved in sqllite');
     int _milliseconds = DateTime.now().millisecondsSinceEpoch;
     var dbClient = await database;
     await dbClient.transaction((txn) async {
@@ -163,8 +162,11 @@ class DBHelper {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT background_image, hosts FROM PodcastLocal WHERE id = ?', [id]);
-    List<String> data = [list.first['background_image'], list.first['hosts']];
-    return data;
+    if (list.length > 0) {
+      List<String> data = [list.first['background_image'], list.first['hosts']];
+      return data;
+    }
+    return ['', ''];
   }
 
   Future delPodcastLocal(String id) async {
@@ -301,7 +303,7 @@ class DBHelper {
     RegExp yyyy = RegExp(r'[1-2][0-9]{3}');
     RegExp hhmm = RegExp(r'[0-2][0-9]\:[0-5][0-9]');
     RegExp ddmmm = RegExp(r'[0-3][0-9]\s[A-Z][a-z]{2}');
-    RegExp mmDd = RegExp(r'([0-1]|\s)[0-9]\-[0-3][0-9]');
+    RegExp mmDd = RegExp(r'([1-2][0-9]{3}\-[0-1]|\s)[0-9]\-[0-3][0-9]');
     // RegExp timezone
     RegExp z = RegExp(r'(\+|\-)[0-1][0-9]00');
     String timezone = z.stringMatch(pubDate);
@@ -331,8 +333,10 @@ class DBHelper {
                 .parse(month + year + time);
           } else if (year != null && time != null && month == null) {
             String month = mmDd.stringMatch(pubDate);
-            date = DateFormat('mm-dd yyyy HH:mm', 'en_US')
-                .parse(month + ' ' + year + ' ' + time);
+            date = DateFormat('yyyy-MM-dd HH:mm', 'en_US')
+                .parse(month + ' ' + time);
+            print(month);
+            print(date.toString());
           } else {
             date = DateTime.now().toUtc();
           }
@@ -426,65 +430,78 @@ class DBHelper {
   }
 
   Future<int> updatePodcastRss(PodcastLocal podcastLocal) async {
-    Response response = await Dio().get(podcastLocal.rssUrl);
-    var feed = RssFeed.parse(response.data);
-    String url, description;
-    feed.items.removeWhere((item) => item == null);
-    int result = feed.items.length;
+    BaseOptions options = new BaseOptions(
+      connectTimeout: 20000,
+      receiveTimeout: 20000,
+    );
+    Response response = await Dio(options).get(podcastLocal.rssUrl);
+    if (response.statusCode == 200) {
+      var feed = RssFeed.parse(response.data);
+      String url, description;
+      feed.items.removeWhere((item) => item == null);
+      int result = feed.items.length;
 
-    var dbClient = await database;
-    int count = Sqflite.firstIntValue(await dbClient.rawQuery(
-        'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?', [podcastLocal.id]));
+      var dbClient = await database;
+      int count = Sqflite.firstIntValue(await dbClient.rawQuery(
+          'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?',
+          [podcastLocal.id]));
 
-    await dbClient.rawUpdate(
-        "UPDATE Episodes SET is_new = 0 WHERE feed_id = ?", [podcastLocal.id]);
+      await dbClient.rawUpdate(
+          "UPDATE Episodes SET is_new = 0 WHERE feed_id = ?",
+          [podcastLocal.id]);
 
-    for (int i = 0; i < result; i++) {
-      print(feed.items[i].title);
-      description = _getDescription(feed.items[i].content.value ?? '',
-          feed.items[i].description ?? '', feed.items[i].itunes.summary ?? '');
+      for (int i = 0; i < result; i++) {
+        print(feed.items[i].title);
+        description = _getDescription(
+            feed.items[i].content.value ?? '',
+            feed.items[i].description ?? '',
+            feed.items[i].itunes.summary ?? '');
 
-      if (feed.items[i].enclosure?.url != null) {
-        _isXimalaya(feed.items[i].enclosure.url)
-            ? url = feed.items[i].enclosure.url.split('=').last
-            : url = feed.items[i].enclosure.url;
-      }
+        if (feed.items[i].enclosure?.url != null) {
+          _isXimalaya(feed.items[i].enclosure.url)
+              ? url = feed.items[i].enclosure.url.split('=').last
+              : url = feed.items[i].enclosure.url;
+        }
 
-      final title = feed.items[i].itunes.title ?? feed.items[i].title;
-      final length = feed.items[i]?.enclosure?.length ?? 0;
-      final pubDate = feed.items[i].pubDate;
-      final date = _parsePubDate(pubDate);
-      final milliseconds = date.millisecondsSinceEpoch;
-      final duration = feed.items[i].itunes.duration?.inSeconds ?? 0;
-      final explicit = _getExplicit(feed.items[i].itunes.explicit);
+        final title = feed.items[i].itunes.title ?? feed.items[i].title;
+        final length = feed.items[i]?.enclosure?.length ?? 0;
+        final pubDate = feed.items[i].pubDate;
+        final date = _parsePubDate(pubDate);
+        final milliseconds = date.millisecondsSinceEpoch;
+        final duration = feed.items[i].itunes.duration?.inSeconds ?? 0;
+        final explicit = _getExplicit(feed.items[i].itunes.explicit);
 
-      if (url != null) {
-        await dbClient.transaction((txn) async {
-          await txn.rawInsert(
-              """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
+        if (url != null) {
+          await dbClient.transaction((txn) async {
+            await txn.rawInsert(
+                """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
                 description, feed_id, milliseconds, duration, explicit, media_id, is_new) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)""",
-              [
-                title,
-                url,
-                length,
-                pubDate,
-                description,
-                podcastLocal.id,
-                milliseconds,
-                duration,
-                explicit,
-                url,
-              ]);
-        });
+                [
+                  title,
+                  url,
+                  length,
+                  pubDate,
+                  description,
+                  podcastLocal.id,
+                  milliseconds,
+                  duration,
+                  explicit,
+                  url,
+                ]);
+          });
+        }
       }
-    }
-    int countUpdate = Sqflite.firstIntValue(await dbClient.rawQuery(
-        'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?', [podcastLocal.id]));
+      int countUpdate = Sqflite.firstIntValue(await dbClient.rawQuery(
+          'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?',
+          [podcastLocal.id]));
 
-    await dbClient.rawUpdate(
-        """UPDATE PodcastLocal SET update_count = ?, episode_count = ? WHERE id = ?""",
-        [countUpdate - count, countUpdate, podcastLocal.id]);
-    return countUpdate - count;
+      await dbClient.rawUpdate(
+          """UPDATE PodcastLocal SET update_count = ?, episode_count = ? WHERE id = ?""",
+          [countUpdate - count, countUpdate, podcastLocal.id]);
+      return countUpdate - count;
+    } else {
+      throw ("network error");
+    }
   }
 
   Future<List<EpisodeBrief>> getRssItem(String id, int i, bool reverse) async {

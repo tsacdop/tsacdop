@@ -134,294 +134,6 @@ class PlayerWidget extends StatefulWidget {
 class _PlayerWidgetState extends State<PlayerWidget> {
   final GlobalKey<AnimatedListState> miniPlaylistKey = GlobalKey();
 
-  Widget _controlPanel(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    return Container(
-      color: Theme.of(context).primaryColor,
-      height: 300,
-      padding: EdgeInsets.symmetric(horizontal: 10.0),
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Consumer<AudioPlayerNotifier>(
-              builder: (_, data, __) {
-                Color _c = (Theme.of(context).brightness == Brightness.light)
-                    ? data.episode.primaryColor.colorizedark()
-                    : data.episode.primaryColor.colorizeLight();
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-                      child: SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          activeTrackColor:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.black38
-                                  : Colors.grey[400],
-                          inactiveTrackColor:
-                              Theme.of(context).primaryColorDark,
-                          trackHeight: 20.0,
-                          trackShape: MyRectangularTrackShape(),
-                          thumbColor: Theme.of(context).accentColor,
-                          thumbShape: MyRoundSliderThumpShape(
-                              enabledThumbRadius: 10.0,
-                              disabledThumbRadius: 10.0,
-                              thumbCenterColor: _c),
-                          overlayColor:
-                              Theme.of(context).accentColor.withAlpha(32),
-                          overlayShape:
-                              RoundSliderOverlayShape(overlayRadius: 4.0),
-                        ),
-                        child: Slider(
-                            value: data.seekSliderValue,
-                            onChanged: (double val) {
-                              audio.sliderSeek(val);
-                            }),
-                      ),
-                    ),
-                    Container(
-                      height: 20.0,
-                      padding: EdgeInsets.symmetric(horizontal: 30.0),
-                      child: Row(
-                        children: <Widget>[
-                          Text(
-                            _stringForSeconds(
-                                    data.backgroundAudioPosition / 1000) ??
-                                '',
-                            style: TextStyle(fontSize: 10),
-                          ),
-                          Expanded(
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: data.remoteErrorMessage != null
-                                  ? Text(data.remoteErrorMessage,
-                                      style: const TextStyle(
-                                          color: const Color(0xFFFF0000)))
-                                  : Text(
-                                      data.audioState ==
-                                                  BasicPlaybackState
-                                                      .buffering ||
-                                              data.audioState ==
-                                                  BasicPlaybackState
-                                                      .connecting ||
-                                              data.audioState ==
-                                                  BasicPlaybackState.none
-                                          ? 'Buffring...'
-                                          : '',
-                                      style: TextStyle(
-                                          color: Theme.of(context).accentColor),
-                                    ),
-                            ),
-                          ),
-                          Text(
-                            _stringForSeconds(
-                                    data.backgroundAudioDuration / 1000) ??
-                                '',
-                            style: TextStyle(fontSize: 10),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-            Container(
-              height: 100,
-              child: Selector<AudioPlayerNotifier, BasicPlaybackState>(
-                selector: (_, audio) => audio.audioState,
-                builder: (_, backplay, __) {
-                  return Material(
-                    color: Colors.transparent,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                            padding: EdgeInsets.symmetric(horizontal: 30.0),
-                            onPressed: backplay == BasicPlaybackState.playing
-                                ? () => audio.forwardAudio(-10)
-                                : null,
-                            iconSize: 32.0,
-                            icon: Icon(Icons.replay_10),
-                            color: Colors.grey[500]),
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 30),
-                          height: 60,
-                          width: 60,
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.black12
-                                      : Colors.white10,
-                                  width: 1),
-                              boxShadow: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? _customShadowNight
-                                  : _customShadow),
-                          child: backplay == BasicPlaybackState.playing
-                              ? Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30)),
-                                    onTap:
-                                        backplay == BasicPlaybackState.playing
-                                            ? () {
-                                                audio.pauseAduio();
-                                              }
-                                            : null,
-                                    child: SizedBox(
-                                      height: 60,
-                                      width: 60,
-                                      child: Icon(
-                                        Icons.pause,
-                                        size: 40,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30)),
-                                    onTap:
-                                        backplay == BasicPlaybackState.playing
-                                            ? null
-                                            : () {
-                                                audio.resumeAudio();
-                                              },
-                                    child: SizedBox(
-                                      height: 60,
-                                      width: 60,
-                                      child: Icon(
-                                        Icons.play_arrow,
-                                        size: 40,
-                                        color: Theme.of(context).accentColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                        ),
-                        IconButton(
-                            padding: EdgeInsets.symmetric(horizontal: 30.0),
-                            onPressed: backplay == BasicPlaybackState.playing
-                                ? () => audio.forwardAudio(30)
-                                : null,
-                            iconSize: 32.0,
-                            icon: Icon(Icons.forward_30),
-                            color: Colors.grey[500]),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            Container(
-              height: 70.0,
-              padding: EdgeInsets.all(20),
-              alignment: Alignment.center,
-              child: Selector<AudioPlayerNotifier, String>(
-                selector: (_, audio) => audio.episode.title,
-                builder: (_, title, __) {
-                  return Container(
-                    child: LayoutBuilder(
-                      builder: (context, size) {
-                        var span = TextSpan(
-                            text: title,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20));
-                        var tp = TextPainter(
-                            text: span,
-                            maxLines: 1,
-                            textDirection: TextDirection.ltr);
-                        tp.layout(maxWidth: size.maxWidth);
-                        if (tp.didExceedMaxLines) {
-                          return Marquee(
-                            text: title,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                            scrollAxis: Axis.horizontal,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            blankSpace: 30.0,
-                            velocity: 50.0,
-                            pauseAfterRound: Duration(seconds: 1),
-                            startPadding: 30.0,
-                            accelerationDuration: Duration(seconds: 1),
-                            accelerationCurve: Curves.linear,
-                            decelerationDuration: Duration(milliseconds: 500),
-                            decelerationCurve: Curves.easeOut,
-                          );
-                        } else {
-                          return Text(
-                            title,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20),
-                          );
-                        }
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            Spacer(),
-            Selector<AudioPlayerNotifier, Tuple3<EpisodeBrief, bool, bool>>(
-              selector: (_, audio) => Tuple3(
-                  audio.episode, audio.stopOnComplete, audio.startSleepTimer),
-              builder: (_, data, __) {
-                return Container(
-                  padding: EdgeInsets.all(5.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Container(
-                        height: 30.0,
-                        width: 30.0,
-                        child: CircleAvatar(
-                          backgroundImage:
-                              FileImage(File("${data.item1.imagePath}")),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0),
-                        width: 150,
-                        child: Text(
-                          data.item1.feedTitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.fade,
-                        ),
-                      ),
-                      Spacer(),
-                      LastPosition(),
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => Navigator.push(
-                          context,
-                          SlideUptRoute(
-                              page: EpisodeDetail(
-                                  episodeItem: data.item1,
-                                  heroTag: 'playpanel')),
-                        ),
-                        icon: Icon(Icons.info),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ]),
-    );
-  }
-
   Widget _playlist(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Container(
@@ -446,7 +158,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   // color: context.primaryColorDark,
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Queue',
+                    'Playlist',
                     style: TextStyle(
                         color: Theme.of(context).accentColor,
                         fontWeight: FontWeight.bold,
@@ -684,7 +396,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           TabBarView(
             children: <Widget>[
               SleepMode(),
-              _controlPanel(context),
+              ControlPanel(),
               _playlist(context),
             ],
           ),
@@ -1429,6 +1141,437 @@ class SleepModeState extends State<SleepMode>
           ),
         );
       },
+    );
+  }
+}
+
+class ControlPanel extends StatefulWidget {
+  ControlPanel({Key key}) : super(key: key);
+
+  @override
+  _ControlPanelState createState() => _ControlPanelState();
+}
+
+class _ControlPanelState extends State<ControlPanel>
+    with SingleTickerProviderStateMixin {
+  final _speedToSelect = [0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0];
+  double _speedSelected;
+  double _setSpeed;
+  AnimationController _controller;
+  Animation<double> _animation;
+  List<BoxShadow> customShadow(double scale) => [
+        BoxShadow(
+            blurRadius: 26 * (1 - scale),
+            offset: Offset(-6, -6) * (1 - scale),
+            color: Colors.white),
+        BoxShadow(
+            blurRadius: 8 * (1 - scale),
+            offset: Offset(2, 2) * (1 - scale),
+            color: Colors.grey[600].withOpacity(0.4))
+      ];
+  List<BoxShadow> customShadowNight(double scale) => [
+        BoxShadow(
+            blurRadius: 6 * (1 - scale),
+            offset: Offset(-1, -1) * (1 - scale),
+            color: Colors.grey[100].withOpacity(0.3)),
+        BoxShadow(
+            blurRadius: 8 * (1 - scale),
+            offset: Offset(2, 2) * (1 - scale),
+            color: Colors.black)
+      ];
+
+  @override
+  void initState() {
+    _speedSelected = 0;
+    _setSpeed = 0;
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        setState(() => _setSpeed = _animation.value);
+      });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    return Container(
+      color: Theme.of(context).primaryColor,
+      height: 300,
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      child: Stack(
+        children: <Widget>[
+          Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Consumer<AudioPlayerNotifier>(
+                  builder: (_, data, __) {
+                    Color _c =
+                        (Theme.of(context).brightness == Brightness.light)
+                            ? data.episode.primaryColor.colorizedark()
+                            : data.episode.primaryColor.colorizeLight();
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          padding:
+                              EdgeInsets.only(top: 10, left: 10, right: 10),
+                          child: SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.black38
+                                  : Colors.grey[400],
+                              inactiveTrackColor:
+                                  Theme.of(context).primaryColorDark,
+                              trackHeight: 20.0,
+                              trackShape: MyRectangularTrackShape(),
+                              thumbColor: Theme.of(context).accentColor,
+                              thumbShape: MyRoundSliderThumpShape(
+                                  enabledThumbRadius: 10.0,
+                                  disabledThumbRadius: 10.0,
+                                  thumbCenterColor: _c),
+                              overlayColor:
+                                  Theme.of(context).accentColor.withAlpha(32),
+                              overlayShape:
+                                  RoundSliderOverlayShape(overlayRadius: 4.0),
+                            ),
+                            child: Slider(
+                                value: data.seekSliderValue,
+                                onChanged: (double val) {
+                                  audio.sliderSeek(val);
+                                }),
+                          ),
+                        ),
+                        Container(
+                          height: 20.0,
+                          padding: EdgeInsets.symmetric(horizontal: 30.0),
+                          child: Row(
+                            children: <Widget>[
+                              Text(
+                                _stringForSeconds(
+                                        data.backgroundAudioPosition / 1000) ??
+                                    '',
+                                style: TextStyle(fontSize: 10),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: data.remoteErrorMessage != null
+                                      ? Text(data.remoteErrorMessage,
+                                          style: const TextStyle(
+                                              color: const Color(0xFFFF0000)))
+                                      : Text(
+                                          data.audioState ==
+                                                      BasicPlaybackState
+                                                          .buffering ||
+                                                  data.audioState ==
+                                                      BasicPlaybackState
+                                                          .connecting ||
+                                                  data.audioState ==
+                                                      BasicPlaybackState.none
+                                              ? 'Buffring...'
+                                              : '',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .accentColor),
+                                        ),
+                                ),
+                              ),
+                              Text(
+                                _stringForSeconds(
+                                        data.backgroundAudioDuration / 1000) ??
+                                    '',
+                                style: TextStyle(fontSize: 10),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                Container(
+                  height: 100,
+                  child: Selector<AudioPlayerNotifier, BasicPlaybackState>(
+                    selector: (_, audio) => audio.audioState,
+                    builder: (_, backplay, __) {
+                      return Material(
+                        color: Colors.transparent,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                onPressed:
+                                    backplay == BasicPlaybackState.playing
+                                        ? () => audio.forwardAudio(-10)
+                                        : null,
+                                iconSize: 32.0,
+                                icon: Icon(Icons.replay_10),
+                                color: Colors.grey[500]),
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 30),
+                              height: 60,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.black12
+                                          : Colors.white10,
+                                      width: 1),
+                                  boxShadow: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? _customShadowNight
+                                      : _customShadow),
+                              child: backplay == BasicPlaybackState.playing
+                                  ? Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30)),
+                                        onTap: backplay ==
+                                                BasicPlaybackState.playing
+                                            ? () {
+                                                audio.pauseAduio();
+                                              }
+                                            : null,
+                                        child: SizedBox(
+                                          height: 60,
+                                          width: 60,
+                                          child: Icon(
+                                            Icons.pause,
+                                            size: 40,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30)),
+                                        onTap: backplay ==
+                                                BasicPlaybackState.playing
+                                            ? null
+                                            : () {
+                                                audio.resumeAudio();
+                                              },
+                                        child: SizedBox(
+                                          height: 60,
+                                          width: 60,
+                                          child: Icon(
+                                            Icons.play_arrow,
+                                            size: 40,
+                                            color:
+                                                Theme.of(context).accentColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                            IconButton(
+                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                onPressed:
+                                    backplay == BasicPlaybackState.playing
+                                        ? () => audio.forwardAudio(30)
+                                        : null,
+                                iconSize: 32.0,
+                                icon: Icon(Icons.forward_30),
+                                color: Colors.grey[500]),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  height: 70.0,
+                  padding:
+                      EdgeInsets.only(left: 60, right: 60, bottom: 10, top: 10),
+                  alignment: Alignment.center,
+                  child: Selector<AudioPlayerNotifier, String>(
+                    selector: (_, audio) => audio.episode.title,
+                    builder: (_, title, __) {
+                      return Container(
+                        child: LayoutBuilder(
+                          builder: (context, size) {
+                            var span = TextSpan(
+                                text: title,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20));
+                            var tp = TextPainter(
+                                text: span,
+                                maxLines: 1,
+                                textDirection: TextDirection.ltr);
+                            tp.layout(maxWidth: size.maxWidth);
+                            if (tp.didExceedMaxLines) {
+                              return Marquee(
+                                text: title,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                                scrollAxis: Axis.horizontal,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                blankSpace: 30.0,
+                                velocity: 50.0,
+                                pauseAfterRound: Duration(seconds: 1),
+                                startPadding: 30.0,
+                                accelerationDuration: Duration(seconds: 1),
+                                accelerationCurve: Curves.linear,
+                                decelerationDuration:
+                                    Duration(milliseconds: 500),
+                                decelerationCurve: Curves.easeOut,
+                              );
+                            } else {
+                              return Text(
+                                title,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
+                              );
+                            }
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Spacer(),
+                Selector<AudioPlayerNotifier, Tuple3<EpisodeBrief, bool, bool>>(
+                  selector: (_, audio) => Tuple3(audio.episode,
+                      audio.stopOnComplete, audio.startSleepTimer),
+                  builder: (_, data, __) {
+                    return Container(
+                      padding:
+                          EdgeInsets.only(left: 5.0, right: 5.0, bottom: 5.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          InkWell(
+                            onTap: () => Navigator.push(
+                                context,
+                                SlideUptRoute(
+                                    page: EpisodeDetail(
+                                        episodeItem: data.item1,
+                                        heroTag: 'playpanel'))),
+                            child: Container(
+                              height: 30.0,
+                              width: 30.0,
+                              child: CircleAvatar(
+                                backgroundImage:
+                                    FileImage(File("${data.item1.imagePath}")),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5.0),
+                            width: 150,
+                            child: Text(
+                              data.item1.feedTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.fade,
+                            ),
+                          ),
+                          Spacer(),
+                          LastPosition(),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              if (_setSpeed == 0)
+                                _controller.forward();
+                              else
+                                _controller.reverse();
+                            },
+                            icon: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Transform.rotate(
+                                    angle: math.pi * _setSpeed,
+                                    child: Text('X')),
+                                Selector<AudioPlayerNotifier, double>(
+                                  selector: (_, audio) =>
+                                      audio.currentSpeed ?? 1.0,
+                                  builder: (context, value, child) =>
+                                      Text(value.toString()),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ]),
+          Positioned(
+            right: 0,
+            bottom: 50.0,
+            child: _setSpeed == 0
+                ? Center()
+                : SingleChildScrollView(
+                    padding: EdgeInsets.all(10.0),
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _speedToSelect
+                          .map<Widget>((e) => InkWell(
+                                onTap: () {
+                                  if (_setSpeed == 1) {
+                                    setState(() => _speedSelected = e);
+                                    audio.setSpeed(e);
+                                  }
+                                },
+                                child: Container(
+                                  height: 30,
+                                  width: 30,
+                                  margin: EdgeInsets.symmetric(horizontal: 5),
+                                  decoration:
+                                      e == _speedSelected && _setSpeed > 0
+                                          ? BoxDecoration(
+                                              color: context.accentColor,
+                                              shape: BoxShape.circle,
+                                              boxShadow: context.brightness ==
+                                                      Brightness.light
+                                                  ? customShadow(1.0)
+                                                  : customShadowNight(1.0),
+                                            )
+                                          : BoxDecoration(
+                                              color: context.primaryColor,
+                                              shape: BoxShape.circle,
+                                              boxShadow: context.brightness ==
+                                                      Brightness.light
+                                                  ? customShadow(1 - _setSpeed)
+                                                  : customShadowNight(
+                                                      1 - _setSpeed)),
+                                  alignment: Alignment.center,
+                                  child: _setSpeed > 0
+                                      ? Text(e.toString(),
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: e == _speedSelected
+                                                  ? Colors.white
+                                                  : null))
+                                      : Center(),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

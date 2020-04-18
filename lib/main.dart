@@ -3,13 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
-import 'package:tsacdop/class/podcast_group.dart';
-import 'package:tsacdop/home/appbar/addpodcast.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/importompl.dart';
-import 'package:tsacdop/class/settingstate.dart';
-import 'package:tsacdop/class/download_state.dart';
-
+import 'class/podcast_group.dart';
+import 'home/appbar/addpodcast.dart';
+import 'class/audiostate.dart';
+import 'class/settingstate.dart';
+import 'class/download_state.dart';
+import 'class/refresh_podcast.dart';
+import 'class/subscribe_podcast.dart';
 import 'intro_slider/app_intro.dart';
 
 final SettingState themeSetting = SettingState();
@@ -23,9 +23,11 @@ Future main() async {
         ChangeNotifierProvider(create: (_) => themeSetting),
         ChangeNotifierProvider(create: (_) => AudioPlayerNotifier()),
         ChangeNotifierProvider(create: (_) => GroupList()),
-        ChangeNotifierProvider(create: (_) => ImportOmpl()),
-        ChangeNotifierProvider(create: (_) => DownloadState(),
-        )
+        ChangeNotifierProvider(create: (_) => SubscribeWorker()),
+        ChangeNotifierProvider(create: (_) => RefreshWorker()),
+        ChangeNotifierProvider(
+          create: (_) => DownloadState(),
+        ),
       ],
       child: MyApp(),
     ),
@@ -72,7 +74,10 @@ class MyApp extends StatelessWidget {
           darkTheme: ThemeData.dark().copyWith(
             accentColor: setting.accentSetColor,
             primaryColorDark: Colors.grey[800],
-            // scaffoldBackgroundColor: Colors.black87,
+            scaffoldBackgroundColor: setting.realDark ? Colors.black87 : null,
+            primaryColor: setting.realDark ? Colors.black : null,
+            popupMenuTheme: PopupMenuThemeData()
+                .copyWith(color: setting.realDark ? Colors.black87 : null),
             appBarTheme: AppBarTheme(elevation: 0),
           ),
           home: setting.showIntro ? SlideIntro(goto: Goto.home) : MyHomePage(),

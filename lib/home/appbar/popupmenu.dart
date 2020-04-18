@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/fireside_data.dart';
+import 'package:tsacdop/class/refresh_podcast.dart';
+import 'package:tsacdop/class/subscribe_podcast.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
@@ -84,108 +86,109 @@ class _PopupMenuState extends State<PopupMenu> {
 
   @override
   Widget build(BuildContext context) {
-    ImportOmpl importOmpl = Provider.of<ImportOmpl>(context, listen: false);
-    GroupList groupList = Provider.of<GroupList>(context, listen: false);
-
-    _refreshAll() async {
-      var dbHelper = DBHelper();
-      List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-      int i = 0;
-      await Future.forEach(podcastList, (podcastLocal) async {
-        importOmpl.rssTitle = podcastLocal.title;
-        importOmpl.importState = ImportState.parse;
-        i += await dbHelper.updatePodcastRss(podcastLocal);
-        print('Refresh ' + podcastLocal.title);
-      });
-      KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
-      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
-      KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
-      await refreshcountstorage.saveInt(i);
-      importOmpl.importState = ImportState.complete;
-      groupList.updateGroups();
-    }
-
-    saveOmpl(String rss) async {
-      var dbHelper = DBHelper();
-      importOmpl.importState = ImportState.import;
-      BaseOptions options = new BaseOptions(
-        connectTimeout: 20000,
-        receiveTimeout: 20000,
-      );
-      Response response = await Dio(options).get(rss);
-      if (response.statusCode == 200) {
-        var _p = RssFeed.parse(response.data);
-
-        var dir = await getApplicationDocumentsDirectory();
-
-        String _realUrl =
-            response.redirects.isEmpty ? rss : response.realUri.toString();
-
-        print(_realUrl);
-        bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
-
-        if (_checkUrl) {
-          Response<List<int>> imageResponse = await Dio().get<List<int>>(
-              _p.itunes.image.href,
-              options: Options(responseType: ResponseType.bytes));
-          img.Image image = img.decodeImage(imageResponse.data);
-          img.Image thumbnail = img.copyResize(image, width: 300);
-          String _uuid = Uuid().v4();
-          File("${dir.path}/$_uuid.png")
-            ..writeAsBytesSync(img.encodePng(thumbnail));
-
-          String _imagePath = "${dir.path}/$_uuid.png";
-          String _primaryColor =
-              await _getColor(File("${dir.path}/$_uuid.png"));
-          String _author = _p.itunes.author ?? _p.author ?? '';
-          String _provider = _p.generator ?? '';
-          String _link = _p.link ?? '';
-          PodcastLocal podcastLocal = PodcastLocal(
-              _p.title,
-              _p.itunes.image.href,
-              _realUrl,
-              _primaryColor,
-              _author,
-              _uuid,
-              _imagePath,
-              _provider,
-              _link,
-              description: _p.description);
-
-          await groupList.subscribe(podcastLocal);
-
-          if (_provider.contains('fireside')) {
-            FiresideData data = FiresideData(_uuid, _link);
-            await data.fatchData();
-          }
-
-          importOmpl.importState = ImportState.parse;
-
-          await dbHelper.savePodcastRss(_p, _uuid);
-          groupList.updatePodcast(podcastLocal);
-          importOmpl.importState = ImportState.complete;
-        } else {
-          importOmpl.importState = ImportState.error;
-
-          Fluttertoast.showToast(
-            msg: 'Podcast Subscribed Already',
-            gravity: ToastGravity.TOP,
-          );
-          await Future.delayed(Duration(seconds: 5));
-          importOmpl.importState = ImportState.stop;
-        }
-      } else {
-        importOmpl.importState = ImportState.error;
-
-        Fluttertoast.showToast(
-          msg: 'Network error, Subscribe failed',
-          gravity: ToastGravity.TOP,
-        );
-        await Future.delayed(Duration(seconds: 5));
-        importOmpl.importState = ImportState.stop;
-      }
-    }
-
+//    ImportOmpl importOmpl = Provider.of<ImportOmpl>(context, listen: false);
+//    GroupList groupList = Provider.of<GroupList>(context, listen: false);
+    var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
+    var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
+//    _refreshAll() async {
+//      var dbHelper = DBHelper();
+//      List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
+//      int i = 0;
+//      await Future.forEach(podcastList, (podcastLocal) async {
+//        importOmpl.rssTitle = podcastLocal.title;
+//        importOmpl.importState = ImportState.parse;
+//        i += await dbHelper.updatePodcastRss(podcastLocal);
+//        print('Refresh ' + podcastLocal.title);
+//      });
+//      KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
+//      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+//      KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
+//      await refreshcountstorage.saveInt(i);
+//      importOmpl.importState = ImportState.complete;
+//      groupList.updateGroups();
+//    }
+//
+//    saveOmpl(String rss) async {
+//      var dbHelper = DBHelper();
+//      importOmpl.importState = ImportState.import;
+//      BaseOptions options = new BaseOptions(
+//        connectTimeout: 20000,
+//        receiveTimeout: 20000,
+//      );
+//      Response response = await Dio(options).get(rss);
+//      if (response.statusCode == 200) {
+//        var _p = RssFeed.parse(response.data);
+//
+//        var dir = await getApplicationDocumentsDirectory();
+//
+//        String _realUrl =
+//            response.redirects.isEmpty ? rss : response.realUri.toString();
+//
+//        print(_realUrl);
+//        bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
+//
+//        if (_checkUrl) {
+//          Response<List<int>> imageResponse = await Dio().get<List<int>>(
+//              _p.itunes.image.href,
+//              options: Options(responseType: ResponseType.bytes));
+//          img.Image image = img.decodeImage(imageResponse.data);
+//          img.Image thumbnail = img.copyResize(image, width: 300);
+//          String _uuid = Uuid().v4();
+//          File("${dir.path}/$_uuid.png")
+//            ..writeAsBytesSync(img.encodePng(thumbnail));
+//
+//          String _imagePath = "${dir.path}/$_uuid.png";
+//          String _primaryColor =
+//              await _getColor(File("${dir.path}/$_uuid.png"));
+//          String _author = _p.itunes.author ?? _p.author ?? '';
+//          String _provider = _p.generator ?? '';
+//          String _link = _p.link ?? '';
+//          PodcastLocal podcastLocal = PodcastLocal(
+//              _p.title,
+//              _p.itunes.image.href,
+//              _realUrl,
+//              _primaryColor,
+//              _author,
+//              _uuid,
+//              _imagePath,
+//              _provider,
+//              _link,
+//              description: _p.description);
+//
+//          await groupList.subscribe(podcastLocal);
+//
+//          if (_provider.contains('fireside')) {
+//            FiresideData data = FiresideData(_uuid, _link);
+//            await data.fatchData();
+//          }
+//
+//          importOmpl.importState = ImportState.parse;
+//
+//          await dbHelper.savePodcastRss(_p, _uuid);
+//          groupList.updatePodcast(podcastLocal.id);
+//          importOmpl.importState = ImportState.complete;
+//        } else {
+//          importOmpl.importState = ImportState.error;
+//
+//          Fluttertoast.showToast(
+//            msg: 'Podcast Subscribed Already',
+//            gravity: ToastGravity.TOP,
+//          );
+//          await Future.delayed(Duration(seconds: 5));
+//          importOmpl.importState = ImportState.stop;
+//        }
+//      } else {
+//        importOmpl.importState = ImportState.error;
+//
+//        Fluttertoast.showToast(
+//          msg: 'Network error, Subscribe failed',
+//          gravity: ToastGravity.TOP,
+//        );
+//        await Future.delayed(Duration(seconds: 5));
+//        importOmpl.importState = ImportState.stop;
+//      }
+//    }
+//
     void _saveOmpl(String path) async {
       File file = File(path);
       try {
@@ -198,18 +201,18 @@ class _PopupMenuState extends State<PopupMenu> {
             .toList();
         if (total.length == 0) {
           Fluttertoast.showToast(
-            msg: 'File Not Valid',
+            msg: 'File not valid',
             gravity: ToastGravity.BOTTOM,
           );
         } else {
           for (int i = 0; i < total.length; i++) {
             if (total[i].xmlUrl != null) {
-              importOmpl.rssTitle = total[i].text;
-              try {
-                await saveOmpl(total[i].xmlUrl);
-              } catch (e) {
-                print(e.toString());
-              }
+              //  importOmpl.rssTitle = total[i].text;
+              //await saveOmpl(total[i].xmlUrl);
+              SubscribeItem item =
+                  SubscribeItem(total[i].xmlUrl, total[i].text);
+              await subscribeWorker.setSubscribeItem(item);
+              await Future.delayed(Duration(milliseconds: 500));
               print(total[i].text);
             }
           }
@@ -221,8 +224,8 @@ class _PopupMenuState extends State<PopupMenu> {
           msg: 'File error, Subscribe failed',
           gravity: ToastGravity.TOP,
         );
-        await Future.delayed(Duration(seconds: 5));
-        importOmpl.importState = ImportState.stop;
+        //await Future.delayed(Duration(seconds: 5));
+        //  importOmpl.importState = ImportState.stop;
       }
     }
 
@@ -233,7 +236,11 @@ class _PopupMenuState extends State<PopupMenu> {
           return;
         }
         print('File Path' + filePath);
-        importOmpl.importState = ImportState.start;
+        //importOmpl.importState = ImportState.start;
+        Fluttertoast.showToast(
+          msg: 'Read file successfully',
+          gravity: ToastGravity.TOP,
+        );
         _saveOmpl(filePath);
       } on PlatformException catch (e) {
         print(e.toString());
@@ -338,7 +345,8 @@ class _PopupMenuState extends State<PopupMenu> {
         } else if (value == 2) {
           _getFilePath();
         } else if (value == 1) {
-          _refreshAll();
+          //_refreshAll();
+          refreshWorker.start();
         } else if (value == 3) {
           //  setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
         } else if (value == 4) {

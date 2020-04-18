@@ -107,7 +107,7 @@ class GroupList extends ChangeNotifier {
         await group.getPodcasts();
       });
       _orderChanged.clear();
-     // notifyListeners();
+      // notifyListeners();
     }
   }
 
@@ -129,11 +129,12 @@ class GroupList extends ChangeNotifier {
       notifyListeners();
     });
   }
-//update podcasts of each group 
-  Future updateGroups() async{
+
+//update podcasts of each group
+  Future updateGroups() async {
     await Future.forEach(_groups, (group) async {
-        await group.getPodcasts();
-      });
+      await group.getPodcasts();
+    });
     notifyListeners();
   }
 
@@ -180,16 +181,23 @@ class GroupList extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future updatePodcast(PodcastLocal podcastLocal) async {
-    List<int> counts = await dbHelper.getPodcastCounts(podcastLocal.id);
+  Future updatePodcast(String id) async {
+    List<int> counts = await dbHelper.getPodcastCounts(id);
     _groups.forEach((group) {
-      if (group.podcastList.contains(podcastLocal.id)) {
-        group.podcasts.firstWhere((podcast) => podcast.id == podcastLocal.id)
+      if (group.podcastList.contains(id)) {
+        group.podcasts.firstWhere((podcast) => podcast.id == id)
           ..upateCount = counts[0]
           ..episodeCount = counts[1];
         notifyListeners();
       }
     });
+  }
+
+  Future subscribeNewPodcast(String id) async {
+    _groups[0].podcastList.insert(0, id);
+    _saveGroup();
+    await _groups[0].getPodcasts();
+    notifyListeners();
   }
 
   List<PodcastGroup> getPodcastGroup(String id) {

@@ -24,7 +24,6 @@ class _DownloadButtonState extends State<DownloadButton> {
   bool _permissionReady;
   bool _usingData;
   StreamSubscription _connectivity;
-  EpisodeTask _task;
 
   @override
   void initState() {

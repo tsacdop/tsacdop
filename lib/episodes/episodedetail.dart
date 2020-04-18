@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
@@ -165,7 +166,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                       child: Text(
                                           (widget.episodeItem.duration ~/ 60)
                                                   .toString() +
-                                              'mins',
+                                              'min',
                                           style: textstyle),
                                     )
                                   : Center(),
@@ -207,7 +208,12 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                 ? Html(
                                     padding: EdgeInsets.only(
                                         left: 20.0, right: 20, bottom: 10),
-                                    defaultTextStyle: TextStyle(height: 1.8),
+                                    defaultTextStyle:
+                                        GoogleFonts.libreBaskerville(
+                                      textStyle: TextStyle(
+                                        height: 1.8,
+                                      ),
+                                    ),
                                     data: _description,
                                     linkStyle: TextStyle(
                                         color: Theme.of(context).accentColor,
@@ -230,8 +236,10 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                             _launchUrl(link.url);
                                           },
                                           text: _description,
-                                          style: TextStyle(
-                                            height: 1.8,
+                                          style: GoogleFonts.libreBaskerville(
+                                            textStyle: TextStyle(
+                                              height: 1.8,
+                                            ),
                                           ),
                                           linkStyle: TextStyle(
                                             color:

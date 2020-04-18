@@ -16,8 +16,15 @@ class FiresideData {
 
   DBHelper dbHelper = DBHelper();
 
+  String parseLink(String link) {
+    if (link == "http://www.shengfm.cn/")
+      return "https://guiguzaozhidao.fireside.fm/";
+    else
+      return link;
+  }
+
   Future fatchData() async {
-    Response response = await Dio().get(link);
+    Response response = await Dio().get(parseLink(link));
     if (response.statusCode == 200) {
       var doc = parse(response.data);
       RegExp reg = RegExp(r'https(.+)jpg');
@@ -54,11 +61,14 @@ class FiresideData {
   Future getData() async {
     List<String> data = await dbHelper.getFiresideData(id);
     _background = data[0];
-    _hosts = json
-        .decode(data[1])['hosts']
-        .cast<Map<String, Object>>()
-        .map<PodcastHost>(PodcastHost.fromJson)
-        .toList();
+    if (data[1] != '') {
+      _hosts = json
+          .decode(data[1])['hosts']
+          .cast<Map<String, Object>>()
+          .map<PodcastHost>(PodcastHost.fromJson)
+          .toList();
+    } else
+      _hosts = null;
   }
 }
 
