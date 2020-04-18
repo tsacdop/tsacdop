@@ -91,7 +91,7 @@ class StarSky extends CustomPainter {
 class ListenedPainter extends CustomPainter {
   Color _color;
   double stroke;
-  ListenedPainter(this._color,{this.stroke = 1.0});
+  ListenedPainter(this._color, {this.stroke = 1.0});
   @override
   void paint(Canvas canvas, Size size) {
     Paint _paint = Paint()
@@ -100,7 +100,6 @@ class ListenedPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
     Path _path = Path();
-
     _path.moveTo(size.width / 6, size.height * 3 / 8);
     _path.lineTo(size.width / 6, size.height * 5 / 8);
     _path.moveTo(size.width / 3, size.height / 4);
@@ -111,6 +110,40 @@ class ListenedPainter extends CustomPainter {
     _path.lineTo(size.width * 5 / 6, size.height * 5 / 8);
     _path.moveTo(size.width * 2 / 3, size.height / 4);
     _path.lineTo(size.width * 2 / 3, size.height * 3 / 4);
+
+    canvas.drawPath(_path, _paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+//Listened Completely indicator
+class ListenedAllPainter extends CustomPainter {
+  Color _color;
+  double stroke;
+  ListenedAllPainter(this._color, {this.stroke = 1.0});
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint _paint = Paint()
+      ..color = _color
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    Path _path = Path();
+    _path.moveTo(size.width / 6, size.height * 3 / 8);
+    _path.lineTo(size.width / 6, size.height * 5 / 8);
+    _path.moveTo(size.width / 3, size.height / 4);
+    _path.lineTo(size.width / 3, size.height * 3 / 4);
+    _path.moveTo(size.width / 2, size.height * 3 / 8);
+    _path.lineTo(size.width / 2, size.height * 5 / 8);
+    _path.moveTo(size.width * 2 / 3, size.height * 4 / 9);
+    _path.lineTo(size.width * 2 / 3, size.height * 5 / 9);
+    _path.moveTo(size.width / 2, size.height * 3 / 4);
+    _path.lineTo(size.width * 2 / 3, size.height * 7 / 8);
+    _path.lineTo(size.width * 7 / 8, size.height * 5 / 8);
 
     canvas.drawPath(_path, _paint);
   }

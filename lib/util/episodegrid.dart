@@ -257,7 +257,7 @@ class EpisodeGrid extends StatelessWidget {
                                                           ),
                                                           child: CustomPaint(
                                                               painter:
-                                                                  ListenedPainter(
+                                                                  ListenedAllPainter(
                                                             Colors.white,
                                                           )),
                                                         )
