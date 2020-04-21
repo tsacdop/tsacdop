@@ -1,13 +1,16 @@
-# Tsacdop
-[![CircleCI](https://circleci.com/gh/stonega/tsacdop.svg?style=svg)](https://circleci.com/gh/stonega/workflows/tsacdop/)
-## About
+
 <p align="center">
 <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/ic_notification.png" art = "Logo"/>
 </br>
 <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/text.png" art = "Tsacdop"/>
 </p>
-<a href='https://play.google.com/store/apps/details?id=com.stonegate.tsacdop&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' height=50 src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
 
+![CircleCI](https://img.shields.io/circleci/build/github/stonega/tsacdop?token=efe1331861e017144f2abb363acd95197e436dad)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/stonega/tsacdop)
+[![GooglePlay](https://img.shields.io/badge/Google-PlayStore-%2323CCC6)](https://play.google.com/store/apps/details?id=com.stonegate.tsacdop)
+
+
+## About
 Enjoy podcasts with Tsacdop.
 
 Tsacdop is a podcast player developed with flutter, a clean, simply beautiful and friendly app, only support Android right now. 
@@ -36,6 +39,18 @@ HomePage | Group | Podcast | Episode |DarkMode
 ## License
 
 Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
+
+## Build
+
+Tsacdop is using ListenNotes api 1.0 pro to search podcast, which is not free. So I can not expose the api key in the repo.
+If you want to build the app, you need to create a new file named .env.dart in lib folder. Add below code in .env.dart.
+
+```
+final environment = {"apiKey":"APIKEY"};
+```
+
+You can get own api key on [RapidApi](https://rapidapi.com/listennotes/api/listennotes), basic plan is free to all, and replace "APIKEY" with it.
+If no api key added, the search function in the app won't work. But you can still add podcasts by serach rss link or import ompl file.
 
 ## Getting Started
 
