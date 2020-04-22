@@ -111,7 +111,10 @@ enum SleepTimerMode { endOfEpisode, timer, undefined }
 
 class AudioPlayerNotifier extends ChangeNotifier {
   DBHelper dbHelper = DBHelper();
-  KeyValueStorage storage = KeyValueStorage('audioposition');
+  KeyValueStorage positionStorage = KeyValueStorage(audioPositionKey);
+  KeyValueStorage autoPlayStorage = KeyValueStorage(autoPlayKey);
+  KeyValueStorage autoAddStorage = KeyValueStorage(autoAddKey);
+
   EpisodeBrief _episode;
   Playlist _queue = Playlist();
   bool _queueUpdate = false;
@@ -130,7 +133,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool _startSleepTimer = false;
   double _switchValue = 0;
   SleepTimerMode _sleepTimerMode = SleepTimerMode.undefined;
+  //set autoplay episode in playlist
   bool _autoPlay = true;
+  //Set auto add episodes to playlist
+  bool _autoAdd = false;
   DateTime _current;
   int _currentPosition;
   double _currentSpeed = 1;
@@ -151,6 +157,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool get startSleepTimer => _startSleepTimer;
   SleepTimerMode get sleepTimerMode => _sleepTimerMode;
   bool get autoPlay => _autoPlay;
+  bool get autoAdd => _autoAdd;
   int get timeLeft => _timeLeft;
   double get switchValue => _switchValue;
   double get currentSpeed => _currentSpeed;
@@ -163,6 +170,31 @@ class AudioPlayerNotifier extends ChangeNotifier {
   set autoPlaySwitch(bool boo) {
     _autoPlay = boo;
     notifyListeners();
+    _setAutoPlay();
+  }
+
+  Future _getAutoPlay() async {
+    int i = await autoPlayStorage.getInt();
+    _autoAdd = i == 0 ? true : false;
+  }
+
+  Future _setAutoPlay() async {
+    await autoPlayStorage.saveInt(_autoPlay ? 1 : 0);
+  }
+
+  set autoAddSwitch(bool boo) {
+    _autoAdd = boo;
+    notifyListeners();
+    _setAutoAdd();
+  }
+
+  Future _getAutoAdd() async {
+    int i = await autoAddStorage.getInt();
+    _autoAdd = i == 0 ? false : true;
+  }
+
+  Future _setAutoAdd() async {
+    await autoAddStorage.saveInt(_autoAdd ? 1 : 0);
   }
 
   set setSleepTimerMode(SleepTimerMode timer) {
@@ -181,7 +213,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   loadPlaylist() async {
     await _queue.getPlaylist();
-    _lastPostion = await storage.getInt();
+    await _getAutoPlay();
+    //  await _getAutoAdd();
+    // await addNewEpisode('all');
+    _lastPostion = await positionStorage.getInt();
     if (_lastPostion > 0 && _queue.playlist.length > 0) {
       final EpisodeBrief episode = _queue.playlist.first;
       final int duration = episode.duration * 1000;
@@ -190,6 +225,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
           episode.title, episode.enclosureUrl, _lastPostion / 1000, seekValue);
       await dbHelper.saveHistory(history);
     }
+    KeyValueStorage lastWorkStorage = KeyValueStorage(lastWorkKey);
+    await lastWorkStorage.saveInt(0);
   }
 
   episodeLoad(EpisodeBrief episode, {int startPosition = 0}) async {
@@ -268,7 +305,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         if (event.length == 0 || _stopOnComplete == true) {
           _queue.delFromPlaylist(_episode);
           _lastPostion = 0;
-          storage.saveInt(_lastPostion);
+          positionStorage.saveInt(_lastPostion);
           final PlayHistory history = PlayHistory(
               _episode.title,
               _episode.enclosureUrl,
@@ -330,7 +367,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
         if (_backgroundAudioPosition > 0) {
           _lastPostion = _backgroundAudioPosition;
-          storage.saveInt(_lastPostion);
+          positionStorage.saveInt(_lastPostion);
         }
         notifyListeners();
       }
@@ -358,11 +395,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   addToPlaylist(EpisodeBrief episode) async {
-    if (_playerRunning) {
-      await AudioService.addQueueItem(episode.toMediaItem());
+    if (!_queue.playlist.contains(episode)) {
+      if (_playerRunning) {
+        await AudioService.addQueueItem(episode.toMediaItem());
+      }
+      await _queue.addToPlayList(episode);
+      notifyListeners();
     }
-    await _queue.addToPlayList(episode);
-    notifyListeners();
   }
 
   addToPlaylistAt(EpisodeBrief episode, int index) async {
@@ -372,6 +411,22 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await _queue.addToPlayListAt(episode, index);
     _queueUpdate = !_queueUpdate;
     notifyListeners();
+  }
+
+  addNewEpisode(List<String> group) async {
+    List<EpisodeBrief> newEpisodes = [];
+    if (group.first == 'All')
+      newEpisodes = await dbHelper.getRecentNewRssItem();
+    else
+      newEpisodes = await dbHelper.getGroupNewRssItem(group);
+    if (newEpisodes.length > 0)
+      await Future.forEach(newEpisodes, (episode) async {
+        await addToPlaylist(episode);
+      });
+    if (group.first == 'All')
+      await dbHelper.removeAllNewMark();
+    else
+      await dbHelper.removeGroupNewMark(group);
   }
 
   updateMediaItem(EpisodeBrief episode) async {
@@ -402,7 +457,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     } else {
       await addToPlaylistAt(episode, 0);
       _lastPostion = 0;
-      storage.saveInt(_lastPostion);
+      positionStorage.saveInt(_lastPostion);
     }
     notifyListeners();
   }
@@ -596,12 +651,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
       _skipState = null;
       onStop();
     } else {
-      // AudioServiceBackground.setQueue(_queue);
-      AudioServiceBackground.setMediaItem(mediaItem);
-      await _audioPlayer.setUrl(mediaItem.id);
-      Duration duration = await _audioPlayer.durationFuture ?? Duration.zero;
-      AudioServiceBackground.setMediaItem(
-          mediaItem.copyWith(duration: duration.inMilliseconds));
+       AudioServiceBackground.setQueue(_queue);
+       AudioServiceBackground.setMediaItem(mediaItem);
+        await _audioPlayer.setUrl(mediaItem.id);
+        Duration duration = await _audioPlayer.durationFuture ?? Duration.zero;
+        AudioServiceBackground.setMediaItem(
+            mediaItem.copyWith(duration: duration.inMilliseconds));
       _skipState = null;
       // Resume playback if we were playing
       // if (_playing) {
@@ -623,8 +678,17 @@ class AudioPlayerTask extends BackgroundAudioTask {
         AudioServiceBackground.setMediaItem(
             mediaItem.copyWith(duration: duration.inMilliseconds));
       }
+      // if (mediaItem.extras['skip'] > 0) {
+      //   await _audioPlayer.setClip(
+      //       start: Duration(seconds: 60));
+      //   print(mediaItem.extras['skip']);
+      //   print('set clip success');
+      // }
       _playing = true;
       _audioPlayer.play();
+      if (mediaItem.extras['skip'] > 0) {
+        _audioPlayer.seek(Duration(seconds: mediaItem.extras['skip']));
+      }
     }
   }
 

@@ -55,10 +55,13 @@ class Import extends StatelessWidget {
         Consumer<RefreshWorker>(
           builder: (context, refreshWorker, child) {
             RefreshItem item = refreshWorker.currentRefreshItem;
-            if (refreshWorker.complete) groupList.updateGroups();
+            if (refreshWorker.complete) {
+              groupList.updateGroups();
+             // audio.addNewEpisode('all');
+            }
             switch (item.refreshState) {
               case RefreshState.fetch:
-                return importColumn("Fetch data ${item.title}", context);
+                return importColumn("Update ${item.title}", context);
               case RefreshState.error:
                 return importColumn("Update error ${item.title}", context);
               default:

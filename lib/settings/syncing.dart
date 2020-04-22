@@ -63,10 +63,10 @@ class SyncingSetting extends StatelessWidget {
                             }
                           },
                           contentPadding: EdgeInsets.only(
-                              left: 80.0, right: 20, bottom: 20),
+                              left: 80.0, right: 20, bottom: 10),
                           title: Text('Enable syncing'),
                           subtitle: Text(
-                              'Refresh all podcasts in the background to get leatest episodes.'),
+                              'Refresh all podcasts in the background to get leatest episodes'),
                           trailing: Switch(
                               value: data.item1,
                               onChanged: (boo) async {

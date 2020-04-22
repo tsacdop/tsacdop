@@ -16,6 +16,7 @@ class EpisodeBrief {
   final String imagePath;
   final String mediaId;
   final int isNew;
+  final int skipSeconds;
   EpisodeBrief(
       this.title,
       this.enclosureUrl,
@@ -29,10 +30,11 @@ class EpisodeBrief {
       this.explicit,
       this.imagePath,
       this.mediaId,
-      this.isNew);
+      this.isNew,
+      this.skipSeconds);
 
   String dateToString() {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate,isUtc: true);
     var diffrence = DateTime.now().toUtc().difference(date);
     if (diffrence.inHours < 1) {
       return '1 hour ago';
@@ -43,18 +45,18 @@ class EpisodeBrief {
     } else if (diffrence.inDays < 7) {
       return '${diffrence.inDays} days ago';
     } else {
-      return DateFormat.yMMMd()
-          .format(DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
+      return DateFormat.yMMMd().format(
+          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
     }
   }
- 
+
   MediaItem toMediaItem() {
     return MediaItem(
         id: mediaId,
         title: title,
         artist: feedTitle,
         album: feedTitle,
-        artUri: 'file://$imagePath');
+        artUri: 'file://$imagePath',
+        extras: {'skip': skipSeconds});
   }
-
 }

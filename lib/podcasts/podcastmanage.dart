@@ -164,7 +164,8 @@ class _PodcastManageState extends State<PodcastManage>
         ),
         body: WillPopScope(
           onWillPop: () async {
-            await Provider.of<GroupList>(context, listen: false).clearOrderChanged();
+            await Provider.of<GroupList>(context, listen: false)
+                .clearOrderChanged();
             return true;
           },
           child: Consumer<GroupList>(builder: (_, groupList, __) {
@@ -347,17 +348,6 @@ class _PodcastManageState extends State<PodcastManage>
                                                                           15,
                                                                           15,
                                                                           1),
-                                                          //   statusBarColor: Theme.of(
-                                                          //                   context)
-                                                          //               .brightness ==
-                                                          //           Brightness.light
-                                                          //       ? Color.fromRGBO(
-                                                          //           113,
-                                                          //           113,
-                                                          //           113,
-                                                          //           1)
-                                                          //       : Color.fromRGBO(
-                                                          //           5, 5, 5, 1),
                                                         ),
                                                         child: AlertDialog(
                                                           elevation: 1,
@@ -375,7 +365,8 @@ class _PodcastManageState extends State<PodcastManage>
                                                           title: Text(
                                                               'Delete confirm'),
                                                           content: Text(
-                                                              'Are you sure you want to delete this group? Podcasts will be moved to Home group.'),
+                                                              'Are you sure you want to delete this group?' +
+                                                                  'Podcasts will be moved to Home group.'),
                                                           actions: <Widget>[
                                                             FlatButton(
                                                               onPressed: () =>
@@ -533,9 +524,6 @@ class _AddGroupState extends State<AddGroup> {
             Theme.of(context).brightness == Brightness.light
                 ? Color.fromRGBO(113, 113, 113, 1)
                 : Color.fromRGBO(5, 5, 5, 1),
-        //  statusBarColor: Theme.of(context).brightness == Brightness.light
-        //      ? Color.fromRGBO(113, 113, 113, 1)
-        //      : Color.fromRGBO(15, 15, 15, 1),
       ),
       child: AlertDialog(
         shape: RoundedRectangleBorder(

@@ -3,10 +3,22 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsacdop/class/podcast_group.dart';
 
+const String autoPlayKey = 'autoPlay';
+const String autoAddKey = 'autoAdd';
+const String audioPositionKey = 'audioposition';
+const String lastWorkKey = 'lastWork';
+const String refreshdateKey = 'refreshdate';
+const String themesKey = 'themes';
+const String accentsKey = 'accents';
+const String autoUpdateKey = 'autoupdate';
+const String updateIntervalKey = 'updateInterval';
+const String downloadUsingDataKey = 'downloadUsingData';
+const String introKey = 'intro';
+const String realDarkKey = 'realDark';
+
 class KeyValueStorage {
   final String key;
   KeyValueStorage(this.key);
-
   Future<List<GroupEntity>> getGroups() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString(key) == null) {
@@ -15,15 +27,16 @@ class KeyValueStorage {
           key,
           json.encode({
             'groups': [home.toEntity().toJson()]
-          }));}
-      print(prefs.getString(key));
-      return json
-          .decode(prefs.getString(key))['groups']
-          .cast<Map<String, Object>>()
-          .map<GroupEntity>(GroupEntity.fromJson)
-          .toList(growable: false);
+          }));
     }
-  
+    print(prefs.getString(key));
+    return json
+        .decode(prefs.getString(key))['groups']
+        .cast<Map<String, Object>>()
+        .map<GroupEntity>(GroupEntity.fromJson)
+        .toList(growable: false);
+  }
+
   Future<bool> saveGroup(List<GroupEntity> groupList) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(
@@ -32,37 +45,40 @@ class KeyValueStorage {
             {'groups': groupList.map((group) => group.toJson()).toList()}));
   }
 
-  Future<bool> saveInt(int setting) async{
+  Future<bool> saveInt(int setting) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setInt(key, setting);
   }
 
-  Future<int> getInt() async{
+  Future<int> getInt() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getInt(key) == null) await prefs.setInt(key, 0);
+    if (prefs.getInt(key) == null) await prefs.setInt(key, 0);
     return prefs.getInt(key);
   }
 
-  Future<bool> saveStringList(List<String> playList) async{
+  Future<bool> saveStringList(List<String> playList) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setStringList(key, playList);
   }
 
-  Future<List<String>> getStringList() async{
+  Future<List<String>> getStringList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getStringList(key) == null) {await prefs.setStringList(key, []);}
+    if (prefs.getStringList(key) == null) {
+      await prefs.setStringList(key, []);
+    }
     return prefs.getStringList(key);
   }
 
-  Future<bool> saveString(String string) async{
+  Future<bool> saveString(String string) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(key, string);
   }
 
-   Future<String> getString() async{
+  Future<String> getString() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getString(key) == null) {await prefs.setString(key, '');}
+    if (prefs.getString(key) == null) {
+      await prefs.setString(key, '');
+    }
     return prefs.getString(key);
   }
-
 }

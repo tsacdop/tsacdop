@@ -67,22 +67,18 @@ class RefreshWorker extends ChangeNotifier {
 }
 
 Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
+  KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
+  await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
   var dbHelper = DBHelper();
   List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-  int i = 0;
-  await Future.forEach(podcastList, (podcastLocal) async {
+  //int i = 0;
+  await Future.forEach<PodcastLocal>(podcastList, (podcastLocal) async {
     sendPort.send([podcastLocal.title, 1]);
-    try {
-      i += await dbHelper.updatePodcastRss(podcastLocal);
-      print('Refresh ' + podcastLocal.title);
-    } catch (e) {
-      sendPort.send([podcastLocal.title, 2]);
-      await Future.delayed(Duration(seconds: 1));
-    }
+    await dbHelper.updatePodcastRss(podcastLocal);
+    print('Refresh ' + podcastLocal.title);
   });
-  KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
-  await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
-  KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
-  await refreshcountstorage.saveInt(i);
+
+  // KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
+//  await refreshcountstorage.saveInt(i);
   sendPort.send("done");
 }

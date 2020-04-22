@@ -2,30 +2,19 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/class/fireside_data.dart';
 import 'package:tsacdop/class/refresh_podcast.dart';
 import 'package:tsacdop/class/subscribe_podcast.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:color_thief_flutter/color_thief_flutter.dart';
-import 'package:image/image.dart' as img;
-import 'package:uuid/uuid.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:intl/intl.dart';
 
-import 'package:tsacdop/class/podcast_group.dart';
 import 'package:tsacdop/settings/settting.dart';
 import 'about.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/class/importompl.dart';
-import 'package:tsacdop/webfeed/webfeed.dart';
 
 class OmplOutline {
   final String text;
@@ -47,14 +36,6 @@ class PopupMenu extends StatefulWidget {
 }
 
 class _PopupMenuState extends State<PopupMenu> {
-  Future<String> _getColor(File file) async {
-    final imageProvider = FileImage(file);
-    var colorImage = await getImageFromProvider(imageProvider);
-    var color = await getColorFromImage(colorImage);
-    String primaryColor = color.toString();
-    return primaryColor;
-  }
-
   Future<String> _getRefreshDate() async {
     int refreshDate;
     KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
@@ -68,14 +49,16 @@ class _PopupMenuState extends State<PopupMenu> {
     }
     DateTime date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
     var diffrence = DateTime.now().difference(date);
-    if (diffrence.inMinutes < 10) {
-      return 'Just now';
+    if (diffrence.inSeconds < 60) {
+      return '${diffrence.inSeconds} seconds ago';
+    } else if (diffrence.inMinutes < 10) {
+      return '${diffrence.inMinutes} minutes ago';
     } else if (diffrence.inHours < 1) {
-      return '1 hour ago';
-    } else if (diffrence.inHours < 24) {
+      return 'an hour ago';
+    } else if (diffrence.inHours <= 24) {
       return '${diffrence.inHours} hours ago';
     } else if (diffrence.inDays < 7) {
-      return '${diffrence.inDays} day ago';
+      return '${diffrence.inDays} days ago';
     } else {
       return DateFormat.yMMMd()
           .format(DateTime.fromMillisecondsSinceEpoch(refreshDate));
@@ -84,8 +67,6 @@ class _PopupMenuState extends State<PopupMenu> {
 
   @override
   Widget build(BuildContext context) {
-//    ImportOmpl importOmpl = Provider.of<ImportOmpl>(context, listen: false);
-//    GroupList groupList = Provider.of<GroupList>(context, listen: false);
     var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
     var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
 //    _refreshAll() async {
@@ -104,87 +85,6 @@ class _PopupMenuState extends State<PopupMenu> {
 //      await refreshcountstorage.saveInt(i);
 //      importOmpl.importState = ImportState.complete;
 //      groupList.updateGroups();
-//    }
-//
-//    saveOmpl(String rss) async {
-//      var dbHelper = DBHelper();
-//      importOmpl.importState = ImportState.import;
-//      BaseOptions options = new BaseOptions(
-//        connectTimeout: 20000,
-//        receiveTimeout: 20000,
-//      );
-//      Response response = await Dio(options).get(rss);
-//      if (response.statusCode == 200) {
-//        var _p = RssFeed.parse(response.data);
-//
-//        var dir = await getApplicationDocumentsDirectory();
-//
-//        String _realUrl =
-//            response.redirects.isEmpty ? rss : response.realUri.toString();
-//
-//        print(_realUrl);
-//        bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
-//
-//        if (_checkUrl) {
-//          Response<List<int>> imageResponse = await Dio().get<List<int>>(
-//              _p.itunes.image.href,
-//              options: Options(responseType: ResponseType.bytes));
-//          img.Image image = img.decodeImage(imageResponse.data);
-//          img.Image thumbnail = img.copyResize(image, width: 300);
-//          String _uuid = Uuid().v4();
-//          File("${dir.path}/$_uuid.png")
-//            ..writeAsBytesSync(img.encodePng(thumbnail));
-//
-//          String _imagePath = "${dir.path}/$_uuid.png";
-//          String _primaryColor =
-//              await _getColor(File("${dir.path}/$_uuid.png"));
-//          String _author = _p.itunes.author ?? _p.author ?? '';
-//          String _provider = _p.generator ?? '';
-//          String _link = _p.link ?? '';
-//          PodcastLocal podcastLocal = PodcastLocal(
-//              _p.title,
-//              _p.itunes.image.href,
-//              _realUrl,
-//              _primaryColor,
-//              _author,
-//              _uuid,
-//              _imagePath,
-//              _provider,
-//              _link,
-//              description: _p.description);
-//
-//          await groupList.subscribe(podcastLocal);
-//
-//          if (_provider.contains('fireside')) {
-//            FiresideData data = FiresideData(_uuid, _link);
-//            await data.fatchData();
-//          }
-//
-//          importOmpl.importState = ImportState.parse;
-//
-//          await dbHelper.savePodcastRss(_p, _uuid);
-//          groupList.updatePodcast(podcastLocal.id);
-//          importOmpl.importState = ImportState.complete;
-//        } else {
-//          importOmpl.importState = ImportState.error;
-//
-//          Fluttertoast.showToast(
-//            msg: 'Podcast Subscribed Already',
-//            gravity: ToastGravity.TOP,
-//          );
-//          await Future.delayed(Duration(seconds: 5));
-//          importOmpl.importState = ImportState.stop;
-//        }
-//      } else {
-//        importOmpl.importState = ImportState.error;
-//
-//        Fluttertoast.showToast(
-//          msg: 'Network error, Subscribe failed',
-//          gravity: ToastGravity.TOP,
-//        );
-//        await Future.delayed(Duration(seconds: 5));
-//        importOmpl.importState = ImportState.stop;
-//      }
 //    }
 //
     void _saveOmpl(String path) async {

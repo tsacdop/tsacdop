@@ -10,25 +10,30 @@ void callbackDispatcher() {
   Workmanager.executeTask((task, inputData) async {
     var dbHelper = DBHelper();
     List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-    await Future.forEach(podcastList, (podcastLocal) async {
-      await dbHelper.updatePodcastRss(podcastLocal);
+    //lastWork is a indicator for if the app was opened since last backgroundwork
+    //if the app wes opend,then the old marked new episode would be marked not new.
+    KeyValueStorage lastWorkStorage = KeyValueStorage(lastWorkKey);
+    int lastWork = await lastWorkStorage.getInt();
+    await Future.forEach<PodcastLocal>(podcastList, (podcastLocal) async {
+      await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
       print('Refresh ' + podcastLocal.title);
     });
-    KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
+    await lastWorkStorage.saveInt(1);
+    KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
     await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
     return Future.value(true);
   });
 }
 
 class SettingState extends ChangeNotifier {
-  KeyValueStorage themeStorage = KeyValueStorage('themes');
-  KeyValueStorage accentStorage = KeyValueStorage('accents');
-  KeyValueStorage autoupdateStorage = KeyValueStorage('autoupdate');
-  KeyValueStorage intervalStorage = KeyValueStorage('updateInterval');
+  KeyValueStorage themeStorage = KeyValueStorage(themesKey);
+  KeyValueStorage accentStorage = KeyValueStorage(accentsKey);
+  KeyValueStorage autoupdateStorage = KeyValueStorage(autoAddKey);
+  KeyValueStorage intervalStorage = KeyValueStorage(updateIntervalKey);
   KeyValueStorage downloadUsingDataStorage =
-      KeyValueStorage('downloadUsingData');
-  KeyValueStorage introStorage = KeyValueStorage('intro');
-  KeyValueStorage realDarkStorage = KeyValueStorage('realDark');
+      KeyValueStorage(downloadUsingDataKey);
+  KeyValueStorage introStorage = KeyValueStorage(introKey);
+  KeyValueStorage realDarkStorage = KeyValueStorage(realDarkKey);
 
   Future initData() async {
     await _getTheme();

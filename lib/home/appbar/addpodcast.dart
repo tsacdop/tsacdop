@@ -8,21 +8,10 @@ import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:image/image.dart' as img;
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/download_state.dart';
-import 'package:tsacdop/class/fireside_data.dart';
-import 'package:tsacdop/class/refresh_podcast.dart';
-import 'package:uuid/uuid.dart';
 
-import '../../class/importompl.dart';
-import '../../class/podcast_group.dart';
 import '../../class/searchpodcast.dart';
-import '../../class/podcastlocal.dart';
 import '../../class/subscribe_podcast.dart';
-import '../../local_storage/sqflite_localpodcast.dart';
 import '../../home/appbar/popupmenu.dart';
 import '../../util/context_extension.dart';
 import '../../webfeed/webfeed.dart';
@@ -479,6 +468,10 @@ class _SearchResultState extends State<SearchResult>
                           onPressed: () {
                             savePodcast(widget.onlinePodcast);
                             setState(() => _issubscribe = true);
+                            Fluttertoast.showToast(
+                              msg: 'Podcast subscribed',
+                              gravity: ToastGravity.TOP,
+                            );
                           })
                       : OutlineButton(
                           color: context.accentColor.withOpacity(0.8),

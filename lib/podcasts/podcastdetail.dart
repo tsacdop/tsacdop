@@ -12,17 +12,17 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:provider/provider.dart';
 import 'package:line_icons/line_icons.dart';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/util/episodegrid.dart';
-import 'package:tsacdop/home/audioplayer.dart';
-import 'package:tsacdop/class/fireside_data.dart';
-import 'package:tsacdop/util/colorize.dart';
-import 'package:tsacdop/util/context_extension.dart';
-import 'package:tsacdop/util/custompaint.dart';
+
+import '../class/podcastlocal.dart';
+import '../class/episodebrief.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../util/episodegrid.dart';
+import '../home/audioplayer.dart';
+import '../class/fireside_data.dart';
+import '../util/colorize.dart';
+import '../util/context_extension.dart';
+import '../util/custompaint.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, this.podcastLocal}) : super(key: key);
@@ -215,7 +215,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
           child: RefreshIndicator(
             key: _refreshIndicatorKey,
             color: Theme.of(context).accentColor,
-            onRefresh: () => _updateRssItem(widget.podcastLocal),
+            onRefresh: () async {
+              await _updateRssItem(widget.podcastLocal);
+            //  audio.addNewEpisode(widget.podcastLocal.id);
+            },
             child: Stack(
               children: <Widget>[
                 Column(

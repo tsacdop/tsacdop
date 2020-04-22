@@ -9,7 +9,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -217,7 +216,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                     data: _description,
                                     linkStyle: TextStyle(
                                         color: Theme.of(context).accentColor,
-                                        decoration: TextDecoration.underline,
+                                       // decoration: TextDecoration.underline,
                                         textBaseline: TextBaseline.ideographic),
                                     onLinkTap: (url) {
                                       _launchUrl(url);
@@ -244,8 +243,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                           linkStyle: TextStyle(
                                             color:
                                                 Theme.of(context).accentColor,
-                                            decoration:
-                                                TextDecoration.underline,
+                                          //  decoration:
+                                          //      TextDecoration.underline,
                                           ),
                                         ),
                                       )
@@ -539,12 +538,18 @@ class _MenuBarState extends State<MenuBar> {
                     : Center();
               }),
           Spacer(),
-          Selector<AudioPlayerNotifier,
-              Tuple2<EpisodeBrief, BasicPlaybackState>>(
-            selector: (_, audio) => Tuple2(audio.episode, audio.audioState),
+          Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
+            selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
             builder: (_, data, __) {
-              return (widget.episodeItem.title != data.item1?.title)
-                  ? Material(
+              return (widget.episodeItem.title == data.item1?.title &&
+                      data.item2)
+                  ? Container(
+                      padding: EdgeInsets.only(right: 30),
+                      child: SizedBox(
+                          width: 20,
+                          height: 15,
+                          child: WaveLoader(color: context.accentColor)))
+                  : Material(
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () {
@@ -570,13 +575,7 @@ class _MenuBarState extends State<MenuBar> {
                           ),
                         ),
                       ),
-                    )
-                  : Container(
-                      padding: EdgeInsets.only(right: 30),
-                      child: SizedBox(
-                          width: 20,
-                          height: 15,
-                          child: WaveLoader(color: context.accentColor)));
+                    );
             },
           ),
         ],

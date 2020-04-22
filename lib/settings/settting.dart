@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:path/path.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:tsacdop/class/podcastlocal.dart';
@@ -11,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
-import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/util/ompl_build.dart';
 import 'package:tsacdop/util/context_extension.dart';
 import 'package:tsacdop/intro_slider/app_intro.dart';
@@ -20,6 +18,7 @@ import 'storage.dart';
 import 'history.dart';
 import 'syncing.dart';
 import 'libries.dart';
+import 'play_setting.dart';
 
 class Settings extends StatelessWidget {
   _launchUrl(String url) async {
@@ -46,7 +45,6 @@ class Settings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -103,17 +101,21 @@ class Settings extends StatelessWidget {
                         ),
                         Divider(height: 2),
                         ListTile(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PlaySetting())),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.play_circle),
-                          title: Text('AutoPlay'),
-                          subtitle: Text('Autoplay next episode in playlist'),
-                          trailing: Selector<AudioPlayerNotifier, bool>(
-                            selector: (_, audio) => audio.autoPlay,
-                            builder: (_, data, __) => Switch(
-                                value: data,
-                                onChanged: (boo) => audio.autoPlaySwitch = boo),
-                          ),
+                          title: Text('Play'),
+                          subtitle: Text('Playlist and player'),
+                        //  trailing: Selector<AudioPlayerNotifier, bool>(
+                        //    selector: (_, audio) => audio.autoPlay,
+                        //    builder: (_, data, __) => Switch(
+                        //        value: data,
+                        //        onChanged: (boo) => audio.autoPlaySwitch = boo),
+                        //  ),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -160,7 +162,7 @@ class Settings extends StatelessWidget {
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.file_code_solid),
                           title: Text('Export'),
-                          subtitle: Text('Export ompl file'),
+                          subtitle: Text('Export ompl file of all podcasts'),
                         ),
                         Divider(height: 2),
                       ],
@@ -214,7 +216,7 @@ class Settings extends StatelessWidget {
                         Divider(height: 2),
                         ListTile(
                           onTap: () => _launchUrl(
-                              'mailto:<tsacdop@stonegate.me>?subject=Tsacdop Feedback'),
+                              'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.bug_solid),

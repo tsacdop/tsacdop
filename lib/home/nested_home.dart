@@ -9,6 +9,7 @@ import 'package:tsacdop/home/playlist.dart';
 import 'package:tuple/tuple.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:tsacdop/class/audiostate.dart';
 import 'package:tsacdop/class/episodebrief.dart';
@@ -332,7 +333,7 @@ class _RecentUpdate extends StatefulWidget {
 }
 
 class _RecentUpdateState extends State<_RecentUpdate>
-    with AutomaticKeepAliveClientMixin , SingleTickerProviderStateMixin{
+    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group) async {
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes;
@@ -341,6 +342,16 @@ class _RecentUpdateState extends State<_RecentUpdate>
     else
       episodes = await dbHelper.getGroupRssItem(top, group);
     return episodes;
+  }
+
+  Future<int> _getUpdateCounts(List<String> group) async {
+    var dbHelper = DBHelper();
+    List<EpisodeBrief> episodes = [];
+    if (group.first == 'All')
+      episodes = await dbHelper.getRecentNewRssItem();
+    else
+      episodes = await dbHelper.getGroupNewRssItem(group);
+    return episodes.length;
   }
 
   _loadMoreEpisode() async {
@@ -370,6 +381,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return FutureBuilder<List<EpisodeBrief>>(
       future: _getRssItem(_top, _group),
       builder: (context, snapshot) {
@@ -450,9 +462,38 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                   ),
                                 ),
                                 Spacer(),
+                                FutureBuilder<int>(
+                                    future: _getUpdateCounts(_group),
+                                    initialData: 0,
+                                    builder: (context, snapshot) {
+                                      return snapshot.data > 0
+                                          ? Material(
+                                              color: Colors.transparent,
+                                              child: IconButton(
+                                                  tooltip:
+                                                      'Add new episodes to playlist',
+                                                  icon: Icon(
+                                                      LineIcons.tasks_solid),
+                                                  onPressed: () async {
+                                                    await audio
+                                                        .addNewEpisode(_group);
+                                                    if (mounted)
+                                                      setState(() {});
+                                                    Fluttertoast.showToast(
+                                                      msg: _groupName == 'All'
+                                                          ? '${snapshot.data} episode added to playlist'
+                                                          : '${snapshot.data} episode in $_groupName added to playlist',
+                                                      gravity:
+                                                          ToastGravity.BOTTOM,
+                                                    );
+                                                  }),
+                                            )
+                                          : Center();
+                                    }),
                                 Material(
                                     color: Colors.transparent,
                                     child: IconButton(
+                                      tooltip: 'Change layout',
                                       padding: EdgeInsets.zero,
                                       onPressed: () {
                                         if (_layout == Layout.three)
@@ -717,8 +758,8 @@ class _MyDownloadState extends State<_MyDownload>
               child: Row(
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('Downloaded')),
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text('Downloaded')),
                   Spacer(),
                   Material(
                     color: Colors.transparent,

@@ -199,7 +199,10 @@ class _SlideIntroState extends State<SlideIntro> {
                                   child: SizedBox(
                                       height: 40,
                                       width: 80,
-                                      child: Center(child: Text('Next'))))
+                                      child: Center(
+                                          child: Text('Next',
+                                              style: TextStyle(
+                                                  color: Colors.black)))))
                               : InkWell(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20)),
@@ -217,7 +220,10 @@ class _SlideIntroState extends State<SlideIntro> {
                                   child: SizedBox(
                                       height: 40,
                                       width: 80,
-                                      child: Center(child: Text('Done')))),
+                                      child: Center(
+                                          child: Text('Done',
+                                              style: TextStyle(
+                                                  color: Colors.black))))),
                         ),
                       ),
                     ],

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,11 +7,14 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
-import 'package:tsacdop/class/podcast_group.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/podcasts/podcastdetail.dart';
-import 'package:tsacdop/util/pageroute.dart';
-import 'package:tsacdop/util/colorize.dart';
+import '../class/podcast_group.dart';
+import '../class/podcastlocal.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../podcasts/podcastdetail.dart';
+import '../util/pageroute.dart';
+import '../util/colorize.dart';
+import '../util/duraiton_picker.dart';
+import '../util/context_extension.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;
@@ -67,11 +71,32 @@ class PodcastCard extends StatefulWidget {
   _PodcastCardState createState() => _PodcastCardState();
 }
 
-class _PodcastCardState extends State<PodcastCard> {
+class _PodcastCardState extends State<PodcastCard>
+    with SingleTickerProviderStateMixin {
   bool _loadMenu;
   bool _addGroup;
   List<PodcastGroup> _selectedGroups;
   List<PodcastGroup> _belongGroups;
+  AnimationController _controller;
+  Animation _animation;
+  double _value;
+  int _seconds;
+
+  Future<int> getSkipSecond(String id) async {
+    var dbHelper = DBHelper();
+    int seconds = await dbHelper.getSkipSeconds(id);
+    return seconds;
+  }
+
+  saveSkipSeconds(String id, int seconds) async {
+    var dbHelper = DBHelper();
+    await dbHelper.saveSkipSeconds(id, seconds);
+  }
+
+  String _stringForSeconds(double seconds) {
+    if (seconds == null) return null;
+    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  }
 
   @override
   void initState() {
@@ -79,6 +104,16 @@ class _PodcastCardState extends State<PodcastCard> {
     _loadMenu = false;
     _addGroup = false;
     _selectedGroups = [widget.group];
+    _value = 0;
+    _seconds = 0;
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        setState(() {
+          _value = _animation.value;
+        });
+      });
   }
 
   Widget _buttonOnMenu(Widget widget, VoidCallback onTap) => Material(
@@ -112,7 +147,15 @@ class _PodcastCardState extends State<PodcastCard> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           InkWell(
-            onTap: () => setState(() => _loadMenu = !_loadMenu),
+            onTap: () => setState(
+              () {
+                _loadMenu = !_loadMenu;
+                if (_value == 0)
+                  _controller.forward();
+                else
+                  _controller.reverse();
+              },
+            ),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12),
               height: 100,
@@ -162,12 +205,30 @@ class _PodcastCardState extends State<PodcastCard> {
                                     child: Text(group.name));
                               }).toList(),
                             ),
+                            FutureBuilder<int>(
+                              future: getSkipSecond(widget.podcastLocal.id),
+                              initialData: 0,
+                              builder: (context, snapshot) {
+                                return snapshot.data == 0
+                                    ? Center()
+                                    : Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text('Skip ' +
+                                            _stringForSeconds(
+                                                snapshot.data.toDouble())),
+                                      );
+                              },
+                            ),
                           ],
                         )),
                     Spacer(),
-                    Icon(_loadMenu
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down),
+                    Transform.rotate(
+                      angle: math.pi * _value,
+                      child: Icon(Icons.keyboard_arrow_down),
+                    ),
+                    //  Icon(_loadMenu
+                    //      ? Icons.keyboard_arrow_up
+                    //      : Icons.keyboard_arrow_down),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
                     ),
@@ -262,7 +323,7 @@ class _PodcastCardState extends State<PodcastCard> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               _buttonOnMenu(
-                                  Icon(Icons.fullscreen),
+                                  Icon(Icons.fullscreen, size: 20 * _value),
                                   () => Navigator.push(
                                         context,
                                         ScaleRoute(
@@ -270,16 +331,90 @@ class _PodcastCardState extends State<PodcastCard> {
                                           podcastLocal: widget.podcastLocal,
                                         )),
                                       )),
-                              _buttonOnMenu(Icon(Icons.add), () {
+                              _buttonOnMenu(Icon(Icons.add, size: 20 * _value),
+                                  () {
                                 setState(() {
                                   _addGroup = true;
                                 });
                               }),
-                            // _buttonOnMenu(Icon(Icons.notifications), () {}),
+                              _buttonOnMenu(
+                                  Icon(
+                                    Icons.fast_forward,
+                                    size: 20 * (_value),
+                                  ), () {
+                                showGeneralDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  barrierLabel:
+                                      MaterialLocalizations.of(context)
+                                          .modalBarrierDismissLabel,
+                                  barrierColor: Colors.black54,
+                                  transitionDuration:
+                                      const Duration(milliseconds: 200),
+                                  pageBuilder: (BuildContext context,
+                                          Animation animaiton,
+                                          Animation secondaryAnimation) =>
+                                      AnnotatedRegion<SystemUiOverlayStyle>(
+                                    value: SystemUiOverlayStyle(
+                                      statusBarIconBrightness: Brightness.light,
+                                      systemNavigationBarColor:
+                                          Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Color.fromRGBO(113, 113, 113, 1)
+                                              : Color.fromRGBO(15, 15, 15, 1),
+                                    ),
+                                    child: AlertDialog(
+                                      elevation: 1,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10.0))),
+                                      titlePadding: EdgeInsets.only(
+                                          top: 20,
+                                          left: 20,
+                                          right: 100,
+                                          bottom: 20),
+                                      title: Text('Skip seconds at the beginning'),
+                                      content: DurationPicker(
+                                        duration: Duration.zero,
+                                        onChange: (value) =>
+                                            _seconds = value.inSeconds,
+                                      ),
+                                      // content: Text('test'),
+                                      actionsPadding: EdgeInsets.all(10),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            _seconds = 0;
+                                          },
+                                          child: Text(
+                                            'CANCEL',
+                                            style: TextStyle(
+                                                color: Colors.grey[600]),
+                                          ),
+                                        ),
+                                        FlatButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            saveSkipSeconds(
+                                                widget.podcastLocal.id,
+                                                _seconds);
+                                          },
+                                          child: Text(
+                                            'CONFIRM',
+                                            style: TextStyle(color: context.accentColor),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
                               _buttonOnMenu(
                                   Icon(
                                     Icons.delete,
                                     color: Colors.red,
+                                    size: 20 * (_value),
                                   ), () {
                                 showGeneralDialog(
                                   context: context,

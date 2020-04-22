@@ -28,6 +28,13 @@ class ScrollPodcasts extends StatefulWidget {
 
 class _ScrollPodcastsState extends State<ScrollPodcasts> {
   int _groupIndex;
+
+  Future<int> getPodcastCounts(String id) async {
+    var dbHelper = DBHelper();
+    List<int> list = await dbHelper.getPodcastCounts(id);
+    return list.first;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -260,20 +267,29 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                             child: Image.file(File(
                                                 "${podcastLocal.imagePath}")),
                                           ),
-                                          podcastLocal.upateCount > 0
-                                              ? Container(
-                                                  alignment: Alignment.center,
-                                                  height: 10,
-                                                  width: 40,
-                                                  color: Colors.black54,
-                                                  child: Text('New',
-                                                      style: TextStyle(
-                                                          color: Colors.red,
-                                                          fontSize: 8,
-                                                          fontStyle: FontStyle
-                                                              .italic)),
-                                                )
-                                              : Center(),
+                                          FutureBuilder<int>(
+                                              future: getPodcastCounts(
+                                                  podcastLocal.id),
+                                              initialData: 0,
+                                              builder: (context, snapshot) {
+                                                return snapshot.data > 0
+                                                    ? Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        height: 10,
+                                                        width: 40,
+                                                        color: Colors.black54,
+                                                        child: Text('New',
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                                fontSize: 8,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic)),
+                                                      )
+                                                    : Center();
+                                              }),
                                         ],
                                       ),
                                     ),
@@ -344,14 +360,16 @@ class _PodcastPreviewState extends State<PodcastPreview> {
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   print(snapshot.error);
-                  Center(child: CircularProgressIndicator());
+                  Center();
                 }
                 return (snapshot.hasData)
                     ? ShowEpisode(
                         episodes: snapshot.data,
                         podcastLocal: widget.podcastLocal,
                       )
-                    : Center(child: CircularProgressIndicator());
+                    : Container(
+                        padding: EdgeInsets.all(5.0),
+                      );
               },
             ),
           ),
@@ -409,75 +427,75 @@ class ShowEpisode extends StatelessWidget {
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
-    Offset offset;
-    _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
-        bool isPlaying, bool isInPlaylist) async {
-      var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-      double left = offset.dx;
-      double top = offset.dy;
-      await showMenu<int>(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
-        context: context,
-        position: RelativeRect.fromLTRB(left, top, _width - left, 0),
-        items: <PopupMenuEntry<int>>[
-          PopupMenuItem(
-            value: 0,
+  _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
+      bool isPlaying, bool isInPlaylist) async {
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    double left = offset.dx;
+    double top = offset.dy;
+    await showMenu<int>(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      context: context,
+      position: RelativeRect.fromLTRB(left, top, context.width - left, 0),
+      items: <PopupMenuEntry<int>>[
+        PopupMenuItem(
+          value: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Icon(
+                LineIcons.play_circle_solid,
+                color: Theme.of(context).accentColor,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 2),
+              ),
+              !isPlaying ? Text('Play') : Text('Playing'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+            value: 1,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Icon(
-                  LineIcons.play_circle_solid,
-                  color: Theme.of(context).accentColor,
+                  LineIcons.clock_solid,
+                  color: Colors.red,
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 2),
                 ),
-                !isPlaying ? Text('Play') : Text('Playing'),
+                !isInPlaylist ? Text('Later') : Text('Remove')
               ],
-            ),
-          ),
-          PopupMenuItem(
-              value: 1,
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    LineIcons.clock_solid,
-                    color: Colors.red,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
-                  ),
-                  !isInPlaylist ? Text('Later') : Text('Remove')
-                ],
-              )),
-        ],
-        elevation: 5.0,
-      ).then((value) {
-        if (value == 0) {
-          if (!isPlaying) audio.episodeLoad(episode);
-        } else if (value == 1) {
-          if (!isInPlaylist) {
-            audio.addToPlaylist(episode);
-            Fluttertoast.showToast(
-              msg: 'Added to playlist',
-              gravity: ToastGravity.BOTTOM,
-            );
-          } else {
-            audio.delFromPlaylist(episode);
-            Fluttertoast.showToast(
-              msg: 'Removed from playlist',
-              gravity: ToastGravity.BOTTOM,
-            );
-          }
+            )),
+      ],
+      elevation: 5.0,
+    ).then((value) {
+      if (value == 0) {
+        if (!isPlaying) audio.episodeLoad(episode);
+      } else if (value == 1) {
+        if (!isInPlaylist) {
+          audio.addToPlaylist(episode);
+          Fluttertoast.showToast(
+            msg: 'Added to playlist',
+            gravity: ToastGravity.BOTTOM,
+          );
+        } else {
+          audio.delFromPlaylist(episode);
+          Fluttertoast.showToast(
+            msg: 'Removed from playlist',
+            gravity: ToastGravity.BOTTOM,
+          );
         }
-      });
-    }
+      }
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    double _width = context.width;
+    Offset offset;
     return CustomScrollView(
       physics: NeverScrollableScrollPhysics(),
       primary: false,
