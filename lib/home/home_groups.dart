@@ -29,10 +29,9 @@ class ScrollPodcasts extends StatefulWidget {
 class _ScrollPodcastsState extends State<ScrollPodcasts> {
   int _groupIndex;
 
-  Future<int> getPodcastCounts(String id) async {
+  Future<int> getPodcastUpdateCounts(String id) async {
     var dbHelper = DBHelper();
-    List<int> list = await dbHelper.getPodcastCounts(id);
-    return list.first;
+    return await dbHelper.getPodcastUpdateCounts(id);
   }
 
   @override
@@ -268,7 +267,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                                 "${podcastLocal.imagePath}")),
                                           ),
                                           FutureBuilder<int>(
-                                              future: getPodcastCounts(
+                                              future: getPodcastUpdateCounts(
                                                   podcastLocal.id),
                                               initialData: 0,
                                               builder: (context, snapshot) {

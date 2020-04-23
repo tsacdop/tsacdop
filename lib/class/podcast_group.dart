@@ -182,12 +182,11 @@ class GroupList extends ChangeNotifier {
   }
 
   Future updatePodcast(String id) async {
-    List<int> counts = await dbHelper.getPodcastCounts(id);
+    int counts = await dbHelper.getPodcastCounts(id);
     _groups.forEach((group) {
       if (group.podcastList.contains(id)) {
         group.podcasts.firstWhere((podcast) => podcast.id == id)
-          ..upateCount = counts[0]
-          ..episodeCount = counts[1];
+          ..episodeCount = counts;
         notifyListeners();
       }
     });

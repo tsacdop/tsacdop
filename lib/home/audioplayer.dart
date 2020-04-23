@@ -507,33 +507,42 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 Expanded(
                   flex: 2,
                   child: Selector<AudioPlayerNotifier,
-                      Tuple2<BasicPlaybackState, double>>(
-                    selector: (_, audio) => Tuple2(
+                      Tuple3<BasicPlaybackState, double, String>>(
+                    selector: (_, audio) => Tuple3(
                         audio.audioState,
                         (audio.backgroundAudioDuration -
                                 audio.backgroundAudioPosition) /
-                            1000),
+                            1000,
+                        audio.remoteErrorMessage),
                     builder: (_, data, __) {
                       return Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         alignment: Alignment.center,
-                        child: data.item1 == BasicPlaybackState.buffering ||
-                                data.item1 == BasicPlaybackState.connecting
-                            ? Text(
-                                'Buffring...',
-                                style: TextStyle(
-                                    color: Theme.of(context).accentColor),
-                              )
-                            : Row(
-                                children: <Widget>[
-                                  Text(
-                                    _stringForSeconds(data.item2) ?? '',
+                        child: data.item3 != null
+                            ? Text(data.item3,
+                                style: const TextStyle(
+                                    color: const Color(0xFFFF0000)))
+                            : data.item1 == BasicPlaybackState.buffering ||
+                                    data.item1 ==
+                                        BasicPlaybackState.connecting ||
+                                    data.item1 ==
+                                        BasicPlaybackState.skippingToNext ||
+                                    data.item1 == BasicPlaybackState.stopped
+                                ? Text(
+                                    'Buffring...',
+                                    style: TextStyle(
+                                        color: Theme.of(context).accentColor),
+                                  )
+                                : Row(
+                                    children: <Widget>[
+                                      Text(
+                                        _stringForSeconds(data.item2) ?? '',
+                                      ),
+                                      Text(
+                                        '  Left',
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    '  Left',
-                                  ),
-                                ],
-                              ),
                       );
                     },
                   ),
@@ -1278,7 +1287,10 @@ class _ControlPanelState extends State<ControlPanel>
                                                       BasicPlaybackState
                                                           .connecting ||
                                                   data.audioState ==
-                                                      BasicPlaybackState.none
+                                                      BasicPlaybackState.none ||
+                                                  data.audioState ==
+                                                      BasicPlaybackState
+                                                          .skippingToNext
                                               ? 'Buffring...'
                                               : '',
                                           style: TextStyle(

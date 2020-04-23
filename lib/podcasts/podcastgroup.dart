@@ -81,10 +81,12 @@ class _PodcastCardState extends State<PodcastCard>
   Animation _animation;
   double _value;
   int _seconds;
+  int _skipSeconds;
 
   Future<int> getSkipSecond(String id) async {
     var dbHelper = DBHelper();
     int seconds = await dbHelper.getSkipSeconds(id);
+    _skipSeconds = seconds;
     return seconds;
   }
 
@@ -373,12 +375,15 @@ class _PodcastCardState extends State<PodcastCard>
                                           left: 20,
                                           right: 100,
                                           bottom: 20),
-                                      title: Text('Skip seconds at the beginning'),
+                                      title:
+                                          Text('Skip seconds at the beginning'),
                                       content: DurationPicker(
-                                        duration: Duration.zero,
+                                        duration: Duration(
+                                            seconds: _skipSeconds ?? 0),
                                         onChange: (value) =>
                                             _seconds = value.inSeconds,
                                       ),
+
                                       // content: Text('test'),
                                       actionsPadding: EdgeInsets.all(10),
                                       actions: <Widget>[
@@ -402,7 +407,8 @@ class _PodcastCardState extends State<PodcastCard>
                                           },
                                           child: Text(
                                             'CONFIRM',
-                                            style: TextStyle(color: context.accentColor),
+                                            style: TextStyle(
+                                                color: context.accentColor),
                                           ),
                                         )
                                       ],

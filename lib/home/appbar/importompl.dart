@@ -34,7 +34,7 @@ class Import extends StatelessWidget {
             SubscribeItem item = subscribeWorker.currentSubscribeItem;
             switch (item.subscribeState) {
               case SubscribeState.start:
-                return importColumn("Subscribe: ${item.title}", context);
+                return importColumn("Subscribe ${item.title}", context);
               case SubscribeState.subscribe:
                 groupList.subscribeNewPodcast(item.id);
                 return importColumn("Fetch data ${item.title}", context);

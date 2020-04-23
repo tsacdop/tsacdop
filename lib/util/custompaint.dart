@@ -154,6 +154,52 @@ class ListenedAllPainter extends CustomPainter {
   }
 }
 
+//Add new episode to palylist
+class AddToPlaylistPainter extends CustomPainter {
+  Color _color;
+  Color _textColor;
+  AddToPlaylistPainter(this._color, this._textColor);
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint _paint = Paint()
+      ..color = _color
+      ..strokeWidth = 1
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    Path _path = Path();
+    _path.moveTo(0, 0);
+    _path.lineTo(size.width * 4 / 7, 0);
+    _path.moveTo(0, size.height / 3);
+    _path.lineTo(size.width * 4 / 7, size.height / 3);
+    _path.moveTo(0, size.height * 2 / 3);
+    _path.lineTo(size.width * 3 / 7, size.height * 2 / 3);
+    //_path.moveTo(size.width * 3 / 7, size.height * 2 / 3);
+    //_path.lineTo(size.width, size.height * 2 / 3);
+    //_path.moveTo(size.width * 5 / 7, size.height / 3);
+    //_path.lineTo(size.width * 5 / 7, size.height);
+    // _path.moveTo(size.width*5/7, size.height/4);
+    // _path.lineTo(size.width*11/14, 0);
+    // _path.lineTo(size.width*13/14, size.height/4);
+    // _path.lineTo(size.width, 0);
+    var textPainter = TextPainter(
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+        text: TextSpan(
+          text: 'N',
+          style: TextStyle(
+              fontStyle: FontStyle.italic, color: _textColor, fontSize: 10),
+        ))
+      ..layout();
+    textPainter.paint(canvas, Offset(size.width * 4 / 7, size.height / 3));
+    canvas.drawPath(_path, _paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
 //Wave play indicator
 class WavePainter extends CustomPainter {
   double _fraction;

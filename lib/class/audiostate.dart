@@ -91,11 +91,13 @@ class Playlist {
   addToPlayList(EpisodeBrief episodeBrief) async {
     _playlist.add(episodeBrief);
     await savePlaylist();
+    dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
   }
 
   addToPlayListAt(EpisodeBrief episodeBrief, int index) async {
     _playlist.insert(index, episodeBrief);
     await savePlaylist();
+    dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
   }
 
   Future<int> delFromPlaylist(EpisodeBrief episodeBrief) async {
@@ -188,10 +190,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _setAutoAdd();
   }
 
-  Future _getAutoAdd() async {
-    int i = await autoAddStorage.getInt();
-    _autoAdd = i == 0 ? false : true;
-  }
+  //Future _getAutoAdd() async {
+  //  int i = await autoAddStorage.getInt();
+  //  _autoAdd = i == 0 ? false : true;
+  //}
 
   Future _setAutoAdd() async {
     await autoAddStorage.saveInt(_autoAdd ? 1 : 0);
@@ -255,6 +257,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
       notifyListeners();
       //await _queue.savePlaylist();
       _startAudioService(startPosition);
+      if (episodeNew.isNew == 1)
+        dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
     }
   }
 
@@ -571,7 +575,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   bool get hasNext => _queue.length > 0;
 
-  MediaItem get mediaItem => _queue.first;
+  MediaItem get mediaItem => _queue.length > 0 ? _queue.first : null;
 
   BasicPlaybackState _stateToBasicState(AudioPlaybackState state) {
     switch (state) {
@@ -644,19 +648,21 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onSkipToNext() async {
     _skipState = BasicPlaybackState.skippingToNext;
     await _audioPlayer.stop();
-    _queue.removeAt(0);
+    if (_queue.length > 0) _queue.removeAt(0);
     await AudioServiceBackground.setQueue(_queue);
     // }
     if (_queue.length == 0 || _stopAtEnd) {
       _skipState = null;
       onStop();
     } else {
-       AudioServiceBackground.setQueue(_queue);
-       AudioServiceBackground.setMediaItem(mediaItem);
-        await _audioPlayer.setUrl(mediaItem.id);
-        Duration duration = await _audioPlayer.durationFuture ?? Duration.zero;
-        AudioServiceBackground.setMediaItem(
-            mediaItem.copyWith(duration: duration.inMilliseconds));
+      await AudioServiceBackground.setQueue(_queue);
+      await AudioServiceBackground.setMediaItem(mediaItem);
+      await _audioPlayer.setUrl(mediaItem.id);
+      print(mediaItem.title);
+      Duration duration = await _audioPlayer.durationFuture;
+      if(duration != null)
+      await AudioServiceBackground.setMediaItem(
+          mediaItem.copyWith(duration: duration.inMilliseconds));
       _skipState = null;
       // Resume playback if we were playing
       // if (_playing) {
@@ -674,9 +680,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
         _playing = true;
         // await AudioServiceBackground.setQueue(_queue);
         await _audioPlayer.setUrl(mediaItem.id);
-        Duration duration = await _audioPlayer.durationFuture;
-        AudioServiceBackground.setMediaItem(
-            mediaItem.copyWith(duration: duration.inMilliseconds));
+        var duration = await _audioPlayer.durationFuture;
+        if (duration != null)
+          await AudioServiceBackground.setMediaItem(
+              mediaItem.copyWith(duration: duration.inMilliseconds));
       }
       // if (mediaItem.extras['skip'] > 0) {
       //   await _audioPlayer.setClip(
@@ -684,8 +691,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
       //   print(mediaItem.extras['skip']);
       //   print('set clip success');
       // }
-      _playing = true;
-      _audioPlayer.play();
+      else
+        _playing = true;
+      await _audioPlayer.play();
       if (mediaItem.extras['skip'] > 0) {
         _audioPlayer.seek(Duration(seconds: mediaItem.extras['skip']));
       }
@@ -716,7 +724,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await _audioPlayer.stop();
     _setState(state: BasicPlaybackState.stopped);
     await Future.delayed(Duration(milliseconds: 500));
-    _completer.complete();
+    _completer?.complete();
   }
 
   @override

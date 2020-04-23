@@ -72,14 +72,14 @@ class AboutApp extends StatelessWidget {
                           image: AssetImage('assets/logo.png'),
                           height: 80,
                         ),
-                        Text('Version: 0.1.9'),
+                        Text('Version: 0.2.0'),
                       ],
                     ),
                   ),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 50),
                     child: Text(
-                      'Tsacdop is a podcast player developed in flutter, a simply beautiful and friendly app.',
+                      'Tsacdop is a podcast player developed in flutter, a clean, simply beautiful and friendly app.',
                       textAlign: TextAlign.center,
                     ),
                   ),

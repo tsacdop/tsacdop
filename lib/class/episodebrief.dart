@@ -56,6 +56,7 @@ class EpisodeBrief {
         title: title,
         artist: feedTitle,
         album: feedTitle,
+       // duration: 0,
         artUri: 'file://$imagePath',
         extras: {'skip': skipSeconds});
   }

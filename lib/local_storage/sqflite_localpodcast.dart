@@ -102,12 +102,20 @@ class DBHelper {
     return podcastLocal;
   }
 
-  Future<List<int>> getPodcastCounts(String id) async {
+  Future<int> getPodcastCounts(String id) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT update_count, episode_count FROM PodcastLocal WHERE id = ?',
+        'SELECT episode_count FROM PodcastLocal WHERE id = ?',
         [id]);
-    return [list.first['update_count'], list.first['episode_count']];
+    return list.first['episode_count'];
+  }
+
+  Future<int> getPodcastUpdateCounts(String id) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        'SELECt count(*) as count FROM Episodes WHERE feed_id = ? AND is_new = 1',
+        [id]);
+    return list.first['count'];
   }
 
   Future<int> getSkipSeconds(String id) async {
@@ -518,7 +526,7 @@ class DBHelper {
       return 0;
     } catch (e) {
       print(e);
-      return 0;
+      return -1;
     }
   }
 
@@ -576,7 +584,6 @@ class DBHelper {
     }
     return episodes;
   }
-
 
   Future<List<EpisodeBrief>> getNewEpisodes(String id) async {
     var dbClient = await database;
@@ -818,6 +825,12 @@ class DBHelper {
           "UPDATE Episodes SET is_new = 0 WHERE feed_id in (${s.join(',')})");
     }
     return 0;
+  }
+
+  Future<int> removeEpisodeNewMark(String url) async {
+    var dbClient = await database;
+    return await dbClient.rawUpdate(
+        "UPDATE Episodes SET is_new = 0 WHERE enclosure_url = ?", [url]);
   }
 
   Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy) async {

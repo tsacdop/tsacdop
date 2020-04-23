@@ -34,7 +34,7 @@ class SubscribeWorker extends ChangeNotifier {
   SubscribeItem _currentSubscribeItem = SubscribeItem('', '');
   bool _created = false;
 
-  setSubscribeItem(SubscribeItem item) async{
+  setSubscribeItem(SubscribeItem item) async {
     _subscribeItem = item;
     await _start();
   }
@@ -155,7 +155,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
 
         sendPort.send([item.title, item.url, 3, uuid]);
 
-        await Future.delayed(Duration(seconds: 5));
+        await Future.delayed(Duration(seconds: 2));
 
         sendPort.send([item.title, item.url, 4]);
         items.removeWhere((element) => element.url == item.url);
@@ -165,7 +165,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
           sendPort.send("done");
       } else {
         sendPort.send([item.title, item.url, 5]);
-        await Future.delayed(Duration(seconds: 5));
+        await Future.delayed(Duration(seconds: 2));
         sendPort.send([item.title, item.url, 4]);
         items.removeWhere((element) => element.url == item.url);
         if (items.length > 0) {
@@ -175,7 +175,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       }
     } else {
       sendPort.send([item.title, item.url, 6]);
-      await Future.delayed(Duration(seconds: 5));
+      await Future.delayed(Duration(seconds: 2));
       sendPort.send([item.title, item.url, 4]);
       items.removeWhere((element) => element.url == item.url);
       if (items.length > 0) {

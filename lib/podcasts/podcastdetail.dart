@@ -38,22 +38,21 @@ class _PodcastDetailState extends State<PodcastDetail> {
   List<PodcastHost> hosts;
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
-    try {
-      final result = await dbHelper.updatePodcastRss(podcastLocal);
-      if (result == 0) {
-        Fluttertoast.showToast(
-          msg: 'No Update',
-          gravity: ToastGravity.TOP,
-        );
-      } else {
-        Fluttertoast.showToast(
-          msg: 'Updated $result Episodes',
-          gravity: ToastGravity.TOP,
-        );
-        Provider.of<GroupList>(context, listen: false)
-            .updatePodcast(podcastLocal.id);
-      }
-    } catch (e) {
+
+    final result = await dbHelper.updatePodcastRss(podcastLocal);
+    if (result == 0) {
+      Fluttertoast.showToast(
+        msg: 'No Update',
+        gravity: ToastGravity.TOP,
+      );
+    } else if (result > 0) {
+      Fluttertoast.showToast(
+        msg: 'Updated $result Episodes',
+        gravity: ToastGravity.TOP,
+      );
+      Provider.of<GroupList>(context, listen: false)
+          .updatePodcast(podcastLocal.id);
+    } else {
       Fluttertoast.showToast(
         msg: 'Update failed, network error',
         gravity: ToastGravity.TOP,
@@ -217,7 +216,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
             color: Theme.of(context).accentColor,
             onRefresh: () async {
               await _updateRssItem(widget.podcastLocal);
-            //  audio.addNewEpisode(widget.podcastLocal.id);
+              //  audio.addNewEpisode(widget.podcastLocal.id);
             },
             child: Stack(
               children: <Widget>[

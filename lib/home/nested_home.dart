@@ -11,16 +11,16 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/util/episodegrid.dart';
-import 'package:tsacdop/util/mypopupmenu.dart';
-import 'package:tsacdop/util/context_extension.dart';
-import 'package:tsacdop/util/custompaint.dart';
+import '../class/audiostate.dart';
+import '../class/episodebrief.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../util/episodegrid.dart';
+import '../util/mypopupmenu.dart';
+import '../util/context_extension.dart';
+import '../util/custompaint.dart';
 
-import 'package:tsacdop/home/appbar/importompl.dart';
-import 'package:tsacdop/home/audioplayer.dart';
+import '../home/appbar/importompl.dart';
+import '../home/audioplayer.dart';
 import 'home_groups.dart';
 import 'download_list.dart';
 
@@ -466,14 +466,24 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                     future: _getUpdateCounts(_group),
                                     initialData: 0,
                                     builder: (context, snapshot) {
-                                      return snapshot.data > 0
+                                      return snapshot.data != 0
                                           ? Material(
                                               color: Colors.transparent,
                                               child: IconButton(
                                                   tooltip:
                                                       'Add new episodes to playlist',
-                                                  icon: Icon(
-                                                      LineIcons.tasks_solid),
+                                                  icon:
+                                                      // Icon(Icons.playlist_add),
+                                                      SizedBox(
+                                                          height: 16,
+                                                          width: 21,
+                                                          child: CustomPaint(
+                                                              painter: AddToPlaylistPainter(
+                                                                  context
+                                                                      .textTheme
+                                                                      .bodyText1
+                                                                      .color,
+                                                                  Colors.red))),
                                                   onPressed: () async {
                                                     await audio
                                                         .addNewEpisode(_group);
@@ -488,7 +498,23 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                     );
                                                   }),
                                             )
-                                          : Center();
+                                          : IconButton(
+                                              tooltip:
+                                                  'Add new episodes to playlist',
+                                              icon:
+                                                  // Icon(Icons.playlist_add),
+                                                  SizedBox(
+                                                      height: 16,
+                                                      width: 21,
+                                                      child: CustomPaint(
+                                                          painter:
+                                                              AddToPlaylistPainter(
+                                                        context.textTheme
+                                                            .bodyText1.color,
+                                                        context.textTheme
+                                                            .bodyText1.color,
+                                                      ))),
+                                              onPressed: () {});
                                     }),
                                 Material(
                                     color: Colors.transparent,
