@@ -348,18 +348,20 @@ class AudioPlayerNotifier extends ChangeNotifier {
       notifyListeners();
     });
 
-    double s = _currentSpeed ?? 1.0;
+    //double s = _currentSpeed ?? 1.0;
     int getPosition = 0;
-    Timer.periodic(Duration(milliseconds: 500), (timer) {
+    Timer.periodic(Duration(milliseconds: 200), (timer) {
+      double s = _currentSpeed ?? 1.0;
       if (_noSlide) {
         if (_audioState == BasicPlaybackState.playing) {
           getPosition = _currentPosition +
-              (DateTime.now().difference(_current).inMilliseconds * s).toInt();
+              ((DateTime.now().difference(_current).inMilliseconds) * s)
+                  .toInt();
           _backgroundAudioPosition = getPosition < _backgroundAudioDuration
               ? getPosition
               : _backgroundAudioDuration;
         } else
-          _backgroundAudioPosition = _currentPosition;
+          _backgroundAudioPosition = _currentPosition ?? 0;
 
         if (_backgroundAudioDuration != null &&
             _backgroundAudioDuration != 0 &&
@@ -618,6 +620,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         _setState(
           state: state,
           position: event.position.inMilliseconds,
+          speed: event.speed,
         );
       }
     });
@@ -660,13 +663,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
       await _audioPlayer.setUrl(mediaItem.id);
       print(mediaItem.title);
       Duration duration = await _audioPlayer.durationFuture;
-      if(duration != null)
-      await AudioServiceBackground.setMediaItem(
-          mediaItem.copyWith(duration: duration.inMilliseconds));
+      if (duration != null)
+        await AudioServiceBackground.setMediaItem(
+            mediaItem.copyWith(duration: duration.inMilliseconds));
       _skipState = null;
       // Resume playback if we were playing
       // if (_playing) {
-      onPlay();
+      //onPlay();
+      playFromStart();
       // } else {
       //   _setState(state: BasicPlaybackState.paused);
       //  }
@@ -684,6 +688,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         if (duration != null)
           await AudioServiceBackground.setMediaItem(
               mediaItem.copyWith(duration: duration.inMilliseconds));
+        playFromStart();
       }
       // if (mediaItem.extras['skip'] > 0) {
       //   await _audioPlayer.setClip(
@@ -691,12 +696,25 @@ class AudioPlayerTask extends BackgroundAudioTask {
       //   print(mediaItem.extras['skip']);
       //   print('set clip success');
       // }
-      else
+      else {
         _playing = true;
-      await _audioPlayer.play();
-      if (mediaItem.extras['skip'] > 0) {
-        _audioPlayer.seek(Duration(seconds: mediaItem.extras['skip']));
+        if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting &&
+            _audioPlayer.playbackEvent.state != AudioPlaybackState.none)
+          _audioPlayer.play();
       }
+      // if (mediaItem.extras['skip'] >
+      //         _audioPlayer.playbackEvent.position.inSeconds ??
+      //     0) {
+      //   _audioPlayer.seek(Duration(seconds: mediaItem.extras['skip']));
+      // }
+    }
+  }
+
+  playFromStart() async {
+    _playing = true;
+    _audioPlayer.play();
+    if (mediaItem.extras['skip'] > 0) {
+      _audioPlayer.seek(Duration(seconds: mediaItem.extras['skip']));
     }
   }
 
@@ -711,7 +729,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   void onSeekTo(int position) {
-    _audioPlayer.seek(Duration(milliseconds: position));
+    if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting &&
+        _audioPlayer.playbackEvent.state != AudioPlaybackState.none)
+      _audioPlayer.seek(Duration(milliseconds: position));
   }
 
   @override
@@ -751,7 +771,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
       Duration duration = await _audioPlayer.durationFuture ?? Duration.zero;
       AudioServiceBackground.setMediaItem(
           mediaItem.copyWith(duration: duration.inMilliseconds));
-      onPlay();
+      playFromStart();
+      //onPlay();
     } else {
       _queue.insert(index, mediaItem);
       await AudioServiceBackground.setQueue(_queue);
@@ -807,15 +828,20 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
   }
 
-  void _setState({@required BasicPlaybackState state, int position}) {
+  void _setState(
+      {@required BasicPlaybackState state, int position, double speed}) {
     if (position == null) {
       position = _audioPlayer.playbackEvent.position.inMilliseconds;
+    }
+    if (speed == null) {
+      speed = _audioPlayer.playbackEvent.speed;
     }
     AudioServiceBackground.setState(
       controls: getControls(state),
       systemActions: [MediaAction.seekTo],
       basicState: state,
       position: position,
+      speed: speed,
     );
   }
 

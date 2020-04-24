@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
 
+const String version = '0.2.0';
+
 class AboutApp extends StatelessWidget {
   _launchUrl(String url) async {
     if (await canLaunch(url)) {
@@ -72,7 +74,7 @@ class AboutApp extends StatelessWidget {
                           image: AssetImage('assets/logo.png'),
                           height: 80,
                         ),
-                        Text('Version: 0.2.0'),
+                        Text('Version: $version'),
                       ],
                     ),
                   ),
