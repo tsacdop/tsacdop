@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'context_extension.dart';
 
 /// Signature for a function that creates a [Widget] to be used within an
 /// [OpenContainer].
@@ -736,7 +737,8 @@ class _OpenContainerRoute extends ModalRoute<void> {
                       offset: Offset(rect.left, rect.top),
                       child: SizedBox(
                         width: rect.width,
-                        height: rect.height,
+                        height: rect.height *
+                            (playerRunning ? (1 - 60 / context.width) : 1),
                         child: Material(
                           clipBehavior: Clip.antiAlias,
                           animationDuration: Duration.zero,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'context_extension.dart';
 
 //Slide Transition
 class SlideLeftRoute extends PageRouteBuilder {
@@ -23,6 +24,38 @@ class SlideLeftRoute extends PageRouteBuilder {
               end: Offset.zero,
             ).animate(animation),
             child: child,
+          ),
+        );
+}
+
+class SlideLeftHideRoute extends PageRouteBuilder {
+  final Widget page;
+  SlideLeftHideRoute({this.page})
+      : super(
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: Container(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: context.width,
+                height: context.height,
+                child: child),
+            ),
           ),
         );
 }

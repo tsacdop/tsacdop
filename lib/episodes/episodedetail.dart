@@ -216,7 +216,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                     data: _description,
                                     linkStyle: TextStyle(
                                         color: Theme.of(context).accentColor,
-                                       // decoration: TextDecoration.underline,
+                                        // decoration: TextDecoration.underline,
                                         textBaseline: TextBaseline.ideographic),
                                     onLinkTap: (url) {
                                       _launchUrl(url);
@@ -243,8 +243,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                           linkStyle: TextStyle(
                                             color:
                                                 Theme.of(context).accentColor,
-                                          //  decoration:
-                                          //      TextDecoration.underline,
+                                            //  decoration:
+                                            //      TextDecoration.underline,
                                           ),
                                         ),
                                       )
@@ -280,7 +280,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       selector: (_, audio) => audio.playerRunning,
                       builder: (_, data, __) {
                         return Padding(
-                          padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
+                          padding: EdgeInsets.only(
+                              bottom: data ? 60.0 : 0),
                         );
                       }),
                 ],
@@ -379,6 +380,22 @@ class _MenuBarState extends State<MenuBar> {
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    OverlayEntry _createOverlayEntry() {
+      RenderBox renderBox = context.findRenderObject();
+      var offset = renderBox.localToGlobal(Offset.zero);
+      return OverlayEntry(
+        builder: (constext) => Positioned(
+          left: offset.dx + 50,
+          top: offset.dy - 60,
+          child: Container(
+              width: 70,
+              height: 100,
+              //color: Colors.grey[200],
+              child: HeartOpen(width: 50, height: 80)),
+        ),
+      );
+    }
+
     return Container(
       height: 50.0,
       decoration: BoxDecoration(
@@ -418,8 +435,14 @@ class _MenuBarState extends State<MenuBar> {
                       Icon(
                         Icons.favorite_border,
                         color: Colors.grey[700],
-                      ),
-                      () => saveLiked(widget.episodeItem.enclosureUrl))
+                      ), () async {
+                      await saveLiked(widget.episodeItem.enclosureUrl);
+                      OverlayEntry _overlayEntry;
+                      _overlayEntry = _createOverlayEntry();
+                      Overlay.of(context).insert(_overlayEntry);
+                      await Future.delayed(Duration(seconds: 2));
+                      _overlayEntry?.remove();
+                    })
                   : (snapshot.data && !_liked)
                       ? _buttonOnMenu(
                           Icon(
@@ -427,18 +450,14 @@ class _MenuBarState extends State<MenuBar> {
                             color: Colors.red,
                           ),
                           () => setUnliked(widget.episodeItem.enclosureUrl))
-                      : Stack(
-                          alignment: Alignment.center,
-                          children: <Widget>[
-                            LoveOpen(),
-                            _buttonOnMenu(
-                                Icon(
-                                  Icons.favorite,
-                                  color: Colors.red,
-                                ),
-                                () => setUnliked(
-                                    widget.episodeItem.enclosureUrl)),
-                          ],
+                      : _buttonOnMenu(
+                          Icon(
+                            Icons.favorite,
+                            color: Colors.red,
+                          ),
+                          () {
+                            setUnliked(widget.episodeItem.enclosureUrl);
+                          },
                         );
             },
           ),

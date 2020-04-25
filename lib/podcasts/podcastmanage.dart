@@ -49,7 +49,7 @@ class _PodcastManageState extends State<PodcastManage>
           });
       });
     _menuAnimation = Tween(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _menuController, curve: Curves.easeInOutBack))
+        CurvedAnimation(parent: _menuController, curve: Curves.easeIn))
       ..addListener(() {
         if (mounted) setState(() => _menuValue = _menuAnimation.value);
       });

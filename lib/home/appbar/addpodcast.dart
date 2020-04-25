@@ -470,7 +470,7 @@ class _SearchResultState extends State<SearchResult>
                             setState(() => _issubscribe = true);
                             Fluttertoast.showToast(
                               msg: 'Podcast subscribed',
-                              gravity: ToastGravity.TOP,
+                              gravity: ToastGravity.BOTTOM,
                             );
                           })
                       : OutlineButton(

@@ -55,7 +55,7 @@ class StorageSetting extends StatelessWidget {
                               MaterialPageRoute(
                                   builder: (context) => DownloadsManage())),
                           contentPadding:
-                              EdgeInsets.only(left: 80.0, right: 25, bottom: 10),
+                              EdgeInsets.only(left: 80.0, right: 25, bottom: 10, top: 10),
                           title: Text('Ask before using cellular data'),
                           subtitle: Text(
                               'Ask to confirm when using cellular data to download episodes.'),
@@ -112,7 +112,7 @@ class StorageSetting extends StatelessWidget {
                         contentPadding: EdgeInsets.symmetric(horizontal: 80.0),
                         //  leading: Icon(Icons.colorize),
                         title: Text('Cache'),
-                        subtitle: Text('Audio cache'),
+                        subtitle: Text('App cache'),
                       ),
                       Divider(height: 2),
                     ],

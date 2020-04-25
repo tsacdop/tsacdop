@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,7 +21,13 @@ import 'syncing.dart';
 import 'libries.dart';
 import 'play_setting.dart';
 
-class Settings extends StatelessWidget {
+class Settings extends StatefulWidget {
+  @override
+  _SettingsState createState() => _SettingsState();
+}
+
+class _SettingsState extends State<Settings>
+    with SingleTickerProviderStateMixin {
   _launchUrl(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -42,6 +49,48 @@ class Settings extends StatelessWidget {
     print(filePath);
     print(ompl.toString());
   }
+
+  bool _showFeedback;
+  Animation _animation;
+  AnimationController _controller;
+  double _value;
+  @override
+  void initState() {
+    super.initState();
+    _showFeedback = false;
+    _value = 0;
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        setState(() {
+          _value = _animation.value;
+        });
+      });
+  }
+
+  Widget _feedbackItem(IconData icon, String name, String url) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _launchUrl(url),
+          child: Container(
+            padding: EdgeInsets.all(5),
+            alignment: Alignment.center,
+            child: Column(
+              children: <Widget>[
+                Icon(
+                  icon,
+                  size: 20 * _value,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                ),
+                Text(name)
+              ],
+            ),
+          ),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -110,12 +159,12 @@ class Settings extends StatelessWidget {
                           leading: Icon(LineIcons.play_circle),
                           title: Text('Play'),
                           subtitle: Text('Playlist and player'),
-                        //  trailing: Selector<AudioPlayerNotifier, bool>(
-                        //    selector: (_, audio) => audio.autoPlay,
-                        //    builder: (_, data, __) => Switch(
-                        //        value: data,
-                        //        onChanged: (boo) => audio.autoPlaySwitch = boo),
-                        //  ),
+                          //  trailing: Selector<AudioPlayerNotifier, bool>(
+                          //    selector: (_, audio) => audio.autoPlay,
+                          //    builder: (_, data, __) => Switch(
+                          //        value: data,
+                          //        onChanged: (boo) => audio.autoPlaySwitch = boo),
+                          //  ),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -215,15 +264,51 @@ class Settings extends StatelessWidget {
                         ),
                         Divider(height: 2),
                         ListTile(
-                          onTap: () => _launchUrl(
-                              'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
+                          onTap: () {
+                            if (_value == 0)
+                              _controller.forward();
+                            else
+                              _controller.reverse();
+                            _showFeedback = !_showFeedback;
+                          },
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.bug_solid),
                           title: Text('Feedback'),
-                          subtitle: Text('Bugs and feature requests'),
+                          subtitle: Text('Bugs and feature request'),
+                          trailing: Transform.rotate(
+                            angle: math.pi * _value,
+                            child: Icon(Icons.keyboard_arrow_down),
+                          ),
                         ),
-                        Divider(height: 2),
+                        _showFeedback
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  _feedbackItem(
+                                      LineIcons.github,
+                                      'Submit issue',
+                                      'https://github.com/stonega/tsacdop/issues'),
+                                  _feedbackItem(
+                                      LineIcons.telegram,
+                                      'Join group',
+                                      'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
+                                  _feedbackItem(
+                                      LineIcons.envelope_open_text_solid,
+                                      'Write to me',
+                                      'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
+                                  _feedbackItem(
+                                      LineIcons.google_play,
+                                      'Rate on Play',
+                                      'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop')
+                                ],
+                              )
+                            : Center(),
+                        Divider(
+                          height: 2,
+                        ),
                         ListTile(
                           onTap: () => Navigator.push(
                               context,
@@ -237,6 +322,9 @@ class Settings extends StatelessWidget {
                         ),
                         Divider(height: 2),
                       ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
                     ),
                   ],
                 ),

@@ -234,11 +234,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
   episodeLoad(EpisodeBrief episode, {int startPosition = 0}) async {
     final EpisodeBrief episodeNew =
         await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    //TODO  load episode from last position when player running
     if (_playerRunning) {
       PlayHistory history = PlayHistory(_episode.title, _episode.enclosureUrl,
           backgroundAudioPosition / 1000, seekSliderValue);
       await dbHelper.saveHistory(history);
       AudioService.addQueueItemAt(episodeNew.toMediaItem(), 0);
+      //if (startPosition > 0) AudioService.seekTo(startPosition);
       _queue.playlist
           .removeWhere((item) => item.enclosureUrl == episode.enclosureUrl);
       _queue.playlist.insert(0, episodeNew);
@@ -256,13 +258,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _audioState = BasicPlaybackState.connecting;
       notifyListeners();
       //await _queue.savePlaylist();
-      _startAudioService(startPosition);
+      _startAudioService(startPosition, episodeNew.enclosureUrl);
       if (episodeNew.isNew == 1)
         dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
     }
   }
 
-  _startAudioService(int position) async {
+  _startAudioService(int position, String url) async {
     _stopOnComplete = false;
     _sleepTimerMode = SleepTimerMode.undefined;
     if (!AudioService.connected) {
@@ -292,7 +294,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
         .listen((item) async {
       _episode = await dbHelper.getRssItemWithMediaId(item.id);
       _backgroundAudioDuration = item?.duration ?? 0;
-      if (position > 0 && _backgroundAudioDuration > 0) {
+      if (position > 0 &&
+          _backgroundAudioDuration > 0 &&
+          _episode.enclosureUrl == url) {
         AudioService.seekTo(position);
         position = 0;
       }
@@ -393,7 +397,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _audioState = BasicPlaybackState.connecting;
     _queueUpdate = !_queueUpdate;
     notifyListeners();
-    _startAudioService(_lastPostion ?? 0);
+    _startAudioService(_lastPostion ?? 0, _queue.playlist.first.enclosureUrl);
   }
 
   playNext() async {
@@ -698,7 +702,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       // }
       else {
         _playing = true;
-        if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting &&
+        if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
             _audioPlayer.playbackEvent.state != AudioPlaybackState.none)
           _audioPlayer.play();
       }
@@ -712,7 +716,13 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   playFromStart() async {
     _playing = true;
-    _audioPlayer.play();
+    if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
+        _audioPlayer.playbackEvent.state != AudioPlaybackState.none)
+      try {
+        _audioPlayer.play();
+      } catch (e) {
+        _setState(state: BasicPlaybackState.error);
+      }
     if (mediaItem.extras['skip'] > 0) {
       _audioPlayer.seek(Duration(seconds: mediaItem.extras['skip']));
     }
@@ -729,7 +739,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   void onSeekTo(int position) {
-    if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting &&
+    if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
         _audioPlayer.playbackEvent.state != AudioPlaybackState.none)
       _audioPlayer.seek(Duration(milliseconds: position));
   }
@@ -825,6 +835,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         break;
       case 'setSpeed':
         await _audioPlayer.setSpeed(argument);
+        break;
     }
   }
 

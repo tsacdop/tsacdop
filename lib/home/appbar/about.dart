@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tsacdop/util/custompaint.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
 
@@ -43,6 +44,23 @@ class AboutApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    OverlayEntry _createOverlayEntry(TapDownDetails detail) {
+      // RenderBox renderBox = context.findRenderObject();
+      var offset = detail.globalPosition;
+      return OverlayEntry(
+        builder: (constext) => Positioned(
+          left: offset.dx - 5,
+          top: offset.dy - 120,
+          child: Container(
+              width: 20,
+              height: 120,
+              color: Colors.transparent,
+              alignment: Alignment.topCenter,
+              child: HeartSet(height: 120, width: 20)),
+        ),
+      );
+    }
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -108,10 +126,10 @@ class AboutApp extends StatelessWidget {
                                 TextStyle(color: Theme.of(context).accentColor),
                           ),
                         ),
-                        _listItem(context, 'GitHub', LineIcons.github,
-                            'https://github.com/stonaga/'),
                         _listItem(context, 'Twitter', LineIcons.twitter,
                             'https://twitter.com/shimenmen'),
+                        _listItem(context, 'GitHub', LineIcons.github_alt,
+                            'https://github.com/stonega'),
                         _listItem(context, 'Medium', LineIcons.medium,
                             'https://medium.com/@stonegate'),
                       ],
@@ -121,28 +139,37 @@ class AboutApp extends StatelessWidget {
                   Container(
                     height: 50,
                     alignment: Alignment.center,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          'assets/text.png',
-                          height: 25,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                        ),
-                        Icon(
-                          Icons.favorite,
-                          color: Colors.blue,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                        ),
-                        FlutterLogo(
-                          size: 18,
-                        ),
-                      ],
+                    child: GestureDetector(
+                      onTapDown: (detail) async {
+                        OverlayEntry _overlayEntry;
+                        _overlayEntry = _createOverlayEntry(detail);
+                        Overlay.of(context).insert(_overlayEntry);
+                        await Future.delayed(Duration(seconds: 2));
+                        _overlayEntry?.remove();
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset(
+                            'assets/text.png',
+                            height: 25,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                          ),
+                          Icon(
+                            Icons.favorite,
+                            color: Colors.blue,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                          ),
+                          FlutterLogo(
+                            size: 18,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

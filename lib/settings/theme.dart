@@ -123,7 +123,7 @@ class ThemeSetting extends StatelessWidget {
                       contentPadding:
                           EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
                       //  leading: Icon(Icons.colorize),
-                      title: Text('Real Dark'),
+                      title: Text('Real Dark',),
                       subtitle: Text(
                           'Turn on if you think the night is not dark enough'),
                       trailing: Selector<SettingState, bool>(

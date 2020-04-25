@@ -478,7 +478,7 @@ class _LoveOpenState extends State<LoveOpen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: Duration(milliseconds: 1000),
     );
 
     _animationA = Tween(begin: 0.0, end: 1.0).animate(_controller)
@@ -550,6 +550,140 @@ class _LoveOpenState extends State<LoveOpen>
           ),
         ],
       ),
+    );
+  }
+}
+
+//Heart rise
+class HeartSet extends StatefulWidget {
+  final double height;
+  final double width;
+  HeartSet({Key key, this.height, this.width}) : super(key: key);
+
+  @override
+  _HeartSetState createState() => _HeartSetState();
+}
+
+class _HeartSetState extends State<HeartSet>
+    with SingleTickerProviderStateMixin {
+  Animation _animation;
+  AnimationController _controller;
+  double _value;
+  @override
+  void initState() {
+    super.initState();
+    _value = 0;
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    );
+
+    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        if (mounted)
+          setState(() {
+            _value = _animation.value;
+          });
+      });
+
+    _controller.forward();
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _controller.reset();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: widget.height,
+      width: widget.width,
+      alignment: Alignment(0.5, 1 - _value),
+      child: Icon(Icons.favorite,
+          color: Colors.blue.withOpacity(0.7), size: 20 * _value),
+    );
+  }
+}
+
+class HeartOpen extends StatefulWidget {
+  final double height;
+  final double width;
+  HeartOpen({Key key, this.height, this.width}) : super(key: key);
+
+  @override
+  _HeartOpenState createState() => _HeartOpenState();
+}
+
+class _HeartOpenState extends State<HeartOpen>
+    with SingleTickerProviderStateMixin {
+  Animation _animation;
+  AnimationController _controller;
+  double _value;
+  @override
+  void initState() {
+    super.initState();
+    _value = 0;
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    );
+
+    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        if (mounted)
+          setState(() {
+            _value = _animation.value;
+          });
+      });
+
+    _controller.forward();
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _controller.reset();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _position(int i) {
+    double scale = _list[i];
+    double position = _list[i + 1];
+    return Positioned(
+      left: widget.width * position,
+      bottom: widget.height * _value * scale,
+      child: Icon(Icons.favorite,
+          color: _value > 0.5 ? Colors.red.withOpacity(2 - _value*2) : Colors.red, size: 20 * _value * scale),
+    );
+  }
+
+  List<double> _list =
+      List<double>.generate(20, (index) => math.Random().nextDouble());
+  List<int> _index = List<int>.generate(19, (index) => index);
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        Container(
+          height: widget.height,
+          width: widget.width,
+          alignment: Alignment(0.5, 1 - _value),
+          child: Icon(Icons.favorite,
+              color: Colors.blue.withOpacity(0.7), size: 20 * _value),
+        ),
+        ..._index.map<Widget>((e) => _position(e)).toList(),
+      ],
     );
   }
 }

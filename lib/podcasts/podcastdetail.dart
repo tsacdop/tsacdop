@@ -590,7 +590,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
       var doc = parse(description);
       _description = parse(doc.body.text).documentElement.text;
     }
-    setState(() => _load = true);
+    if(mounted) setState(() => _load = true);
   }
 
   _launchUrl(String url) async {
