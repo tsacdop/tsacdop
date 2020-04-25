@@ -47,7 +47,7 @@ android {
         applicationId "com.stonegate.tsacdop"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 5 
+        versionCode 6 
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
