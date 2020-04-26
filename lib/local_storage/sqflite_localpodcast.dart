@@ -64,18 +64,19 @@ class DBHelper {
           """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
           link ,update_count, episode_count FROM PodcastLocal WHERE id = ?""",
           [s]);
-      podcastLocal.add(PodcastLocal(
-          list.first['title'],
-          list.first['imageUrl'],
-          list.first['rssUrl'],
-          list.first['primaryColor'],
-          list.first['author'],
-          list.first['id'],
-          list.first['imagePath'],
-          list.first['provider'],
-          list.first['link'],
-          upateCount: list.first['update_count'],
-          episodeCount: list.first['episode_count']));
+      if (list.length > 0)
+        podcastLocal.add(PodcastLocal(
+            list.first['title'],
+            list.first['imageUrl'],
+            list.first['rssUrl'],
+            list.first['primaryColor'],
+            list.first['author'],
+            list.first['id'],
+            list.first['imagePath'],
+            list.first['provider'],
+            list.first['link'],
+            upateCount: list.first['update_count'],
+            episodeCount: list.first['episode_count']));
     });
     return podcastLocal;
   }
@@ -104,9 +105,8 @@ class DBHelper {
 
   Future<int> getPodcastCounts(String id) async {
     var dbClient = await database;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT episode_count FROM PodcastLocal WHERE id = ?',
-        [id]);
+    List<Map> list = await dbClient
+        .rawQuery('SELECT episode_count FROM PodcastLocal WHERE id = ?', [id]);
     return list.first['episode_count'];
   }
 

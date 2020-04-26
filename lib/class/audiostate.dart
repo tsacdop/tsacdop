@@ -354,7 +354,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
     //double s = _currentSpeed ?? 1.0;
     int getPosition = 0;
-    Timer.periodic(Duration(milliseconds: 200), (timer) {
+    Timer.periodic(Duration(milliseconds: 500), (timer) {
       double s = _currentSpeed ?? 1.0;
       if (_noSlide) {
         if (_audioState == BasicPlaybackState.playing) {

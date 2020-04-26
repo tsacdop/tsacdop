@@ -69,24 +69,7 @@ class _PopupMenuState extends State<PopupMenu> {
   Widget build(BuildContext context) {
     var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
     var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
-//    _refreshAll() async {
-//      var dbHelper = DBHelper();
-//      List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-//      int i = 0;
-//      await Future.forEach(podcastList, (podcastLocal) async {
-//        importOmpl.rssTitle = podcastLocal.title;
-//        importOmpl.importState = ImportState.parse;
-//        i += await dbHelper.updatePodcastRss(podcastLocal);
-//        print('Refresh ' + podcastLocal.title);
-//      });
-//      KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
-//      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
-//      KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
-//      await refreshcountstorage.saveInt(i);
-//      importOmpl.importState = ImportState.complete;
-//      groupList.updateGroups();
-//    }
-//
+
     void _saveOmpl(String path) async {
       File file = File(path);
       try {
