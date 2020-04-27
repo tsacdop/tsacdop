@@ -137,8 +137,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   SleepTimerMode _sleepTimerMode = SleepTimerMode.undefined;
   //set autoplay episode in playlist
   bool _autoPlay = true;
-  //Set auto add episodes to playlist
-  bool _autoAdd = false;
+  //TODO Set auto add episodes to playlist
+  //bool _autoAdd = false;
   DateTime _current;
   int _currentPosition;
   double _currentSpeed = 1;
@@ -159,7 +159,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool get startSleepTimer => _startSleepTimer;
   SleepTimerMode get sleepTimerMode => _sleepTimerMode;
   bool get autoPlay => _autoPlay;
-  bool get autoAdd => _autoAdd;
   int get timeLeft => _timeLeft;
   double get switchValue => _switchValue;
   double get currentSpeed => _currentSpeed;
@@ -177,26 +176,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   Future _getAutoPlay() async {
     int i = await autoPlayStorage.getInt();
-    _autoAdd = i == 0 ? true : false;
+    _autoPlay = i == 0 ? true : false;
   }
 
   Future _setAutoPlay() async {
     await autoPlayStorage.saveInt(_autoPlay ? 1 : 0);
-  }
-
-  set autoAddSwitch(bool boo) {
-    _autoAdd = boo;
-    notifyListeners();
-    _setAutoAdd();
-  }
-
-  //Future _getAutoAdd() async {
-  //  int i = await autoAddStorage.getInt();
-  //  _autoAdd = i == 0 ? false : true;
-  //}
-
-  Future _setAutoAdd() async {
-    await autoAddStorage.saveInt(_autoAdd ? 1 : 0);
   }
 
   set setSleepTimerMode(SleepTimerMode timer) {
@@ -270,6 +254,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     if (!AudioService.connected) {
       await AudioService.connect();
     }
+
     await AudioService.start(
         backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
         androidNotificationChannelName: 'Tsacdop',
@@ -278,7 +263,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
         enableQueue: true,
         androidStopOnRemoveTask: true,
         androidStopForegroundOnPause: true);
-
     if (_autoPlay) {
       await Future.forEach(_queue.playlist, (episode) async {
         await AudioService.addQueueItem(episode.toMediaItem());
@@ -572,13 +556,15 @@ class AudioPlayerNotifier extends ChangeNotifier {
 }
 
 class AudioPlayerTask extends BackgroundAudioTask {
+  KeyValueStorage cacheStorage = KeyValueStorage(cacheMaxKey);
+
   List<MediaItem> _queue = [];
   AudioPlayer _audioPlayer = AudioPlayer();
   Completer _completer = Completer();
   BasicPlaybackState _skipState;
   bool _playing;
   bool _stopAtEnd;
-
+  int cacheMax;
   bool get hasNext => _queue.length > 0;
 
   MediaItem get mediaItem => _queue.length > 0 ? _queue.first : null;
@@ -605,6 +591,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart() async {
     _stopAtEnd = false;
+    int cache = await cacheStorage.getInt();
+    cacheMax = cache == 0 ? 500 * 1024 * 1024 : cache;
     var playerStateSubscription = _audioPlayer.playbackStateStream
         .where((state) => state == AudioPlaybackState.completed)
         .listen((state) {
@@ -664,7 +652,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     } else {
       await AudioServiceBackground.setQueue(_queue);
       await AudioServiceBackground.setMediaItem(mediaItem);
-      await _audioPlayer.setUrl(mediaItem.id);
+      await _audioPlayer.setUrl(mediaItem.id, cacheMax);
       print(mediaItem.title);
       Duration duration = await _audioPlayer.durationFuture;
       if (duration != null)
@@ -687,7 +675,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       if (_playing == null) {
         _playing = true;
         // await AudioServiceBackground.setQueue(_queue);
-        await _audioPlayer.setUrl(mediaItem.id);
+        await _audioPlayer.setUrl(mediaItem.id, cacheMax);
         var duration = await _audioPlayer.durationFuture;
         if (duration != null)
           await AudioServiceBackground.setMediaItem(
@@ -777,7 +765,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       _queue.insert(0, mediaItem);
       await AudioServiceBackground.setQueue(_queue);
       await AudioServiceBackground.setMediaItem(mediaItem);
-      await _audioPlayer.setUrl(mediaItem.id);
+      await _audioPlayer.setUrl(mediaItem.id, cacheMax);
       Duration duration = await _audioPlayer.durationFuture ?? Duration.zero;
       AudioServiceBackground.setMediaItem(
           mediaItem.copyWith(duration: duration.inMilliseconds));

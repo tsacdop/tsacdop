@@ -264,12 +264,14 @@ class _SettingsState extends State<Settings>
                         ),
                         Divider(height: 2),
                         ListTile(
-                          onTap: () {
-                            if (_value == 0)
+                          onTap: () async {
+                            if (_value == 0) {
+                              _showFeedback = !_showFeedback;
                               _controller.forward();
-                            else
-                              _controller.reverse();
-                            _showFeedback = !_showFeedback;
+                            } else {
+                              await _controller.reverse();
+                              _showFeedback = !_showFeedback;
+                            }
                           },
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),

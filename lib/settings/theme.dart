@@ -123,7 +123,9 @@ class ThemeSetting extends StatelessWidget {
                       contentPadding:
                           EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
                       //  leading: Icon(Icons.colorize),
-                      title: Text('Real Dark',),
+                      title: Text(
+                        'Real Dark',
+                      ),
                       subtitle: Text(
                           'Turn on if you think the night is not dark enough'),
                       trailing: Selector<SettingState, bool>(
@@ -167,18 +169,22 @@ class ThemeSetting extends StatelessWidget {
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10.0))),
                                     title: Text('Choose a color'),
-                                    content: SingleChildScrollView(
-                                      child: MaterialPicker(
-                                        onColorChanged: (value) {
-                                          settings.setAccentColor = value;
-                                        },
-                                        pickerColor: context.accentColor,
-                                      ),
+                                    content: MaterialPicker(
+                                      onColorChanged: (value) {
+                                        settings.setAccentColor = value;
+                                      },
+                                      pickerColor: context.accentColor,
                                     ),
                                   ))),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 80.0),
+                      contentPadding: EdgeInsets.only(left: 80.0, right: 25),
                       title: Text('Accent color'),
                       subtitle: Text('Include the overlay color'),
+                      trailing: Container(
+                        height: 25,
+                        width: 25,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: context.accentColor),
+                      ),
                     ),
                     Divider(height: 2),
                   ],
@@ -191,3 +197,13 @@ class ThemeSetting extends StatelessWidget {
     );
   }
 }
+
+const List<Color> colorList = [
+  Colors.pink,
+  Colors.pinkAccent,
+  Colors.red,
+  Colors.blue,
+  Colors.green
+];
+
+List<int> intList = List<int>.generate(9, (index) => (index + 1) * 100);

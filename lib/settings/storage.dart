@@ -1,11 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:app_settings/app_settings.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tsacdop/settings/downloads_manage.dart';
 import 'package:tsacdop/class/settingstate.dart';
+import '../local_storage/key_value_storage.dart';
+import '../util/context_extension.dart';
 
-class StorageSetting extends StatelessWidget {
+class StorageSetting extends StatefulWidget {
+  @override
+  _StorageSettingState createState() => _StorageSettingState();
+}
+
+class _StorageSettingState extends State<StorageSetting>
+    with SingleTickerProviderStateMixin {
+  final KeyValueStorage cacheStorage = KeyValueStorage(cacheMaxKey);
+  AnimationController _controller;
+  Animation<double> _animation;
+  _getCacheMax() async {
+    int cache = await cacheStorage.getInt();
+    int value = cache == 0 ? 500 : cache ~/ (1024 * 1024);
+    if (value > 100) {
+      _controller = AnimationController(
+          vsync: this, duration: Duration(milliseconds: value * 2));
+      _animation = Tween<double>(begin: 100, end: value.toDouble()).animate(
+          CurvedAnimation(curve: Curves.easeOutQuart, parent: _controller))
+        ..addListener(() {
+          setState(() => _value = _animation.value);
+        });
+      _controller.forward();
+      //  _controller.addStatusListener((status) {
+      //    if (status == AnimationStatus.completed) {
+      //      _controller.reset();
+      //    }
+      //  });
+    }
+  }
+
+  double _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = 100;
+    _getCacheMax();
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var settings = Provider.of<SettingState>(context, listen: false);
@@ -54,8 +100,8 @@ class StorageSetting extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => DownloadsManage())),
-                          contentPadding:
-                              EdgeInsets.only(left: 80.0, right: 25, bottom: 10, top: 10),
+                          contentPadding: EdgeInsets.only(
+                              left: 80.0, right: 25, bottom: 10, top: 10),
                           title: Text('Ask before using cellular data'),
                           subtitle: Text(
                               'Ask to confirm when using cellular data to download episodes.'),
@@ -108,11 +154,44 @@ class StorageSetting extends StatelessWidget {
                       ),
                       Divider(height: 2),
                       ListTile(
-                        onTap: () => AppSettings.openAppSettings(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 80.0),
+                        contentPadding: EdgeInsets.only(left: 80.0, right: 25),
                         //  leading: Icon(Icons.colorize),
                         title: Text('Cache'),
-                        subtitle: Text('App cache'),
+                        subtitle: Text('Audio cache max size'),
+                        trailing: Text.rich(TextSpan(
+                            text: '${(_value ~/ 100) * 100}',
+                            style: GoogleFonts.teko(
+                                textStyle: context.textTheme.headline6
+                                    .copyWith(color: context.accentColor)),
+                            children: [
+                              TextSpan(
+                                  text: ' Mb',
+                                  style: context.textTheme.subtitle2),
+                            ])),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: 60.0, right: 20.0, bottom: 10.0),
+                        child: SliderTheme(
+                          data: Theme.of(context).sliderTheme.copyWith(
+                                showValueIndicator: ShowValueIndicator.always,
+                              ),
+                          child: Slider(
+                              label: '${_value ~/ 100 * 100} Mb',
+                              activeColor: context.accentColor,
+                              inactiveColor: context.primaryColorDark,
+                              value: _value,
+                              min: 100,
+                              max: 1000,
+                              divisions: 9,
+                              onChanged: (double val) {
+                                setState(() {
+                                  _value = val;
+                                });
+                                cacheStorage
+                                    .saveInt((val * 1024 * 1024).toInt());
+                              }),
+                        ),
                       ),
                       Divider(height: 2),
                     ],

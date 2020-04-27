@@ -15,6 +15,7 @@ const String updateIntervalKey = 'updateInterval';
 const String downloadUsingDataKey = 'downloadUsingData';
 const String introKey = 'intro';
 const String realDarkKey = 'realDark';
+const String cacheMaxKey = 'cacheMax';
 
 class KeyValueStorage {
   final String key;
