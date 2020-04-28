@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.stonegate.tsacdop" xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.stonegate.tsacdop" 
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
@@ -9,11 +10,12 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <application android:name="io.flutter.app.FlutterApplication" android:label="Tsacdop" android:icon="@mipmap/ic_launcher_icon" android:roundIcon="@mipmap/ic_launcher_round" android:networkSecurityConfig="@xml/network_security_config">
         <activity android:name=".MainActivity" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
+            <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-           <!-- <meta-data android:name="io.flutter.embedding.android.SplashScreenUntilFirstFrame" android:value="true" /> -->
+            <!-- <meta-data android:name="io.flutter.embedding.android.SplashScreenUntilFirstFrame" android:value="true" /> -->
         </activity>
         <service android:name="com.ryanheise.audioservice.AudioService">
             <intent-filter>

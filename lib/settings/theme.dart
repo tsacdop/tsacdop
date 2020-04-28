@@ -197,13 +197,3 @@ class ThemeSetting extends StatelessWidget {
     );
   }
 }
-
-const List<Color> colorList = [
-  Colors.pink,
-  Colors.pinkAccent,
-  Colors.red,
-  Colors.blue,
-  Colors.green
-];
-
-List<int> intList = List<int>.generate(9, (index) => (index + 1) * 100);

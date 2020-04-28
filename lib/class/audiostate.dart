@@ -591,8 +591,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart() async {
     _stopAtEnd = false;
-    int cache = await cacheStorage.getInt();
-    cacheMax = cache == 0 ? 500 * 1024 * 1024 : cache;
+
+    print(cacheMax);
     var playerStateSubscription = _audioPlayer.playbackStateStream
         .where((state) => state == AudioPlaybackState.completed)
         .listen((state) {
@@ -674,6 +674,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
     if (_skipState == null) {
       if (_playing == null) {
         _playing = true;
+        int cache = await cacheStorage.getInt();
+        cacheMax = cache == 0 ? 500 * 1024 * 1024 : cache;
         // await AudioServiceBackground.setQueue(_queue);
         await _audioPlayer.setUrl(mediaItem.id, cacheMax);
         var duration = await _audioPlayer.durationFuture;
