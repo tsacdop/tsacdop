@@ -25,6 +25,29 @@ void callbackDispatcher() {
   });
 }
 
+ThemeData lightTheme = ThemeData(
+  accentColorBrightness: Brightness.dark,
+  primaryColor: Colors.grey[100],
+  //  accentColor: _accentSetColor,
+  primaryColorLight: Colors.white,
+  primaryColorDark: Colors.grey[300],
+  dialogBackgroundColor: Colors.white,
+  backgroundColor: Colors.grey[100],
+  appBarTheme: AppBarTheme(
+    color: Colors.grey[100],
+    elevation: 0,
+  ),
+  textTheme: TextTheme(
+    bodyText2: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
+  ),
+  tabBarTheme: TabBarTheme(
+    labelColor: Colors.black,
+    unselectedLabelColor: Colors.grey[400],
+  ),
+);
+
+
+
 class SettingState extends ChangeNotifier {
   KeyValueStorage themeStorage = KeyValueStorage(themesKey);
   KeyValueStorage accentStorage = KeyValueStorage(accentsKey);

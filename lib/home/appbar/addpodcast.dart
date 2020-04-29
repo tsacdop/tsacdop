@@ -12,80 +12,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../class/searchpodcast.dart';
 import '../../class/subscribe_podcast.dart';
-import '../../home/appbar/popupmenu.dart';
 import '../../util/context_extension.dart';
 import '../../webfeed/webfeed.dart';
 import '../../.env.dart';
-import '../nested_home.dart';
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final _MyHomePageDelegate _delegate = _MyHomePageDelegate();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  var _androidAppRetain = MethodChannel("android_app_retain");
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        // statusBarColor: Theme.of(context).primaryColor,
-      ),
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          //elevation: 1.0,
-          centerTitle: true,
-          leading: IconButton(
-            tooltip: 'Add',
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: () async {
-              await showSearch<int>(
-                context: context,
-                delegate: _delegate,
-              );
-            },
-          ),
-          title: Image(
-            image: Theme.of(context).brightness == Brightness.light
-                ? AssetImage('assets/text.png')
-                : AssetImage('assets/text_light.png'),
-            height: 30,
-          ),
-          actions: <Widget>[
-            PopupMenu(),
-          ],
-        ),
-        body: WillPopScope(
-          onWillPop: () async {
-            if (Platform.isAndroid) {
-              _androidAppRetain.invokeMethod('sendToBackground');
-              return false;
-            } else {
-              return true;
-            }
-          },
-          child: Home(),
-        ),
-      ),
-    );
-  }
-}
-
-class _MyHomePageDelegate extends SearchDelegate<int> {
+class MyHomePageDelegate extends SearchDelegate<int> {
+  final String searchFieldLabel;
+  MyHomePageDelegate({this.searchFieldLabel})
+      : super(searchFieldLabel: searchFieldLabel);
   static Future<List> getList(String searchText) async {
     String apiKey = environment['apiKey'];
     String url =
@@ -328,89 +262,6 @@ class _SearchResultState extends State<SearchResult>
       SubscribeItem item = SubscribeItem(podcast.rss, podcast.title);
       subscribeWorker.setSubscribeItem(item);
     }
-
-    // savePodcast(String rss) async {
-    //   if (mounted) setState(() => _adding = true);
-
-    //   importOmpl.importState = ImportState.import;
-    //   try {
-    //     BaseOptions options = new BaseOptions(
-    //       connectTimeout: 30000,
-    //       receiveTimeout: 30000,
-    //     );
-    //     Response response = await Dio(options).get(rss);
-    //     var dbHelper = DBHelper();
-    //     String _realUrl = response.realUri.toString();
-
-    //     bool _checkUrl = await dbHelper.checkPodcast(_realUrl);
-
-    //     if (_checkUrl) {
-    //       if (mounted) setState(() => _issubscribe = true);
-
-    //       var _p = RssFeed.parse(response.data);
-
-    //       print(_p.title);
-
-    //       var dir = await getApplicationDocumentsDirectory();
-
-    //       Response<List<int>> imageResponse = await Dio().get<List<int>>(
-    //           _p.itunes.image.href,
-    //           options: Options(responseType: ResponseType.bytes));
-
-    //       img.Image image = img.decodeImage(imageResponse.data);
-    //       img.Image thumbnail = img.copyResize(image, width: 300);
-
-    //       String _uuid = Uuid().v4();
-    //       File("${dir.path}/$_uuid.png")
-    //         ..writeAsBytesSync(img.encodePng(thumbnail));
-
-    //       String _imagePath = "${dir.path}/$_uuid.png";
-    //       String _primaryColor = await getColor(File("${dir.path}/$_uuid.png"));
-    //       String _author = _p.itunes.author ?? _p.author ?? '';
-    //       String _provider = _p.generator ?? '';
-    //       String _link = _p.link ?? '';
-    //       PodcastLocal podcastLocal = PodcastLocal(
-    //           _p.title,
-    //           _p.itunes.image.href,
-    //           _realUrl,
-    //           _primaryColor,
-    //           _author,
-    //           _uuid,
-    //           _imagePath,
-    //           _provider,
-    //           _link,
-    //           description: _p.description);
-    //       await groupList.subscribe(podcastLocal);
-
-    //       if (_provider.contains('fireside')) {
-    //         FiresideData data = FiresideData(_uuid, _link);
-    //         await data.fatchData();
-    //       }
-
-    //       importOmpl.importState = ImportState.parse;
-
-    //       await dbHelper.savePodcastRss(_p, _uuid);
-    //       groupList.updatePodcast(podcastLocal.id);
-    //       importOmpl.importState = ImportState.complete;
-    //     } else {
-    //       importOmpl.importState = ImportState.error;
-    //       Fluttertoast.showToast(
-    //         msg: 'Podcast subscribed already',
-    //         gravity: ToastGravity.TOP,
-    //       );
-    //       await Future.delayed(Duration(seconds: 10));
-    //       importOmpl.importState = ImportState.stop;
-    //     }
-    //   } catch (e) {
-    //     importOmpl.importState = ImportState.error;
-    //     Fluttertoast.showToast(
-    //       msg: 'Network error, Subscribe failed',
-    //       gravity: ToastGravity.TOP,
-    //     );
-    //     await Future.delayed(Duration(seconds: 5));
-    //     importOmpl.importState = ImportState.stop;
-    //   }
-    // }
 
     return Container(
       decoration: BoxDecoration(

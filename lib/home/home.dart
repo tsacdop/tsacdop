@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/download_state.dart';
 import 'package:tsacdop/class/podcast_group.dart';
@@ -21,6 +22,8 @@ import '../util/custompaint.dart';
 
 import '../home/appbar/importompl.dart';
 import '../home/audioplayer.dart';
+import 'appbar/addpodcast.dart';
+import 'appbar/popupmenu.dart';
 import 'home_groups.dart';
 import 'download_list.dart';
 
@@ -30,6 +33,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+  final MyHomePageDelegate _delegate =
+      MyHomePageDelegate(searchFieldLabel: 'Search podcast');
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TabController _controller;
   Decoration _getIndicator(BuildContext context) {
     return UnderlineTabIndicator(
@@ -40,6 +47,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           top: 10.0,
         ));
   }
+
+  var _androidAppRetain = MethodChannel("android_app_retain");
 
   @override
   void initState() {
@@ -58,83 +67,134 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = (width - 20) / 3 + 140;
-    return SafeArea(
-      child: Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              Import(),
-              Expanded(
-                child: NestedScrollView(
-                  innerScrollPositionKeyBuilder: () {
-                    return Key('tab' + _controller.index.toString());
-                  },
-                  pinnedHeaderSliverHeightBuilder: () => 50,
-                  headerSliverBuilder:
-                      (BuildContext context, bool innerBoxScrolled) {
-                    return <Widget>[
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            return SizedBox(
-                              height: height,
-                              width: width,
-                              child: ScrollPodcasts(),
-                            );
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          systemNavigationBarIconBrightness:
+              Theme.of(context).accentColorBrightness,
+          statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+          systemNavigationBarColor: Theme.of(context).primaryColor,
+        ),
+        child: Scaffold(
+          key: _scaffoldKey,
+          body: WillPopScope(
+            onWillPop: () async {
+              if (Platform.isAndroid) {
+                _androidAppRetain.invokeMethod('sendToBackground');
+                return false;
+              } else {
+                return true;
+              }
+            },
+            child: SafeArea(
+              child: Stack(
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Import(),
+                      Expanded(
+                        child: NestedScrollView(
+                          innerScrollPositionKeyBuilder: () {
+                            return Key('tab' + _controller.index.toString());
                           },
-                          childCount: 1,
-                        ),
-                      ),
-                      SliverPersistentHeader(
-                        delegate: _SliverAppBarDelegate(
-                          TabBar(
-                            indicator: _getIndicator(context),
-                            isScrollable: true,
-                            indicatorSize: TabBarIndicatorSize.tab,
+                          pinnedHeaderSliverHeightBuilder: () => 50,
+                          headerSliverBuilder:
+                              (BuildContext context, bool innerBoxScrolled) {
+                            return <Widget>[
+                              SliverToBoxAdapter(
+                                child: SizedBox(
+                                  height: 50.0,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      IconButton(
+                                        tooltip: 'Add',
+                                        icon: const Icon(
+                                            Icons.add_circle_outline),
+                                        onPressed: () async {
+                                          await showSearch<int>(
+                                            context: context,
+                                            delegate: _delegate,
+                                          );
+                                        },
+                                      ),
+                                      Image(
+                                        image: Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? AssetImage('assets/text.png')
+                                            : AssetImage(
+                                                'assets/text_light.png'),
+                                        height: 30,
+                                      ),
+                                      PopupMenu(),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (BuildContext context, int index) {
+                                    return SizedBox(
+                                      height: height,
+                                      width: width,
+                                      child: ScrollPodcasts(),
+                                    );
+                                  },
+                                  childCount: 1,
+                                ),
+                              ),
+                              SliverPersistentHeader(
+                                delegate: _SliverAppBarDelegate(
+                                  TabBar(
+                                    indicator: _getIndicator(context),
+                                    isScrollable: true,
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    controller: _controller,
+                                    tabs: <Widget>[
+                                      Tab(
+                                        child: Text('Recent Update'),
+                                      ),
+                                      Tab(
+                                        child: Text('Favorite'),
+                                      ),
+                                      Tab(
+                                        child: Text('Download'),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                pinned: true,
+                              ),
+                            ];
+                          },
+                          body: TabBarView(
                             controller: _controller,
-                            tabs: <Widget>[
-                              Tab(
-                                child: Text('Recent Update'),
-                              ),
-                              Tab(
-                                child: Text('Favorite'),
-                              ),
-                              Tab(
-                                child: Text('Download'),
-                              )
+                            children: <Widget>[
+                              NestedScrollViewInnerScrollPositionKeyWidget(
+                                  Key('tab0'), _RecentUpdate()),
+                              NestedScrollViewInnerScrollPositionKeyWidget(
+                                  Key('tab1'), _MyFavorite()),
+                              NestedScrollViewInnerScrollPositionKeyWidget(
+                                  Key('tab2'), _MyDownload()),
                             ],
                           ),
                         ),
-                        pinned: true,
                       ),
-                    ];
-                  },
-                  body: TabBarView(
-                    controller: _controller,
-                    children: <Widget>[
-                      NestedScrollViewInnerScrollPositionKeyWidget(
-                          Key('tab0'), _RecentUpdate()),
-                      NestedScrollViewInnerScrollPositionKeyWidget(
-                          Key('tab1'), _MyFavorite()),
-                      NestedScrollViewInnerScrollPositionKeyWidget(
-                          Key('tab2'), _MyDownload()),
+                      Selector<AudioPlayerNotifier, bool>(
+                          selector: (_, audio) => audio.playerRunning,
+                          builder: (_, data, __) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
+                            );
+                          }),
                     ],
                   ),
-                ),
+                  Container(child: PlayerWidget()),
+                ],
               ),
-              Selector<AudioPlayerNotifier, bool>(
-                  selector: (_, audio) => audio.playerRunning,
-                  builder: (_, data, __) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
-                    );
-                  }),
-            ],
+            ),
           ),
-          Container(child: PlayerWidget()),
-        ],
-      ),
-    );
+        ));
   }
 }
 
@@ -573,7 +633,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                       ),
                     ]),
               )
-            : Center(child: CircularProgressIndicator());
+            : Center();
       },
     );
   }

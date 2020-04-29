@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/class/settingstate.dart';
-import 'package:tsacdop/home/appbar/addpodcast.dart';
+import 'package:tsacdop/home/home.dart';
 import 'package:tsacdop/util/pageroute.dart';
 import 'fourthpage.dart';
 import 'secondpage.dart';
@@ -209,7 +209,7 @@ class _SlideIntroState extends State<SlideIntro> {
                                   onTap: () {
                                     if (widget.goto == Goto.home) {
                                       Navigator.push(context,
-                                          SlideLeftRoute(page: MyHomePage()));
+                                          SlideLeftRoute(page: Home()));
                                       Provider.of<SettingState>(context,
                                               listen: false)
                                           .saveShowIntro();

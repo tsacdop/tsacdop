@@ -40,6 +40,14 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
     _groupIndex = 0;
   }
 
+  Widget _circleContainer(BuildContext context) => Container(
+        margin: EdgeInsets.symmetric(horizontal: 10),
+        height: 50,
+        width: 50,
+        decoration:
+            BoxDecoration(shape: BoxShape.circle, color: context.primaryColor),
+      );
+
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
@@ -137,16 +145,49 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                 ),
                               ),
                               Container(
-                                height: 70,
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                              ),
+                                  height: 70,
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                  child: Row(
+                                    children: <Widget>[
+                                      _circleContainer(context),
+                                      _circleContainer(context),
+                                      _circleContainer(context)
+                                    ],
+                                  )),
                             ],
                           )),
                       Container(
                         height: (_width - 20) / 3 + 40,
                         color: Theme.of(context).primaryColor,
                         margin: EdgeInsets.symmetric(horizontal: 15),
+                        child: Center(
+                            child: _groupIndex == 0
+                                ? Text.rich(TextSpan(
+                                    style: context.textTheme.headline6
+                                        .copyWith(height: 2),
+                                    children: [
+                                      TextSpan(
+                                          text: 'Welcome to Tsacdop\n',
+                                          style: context.textTheme.headline6
+                                              .copyWith(
+                                                  color: context.accentColor)),
+                                      TextSpan(
+                                          text: 'Get started\n',
+                                          style: context.textTheme.headline6
+                                              .copyWith(
+                                                  color: context.accentColor)),
+                                      TextSpan(text: 'Tap '),
+                                      WidgetSpan(
+                                          child:
+                                              Icon(Icons.add_circle_outline)),
+                                      TextSpan(text: ' to subscribe podcasts')
+                                    ],
+                                  ))
+                                : Text('No podcast in this group',
+                                    style: TextStyle(
+                                        color: context.textTheme.bodyText2.color
+                                            .withOpacity(0.5)))),
                       ),
                     ],
                   ),
