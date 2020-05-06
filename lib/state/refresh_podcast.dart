@@ -5,7 +5,7 @@ import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
-import 'podcastlocal.dart';
+import '../type/podcastlocal.dart';
 
 enum RefreshState { none, fetch, error }
 

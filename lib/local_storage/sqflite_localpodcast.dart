@@ -4,11 +4,11 @@ import 'package:path/path.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:dio/dio.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/webfeed/webfeed.dart';
-import 'package:tsacdop/class/sub_history.dart';
+import '../type/podcastlocal.dart';
+import '../state/audiostate.dart';
+import '../type/episodebrief.dart';
+import '../webfeed/webfeed.dart';
+import '../type/sub_history.dart';
 
 class DBHelper {
   static Database _db;

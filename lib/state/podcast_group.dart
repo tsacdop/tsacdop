@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:uuid/uuid.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
+
+import '../type/podcastlocal.dart';
 
 class GroupEntity {
   final String name;

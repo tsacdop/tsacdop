@@ -1,5 +1,5 @@
-import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:xml/xml.dart' as xml;
+import '../type/podcastlocal.dart';
 
 omplBuilder(List<PodcastLocal> podcasts) {
   var builder = xml.XmlBuilder();

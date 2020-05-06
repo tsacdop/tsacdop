@@ -3,8 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/class/refresh_podcast.dart';
-import 'package:tsacdop/class/subscribe_podcast.dart';
+
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
@@ -13,7 +12,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:intl/intl.dart';
 
-import 'package:tsacdop/settings/settting.dart';
+import '../settings/settting.dart';
+import '../state/refresh_podcast.dart';
+import '../state/subscribe_podcast.dart';
 import 'about.dart';
 
 class OmplOutline {

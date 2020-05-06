@@ -4,26 +4,25 @@ import 'dart:io';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/class/download_state.dart';
-import 'package:tsacdop/class/podcast_group.dart';
-import 'package:tsacdop/home/playlist.dart';
 import 'package:tuple/tuple.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../class/audiostate.dart';
-import '../class/episodebrief.dart';
+import '../state/audiostate.dart';
+import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../util/episodegrid.dart';
 import '../util/mypopupmenu.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
-
-import '../home/appbar/importompl.dart';
-import '../home/audioplayer.dart';
-import 'appbar/addpodcast.dart';
-import 'appbar/popupmenu.dart';
+import '../state/download_state.dart';
+import '../state/podcast_group.dart';
+import 'playlist.dart';
+import 'importompl.dart';
+import 'audioplayer.dart';
+import 'addpodcast.dart';
+import 'popupmenu.dart';
 import 'home_groups.dart';
 import 'download_list.dart';
 

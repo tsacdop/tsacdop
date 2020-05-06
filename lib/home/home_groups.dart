@@ -5,21 +5,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/util/custompaint.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
 
-import '../class/episodebrief.dart';
-import '../class/podcast_group.dart';
-import '../class/podcastlocal.dart';
+import '../type/episodebrief.dart';
+import '../state/podcast_group.dart';
+import '../type/podcastlocal.dart';
+import '../state/audiostate.dart';
+import '../util/custompaint.dart';
+import '../util/pageroute.dart';
+import '../util/colorize.dart';
+import '../util/context_extension.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../episodes/episodedetail.dart';
 import '../podcasts/podcastdetail.dart';
 import '../podcasts/podcastmanage.dart';
-import '../util/pageroute.dart';
-import '../util/colorize.dart';
-import '../util/context_extension.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override

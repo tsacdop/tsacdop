@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/class/settingstate.dart';
-import 'package:tsacdop/home/home.dart';
-import 'package:tsacdop/util/pageroute.dart';
+import '../state/settingstate.dart';
+import '../home/home.dart';
+import '../util/pageroute.dart';
 import 'fourthpage.dart';
 import 'secondpage.dart';
 import 'thirdpage.dart';

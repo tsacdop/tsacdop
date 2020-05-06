@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
-import '../class/podcast_group.dart';
-import '../class/podcastlocal.dart';
+import '../state/podcast_group.dart';
+import '../type/podcastlocal.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../podcasts/podcastdetail.dart';
 import '../util/pageroute.dart';

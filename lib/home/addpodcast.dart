@@ -10,11 +10,11 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../../class/searchpodcast.dart';
-import '../../class/subscribe_podcast.dart';
-import '../../util/context_extension.dart';
-import '../../webfeed/webfeed.dart';
-import '../../.env.dart';
+import '../type/searchpodcast.dart';
+import '../state/subscribe_podcast.dart';
+import '../util/context_extension.dart';
+import '../webfeed/webfeed.dart';
+import '../.env.dart';
 
 class MyHomePageDelegate extends SearchDelegate<int> {
   final String searchFieldLabel;

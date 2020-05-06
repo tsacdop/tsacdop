@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tsacdop/class/podcast_group.dart';
+
+import '../state/podcast_group.dart';
 
 const String autoPlayKey = 'autoPlay';
 const String autoAddKey = 'autoAdd';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../class/audiostate.dart';
+import '../state/audiostate.dart';
 
 class PlaySetting extends StatelessWidget {
   @override

@@ -7,12 +7,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/class/podcast_group.dart';
 
-import 'package:tsacdop/class/podcastlocal.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/podcasts/podcastdetail.dart';
-import 'package:tsacdop/util/pageroute.dart';
+import '../state/podcast_group.dart';
+import '../type/podcastlocal.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../podcasts/podcastdetail.dart';
+import '../util/pageroute.dart';
 
 class AboutPodcast extends StatefulWidget {
   final PodcastLocal podcastLocal;

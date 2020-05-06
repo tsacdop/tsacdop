@@ -11,8 +11,8 @@ import 'package:flutter_isolate/flutter_isolate.dart';
 
 import '../webfeed/webfeed.dart';
 import '../local_storage/sqflite_localpodcast.dart';
-import 'fireside_data.dart';
-import 'podcastlocal.dart';
+import '../type/fireside_data.dart';
+import '../type/podcastlocal.dart';
 
 enum SubscribeState { none, start, subscribe, fetch, stop, exist, error }
 

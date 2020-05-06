@@ -6,8 +6,9 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+
+import '../type/episodebrief.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 
 class DownloadsManage extends StatefulWidget {
   @override

@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
-import 'episodebrief.dart';
+import '../type/episodebrief.dart';
 
 class EpisodeTask {
   final String taskId;

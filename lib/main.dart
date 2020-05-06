@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
-import 'class/podcast_group.dart';
-import 'class/audiostate.dart';
-import 'class/settingstate.dart';
-import 'class/download_state.dart';
-import 'class/refresh_podcast.dart';
-import 'class/subscribe_podcast.dart';
+import 'state/podcast_group.dart';
+import 'state/audiostate.dart';
+import 'state/settingstate.dart';
+import 'state/download_state.dart';
+import 'state/refresh_podcast.dart';
+import 'state/subscribe_podcast.dart';
 import 'home/home.dart';
 import 'intro_slider/app_intro.dart';
 

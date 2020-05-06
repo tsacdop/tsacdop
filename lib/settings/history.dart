@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/sub_history.dart';
+
+import '../local_storage/sqflite_localpodcast.dart';
+import '../state/audiostate.dart';
+import '../type/sub_history.dart';
 
 class PlayedHistory extends StatefulWidget {
   @override

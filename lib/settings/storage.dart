@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tsacdop/settings/downloads_manage.dart';
-import 'package:tsacdop/class/settingstate.dart';
+
+import '../settings/downloads_manage.dart';
+import '../state/settingstate.dart';
 import '../local_storage/key_value_storage.dart';
 import '../util/context_extension.dart';
 

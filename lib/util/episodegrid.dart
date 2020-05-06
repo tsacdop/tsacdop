@@ -10,13 +10,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:auto_animated/auto_animated.dart';
 import 'open_container.dart';
 
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/episodes/episodedetail.dart';
-import 'package:tsacdop/util/colorize.dart';
-import 'package:tsacdop/util/context_extension.dart';
-import 'package:tsacdop/util/custompaint.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+import '../state/audiostate.dart';
+import '../type/episodebrief.dart';
+import '../episodes/episodedetail.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import 'colorize.dart';
+import 'context_extension.dart';
+import 'custompaint.dart';
 
 enum Layout { two, three }
 

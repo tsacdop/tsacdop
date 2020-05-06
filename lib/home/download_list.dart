@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:tsacdop/class/download_state.dart';
-import 'package:tsacdop/episodes/episodedetail.dart';
-import 'package:tsacdop/util/pageroute.dart';
+
+import '../state/download_state.dart';
+import '../episodes/episodedetail.dart';
+import '../util/pageroute.dart';
 
 class DownloadList extends StatefulWidget {
   DownloadList({Key key}) : super(key: key);

@@ -8,10 +8,11 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:tsacdop/class/download_state.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/settingstate.dart';
+
+import '../state/download_state.dart';
+import '../state/audiostate.dart';
+import '../state/settingstate.dart';
+import '../type/episodebrief.dart';
 
 class DownloadButton extends StatefulWidget {
   final EpisodeBrief episode;

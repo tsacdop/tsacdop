@@ -4,22 +4,21 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:marquee/marquee.dart';
-import 'package:tsacdop/home/playlist.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 import 'package:tuple/tuple.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:line_icons/line_icons.dart';
 
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/episodes/episodedetail.dart';
-import 'package:tsacdop/home/audiopanel.dart';
-import 'package:tsacdop/util/pageroute.dart';
-import 'package:tsacdop/util/colorize.dart';
-import 'package:tsacdop/util/context_extension.dart';
-import 'package:tsacdop/util/custompaint.dart';
+import '../type/episodebrief.dart';
+import '../state/audiostate.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../util/pageroute.dart';
+import '../util/colorize.dart';
+import '../util/context_extension.dart';
+import '../util/custompaint.dart';
 import '../util/customslider.dart';
-
+import '../episodes/episodedetail.dart';
+import 'playlist.dart';
+import 'audiopanel.dart';
 
 final List<BoxShadow> _customShadow = [
   BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),

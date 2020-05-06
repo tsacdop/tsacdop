@@ -12,11 +12,11 @@ import 'package:tuple/tuple.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/util/context_extension.dart';
-import 'package:tsacdop/util/custompaint.dart';
+import '../state/audiostate.dart';
+import '../type/episodebrief.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../util/context_extension.dart';
+import '../util/custompaint.dart';
 import 'episodedownload.dart';
 
 class EpisodeDetail extends StatefulWidget {

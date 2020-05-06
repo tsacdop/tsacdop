@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/podcast_group.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -14,15 +12,17 @@ import 'package:provider/provider.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../class/podcastlocal.dart';
-import '../class/episodebrief.dart';
+import '../type/podcastlocal.dart';
+import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../util/episodegrid.dart';
 import '../home/audioplayer.dart';
-import '../class/fireside_data.dart';
+import '../type/fireside_data.dart';
 import '../util/colorize.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
+import '../state/audiostate.dart';
+import '../state/podcast_group.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, this.podcastLocal}) : super(key: key);

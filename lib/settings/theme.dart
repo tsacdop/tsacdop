@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:tsacdop/class/settingstate.dart';
-import 'package:tsacdop/util/context_extension.dart';
+
+import '../state/settingstate.dart';
+import '../util/context_extension.dart';
 
 class ThemeSetting extends StatelessWidget {
   @override

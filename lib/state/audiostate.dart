@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/local_storage/key_value_storage.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+import '../type/episodebrief.dart';
+import '../local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 
 MediaControl playControl = MediaControl(
   androidIcon: 'drawable/ic_stat_play_circle_filled',

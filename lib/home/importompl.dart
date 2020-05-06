@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../class/podcast_group.dart';
-import '../../class/subscribe_podcast.dart';
-import '../../class/refresh_podcast.dart';
-import '../../util/context_extension.dart';
+import '../state/podcast_group.dart';
+import '../state/subscribe_podcast.dart';
+import '../state/refresh_podcast.dart';
+import '../util/context_extension.dart';
 
 class Import extends StatelessWidget {
   Widget importColumn(String text, BuildContext context) {

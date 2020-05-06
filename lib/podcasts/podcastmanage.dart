@@ -6,11 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tsacdop/class/podcast_group.dart';
-import 'package:tsacdop/podcasts/podcastgroup.dart';
-import 'package:tsacdop/podcasts/podcastlist.dart';
-import 'package:tsacdop/util/pageroute.dart';
-import 'package:tsacdop/util/context_extension.dart';
+
+import '../state/podcast_group.dart';
+import '../podcasts/podcastgroup.dart';
+import '../podcasts/podcastlist.dart';
+import '../util/pageroute.dart';
+import '../util/context_extension.dart';
 import 'custom_tabview.dart';
 
 class PodcastManage extends StatefulWidget {

@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tsacdop/class/podcastlocal.dart';
 import 'package:workmanager/workmanager.dart';
 
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
-import 'package:tsacdop/local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../local_storage/key_value_storage.dart';
+import '../type/podcastlocal.dart';
 
 void callbackDispatcher() {
   Workmanager.executeTask((task, inputData) async {
