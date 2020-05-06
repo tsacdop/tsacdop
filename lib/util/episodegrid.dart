@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:auto_animated/auto_animated.dart';
 import 'open_container.dart';
 
 import 'package:tsacdop/class/audiostate.dart';
@@ -122,22 +123,35 @@ class EpisodeGrid extends StatelessWidget {
       });
     }
 
+    final options = LiveOptions(
+      delay: Duration(milliseconds: 0),
+      showItemInterval: Duration(milliseconds: 100),
+      showItemDuration: Duration(milliseconds: 100),
+    );
+    final scrollController = ScrollController();
     return SliverPadding(
       padding: const EdgeInsets.only(
           top: 10.0, bottom: 5.0, left: 15.0, right: 15.0),
-      sliver: SliverGrid(
+      sliver: LiveSliverGrid.options(
+        controller: scrollController,
+        options: options,
+        itemCount: episodes.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           childAspectRatio: layout == Layout.three ? 1 : 1.5,
           crossAxisCount: layout == Layout.three ? 3 : 2,
           mainAxisSpacing: 6.0,
           crossAxisSpacing: 6.0,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) {
-            Color _c = (Theme.of(context).brightness == Brightness.light)
-                ? episodes[index].primaryColor.colorizedark()
-                : episodes[index].primaryColor.colorizeLight();
-            return Selector<AudioPlayerNotifier,
+        itemBuilder: (context, index, animation) {
+          Color _c = (Theme.of(context).brightness == Brightness.light)
+              ? episodes[index].primaryColor.colorizedark()
+              : episodes[index].primaryColor.colorizeLight();
+          return FadeTransition(
+            opacity: Tween<double>(
+              begin: 0,
+              end: 1,
+            ).animate(animation),
+            child: Selector<AudioPlayerNotifier,
                 Tuple2<EpisodeBrief, List<String>>>(
               selector: (_, audio) => Tuple2(audio?.episode,
                   audio.queue.playlist.map((e) => e.enclosureUrl).toList()),
@@ -441,10 +455,9 @@ class EpisodeGrid extends StatelessWidget {
                       );
                     }),
               ),
-            );
-          },
-          childCount: episodes.length,
-        ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -16,7 +16,6 @@ final SettingState themeSetting = SettingState();
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await themeSetting.initData();
-
   runApp(
     MultiProvider(
       providers: [

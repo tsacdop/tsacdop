@@ -53,6 +53,7 @@ dev_dependencies:
   flare_flutter: ^2.0.3
   rxdart: ^0.24.0
   flutter_isolate: ^1.0.0+11
+  auto_animated: ^2.0.2
   
 
 flutter:

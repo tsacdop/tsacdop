@@ -90,7 +90,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 children: <Widget>[
                   Column(
                     children: <Widget>[
-                      Import(),
                       Expanded(
                         child: NestedScrollView(
                           innerScrollPositionKeyBuilder: () {
@@ -101,34 +100,40 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               (BuildContext context, bool innerBoxScrolled) {
                             return <Widget>[
                               SliverToBoxAdapter(
-                                child: SizedBox(
-                                  height: 50.0,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      IconButton(
-                                        tooltip: 'Add',
-                                        icon: const Icon(
-                                            Icons.add_circle_outline),
-                                        onPressed: () async {
-                                          await showSearch<int>(
-                                            context: context,
-                                            delegate: _delegate,
-                                          );
-                                        },
+                                child: Column(
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height: 50.0,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          IconButton(
+                                            tooltip: 'Add',
+                                            icon: const Icon(
+                                                Icons.add_circle_outline),
+                                            onPressed: () async {
+                                              await showSearch<int>(
+                                                context: context,
+                                                delegate: _delegate,
+                                              );
+                                            },
+                                          ),
+                                          Image(
+                                            image: Theme.of(context)
+                                                        .brightness ==
+                                                    Brightness.light
+                                                ? AssetImage('assets/text.png')
+                                                : AssetImage(
+                                                    'assets/text_light.png'),
+                                            height: 30,
+                                          ),
+                                          PopupMenu(),
+                                        ],
                                       ),
-                                      Image(
-                                        image: Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? AssetImage('assets/text.png')
-                                            : AssetImage(
-                                                'assets/text_light.png'),
-                                        height: 30,
-                                      ),
-                                      PopupMenu(),
-                                    ],
-                                  ),
+                                    ),
+                                    Import(),
+                                  ],
                                 ),
                               ),
                               SliverList(

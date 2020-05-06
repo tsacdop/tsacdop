@@ -224,7 +224,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
           backgroundAudioPosition / 1000, seekSliderValue);
       await dbHelper.saveHistory(history);
       AudioService.addQueueItemAt(episodeNew.toMediaItem(), 0);
-      //if (startPosition > 0) AudioService.seekTo(startPosition);
       _queue.playlist
           .removeWhere((item) => item.enclosureUrl == episode.enclosureUrl);
       _queue.playlist.insert(0, episodeNew);
@@ -294,9 +293,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
       print(event.length);
       if (event.length == _queue.playlist.length - 1 &&
           _audioState == BasicPlaybackState.skippingToNext) {
-        if (event.length == 0 || _stopOnComplete == true) {
+        if (event.length == 0 || _stopOnComplete) {
           _queue.delFromPlaylist(_episode);
           _lastPostion = 0;
+          notifyListeners();
           positionStorage.saveInt(_lastPostion);
           final PlayHistory history = PlayHistory(
               _episode.title,
@@ -305,6 +305,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
               seekSliderValue);
           dbHelper.saveHistory(history);
         } else if (event.first.id != _episode.mediaId) {
+          _lastPostion = 0;
+          notifyListeners();
+          positionStorage.saveInt(_lastPostion);
           _queue.delFromPlaylist(_episode);
           final PlayHistory history = PlayHistory(
               _episode.title,
@@ -359,7 +362,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
         } else
           _seekSliderValue = 0;
 
-        if (_backgroundAudioPosition > 0) {
+        if (_backgroundAudioPosition > 0 &&
+            _backgroundAudioPosition < _backgroundAudioDuration) {
           _lastPostion = _backgroundAudioPosition;
           positionStorage.saveInt(_lastPostion);
         }
@@ -592,7 +596,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onStart() async {
     _stopAtEnd = false;
 
-    print(cacheMax);
     var playerStateSubscription = _audioPlayer.playbackStateStream
         .where((state) => state == AudioPlaybackState.completed)
         .listen((state) {
@@ -647,6 +650,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await AudioServiceBackground.setQueue(_queue);
     // }
     if (_queue.length == 0 || _stopAtEnd) {
+      // await Future.delayed(Duration(milliseconds: 300));
       _skipState = null;
       onStop();
     } else {
@@ -742,8 +746,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   void onStop() async {
     await _audioPlayer.stop();
+    await _audioPlayer.dispose();
     _setState(state: BasicPlaybackState.stopped);
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(Duration(milliseconds: 300));
     _completer?.complete();
   }
 

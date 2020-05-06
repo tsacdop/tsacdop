@@ -259,7 +259,7 @@ class _SearchResultState extends State<SearchResult>
     var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
 
     savePodcast(OnlinePodcast podcast) async {
-      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title);
+      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title, imgUrl: podcast.image);
       subscribeWorker.setSubscribeItem(item);
     }
 

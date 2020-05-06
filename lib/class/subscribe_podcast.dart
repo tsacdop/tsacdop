@@ -21,8 +21,11 @@ class SubscribeItem {
   String title;
   SubscribeState subscribeState;
   String id;
+  String imgUrl;
   SubscribeItem(this.url, this.title,
-      {this.subscribeState = SubscribeState.none, this.id = ''});
+      {this.subscribeState = SubscribeState.none,
+      this.id = '',
+      this.imgUrl = ''});
 }
 
 class SubscribeWorker extends ChangeNotifier {
@@ -56,7 +59,7 @@ class SubscribeWorker extends ChangeNotifier {
     receivePort.distinct().listen((message) {
       if (message is SendPort) {
         subSendPort = message;
-        subSendPort.send([_subscribeItem.url, _subscribeItem.title]);
+        subSendPort.send([_subscribeItem.url, _subscribeItem.title, _subscribeItem.imgUrl]);
       } else if (message is List) {
         _setCurrentSubscribeItem(SubscribeItem(message[1], message[0],
             subscribeState: SubscribeState.values[message[2]],
@@ -76,7 +79,7 @@ class SubscribeWorker extends ChangeNotifier {
       _created = true;
       listen();
     } else
-      subSendPort.send([_subscribeItem.url, _subscribeItem.title]);
+      subSendPort.send([_subscribeItem.url, _subscribeItem.title, _subscribeItem.imgUrl]);
   }
 
   void dispose() {
@@ -109,8 +112,9 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       receiveTimeout: 20000,
     );
     print(rss);
-    Response response = await Dio(options).get(rss);
-    if (response.statusCode == 200) {
+    try {
+      Response response = await Dio(options).get(rss);
+
       var p = RssFeed.parse(response.data);
 
       var dir = await getApplicationDocumentsDirectory();
@@ -122,11 +126,41 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       bool checkUrl = await dbHelper.checkPodcast(realUrl);
 
       if (checkUrl) {
-        Response<List<int>> imageResponse = await Dio().get<List<int>>(
-            p.itunes.image.href,
-            options: Options(responseType: ResponseType.bytes));
-        img.Image image = img.decodeImage(imageResponse.data);
-        img.Image thumbnail = img.copyResize(image, width: 300);
+        img.Image thumbnail;
+        try {
+          Response<List<int>> imageResponse = await Dio().get<List<int>>(
+              p.itunes.image.href,
+              options: Options(responseType: ResponseType.bytes));
+          img.Image image = img.decodeImage(imageResponse.data);
+          thumbnail = img.copyResize(image, width: 300);
+        } on DioError catch (e) {
+          print(e);
+          try {
+            Response<List<int>> imageResponse = await Dio().get<List<int>>(
+                item.imgUrl,
+                options: Options(responseType: ResponseType.bytes));
+            img.Image image = img.decodeImage(imageResponse.data);
+            thumbnail = img.copyResize(image, width: 300);
+          } on DioError catch (e) {
+            print(e);
+            try {
+              Response<List<int>> imageResponse = await Dio().get<List<int>>(
+                  "https://ui-avatars.com/api/?size=300&background=4D91BE&color=fff&name=${item.title}&length=2&bold=true",
+                  options: Options(responseType: ResponseType.bytes));
+              thumbnail = img.decodeImage(imageResponse.data);
+            } on DioError catch (e) {
+              print(e);
+              sendPort.send([item.title, item.url, 6]);
+              await Future.delayed(Duration(seconds: 2));
+              sendPort.send([item.title, item.url, 4]);
+              items.removeWhere((element) => element.url == item.url);
+              if (items.length > 0) {
+                await _subscribe(items.first);
+              } else
+                sendPort.send("done");
+            }
+          }
+        }
         String uuid = Uuid().v4();
         File("${dir.path}/$uuid.png")
           ..writeAsBytesSync(img.encodePng(thumbnail));
@@ -173,7 +207,8 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         } else
           sendPort.send("done");
       }
-    } else {
+    } on DioError catch (e) {
+      print(e);
       sendPort.send([item.title, item.url, 6]);
       await Future.delayed(Duration(seconds: 2));
       sendPort.send([item.title, item.url, 4]);
@@ -187,7 +222,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
 
   subReceivePort.distinct().listen((message) {
     if (message is List<String>) {
-      items.add(SubscribeItem(message[0], message[1]));
+      items.add(SubscribeItem(message[0], message[1], imgUrl: message[2]));
       if (!_running) {
         _subscribe(items.first);
         _running = true;
