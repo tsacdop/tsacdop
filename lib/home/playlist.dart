@@ -8,10 +8,10 @@ import 'package:tuple/tuple.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 
-import 'package:tsacdop/class/audiostate.dart';
-import 'package:tsacdop/class/episodebrief.dart';
-import 'package:tsacdop/util/context_extension.dart';
-import 'package:tsacdop/util/custompaint.dart';
+import '../class/audiostate.dart';
+import '../class/episodebrief.dart';
+import '../util/context_extension.dart';
+import '../util/custompaint.dart';
 
 class PlaylistPage extends StatefulWidget {
   @override
