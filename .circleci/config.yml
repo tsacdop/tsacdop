@@ -18,9 +18,9 @@ jobs:
       - run: dart tool/env.dart
       - run: 
           name: Build the Android bundle
-          command: flutter build appbundle --no-shrink --info
+          command: flutter build appbundle --no-shrink 
       - run:
           name: Build the Android version
-          command: flutter build apk --split-per-abi --no-shrink --info
+          command: flutter build apk --split-per-abi --no-shrink
       - store_artifacts:
           path: build/app/outputs/
