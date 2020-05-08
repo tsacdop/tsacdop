@@ -54,8 +54,6 @@ List<Libries> plugins = [
   Libries('cached_network_image', mit,
       'https://pub.dev/packages/cached_network_image'),
   Libries('workmanager', mit, 'https://pub.dev/packages/workmanager'),
-  Libries('flutter_colorpicker', mit,
-      'https://pub.dev/packages/flutter_colorpicker'),
   Libries('app_settings', mit, 'https://pub.dev/packages/app_settings'),
   Libries('fl_chart', bsd, 'https://pub.dev/packages/fl_chart'),
   Libries('audio_service', mit, 'https://pub.dev/packages/audio_service'),

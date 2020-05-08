@@ -53,6 +53,7 @@ class MyApp extends StatelessWidget {
           title: 'Tsacdop',
           theme: lightTheme.copyWith(
             accentColor: setting.accentSetColor,
+            toggleableActiveColor: setting.accentSetColor
           ),
           darkTheme: ThemeData.dark().copyWith(
             accentColor: setting.accentSetColor,
