@@ -46,8 +46,6 @@ ThemeData lightTheme = ThemeData(
   ),
 );
 
-
-
 class SettingState extends ChangeNotifier {
   KeyValueStorage themeStorage = KeyValueStorage(themesKey);
   KeyValueStorage accentStorage = KeyValueStorage(accentsKey);

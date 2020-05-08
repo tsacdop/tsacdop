@@ -254,11 +254,9 @@ class _SearchResultState extends State<SearchResult>
 
   @override
   Widget build(BuildContext context) {
-    // var importOmpl = Provider.of<ImportOmpl>(context, listen: false);
-    // var groupList = Provider.of<GroupList>(context, listen: false);
     var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
 
-    savePodcast(OnlinePodcast podcast) async {
+    savePodcast(OnlinePodcast podcast) {
       SubscribeItem item = SubscribeItem(podcast.rss, podcast.title, imgUrl: podcast.image);
       subscribeWorker.setSubscribeItem(item);
     }
@@ -310,9 +308,9 @@ class _SearchResultState extends State<SearchResult>
                   height: 35,
                   child: !_issubscribe
                       ? OutlineButton(
-                          highlightedBorderColor: Theme.of(context).accentColor,
+                          highlightedBorderColor: context.accentColor,
                           splashColor:
-                              Theme.of(context).accentColor.withOpacity(0.8),
+                              context.accentColor.withOpacity(0.8),
                           child: Text('Subscribe',
                               style: TextStyle(
                                   color: Theme.of(context).accentColor)),

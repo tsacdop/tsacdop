@@ -59,15 +59,17 @@ class SubscribeWorker extends ChangeNotifier {
     receivePort.distinct().listen((message) {
       if (message is SendPort) {
         subSendPort = message;
-        subSendPort.send([_subscribeItem.url, _subscribeItem.title, _subscribeItem.imgUrl]);
+        subSendPort.send(
+            [_subscribeItem.url, _subscribeItem.title, _subscribeItem.imgUrl]);
       } else if (message is List) {
         _setCurrentSubscribeItem(SubscribeItem(message[1], message[0],
             subscribeState: SubscribeState.values[message[2]],
             id: message.length == 4 ? message[3] : ''));
         print(message[2]);
       } else if (message is String && message == "done") {
-        subIsolate?.kill();
+        subIsolate.kill();
         subIsolate = null;
+        _currentSubscribeItem = SubscribeItem('', '');
         _created = false;
       }
     });
@@ -79,7 +81,8 @@ class SubscribeWorker extends ChangeNotifier {
       _created = true;
       listen();
     } else
-      subSendPort.send([_subscribeItem.url, _subscribeItem.title, _subscribeItem.imgUrl]);
+      subSendPort.send(
+          [_subscribeItem.url, _subscribeItem.title, _subscribeItem.imgUrl]);
   }
 
   void dispose() {
@@ -114,7 +117,6 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
     print(rss);
     try {
       Response response = await Dio(options).get(rss);
-
       var p = RssFeed.parse(response.data);
 
       var dir = await getApplicationDocumentsDirectory();

@@ -820,7 +820,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  void onCustomAction(funtion, argument) async {
+  Future onCustomAction(funtion, argument) async {
     switch (funtion) {
       case 'stopAtEnd':
         _stopAtEnd = true;

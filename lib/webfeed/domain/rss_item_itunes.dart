@@ -69,13 +69,18 @@ Duration parseDuration(String s) {
   var minutes = 0;
   var seconds = 0;
   var parts = s.split(':');
-  if (parts.length > 2) {
-    hours = int.parse(parts[parts.length - 3]);
+  try {
+    if (parts.length > 2) {
+      hours = int.parse(parts[parts.length - 3]);
+    }
+    if (parts.length > 1) {
+      minutes = int.parse(parts[parts.length - 2]);
+    }
+    seconds = int.parse(parts[parts.length - 1]);
+  } catch (e) {
+    print(e);
   }
-  if (parts.length > 1) {
-    minutes = int.parse(parts[parts.length - 2]);
-  }
-  seconds = int.parse(parts[parts.length - 1]);
+
   return Duration(
     hours: hours,
     minutes: minutes,
