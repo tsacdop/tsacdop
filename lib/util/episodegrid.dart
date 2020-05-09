@@ -124,9 +124,9 @@ class EpisodeGrid extends StatelessWidget {
     }
 
     final options = LiveOptions(
-      delay: Duration(milliseconds: 0),
-      showItemInterval: Duration(milliseconds: 100),
-      showItemDuration: Duration(milliseconds: 100),
+      delay: Duration.zero,
+      showItemInterval: Duration(milliseconds: 50),
+      showItemDuration: Duration(milliseconds: 50),
     );
     final scrollController = ScrollController();
     return SliverPadding(

@@ -1018,21 +1018,25 @@ class DBHelper {
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
         P.primaryColor, E.media_id, E.is_new, P.skip_seconds FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.media_id = ?""", [id]);
-    episode = EpisodeBrief(
-        list.first['title'],
-        list.first['enclosure_url'],
-        list.first['enclosure_length'],
-        list.first['milliseconds'],
-        list.first['feed_title'],
-        list.first['primaryColor'],
-        list.first['liked'],
-        list.first['downloaded'],
-        list.first['duration'],
-        list.first['explicit'],
-        list.first['imagePath'],
-        list.first['media_id'],
-        list.first['is_new'],
-        list.first['skip_seconds']);
-    return episode;
+    if (list.length == 0)
+      return null;
+    else {
+      episode = EpisodeBrief(
+          list.first['title'],
+          list.first['enclosure_url'],
+          list.first['enclosure_length'],
+          list.first['milliseconds'],
+          list.first['feed_title'],
+          list.first['primaryColor'],
+          list.first['liked'],
+          list.first['downloaded'],
+          list.first['duration'],
+          list.first['explicit'],
+          list.first['imagePath'],
+          list.first['media_id'],
+          list.first['is_new'],
+          list.first['skip_seconds']);
+      return episode;
+    }
   }
 }

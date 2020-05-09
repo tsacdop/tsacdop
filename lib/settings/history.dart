@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:line_icons/line_icons.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
+import '../webfeed/webfeed.dart';
+import '../type/searchpodcast.dart';
+import '../util/context_extension.dart';
 import '../state/audiostate.dart';
+import '../state/subscribe_podcast.dart';
 import '../type/sub_history.dart';
 
 class PlayedHistory extends StatefulWidget {
@@ -25,7 +33,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
   }
 
   _loadMoreData() async {
-   // await Future.delayed(Duration(seconds: 3));
+    // await Future.delayed(Duration(seconds: 3));
     if (mounted)
       setState(() {
         _top = _top + 100;
@@ -55,6 +63,37 @@ class _PlayedHistoryState extends State<PlayedHistory>
       stats.add(FlSpot(day.toDouble(), mins));
     });
     return stats;
+  }
+
+  Future recoverSub(BuildContext context, String url) async {
+    Fluttertoast.showToast(
+      msg: 'Recovering, wait for seconds',
+      gravity: ToastGravity.BOTTOM,
+    );
+    var subscribeWorker = context.read<SubscribeWorker>();
+    try {
+      BaseOptions options = new BaseOptions(
+        connectTimeout: 10000,
+        receiveTimeout: 10000,
+      );
+      Response response = await Dio(options).get(url);
+      var p = RssFeed.parse(response.data);
+      var podcast = OnlinePodcast(
+          rss: url,
+          title: p.title,
+          publisher: p.author,
+          description: p.description,
+          image: p.itunes.image.href);
+      SubscribeItem item =
+          SubscribeItem(podcast.rss, podcast.title, imgUrl: podcast.image);
+      subscribeWorker.setSubscribeItem(item);
+    } on DioError catch (e) {
+      print(e);
+      Fluttertoast.showToast(
+        msg: 'Podcast recover failed',
+        gravity: ToastGravity.BOTTOM,
+      );
+    }
   }
 
   @override
@@ -121,16 +160,19 @@ class _PlayedHistoryState extends State<PlayedHistory>
                   delegate: _SliverAppBarDelegate(
                       TabBar(
                         controller: _controller,
+                        indicatorColor: context.accentColor,
                         tabs: <Widget>[
                           Tab(
-                            child: Text('Listen'),
+                            child: Text('Listen',
+                                style: context.textTheme.headline6),
                           ),
                           Tab(
-                            child: Text('Subscribe'),
+                            child: Text('Subscribe',
+                                style: context.textTheme.headline6),
                           )
                         ],
                       ),
-                      Theme.of(context).primaryColor),
+                      context.primaryColor),
                   pinned: true,
                 ),
               ];
@@ -145,8 +187,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                           onNotification: (ScrollNotification scrollInfo) {
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data.length == _top)
-                              _loadMoreData();
+                                snapshot.data.length == _top) _loadMoreData();
                             return true;
                           },
                           child: ListView.builder(
@@ -155,6 +196,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                               itemCount: snapshot.data.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5),
                                   color:
                                       Theme.of(context).scaffoldBackgroundColor,
                                   child: Column(
@@ -184,7 +227,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                           ],
                                         ),
                                         subtitle: Container(
-                                          width: _width,
+                                          width: double.infinity,
                                           child: Row(
                                             children: <Widget>[
                                               Icon(
@@ -257,6 +300,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                             bool _status = snapshot.data[index].status;
                             return Container(
                               color: Theme.of(context).scaffoldBackgroundColor,
+                              padding: const EdgeInsets.symmetric(vertical: 5),
                               child: Column(
                                 children: <Widget>[
                                   ListTile(
@@ -286,13 +330,13 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                         .data[index].subDate)
                                                     .inDays
                                                     .toString() +
-                                                ' days ago')
+                                                ' day ago')
                                             : Text(snapshot.data[index].delDate
                                                     .difference(snapshot
                                                         .data[index].subDate)
                                                     .inDays
                                                     .toString() +
-                                                ' days'),
+                                                ' day on your device'),
                                         Spacer(),
                                         !_status
                                             ? Text(
@@ -308,6 +352,19 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                             : Center(),
                                       ],
                                     ),
+                                    trailing: !_status
+                                        ? Material(
+                                            color: Colors.transparent,
+                                            child: IconButton(
+                                              tooltip: 'Recover subscribe',
+                                              icon: Icon(LineIcons
+                                                  .trash_restore_alt_solid),
+                                              onPressed: () => recoverSub(
+                                                  context,
+                                                  snapshot.data[index].rssUrl),
+                                            ),
+                                          )
+                                        : null,
                                   ),
                                   Divider(
                                     height: 2,
@@ -365,14 +422,14 @@ class HistoryChart extends StatelessWidget {
           backgroundColor: Colors.transparent,
           gridData: FlGridData(
             show: true,
-            drawHorizontalLine: true,
+            drawHorizontalLine: false,
             getDrawingHorizontalLine: (value) {
-              return value % 60 == 0
+              return value % 1000 == 0
                   ? FlLine(
-                      color: Theme.of(context).brightness == Brightness.light
+                      color: context.brightness == Brightness.light
                           ? Colors.grey[400]
                           : Colors.grey[700],
-                      strokeWidth: 1,
+                      strokeWidth: 0,
                     )
                   : FlLine(color: Colors.transparent);
             },
@@ -416,13 +473,26 @@ class HistoryChart extends StatelessWidget {
             LineChartBarData(
               spots: this.stats,
               isCurved: false,
-              colors: [Theme.of(context).accentColor],
+              colors: [
+                context.accentColor,
+              ],
               barWidth: 3,
               isStrokeCapRound: true,
+              belowBarData: BarAreaData(
+                  show: true,
+                  gradientFrom: Offset(0, 0),
+                  gradientTo: Offset(0, 1),
+                  gradientColorStops: [
+                    0.3,
+                    0.8
+                  ],
+                  colors: [
+                    context.accentColor.withOpacity(0.6),
+                    context.accentColor.withOpacity(0.1)
+                  ]),
               dotData: FlDotData(
                 show: true,
                 dotSize: 5,
-               // getDotColor: Theme.of(context).accentColor,
               ),
             ),
           ],

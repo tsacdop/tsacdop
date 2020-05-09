@@ -15,6 +15,7 @@ import '../util/pageroute.dart';
 import '../util/colorize.dart';
 import '../util/duraiton_picker.dart';
 import '../util/context_extension.dart';
+import '../state/audiostate.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;
@@ -136,8 +137,8 @@ class _PodcastCardState extends State<PodcastCard>
         : widget.podcastLocal.primaryColor.colorizeLight();
 
     double _width = MediaQuery.of(context).size.width;
-    var _groupList = Provider.of<GroupList>(context);
-    _belongGroups = _groupList.getPodcastGroup(widget.podcastLocal.id);
+    var groupList = context.watch<GroupList>();
+    _belongGroups = groupList.getPodcastGroup(widget.podcastLocal.id);
 
     return Container(
       decoration: BoxDecoration(
@@ -259,7 +260,7 @@ class _PodcastCardState extends State<PodcastCard>
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
-                                      children: _groupList.groups
+                                      children: groupList.groups
                                           .map<Widget>((PodcastGroup group) {
                                     return Container(
                                       padding: EdgeInsets.only(left: 5.0),
@@ -300,7 +301,7 @@ class _PodcastCardState extends State<PodcastCard>
                                           setState(() {
                                             _addGroup = false;
                                           });
-                                          await _groupList.changeGroup(
+                                          await groupList.changeGroup(
                                             widget.podcastLocal.id,
                                             _selectedGroups,
                                           );
@@ -468,7 +469,7 @@ class _PodcastCardState extends State<PodcastCard>
                                         ),
                                         FlatButton(
                                           onPressed: () {
-                                            _groupList.removePodcast(
+                                            groupList.removePodcast(
                                                 widget.podcastLocal.id);
                                             Navigator.of(context).pop();
                                           },

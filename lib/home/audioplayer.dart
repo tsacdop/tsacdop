@@ -408,7 +408,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 Expanded(
                   flex: 4,
                   child: Selector<AudioPlayerNotifier, String>(
-                    selector: (_, audio) => audio.episode.title,
+                    selector: (_, audio) => audio.episode?.title,
                     builder: (_, title, __) {
                       return Text(
                         title,
@@ -481,8 +481,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                               }
                                             : null,
                                     child: ImageRotate(
-                                        title: audio.episode.title,
-                                        path: audio.episode.imagePath),
+                                        title: audio.episode?.title,
+                                        path: audio.episode?.imagePath),
                                   )
                                 : InkWell(
                                     onTap:

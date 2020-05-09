@@ -275,15 +275,21 @@ class AudioPlayerNotifier extends ChangeNotifier {
     AudioService.currentMediaItemStream
         .where((event) => event != null)
         .listen((item) async {
-      _episode = await dbHelper.getRssItemWithMediaId(item.id);
-      _backgroundAudioDuration = item?.duration ?? 0;
-      if (position > 0 &&
-          _backgroundAudioDuration > 0 &&
-          _episode.enclosureUrl == url) {
-        AudioService.seekTo(position);
-        position = 0;
+      EpisodeBrief episode = await dbHelper.getRssItemWithMediaId(item.id);
+      if (episode != null) {
+        _episode = episode;
+        _backgroundAudioDuration = item?.duration ?? 0;
+        if (position > 0 &&
+            _backgroundAudioDuration > 0 &&
+            _episode.enclosureUrl == url) {
+          AudioService.seekTo(position);
+          position = 0;
+        }
+        notifyListeners();
+      } else {
+        _queue.playlist.removeAt(0);
+        AudioService.skipToNext();
       }
-      notifyListeners();
     });
 
     queueSubject = BehaviorSubject<List<MediaItem>>();

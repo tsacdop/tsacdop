@@ -60,4 +60,5 @@ class EpisodeBrief {
         artUri: 'file://$imagePath',
         extras: {'skip': skipSeconds});
   }
+
 }
