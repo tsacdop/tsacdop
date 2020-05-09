@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'generated/l10n.dart';
 import 'state/podcast_group.dart';
 import 'state/audiostate.dart';
 import 'state/settingstate.dart';
@@ -52,9 +54,8 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Tsacdop',
           theme: lightTheme.copyWith(
-            accentColor: setting.accentSetColor,
-            toggleableActiveColor: setting.accentSetColor
-          ),
+              accentColor: setting.accentSetColor,
+              toggleableActiveColor: setting.accentSetColor),
           darkTheme: ThemeData.dark().copyWith(
             accentColor: setting.accentSetColor,
             primaryColorDark: Colors.grey[800],
@@ -64,6 +65,13 @@ class MyApp extends StatelessWidget {
                 .copyWith(color: setting.realDark ? Colors.black87 : null),
             appBarTheme: AppBarTheme(elevation: 0),
           ),
+          localizationsDelegates: [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: S.delegate.supportedLocales,
           home: setting.showIntro ? SlideIntro(goto: Goto.home) : Home(),
         );
       },
