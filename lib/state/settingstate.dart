@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
@@ -7,6 +8,7 @@ import '../local_storage/key_value_storage.dart';
 import '../type/podcastlocal.dart';
 
 void callbackDispatcher() {
+  if(Platform.isAndroid) 
   Workmanager.executeTask((task, inputData) async {
     var dbHelper = DBHelper();
     List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
