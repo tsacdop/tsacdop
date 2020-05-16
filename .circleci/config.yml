@@ -12,6 +12,9 @@ jobs:
       - run:
           name: Run Flutter doctor
           command: flutter doctor
+      - run:
+          name: Update package
+          command: flutter update-packages --force-upgrade
       - run: echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
       - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
       - run: dart tool/env.dart
