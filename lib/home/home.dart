@@ -562,23 +562,30 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                     );
                                                   }),
                                             )
-                                          : IconButton(
-                                              tooltip:
-                                                  'Add new episodes to playlist',
-                                              icon:
-                                                  // Icon(Icons.playlist_add),
-                                                  SizedBox(
-                                                      height: 16,
-                                                      width: 21,
-                                                      child: CustomPaint(
-                                                          painter:
-                                                              AddToPlaylistPainter(
-                                                        context.textTheme
-                                                            .bodyText1.color,
-                                                        context.textTheme
-                                                            .bodyText1.color,
-                                                      ))),
-                                              onPressed: () {});
+                                          : Material(
+                                              color: Colors.transparent,
+                                              child: IconButton(
+                                                  tooltip:
+                                                      'Add new episodes to playlist',
+                                                  icon:
+                                                      // Icon(Icons.playlist_add),
+                                                      SizedBox(
+                                                          height: 16,
+                                                          width: 21,
+                                                          child: CustomPaint(
+                                                              painter:
+                                                                  AddToPlaylistPainter(
+                                                            context
+                                                                .textTheme
+                                                                .bodyText1
+                                                                .color,
+                                                            context
+                                                                .textTheme
+                                                                .bodyText1
+                                                                .color,
+                                                          ))),
+                                                  onPressed: () {}),
+                                            );
                                     }),
                                 Material(
                                     color: Colors.transparent,
