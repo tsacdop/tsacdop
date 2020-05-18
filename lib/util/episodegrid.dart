@@ -28,6 +28,7 @@ class EpisodeGrid extends StatelessWidget {
   final int episodeCount;
   final Layout layout;
   final bool reverse;
+  final int initNum;
   Future<int> _isListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
     return await dbHelper.isListened(episode.enclosureUrl);
@@ -46,6 +47,7 @@ class EpisodeGrid extends StatelessWidget {
   EpisodeGrid({
     Key key,
     @required this.episodes,
+    this.initNum = 12,
     this.showDownload = false,
     this.showFavorite = false,
     this.showNumber = false,
@@ -148,7 +150,7 @@ class EpisodeGrid extends StatelessWidget {
               : episodes[index].primaryColor.colorizeLight();
           return FadeTransition(
             opacity: Tween<double>(
-              begin: index < 12 ? 0 : 1,
+              begin: index < initNum ? 0 : 1,
               end: 1,
             ).animate(animation),
             child: Selector<AudioPlayerNotifier,
