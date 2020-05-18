@@ -1,7 +1,7 @@
 name: tsacdop
 description: An easy-use podacasts player.
 
-version: 0.2.3
+version: 0.2.4
 
 environment:
   sdk: ">=2.6.0 <3.0.0"
@@ -47,6 +47,8 @@ dev_dependencies:
   flare_flutter: ^2.0.3
   rxdart: ^0.24.0
   auto_animated: ^2.1.0
+  wc_flutter_share: ^0.2.1
+  video_player: ^0.10.11
   just_audio:
     git:
       url: https://github.com/stonega/just_audio.git

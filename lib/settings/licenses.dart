@@ -68,4 +68,5 @@ List<Libries> plugins = [
   Libries('Rxdart', apacheLicense, 'https://pub.dev/packages/rxdart'),
   Libries('flutter_isolate', mit, 'https://pub.dev/packages/flutter_isolate'),
   Libries('auto_animated', mit, 'https://pub.dev/packages/auto_animated'),
+  Libries('wc_flutter_share', apacheLicense, 'https://pub.dev/packages/wc_flutter_share')
 ];

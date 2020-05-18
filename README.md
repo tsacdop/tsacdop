@@ -22,12 +22,13 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 ## Features
 * Subscriptoin group management
 * Playlist support
-* Sleep timer
+* Sleep timer / Speed setting
 * OMPL file export and import
 * Auto syncing in background
 * Listen and subscribe history record
-* Dark mode / Accent color personalization
-* Download for offline playing 
+* Dark mode / Accent color 
+* Download for offline playing
+* Share clip on twitter
 
 More to come...
 
@@ -46,11 +47,13 @@ Tsacdop is using ListenNotes api 1.0 pro to search podcast, which is not free. S
 If you want to build the app, you need to create a new file named .env.dart in lib folder. Add below code in .env.dart.
 
 ```
-final environment = {"apiKey":"APIKEY"};
+final environment = {"apiKey":"APIKEY", "shareKey":"SHAREKEY"};
 ```
 
 You can get own api key on [RapidApi](https://rapidapi.com/listennotes/api/listennotes), basic plan is free to all, and replace "APIKEY" with it.
 If no api key added, the search function in the app won't work. But you can still add podcasts by serach rss link or import ompl file.
+
+Share_key is used for generate clip.
 
 ## Getting Started
 

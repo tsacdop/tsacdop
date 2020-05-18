@@ -4,7 +4,7 @@ import 'package:tsacdop/util/custompaint.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
 
-const String version = '0.2.3';
+const String version = '0.2.4';
 
 class AboutApp extends StatelessWidget {
   _launchUrl(String url) async {

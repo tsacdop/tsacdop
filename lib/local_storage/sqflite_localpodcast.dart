@@ -1039,4 +1039,14 @@ class DBHelper {
       return episode;
     }
   }
+
+  Future<String> getImageUrl(String url) async{
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT P.imageUrl FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
+        WHERE E.enclosure_url = ?""", [url]);
+    if(list.length ==0)
+    return null;
+    return list.first["imageUrl"];
+  }
 }

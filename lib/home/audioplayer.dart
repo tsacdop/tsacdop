@@ -19,6 +19,7 @@ import '../util/customslider.dart';
 import '../episodes/episodedetail.dart';
 import 'playlist.dart';
 import 'audiopanel.dart';
+import 'share.dart';
 
 final List<BoxShadow> _customShadow = [
   BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),
@@ -54,7 +55,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Container(
       alignment: Alignment.topLeft,
       height: 300,
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
       ),
@@ -305,7 +306,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget _expandedPanel(BuildContext context) {
     return DefaultTabController(
       initialIndex: 1,
-      length: 3,
+      length: 4,
       child: Stack(
         children: <Widget>[
           TabBarView(
@@ -313,6 +314,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               SleepMode(),
               ControlPanel(),
               _playlist(context),
+              ShareClip(),
             ],
           ),
           Positioned(
@@ -335,6 +337,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   tabs: <Widget>[
                     Container(
                       // child: Text('p'),
+                      height: 8.0,
+                      width: 8.0,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                          border: Border.all(
+                              color: Theme.of(context).accentColor,
+                              width: 2.0)),
+                    ),
+                    Container(
                       height: 8.0,
                       width: 8.0,
                       decoration: BoxDecoration(

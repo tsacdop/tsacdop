@@ -1,12 +1,19 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:math' as math;
 
+import 'package:path/path.dart';
 import 'package:flutter/foundation.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+
 import '../type/episodebrief.dart';
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../.env.dart';
 
 MediaControl playControl = MediaControl(
   androidIcon: 'drawable/ic_stat_play_circle_filled',
@@ -110,6 +117,7 @@ class Playlist {
 }
 
 enum SleepTimerMode { endOfEpisode, timer, undefined }
+enum ShareStatus { generate, download, complete, undefined, error }
 
 class AudioPlayerNotifier extends ChangeNotifier {
   DBHelper dbHelper = DBHelper();
@@ -135,6 +143,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool _startSleepTimer = false;
   double _switchValue = 0;
   SleepTimerMode _sleepTimerMode = SleepTimerMode.undefined;
+  ShareStatus _shareStatus = ShareStatus.undefined;
+  String _shareFile = '';
   //set autoplay episode in playlist
   bool _autoPlay = true;
   //TODO Set auto add episodes to playlist
@@ -158,6 +168,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool get stopOnComplete => _stopOnComplete;
   bool get startSleepTimer => _startSleepTimer;
   SleepTimerMode get sleepTimerMode => _sleepTimerMode;
+  ShareStatus get shareStatus => _shareStatus;
+  String get shareFile => _shareFile;
   bool get autoPlay => _autoPlay;
   int get timeLeft => _timeLeft;
   double get switchValue => _switchValue;
@@ -172,6 +184,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _autoPlay = boo;
     notifyListeners();
     _setAutoPlay();
+  }
+
+  set setShareStatue(ShareStatus status) {
+    _shareStatus = status;
+    notifyListeners();
   }
 
   Future _getAutoPlay() async {
@@ -552,6 +569,48 @@ class AudioPlayerNotifier extends ChangeNotifier {
       AudioService.customAction('cancelStopAtEnd');
       _switchValue = 0;
       _stopOnComplete = false;
+      notifyListeners();
+    }
+  }
+
+  shareClip(int start, int duration) async {
+    _shareStatus = ShareStatus.generate;
+    notifyListeners();
+    int length = math.min(duration, (_backgroundAudioDuration ~/ 1000 - start));
+    final BaseOptions options = BaseOptions(
+      connectTimeout: 60000,
+      receiveTimeout: 120000,
+    );
+    String imageUrl = await dbHelper.getImageUrl(_episode.enclosureUrl);
+    String url = "https://podcastapi.stonegate.me/clip?" +
+        "audio_link=${_episode.enclosureUrl}&image_link=$imageUrl&title=${_episode.feedTitle}" +
+        "&text=${_episode.title}&start=$start&length=$length";
+    String shareKey = environment['shareKey'];
+    try {
+      Response response = await Dio(options).get(url,
+          options: Options(headers: {
+            'X-Share-Key': "$shareKey",
+          }));
+      String shareLink = response.data;
+      print(shareLink);
+      String fileName = _episode.title + start.toString() + '.mp4';
+      _shareStatus = ShareStatus.download;
+      notifyListeners();
+      Directory dir = await getTemporaryDirectory();
+      String shareDir = join(dir.path, 'share', fileName);
+      try {
+        await Dio().download(shareLink, shareDir);
+        _shareFile = shareDir;
+        _shareStatus = ShareStatus.complete;
+        notifyListeners();
+      } on DioError catch (e) {
+        print(e);
+        _shareStatus = ShareStatus.error;
+        notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+      _shareStatus = ShareStatus.error;
       notifyListeners();
     }
   }
