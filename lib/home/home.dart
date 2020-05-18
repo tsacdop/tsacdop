@@ -868,7 +868,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                         EpisodeGrid(
                           episodes: snapshot.data,
                           layout: _layout,
-                          initNum: 9,
+                          initNum: 0,
                         ),
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
@@ -991,7 +991,7 @@ class _MyDownloadState extends State<_MyDownload>
                 : EpisodeGrid(
                     episodes: episodes,
                     layout: _layout,
-                    initNum: 9,
+                    initNum: 0,
                   );
           },
         ),
