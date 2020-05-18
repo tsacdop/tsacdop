@@ -21,8 +21,5 @@ jobs:
       - run:
           name: Build the Android version
           command: flutter build appbundle --no-shrink
-      - run:
-          name: Build the Android apks
-          command: flutter build apk --split-per-abi --no-shrink
       - store_artifacts:
           path: build/app/outputs/

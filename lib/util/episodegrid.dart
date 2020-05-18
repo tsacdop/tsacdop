@@ -148,7 +148,7 @@ class EpisodeGrid extends StatelessWidget {
               : episodes[index].primaryColor.colorizeLight();
           return FadeTransition(
             opacity: Tween<double>(
-              begin: 0,
+              begin: index < 12 ? 0 : 1,
               end: 1,
             ).animate(animation),
             child: Selector<AudioPlayerNotifier,

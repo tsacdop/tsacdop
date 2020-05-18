@@ -36,6 +36,7 @@ class SubscribeWorker extends ChangeNotifier {
   SubscribeItem _subscribeItem;
   SubscribeItem _currentSubscribeItem = SubscribeItem('', '');
   bool _created = false;
+  bool get created => _created;
 
   setSubscribeItem(SubscribeItem item) async {
     _subscribeItem = item;
@@ -71,6 +72,7 @@ class SubscribeWorker extends ChangeNotifier {
         subIsolate = null;
         _currentSubscribeItem = SubscribeItem('', '');
         _created = false;
+        notifyListeners();
       }
     });
   }
