@@ -43,5 +43,10 @@ jobs:
         dart tool/env.dart
     - name: Build android version
       run: flutter build appbundle --no-shrink
+    - name: Create a Release APK
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build/app/outputs/apk/debug/*.apk"
+        token: ${{ secrets.TOKEN }}
     
     
