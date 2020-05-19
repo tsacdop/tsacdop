@@ -28,7 +28,11 @@ jobs:
       with:
         flutter-version: '1.18.0-11.1.pre'
         channel: 'beta'
-
+      env:
+        KEY_AILAS: ${{ secrets.KEY_ALIAS}}
+        KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+        ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
     # Runs a single command using the runners shell
     - name: Run flutter doctor
       run: flutter doctor
@@ -39,14 +43,12 @@ jobs:
     - name: Configure env
       run: |
         echo $ENCODED_KEYSTORE | base64 -di > /home/runner/work/tsacdop/tsacdop/android/app/keystore.jks
-        export KEYSTORE=${HOME}/keystore.jks
         dart tool/env.dart
     - name: Build android version
       run: flutter build appbundle --no-shrink
-    - name: Create a Release APK
-      uses: ncipollo/release-action@v1
+    - uses: actions/upload-artifact@v1
       with:
-        artifacts: "build/app/outputs/apk/debug/*.apk"
-        token: ${{ secrets.TOKEN }}
+        name: release-apk
+        path: build/app/outputs/bundle/release/app-release.aab
     
     
