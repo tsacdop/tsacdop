@@ -38,7 +38,7 @@ jobs:
       run: flutter update-packages --force-upgrade
     - name: Configure env
       run: |
-        echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
+        echo $ENCODED_KEYSTORE | base64 -di > /home/runner/work/tsacdop/tsacdop/android/app/keystore.jks
         export KEYSTORE=${HOME}/keystore.jks
         dart tool/env.dart
     - name: Build android version
