@@ -32,10 +32,10 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
    }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     ndkVersion "21.1.6352462"
-    
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -57,9 +57,9 @@ android {
      signingConfigs {
        release {
            storeFile file(System.getenv("KEYSTORE") ?: "keystore.jks")
-           storePassword System.getenv("KEYSTORE_PASSWORD")
-           keyAlias System.getenv("KEY_ALIAS")
-           keyPassword System.getenv("KEY_PASSWORD")
+           storePassword System.getenv("secrets.KEYSTORE_PASSWORD")
+           keyAlias System.getenv("secrets.KEY_ALIAS")
+           keyPassword System.getenv("secrets.KEY_PASSWORD")
         //   keyAlias keystoreProperties['keyAlias']
         //   keyPassword keystoreProperties['keyPassword']
         //   storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
