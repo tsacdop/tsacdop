@@ -39,7 +39,7 @@ jobs:
     - name: Configure env
       run: |
         echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
-        echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
+        export KEYSTORE=${HOME}/keystore.jks
         dart tool/env.dart
     - name: Build android version
       run: flutter build appbundle --no-shrink
