@@ -29,9 +29,9 @@ jobs:
         flutter-version: '1.18.0-11.1.pre'
         channel: 'beta'
       env:
-        KEY_AILAS: ${{ secrets.KEY_ALIAS}}
-        KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-        ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS}}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
     # Runs a single command using the runners shell
     - name: Run flutter doctor
