@@ -27,7 +27,7 @@ jobs:
     - uses: subosito/flutter-action@v1
       with:
         flutter-version: '1.18.0-11.1.pre'
-        channel: beta
+        channel: 'beta'
 
     # Runs a single command using the runners shell
     - name: Run flutter doctor
