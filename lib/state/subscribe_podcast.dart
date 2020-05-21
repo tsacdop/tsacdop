@@ -36,7 +36,7 @@ class SubscribeWorker extends ChangeNotifier {
   SubscribeItem _subscribeItem;
   SubscribeItem _currentSubscribeItem = SubscribeItem('', '');
   bool _created = false;
-  bool get created => _created;
+  bool get created=> _created;
 
   setSubscribeItem(SubscribeItem item) async {
     _subscribeItem = item;

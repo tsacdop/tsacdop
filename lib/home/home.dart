@@ -447,256 +447,257 @@ class _RecentUpdateState extends State<_RecentUpdate>
   Widget build(BuildContext context) {
     super.build(context);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    return FutureBuilder<List<EpisodeBrief>>(
-      future: _getRssItem(_top, _group),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-        return (snapshot.hasData)
-            ? snapshot.data.length == 0
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(LineIcons.cloud_download_alt_solid,
-                            size: 80, color: Colors.grey[500]),
-                        Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                        Text(
-                          'No episode received yet',
-                          style: TextStyle(color: Colors.grey[500]),
+    return Selector<SubscribeWorker, bool>(
+        selector: (_, worker) => worker.created,
+        builder: (context, created, child) {
+          return FutureBuilder<List<EpisodeBrief>>(
+            future: _getRssItem(_top, _group),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+              return (snapshot.hasData)
+                  ? snapshot.data.length == 0
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(LineIcons.cloud_download_alt_solid,
+                                  size: 80, color: Colors.grey[500]),
+                              Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10)),
+                              Text(
+                                'No episode received yet',
+                                style: TextStyle(color: Colors.grey[500]),
+                              )
+                            ],
+                          ),
                         )
-                      ],
-                    ),
-                  )
-                : NotificationListener<ScrollNotification>(
-                    onNotification: (ScrollNotification scrollInfo) {
-                      if (scrollInfo.metrics.pixels ==
-                              scrollInfo.metrics.maxScrollExtent &&
-                          snapshot.data.length == _top) _loadMoreEpisode();
-                      return true;
-                    },
-                    child: Selector<SubscribeWorker, bool>(
-                      selector: (_, worker) => worker.created,
-                      builder: (context, created, child) {
-                        return CustomScrollView(
-                            key: PageStorageKey<String>('update'),
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            slivers: <Widget>[
-                              SliverToBoxAdapter(
-                                child: Container(
-                                    height: 40,
-                                    color: context.primaryColor,
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Consumer<GroupList>(
-                                            builder:
-                                                (context, groupList, child) =>
-                                                    Material(
-                                              color: Colors.transparent,
-                                              child: PopupMenuButton<String>(
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10))),
-                                                elevation: 1,
-                                                tooltip: 'Groups fliter',
-                                                child: Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 20),
-                                                    height: 50,
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: <Widget>[
-                                                        Text(_groupName),
-                                                        Padding(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  horizontal:
-                                                                      5),
-                                                        ),
-                                                        Icon(
-                                                          LineIcons
-                                                              .filter_solid,
-                                                          size: 18,
-                                                        )
-                                                      ],
-                                                    )),
-                                                itemBuilder: (context) => [
-                                                  PopupMenuItem(
-                                                      child: Text('All'),
-                                                      value: 'All')
-                                                ]..addAll(groupList.groups
-                                                    .map<
-                                                        PopupMenuEntry<
-                                                            String>>((e) =>
-                                                        PopupMenuItem(
-                                                            value: e.name,
-                                                            child:
-                                                                Text(e.name)))
-                                                    .toList()),
-                                                onSelected: (value) {
-                                                  if (value == 'All') {
-                                                    setState(() {
-                                                      _groupName = 'All';
-                                                      _group = ['All'];
-                                                    });
-                                                  } else {
-                                                    groupList.groups
-                                                        .forEach((group) {
-                                                      if (group.name == value) {
-                                                        setState(() {
-                                                          _groupName = value;
-                                                          _group =
-                                                              group.podcastList;
-                                                        });
-                                                      }
-                                                    });
-                                                  }
-                                                },
+                      : NotificationListener<ScrollNotification>(
+                          onNotification: (ScrollNotification scrollInfo) {
+                            if (scrollInfo.metrics.pixels ==
+                                    scrollInfo.metrics.maxScrollExtent &&
+                                snapshot.data.length == _top)
+                              _loadMoreEpisode();
+                            return true;
+                          },
+                          child: CustomScrollView(
+                              key: PageStorageKey<String>('update'),
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              slivers: <Widget>[
+                                SliverToBoxAdapter(
+                                  child: Container(
+                                      height: 40,
+                                      color: context.primaryColor,
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: Row(
+                                          children: <Widget>[
+                                            Consumer<GroupList>(
+                                              builder:
+                                                  (context, groupList, child) =>
+                                                      Material(
+                                                color: Colors.transparent,
+                                                child: PopupMenuButton<String>(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  10))),
+                                                  elevation: 1,
+                                                  tooltip: 'Groups fliter',
+                                                  child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 20),
+                                                      height: 50,
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: <Widget>[
+                                                          Text(_groupName),
+                                                          Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        5),
+                                                          ),
+                                                          Icon(
+                                                            LineIcons
+                                                                .filter_solid,
+                                                            size: 18,
+                                                          )
+                                                        ],
+                                                      )),
+                                                  itemBuilder: (context) => [
+                                                    PopupMenuItem(
+                                                        child: Text('All'),
+                                                        value: 'All')
+                                                  ]..addAll(groupList.groups
+                                                      .map<
+                                                          PopupMenuEntry<
+                                                              String>>((e) =>
+                                                          PopupMenuItem(
+                                                              value: e.name,
+                                                              child:
+                                                                  Text(e.name)))
+                                                      .toList()),
+                                                  onSelected: (value) {
+                                                    if (value == 'All') {
+                                                      setState(() {
+                                                        _groupName = 'All';
+                                                        _group = ['All'];
+                                                      });
+                                                    } else {
+                                                      groupList.groups
+                                                          .forEach((group) {
+                                                        if (group.name ==
+                                                            value) {
+                                                          setState(() {
+                                                            _groupName = value;
+                                                            _group = group
+                                                                .podcastList;
+                                                          });
+                                                        }
+                                                      });
+                                                    }
+                                                  },
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Spacer(),
-                                          FutureBuilder<int>(
-                                              future: _getUpdateCounts(_group),
-                                              initialData: 0,
-                                              builder: (context, snapshot) {
-                                                return snapshot.data != 0
-                                                    ? Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        child: IconButton(
-                                                            tooltip:
-                                                                'Add new episodes to playlist',
-                                                            icon:
-                                                                // Icon(Icons.playlist_add),
-                                                                SizedBox(
-                                                                    height: 16,
-                                                                    width: 21,
-                                                                    child: CustomPaint(
-                                                                        painter: AddToPlaylistPainter(
-                                                                            context
-                                                                                .textTheme.bodyText1.color,
-                                                                            Colors
-                                                                                .red))),
-                                                            onPressed:
-                                                                () async {
-                                                              await audio
-                                                                  .addNewEpisode(
-                                                                      _group);
-                                                              if (mounted)
-                                                                setState(() {});
-                                                              Fluttertoast
-                                                                  .showToast(
-                                                                msg: _groupName ==
-                                                                        'All'
-                                                                    ? '${snapshot.data} episode added to playlist'
-                                                                    : '${snapshot.data} episode in $_groupName added to playlist',
-                                                                gravity:
-                                                                    ToastGravity
-                                                                        .BOTTOM,
-                                                              );
-                                                            }),
-                                                      )
-                                                    : Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        child: IconButton(
-                                                            tooltip:
-                                                                'Add new episodes to playlist',
-                                                            icon:
-                                                                // Icon(Icons.playlist_add),
-                                                                SizedBox(
-                                                                    height: 16,
-                                                                    width: 21,
-                                                                    child: CustomPaint(
-                                                                        painter: AddToPlaylistPainter(
-                                                                      context
-                                                                          .textTheme
-                                                                          .bodyText1
-                                                                          .color,
-                                                                      context
-                                                                          .textTheme
-                                                                          .bodyText1
-                                                                          .color,
-                                                                    ))),
-                                                            onPressed: () {}),
-                                                      );
-                                              }),
-                                          Material(
-                                              color: Colors.transparent,
-                                              child: IconButton(
-                                                tooltip: 'Change layout',
-                                                padding: EdgeInsets.zero,
-                                                onPressed: () {
-                                                  if (_layout == Layout.three)
-                                                    setState(() {
-                                                      _layout = Layout.two;
-                                                    });
-                                                  else
-                                                    setState(() {
-                                                      _layout = Layout.three;
-                                                    });
-                                                },
-                                                icon: _layout == Layout.three
-                                                    ? SizedBox(
-                                                        height: 10,
-                                                        width: 30,
-                                                        child: CustomPaint(
-                                                          painter:
-                                                              LayoutPainter(
-                                                                  0,
-                                                                  context
-                                                                      .textTheme
-                                                                      .bodyText1
-                                                                      .color),
+                                            Spacer(),
+                                            FutureBuilder<int>(
+                                                future:
+                                                    _getUpdateCounts(_group),
+                                                initialData: 0,
+                                                builder: (context, snapshot) {
+                                                  return snapshot.data != 0
+                                                      ? Material(
+                                                          color: Colors
+                                                              .transparent,
+                                                          child: IconButton(
+                                                              tooltip:
+                                                                  'Add new episodes to playlist',
+                                                              icon:
+                                                                  // Icon(Icons.playlist_add),
+                                                                  SizedBox(
+                                                                      height:
+                                                                          16,
+                                                                      width: 21,
+                                                                      child: CustomPaint(
+                                                                          painter: AddToPlaylistPainter(
+                                                                              context.textTheme.bodyText1.color,
+                                                                              Colors.red))),
+                                                              onPressed: () async {
+                                                                await audio
+                                                                    .addNewEpisode(
+                                                                        _group);
+                                                                if (mounted)
+                                                                  setState(
+                                                                      () {});
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                  msg: _groupName ==
+                                                                          'All'
+                                                                      ? '${snapshot.data} episode added to playlist'
+                                                                      : '${snapshot.data} episode in $_groupName added to playlist',
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .BOTTOM,
+                                                                );
+                                                              }),
+                                                        )
+                                                      : Material(
+                                                          color: Colors
+                                                              .transparent,
+                                                          child: IconButton(
+                                                              tooltip:
+                                                                  'Add new episodes to playlist',
+                                                              icon:
+                                                                  // Icon(Icons.playlist_add),
+                                                                  SizedBox(
+                                                                      height:
+                                                                          16,
+                                                                      width: 21,
+                                                                      child: CustomPaint(
+                                                                          painter: AddToPlaylistPainter(
+                                                                        context
+                                                                            .textTheme
+                                                                            .bodyText1
+                                                                            .color,
+                                                                        context
+                                                                            .textTheme
+                                                                            .bodyText1
+                                                                            .color,
+                                                                      ))),
+                                                              onPressed: () {}),
+                                                        );
+                                                }),
+                                            Material(
+                                                color: Colors.transparent,
+                                                child: IconButton(
+                                                  tooltip: 'Change layout',
+                                                  padding: EdgeInsets.zero,
+                                                  onPressed: () {
+                                                    if (_layout == Layout.three)
+                                                      setState(() {
+                                                        _layout = Layout.two;
+                                                      });
+                                                    else
+                                                      setState(() {
+                                                        _layout = Layout.three;
+                                                      });
+                                                  },
+                                                  icon: _layout == Layout.three
+                                                      ? SizedBox(
+                                                          height: 10,
+                                                          width: 30,
+                                                          child: CustomPaint(
+                                                            painter: LayoutPainter(
+                                                                0,
+                                                                context
+                                                                    .textTheme
+                                                                    .bodyText1
+                                                                    .color),
+                                                          ),
+                                                        )
+                                                      : SizedBox(
+                                                          height: 10,
+                                                          width: 30,
+                                                          child: CustomPaint(
+                                                            painter: LayoutPainter(
+                                                                1,
+                                                                context
+                                                                    .textTheme
+                                                                    .bodyText1
+                                                                    .color),
+                                                          ),
                                                         ),
-                                                      )
-                                                    : SizedBox(
-                                                        height: 10,
-                                                        width: 30,
-                                                        child: CustomPaint(
-                                                          painter:
-                                                              LayoutPainter(
-                                                                  1,
-                                                                  context
-                                                                      .textTheme
-                                                                      .bodyText1
-                                                                      .color),
-                                                        ),
-                                                      ),
-                                              )),
-                                        ],
-                                      ),
-                                    )),
-                              ),
-                              EpisodeGrid(
-                                episodes: snapshot.data,
-                                layout: _layout,
-                                initNum: 9,
-                              ),
-                              SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, int index) {
-                                    return _loadMore
-                                        ? Container(
-                                            height: 2,
-                                            child: LinearProgressIndicator())
-                                        : Center();
-                                  },
-                                  childCount: 1,
+                                                )),
+                                          ],
+                                        ),
+                                      )),
                                 ),
-                              ),
-                            ]);
-                      },
-                    ))
-            : Center();
-      },
-    );
+                                EpisodeGrid(
+                                  episodes: snapshot.data,
+                                  layout: _layout,
+                                  initNum: 9,
+                                ),
+                                SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (BuildContext context, int index) {
+                                      return _loadMore
+                                          ? Container(
+                                              height: 2,
+                                              child: LinearProgressIndicator())
+                                          : Center();
+                                    },
+                                    childCount: 1,
+                                  ),
+                                ),
+                              ]))
+                  : Center();
+            },
+          );
+        });
   }
 
   @override
@@ -970,29 +971,31 @@ class _MyDownloadState extends State<_MyDownload>
                 .toList()
                 .reversed
                 .toList();
-            return episodes.length == 0
-                ? SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 100),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(LineIcons.download_solid,
-                              size: 80, color: Colors.grey[500]),
-                          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                          Text(
-                            'No episode collected yet',
-                            style: TextStyle(color: Colors.grey[500]),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                : EpisodeGrid(
-                    episodes: episodes,
-                    layout: _layout,
-                    initNum: 0,
-                  );
+            return
+                //episodes.length == 0
+                //   ? SliverToBoxAdapter(
+                //       child: Padding(
+                //         padding: EdgeInsets.only(top: 100),
+                //         child: Column(
+                //           mainAxisAlignment: MainAxisAlignment.center,
+                //           children: [
+                //             Icon(LineIcons.download_solid,
+                //                 size: 80, color: Colors.grey[500]),
+                //             Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+                //             Text(
+                //               'No episode collected yet',
+                //               style: TextStyle(color: Colors.grey[500]),
+                //             )
+                //           ],
+                //         ),
+                //       ),
+                //     )
+                //   :
+                EpisodeGrid(
+              episodes: episodes,
+              layout: _layout,
+              initNum: 0,
+            );
           },
         ),
       ],

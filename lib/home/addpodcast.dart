@@ -24,8 +24,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
     String apiKey = environment['apiKey'];
     String url =
         "https://listennotes.p.rapidapi.com/api/v1/search?only_in=title%2Cdescription&q=" +
-            searchText +
-            "&sort_by_date=0&type=podcast";
+            "$searchText&sort_by_date=0&type=podcast";
     Response response = await Dio().get(url,
         options: Options(headers: {
           'X-Mashape-Key': "$apiKey",
@@ -81,57 +80,57 @@ class MyHomePageDelegate extends SearchDelegate<int> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    if (query.isEmpty)
-      return Center(
-          child: Container(
-        padding: EdgeInsets.only(top: 400),
-        child: Image(
-          image: Theme.of(context).brightness == Brightness.light
-              ? AssetImage('assets/listennotes.png')
-              : AssetImage('assets/listennotes_light.png'),
-          height: 20,
-        ),
-      ));
-    else if (rssExp.stringMatch(query) != null)
-      return FutureBuilder(
-        future: getRss(rssExp.stringMatch(query)),
-        builder: (context, snapshot) {
-          if (snapshot.hasError)
-            return invalidRss();
-          else if (snapshot.hasData)
-            return SearchResult(
-              onlinePodcast: snapshot.data,
-            );
-          else
-            return Container(
-              padding: EdgeInsets.only(top: 200),
-              alignment: Alignment.topCenter,
-              child: CircularProgressIndicator(),
-            );
-        },
-      );
-    else
-      return FutureBuilder(
-        future: getList(query),
-        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-          if (!snapshot.hasData && query != null)
-            return Container(
-              padding: EdgeInsets.only(top: 200),
-              alignment: Alignment.topCenter,
-              child: CircularProgressIndicator(),
-            );
-          List content = snapshot.data;
-          return ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: content.length,
-            itemBuilder: (BuildContext context, int index) {
-              return SearchResult(
-                onlinePodcast: content[index],
-              );
-            },
-          );
-        },
-      );
+    // if (query.isEmpty)
+    return Center(
+        child: Container(
+      padding: EdgeInsets.only(top: 400),
+      child: Image(
+        image: Theme.of(context).brightness == Brightness.light
+            ? AssetImage('assets/listennotes.png')
+            : AssetImage('assets/listennotes_light.png'),
+        height: 20,
+      ),
+    ));
+    // else if (rssExp.stringMatch(query) != null)
+    //   return FutureBuilder(
+    //     future: getRss(rssExp.stringMatch(query)),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.hasError)
+    //         return invalidRss();
+    //       else if (snapshot.hasData)
+    //         return SearchResult(
+    //           onlinePodcast: snapshot.data,
+    //         );
+    //       else
+    //         return Container(
+    //           padding: EdgeInsets.only(top: 200),
+    //           alignment: Alignment.topCenter,
+    //           child: CircularProgressIndicator(),
+    //         );
+    //     },
+    //   );
+    // else
+    //   return FutureBuilder(
+    //     future: getList(query),
+    //     builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+    //       if (!snapshot.hasData && query != null)
+    //         return Container(
+    //           padding: EdgeInsets.only(top: 200),
+    //           alignment: Alignment.topCenter,
+    //           child: CircularProgressIndicator(),
+    //         );
+    //       List content = snapshot.data;
+    //       return ListView.builder(
+    //         scrollDirection: Axis.vertical,
+    //         itemCount: content.length,
+    //         itemBuilder: (BuildContext context, int index) {
+    //           return SearchResult(
+    //             onlinePodcast: content[index],
+    //           );
+    //         },
+    //       );
+    //     },
+    //   );
   }
 
   @override
@@ -257,7 +256,8 @@ class _SearchResultState extends State<SearchResult>
     var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
 
     savePodcast(OnlinePodcast podcast) {
-      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title, imgUrl: podcast.image);
+      SubscribeItem item =
+          SubscribeItem(podcast.rss, podcast.title, imgUrl: podcast.image);
       subscribeWorker.setSubscribeItem(item);
     }
 
@@ -309,8 +309,7 @@ class _SearchResultState extends State<SearchResult>
                   child: !_issubscribe
                       ? OutlineButton(
                           highlightedBorderColor: context.accentColor,
-                          splashColor:
-                              context.accentColor.withOpacity(0.8),
+                          splashColor: context.accentColor.withOpacity(0.8),
                           child: Text('Subscribe',
                               style: TextStyle(
                                   color: Theme.of(context).accentColor)),
