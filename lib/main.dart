@@ -55,16 +55,17 @@ class MyApp extends StatelessWidget {
           title: 'Tsacdop',
           theme: lightTheme.copyWith(
               accentColor: setting.accentSetColor,
+              cursorColor: setting.accentSetColor,
               toggleableActiveColor: setting.accentSetColor),
           darkTheme: ThemeData.dark().copyWith(
-            accentColor: setting.accentSetColor,
-            primaryColorDark: Colors.grey[800],
-            scaffoldBackgroundColor: setting.realDark ? Colors.black87 : null,
-            primaryColor: setting.realDark ? Colors.black : null,
-            popupMenuTheme: PopupMenuThemeData()
-                .copyWith(color: setting.realDark ? Colors.black87 : null),
-            appBarTheme: AppBarTheme(elevation: 0),
-          ),
+              accentColor: setting.accentSetColor,
+              primaryColorDark: Colors.grey[800],
+              scaffoldBackgroundColor: setting.realDark ? Colors.black87 : null,
+              primaryColor: setting.realDark ? Colors.black : null,
+              popupMenuTheme: PopupMenuThemeData()
+                  .copyWith(color: setting.realDark ? Colors.black87 : null),
+              appBarTheme: AppBarTheme(elevation: 0),
+              cursorColor: setting.accentSetColor),
           localizationsDelegates: [
             S.delegate,
             GlobalMaterialLocalizations.delegate,

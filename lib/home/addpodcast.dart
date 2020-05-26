@@ -19,15 +19,17 @@ import '../.env.dart';
 class MyHomePageDelegate extends SearchDelegate<int> {
   final String searchFieldLabel;
   MyHomePageDelegate({this.searchFieldLabel})
-      : super(searchFieldLabel: searchFieldLabel);
+      : super(
+            searchFieldLabel: searchFieldLabel,
+            );
   static Future<List> getList(String searchText) async {
     String apiKey = environment['apiKey'];
     String url =
         "https://listennotes.p.rapidapi.com/api/v1/search?only_in=title%2Cdescription&q=" +
-            "$searchText&sort_by_date=0&type=podcast";
+            "$searchText&type=podcast";
     Response response = await Dio().get(url,
         options: Options(headers: {
-          'X-Mashape-Key': "$apiKey",
+          'X-RapidAPI-Key': "$apiKey",
           'Accept': "application/json"
         }));
     Map searchResultMap = jsonDecode(response.toString());

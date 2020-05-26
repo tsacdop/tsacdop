@@ -33,8 +33,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  final MyHomePageDelegate _delegate =
-      MyHomePageDelegate(searchFieldLabel: 'Search podcast');
+  final MyHomePageDelegate _delegate = MyHomePageDelegate(
+    searchFieldLabel: 'Search podcast',
+  );
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TabController _controller;
@@ -456,9 +457,10 @@ class _RecentUpdateState extends State<_RecentUpdate>
               if (snapshot.hasError) print(snapshot.error);
               return (snapshot.hasData)
                   ? snapshot.data.length == 0
-                      ? Center(
+                      ? Padding(
+                          padding: EdgeInsets.only(top: 150),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Icon(LineIcons.cloud_download_alt_solid,
                                   size: 80, color: Colors.grey[500]),
@@ -748,9 +750,10 @@ class _MyFavoriteState extends State<_MyFavorite>
         if (snapshot.hasError) print(snapshot.error);
         return (snapshot.hasData)
             ? snapshot.data.length == 0
-                ? Center(
+                ? Padding(
+                    padding: EdgeInsets.only(top: 150),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Icon(LineIcons.heartbeat_solid,
                             size: 80, color: Colors.grey[500]),
@@ -971,31 +974,29 @@ class _MyDownloadState extends State<_MyDownload>
                 .toList()
                 .reversed
                 .toList();
-            return
-                //episodes.length == 0
-                //   ? SliverToBoxAdapter(
-                //       child: Padding(
-                //         padding: EdgeInsets.only(top: 100),
-                //         child: Column(
-                //           mainAxisAlignment: MainAxisAlignment.center,
-                //           children: [
-                //             Icon(LineIcons.download_solid,
-                //                 size: 80, color: Colors.grey[500]),
-                //             Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                //             Text(
-                //               'No episode collected yet',
-                //               style: TextStyle(color: Colors.grey[500]),
-                //             )
-                //           ],
-                //         ),
-                //       ),
-                //     )
-                //   :
-                EpisodeGrid(
-              episodes: episodes,
-              layout: _layout,
-              initNum: 0,
-            );
+            return episodes.length == 0
+                ? SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 110),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(LineIcons.download_solid,
+                              size: 80, color: Colors.grey[500]),
+                          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+                          Text(
+                            'No episode downloaded yet',
+                            style: TextStyle(color: Colors.grey[500]),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : EpisodeGrid(
+                    episodes: episodes,
+                    layout: _layout,
+                    initNum: 0,
+                  );
           },
         ),
       ],
