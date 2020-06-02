@@ -13,6 +13,7 @@ import '../type/podcastlocal.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../podcasts/podcastdetail.dart';
 import '../util/pageroute.dart';
+import '../util/context_extension.dart';
 
 class AboutPodcast extends StatefulWidget {
   final PodcastLocal podcastLocal;
@@ -48,7 +49,8 @@ class _AboutPodcastState extends State<AboutPodcast> {
     return AlertDialog(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10.0))),
-      titlePadding: EdgeInsets.only(top: 20, left: 20, right: 200, bottom: 20),
+      titlePadding: EdgeInsets.only(
+          top: 20, left: 20, right: context.width / 3, bottom: 20),
       actions: <Widget>[
         FlatButton(
           padding: EdgeInsets.all(10.0),
@@ -63,18 +65,21 @@ class _AboutPodcastState extends State<AboutPodcast> {
         ),
       ],
       title: Text(widget.podcastLocal.title),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          !_load
-              ? Center()
-              : _description != null ? Html(data: _description) : Center(),
-          (widget.podcastLocal.author != null)
-              ? Text(widget.podcastLocal.author,
-                  style: TextStyle(color: Colors.blue))
-              : Center(),
-        ],
+      content: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            !_load
+                ? Center()
+                : _description != null ? Html(data: _description) : Center(),
+            (widget.podcastLocal.author != null)
+                ? Text(widget.podcastLocal.author,
+                    style: TextStyle(color: Colors.blue))
+                : Center(),
+          ],
+        ),
       ),
     );
   }

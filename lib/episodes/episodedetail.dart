@@ -580,7 +580,7 @@ class _MenuBarState extends State<MenuBar> {
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
                           child: Row(
                             children: <Widget>[
-                              Text('Play Now',
+                              Text('Play',
                                   style: TextStyle(
                                     color: Theme.of(context).accentColor,
                                     fontSize: 15,

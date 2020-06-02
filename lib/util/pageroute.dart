@@ -30,7 +30,8 @@ class SlideLeftRoute extends PageRouteBuilder {
 
 class SlideLeftHideRoute extends PageRouteBuilder {
   final Widget page;
-  SlideLeftHideRoute({this.page})
+  final Widget transitionPage;
+  SlideLeftHideRoute({this.page, this.transitionPage})
       : super(
           pageBuilder: (
             BuildContext context,
@@ -38,25 +39,23 @@ class SlideLeftHideRoute extends PageRouteBuilder {
             Animation<double> secondaryAnimation,
           ) =>
               page,
+          transitionDuration: Duration(seconds: 2),
           transitionsBuilder: (
             BuildContext context,
             Animation<double> animation,
             Animation<double> secondaryAnimation,
             Widget child,
-          ) =>
-              SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1, 0),
-              end: Offset.zero,
-            ).animate(animation),
-            child: Container(
-              alignment: Alignment.topLeft,
-              child: SizedBox(
-                width: context.width,
-                height: context.height,
-                child: child),
-            ),
-          ),
+          ) {
+            if (animation.isCompleted)
+              return child;
+            else
+              return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: transitionPage);
+          },
         );
 }
 

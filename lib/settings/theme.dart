@@ -72,45 +72,46 @@ class ThemeSetting extends StatelessWidget {
                                   titlePadding: EdgeInsets.only(
                                     top: 20,
                                     left: 40,
-                                    right: 200,
+                                    right: context.width / 3,
                                   ),
                                   elevation: 1,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10.0))),
                                   title: Text('Theme'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      RadioListTile(
-                                          title: Container(
-                                              padding:
-                                                  EdgeInsets.only(right: 80),
-                                              child: Text('System default')),
-                                          value: ThemeMode.system,
-                                          groupValue: settings.theme,
-                                          onChanged: (value) {
-                                            settings.setTheme = value;
-                                            Navigator.of(context).pop();
-                                          }),
-                                      RadioListTile(
-                                          title: Text('Dark mode'),
-                                          value: ThemeMode.dark,
-                                          groupValue: settings.theme,
-                                          onChanged: (value) {
-                                            settings.setTheme = value;
-                                            Navigator.of(context).pop();
-                                          }),
-                                      RadioListTile(
-                                          title: Text('Light mode'),
-                                          value: ThemeMode.light,
-                                          groupValue: settings.theme,
-                                          onChanged: (value) {
-                                            settings.setTheme = value;
-                                            Navigator.of(context).pop();
-                                          }),
-                                    ],
+                                  content: SingleChildScrollView(
+                                    scrollDirection: Axis.vertical,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        RadioListTile(
+                                            title: Text('System default'),
+                                            value: ThemeMode.system,
+                                            groupValue: settings.theme,
+                                            onChanged: (value) {
+                                              settings.setTheme = value;
+                                              Navigator.of(context).pop();
+                                            }),
+                                        RadioListTile(
+                                            title: Text('Dark mode'),
+                                            value: ThemeMode.dark,
+                                            groupValue: settings.theme,
+                                            onChanged: (value) {
+                                              settings.setTheme = value;
+                                              Navigator.of(context).pop();
+                                            }),
+                                        RadioListTile(
+                                            title: Text('Light mode'),
+                                            value: ThemeMode.light,
+                                            groupValue: settings.theme,
+                                            onChanged: (value) {
+                                              settings.setTheme = value;
+                                              Navigator.of(context).pop();
+                                            }),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )),

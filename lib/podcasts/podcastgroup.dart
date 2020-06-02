@@ -253,10 +253,8 @@ class _PodcastCardState extends State<PodcastCard>
                     child: _addGroup
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               Expanded(
-                                flex: 4,
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
@@ -284,9 +282,10 @@ class _PodcastCardState extends State<PodcastCard>
                                   }).toList()),
                                 ),
                               ),
-                              Expanded(
-                                flex: 1,
+                              SizedBox(
+                                width: 100,
                                 child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: <Widget>[
                                     IconButton(
                                       icon: Icon(Icons.clear),
@@ -374,7 +373,7 @@ class _PodcastCardState extends State<PodcastCard>
                                       titlePadding: EdgeInsets.only(
                                           top: 20,
                                           left: 20,
-                                          right: 100,
+                                          right: context.width / 3,
                                           bottom: 20),
                                       title:
                                           Text('Skip seconds at the beginning'),
@@ -452,7 +451,7 @@ class _PodcastCardState extends State<PodcastCard>
                                       titlePadding: EdgeInsets.only(
                                           top: 20,
                                           left: 20,
-                                          right: 200,
+                                          right: context.width / 3,
                                           bottom: 20),
                                       title: Text('Remove confirm'),
                                       content: Text(
@@ -535,8 +534,8 @@ class _RenameGroupState extends State<RenameGroup> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         elevation: 1,
         contentPadding: EdgeInsets.symmetric(horizontal: 20),
-        titlePadding:
-            EdgeInsets.only(top: 20, left: 20, right: 200, bottom: 20),
+        titlePadding: EdgeInsets.only(
+            top: 20, left: 20, right: context.width / 3, bottom: 20),
         actionsPadding: EdgeInsets.all(0),
         actions: <Widget>[
           FlatButton(

@@ -158,7 +158,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     controller: _controller,
                                     tabs: <Widget>[
                                       Tab(
-                                        child: Text('Recent Update'),
+                                        child: Text('Recent'),
                                       ),
                                       Tab(
                                         child: Text('Favorite'),

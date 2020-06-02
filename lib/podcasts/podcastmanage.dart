@@ -49,11 +49,11 @@ class _PodcastManageState extends State<PodcastManage>
             _fraction = _animation.value;
           });
       });
-    _menuAnimation = Tween(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _menuController, curve: Curves.easeIn))
-      ..addListener(() {
-        if (mounted) setState(() => _menuValue = _menuAnimation.value);
-      });
+    _menuAnimation = Tween(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _menuController, curve: Curves.easeIn))
+          ..addListener(() {
+            if (mounted) setState(() => _menuValue = _menuAnimation.value);
+          });
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -361,7 +361,9 @@ class _PodcastManageState extends State<PodcastManage>
                                                               EdgeInsets.only(
                                                                   top: 20,
                                                                   left: 20,
-                                                                  right: 200,
+                                                                  right: context
+                                                                          .width /
+                                                                      3,
                                                                   bottom: 20),
                                                           title: Text(
                                                               'Delete confirm'),
@@ -531,8 +533,8 @@ class _AddGroupState extends State<AddGroup> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         elevation: 1,
         contentPadding: EdgeInsets.symmetric(horizontal: 20),
-        titlePadding:
-            EdgeInsets.only(top: 20, left: 20, right: 200, bottom: 20),
+        titlePadding: EdgeInsets.only(
+            top: 20, left: 20, right: context.width / 3, bottom: 20),
         actionsPadding: EdgeInsets.all(0),
         actions: <Widget>[
           FlatButton(

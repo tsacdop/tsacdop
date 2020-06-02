@@ -36,7 +36,7 @@ class SubscribeWorker extends ChangeNotifier {
   SubscribeItem _subscribeItem;
   SubscribeItem _currentSubscribeItem = SubscribeItem('', '');
   bool _created = false;
-  bool get created=> _created;
+  bool get created => _created;
 
   setSubscribeItem(SubscribeItem item) async {
     _subscribeItem = item;
@@ -117,9 +117,23 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       receiveTimeout: 20000,
     );
     print(rss);
+
     try {
       Response response = await Dio(options).get(rss);
-      var p = RssFeed.parse(response.data);
+      RssFeed p;
+      try {
+        p = RssFeed.parse(response.data);
+      } on ArgumentError catch (e) {
+        print(e);
+        sendPort.send([item.title, item.url, 6]);
+        await Future.delayed(Duration(seconds: 2));
+        sendPort.send([item.title, item.url, 4]);
+        items.removeWhere((element) => element.url == item.url);
+        if (items.length > 0) {
+          await _subscribe(items.first);
+        } else
+          sendPort.send("done");
+      }
 
       var dir = await getApplicationDocumentsDirectory();
 
@@ -128,31 +142,35 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
 
       print(realUrl);
       bool checkUrl = await dbHelper.checkPodcast(realUrl);
-
+      String imageUrl;
       if (checkUrl) {
         img.Image thumbnail;
         try {
           Response<List<int>> imageResponse = await Dio().get<List<int>>(
               p.itunes.image.href,
               options: Options(responseType: ResponseType.bytes));
+          imageUrl = p.itunes.image.href;
           img.Image image = img.decodeImage(imageResponse.data);
           thumbnail = img.copyResize(image, width: 300);
-        } on DioError catch (e) {
+        } catch (e) {
           print(e);
           try {
             Response<List<int>> imageResponse = await Dio().get<List<int>>(
                 item.imgUrl,
                 options: Options(responseType: ResponseType.bytes));
+            imageUrl = item.imgUrl;
             img.Image image = img.decodeImage(imageResponse.data);
             thumbnail = img.copyResize(image, width: 300);
-          } on DioError catch (e) {
+          } catch (e) {
             print(e);
             try {
               Response<List<int>> imageResponse = await Dio().get<List<int>>(
                   "https://ui-avatars.com/api/?size=300&background=4D91BE&color=fff&name=${item.title}&length=2&bold=true",
                   options: Options(responseType: ResponseType.bytes));
+              imageUrl =
+                  "https://ui-avatars.com/api/?size=300&background=4D91BE&color=fff&name=${item.title}&length=2&bold=true";
               thumbnail = img.decodeImage(imageResponse.data);
-            } on DioError catch (e) {
+            } catch (e) {
               print(e);
               sendPort.send([item.title, item.url, 6]);
               await Future.delayed(Duration(seconds: 2));
@@ -174,8 +192,8 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         String author = p.itunes.author ?? p.author ?? '';
         String provider = p.generator ?? '';
         String link = p.link ?? '';
-        PodcastLocal podcastLocal = PodcastLocal(p.title, p.itunes.image.href,
-            realUrl, primaryColor, author, uuid, imagePath, provider, link,
+        PodcastLocal podcastLocal = PodcastLocal(p.title, imageUrl, realUrl,
+            primaryColor, author, uuid, imagePath, provider, link,
             description: p.description);
 
         //   await groupList.subscribe(podcastLocal);

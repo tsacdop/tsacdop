@@ -39,7 +39,7 @@ class Import extends StatelessWidget {
                 groupList.subscribeNewPodcast(item.id);
                 return importColumn("Fetch data ${item.title}", context);
               case SubscribeState.fetch:
-                groupList.updatePodcast(item.id);
+              //  groupList.updatePodcast(item.id);
                 return importColumn("Subscribe success ${item.title}", context);
               case SubscribeState.exist:
                 return importColumn(

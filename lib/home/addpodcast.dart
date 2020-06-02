@@ -18,24 +18,26 @@ import '../.env.dart';
 
 class MyHomePageDelegate extends SearchDelegate<int> {
   final String searchFieldLabel;
+
   MyHomePageDelegate({this.searchFieldLabel})
       : super(
-            searchFieldLabel: searchFieldLabel,
-            );
-  static Future<List> getList(String searchText) async {
-    String apiKey = environment['apiKey'];
-    String url =
-        "https://listennotes.p.rapidapi.com/api/v1/search?only_in=title%2Cdescription&q=" +
-            "$searchText&type=podcast";
-    Response response = await Dio().get(url,
-        options: Options(headers: {
-          'X-RapidAPI-Key': "$apiKey",
-          'Accept': "application/json"
-        }));
-    Map searchResultMap = jsonDecode(response.toString());
-    var searchResult = SearchPodcast.fromJson(searchResultMap);
-    return searchResult.results;
-  }
+          searchFieldLabel: searchFieldLabel,
+        );
+
+  //static Future<List> getList(String searchText) async {
+  //  String apiKey = environment['apiKey'];
+  //  String url =
+  //      "https://listennotes.p.rapidapi.com/api/v1/search?only_in=title%2Cdescription&q=" +
+  //          "$searchText&type=podcast";
+  //  Response response = await Dio().get(url,
+  //      options: Options(headers: {
+  //        'X-RapidAPI-Key': "$apiKey",
+  //        'Accept': "application/json"
+  //      }));
+  //  Map searchResultMap = jsonDecode(response.toString());
+  //  var searchResult = SearchPodcast.fromJson(searchResultMap);
+  //  return searchResult.results;
+  //}
 
   static Future getRss(String url) async {
     try {
@@ -185,27 +187,130 @@ class MyHomePageDelegate extends SearchDelegate<int> {
         },
       );
     else
-      return FutureBuilder(
-        future: getList(query),
-        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-          if (!snapshot.hasData && query != null)
-            return Container(
-              padding: EdgeInsets.only(top: 200),
-              alignment: Alignment.topCenter,
-              child: CircularProgressIndicator(),
-            );
-          List content = snapshot.data;
-          return ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: content.length,
-            itemBuilder: (BuildContext context, int index) {
-              return SearchResult(
-                onlinePodcast: content[index],
-              );
-            },
-          );
-        },
+      return SearchList(
+        query: query,
       );
+    // return FutureBuilder(
+    //   future: getList(query),
+    //   builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+    //     if (!snapshot.hasData && query != null)
+    //       return Container(
+    //         padding: EdgeInsets.only(top: 200),
+    //         alignment: Alignment.topCenter,
+    //         child: CircularProgressIndicator(),
+    //       );
+    //     List content = snapshot.data;
+    //     return ListView.builder(
+    //       scrollDirection: Axis.vertical,
+    //       itemCount: content.length,
+    //       itemBuilder: (BuildContext context, int index) {
+    //         return SearchResult(
+    //           onlinePodcast: content[index],
+    //         );
+    //       },
+    //     );
+    //   },
+    // );
+  }
+}
+
+class SearchList extends StatefulWidget {
+  final String query;
+  SearchList({this.query, Key key}) : super(key: key);
+
+  @override
+  _SearchListState createState() => _SearchListState();
+}
+
+class _SearchListState extends State<SearchList> {
+  int _nextOffset;
+  List<OnlinePodcast> _podcastList;
+  int _offset;
+  bool _loading;
+  @override
+  void initState() {
+    super.initState();
+    _nextOffset = 0;
+    _podcastList = [];
+  }
+
+  Future<List> _getList(String searchText, int nextOffset) async {
+    String apiKey = environment['apiKey'];
+    String url = "https://listen-api.listennotes.com/api/v2/search?q=" +
+        searchText +
+        "&sort_by_date=0&type=podcast&offset=$nextOffset";
+    Response response = await Dio().get(url,
+        options: Options(headers: {
+          'X-ListenAPI-Key': "$apiKey",
+          'Accept': "application/json"
+        }));
+    Map searchResultMap = jsonDecode(response.toString());
+    var searchResult = SearchPodcast.fromJson(searchResultMap);
+    _offset = searchResult.nextOffset;
+    _podcastList.addAll(searchResult.results.cast());
+    _loading = false;
+    return _podcastList;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List>(
+      future: _getList(widget.query, _nextOffset),
+      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+        if (!snapshot.hasData && widget.query != null)
+          return Container(
+            padding: EdgeInsets.only(top: 200),
+            alignment: Alignment.topCenter,
+            child: CircularProgressIndicator(),
+          );
+        var content = snapshot.data;
+        return CustomScrollView(
+          slivers: [
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return SearchResult(
+                    onlinePodcast: content[index],
+                  );
+                },
+                childCount: content.length,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
+                    child: SizedBox(
+                        height: 30,
+                        child: OutlineButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15))),
+                            child: _loading
+                                ? SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ))
+                                : Text('Load more'),
+                            onPressed: () => _loading
+                                ? null
+                                : setState(() {
+                                    _loading = true;
+                                    _nextOffset = _offset;
+                                  }))),
+                  )
+                ],
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -292,6 +397,25 @@ class _SearchResultState extends State<SearchResult>
                 width: 40.0,
                 fit: BoxFit.fitWidth,
                 alignment: Alignment.center,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    alignment: Alignment.center,
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.primaryColorDark),
+                    child: SizedBox(
+                        width: 20, height: 2, child: LinearProgressIndicator()),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                    width: 40,
+                    height: 40,
+                    alignment: Alignment.center,
+                    color: context.primaryColorDark,
+                    child: Icon(Icons.error)),
               ),
             ),
             title: Text(widget.onlinePodcast.title),

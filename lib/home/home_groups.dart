@@ -440,7 +440,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          SlideLeftRoute(
+                          SlideLeftHideRoute(
                               page: PodcastDetail(
                             podcastLocal: widget.podcastLocal,
                           )),

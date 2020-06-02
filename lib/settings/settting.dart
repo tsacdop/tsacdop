@@ -85,7 +85,10 @@ class _SettingsState extends State<Settings>
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 5),
                 ),
-                Text(name)
+                Text(
+                  name,
+                  maxLines: 2,
+                )
               ],
             ),
           ),
@@ -284,28 +287,31 @@ class _SettingsState extends State<Settings>
                           ),
                         ),
                         _showFeedback
-                            ? Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  _feedbackItem(
-                                      LineIcons.github,
-                                      'Submit issue',
-                                      'https://github.com/stonega/tsacdop/issues'),
-                                  _feedbackItem(
-                                      LineIcons.telegram,
-                                      'Join group',
-                                      'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
-                                  _feedbackItem(
-                                      LineIcons.envelope_open_text_solid,
-                                      'Write to me',
-                                      'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
-                                  _feedbackItem(
-                                      LineIcons.google_play,
-                                      'Rate on Play',
-                                      'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop')
-                                ],
+                            ? SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    _feedbackItem(
+                                        LineIcons.github,
+                                        'Submit issue',
+                                        'https://github.com/stonega/tsacdop/issues'),
+                                    _feedbackItem(
+                                        LineIcons.telegram,
+                                        'Join group',
+                                        'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
+                                    _feedbackItem(
+                                        LineIcons.envelope_open_text_solid,
+                                        'Write to me',
+                                        'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
+                                    _feedbackItem(
+                                        LineIcons.google_play,
+                                        'Rate on Play',
+                                        'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop')
+                                  ],
+                                ),
                               )
                             : Center(),
                         Divider(

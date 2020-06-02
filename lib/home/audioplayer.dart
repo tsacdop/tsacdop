@@ -460,15 +460,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                     style: TextStyle(
                                         color: Theme.of(context).accentColor),
                                   )
-                                : Row(
-                                    children: <Widget>[
-                                      Text(
-                                        _stringForSeconds(data.item2) ?? '',
-                                      ),
-                                      Text(
-                                        '  Left',
-                                      ),
-                                    ],
+                                : Text(
+                                    (_stringForSeconds(data.item2) ?? '') +
+                                        ' Left',
+                                    maxLines: 2,
                                   ),
                       );
                     },
@@ -480,10 +475,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       selector: (_, audio) => audio.audioState,
                       builder: (_, audioplay, __) {
                         return Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Spacer(),
+                            //Spacer(),
                             audioplay == BasicPlaybackState.playing
                                 ? InkWell(
                                     onTap:
@@ -518,7 +512,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                               )),
                                         ),
                                         Container(
-                                          height: 50.0,
+                                          height: 40.0,
                                           decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               color: Colors.black),
@@ -531,8 +525,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                     ),
                                   ),
                             IconButton(
+                                padding: EdgeInsets.zero,
                                 onPressed: () => audio.playNext(),
-                                iconSize: 25.0,
+                                iconSize: 20.0,
                                 icon: Icon(Icons.skip_next),
                                 color:
                                     Theme.of(context).tabBarTheme.labelColor),
@@ -1251,7 +1246,7 @@ class _ControlPanelState extends State<ControlPanel>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton(
-                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                padding: EdgeInsets.symmetric(horizontal: 25.0),
                                 onPressed:
                                     backplay == BasicPlaybackState.playing
                                         ? () => audio.forwardAudio(-10)
@@ -1323,7 +1318,7 @@ class _ControlPanelState extends State<ControlPanel>
                                     ),
                             ),
                             IconButton(
-                                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                                padding: EdgeInsets.symmetric(horizontal: 25.0),
                                 onPressed:
                                     backplay == BasicPlaybackState.playing
                                         ? () => audio.forwardAudio(30)

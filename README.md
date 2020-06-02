@@ -20,7 +20,7 @@ Credit to flutter team and  all involved plugins, especially [webfeed](https://g
 The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 
 ## Features
-* Subscriptoin group management
+* Podcasts group management
 * Playlist support
 * Sleep timer / Speed setting
 * OMPL file export and import
@@ -28,7 +28,7 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 * Listen and subscribe history record
 * Dark mode / Accent color 
 * Download for offline playing
-* Share clip on twitter
+* Share clip(video format) on twitter
 
 More to come...
 
