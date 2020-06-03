@@ -15,6 +15,7 @@ import '../intro_slider/app_intro.dart';
 import '../type/podcastlocal.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import 'theme.dart';
+import 'layouts.dart';
 import 'storage.dart';
 import 'history.dart';
 import 'syncing.dart';
@@ -150,6 +151,18 @@ class _SettingsState extends State<Settings>
                           leading: Icon(LineIcons.adjust_solid),
                           title: Text('Appearance'),
                           subtitle: Text('Colors and themes'),
+                        ),
+                        Divider(height: 2),
+                        ListTile(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LayoutSetting())),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
+                          leading: Icon(LineIcons.stop_circle_solid),
+                          title: Text('Layout'),
+                          subtitle: Text('App layout'),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -294,6 +307,7 @@ class _SettingsState extends State<Settings>
                                       MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
+                                    SizedBox(width: 75),
                                     _feedbackItem(
                                         LineIcons.github,
                                         'Submit issue',

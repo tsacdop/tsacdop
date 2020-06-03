@@ -10,6 +10,7 @@ import 'package:line_icons/line_icons.dart';
 
 import '../type/episodebrief.dart';
 import '../state/podcast_group.dart';
+import '../state/subscribe_podcast.dart';
 import '../type/podcastlocal.dart';
 import '../state/audiostate.dart';
 import '../util/custompaint.dart';
@@ -394,29 +395,31 @@ class _PodcastPreviewState extends State<PodcastPreview> {
     return Column(
       children: <Widget>[
         Expanded(
-          child: Container(
-            child: FutureBuilder<List<EpisodeBrief>>(
-              future: _getRssItemTop(widget.podcastLocal),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  print(snapshot.error);
-                  Center();
-                }
-                return (snapshot.hasData)
-                    ? ShowEpisode(
-                        episodes: snapshot.data,
-                        podcastLocal: widget.podcastLocal,
-                      )
-                    : Container(
-                        padding: EdgeInsets.all(5.0),
-                      );
-              },
-            ),
-          ),
+          child: Selector<SubscribeWorker, bool>(
+              selector: (_, worker) => worker.created,
+              builder: (context, created, child) {
+                return FutureBuilder<List<EpisodeBrief>>(
+                  future: _getRssItemTop(widget.podcastLocal),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      print(snapshot.error);
+                      Center();
+                    }
+                    return (snapshot.hasData)
+                        ? ShowEpisode(
+                            episodes: snapshot.data,
+                            podcastLocal: widget.podcastLocal,
+                          )
+                        : Container(
+                            padding: EdgeInsets.all(5.0),
+                          );
+                  },
+                );
+              }),
         ),
         Container(
           height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          padding: EdgeInsets.only(left: 10.0),
           alignment: Alignment.center,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -434,18 +437,25 @@ class _PodcastPreviewState extends State<PodcastPreview> {
                   alignment: Alignment.centerRight,
                   child: Material(
                     color: Colors.transparent,
-                    child: IconButton(
-                      icon: Icon(Icons.arrow_forward),
-                      tooltip: 'See All',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          SlideLeftHideRoute(
-                              page: PodcastDetail(
-                            podcastLocal: widget.podcastLocal,
-                          )),
-                        );
-                      },
+                    child: Selector<AudioPlayerNotifier, bool>(
+                      selector: (_, audio) => audio.playerRunning,
+                      builder: (_, playerRunning, __) => IconButton(
+                        icon: Icon(Icons.arrow_forward),
+                        tooltip: 'See All',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            SlideLeftHideRoute(
+                                transitionPage: PodcastDetail(
+                                  podcastLocal: widget.podcastLocal,
+                                  hide: playerRunning,
+                                ),
+                                page: PodcastDetail(
+                                  podcastLocal: widget.podcastLocal,
+                                )),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),

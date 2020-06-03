@@ -15,6 +15,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../type/podcastlocal.dart';
 import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../local_storage/key_value_storage.dart';
 import '../util/episodegrid.dart';
 import '../home/audioplayer.dart';
 import '../type/fireside_data.dart';
@@ -25,8 +26,10 @@ import '../state/audiostate.dart';
 import '../state/podcast_group.dart';
 
 class PodcastDetail extends StatefulWidget {
-  PodcastDetail({Key key, this.podcastLocal}) : super(key: key);
+  PodcastDetail({Key key, @required this.podcastLocal, this.hide = false})
+      : super(key: key);
   final PodcastLocal podcastLocal;
+  final bool hide;
   @override
   _PodcastDetailState createState() => _PodcastDetailState();
 }
@@ -34,8 +37,10 @@ class PodcastDetail extends StatefulWidget {
 class _PodcastDetailState extends State<PodcastDetail> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  String backgroundImage;
-  List<PodcastHost> hosts;
+  String _backgroundImage;
+  List<PodcastHost> _hosts;
+  int _episodeCount;
+  Layout _layout;
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
 
@@ -50,8 +55,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
         msg: 'Updated $result Episodes',
         gravity: ToastGravity.TOP,
       );
-      Provider.of<GroupList>(context, listen: false)
-          .updatePodcast(podcastLocal.id);
+      //  Provider.of<GroupList>(context, listen: false)
+      //      .updatePodcast(podcastLocal.id);
     } else {
       Fluttertoast.showToast(
         msg: 'Update failed, network error',
@@ -64,13 +69,17 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Future<List<EpisodeBrief>> _getRssItem(
       PodcastLocal podcastLocal, int i, bool reverse) async {
     var dbHelper = DBHelper();
+    _episodeCount = await dbHelper.getPodcastCounts(podcastLocal.id);
+    KeyValueStorage storage = KeyValueStorage(podcastLayoutKey);
+    int index = await storage.getInt();
+    if (_layout == null) _layout = Layout.values[index];
     List<EpisodeBrief> episodes =
         await dbHelper.getRssItem(podcastLocal.id, i, reverse);
     if (podcastLocal.provider.contains('fireside')) {
       FiresideData data = FiresideData(podcastLocal.id, podcastLocal.link);
       await data.getData();
-      backgroundImage = data.background;
-      hosts = data.hosts;
+      _backgroundImage = data.background;
+      _hosts = data.hosts;
     }
     return episodes;
   }
@@ -114,7 +123,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                     image: DecorationImage(
                         //  colorFilter: ColorFilter.mode(_color, BlendMode.color),
                         image: CachedNetworkImageProvider(
-                          backgroundImage,
+                          _backgroundImage,
                         ),
                         fit: BoxFit.cover)),
                 alignment: Alignment.centerRight,
@@ -179,14 +188,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
   ScrollController _controller;
   int _top;
   bool _loadMore;
-  Layout _layout;
   bool _reverse;
   @override
   void initState() {
     super.initState();
     _loadMore = false;
     _top = 99;
-    _layout = Layout.three;
     _reverse = false;
     _controller = ScrollController();
   }
@@ -211,6 +218,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       child: Scaffold(
         body: SafeArea(
           top: false,
+          minimum: widget.hide ? EdgeInsets.only(bottom: 50) : EdgeInsets.zero,
           child: RefreshIndicator(
             key: _refreshIndicatorKey,
             color: Theme.of(context).accentColor,
@@ -412,7 +420,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       }),
                                     ),
                                     SliverToBoxAdapter(
-                                      child: hostsList(context, hosts),
+                                      child: hostsList(context, _hosts),
                                     ),
                                     SliverToBoxAdapter(
                                       child: Container(
@@ -485,11 +493,16 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                   onPressed: () {
                                                     if (_layout == Layout.three)
                                                       setState(() {
-                                                        _layout = Layout.two;
+                                                        _layout = Layout.one;
+                                                      });
+                                                    else if (_layout ==
+                                                        Layout.two)
+                                                      setState(() {
+                                                        _layout = Layout.three;
                                                       });
                                                     else
                                                       setState(() {
-                                                        _layout = Layout.three;
+                                                        _layout = Layout.two;
                                                       });
                                                   },
                                                   icon: _layout == Layout.three
@@ -505,18 +518,33 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                                     .color),
                                                           ),
                                                         )
-                                                      : SizedBox(
-                                                          height: 10,
-                                                          width: 30,
-                                                          child: CustomPaint(
-                                                            painter: LayoutPainter(
-                                                                1,
-                                                                context
-                                                                    .textTheme
-                                                                    .bodyText1
-                                                                    .color),
-                                                          ),
-                                                        ),
+                                                      : _layout == Layout.two
+                                                          ? SizedBox(
+                                                              height: 10,
+                                                              width: 30,
+                                                              child:
+                                                                  CustomPaint(
+                                                                painter: LayoutPainter(
+                                                                    1,
+                                                                    context
+                                                                        .textTheme
+                                                                        .bodyText1
+                                                                        .color),
+                                                              ),
+                                                            )
+                                                          : SizedBox(
+                                                              height: 10,
+                                                              width: 30,
+                                                              child:
+                                                                  CustomPaint(
+                                                                painter: LayoutPainter(
+                                                                    4,
+                                                                    context
+                                                                        .textTheme
+                                                                        .bodyText1
+                                                                        .color),
+                                                              ),
+                                                            ),
                                                 ),
                                               ),
                                             ],
@@ -528,8 +556,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       showNumber: true,
                                       layout: _layout,
                                       reverse: _reverse,
-                                      episodeCount:
-                                          widget.podcastLocal.episodeCount,
+                                      episodeCount: _episodeCount,
                                     ),
                                     SliverList(
                                       delegate: SliverChildBuilderDelegate(
@@ -590,7 +617,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
       var doc = parse(description);
       _description = parse(doc.body.text).documentElement.text;
     }
-    if(mounted) setState(() => _load = true);
+    if (mounted) setState(() => _load = true);
   }
 
   _launchUrl(String url) async {

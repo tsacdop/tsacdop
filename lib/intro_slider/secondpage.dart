@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import '../util/context_extension.dart';
 
 class SecondPage extends StatefulWidget {
   SecondPage({Key key}) : super(key: key);
@@ -21,14 +22,15 @@ class _SecondPageState extends State<SecondPage> {
             Container(
               height: 200,
               alignment: Alignment.center,
-              padding: EdgeInsets.all(40),
+              padding:
+                  EdgeInsets.only(top: 20, bottom: 20, left: 40, right: 40),
               child: Text(
                 'Subscribe podcast via search or import OMPL file.',
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),
             Container(
-                height: 400,
+                height: context.width * 3 / 4,
                 // color: Colors.red,
                 child: FlareActor(
                   'assets/add.flr',

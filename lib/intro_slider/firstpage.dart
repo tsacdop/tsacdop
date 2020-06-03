@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import '../util/context_extension.dart';
 
 class FirstPage extends StatefulWidget {
   FirstPage({Key key}) : super(key: key);
@@ -12,7 +13,7 @@ class _FirstPageState extends State<FirstPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          body: Container(
+      body: Container(
         color: Color.fromRGBO(35, 204, 198, 1),
         child: Center(
           child: Column(
@@ -20,10 +21,10 @@ class _FirstPageState extends State<FirstPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.all(100),
+                padding: EdgeInsets.symmetric(vertical: 100),
               ),
               Container(
-                  height: 400,
+                  height: context.width * 3 / 4,
                   // color: Colors.red,
                   child: FlareActor(
                     'assets/splash.flr',

@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../state/podcast_group.dart';
+import '../util/episodegrid.dart';
 
 const String autoPlayKey = 'autoPlay';
 const String autoAddKey = 'autoAdd';
@@ -17,6 +19,10 @@ const String downloadUsingDataKey = 'downloadUsingData';
 const String introKey = 'intro';
 const String realDarkKey = 'realDark';
 const String cacheMaxKey = 'cacheMax';
+const String podcastLayoutKey = 'podcastLayoutKey';
+const String recentLayoutKey = 'recentLayoutKey';
+const String favLayoutKey = 'favLayoutKey';
+const String downloadLayoutKey = 'downloadLayoutKey';
 
 class KeyValueStorage {
   final String key;

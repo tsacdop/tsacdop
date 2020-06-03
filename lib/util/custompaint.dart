@@ -17,10 +17,12 @@ class LayoutPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     canvas.drawRect(Rect.fromLTRB(0, 0, 10 + 5 * scale, 10), _paint);
-    canvas.drawRect(
-        Rect.fromLTRB(10 + 5 * scale, 0, 20 + 10 * scale, 10), _paint);
-    canvas.drawRect(
-        Rect.fromLTRB(20 + 5 * scale, 0, 30, 10 - 10 * scale), _paint);
+    if (scale < 4) {
+      canvas.drawRect(
+          Rect.fromLTRB(10 + 5 * scale, 0, 20 + 10 * scale, 10), _paint);
+      canvas.drawRect(
+          Rect.fromLTRB(20 + 5 * scale, 0, 30, 10 - 10 * scale), _paint);
+    }
   }
 
   @override
@@ -664,7 +666,10 @@ class _HeartOpenState extends State<HeartOpen>
       left: widget.width * position,
       bottom: widget.height * _value * scale,
       child: Icon(Icons.favorite,
-          color: _value > 0.5 ? Colors.red.withOpacity(2 - _value*2) : Colors.red, size: 20 * _value * scale),
+          color: _value > 0.5
+              ? Colors.red.withOpacity(2 - _value * 2)
+              : Colors.red,
+          size: 20 * _value * scale),
     );
   }
 

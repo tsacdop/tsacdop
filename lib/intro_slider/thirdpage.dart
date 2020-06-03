@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import '../util/context_extension.dart';
 
 class ThirdPage extends StatefulWidget {
   ThirdPage({Key key}) : super(key: key);
@@ -22,13 +23,13 @@ class _ThirdPageState extends State<ThirdPage> {
               height: 200,
               alignment: Alignment.center,
               padding: EdgeInsets.all(40),
-              child: Text('Swipe on podcast list to change group.', style: TextStyle(
-                fontSize: 30,
-                color: Colors.white
-              ),),
+              child: Text(
+                'Swipe on podcast list to change group.',
+                style: TextStyle(fontSize: 30, color: Colors.white),
+              ),
             ),
             Container(
-                height: 400,
+                height: context.width * 3 / 4,
                 // color: Colors.red,
                 child: FlareActor(
                   'assets/swipe.flr',

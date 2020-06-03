@@ -12,6 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../state/audiostate.dart';
 import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../local_storage/key_value_storage.dart';
 import '../util/episodegrid.dart';
 import '../util/mypopupmenu.dart';
 import '../util/context_extension.dart';
@@ -401,6 +402,10 @@ class _RecentUpdate extends StatefulWidget {
 class _RecentUpdateState extends State<_RecentUpdate>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group) async {
+    KeyValueStorage storage = KeyValueStorage(recentLayoutKey);
+    int index = await storage.getInt();
+    if (_layout == null) _layout = Layout.values[index];
+
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes;
     if (group.first == 'All')
@@ -441,7 +446,6 @@ class _RecentUpdateState extends State<_RecentUpdate>
     _loadMore = false;
     _groupName = 'All';
     _group = ['All'];
-    _layout = Layout.three;
   }
 
   @override
@@ -641,11 +645,16 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                   onPressed: () {
                                                     if (_layout == Layout.three)
                                                       setState(() {
-                                                        _layout = Layout.two;
+                                                        _layout = Layout.one;
+                                                      });
+                                                    else if (_layout ==
+                                                        Layout.two)
+                                                      setState(() {
+                                                        _layout = Layout.three;
                                                       });
                                                     else
                                                       setState(() {
-                                                        _layout = Layout.three;
+                                                        _layout = Layout.two;
                                                       });
                                                   },
                                                   icon: _layout == Layout.three
@@ -661,18 +670,33 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                                     .color),
                                                           ),
                                                         )
-                                                      : SizedBox(
-                                                          height: 10,
-                                                          width: 30,
-                                                          child: CustomPaint(
-                                                            painter: LayoutPainter(
-                                                                1,
-                                                                context
-                                                                    .textTheme
-                                                                    .bodyText1
-                                                                    .color),
-                                                          ),
-                                                        ),
+                                                      : _layout == Layout.two
+                                                          ? SizedBox(
+                                                              height: 10,
+                                                              width: 30,
+                                                              child:
+                                                                  CustomPaint(
+                                                                painter: LayoutPainter(
+                                                                    1,
+                                                                    context
+                                                                        .textTheme
+                                                                        .bodyText1
+                                                                        .color),
+                                                              ),
+                                                            )
+                                                          : SizedBox(
+                                                              height: 10,
+                                                              width: 30,
+                                                              child:
+                                                                  CustomPaint(
+                                                                painter: LayoutPainter(
+                                                                    4,
+                                                                    context
+                                                                        .textTheme
+                                                                        .bodyText1
+                                                                        .color),
+                                                              ),
+                                                            ),
                                                 )),
                                           ],
                                         ),
@@ -714,6 +738,9 @@ class _MyFavorite extends StatefulWidget {
 class _MyFavoriteState extends State<_MyFavorite>
     with AutomaticKeepAliveClientMixin {
   Future<List<EpisodeBrief>> _getLikedRssItem(int top, int sortBy) async {
+    KeyValueStorage storage = KeyValueStorage(favLayoutKey);
+    int index = await storage.getInt();
+    if (_layout == null) _layout = Layout.values[index];
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await dbHelper.getLikedRssItem(top, sortBy);
     return episodes;
@@ -737,7 +764,6 @@ class _MyFavoriteState extends State<_MyFavorite>
   void initState() {
     super.initState();
     _loadMore = false;
-    _layout = Layout.three;
     _sortBy = 0;
   }
 
@@ -832,39 +858,53 @@ class _MyFavoriteState extends State<_MyFavorite>
                                   Material(
                                     color: Colors.transparent,
                                     child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () {
-                                        if (_layout == Layout.three)
-                                          setState(() {
-                                            _layout = Layout.two;
-                                          });
-                                        else
-                                          setState(() {
-                                            _layout = Layout.three;
-                                          });
-                                      },
-                                      icon: _layout == Layout.three
-                                          ? SizedBox(
-                                              height: 10,
-                                              width: 30,
-                                              child: CustomPaint(
-                                                painter: LayoutPainter(
-                                                    0,
-                                                    context.textTheme.bodyText1
-                                                        .color),
-                                              ),
-                                            )
-                                          : SizedBox(
-                                              height: 10,
-                                              width: 30,
-                                              child: CustomPaint(
-                                                painter: LayoutPainter(
-                                                    1,
-                                                    context.textTheme.bodyText1
-                                                        .color),
-                                              ),
-                                            ),
-                                    ),
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () {
+                                          if (_layout == Layout.three)
+                                            setState(() {
+                                              _layout = Layout.one;
+                                            });
+                                          else if (_layout == Layout.two)
+                                            setState(() {
+                                              _layout = Layout.three;
+                                            });
+                                          else
+                                            setState(() {
+                                              _layout = Layout.two;
+                                            });
+                                        },
+                                        icon: _layout == Layout.three
+                                            ? SizedBox(
+                                                height: 10,
+                                                width: 30,
+                                                child: CustomPaint(
+                                                  painter: LayoutPainter(
+                                                      0,
+                                                      context.textTheme
+                                                          .bodyText1.color),
+                                                ),
+                                              )
+                                            : _layout == Layout.two
+                                                ? SizedBox(
+                                                    height: 10,
+                                                    width: 30,
+                                                    child: CustomPaint(
+                                                      painter: LayoutPainter(
+                                                          1,
+                                                          context.textTheme
+                                                              .bodyText1.color),
+                                                    ),
+                                                  )
+                                                : SizedBox(
+                                                    height: 10,
+                                                    width: 30,
+                                                    child: CustomPaint(
+                                                      painter: LayoutPainter(
+                                                          4,
+                                                          context.textTheme
+                                                              .bodyText1.color),
+                                                    ),
+                                                  )),
                                   ),
                                 ],
                               )),
@@ -906,10 +946,19 @@ class _MyDownload extends StatefulWidget {
 class _MyDownloadState extends State<_MyDownload>
     with AutomaticKeepAliveClientMixin {
   Layout _layout;
+  _getLayout() async {
+    KeyValueStorage keyValueStorage = KeyValueStorage(downloadLayoutKey);
+    int layout = await keyValueStorage.getInt();
+    if (_layout == null)
+      setState(() {
+        _layout = Layout.values[layout];
+      });
+  }
+
   @override
   void initState() {
     super.initState();
-    _layout = Layout.three;
+    _getLayout();
   }
 
   @override
@@ -920,50 +969,65 @@ class _MyDownloadState extends State<_MyDownload>
       slivers: <Widget>[
         DownloadList(),
         SliverToBoxAdapter(
-          child: Container(
-              height: 40,
-              color: context.primaryColor,
-              child: Row(
-                children: <Widget>[
-                  Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Text('Downloaded')),
-                  Spacer(),
-                  Material(
-                    color: Colors.transparent,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        if (_layout == Layout.three)
-                          setState(() {
-                            _layout = Layout.two;
-                          });
-                        else
-                          setState(() {
-                            _layout = Layout.three;
-                          });
-                      },
-                      icon: _layout == Layout.three
-                          ? SizedBox(
-                              height: 10,
-                              width: 30,
-                              child: CustomPaint(
-                                painter: LayoutPainter(
-                                    0, context.textTheme.bodyText1.color),
-                              ),
-                            )
-                          : SizedBox(
-                              height: 10,
-                              width: 30,
-                              child: CustomPaint(
-                                painter: LayoutPainter(
-                                    1, context.textTheme.bodyText1.color),
-                              ),
-                            ),
-                    ),
-                  ),
-                ],
-              )),
+          child: _layout == null
+              ? Center()
+              : Container(
+                  height: 40,
+                  color: context.primaryColor,
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Text('Downloaded')),
+                      Spacer(),
+                      Material(
+                        color: Colors.transparent,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            if (_layout == Layout.three)
+                              setState(() {
+                                _layout = Layout.one;
+                              });
+                            else if (_layout == Layout.two)
+                              setState(() {
+                                _layout = Layout.three;
+                              });
+                            else
+                              setState(() {
+                                _layout = Layout.two;
+                              });
+                          },
+                          icon: _layout == Layout.three
+                              ? SizedBox(
+                                  height: 10,
+                                  width: 30,
+                                  child: CustomPaint(
+                                    painter: LayoutPainter(
+                                        0, context.textTheme.bodyText1.color),
+                                  ),
+                                )
+                              : _layout == Layout.two
+                                  ? SizedBox(
+                                      height: 10,
+                                      width: 30,
+                                      child: CustomPaint(
+                                        painter: LayoutPainter(1,
+                                            context.textTheme.bodyText1.color),
+                                      ),
+                                    )
+                                  : SizedBox(
+                                      height: 10,
+                                      width: 30,
+                                      child: CustomPaint(
+                                        painter: LayoutPainter(4,
+                                            context.textTheme.bodyText1.color),
+                                      ),
+                                    ),
+                        ),
+                      ),
+                    ],
+                  )),
         ),
         Consumer<DownloadState>(
           builder: (_, downloader, __) {

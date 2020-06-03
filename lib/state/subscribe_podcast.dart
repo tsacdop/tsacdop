@@ -140,11 +140,11 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       String realUrl =
           response.redirects.isEmpty ? rss : response.realUri.toString();
 
-      print(realUrl);
       bool checkUrl = await dbHelper.checkPodcast(realUrl);
-      String imageUrl;
+
       if (checkUrl) {
         img.Image thumbnail;
+        String imageUrl;
         try {
           Response<List<int>> imageResponse = await Dio().get<List<int>>(
               p.itunes.image.href,
@@ -153,7 +153,6 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
           img.Image image = img.decodeImage(imageResponse.data);
           thumbnail = img.copyResize(image, width: 300);
         } catch (e) {
-          print(e);
           try {
             Response<List<int>> imageResponse = await Dio().get<List<int>>(
                 item.imgUrl,

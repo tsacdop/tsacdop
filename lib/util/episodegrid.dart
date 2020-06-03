@@ -18,7 +18,7 @@ import 'colorize.dart';
 import 'context_extension.dart';
 import 'custompaint.dart';
 
-enum Layout { two, three }
+enum Layout { three, two, one }
 
 class EpisodeGrid extends StatelessWidget {
   final List<EpisodeBrief> episodes;
@@ -55,6 +55,117 @@ class EpisodeGrid extends StatelessWidget {
     this.layout = Layout.three,
     this.reverse,
   }) : super(key: key);
+
+  Widget _title(EpisodeBrief episode) => Container(
+        alignment:
+            layout == Layout.one ? Alignment.centerLeft : Alignment.topLeft,
+        padding: EdgeInsets.only(top: 2.0),
+        child: Text(
+          episode.title,
+          maxLines: layout == Layout.one ? 1 : 4,
+          overflow:
+              layout == Layout.one ? TextOverflow.ellipsis : TextOverflow.fade,
+        ),
+      );
+  Widget _circleImage(BuildContext context,
+          {EpisodeBrief episode, Color color, bool boo}) =>
+      Container(
+        height: context.width / 16,
+        width: context.width / 16,
+        child: boo
+            ? Center()
+            : CircleAvatar(
+                backgroundColor: color.withOpacity(0.5),
+                backgroundImage: FileImage(File("${episode.imagePath}")),
+              ),
+      );
+  Widget _listenIndicater(BuildContext context,
+          {EpisodeBrief episode, int isListened}) =>
+      Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
+          selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
+          builder: (_, data, __) {
+            return (episode.enclosureUrl == data.item1?.enclosureUrl &&
+                    data.item2)
+                ? Container(
+                    height: 20,
+                    width: 20,
+                    margin: EdgeInsets.symmetric(horizontal: 2),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: WaveLoader(color: context.accentColor))
+                : layout == Layout.two && isListened > 0
+                    ? Container(
+                        height: 20,
+                        width: 20,
+                        margin: EdgeInsets.symmetric(horizontal: 2),
+                        decoration: BoxDecoration(
+                          color: context.accentColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: CustomPaint(
+                            painter: ListenedAllPainter(
+                          Colors.white,
+                        )),
+                      )
+                    : Center();
+          });
+
+  Widget _downloadIndicater(BuildContext context, {EpisodeBrief episode}) =>
+      showDownload || layout != Layout.three
+          ? Container(
+              child: (episode.enclosureUrl != episode.mediaId)
+                  ? Container(
+                      height: 20,
+                      width: 20,
+                      margin: EdgeInsets.symmetric(horizontal: 5),
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                        color: context.accentColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.done_all,
+                        size: 15,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Center(),
+            )
+          : Center();
+  Widget _isNewIndicator(EpisodeBrief episode) => episode.isNew == 1
+      ? Container(
+          padding: EdgeInsets.symmetric(horizontal: 2),
+          child: Text('New',
+              style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)),
+        )
+      : Center();
+
+  Widget _numberIndicater(BuildContext context, {int index, Color color}) =>
+      showNumber
+          ? Container(
+              alignment: Alignment.topRight,
+              child: Text(
+                reverse
+                    ? (index + 1).toString()
+                    : (episodeCount - index).toString(),
+                style: GoogleFonts.teko(
+                  textStyle: TextStyle(
+                    fontSize: context.width / 24,
+                    color: color,
+                  ),
+                ),
+              ),
+            )
+          : Center();
+  Widget _pubDate(BuildContext context, {EpisodeBrief episode, Color color}) =>
+      Text(
+        episode.dateToString(),
+        style: TextStyle(
+            fontSize: context.width / 35,
+            color: color,
+            fontStyle: FontStyle.italic),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +250,10 @@ class EpisodeGrid extends StatelessWidget {
         options: options,
         itemCount: episodes.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          childAspectRatio: layout == Layout.three ? 1 : 1.5,
-          crossAxisCount: layout == Layout.three ? 3 : 2,
+          childAspectRatio:
+              layout == Layout.three ? 1 : layout == Layout.two ? 1.5 : 4,
+          crossAxisCount:
+              layout == Layout.three ? 3 : layout == Layout.two ? 2 : 1,
           mainAxisSpacing: 6.0,
           crossAxisSpacing: 6.0,
         ),
@@ -211,166 +324,71 @@ class EpisodeGrid extends StatelessWidget {
                                 ),
                               ),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
                                   Expanded(
-                                    flex: 2,
+                                    flex: layout == Layout.one ? 1 : 2,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: <Widget>[
-                                        Container(
-                                          height: _width / 16,
-                                          width: _width / 16,
-                                          child: boo
-                                              ? Center()
-                                              : CircleAvatar(
-                                                  backgroundColor:
-                                                      _c.withOpacity(0.5),
-                                                  backgroundImage: FileImage(File(
-                                                      "${episodes[index].imagePath}")),
-                                                ),
-                                        ),
+                                        layout != Layout.one
+                                            ? _circleImage(context,
+                                                episode: episodes[index],
+                                                color: _c,
+                                                boo: boo)
+                                            : _pubDate(context,
+                                                episode: episodes[index],
+                                                color: _c),
                                         Spacer(),
-                                        Selector<AudioPlayerNotifier,
-                                                Tuple2<EpisodeBrief, bool>>(
-                                            selector: (_, audio) => Tuple2(
-                                                audio.episode,
-                                                audio.playerRunning),
-                                            builder: (_, data, __) {
-                                              return (episodes[index]
-                                                              .enclosureUrl ==
-                                                          data.item1
-                                                              ?.enclosureUrl &&
-                                                      data.item2)
-                                                  ? Container(
-                                                      height: 20,
-                                                      width: 20,
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 2),
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: WaveLoader(
-                                                          color: context
-                                                              .accentColor))
-                                                  : layout == Layout.two &&
-                                                          snapshot.data > 0
-                                                      ? Container(
-                                                          height: 20,
-                                                          width: 20,
-                                                          margin: EdgeInsets
-                                                              .symmetric(
-                                                                  horizontal:
-                                                                      2),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: context
-                                                                .accentColor,
-                                                            shape:
-                                                                BoxShape.circle,
-                                                          ),
-                                                          child: CustomPaint(
-                                                              painter:
-                                                                  ListenedAllPainter(
-                                                            Colors.white,
-                                                          )),
-                                                        )
-                                                      : Center();
-                                            }),
-                                        showDownload || layout == Layout.two
-                                            ? Container(
-                                                child: (episodes[index]
-                                                            .enclosureUrl !=
-                                                        episodes[index].mediaId)
-                                                    ? Container(
-                                                        height: 20,
-                                                        width: 20,
-                                                        margin: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 5),
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 2),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: context
-                                                              .accentColor,
-                                                          shape:
-                                                              BoxShape.circle,
-                                                        ),
-                                                        child: Icon(
-                                                          Icons.done_all,
-                                                          size: 15,
-                                                          color: Colors.white,
-                                                        ),
-                                                      )
-                                                    : Center(),
-                                              )
-                                            : Center(),
-                                        episodes[index].isNew == 1
-                                            ? Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 2),
-                                                child: Text('New',
-                                                    style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontStyle:
-                                                            FontStyle.italic)),
-                                              )
-                                            : Center(),
-                                        showNumber
-                                            ? Container(
-                                                alignment: Alignment.topRight,
-                                                child: Text(
-                                                  reverse
-                                                      ? (index + 1).toString()
-                                                      : (episodeCount - index)
-                                                          .toString(),
-                                                  style: GoogleFonts.teko(
-                                                    textStyle: TextStyle(
-                                                      fontSize: _width / 24,
-                                                      color: _c,
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            : Center(),
+                                        _listenIndicater(context,
+                                            episode: episodes[index],
+                                            isListened: snapshot.data),
+                                        _downloadIndicater(context,
+                                            episode: episodes[index]),
+                                        _isNewIndicator(episodes[index]),
+                                        _numberIndicater(context,
+                                            index: index, color: _c)
                                       ],
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 5,
-                                    child: Container(
-                                      alignment: Alignment.topLeft,
-                                      padding: EdgeInsets.only(top: 2.0),
-                                      child: Text(
-                                        episodes[index].title,
-                                        style: TextStyle(
-                                            // fontSize: _width / 32,
-                                            ),
-                                        maxLines: 4,
-                                        overflow: TextOverflow.fade,
-                                      ),
-                                    ),
+                                    flex: layout == Layout.one ? 3 : 5,
+                                    child: layout != Layout.one
+                                        ? _title(episodes[index])
+                                        : Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              _circleImage(context,
+                                                  episode: episodes[index],
+                                                  color: _c,
+                                                  boo: boo),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Expanded(
+                                                  child:
+                                                      _title(episodes[index]))
+                                            ],
+                                          ),
                                   ),
                                   Expanded(
                                     flex: 1,
                                     child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: <Widget>[
-                                        Align(
-                                          alignment: Alignment.bottomLeft,
-                                          child: Text(
-                                            episodes[index].dateToString(),
-                                            style: TextStyle(
-                                                fontSize: _width / 35,
-                                                color: _c,
-                                                fontStyle: FontStyle.italic),
-                                          ),
-                                        ),
+                                        layout != Layout.one
+                                            ? Align(
+                                                alignment: Alignment.bottomLeft,
+                                                child: _pubDate(context,
+                                                    episode: episodes[index],
+                                                    color: _c),
+                                              )
+                                            : SizedBox(width: 1),
                                         Spacer(),
-                                        layout == Layout.two &&
+                                        layout != Layout.three &&
                                                 episodes[index].duration != 0
                                             ? Container(
                                                 alignment: Alignment.center,
@@ -401,7 +419,7 @@ class EpisodeGrid extends StatelessWidget {
                                                   // fontStyle: FontStyle.italic,
                                                 ),
                                               ),
-                                        layout == Layout.two &&
+                                        layout != Layout.three &&
                                                 episodes[index]
                                                         .enclosureLength !=
                                                     null &&
@@ -424,19 +442,19 @@ class EpisodeGrid extends StatelessWidget {
                                         Padding(
                                           padding: EdgeInsets.all(1),
                                         ),
-                                        showFavorite || layout == Layout.two
+                                        showFavorite || layout != Layout.three
                                             ? FutureBuilder<bool>(
                                                 future:
                                                     _isLiked(episodes[index]),
                                                 initialData: false,
                                                 builder: (context, snapshot) =>
                                                     Container(
-                                                  alignment:
-                                                      Alignment.bottomRight,
+                                                  alignment: Alignment.center,
                                                   child: (snapshot.data)
                                                       ? IconTheme(
                                                           data: IconThemeData(
-                                                              size: 15),
+                                                              size:
+                                                                  _width / 35),
                                                           child: Icon(
                                                             Icons.favorite,
                                                             color: Colors.red,

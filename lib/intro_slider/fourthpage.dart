@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import '../util/context_extension.dart';
 
 class FourthPage extends StatefulWidget {
   FourthPage({Key key}) : super(key: key);
@@ -28,7 +29,7 @@ class _FourthPageState extends State<FourthPage> {
               ),),
             ),
             Container(
-                height: 400,
+                height: context.width*3/4,
                 // color: Colors.red,
                 child: FlareActor(
                   'assets/longtap.flr',

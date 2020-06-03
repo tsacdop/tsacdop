@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../type/searchpodcast.dart';
 import '../state/subscribe_podcast.dart';
@@ -391,26 +392,26 @@ class _SearchResultState extends State<SearchResult>
             },
             leading: ClipRRect(
               borderRadius: BorderRadius.all(Radius.circular(20.0)),
-              child: Image.network(
-                widget.onlinePodcast.image,
+              child: CachedNetworkImage(
                 height: 40.0,
                 width: 40.0,
                 fit: BoxFit.fitWidth,
                 alignment: Alignment.center,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    alignment: Alignment.center,
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: context.primaryColorDark),
-                    child: SizedBox(
-                        width: 20, height: 2, child: LinearProgressIndicator()),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) => Container(
+                imageUrl: widget.onlinePodcast.image,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    Container(
+                  height: 40,
+                  width: 40,
+                  alignment: Alignment.center,
+                  color: context.primaryColorDark,
+                  child: SizedBox(
+                    width: 20,
+                    height: 2,
+                    child: LinearProgressIndicator(
+                        value: downloadProgress.progress),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
                     width: 40,
                     height: 40,
                     alignment: Alignment.center,
