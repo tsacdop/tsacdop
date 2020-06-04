@@ -22,7 +22,7 @@ class _AudioPanelState extends State<AudioPanel>
   void initState() {
     initSize = minSize;
     _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 100))
+        AnimationController(vsync: this, duration: Duration(milliseconds: 50))
           ..addListener(() {
             setState(() {});
           });
@@ -83,9 +83,10 @@ class _AudioPanelState extends State<AudioPanel>
                         BoxShadow(
                           offset: Offset(0, -0.5),
                           blurRadius: 1,
-                          color: Theme.of(context).brightness == Brightness.light
-                         ? Colors.grey[400].withOpacity(0.5)
-                         : Colors.grey[800],
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Colors.grey[400].withOpacity(0.5)
+                                  : Colors.grey[800],
                         ),
                       ],
                     ),
@@ -136,7 +137,7 @@ class _AudioPanelState extends State<AudioPanel>
   }
 
   _end() {
-    if (_animation.value >= (maxSize + minSize) / 2.2 &&
+    if (_animation.value >= (maxSize + minSize) / 4 &&
         _animation.value < maxSize) {
       setState(() {
         _animation = Tween<double>(begin: _animation.value, end: maxSize)
@@ -144,7 +145,7 @@ class _AudioPanelState extends State<AudioPanel>
         initSize = maxSize;
       });
       _controller.forward();
-    } else if (_animation.value < (maxSize + minSize) / 2.2 &&
+    } else if (_animation.value < (maxSize + minSize) / 4 &&
         _animation.value > minSize) {
       setState(() {
         _animation = Tween<double>(begin: _animation.value, end: minSize)

@@ -132,6 +132,7 @@ class DownloadState extends ChangeNotifier {
       saveDir.create();
     }
     String taskId = await FlutterDownloader.enqueue(
+      fileName: episode.enclosureUrl.split('/').last,
       url: episode.enclosureUrl,
       savedDir: localPath,
       showNotification: true,

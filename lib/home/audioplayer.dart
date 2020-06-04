@@ -456,7 +456,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                         BasicPlaybackState.skippingToNext ||
                                     data.item1 == BasicPlaybackState.stopped
                                 ? Text(
-                                    'Buffring...',
+                                    'Buffering...',
                                     style: TextStyle(
                                         color: Theme.of(context).accentColor),
                                   )
@@ -1361,13 +1361,13 @@ class _ControlPanelState extends State<ControlPanel>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 blankSpace: 30.0,
                                 velocity: 50.0,
-                                pauseAfterRound: Duration(seconds: 1),
+                                pauseAfterRound: Duration.zero,
                                 startPadding: 30.0,
-                                accelerationDuration: Duration(seconds: 1),
+                                accelerationDuration: Duration(milliseconds: 100),
                                 accelerationCurve: Curves.linear,
                                 decelerationDuration:
-                                    Duration(milliseconds: 500),
-                                decelerationCurve: Curves.easeOut,
+                                    Duration(milliseconds: 100),
+                                decelerationCurve: Curves.linear,
                               );
                             } else {
                               return Text(
