@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../state/podcast_group.dart';
-import '../util/episodegrid.dart';
 
 const String autoPlayKey = 'autoPlay';
 const String autoAddKey = 'autoAdd';

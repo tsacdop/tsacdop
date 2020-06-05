@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'context_extension.dart';
 
 //Slide Transition
 class SlideLeftRoute extends PageRouteBuilder {

@@ -96,9 +96,11 @@ class Playlist {
   }
 
   addToPlayList(EpisodeBrief episodeBrief) async {
-    _playlist.add(episodeBrief);
-    await savePlaylist();
-    dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+    if (!_playlist.contains(episodeBrief)) {
+      _playlist.add(episodeBrief);
+      await savePlaylist();
+      dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+    }
   }
 
   addToPlayListAt(EpisodeBrief episodeBrief, int index) async {

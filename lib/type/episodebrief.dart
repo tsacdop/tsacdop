@@ -34,7 +34,7 @@ class EpisodeBrief {
       this.skipSeconds);
 
   String dateToString() {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate,isUtc: true);
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
     var diffrence = DateTime.now().toUtc().difference(date);
     if (diffrence.inHours < 1) {
       return '1 hour ago';
@@ -56,9 +56,17 @@ class EpisodeBrief {
         title: title,
         artist: feedTitle,
         album: feedTitle,
-       // duration: 0,
+        // duration: 0,
         artUri: 'file://$imagePath',
         extras: {'skip': skipSeconds});
   }
 
+  @override
+  bool operator ==(Object episode) =>
+      episode is EpisodeBrief &&
+      episode.title == title &&
+      episode.enclosureUrl == enclosureUrl;
+
+  @override
+  int get hashCode => enclosureUrl.hashCode;
 }

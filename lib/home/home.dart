@@ -440,12 +440,14 @@ class _RecentUpdateState extends State<_RecentUpdate>
   String _groupName;
   List<String> _group;
   Layout _layout;
+  bool _scroll;
   @override
   void initState() {
     super.initState();
     _loadMore = false;
     _groupName = 'All';
     _group = ['All'];
+    _scroll = false;
   }
 
   @override
@@ -479,6 +481,11 @@ class _RecentUpdateState extends State<_RecentUpdate>
                         )
                       : NotificationListener<ScrollNotification>(
                           onNotification: (ScrollNotification scrollInfo) {
+                            if (scrollInfo is ScrollStartNotification &&
+                                mounted &&
+                                !_scroll) {
+                              setState(() => _scroll = true);
+                            }
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
                                 snapshot.data.length == _top)
@@ -705,7 +712,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                 EpisodeGrid(
                                   episodes: snapshot.data,
                                   layout: _layout,
-                                  initNum: 9,
+                                  initNum: _scroll ? 0 : 12,
                                 ),
                                 SliverList(
                                   delegate: SliverChildBuilderDelegate(

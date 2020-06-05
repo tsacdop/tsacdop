@@ -15,7 +15,6 @@ import '../util/pageroute.dart';
 import '../util/colorize.dart';
 import '../util/duraiton_picker.dart';
 import '../util/context_extension.dart';
-import '../state/audiostate.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;

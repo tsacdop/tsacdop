@@ -29,6 +29,18 @@ class EpisodeGrid extends StatelessWidget {
   final Layout layout;
   final bool reverse;
   final int initNum;
+  EpisodeGrid({
+    Key key,
+    @required this.episodes,
+    this.initNum = 12,
+    this.showDownload = false,
+    this.showFavorite = false,
+    this.showNumber = false,
+    this.episodeCount = 0,
+    this.layout = Layout.three,
+    this.reverse,
+  }) : super(key: key);
+
   Future<int> _isListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
     return await dbHelper.isListened(episode.enclosureUrl);
@@ -44,18 +56,6 @@ class EpisodeGrid extends StatelessWidget {
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
-  EpisodeGrid({
-    Key key,
-    @required this.episodes,
-    this.initNum = 12,
-    this.showDownload = false,
-    this.showFavorite = false,
-    this.showNumber = false,
-    this.episodeCount = 0,
-    this.layout = Layout.three,
-    this.reverse,
-  }) : super(key: key);
-
   Widget _title(EpisodeBrief episode) => Container(
         alignment:
             layout == Layout.one ? Alignment.centerLeft : Alignment.topLeft,
@@ -67,6 +67,7 @@ class EpisodeGrid extends StatelessWidget {
               layout == Layout.one ? TextOverflow.ellipsis : TextOverflow.fade,
         ),
       );
+
   Widget _circleImage(BuildContext context,
           {EpisodeBrief episode, Color color, bool boo}) =>
       Container(
@@ -79,6 +80,7 @@ class EpisodeGrid extends StatelessWidget {
                 backgroundImage: FileImage(File("${episode.imagePath}")),
               ),
       );
+
   Widget _listenIndicater(BuildContext context,
           {EpisodeBrief episode, int isListened}) =>
       Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
@@ -133,6 +135,7 @@ class EpisodeGrid extends StatelessWidget {
                   : Center(),
             )
           : Center();
+
   Widget _isNewIndicator(EpisodeBrief episode) => episode.isNew == 1
       ? Container(
           padding: EdgeInsets.symmetric(horizontal: 2),
@@ -158,6 +161,7 @@ class EpisodeGrid extends StatelessWidget {
               ),
             )
           : Center();
+
   Widget _pubDate(BuildContext context, {EpisodeBrief episode, Color color}) =>
       Text(
         episode.dateToString(),
@@ -166,7 +170,6 @@ class EpisodeGrid extends StatelessWidget {
             color: color,
             fontStyle: FontStyle.italic),
       );
-
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
@@ -242,6 +245,7 @@ class EpisodeGrid extends StatelessWidget {
       showItemDuration: Duration(milliseconds: 50),
     );
     final scrollController = ScrollController();
+
     return SliverPadding(
       padding: const EdgeInsets.only(
           top: 10.0, bottom: 5.0, left: 15.0, right: 15.0),
@@ -261,11 +265,12 @@ class EpisodeGrid extends StatelessWidget {
           Color _c = (Theme.of(context).brightness == Brightness.light)
               ? episodes[index].primaryColor.colorizedark()
               : episodes[index].primaryColor.colorizeLight();
+          scrollController.addListener(() {
+            print(scrollController.offset);
+          });
           return FadeTransition(
-            opacity: Tween<double>(
-              begin: index < initNum ? 0 : 1,
-              end: 1,
-            ).animate(animation),
+            opacity: Tween<double>(begin: index < initNum ? 0 : 1, end: 1)
+                .animate(animation),
             child: Selector<AudioPlayerNotifier,
                 Tuple2<EpisodeBrief, List<String>>>(
               selector: (_, audio) => Tuple2(audio?.episode,

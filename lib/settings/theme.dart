@@ -52,8 +52,7 @@ class ThemeSetting extends StatelessWidget {
                           .modalBarrierDismissLabel,
                       barrierColor: Colors.black54,
                       transitionDuration: const Duration(milliseconds: 200),
-                      pageBuilder: (BuildContext context,
-                              Animation animaiton,
+                      pageBuilder: (BuildContext context, Animation animaiton,
                               Animation secondaryAnimation) =>
                           AnnotatedRegion<SystemUiOverlayStyle>(
                             value: SystemUiOverlayStyle(
@@ -72,15 +71,14 @@ class ThemeSetting extends StatelessWidget {
                               ),
                               elevation: 1,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(10.0))),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0))),
                               title: Text('Theme'),
                               content: SingleChildScrollView(
                                 scrollDirection: Axis.vertical,
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
                                     RadioListTile(
                                         title: Text('System default'),
@@ -123,8 +121,8 @@ class ThemeSetting extends StatelessWidget {
                   title: Text(
                     'Real Dark',
                   ),
-                  subtitle: Text(
-                      'Turn on if you think the night is not dark enough'),
+                  subtitle:
+                      Text('Turn on if you think the night is not dark enough'),
                   trailing: Selector<SettingState, bool>(
                     selector: (_, setting) => setting.realDark,
                     builder: (_, data, __) => Switch(
@@ -143,8 +141,7 @@ class ThemeSetting extends StatelessWidget {
                           .modalBarrierDismissLabel,
                       barrierColor: Colors.black54,
                       transitionDuration: const Duration(milliseconds: 200),
-                      pageBuilder: (BuildContext context,
-                              Animation animaiton,
+                      pageBuilder: (BuildContext context, Animation animaiton,
                               Animation secondaryAnimation) =>
                           AnnotatedRegion<SystemUiOverlayStyle>(
                               value: SystemUiOverlayStyle(
@@ -160,7 +157,7 @@ class ThemeSetting extends StatelessWidget {
                                 titlePadding: EdgeInsets.only(
                                     top: 20,
                                     left: 40,
-                                    right: 200,
+                                    right: context.width / 3,
                                     bottom: 0),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.all(

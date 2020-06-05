@@ -23,7 +23,6 @@ import '../util/colorize.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
 import '../state/audiostate.dart';
-import '../state/podcast_group.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, @required this.podcastLocal, this.hide = false})
@@ -41,6 +40,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   List<PodcastHost> _hosts;
   int _episodeCount;
   Layout _layout;
+  bool _scroll;
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
 
@@ -196,6 +196,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     _top = 99;
     _reverse = false;
     _controller = ScrollController();
+    _scroll = false;
   }
 
   @override
@@ -257,6 +258,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                             _loadMore = false;
                                           });
                                       }
+                                      if (_controller.offset > 0 && mounted && !_scroll )
+                                        setState(() {
+                                          _scroll = true;
+                                        });
                                     }),
                                   physics:
                                       const AlwaysScrollableScrollPhysics(),
@@ -557,6 +562,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       layout: _layout,
                                       reverse: _reverse,
                                       episodeCount: _episodeCount,
+                                      initNum: _scroll ? 0 : 12,
                                     ),
                                     SliverList(
                                       delegate: SliverChildBuilderDelegate(
