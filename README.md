@@ -49,7 +49,7 @@ Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob
 Tsacdop is using ListenNotes api 1.0 pro to search podcast, which is not free. So I can not expose the api key in the repo.
 If you want to build the app, you need to create a new file named .env.dart in lib folder. Add below code in .env.dart.
 
-``llkk
+```
 final environment = {"apiKey":"APIKEY", "shareKey":"SHAREKEY"}; 
 ```
 
