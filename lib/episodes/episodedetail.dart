@@ -69,6 +69,13 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     }
   }
 
+  _markListened(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    final PlayHistory history =
+        PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+    await dbHelper.saveHistory(history);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +106,53 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
         appBar: AppBar(
           //  title: Text(widget.episodeItem.feedTitle),
           centerTitle: true,
+          actions: [
+            PopupMenuButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              elevation: 1,
+              tooltip: 'Menu',
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 0,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(
+                          width: 25,
+                          height: 25,
+                          child: CustomPaint(
+                              painter: ListenedAllPainter(
+                                  context.textTheme.bodyText1.color,
+                                  stroke: 1.5)),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 5.0),
+                        ),
+                        Text(
+                          'Mark listened',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              onSelected: (int value) async {
+                switch (value) {
+                  case 0:
+                    await _markListened(widget.episodeItem);
+                    setState(() {});
+                    Fluttertoast.showToast(
+                      msg: 'Mark as listened',
+                      gravity: ToastGravity.BOTTOM,
+                    );
+                    break;
+                }
+              },
+            ),
+          ],
         ),
         body: Stack(
           children: <Widget>[
@@ -280,8 +334,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       selector: (_, audio) => audio.playerRunning,
                       builder: (_, data, __) {
                         return Padding(
-                          padding: EdgeInsets.only(
-                              bottom: data ? 60.0 : 0),
+                          padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
                         );
                       }),
                 ],
@@ -358,6 +411,13 @@ class _MenuBarState extends State<MenuBar> {
   static String _stringForSeconds(double seconds) {
     if (seconds == null) return null;
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  }
+
+  _markListened(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    final PlayHistory history =
+        PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+    await dbHelper.saveHistory(history);
   }
 
   @override
@@ -505,6 +565,36 @@ class _MenuBarState extends State<MenuBar> {
                             ),
                           )
                         : snapshot.data.seconds < 0.1
+                            // ? Material(
+                            //     color: Colors.transparent,
+                            //     child: InkWell(
+                            //       onTap: () async {
+                            //         await _markListened(widget.episodeItem);
+                            //         setState(() {});
+                            //         Fluttertoast.showToast(
+                            //           msg: 'Mark as listened',
+                            //           gravity: ToastGravity.BOTTOM,
+                            //         );
+                            //       },
+                            //       child: Container(
+                            //         height: 50,
+                            //         padding: EdgeInsets.only(
+                            //             left: 15,
+                            //             right: 15,
+                            //             top: 12,
+                            //             bottom: 12),
+                            //         child: SizedBox(
+                            //           width: 22,
+                            //           height: 22,
+                            //           child: CustomPaint(
+                            //             painter: MarkListenedPainter(
+                            //                 Colors.grey[700],
+                            //                 stroke: 2.0),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   )
                             ? Center()
                             : Material(
                                 color: Colors.transparent,

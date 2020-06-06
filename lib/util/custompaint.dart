@@ -156,6 +156,41 @@ class ListenedAllPainter extends CustomPainter {
   }
 }
 
+//Mark Listened indicator
+class MarkListenedPainter extends CustomPainter {
+  Color _color;
+  double stroke;
+  MarkListenedPainter(this._color, {this.stroke = 1.0});
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint _paint = Paint()
+      ..color = _color
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    Path _path = Path();
+    _path.moveTo(size.width / 6, size.height * 3 / 8);
+    _path.lineTo(size.width / 6, size.height * 5 / 8);
+    _path.moveTo(size.width / 3, size.height / 4);
+    _path.lineTo(size.width / 3, size.height * 3 / 4);
+    _path.moveTo(size.width / 2, size.height * 3 / 8);
+    _path.lineTo(size.width / 2, size.height * 5 / 8);
+   // _path.moveTo(size.width * 2 / 3, size.height * 4 / 9);
+   // _path.lineTo(size.width * 2 / 3, size.height * 5 / 9);
+    _path.moveTo(size.width / 2, size.height * 13 / 18);
+    _path.lineTo(size.width * 5 / 6, size.height * 13 / 18);
+    _path.moveTo(size.width * 2 / 3, size.height * 5 / 9);
+    _path.lineTo(size.width * 2 / 3, size.height * 8 / 9);
+
+    canvas.drawPath(_path, _paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
 //Add new episode to palylist
 class AddToPlaylistPainter extends CustomPainter {
   Color _color;

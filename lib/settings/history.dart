@@ -267,8 +267,16 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                                 10))),
                                                 padding: EdgeInsets.all(2),
                                                 child: Text(
-                                                  _stringForSeconds(snapshot
-                                                      .data[index].seconds),
+                                                  snapshot.data[index]
+                                                                  .seconds ==
+                                                              0 &&
+                                                          snapshot.data[index]
+                                                                  .seekValue ==
+                                                              1
+                                                      ? 'Mark'
+                                                      : _stringForSeconds(
+                                                          snapshot.data[index]
+                                                              .seconds),
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),

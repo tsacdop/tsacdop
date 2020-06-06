@@ -96,11 +96,12 @@ class EpisodeGrid extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: WaveLoader(color: context.accentColor))
-                : layout == Layout.two && isListened > 0
+                : layout != Layout.three && isListened > 0
                     ? Container(
                         height: 20,
                         width: 20,
                         margin: EdgeInsets.symmetric(horizontal: 2),
+                        padding: EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: context.accentColor,
                           shape: BoxShape.circle,
