@@ -11,12 +11,12 @@ class AudioPanel extends StatefulWidget {
 class _AudioPanelState extends State<AudioPanel>
     with SingleTickerProviderStateMixin {
   double initSize;
-  double minSize = 60;
-  double maxSize = 300;
+  final double minSize = 60;
+  final double maxSize = 300;
   double _startdy;
   double _move = 0;
   AnimationController _controller;
-  var _animation;
+  Animation _animation;
 
   @override
   void initState() {
@@ -138,7 +138,8 @@ class _AudioPanelState extends State<AudioPanel>
 
   _end() {
     if (_animation.value >= (maxSize + minSize) / 4 &&
-        _animation.value < maxSize) {
+            _animation.value < maxSize ||
+        (_move - _startdy > 20)) {
       setState(() {
         _animation = Tween<double>(begin: _animation.value, end: maxSize)
             .animate(_controller);
@@ -157,7 +158,7 @@ class _AudioPanelState extends State<AudioPanel>
       setState(() {
         initSize = maxSize;
       });
-    } else if (_animation.value <= minSize) {
+    } else if (_animation.value < minSize) {
       setState(() {
         initSize = minSize;
       });

@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -131,8 +132,17 @@ class DownloadState extends ChangeNotifier {
     if (!hasExisted) {
       saveDir.create();
     }
+    DateTime now = DateTime.now();
+    String datePlus = now.year.toString() +
+        now.month.toString() +
+        now.day.toString() +
+        now.second.toString();
+    String fileName = episode.title +
+        datePlus +
+        '.' +
+        episode.enclosureUrl.split('/').last.split('.').last;
     String taskId = await FlutterDownloader.enqueue(
-      fileName: episode.enclosureUrl.split('/').last,
+      fileName: fileName,
       url: episode.enclosureUrl,
       savedDir: localPath,
       showNotification: true,

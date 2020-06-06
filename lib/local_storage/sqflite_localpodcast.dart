@@ -512,6 +512,7 @@ class DBHelper {
                     url,
                   ]);
             });
+            
           }
         }
         int countUpdate = Sqflite.firstIntValue(await dbClient.rawQuery(

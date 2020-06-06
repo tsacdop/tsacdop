@@ -5,9 +5,7 @@
 </p>
 
 ![CircleCI](https://img.shields.io/circleci/build/github/stonega/tsacdop?token=efe1331861e017144f2abb363acd95197e436dad)
-
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/stonega/tsacdop)
-
 [![GooglePlay](https://img.shields.io/badge/Google-PlayStore-%2323CCC6)](https://play.google.com/store/apps/details?id=com.stonegate.tsacdop)
 
 ## About

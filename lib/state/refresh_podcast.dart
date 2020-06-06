@@ -77,8 +77,7 @@ Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
     await dbHelper.updatePodcastRss(podcastLocal);
     print('Refresh ' + podcastLocal.title);
   });
-
   // KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');
-//  await refreshcountstorage.saveInt(i);
+  //  await refreshcountstorage.saveInt(i);
   sendPort.send("done");
 }

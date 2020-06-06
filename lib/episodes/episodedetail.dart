@@ -469,186 +469,207 @@ class _MenuBarState extends State<MenuBar> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Hero(
-            tag: widget.episodeItem.enclosureUrl + widget.heroTag,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: Container(
-                height: 30.0,
-                width: 30.0,
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: widget.hide
-                    ? Center()
-                    : CircleAvatar(
-                        backgroundImage:
-                            FileImage(File("${widget.episodeItem.imagePath}"))),
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Hero(
+                    tag: widget.episodeItem.enclosureUrl + widget.heroTag,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Container(
+                        height: 30.0,
+                        width: 30.0,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        child: widget.hide
+                            ? Center()
+                            : CircleAvatar(
+                                backgroundImage: FileImage(
+                                    File("${widget.episodeItem.imagePath}"))),
+                      ),
+                    ),
+                  ),
+                  FutureBuilder<bool>(
+                    future: _isLiked(widget.episodeItem),
+                    initialData: false,
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      return (!snapshot.data && !_liked)
+                          ? _buttonOnMenu(
+                              Icon(
+                                Icons.favorite_border,
+                                color: Colors.grey[700],
+                              ), () async {
+                              await saveLiked(widget.episodeItem.enclosureUrl);
+                              OverlayEntry _overlayEntry;
+                              _overlayEntry = _createOverlayEntry();
+                              Overlay.of(context).insert(_overlayEntry);
+                              await Future.delayed(Duration(seconds: 2));
+                              _overlayEntry?.remove();
+                            })
+                          : (snapshot.data && !_liked)
+                              ? _buttonOnMenu(
+                                  Icon(
+                                    Icons.favorite,
+                                    color: Colors.red,
+                                  ),
+                                  () => setUnliked(
+                                      widget.episodeItem.enclosureUrl))
+                              : _buttonOnMenu(
+                                  Icon(
+                                    Icons.favorite,
+                                    color: Colors.red,
+                                  ),
+                                  () {
+                                    setUnliked(widget.episodeItem.enclosureUrl);
+                                  },
+                                );
+                    },
+                  ),
+                  DownloadButton(episode: widget.episodeItem),
+                  Selector<AudioPlayerNotifier, List<String>>(
+                    selector: (_, audio) => audio.queue.playlist
+                        .map((e) => e.enclosureUrl)
+                        .toList(),
+                    builder: (_, data, __) {
+                      return data.contains(widget.episodeItem.enclosureUrl)
+                          ? _buttonOnMenu(
+                              Icon(Icons.playlist_add_check,
+                                  color: Theme.of(context).accentColor), () {
+                              audio.delFromPlaylist(widget.episodeItem);
+                              Fluttertoast.showToast(
+                                msg: 'Removed from playlist',
+                                gravity: ToastGravity.BOTTOM,
+                              );
+                            })
+                          : _buttonOnMenu(
+                              Icon(Icons.playlist_add, color: Colors.grey[700]),
+                              () {
+                              Fluttertoast.showToast(
+                                msg: 'Added to playlist',
+                                gravity: ToastGravity.BOTTOM,
+                              );
+                              audio.addToPlaylist(widget.episodeItem);
+                            });
+                    },
+                  ),
+                  FutureBuilder<PlayHistory>(
+                      future: getPosition(widget.episodeItem),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) print(snapshot.error);
+                        return snapshot.hasData
+                            ? snapshot.data.seekValue > 0.95
+                                ? Container(
+                                    height: 25,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 15),
+                                    child: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: CustomPaint(
+                                        painter: ListenedAllPainter(
+                                            context.accentColor,
+                                            stroke: 2.0),
+                                      ),
+                                    ),
+                                  )
+                                : snapshot.data.seconds < 0.1
+                                    // ? Material(
+                                    //     color: Colors.transparent,
+                                    //     child: InkWell(
+                                    //       onTap: () async {
+                                    //         await _markListened(widget.episodeItem);
+                                    //         setState(() {});
+                                    //         Fluttertoast.showToast(
+                                    //           msg: 'Mark as listened',
+                                    //           gravity: ToastGravity.BOTTOM,
+                                    //         );
+                                    //       },
+                                    //       child: Container(
+                                    //         height: 50,
+                                    //         padding: EdgeInsets.only(
+                                    //             left: 15,
+                                    //             right: 15,
+                                    //             top: 12,
+                                    //             bottom: 12),
+                                    //         child: SizedBox(
+                                    //           width: 22,
+                                    //           height: 22,
+                                    //           child: CustomPaint(
+                                    //             painter: MarkListenedPainter(
+                                    //                 Colors.grey[700],
+                                    //                 stroke: 2.0),
+                                    //           ),
+                                    //         ),
+                                    //       ),
+                                    //     ),
+                                    //   )
+                                    ? SizedBox(
+                                        width: 1,
+                                      )
+                                    : Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: () => audio.episodeLoad(
+                                              widget.episodeItem,
+                                              startPosition:
+                                                  (snapshot.data.seconds * 1000)
+                                                      .toInt()),
+                                          child: Container(
+                                            height: 50,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            child: Row(
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  width: 20,
+                                                  height: 20,
+                                                  child: CustomPaint(
+                                                    painter: ListenedPainter(
+                                                        context.accentColor,
+                                                        stroke: 2.0),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 2)),
+                                                Container(
+                                                  height: 20,
+                                                  alignment: Alignment.center,
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 5),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0)),
+                                                    color: context.accentColor,
+                                                  ),
+                                                  child: Text(
+                                                    _stringForSeconds(
+                                                        snapshot.data.seconds),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                            : Center();
+                      }),
+                ],
               ),
             ),
           ),
-          FutureBuilder<bool>(
-            future: _isLiked(widget.episodeItem),
-            initialData: false,
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              return (!snapshot.data && !_liked)
-                  ? _buttonOnMenu(
-                      Icon(
-                        Icons.favorite_border,
-                        color: Colors.grey[700],
-                      ), () async {
-                      await saveLiked(widget.episodeItem.enclosureUrl);
-                      OverlayEntry _overlayEntry;
-                      _overlayEntry = _createOverlayEntry();
-                      Overlay.of(context).insert(_overlayEntry);
-                      await Future.delayed(Duration(seconds: 2));
-                      _overlayEntry?.remove();
-                    })
-                  : (snapshot.data && !_liked)
-                      ? _buttonOnMenu(
-                          Icon(
-                            Icons.favorite,
-                            color: Colors.red,
-                          ),
-                          () => setUnliked(widget.episodeItem.enclosureUrl))
-                      : _buttonOnMenu(
-                          Icon(
-                            Icons.favorite,
-                            color: Colors.red,
-                          ),
-                          () {
-                            setUnliked(widget.episodeItem.enclosureUrl);
-                          },
-                        );
-            },
-          ),
-          DownloadButton(episode: widget.episodeItem),
-          Selector<AudioPlayerNotifier, List<String>>(
-            selector: (_, audio) =>
-                audio.queue.playlist.map((e) => e.enclosureUrl).toList(),
-            builder: (_, data, __) {
-              return data.contains(widget.episodeItem.enclosureUrl)
-                  ? _buttonOnMenu(
-                      Icon(Icons.playlist_add_check,
-                          color: Theme.of(context).accentColor), () {
-                      audio.delFromPlaylist(widget.episodeItem);
-                      Fluttertoast.showToast(
-                        msg: 'Removed from playlist',
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                    })
-                  : _buttonOnMenu(
-                      Icon(Icons.playlist_add, color: Colors.grey[700]), () {
-                      Fluttertoast.showToast(
-                        msg: 'Added to playlist',
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                      audio.addToPlaylist(widget.episodeItem);
-                    });
-            },
-          ),
-          FutureBuilder<PlayHistory>(
-              future: getPosition(widget.episodeItem),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) print(snapshot.error);
-                return snapshot.hasData
-                    ? snapshot.data.seekValue > 0.95
-                        ? Container(
-                            height: 25,
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                            child: SizedBox(
-                              width: 25,
-                              height: 25,
-                              child: CustomPaint(
-                                painter: ListenedAllPainter(context.accentColor,
-                                    stroke: 2.0),
-                              ),
-                            ),
-                          )
-                        : snapshot.data.seconds < 0.1
-                            // ? Material(
-                            //     color: Colors.transparent,
-                            //     child: InkWell(
-                            //       onTap: () async {
-                            //         await _markListened(widget.episodeItem);
-                            //         setState(() {});
-                            //         Fluttertoast.showToast(
-                            //           msg: 'Mark as listened',
-                            //           gravity: ToastGravity.BOTTOM,
-                            //         );
-                            //       },
-                            //       child: Container(
-                            //         height: 50,
-                            //         padding: EdgeInsets.only(
-                            //             left: 15,
-                            //             right: 15,
-                            //             top: 12,
-                            //             bottom: 12),
-                            //         child: SizedBox(
-                            //           width: 22,
-                            //           height: 22,
-                            //           child: CustomPaint(
-                            //             painter: MarkListenedPainter(
-                            //                 Colors.grey[700],
-                            //                 stroke: 2.0),
-                            //           ),
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   )
-                            ? Center()
-                            : Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () => audio.episodeLoad(
-                                      widget.episodeItem,
-                                      startPosition:
-                                          (snapshot.data.seconds * 1000)
-                                              .toInt()),
-                                  child: Container(
-                                    height: 50,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 15),
-                                    child: Row(
-                                      children: <Widget>[
-                                        SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CustomPaint(
-                                            painter: ListenedPainter(
-                                                context.accentColor,
-                                                stroke: 2.0),
-                                          ),
-                                        ),
-                                        Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 2)),
-                                        Container(
-                                          height: 20,
-                                          alignment: Alignment.center,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 5),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10.0)),
-                                            color: context.accentColor,
-                                          ),
-                                          child: Text(
-                                            _stringForSeconds(
-                                                snapshot.data.seconds),
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              )
-                    : Center();
-              }),
-          Spacer(),
           Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
-            selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
+            selector: (_, audio) =>
+                Tuple2(audio.episode, audio.playerRunning),
             builder: (_, data, __) {
               return (widget.episodeItem.title == data.item1?.title &&
                       data.item2)
