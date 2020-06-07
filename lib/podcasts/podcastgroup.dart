@@ -15,6 +15,8 @@ import '../util/pageroute.dart';
 import '../util/colorize.dart';
 import '../util/duraiton_picker.dart';
 import '../util/context_extension.dart';
+import '../util/general_dialog.dart';
+import 'podcastmanage.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;
@@ -343,76 +345,41 @@ class _PodcastCardState extends State<PodcastCard>
                                     Icons.fast_forward,
                                     size: 20 * (_value),
                                   ), () {
-                                showGeneralDialog(
-                                  context: context,
-                                  barrierDismissible: true,
-                                  barrierLabel:
-                                      MaterialLocalizations.of(context)
-                                          .modalBarrierDismissLabel,
-                                  barrierColor: Colors.black54,
-                                  transitionDuration:
-                                      const Duration(milliseconds: 200),
-                                  pageBuilder: (BuildContext context,
-                                          Animation animaiton,
-                                          Animation secondaryAnimation) =>
-                                      AnnotatedRegion<SystemUiOverlayStyle>(
-                                    value: SystemUiOverlayStyle(
-                                      statusBarIconBrightness: Brightness.light,
-                                      systemNavigationBarColor:
-                                          Theme.of(context).brightness ==
-                                                  Brightness.light
-                                              ? Color.fromRGBO(113, 113, 113, 1)
-                                              : Color.fromRGBO(15, 15, 15, 1),
-                                    ),
-                                    child: AlertDialog(
-                                      elevation: 1,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10.0))),
-                                      titlePadding: EdgeInsets.only(
-                                          top: 20,
-                                          left: 20,
-                                          right: context.width / 3,
-                                          bottom: 20),
-                                      title:
-                                          Text('Skip seconds at the beginning'),
-                                      content: DurationPicker(
-                                        duration: Duration(
-                                            seconds: _skipSeconds ?? 0),
-                                        onChange: (value) =>
-                                            _seconds = value.inSeconds,
-                                      ),
-
-                                      // content: Text('test'),
-                                      actionsPadding: EdgeInsets.all(10),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            _seconds = 0;
-                                          },
-                                          child: Text(
-                                            'CANCEL',
-                                            style: TextStyle(
-                                                color: Colors.grey[600]),
-                                          ),
-                                        ),
-                                        FlatButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            saveSkipSeconds(
-                                                widget.podcastLocal.id,
-                                                _seconds);
-                                          },
-                                          child: Text(
-                                            'CONFIRM',
-                                            style: TextStyle(
-                                                color: context.accentColor),
-                                          ),
-                                        )
-                                      ],
-                                    ),
+                                generalDialog(
+                                  context,
+                                  title: Text('Skip seconds at start',
+                                      maxLines: 2),
+                                  content: DurationPicker(
+                                    duration:
+                                        Duration(seconds: _skipSeconds ?? 0),
+                                    onChange: (value) =>
+                                        _seconds = value.inSeconds,
                                   ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        _seconds = 0;
+                                      },
+                                      child: Text(
+                                        'CANCEL',
+                                        style:
+                                            TextStyle(color: Colors.grey[600]),
+                                      ),
+                                    ),
+                                    FlatButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        saveSkipSeconds(
+                                            widget.podcastLocal.id, _seconds);
+                                      },
+                                      child: Text(
+                                        'CONFIRM',
+                                        style: TextStyle(
+                                            color: context.accentColor),
+                                      ),
+                                    )
+                                  ],
                                 );
                               }),
                               _buttonOnMenu(
@@ -421,64 +388,33 @@ class _PodcastCardState extends State<PodcastCard>
                                     color: Colors.red,
                                     size: 20 * (_value),
                                   ), () {
-                                showGeneralDialog(
-                                  context: context,
-                                  barrierDismissible: true,
-                                  barrierLabel:
-                                      MaterialLocalizations.of(context)
-                                          .modalBarrierDismissLabel,
-                                  barrierColor: Colors.black54,
-                                  transitionDuration:
-                                      const Duration(milliseconds: 200),
-                                  pageBuilder: (BuildContext context,
-                                          Animation animaiton,
-                                          Animation secondaryAnimation) =>
-                                      AnnotatedRegion<SystemUiOverlayStyle>(
-                                    value: SystemUiOverlayStyle(
-                                      statusBarIconBrightness: Brightness.light,
-                                      systemNavigationBarColor:
-                                          Theme.of(context).brightness ==
-                                                  Brightness.light
-                                              ? Color.fromRGBO(113, 113, 113, 1)
-                                              : Color.fromRGBO(15, 15, 15, 1),
+                                generalDialog(
+                                  context,
+                                  title: Text('Remove confirm'),
+                                  content: Text(
+                                      'Are you sure you want to unsubscribe?'),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: Text(
+                                        'CANCEL',
+                                        style:
+                                            TextStyle(color: Colors.grey[600]),
+                                      ),
                                     ),
-                                    child: AlertDialog(
-                                      elevation: 1,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10.0))),
-                                      titlePadding: EdgeInsets.only(
-                                          top: 20,
-                                          left: 20,
-                                          right: context.width / 3,
-                                          bottom: 20),
-                                      title: Text('Remove confirm'),
-                                      content: Text(
-                                          'Are you sure you want to unsubscribe?'),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                          child: Text(
-                                            'CANCEL',
-                                            style: TextStyle(
-                                                color: Colors.grey[600]),
-                                          ),
-                                        ),
-                                        FlatButton(
-                                          onPressed: () {
-                                            groupList.removePodcast(
-                                                widget.podcastLocal.id);
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text(
-                                            'CONFIRM',
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                    FlatButton(
+                                      onPressed: () {
+                                        groupList.removePodcast(
+                                            widget.podcastLocal.id);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        'CONFIRM',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    )
+                                  ],
                                 );
                               }),
                             ],
@@ -534,7 +470,7 @@ class _RenameGroupState extends State<RenameGroup> {
         elevation: 1,
         contentPadding: EdgeInsets.symmetric(horizontal: 20),
         titlePadding: EdgeInsets.only(
-            top: 20, left: 20, right: context.width / 3, bottom: 20),
+            top: 20, left: 20, right: 20, bottom: 20),
         actionsPadding: EdgeInsets.all(0),
         actions: <Widget>[
           FlatButton(
@@ -561,7 +497,7 @@ class _RenameGroupState extends State<RenameGroup> {
                 style: TextStyle(color: Theme.of(context).accentColor)),
           )
         ],
-        title: Text('Edit group name'),
+        title: SizedBox(width: context.width - 160, child: Text('Edit group name')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[

@@ -22,6 +22,7 @@ import '../type/fireside_data.dart';
 import '../util/colorize.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
+import '../util/general_dialog.dart';
 import '../state/audiostate.dart';
 
 class PodcastDetail extends StatefulWidget {
@@ -93,6 +94,21 @@ class _PodcastDetailState extends State<PodcastDetail> {
         gravity: ToastGravity.TOP,
       );
     }
+  }
+
+  _markListened(String podcastId) async {
+    DBHelper dbHelper = DBHelper();
+    List<EpisodeBrief> episodes =
+        await dbHelper.getRssItem(podcastId, -1, true);
+    await Future.forEach(episodes, (episode) async {
+      bool marked = await dbHelper.checkMarked(episode);
+      if (!marked) {
+        final PlayHistory history =
+            PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+        await dbHelper.saveHistory(history);
+        if (mounted) setState(() {});
+      }
+    });
   }
 
   Widget podcastInfo(BuildContext context) {
@@ -183,6 +199,33 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
+  _confirmMarkListened(BuildContext context) => generalDialog(
+        context,
+        title: Text('Mark confirm'),
+        content: Text('Confirm mark all episodes listened?'),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              'CANCEL',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          ),
+          FlatButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _markListened(widget.podcastLocal.id);
+            },
+            child: Text(
+              'CONFIRM',
+              style: TextStyle(color: context.accentColor),
+            ),
+          )
+        ],
+      );
+
   double _topHeight = 0;
 
   ScrollController _controller;
@@ -258,7 +301,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                             _loadMore = false;
                                           });
                                       }
-                                      if (_controller.offset > 0 && mounted && !_scroll )
+                                      if (_controller.offset > 0 &&
+                                          mounted &&
+                                          !_scroll)
                                         setState(() {
                                           _scroll = true;
                                         });
@@ -270,7 +315,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     SliverAppBar(
                                       brightness: Brightness.dark,
                                       actions: <Widget>[
-                                        PopupMenuButton<String>(
+                                        PopupMenuButton<int>(
                                           shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(10))),
@@ -279,8 +324,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                           itemBuilder: (context) => [
                                             widget.podcastLocal.link != null
                                                 ? PopupMenuItem(
-                                                    value: widget
-                                                        .podcastLocal.link,
+                                                    value: 0,
                                                     child: Container(
                                                       padding: EdgeInsets.only(
                                                           left: 10),
@@ -304,7 +348,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                   )
                                                 : Center(),
                                             PopupMenuItem(
-                                              value: widget.podcastLocal.rssUrl,
+                                              value: 1,
                                               child: Container(
                                                 padding:
                                                     EdgeInsets.only(left: 10),
@@ -326,9 +370,54 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                 ),
                                               ),
                                             ),
+                                            PopupMenuItem(
+                                              value: 2,
+                                              child: Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 10),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    SizedBox(
+                                                      width: 25,
+                                                      height: 25,
+                                                      child: CustomPaint(
+                                                          painter:
+                                                              ListenedAllPainter(
+                                                                  context
+                                                                      .textTheme
+                                                                      .bodyText1
+                                                                      .color,
+                                                                  stroke: 2)),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 5.0),
+                                                    ),
+                                                    Text(
+                                                      'Mark All Listened',
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                           ],
-                                          onSelected: (url) {
-                                            _launchUrl(url);
+                                          onSelected: (int value) {
+                                            switch (value) {
+                                              case 0:
+                                                _launchUrl(
+                                                    widget.podcastLocal.link);
+                                                break;
+                                              case 1:
+                                                _launchUrl(
+                                                    widget.podcastLocal.rssUrl);
+                                                break;
+                                              case 2:
+                                                _confirmMarkListened(context);
+                                                break;
+                                            }
                                           },
                                         )
                                       ],

@@ -137,7 +137,10 @@ class DownloadState extends ChangeNotifier {
         now.month.toString() +
         now.day.toString() +
         now.second.toString();
-    String fileName = episode.title +
+    String title = episode.title.trim().substring(0, 1) == '#'
+        ? episode.title.trim().substring(1)
+        : episode.title.trim();
+    String fileName = title +
         datePlus +
         '.' +
         episode.enclosureUrl.split('/').last.split('.').last;

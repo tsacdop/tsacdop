@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:feature_discovery/feature_discovery.dart';
 
 import 'generated/l10n.dart';
 import 'state/podcast_group.dart';
@@ -16,6 +18,7 @@ import 'intro_slider/app_intro.dart';
 
 final SettingState themeSetting = SettingState();
 Future main() async {
+  timeDilation = 1.0;
   WidgetsFlutterBinding.ensureInitialized();
   await themeSetting.initData();
   runApp(
@@ -49,31 +52,34 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingState>(
       builder: (_, setting, __) {
-        return MaterialApp(
-          themeMode: setting.theme,
-          debugShowCheckedModeBanner: false,
-          title: 'Tsacdop',
-          theme: lightTheme.copyWith(
-              accentColor: setting.accentSetColor,
-              cursorColor: setting.accentSetColor,
-              toggleableActiveColor: setting.accentSetColor),
-          darkTheme: ThemeData.dark().copyWith(
-              accentColor: setting.accentSetColor,
-              primaryColorDark: Colors.grey[800],
-              scaffoldBackgroundColor: setting.realDark ? Colors.black87 : null,
-              primaryColor: setting.realDark ? Colors.black : null,
-              popupMenuTheme: PopupMenuThemeData()
-                  .copyWith(color: setting.realDark ? Colors.black87 : null),
-              appBarTheme: AppBarTheme(elevation: 0),
-              cursorColor: setting.accentSetColor),
-          localizationsDelegates: [
-            S.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: S.delegate.supportedLocales,
-          home: setting.showIntro ? SlideIntro(goto: Goto.home) : Home(),
+        return FeatureDiscovery(
+          child: MaterialApp(
+            themeMode: setting.theme,
+            debugShowCheckedModeBanner: false,
+            title: 'Tsacdop',
+            theme: lightTheme.copyWith(
+                accentColor: setting.accentSetColor,
+                cursorColor: setting.accentSetColor,
+                toggleableActiveColor: setting.accentSetColor),
+            darkTheme: ThemeData.dark().copyWith(
+                accentColor: setting.accentSetColor,
+                primaryColorDark: Colors.grey[800],
+                scaffoldBackgroundColor:
+                    setting.realDark ? Colors.black87 : null,
+                primaryColor: setting.realDark ? Colors.black : null,
+                popupMenuTheme: PopupMenuThemeData()
+                    .copyWith(color: setting.realDark ? Colors.black87 : null),
+                appBarTheme: AppBarTheme(elevation: 0),
+                cursorColor: setting.accentSetColor),
+            localizationsDelegates: [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            home: setting.showIntro ? SlideIntro(goto: Goto.home) : Home(),
+          ),
         );
       },
     );

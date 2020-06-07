@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../state/settingstate.dart';
 import '../util/context_extension.dart';
+import '../util/general_dialog.dart';
 
 class ThemeSetting extends StatelessWidget {
   @override
@@ -134,47 +135,20 @@ class ThemeSetting extends StatelessWidget {
                 ),
                 Divider(height: 2),
                 ListTile(
-                  onTap: () => showGeneralDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      barrierLabel: MaterialLocalizations.of(context)
-                          .modalBarrierDismissLabel,
-                      barrierColor: Colors.black54,
-                      transitionDuration: const Duration(milliseconds: 200),
-                      pageBuilder: (BuildContext context, Animation animaiton,
-                              Animation secondaryAnimation) =>
-                          AnnotatedRegion<SystemUiOverlayStyle>(
-                              value: SystemUiOverlayStyle(
-                                statusBarIconBrightness: Brightness.light,
-                                systemNavigationBarColor:
-                                    Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Color.fromRGBO(113, 113, 113, 1)
-                                        : Color.fromRGBO(15, 15, 15, 1),
-                              ),
-                              child: AlertDialog(
-                                elevation: 1,
-                                titlePadding: EdgeInsets.only(
-                                    top: 20,
-                                    left: 40,
-                                    right: context.width / 3,
-                                    bottom: 0),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(10.0))),
-                                title: Text.rich(
-                                    TextSpan(text: 'Choose a ', children: [
-                                  TextSpan(
-                                      text: 'color',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: context.accentColor))
-                                ])),
-                                content: ColorPicker(
-                                  onColorChanged: (value) =>
-                                      settings.setAccentColor = value,
-                                ),
-                              ))),
+                  onTap: () => generalDialog(
+                    context,
+                    title: Text.rich(TextSpan(text: 'Choose a ', children: [
+                      TextSpan(
+                          text: 'color',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: context.accentColor))
+                    ])),
+                    content: ColorPicker(
+                      onColorChanged: (value) =>
+                          settings.setAccentColor = value,
+                    ),
+                  ),
                   contentPadding: EdgeInsets.only(left: 80.0, right: 25),
                   title: Text('Accent color'),
                   subtitle: Text('Include the overlay color'),

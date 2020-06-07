@@ -4,6 +4,8 @@ import 'package:tsacdop/util/custompaint.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
 
+import '../util/context_extension.dart';
+
 const String version = '0.3.3';
 
 class AboutApp extends StatelessWidget {
@@ -97,12 +99,37 @@ class AboutApp extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Container(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 50),
                       child: Text(
                         'Tsacdop is a podcast player developed in flutter, a clean, simply beautiful and friendly app.',
                         textAlign: TextAlign.center,
                       ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        FlatButton(
+                          onPressed: () => _launchUrl(
+                              'https://tsacdop.stonegate.me/#/privacy'),
+                          child: Text('Privacy Policy',
+                              style: TextStyle(color: context.accentColor)),
+                        ),
+                        Container(
+                          height: 4,
+                          width: 4,
+                          decoration: BoxDecoration(
+                              color: context.accentColor,
+                              shape: BoxShape.circle),
+                        ),
+                        FlatButton(
+                          onPressed: () => _launchUrl(
+                              'https://tsacdop.stonegate.me/#/changelog'),
+                          child: Text('Changelogs',
+                              style: TextStyle(color: context.accentColor)),
+                        ),
+                      ],
                     ),
                     Padding(
                       padding: EdgeInsets.all(10.0),

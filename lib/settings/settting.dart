@@ -8,12 +8,16 @@ import 'package:line_icons/line_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:feature_discovery/feature_discovery.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../util/ompl_build.dart';
 import '../util/context_extension.dart';
 import '../intro_slider/app_intro.dart';
 import '../type/podcastlocal.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../home/home.dart';
+import '../podcasts/podcastmanage.dart';
 import 'theme.dart';
 import 'layouts.dart';
 import 'storage.dart';
@@ -257,16 +261,6 @@ class _SettingsState extends State<Settings>
                       scrollDirection: Axis.vertical,
                       children: <Widget>[
                         ListTile(
-                          onTap: () => _launchUrl(
-                              'https://github.com/stonega/tsacdop/releases'),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.map_signs_solid),
-                          title: Text('Changelog'),
-                          subtitle: Text('List of changes'),
-                        ),
-                        Divider(height: 2),
-                        ListTile(
                           onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -331,6 +325,31 @@ class _SettingsState extends State<Settings>
                         Divider(
                           height: 2,
                         ),
+                        ListTile(
+                          onTap: () {
+                            FeatureDiscovery.clearPreferences(
+                                context, const <String>{
+                              addFeature,
+                              menuFeature,
+                              playlistFeature,
+                              groupsFeature,
+                              addGroupFeature,
+                              configureGroup,
+                              configurePodcast,
+                              podcastFeature
+                            });
+                            Fluttertoast.showToast(
+                              msg:
+                                  'Discovery Feature Reopened, pleast restart the app',
+                              gravity: ToastGravity.BOTTOM,
+                            );
+                          },
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
+                          leading: Icon(LineIcons.capsules_solid),
+                          title: Text('Discovery Features Again'),
+                        ),
+                        Divider(height: 2),
                         ListTile(
                           onTap: () => Navigator.push(
                               context,

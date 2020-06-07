@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:feature_discovery/feature_discovery.dart';
 
 import '../type/episodebrief.dart';
 import '../state/podcast_group.dart';

@@ -316,6 +316,15 @@ class DBHelper {
         : PlayHistory(episodeBrief.title, episodeBrief.enclosureUrl, 0, 0);
   }
 
+  Future<bool> checkMarked(EpisodeBrief episodeBrief) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory 
+        WHERE enclosure_url = ? AND seek_value = 1 ORDER BY add_date DESC LIMIT 1""",
+        [episodeBrief.enclosureUrl]);
+    return list.length > 0;
+  }
+
   DateTime _parsePubDate(String pubDate) {
     if (pubDate == null) return DateTime.now();
     DateTime date;
@@ -512,7 +521,6 @@ class DBHelper {
                     url,
                   ]);
             });
-            
           }
         }
         int countUpdate = Sqflite.firstIntValue(await dbClient.rawQuery(
@@ -534,7 +542,32 @@ class DBHelper {
   Future<List<EpisodeBrief>> getRssItem(String id, int i, bool reverse) async {
     var dbClient = await database;
     List<EpisodeBrief> episodes = [];
-    if (reverse) {
+    if (i == -1) {
+      List<Map> list = await dbClient
+          .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, E.liked, 
+        E.downloaded,  P.primaryColor , E.media_id, E.is_new, P.skip_seconds
+        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE P.id = ? ORDER BY E.milliseconds ASC""", [id]);
+      for (int x = 0; x < list.length; x++) {
+        episodes.add(EpisodeBrief(
+            list[x]['title'],
+            list[x]['enclosure_url'],
+            list[x]['enclosure_length'],
+            list[x]['milliseconds'],
+            list[x]['feedTitle'],
+            list[x]['primaryColor'],
+            list[x]['liked'],
+            list[x]['downloaded'],
+            list[x]['duration'],
+            list[x]['explicit'],
+            list[x]['imagePath'],
+            list[x]['media_id'],
+            list[x]['is_new'],
+            list[x]['skip_seconds']));
+      }
+      return episodes;
+    } else if (reverse) {
       List<Map> list = await dbClient
           .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, E.liked, 
@@ -558,6 +591,7 @@ class DBHelper {
             list[x]['is_new'],
             list[x]['skip_seconds']));
       }
+      return episodes;
     } else {
       List<Map> list = await dbClient
           .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
@@ -582,8 +616,8 @@ class DBHelper {
             list[x]['is_new'],
             list[x]['skip_seconds']));
       }
+      return episodes;
     }
-    return episodes;
   }
 
   Future<List<EpisodeBrief>> getNewEpisodes(String id) async {
@@ -1041,13 +1075,12 @@ class DBHelper {
     }
   }
 
-  Future<String> getImageUrl(String url) async{
+  Future<String> getImageUrl(String url) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         """SELECT P.imageUrl FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.enclosure_url = ?""", [url]);
-    if(list.length ==0)
-    return null;
+    if (list.length == 0) return null;
     return list.first["imageUrl"];
   }
 }

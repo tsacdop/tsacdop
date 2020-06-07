@@ -8,6 +8,7 @@ import 'package:tuple/tuple.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:feature_discovery/feature_discovery.dart';
 
 import '../state/audiostate.dart';
 import '../type/episodebrief.dart';
@@ -27,6 +28,13 @@ import 'addpodcast.dart';
 import 'popupmenu.dart';
 import 'home_groups.dart';
 import 'download_list.dart';
+
+const String addFeature = 'addFeature';
+const String menuFeature = 'menuFeature';
+const String playlistFeature = 'playlistFeature';
+const String longTapFeature = 'longTapFeature';
+const String groupsFeature = 'groupsFeature';
+const String podcastFeature = 'podcastFeature';
 
 class Home extends StatefulWidget {
   @override
@@ -51,11 +59,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   var _androidAppRetain = MethodChannel("android_app_retain");
+  var feature1OverflowMode = OverflowMode.clipContent;
+  var feature1EnablePulsingAnimation = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TabController(length: 3, vsync: this);
+    FeatureDiscovery.isDisplayed(context, addFeature).then((value) {
+      if (!value)
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          FeatureDiscovery.discoverFeatures(
+            context,
+            const <String>{
+              addFeature,
+              menuFeature,
+              playlistFeature,
+              groupsFeature,
+              podcastFeature,
+            },
+          );
+        });
+    });
   }
 
   @override
@@ -110,16 +135,67 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
-                                          IconButton(
-                                            tooltip: 'Add',
-                                            icon: const Icon(
-                                                Icons.add_circle_outline),
-                                            onPressed: () async {
-                                              await showSearch<int>(
-                                                context: context,
-                                                delegate: _delegate,
-                                              );
+                                          DescribedFeatureOverlay(
+                                            featureId: addFeature,
+                                            tapTarget:
+                                                Icon(Icons.add_circle_outline),
+                                            title: const Text(
+                                                'Tap to search podcast'),
+                                            backgroundColor: Colors.cyan[600],
+                                            overflowMode: feature1OverflowMode,
+                                            onDismiss: () {
+                                              return Future.value(true);
                                             },
+                                            description: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                const Text(
+                                                    'You can search podcast title , key word or RSS link to subscribe new podcast.'),
+                                                FlatButton(
+                                                  color: Colors.cyan[500],
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  child: Text('Understood',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .button
+                                                          .copyWith(
+                                                              color: Colors
+                                                                  .white)),
+                                                  onPressed: () async =>
+                                                      FeatureDiscovery
+                                                          .completeCurrentStep(
+                                                              context),
+                                                ),
+                                                FlatButton(
+                                                  color: Colors.cyan[500],
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  child: Text('Dismiss',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .button
+                                                          .copyWith(
+                                                              color: Colors
+                                                                  .white)),
+                                                  onPressed: () =>
+                                                      FeatureDiscovery
+                                                          .dismissAll(context),
+                                                ),
+                                              ],
+                                            ),
+                                            child: IconButton(
+                                              tooltip: 'Add',
+                                              icon: const Icon(
+                                                  Icons.add_circle_outline),
+                                              onPressed: () async {
+                                                await showSearch<int>(
+                                                  context: context,
+                                                  delegate: _delegate,
+                                                );
+                                              },
+                                            ),
                                           ),
                                           Image(
                                             image: Theme.of(context)
@@ -130,7 +206,55 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                     'assets/text_light.png'),
                                             height: 30,
                                           ),
-                                          PopupMenu(),
+                                          DescribedFeatureOverlay(
+                                              featureId: menuFeature,
+                                              tapTarget: Icon(Icons.more_vert),
+                                              backgroundColor: Colors.cyan[500],
+                                              onDismiss: () =>
+                                                  Future.value(true),
+                                              title: const Text(
+                                                  'Tap to import OMPL'),
+                                              description: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: <Widget>[
+                                                  const Text(
+                                                      'You can import OMPL file, open setting or refresh all podcast at once here.'),
+                                                  FlatButton(
+                                                    color: Colors.cyan[600],
+                                                    padding:
+                                                        const EdgeInsets.all(0),
+                                                    child: Text('Understood',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .button
+                                                            .copyWith(
+                                                                color: Colors
+                                                                    .white)),
+                                                    onPressed: () async =>
+                                                        FeatureDiscovery
+                                                            .completeCurrentStep(
+                                                                context),
+                                                  ),
+                                                  FlatButton(
+                                                    color: Colors.cyan[600],
+                                                    padding:
+                                                        const EdgeInsets.all(0),
+                                                    child: Text('Dismiss',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .button
+                                                            .copyWith(
+                                                                color: Colors
+                                                                    .white)),
+                                                    onPressed: () =>
+                                                        FeatureDiscovery
+                                                            .dismissAll(
+                                                                context),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: PopupMenu()),
                                         ],
                                       ),
                                     ),
@@ -141,10 +265,69 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               SliverList(
                                 delegate: SliverChildBuilderDelegate(
                                   (BuildContext context, int index) {
-                                    return SizedBox(
-                                      height: height,
-                                      width: width,
-                                      child: ScrollPodcasts(),
+                                    return DescribedFeatureOverlay(
+                                      featureId: groupsFeature,
+                                      tapTarget: Center(
+                                          child: Text(
+                                        'Podcast View',
+                                        textAlign: TextAlign.center,
+                                      )),
+                                      backgroundColor: Colors.cyan[500],
+                                      enablePulsingAnimation: false,
+                                      onDismiss: () => Future.value(true),
+                                      title: const Text(
+                                          'Scroll vertically to switch groups'),
+                                      description: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          const Text(
+                                              'You can tap See All to add groups or manage podcasts.'),
+                                          Row(
+                                            children: [
+                                              FlatButton(
+                                                color: Colors.cyan[600],
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                child: Text('Understood',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .button
+                                                        .copyWith(
+                                                            color:
+                                                                Colors.white)),
+                                                onPressed: () async =>
+                                                    FeatureDiscovery
+                                                        .completeCurrentStep(
+                                                            context),
+                                              ),
+                                              Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 5)),
+                                              FlatButton(
+                                                color: Colors.cyan[600],
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                child: Text('Dismiss',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .button
+                                                        .copyWith(
+                                                            color:
+                                                                Colors.white)),
+                                                onPressed: () =>
+                                                    FeatureDiscovery.dismissAll(
+                                                        context),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      child: SizedBox(
+                                        height: height,
+                                        width: width,
+                                        child: ScrollPodcasts(),
+                                      ),
                                     );
                                   },
                                   childCount: 1,
@@ -178,7 +361,63 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             controller: _controller,
                             children: <Widget>[
                               NestedScrollViewInnerScrollPositionKeyWidget(
-                                  Key('tab0'), _RecentUpdate()),
+                                  Key('tab0'),
+                                  DescribedFeatureOverlay(
+                                      featureId: podcastFeature,
+                                      tapTarget: Text('Episode View',
+                                          textAlign: TextAlign.center),
+                                      backgroundColor: Colors.cyan[500],
+                                      enablePulsingAnimation: false,
+                                      onDismiss: () => Future.value(true),
+                                      title: const Text(
+                                          'Long tap to play episode instantly'),
+                                      description: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          const Text(
+                                              'You can long tap to play episode or add episode to playlist.'),
+                                          Row(
+                                            children: [
+                                              FlatButton(
+                                                color: Colors.cyan[600],
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                child: Text('Understood',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .button
+                                                        .copyWith(
+                                                            color:
+                                                                Colors.white)),
+                                                onPressed: () async =>
+                                                    FeatureDiscovery
+                                                        .completeCurrentStep(
+                                                            context),
+                                              ),
+                                              Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 5)),
+                                              FlatButton(
+                                                color: Colors.cyan[600],
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                child: Text('Dismiss',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .button
+                                                        .copyWith(
+                                                            color:
+                                                                Colors.white)),
+                                                onPressed: () =>
+                                                    FeatureDiscovery.dismissAll(
+                                                        context),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      child: _RecentUpdate())),
                               NestedScrollViewInnerScrollPositionKeyWidget(
                                   Key('tab1'), _MyFavorite()),
                               NestedScrollViewInnerScrollPositionKeyWidget(
@@ -227,7 +466,41 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             children: <Widget>[
               _tabBar,
               Spacer(),
-              PlaylistButton(),
+              DescribedFeatureOverlay(
+                  featureId: playlistFeature,
+                  tapTarget: Icon(Icons.playlist_play),
+                  backgroundColor: Colors.cyan[500],
+                  title: const Text('Tap to open playlist'),
+                  onDismiss: () => Future.value(true),
+                  description: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Text(
+                          'You can add episode to playlist by yourself. Episode will be auto removed from playlist when played.'),
+                      FlatButton(
+                        color: Colors.cyan[600],
+                        padding: const EdgeInsets.all(0),
+                        child: Text('Understood',
+                            style: Theme.of(context)
+                                .textTheme
+                                .button
+                                .copyWith(color: Colors.white)),
+                        onPressed: () async =>
+                            FeatureDiscovery.completeCurrentStep(context),
+                      ),
+                      FlatButton(
+                        color: Colors.cyan[600],
+                        padding: const EdgeInsets.all(0),
+                        child: Text('Dismiss',
+                            style: Theme.of(context)
+                                .textTheme
+                                .button
+                                .copyWith(color: Colors.white)),
+                        onPressed: () => FeatureDiscovery.dismissAll(context),
+                      ),
+                    ],
+                  ),
+                  child: PlaylistButton()),
             ],
           ),
           Container(height: 2, color: context.primaryColor),

@@ -71,9 +71,12 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 
   _markListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
-    final PlayHistory history =
-        PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-    await dbHelper.saveHistory(history);
+    bool marked = await dbHelper.checkMarked(episode);
+    if (!marked) {
+      final PlayHistory history =
+          PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+      await dbHelper.saveHistory(history);
+    }
   }
 
   @override
@@ -110,7 +113,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
             PopupMenuButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10))),
-              elevation: 1,
+              elevation: 2,
               tooltip: 'Menu',
               itemBuilder: (context) => [
                 PopupMenuItem(
@@ -126,13 +129,13 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                           child: CustomPaint(
                               painter: ListenedAllPainter(
                                   context.textTheme.bodyText1.color,
-                                  stroke: 1.5)),
+                                  stroke: 2)),
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 5.0),
                         ),
                         Text(
-                          'Mark listened',
+                          'Mark Listened',
                         ),
                       ],
                     ),
@@ -143,7 +146,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                 switch (value) {
                   case 0:
                     await _markListened(widget.episodeItem);
-                    setState(() {});
+                    if (mounted) setState(() {});
                     Fluttertoast.showToast(
                       msg: 'Mark as listened',
                       gravity: ToastGravity.BOTTOM,
@@ -413,13 +416,6 @@ class _MenuBarState extends State<MenuBar> {
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
-  _markListened(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
-    final PlayHistory history =
-        PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-    await dbHelper.saveHistory(history);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -577,36 +573,6 @@ class _MenuBarState extends State<MenuBar> {
                                     ),
                                   )
                                 : snapshot.data.seconds < 0.1
-                                    // ? Material(
-                                    //     color: Colors.transparent,
-                                    //     child: InkWell(
-                                    //       onTap: () async {
-                                    //         await _markListened(widget.episodeItem);
-                                    //         setState(() {});
-                                    //         Fluttertoast.showToast(
-                                    //           msg: 'Mark as listened',
-                                    //           gravity: ToastGravity.BOTTOM,
-                                    //         );
-                                    //       },
-                                    //       child: Container(
-                                    //         height: 50,
-                                    //         padding: EdgeInsets.only(
-                                    //             left: 15,
-                                    //             right: 15,
-                                    //             top: 12,
-                                    //             bottom: 12),
-                                    //         child: SizedBox(
-                                    //           width: 22,
-                                    //           height: 22,
-                                    //           child: CustomPaint(
-                                    //             painter: MarkListenedPainter(
-                                    //                 Colors.grey[700],
-                                    //                 stroke: 2.0),
-                                    //           ),
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //   )
                                     ? SizedBox(
                                         width: 1,
                                       )
@@ -668,8 +634,7 @@ class _MenuBarState extends State<MenuBar> {
             ),
           ),
           Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
-            selector: (_, audio) =>
-                Tuple2(audio.episode, audio.playerRunning),
+            selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
             builder: (_, data, __) {
               return (widget.episodeItem.title == data.item1?.title &&
                       data.item2)
