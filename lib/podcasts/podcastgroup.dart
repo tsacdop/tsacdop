@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:line_icons/line_icons.dart';
 
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
@@ -16,7 +17,6 @@ import '../util/colorize.dart';
 import '../util/duraiton_picker.dart';
 import '../util/context_extension.dart';
 import '../util/general_dialog.dart';
-import 'podcastmanage.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;
@@ -97,6 +97,16 @@ class _PodcastCardState extends State<PodcastCard>
     await dbHelper.saveSkipSeconds(id, seconds);
   }
 
+  _setAutoDownload(String id, bool boo) async {
+    DBHelper dbHelper = DBHelper();
+    await dbHelper.saveAutoDownload(id, boo);
+  }
+
+  Future<bool> _getAutoDownload(String id) async {
+    DBHelper dbHelper = DBHelper();
+    return await dbHelper.getAutoDownload(id);
+  }
+
   String _stringForSeconds(double seconds) {
     if (seconds == null) return null;
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
@@ -120,14 +130,25 @@ class _PodcastCardState extends State<PodcastCard>
       });
   }
 
-  Widget _buttonOnMenu(Widget widget, VoidCallback onTap) => Material(
+  Widget _buttonOnMenu({Widget icon, VoidCallback onTap, String tooltip}) =>
+      Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           child: Container(
               height: 50.0,
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: widget),
+              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: icon,
+                  ),
+                  Text(tooltip, style: context.textTheme.subtitle2),
+                ],
+              )),
         ),
       );
 
@@ -209,20 +230,6 @@ class _PodcastCardState extends State<PodcastCard>
                                     child: Text(group.name));
                               }).toList(),
                             ),
-                            FutureBuilder<int>(
-                              future: getSkipSecond(widget.podcastLocal.id),
-                              initialData: 0,
-                              builder: (context, snapshot) {
-                                return snapshot.data == 0
-                                    ? Center()
-                                    : Container(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text('Skip ' +
-                                            _stringForSeconds(
-                                                snapshot.data.toDouble())),
-                                      );
-                              },
-                            ),
                           ],
                         )),
                     Spacer(),
@@ -230,9 +237,6 @@ class _PodcastCardState extends State<PodcastCard>
                       angle: math.pi * _value,
                       child: Icon(Icons.keyboard_arrow_down),
                     ),
-                    //  Icon(_loadMenu
-                    //      ? Icons.keyboard_arrow_up
-                    //      : Icons.keyboard_arrow_down),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
                     ),
@@ -326,97 +330,127 @@ class _PodcastCardState extends State<PodcastCard>
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               _buttonOnMenu(
-                                  Icon(Icons.fullscreen, size: 20 * _value),
-                                  () => Navigator.push(
-                                        context,
-                                        ScaleRoute(
-                                            page: PodcastDetail(
-                                          podcastLocal: widget.podcastLocal,
-                                        )),
-                                      )),
-                              _buttonOnMenu(Icon(Icons.add, size: 20 * _value),
-                                  () {
-                                setState(() {
-                                  _addGroup = true;
-                                });
-                              }),
+                                  icon: Icon(Icons.add,
+                                      size: _value == 0 ? 1 : 20 * _value),
+                                  onTap: () {
+                                    setState(() {
+                                      _addGroup = true;
+                                    });
+                                  },
+                                  tooltip: 'Group'),
+                              FutureBuilder<bool>(
+                                future:
+                                    _getAutoDownload(widget.podcastLocal.id),
+                                initialData: false,
+                                builder: (context, snapshot) {
+                                  return _buttonOnMenu(
+                                    icon: Icon(
+                                        LineIcons.cloud_download_alt_solid,
+                                        size: _value == 0 ? 1 : 20 * _value,
+                                        color: snapshot.data
+                                            ? context.accentColor
+                                            : null),
+                                    tooltip: 'AutoDownload',
+                                    onTap: () {
+                                      _setAutoDownload(widget.podcastLocal.id,
+                                          !snapshot.data);
+                                      setState(() {});
+                                    },
+                                  );
+                                },
+                              ),
+                              FutureBuilder<int>(
+                                  future: getSkipSecond(widget.podcastLocal.id),
+                                  initialData: 0,
+                                  builder: (context, snapshot) {
+                                    return _buttonOnMenu(
+                                        icon: Icon(
+                                          Icons.fast_forward,
+                                          size: _value == 0 ? 1 : 20 * (_value),
+                                        ),
+                                        tooltip: 'Skip' +
+                                            (snapshot.data == 0
+                                                ? ''
+                                                : _stringForSeconds(
+                                                    snapshot.data.toDouble())),
+                                        onTap: () {
+                                          generalDialog(
+                                            context,
+                                            title: Text('Skip seconds at start',
+                                                maxLines: 2),
+                                            content: DurationPicker(
+                                              duration: Duration(
+                                                  seconds: _skipSeconds ?? 0),
+                                              onChange: (value) =>
+                                                  _seconds = value.inSeconds,
+                                            ),
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  _seconds = 0;
+                                                },
+                                                child: Text(
+                                                  'CANCEL',
+                                                  style: TextStyle(
+                                                      color: Colors.grey[600]),
+                                                ),
+                                              ),
+                                              FlatButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  saveSkipSeconds(
+                                                      widget.podcastLocal.id,
+                                                      _seconds);
+                                                },
+                                                child: Text(
+                                                  'CONFIRM',
+                                                  style: TextStyle(
+                                                      color:
+                                                          context.accentColor),
+                                                ),
+                                              )
+                                            ],
+                                          );
+                                        });
+                                  }),
                               _buttonOnMenu(
-                                  Icon(
-                                    Icons.fast_forward,
-                                    size: 20 * (_value),
-                                  ), () {
-                                generalDialog(
-                                  context,
-                                  title: Text('Skip seconds at start',
-                                      maxLines: 2),
-                                  content: DurationPicker(
-                                    duration:
-                                        Duration(seconds: _skipSeconds ?? 0),
-                                    onChange: (value) =>
-                                        _seconds = value.inSeconds,
-                                  ),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        _seconds = 0;
-                                      },
-                                      child: Text(
-                                        'CANCEL',
-                                        style:
-                                            TextStyle(color: Colors.grey[600]),
-                                      ),
-                                    ),
-                                    FlatButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        saveSkipSeconds(
-                                            widget.podcastLocal.id, _seconds);
-                                      },
-                                      child: Text(
-                                        'CONFIRM',
-                                        style: TextStyle(
-                                            color: context.accentColor),
-                                      ),
-                                    )
-                                  ],
-                                );
-                              }),
-                              _buttonOnMenu(
-                                  Icon(
+                                  icon: Icon(
                                     Icons.delete,
                                     color: Colors.red,
-                                    size: 20 * (_value),
-                                  ), () {
-                                generalDialog(
-                                  context,
-                                  title: Text('Remove confirm'),
-                                  content: Text(
-                                      'Are you sure you want to unsubscribe?'),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      child: Text(
-                                        'CANCEL',
-                                        style:
-                                            TextStyle(color: Colors.grey[600]),
-                                      ),
-                                    ),
-                                    FlatButton(
-                                      onPressed: () {
-                                        groupList.removePodcast(
-                                            widget.podcastLocal.id);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text(
-                                        'CONFIRM',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    )
-                                  ],
-                                );
-                              }),
+                                    size: _value == 0 ? 1 : 20 * _value,
+                                  ),
+                                  tooltip: 'Remove',
+                                  onTap: () {
+                                    generalDialog(
+                                      context,
+                                      title: Text('Remove confirm'),
+                                      content: Text(
+                                          'Are you sure you want to unsubscribe?'),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text(
+                                            'CANCEL',
+                                            style: TextStyle(
+                                                color: Colors.grey[600]),
+                                          ),
+                                        ),
+                                        FlatButton(
+                                          onPressed: () {
+                                            groupList.removePodcast(
+                                                widget.podcastLocal.id);
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text(
+                                            'CONFIRM',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  }),
                             ],
                           ),
                   ),
@@ -469,8 +503,7 @@ class _RenameGroupState extends State<RenameGroup> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         elevation: 1,
         contentPadding: EdgeInsets.symmetric(horizontal: 20),
-        titlePadding: EdgeInsets.only(
-            top: 20, left: 20, right: 20, bottom: 20),
+        titlePadding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
         actionsPadding: EdgeInsets.all(0),
         actions: <Widget>[
           FlatButton(
@@ -497,7 +530,8 @@ class _RenameGroupState extends State<RenameGroup> {
                 style: TextStyle(color: Theme.of(context).accentColor)),
           )
         ],
-        title: SizedBox(width: context.width - 160, child: Text('Edit group name')),
+        title: SizedBox(
+            width: context.width - 160, child: Text('Edit group name')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[

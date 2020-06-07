@@ -22,7 +22,7 @@ class DBHelper {
     var documentsDirectory = await getDatabasesPath();
     String path = join(documentsDirectory, "podcasts.db");
     Database theDb = await openDatabase(path,
-        version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
+        version: 3, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -32,7 +32,7 @@ class DBHelper {
         imageUrl TEXT,rssUrl TEXT UNIQUE, primaryColor TEXT, author TEXT, 
         description TEXT, add_date INTEGER, imagePath TEXT, provider TEXT, link TEXT, 
         background_image TEXT DEFAULT '',hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0,
-        episode_count INTEGER DEFAULT 0, skip_seconds INTEGER DEFAULT 0)""");
+        episode_count INTEGER DEFAULT 0, skip_seconds INTEGER DEFAULT 0, auto_download INTEGER DEFAULT 0)""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
@@ -51,7 +51,12 @@ class DBHelper {
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion == 1) {
       await db.execute(
-          "ALTER TABLE PodcastLocal ADD skip_seconds INTEGER DEFAULT 0");
+          "ALTER TABLE PodcastLocal ADD skip_seconds INTEGER DEFAULT 0 ");
+      await db.execute(
+          "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
+    } else if (oldVersion == 2) {
+      await db.execute(
+          "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
     }
   }
 
@@ -129,6 +134,20 @@ class DBHelper {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET skip_seconds = ? WHERE id = ?", [seconds, id]);
+  }
+
+  Future<bool> getAutoDownload(String id) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT auto_download FROM PodcastLocal WHERE id = ?', [id]);
+    return list.first['auto_download'] == 1;
+  }
+
+  Future<int> saveAutoDownload(String id, bool boo) async {
+    var dbClient = await database;
+    return await dbClient.rawUpdate(
+        "UPDATE PodcastLocal SET auto_download = ? WHERE id = ?",
+        [boo ? 1 : 0, id]);
   }
 
   Future<bool> checkPodcast(String url) async {
@@ -813,6 +832,37 @@ class DBHelper {
     return episodes;
   }
 
+  Future<List<EpisodeBrief>> gettNewRssItem(String id) async {
+    var dbClient = await database;
+    List<EpisodeBrief> episodes = [];
+    List<Map> list = await dbClient.rawQuery(
+      """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.title as feed_title, E.duration, E.explicit, E.liked, 
+        E.downloaded, P.imagePath, P.primaryColor, E.media_id, E.is_new, P.skip_seconds
+        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE is_new = 1 AND downloaded != 'ND' AND P.id = ?ORDER BY E.milliseconds DESC  """,
+      [id],
+    );
+    for (int x = 0; x < list.length; x++) {
+      episodes.add(EpisodeBrief(
+          list[x]['title'],
+          list[x]['enclosure_url'],
+          list[x]['enclosure_length'],
+          list[x]['milliseconds'],
+          list[x]['feed_title'],
+          list[x]['primaryColor'],
+          list[x]['liked'],
+          list[x]['downloaded'],
+          list[x]['duration'],
+          list[x]['explicit'],
+          list[x]['imagePath'],
+          list[x]['media_id'],
+          list[x]['is_new'],
+          list[x]['skip_seconds']));
+    }
+    return episodes;
+  }
+
   Future<int> removeAllNewMark() async {
     var dbClient = await database;
     return await dbClient.rawUpdate("UPDATE Episodes SET is_new = 0 ");
@@ -969,34 +1019,6 @@ class DBHelper {
         [url, url]);
     print('Deleted ' + url);
     return count;
-  }
-
-  Future<List<EpisodeBrief>> getDownloadedRssItem() async {
-    var dbClient = await database;
-    List<EpisodeBrief> episodes = List();
-    List<Map> list = await dbClient.rawQuery(
-        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
-        P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
-        P.primaryColor, E.media_id, E.is_new, P.skip_seconds FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE E.downloaded != 'ND' ORDER BY E.download_date DESC""");
-    for (int x = 0; x < list.length; x++) {
-      episodes.add(EpisodeBrief(
-          list[x]['title'],
-          list[x]['enclosure_url'],
-          list[x]['enclosure_length'],
-          list[x]['milliseconds'],
-          list[x]['feed_title'],
-          list[x]['primaryColor'],
-          list[x]['liked'],
-          list[x]['downloaded'],
-          list[x]['duration'],
-          list[x]['explicit'],
-          list[x]['imagePath'],
-          list[x]['media_id'],
-          list[x]['is_new'],
-          list[x]['skip_seconds']));
-    }
-    return episodes;
   }
 
   Future<String> getDescription(String url) async {

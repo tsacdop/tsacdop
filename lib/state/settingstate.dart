@@ -2,29 +2,41 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
 import '../type/podcastlocal.dart';
+import '../type/episodebrief.dart';
+import 'download_state.dart';
 
 void callbackDispatcher() {
-  if(Platform.isAndroid) 
-  Workmanager.executeTask((task, inputData) async {
-    var dbHelper = DBHelper();
-    List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-    //lastWork is a indicator for if the app was opened since last backgroundwork
-    //if the app wes opend,then the old marked new episode would be marked not new.
-    KeyValueStorage lastWorkStorage = KeyValueStorage(lastWorkKey);
-    int lastWork = await lastWorkStorage.getInt();
-    await Future.forEach<PodcastLocal>(podcastList, (podcastLocal) async {
-      await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
-      print('Refresh ' + podcastLocal.title);
+  if (Platform.isAndroid)
+    Workmanager.executeTask((task, inputData) async {
+      var dbHelper = DBHelper();
+      List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
+      //lastWork is a indicator for if the app was opened since last backgroundwork
+      //if the app wes opend,then the old marked new episode would be marked not new.
+      KeyValueStorage lastWorkStorage = KeyValueStorage(lastWorkKey);
+      int lastWork = await lastWorkStorage.getInt();
+      await Future.forEach<PodcastLocal>(podcastList, (podcastLocal) async {
+        int updateCount =
+            await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
+        bool autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
+        if (autoDownload && updateCount > 0) {
+          List<EpisodeBrief> episodes =
+              await dbHelper.getNewEpisodes(podcastLocal.id);
+          episodes.forEach((episode) {
+            DownloadState().startTask(episode);
+          });
+        }
+        print('Refresh ' + podcastLocal.title);
+      });
+      await lastWorkStorage.saveInt(1);
+      KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
+      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+      return Future.value(true);
     });
-    await lastWorkStorage.saveInt(1);
-    KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
-    await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
-    return Future.value(true);
-  });
 }
 
 ThemeData lightTheme = ThemeData(

@@ -152,6 +152,8 @@ class DownloadState extends ChangeNotifier {
       openFileFromNotification: false,
     );
     _episodeTasks.add(EpisodeTask(episode, taskId));
+    var dbHelper = DBHelper();
+    await dbHelper.saveDownloaded(taskId, episode.enclosureUrl);
     notifyListeners();
   }
 
