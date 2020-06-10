@@ -58,7 +58,6 @@ class _DownloadsManageState extends State<DownloadsManage> {
   _delSelectedEpisodes() async {
     setState(() => _clearing = true);
     await Future.forEach(_selectedList, (EpisodeBrief episode) async {
-      print(episode.downloaded);
       await FlutterDownloader.remove(
           taskId: episode.downloaded, shouldDeleteContent: true);
       var dbHelper = DBHelper();
@@ -212,7 +211,6 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                         value: _selectedList
                                             .contains(_episodes[index]),
                                         onChanged: (bool boo) {
-                                          print(boo);
                                           if (boo) {
                                             setState(() => _selectedList
                                                 .add(_episodes[index]));

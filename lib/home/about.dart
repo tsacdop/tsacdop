@@ -6,7 +6,7 @@ import 'package:line_icons/line_icons.dart';
 
 import '../util/context_extension.dart';
 
-const String version = '0.3.3';
+const String version = '0.3.4';
 
 class AboutApp extends StatelessWidget {
   _launchUrl(String url) async {

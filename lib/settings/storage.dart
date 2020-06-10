@@ -20,7 +20,7 @@ class _StorageSettingState extends State<StorageSetting>
   Animation<double> _animation;
   _getCacheMax() async {
     int cache = await cacheStorage.getInt();
-    int value = cache == 0 ? 500 : cache ~/ (1024 * 1024);
+    int value = cache == 0 ? 200 : cache ~/ (1024 * 1024);
     if (value > 100) {
       _controller = AnimationController(
           vsync: this, duration: Duration(milliseconds: value * 2));
@@ -36,6 +36,17 @@ class _StorageSettingState extends State<StorageSetting>
       //    }
       //  });
     }
+  }
+
+  Future<bool> _getAutoDownloadNetwork() async {
+    KeyValueStorage storage = KeyValueStorage(autoDownloadNetworkKey);
+    int value = await storage.getInt();
+    return value != 0;
+  }
+
+  _setAudtDownloadNetwork(bool boo) async {
+    KeyValueStorage storage = KeyValueStorage(autoDownloadNetworkKey);
+    await storage.saveInt(boo ? 1 : 0);
   }
 
   double _value;
@@ -96,28 +107,49 @@ class _StorageSettingState extends State<StorageSetting>
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
                       children: <Widget>[
-                        ListTile(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DownloadsManage())),
-                          contentPadding: EdgeInsets.only(
-                              left: 80.0, right: 25, bottom: 10, top: 10),
-                          title: Text('Ask before using cellular data'),
-                          subtitle: Text(
-                              'Ask to confirm when using cellular data to download episodes.'),
-                          trailing: Selector<SettingState, bool>(
-                            selector: (_, settings) =>
-                                settings.downloadUsingData,
-                            builder: (_, data, __) {
-                              return Switch(
+                        Selector<SettingState, bool>(
+                          selector: (_, settings) => settings.downloadUsingData,
+                          builder: (_, data, __) {
+                            return ListTile(
+                              onTap: () => settings.downloadUsingData = !data,
+                              contentPadding: EdgeInsets.only(
+                                  left: 80.0, right: 25, bottom: 10, top: 10),
+                              title: Text('Ask before using cellular data'),
+                              subtitle: Text(
+                                  'Ask to confirm when using cellular data to download episodes.'),
+                              trailing: Switch(
                                 value: data,
                                 onChanged: (value) =>
                                     settings.downloadUsingData = value,
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
                         ),
+                        Divider(height: 2),
+                        FutureBuilder<bool>(
+                            future: _getAutoDownloadNetwork(),
+                            initialData: false,
+                            builder: (context, snapshot) {
+                              return ListTile(
+                                onTap: () async {
+                                  _setAudtDownloadNetwork(!snapshot.data);
+                                  setState(() {});
+                                },
+                                contentPadding: EdgeInsets.only(
+                                    left: 80.0, right: 25, bottom: 10, top: 10),
+                                title:
+                                    Text('Auto download using cellular data'),
+                                subtitle: Text(
+                                    'You can set podcast auto download in group manage page.'),
+                                trailing: Switch(
+                                  value: snapshot.data,
+                                  onChanged: (value) async {
+                                    await _setAudtDownloadNetwork(value);
+                                    setState(() {});
+                                  },
+                                ),
+                              );
+                            }),
                         Divider(height: 2),
                       ],
                     ),
@@ -151,7 +183,7 @@ class _StorageSettingState extends State<StorageSetting>
                                 builder: (context) => DownloadsManage())),
                         contentPadding: EdgeInsets.symmetric(horizontal: 80.0),
                         title: Text('Downloads'),
-                        subtitle: Text('Manage doanloaded audio files'),
+                        subtitle: Text('Manage downloaded audio files'),
                       ),
                       Divider(height: 2),
                       ListTile(
@@ -175,8 +207,10 @@ class _StorageSettingState extends State<StorageSetting>
                             left: 60.0, right: 20.0, bottom: 10.0),
                         child: SliderTheme(
                           data: Theme.of(context).sliderTheme.copyWith(
-                                showValueIndicator: ShowValueIndicator.always,
-                              ),
+                              showValueIndicator: ShowValueIndicator.always,
+                              trackHeight: 2,
+                              thumbShape:
+                                  RoundSliderThumbShape(enabledThumbRadius: 6)),
                           child: Slider(
                               label: '${_value ~/ 100 * 100} Mb',
                               activeColor: context.accentColor,

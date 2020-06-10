@@ -5,14 +5,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:line_icons/line_icons.dart';
 
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
 import '../local_storage/sqflite_localpodcast.dart';
-import '../podcasts/podcastdetail.dart';
-import '../util/pageroute.dart';
 import '../util/colorize.dart';
 import '../util/duraiton_picker.dart';
 import '../util/context_extension.dart';
@@ -98,13 +96,31 @@ class _PodcastCardState extends State<PodcastCard>
   }
 
   _setAutoDownload(String id, bool boo) async {
-    DBHelper dbHelper = DBHelper();
-    await dbHelper.saveAutoDownload(id, boo);
+    bool permission = await _checkPermmison();
+    if (permission) {
+      DBHelper dbHelper = DBHelper();
+      await dbHelper.saveAutoDownload(id, boo);
+    }
   }
 
   Future<bool> _getAutoDownload(String id) async {
     DBHelper dbHelper = DBHelper();
     return await dbHelper.getAutoDownload(id);
+  }
+
+  Future<bool> _checkPermmison() async {
+    PermissionStatus permission = await Permission.storage.status;
+    if (permission != PermissionStatus.granted) {
+      Map<Permission, PermissionStatus> permissions =
+          await [Permission.storage].request();
+      if (permissions[Permission.storage] == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
   }
 
   String _stringForSeconds(double seconds) {
@@ -344,13 +360,27 @@ class _PodcastCardState extends State<PodcastCard>
                                 initialData: false,
                                 builder: (context, snapshot) {
                                   return _buttonOnMenu(
-                                    icon: Icon(
-                                        LineIcons.cloud_download_alt_solid,
-                                        size: _value == 0 ? 1 : 20 * _value,
-                                        color: snapshot.data
-                                            ? context.accentColor
-                                            : null),
-                                    tooltip: 'AutoDownload',
+                                    icon: Container(
+                                      child: Icon(Icons.done_all,
+                                          size: _value * 15,
+                                          color: snapshot.data
+                                              ? Colors.white
+                                              : null),
+                                      height: _value == 0 ? 1 : 18 * _value,
+                                      width: _value == 0 ? 1 : 18 * _value,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                              width: 1,
+                                              color: snapshot.data
+                                                  ? context.accentColor
+                                                  : context.textTheme.subtitle1
+                                                      .color),
+                                          shape: BoxShape.circle,
+                                          color: snapshot.data
+                                              ? context.accentColor
+                                              : null),
+                                    ),
+                                    tooltip: 'Auto Download',
                                     onTap: () {
                                       _setAutoDownload(widget.podcastLocal.id,
                                           !snapshot.data);

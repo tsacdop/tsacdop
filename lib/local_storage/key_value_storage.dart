@@ -22,6 +22,8 @@ const String podcastLayoutKey = 'podcastLayoutKey';
 const String recentLayoutKey = 'recentLayoutKey';
 const String favLayoutKey = 'favLayoutKey';
 const String downloadLayoutKey = 'downloadLayoutKey';
+const String autoDownloadNetworkKey = 'autoDownloadNetwork';
+const String episodePopupMenuKey = 'episodePopupMenuKey';
 
 class KeyValueStorage {
   final String key;
@@ -87,5 +89,19 @@ class KeyValueStorage {
       await prefs.setString(key, '');
     }
     return prefs.getString(key);
+  }
+
+  saveMenu(List<int> list) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(key, list.map((e) => e.toString()).toList());
+  }
+
+  Future<List<int>> getMenu() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getStringList(key) == null) {
+      await prefs.setStringList(key, ['0', '1', '12', '13', '14']);
+    }
+    List<String> list = prefs.getStringList(key);
+    return list.map((e) => int.parse(e)).toList();
   }
 }

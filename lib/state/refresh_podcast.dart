@@ -2,10 +2,13 @@ import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_isolate/flutter_isolate.dart';
-import 'package:tsacdop/local_storage/key_value_storage.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+import 'package:connectivity/connectivity.dart';
 
+import '../local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 import '../type/podcastlocal.dart';
+import '../type/episodebrief.dart';
+import 'download_state.dart';
 
 enum RefreshState { none, fetch, error }
 
@@ -68,13 +71,32 @@ class RefreshWorker extends ChangeNotifier {
 
 Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
   KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
+  KeyValueStorage autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
   await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
   var dbHelper = DBHelper();
   List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
   //int i = 0;
   await Future.forEach<PodcastLocal>(podcastList, (podcastLocal) async {
     sendPort.send([podcastLocal.title, 1]);
-    await dbHelper.updatePodcastRss(podcastLocal);
+    int updateCount = await dbHelper.updatePodcastRss(podcastLocal);
+    bool autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
+    if (autoDownload && updateCount > 0) {
+      var result = await Connectivity().checkConnectivity();
+      int autoDownloadNetwork = await autoDownloadStorage.getInt();
+      if (autoDownloadNetwork == 1) {
+        List<EpisodeBrief> episodes =
+            await dbHelper.getNewEpisodes(podcastLocal.id);
+        episodes.forEach((episode) {
+          DownloadState().startTask(episode, showNotification: false);
+        });
+      } else if (result == ConnectivityResult.wifi) {
+        List<EpisodeBrief> episodes =
+            await dbHelper.getNewEpisodes(podcastLocal.id);
+        episodes.forEach((episode) {
+          DownloadState().startTask(episode, showNotification: false);
+        });
+      }
+    }
     print('Refresh ' + podcastLocal.title);
   });
   // KeyValueStorage refreshcountstorage = KeyValueStorage('refreshcount');

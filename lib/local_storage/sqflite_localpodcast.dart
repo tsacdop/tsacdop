@@ -382,7 +382,6 @@ class DBHelper {
             String month = mmDd.stringMatch(pubDate);
             date = DateFormat('yyyy-MM-dd HH:mm', 'en_US')
                 .parse(month + ' ' + time);
-            print(month);
             print(date.toString());
           } else {
             date = DateTime.now();
@@ -832,36 +831,36 @@ class DBHelper {
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> gettNewRssItem(String id) async {
-    var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
-    List<Map> list = await dbClient.rawQuery(
-      """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.title as feed_title, E.duration, E.explicit, E.liked, 
-        E.downloaded, P.imagePath, P.primaryColor, E.media_id, E.is_new, P.skip_seconds
-        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE is_new = 1 AND downloaded != 'ND' AND P.id = ?ORDER BY E.milliseconds DESC  """,
-      [id],
-    );
-    for (int x = 0; x < list.length; x++) {
-      episodes.add(EpisodeBrief(
-          list[x]['title'],
-          list[x]['enclosure_url'],
-          list[x]['enclosure_length'],
-          list[x]['milliseconds'],
-          list[x]['feed_title'],
-          list[x]['primaryColor'],
-          list[x]['liked'],
-          list[x]['downloaded'],
-          list[x]['duration'],
-          list[x]['explicit'],
-          list[x]['imagePath'],
-          list[x]['media_id'],
-          list[x]['is_new'],
-          list[x]['skip_seconds']));
-    }
-    return episodes;
-  }
+  //Future<List<EpisodeBrief>> getNewRssItem(String id) async {
+  //  var dbClient = await database;
+  //  List<EpisodeBrief> episodes = [];
+  //  List<Map> list = await dbClient.rawQuery(
+  //    """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+  //      E.milliseconds, P.title as feed_title, E.duration, E.explicit, E.liked, 
+  //      E.downloaded, P.imagePath, P.primaryColor, E.media_id, E.is_new, P.skip_seconds
+  //      FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+  //      WHERE is_new = 1 AND downloaded != 'ND' AND P.id = ?ORDER BY E.milliseconds DESC  """,
+  //    [id],
+  //  );
+  //  for (int x = 0; x < list.length; x++) {
+  //    episodes.add(EpisodeBrief(
+  //        list[x]['title'],
+  //        list[x]['enclosure_url'],
+  //        list[x]['enclosure_length'],
+  //        list[x]['milliseconds'],
+  //        list[x]['feed_title'],
+  //        list[x]['primaryColor'],
+  //        list[x]['liked'],
+  //        list[x]['downloaded'],
+  //        list[x]['duration'],
+  //        list[x]['explicit'],
+  //        list[x]['imagePath'],
+  //        list[x]['media_id'],
+  //        list[x]['is_new'],
+  //        list[x]['skip_seconds']));
+  //  }
+  //  return episodes;
+  //}
 
   Future<int> removeAllNewMark() async {
     var dbClient = await database;
@@ -992,6 +991,13 @@ class DBHelper {
     List<Map> list = await dbClient
         .rawQuery("SELECT liked FROM Episodes WHERE enclosure_url = ?", [url]);
     return list.first['liked'] == 0 ? false : true;
+  }
+
+  Future<bool> isDownloaded(String url) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient
+        .rawQuery("SELECT downloaded FROM Episodes WHERE enclosure_url = ?", [url]);
+    return list.first['downloaded'] == 'ND' ? false: true;
   }
 
   Future<int> saveDownloaded(String url, String id) async {

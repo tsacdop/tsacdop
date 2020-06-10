@@ -93,7 +93,8 @@ class DownloadState extends ChangeNotifier {
     final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
         query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
     String filePath = 'file://' +
-        path.join(completeTask.first.savedDir, completeTask.first.filename);
+        path.join(completeTask.first.savedDir,
+            Uri.encodeComponent(completeTask.first.filename));
     dbHelper.saveMediaId(
         episodeTask.episode.enclosureUrl, filePath, episodeTask.taskId);
     EpisodeBrief episode =
@@ -124,7 +125,7 @@ class DownloadState extends ChangeNotifier {
     super.dispose();
   }
 
-  Future startTask(EpisodeBrief episode) async {
+  Future startTask(EpisodeBrief episode, {bool showNotification = true}) async {
     final dir = await getExternalStorageDirectory();
     String localPath = path.join(dir.path, episode.feedTitle);
     final saveDir = Directory(localPath);
@@ -137,10 +138,7 @@ class DownloadState extends ChangeNotifier {
         now.month.toString() +
         now.day.toString() +
         now.second.toString();
-    String title = episode.title.trim().substring(0, 1) == '#'
-        ? episode.title.trim().substring(1)
-        : episode.title.trim();
-    String fileName = title +
+    String fileName = episode.title +
         datePlus +
         '.' +
         episode.enclosureUrl.split('/').last.split('.').last;
@@ -148,12 +146,12 @@ class DownloadState extends ChangeNotifier {
       fileName: fileName,
       url: episode.enclosureUrl,
       savedDir: localPath,
-      showNotification: true,
+      showNotification: showNotification,
       openFileFromNotification: false,
     );
     _episodeTasks.add(EpisodeTask(episode, taskId));
     var dbHelper = DBHelper();
-    await dbHelper.saveDownloaded(taskId, episode.enclosureUrl);
+    await dbHelper.saveDownloaded(episode.enclosureUrl, taskId);
     notifyListeners();
   }
 

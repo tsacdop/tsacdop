@@ -155,6 +155,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   int _currentPosition;
   double _currentSpeed = 1;
   BehaviorSubject<List<MediaItem>> queueSubject;
+  //Update episode card when setting changed
+  bool _episodeState = false;
 
   BasicPlaybackState get audioState => _audioState;
 
@@ -176,6 +178,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   int get timeLeft => _timeLeft;
   double get switchValue => _switchValue;
   double get currentSpeed => _currentSpeed;
+  bool get episodeState => _episodeState;
 
   set setSwitchValue(double value) {
     _switchValue = value;
@@ -190,6 +193,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   set setShareStatue(ShareStatus status) {
     _shareStatus = status;
+    notifyListeners();
+  }
+
+  set setEpisodeState(bool boo) {
+    _episodeState = !_episodeState;
     notifyListeners();
   }
 
@@ -315,7 +323,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
     queueSubject.addStream(
         AudioService.queueStream.distinct().where((event) => event != null));
     queueSubject.stream.listen((event) {
-      print(event.length);
       if (event.length == _queue.playlist.length - 1 &&
           _audioState == BasicPlaybackState.skippingToNext) {
         if (event.length == 0 || _stopOnComplete) {
@@ -506,7 +513,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   sliderSeek(double val) async {
-    print(val.toString());
     if (_audioState != BasicPlaybackState.connecting &&
         _audioState != BasicPlaybackState.none) {
       _noSlide = false;
@@ -633,6 +639,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   AudioPlayer _audioPlayer = AudioPlayer();
   Completer _completer = Completer();
   BasicPlaybackState _skipState;
+  bool _lostFocus;
   bool _playing;
   bool _stopAtEnd;
   int cacheMax;
@@ -662,7 +669,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart() async {
     _stopAtEnd = false;
-
+    _lostFocus = false;
     var playerStateSubscription = _audioPlayer.playbackStateStream
         .where((state) => state == AudioPlaybackState.completed)
         .listen((state) {
@@ -792,9 +799,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   void onPause() {
     if (_skipState == null) {
-      if (_playing == null) {}
-      _playing = false;
-      _audioPlayer.pause();
+      if (_playing == null) {
+      } else if (_audioPlayer.playbackEvent.state ==
+          AudioPlaybackState.playing) {
+        _playing = false;
+        _audioPlayer.pause();
+      }
     }
   }
 
@@ -858,31 +868,44 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
+  void onRewind() {
+    _audioPlayer.seek(Duration(
+        milliseconds: AudioServiceBackground.state.position - 10 * 1000));
+  }
+
+  @override
   void onAudioFocusLost() {
     if (_skipState == null) {
-      if (_playing == null ||
-          _audioPlayer.playbackState == AudioPlaybackState.none ||
-          _audioPlayer.playbackState == AudioPlaybackState.connecting) {}
-      _playing = false;
-      _audioPlayer.pause();
+      if (_playing == null) {
+      } else if (_audioPlayer.playbackEvent.state ==
+          AudioPlaybackState.playing) {
+        _playing = false;
+        _lostFocus = true;
+        _audioPlayer.pause();
+      }
     }
   }
 
   @override
   void onAudioBecomingNoisy() {
     if (_skipState == null) {
-      if (_playing == null) {}
-      _playing = false;
-      _audioPlayer.pause();
+      if (_playing == null) {
+      } else if (_audioPlayer.playbackEvent.state ==
+          AudioPlaybackState.playing) {
+        _playing = false;
+        _audioPlayer.pause();
+      }
     }
   }
 
   @override
   void onAudioFocusGained() {
     if (_skipState == null) {
-      if (_playing == null) {}
-      _playing = true;
-      _audioPlayer.play();
+      if (_lostFocus) {
+        _lostFocus = false;
+        _playing = true;
+        _audioPlayer.play();
+      }
     }
   }
 

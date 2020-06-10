@@ -1050,168 +1050,183 @@ class _MyFavoriteState extends State<_MyFavorite>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return FutureBuilder<List<EpisodeBrief>>(
-      future: _getLikedRssItem(_top, _sortBy),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-        return (snapshot.hasData)
-            ? snapshot.data.length == 0
-                ? Padding(
-                    padding: EdgeInsets.only(top: 150),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Icon(LineIcons.heartbeat_solid,
-                            size: 80, color: Colors.grey[500]),
-                        Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                        Text(
-                          'No episode collected yet',
-                          style: TextStyle(color: Colors.grey[500]),
+    return Selector<AudioPlayerNotifier, bool>(
+        selector: (_, audio) => audio.episodeState,
+        builder: (context, episodeState, child) {
+          return FutureBuilder<List<EpisodeBrief>>(
+            future: _getLikedRssItem(_top, _sortBy),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+              return (snapshot.hasData)
+                  ? snapshot.data.length == 0
+                      ? Padding(
+                          padding: EdgeInsets.only(top: 150),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(LineIcons.heartbeat_solid,
+                                  size: 80, color: Colors.grey[500]),
+                              Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10)),
+                              Text(
+                                'No episode collected yet',
+                                style: TextStyle(color: Colors.grey[500]),
+                              )
+                            ],
+                          ),
                         )
-                      ],
-                    ),
-                  )
-                : NotificationListener<ScrollNotification>(
-                    onNotification: (ScrollNotification scrollInfo) {
-                      if (scrollInfo.metrics.pixels ==
-                              scrollInfo.metrics.maxScrollExtent &&
-                          snapshot.data.length == _top) _loadMoreEpisode();
-                      return true;
-                    },
-                    child: CustomScrollView(
-                      key: PageStorageKey<String>('favorite'),
-                      slivers: <Widget>[
-                        SliverToBoxAdapter(
-                          child: Container(
-                              height: 40,
-                              color: context.primaryColor,
-                              child: Row(
-                                children: <Widget>[
-                                  Material(
-                                    color: Colors.transparent,
-                                    child: PopupMenuButton<int>(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10))),
-                                      elevation: 1,
-                                      tooltip: 'Sort By',
-                                      child: Container(
-                                          height: 50,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Text('Sory by'),
-                                              Padding(
+                      : NotificationListener<ScrollNotification>(
+                          onNotification: (ScrollNotification scrollInfo) {
+                            if (scrollInfo.metrics.pixels ==
+                                    scrollInfo.metrics.maxScrollExtent &&
+                                snapshot.data.length == _top)
+                              _loadMoreEpisode();
+                            return true;
+                          },
+                          child: CustomScrollView(
+                            key: PageStorageKey<String>('favorite'),
+                            slivers: <Widget>[
+                              SliverToBoxAdapter(
+                                child: Container(
+                                    height: 40,
+                                    color: context.primaryColor,
+                                    child: Row(
+                                      children: <Widget>[
+                                        Material(
+                                          color: Colors.transparent,
+                                          child: PopupMenuButton<int>(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10))),
+                                            elevation: 1,
+                                            tooltip: 'Sort By',
+                                            child: Container(
+                                                height: 50,
                                                 padding: EdgeInsets.symmetric(
-                                                    horizontal: 5),
+                                                    horizontal: 20),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: <Widget>[
+                                                    Text('Sory by'),
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 5),
+                                                    ),
+                                                    Icon(
+                                                      _sortBy == 0
+                                                          ? LineIcons
+                                                              .cloud_download_alt_solid
+                                                          : LineIcons
+                                                              .heartbeat_solid,
+                                                      size: 18,
+                                                    )
+                                                  ],
+                                                )),
+                                            itemBuilder: (context) => [
+                                              PopupMenuItem(
+                                                value: 0,
+                                                child: Text('Update Date'),
                                               ),
-                                              Icon(
-                                                _sortBy == 0
-                                                    ? LineIcons
-                                                        .cloud_download_alt_solid
-                                                    : LineIcons.heartbeat_solid,
-                                                size: 18,
+                                              PopupMenuItem(
+                                                value: 1,
+                                                child: Text('Like Date'),
                                               )
                                             ],
-                                          )),
-                                      itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                          value: 0,
-                                          child: Text('Update Date'),
+                                            onSelected: (value) {
+                                              if (value == 0)
+                                                setState(() => _sortBy = 0);
+                                              else if (value == 1)
+                                                setState(() => _sortBy = 1);
+                                            },
+                                          ),
                                         ),
-                                        PopupMenuItem(
-                                          value: 1,
-                                          child: Text('Like Date'),
-                                        )
+                                        Spacer(),
+                                        Material(
+                                          color: Colors.transparent,
+                                          child: IconButton(
+                                              padding: EdgeInsets.zero,
+                                              onPressed: () {
+                                                if (_layout == Layout.three)
+                                                  setState(() {
+                                                    _layout = Layout.one;
+                                                  });
+                                                else if (_layout == Layout.two)
+                                                  setState(() {
+                                                    _layout = Layout.three;
+                                                  });
+                                                else
+                                                  setState(() {
+                                                    _layout = Layout.two;
+                                                  });
+                                              },
+                                              icon: _layout == Layout.three
+                                                  ? SizedBox(
+                                                      height: 10,
+                                                      width: 30,
+                                                      child: CustomPaint(
+                                                        painter: LayoutPainter(
+                                                            0,
+                                                            context
+                                                                .textTheme
+                                                                .bodyText1
+                                                                .color),
+                                                      ),
+                                                    )
+                                                  : _layout == Layout.two
+                                                      ? SizedBox(
+                                                          height: 10,
+                                                          width: 30,
+                                                          child: CustomPaint(
+                                                            painter: LayoutPainter(
+                                                                1,
+                                                                context
+                                                                    .textTheme
+                                                                    .bodyText1
+                                                                    .color),
+                                                          ),
+                                                        )
+                                                      : SizedBox(
+                                                          height: 10,
+                                                          width: 30,
+                                                          child: CustomPaint(
+                                                            painter: LayoutPainter(
+                                                                4,
+                                                                context
+                                                                    .textTheme
+                                                                    .bodyText1
+                                                                    .color),
+                                                          ),
+                                                        )),
+                                        ),
                                       ],
-                                      onSelected: (value) {
-                                        if (value == 0)
-                                          setState(() => _sortBy = 0);
-                                        else if (value == 1)
-                                          setState(() => _sortBy = 1);
-                                      },
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Material(
-                                    color: Colors.transparent,
-                                    child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: () {
-                                          if (_layout == Layout.three)
-                                            setState(() {
-                                              _layout = Layout.one;
-                                            });
-                                          else if (_layout == Layout.two)
-                                            setState(() {
-                                              _layout = Layout.three;
-                                            });
-                                          else
-                                            setState(() {
-                                              _layout = Layout.two;
-                                            });
-                                        },
-                                        icon: _layout == Layout.three
-                                            ? SizedBox(
-                                                height: 10,
-                                                width: 30,
-                                                child: CustomPaint(
-                                                  painter: LayoutPainter(
-                                                      0,
-                                                      context.textTheme
-                                                          .bodyText1.color),
-                                                ),
-                                              )
-                                            : _layout == Layout.two
-                                                ? SizedBox(
-                                                    height: 10,
-                                                    width: 30,
-                                                    child: CustomPaint(
-                                                      painter: LayoutPainter(
-                                                          1,
-                                                          context.textTheme
-                                                              .bodyText1.color),
-                                                    ),
-                                                  )
-                                                : SizedBox(
-                                                    height: 10,
-                                                    width: 30,
-                                                    child: CustomPaint(
-                                                      painter: LayoutPainter(
-                                                          4,
-                                                          context.textTheme
-                                                              .bodyText1.color),
-                                                    ),
-                                                  )),
-                                  ),
-                                ],
-                              )),
-                        ),
-                        EpisodeGrid(
-                          episodes: snapshot.data,
-                          layout: _layout,
-                          initNum: 0,
-                        ),
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              return _loadMore
-                                  ? Container(
-                                      height: 2,
-                                      child: LinearProgressIndicator())
-                                  : Center();
-                            },
-                            childCount: 1,
+                                    )),
+                              ),
+                              EpisodeGrid(
+                                episodes: snapshot.data,
+                                layout: _layout,
+                                initNum: 0,
+                              ),
+                              SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (BuildContext context, int index) {
+                                    return _loadMore
+                                        ? Container(
+                                            height: 2,
+                                            child: LinearProgressIndicator())
+                                        : Center();
+                                  },
+                                  childCount: 1,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-            : Center();
-      },
-    );
+                        )
+                  : Center();
+            },
+          );
+        });
   }
 
   @override

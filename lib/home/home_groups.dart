@@ -12,6 +12,7 @@ import 'package:feature_discovery/feature_discovery.dart';
 import '../type/episodebrief.dart';
 import '../state/podcast_group.dart';
 import '../state/subscribe_podcast.dart';
+import '../state/download_state.dart';
 import '../type/podcastlocal.dart';
 import '../state/audiostate.dart';
 import '../util/custompaint.dart';
@@ -19,6 +20,7 @@ import '../util/pageroute.dart';
 import '../util/colorize.dart';
 import '../util/context_extension.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../local_storage/key_value_storage.dart';
 import '../episodes/episodedetail.dart';
 import '../podcasts/podcastdetail.dart';
 import '../podcasts/podcastmanage.dart';
@@ -478,11 +480,61 @@ class ShowEpisode extends StatelessWidget {
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
+  Future<int> _isListened(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    return await dbHelper.isListened(episode.enclosureUrl);
+  }
+
+  Future<bool> _isLiked(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    return await dbHelper.isLiked(episode.enclosureUrl);
+  }
+
+  Future<List<int>> _getEpisodeMenu() async {
+    KeyValueStorage popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
+    List<int> list = await popupMenuStorage.getMenu();
+    return list;
+  }
+
+  Future<bool> _isDownloaded(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    return await dbHelper.isDownloaded(episode.enclosureUrl);
+  }
+
+  _markListened(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    bool marked = await dbHelper.checkMarked(episode);
+    if (!marked) {
+      final PlayHistory history =
+          PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+      await dbHelper.saveHistory(history);
+    }
+  }
+
+  Future<int> _saveLiked(String url) async {
+    var dbHelper = DBHelper();
+    int result = await dbHelper.setLiked(url);
+    return result;
+  }
+
+  Future<int> _setUnliked(String url) async {
+    var dbHelper = DBHelper();
+    int result = await dbHelper.setUniked(url);
+    return result;
+  }
+
   _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
       bool isPlaying, bool isInPlaylist) async {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     double left = offset.dx;
     double top = offset.dy;
+    bool isLiked, isDownload;
+    int isListened;
+    var downloader = Provider.of<DownloadState>(context, listen: false);
+    List<int> menuList = await _getEpisodeMenu();
+    if (menuList.contains(3)) isListened = await _isListened(episode);
+    if (menuList.contains(2)) isLiked = await _isLiked(episode);
+    if (menuList.contains(4)) isDownload = await _isDownloaded(episode);
     await showMenu<int>(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -506,39 +558,134 @@ class ShowEpisode extends StatelessWidget {
             ],
           ),
         ),
-        PopupMenuItem(
-            value: 1,
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  LineIcons.clock_solid,
-                  color: Colors.red,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2),
-                ),
-                !isInPlaylist ? Text('Later') : Text('Remove')
-              ],
-            )),
+        menuList.contains(1)
+            ? PopupMenuItem(
+                value: 1,
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      LineIcons.clock_solid,
+                      color: Colors.red,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                    ),
+                    !isInPlaylist ? Text('Later') : Text('Remove')
+                  ],
+                ))
+            : null,
+        menuList.contains(2)
+            ? PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: <Widget>[
+                    Icon(LineIcons.heart, color: Colors.red, size: 21),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                    ),
+                    isLiked
+                        ? Text(
+                            'Unlike',
+                          )
+                        : Text('Like')
+                  ],
+                ))
+            : null,
+        menuList.contains(3)
+            ? PopupMenuItem(
+                value: 3,
+                child: Row(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 23,
+                      height: 23,
+                      child: CustomPaint(
+                          painter:
+                              ListenedAllPainter(Colors.blue, stroke: 1.5)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                    ),
+                    isListened > 0.95
+                        ? Text('Listened',
+                            style: TextStyle(
+                                color: context.textColor.withOpacity(0.5)))
+                        : Text('Mark\nListened')
+                  ],
+                ))
+            : null,
+        menuList.contains(4)
+            ? PopupMenuItem(
+                value: 4,
+                child: Row(
+                  children: <Widget>[
+                    Icon(LineIcons.download_solid, color: Colors.green),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                    ),
+                    isDownload
+                        ? Text('Downloaded',
+                            style: TextStyle(
+                                color: context.textColor.withOpacity(0.5)))
+                        : Text('Download')
+                  ],
+                ))
+            : null,
       ],
       elevation: 5.0,
-    ).then((value) {
-      if (value == 0) {
-        if (!isPlaying) audio.episodeLoad(episode);
-      } else if (value == 1) {
-        if (!isInPlaylist) {
-          audio.addToPlaylist(episode);
-          Fluttertoast.showToast(
-            msg: 'Added to playlist',
-            gravity: ToastGravity.BOTTOM,
-          );
-        } else {
-          audio.delFromPlaylist(episode);
-          Fluttertoast.showToast(
-            msg: 'Removed from playlist',
-            gravity: ToastGravity.BOTTOM,
-          );
-        }
+    ).then((value) async {
+      switch (value) {
+        case 0:
+          if (!isPlaying) audio.episodeLoad(episode);
+          break;
+        case 1:
+          if (!isInPlaylist) {
+            audio.addToPlaylist(episode);
+            Fluttertoast.showToast(
+              msg: 'Added to playlist',
+              gravity: ToastGravity.BOTTOM,
+            );
+          } else {
+            audio.delFromPlaylist(episode);
+            Fluttertoast.showToast(
+              msg: 'Removed from playlist',
+              gravity: ToastGravity.BOTTOM,
+            );
+          }
+          break;
+        case 2:
+          if (isLiked) {
+            await _setUnliked(episode.enclosureUrl);
+            audio.setEpisodeState = true;
+            Fluttertoast.showToast(
+              msg: 'Unliked',
+              gravity: ToastGravity.BOTTOM,
+            );
+          } else {
+            await _saveLiked(episode.enclosureUrl);
+            audio.setEpisodeState = true;
+            Fluttertoast.showToast(
+              msg: 'Liked',
+              gravity: ToastGravity.BOTTOM,
+            );
+          }
+          break;
+        case 3:
+          if (isListened < 0.95) {
+            await _markListened(episode);
+            audio.setEpisodeState = true;
+            Fluttertoast.showToast(
+              msg: 'Mark listened',
+              gravity: ToastGravity.BOTTOM,
+            );
+          }
+          break;
+
+        case 4:
+          if (!isDownload) downloader.startTask(episode);
+          break;
+        default:
+          break;
       }
     });
   }

@@ -5,6 +5,7 @@ import '../util/context_extension.dart';
 import '../util/episodegrid.dart';
 import '../util/custompaint.dart';
 import '../local_storage/key_value_storage.dart';
+import 'popup_menu.dart';
 
 class LayoutSetting extends StatefulWidget {
   const LayoutSetting({Key key}) : super(key: key);
@@ -23,7 +24,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
   Widget _gridOptions(BuildContext context,
           {String key, Layout layout, Layout option, double scale}) =>
       Padding(
-        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20.0),
+        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
         child: InkWell(
           onTap: () async {
             KeyValueStorage storage = KeyValueStorage(key);
@@ -34,7 +35,9 @@ class _LayoutSettingState extends State<LayoutSetting> {
           child: Container(
             height: 30,
             width: 50,
-            color: layout == option ? context.accentColor : Colors.transparent,
+            color: layout == option
+                ? context.accentColor
+                : context.primaryColorDark,
             alignment: Alignment.center,
             child: SizedBox(
               height: 10,
@@ -80,6 +83,32 @@ class _LayoutSettingState extends State<LayoutSetting> {
         });
   }
 
+  Widget _setDefaultGridView(BuildContext context, {String text, String key}) {
+    return Padding(
+      padding: EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
+      child: context.width > 360
+          ? Row(
+              children: [
+                Text(
+                  text,
+                ),
+                Spacer(),
+                _setDefaultGrid(context, key: key),
+              ],
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  text,
+                ),
+                _setDefaultGrid(context, key: key),
+              ],
+            ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -106,7 +135,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 80),
                   alignment: Alignment.centerLeft,
-                  child: Text('Default grid view',
+                  child: Text('Episode popup menu',
                       style: Theme.of(context)
                           .textTheme
                           .bodyText1
@@ -118,44 +147,42 @@ class _LayoutSettingState extends State<LayoutSetting> {
                     scrollDirection: Axis.vertical,
                     children: <Widget>[
                       ListTile(
-                        contentPadding:
-                            EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
-                        //  leading: Icon(Icons.colorize),
-                        title: Text(
-                          'Podcast page',
-                        ),
-                        subtitle:
-                            _setDefaultGrid(context, key: podcastLayoutKey),
-                      ),
-                      ListTile(
-                        contentPadding:
-                            EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
-                        //  leading: Icon(Icons.colorize),
-                        title: Text(
-                          'Recent tab in homepage',
-                        ),
-                        subtitle:
-                            _setDefaultGrid(context, key: recentLayoutKey),
-                      ),
-                      ListTile(
-                        contentPadding:
-                            EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
-                        //  leading: Icon(Icons.colorize),
-                        title: Text(
-                          'Favorite tab in homepage',
-                        ),
-                        subtitle: _setDefaultGrid(context, key: favLayoutKey),
-                      ),
-                      ListTile(
-                        contentPadding:
-                            EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
-                        //  leading: Icon(Icons.colorize),
-                        title: Text(
-                          'Download tab in homepage',
-                        ),
-                        subtitle: _setDefaultGrid(context, key: downloadLayoutKey),
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PopupMenuSetting())),
+                        contentPadding: EdgeInsets.only(left: 80.0, right: 20),
+                        title: Text('Episode popup menu'),
+                        subtitle: Text('Change the menu when long tap episode'),
                       ),
                       Divider(height: 2),
+                      Container(
+                        height: 30.0,
+                        padding: EdgeInsets.symmetric(horizontal: 80),
+                        alignment: Alignment.centerLeft,
+                        child: Text('Default grid view',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1
+                                .copyWith(
+                                    color: Theme.of(context).accentColor)),
+                      ),
+                      ListView(
+                          physics: const BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          children: <Widget>[
+                            _setDefaultGridView(context,
+                                text: 'Podcast page', key: podcastLayoutKey),
+                            _setDefaultGridView(context,
+                                text: 'Recent tab', key: recentLayoutKey),
+                            _setDefaultGridView(context,
+                                text: 'Favorite tab', key: favLayoutKey),
+                            _setDefaultGridView(context,
+                                text: 'Downlaod tab', key: downloadLayoutKey),
+                            Divider(height: 2),
+                          ]),
+                      Divider(height: 2)
                     ]),
               ],
             ),

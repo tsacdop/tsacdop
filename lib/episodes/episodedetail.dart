@@ -55,10 +55,12 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
       setState(() {
         _showMenu = true;
       });
-    } else
+    } else if (_controller.offset <
+        _controller.position.maxScrollExtent * 0.8) {
       setState(() {
         _showMenu = false;
       });
+    }
   }
 
   _launchUrl(String url) async {
@@ -113,7 +115,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
             PopupMenuButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10))),
-              elevation: 2,
+              elevation: 1,
               tooltip: 'Menu',
               itemBuilder: (context) => [
                 PopupMenuItem(
@@ -151,6 +153,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       msg: 'Mark as listened',
                       gravity: ToastGravity.BOTTOM,
                     );
+                    break;
+                  default:
                     break;
                 }
               },
@@ -323,8 +327,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                                 'Still no shownote received\n for this episode.',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                    color: context.textTheme
-                                                        .bodyText1.color
+                                                    color: context.textColor
                                                         .withOpacity(0.5))),
                                           ],
                                         ),
@@ -381,7 +384,7 @@ class MenuBar extends StatefulWidget {
 }
 
 class _MenuBarState extends State<MenuBar> {
-  bool _liked;
+  bool _liked = false;
 
   Future<PlayHistory> getPosition(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
@@ -401,7 +404,6 @@ class _MenuBarState extends State<MenuBar> {
     if (result == 1 && mounted)
       setState(() {
         _liked = false;
-        // _like = 0;
       });
     return result;
   }
@@ -526,12 +528,10 @@ class _MenuBarState extends State<MenuBar> {
                     },
                   ),
                   DownloadButton(episode: widget.episodeItem),
-                  Selector<AudioPlayerNotifier, List<String>>(
-                    selector: (_, audio) => audio.queue.playlist
-                        .map((e) => e.enclosureUrl)
-                        .toList(),
+                  Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
+                    selector: (_, audio) => audio.queue.playlist,
                     builder: (_, data, __) {
-                      return data.contains(widget.episodeItem.enclosureUrl)
+                      return data.contains(widget.episodeItem)
                           ? _buttonOnMenu(
                               Icon(Icons.playlist_add_check,
                                   color: Theme.of(context).accentColor), () {

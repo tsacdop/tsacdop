@@ -117,7 +117,6 @@ class _PlayedHistoryState extends State<PlayedHistory>
         systemNavigationBarColor: Theme.of(context).primaryColor,
         systemNavigationBarIconBrightness:
             Theme.of(context).accentColorBrightness,
-        //statusBarColor: Theme.of(context).primaryColor,
       ),
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,

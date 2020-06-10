@@ -238,7 +238,7 @@ class _SearchListState extends State<SearchList> {
   Future<List> _getList(String searchText, int nextOffset) async {
     String apiKey = environment['apiKey'];
     String url = "https://listen-api.listennotes.com/api/v2/search?q=" +
-        searchText +
+        Uri.encodeComponent(searchText) +
         "&sort_by_date=0&type=podcast&offset=$nextOffset";
     Response response = await Dio().get(url,
         options: Options(headers: {

@@ -1,8 +1,8 @@
 import 'dart:io';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
@@ -24,11 +24,23 @@ void callbackDispatcher() {
             await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
         bool autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
         if (autoDownload && updateCount > 0) {
-          List<EpisodeBrief> episodes =
-              await dbHelper.getNewEpisodes(podcastLocal.id);
-          episodes.forEach((episode) {
-            DownloadState().startTask(episode);
-          });
+          var result = await Connectivity().checkConnectivity();
+          KeyValueStorage autoDownloadStorage =
+              KeyValueStorage(autoDownloadNetworkKey);
+          int autoDownloadNetwork = await autoDownloadStorage.getInt();
+          if (autoDownloadNetwork == 1) {
+            List<EpisodeBrief> episodes =
+                await dbHelper.getNewEpisodes(podcastLocal.id);
+            episodes.forEach((episode) {
+              DownloadState().startTask(episode, showNotification: false);
+            });
+          } else if (result == ConnectivityResult.wifi) {
+            List<EpisodeBrief> episodes =
+                await dbHelper.getNewEpisodes(podcastLocal.id);
+            episodes.forEach((episode) {
+              DownloadState().startTask(episode, showNotification: false);
+            });
+          }
         }
         print('Refresh ' + podcastLocal.title);
       });

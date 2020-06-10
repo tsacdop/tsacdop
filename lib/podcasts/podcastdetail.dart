@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'dart:async';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
+import 'package:tsacdop/state/download_state.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -56,6 +58,26 @@ class _PodcastDetailState extends State<PodcastDetail> {
         msg: 'Updated $result Episodes',
         gravity: ToastGravity.TOP,
       );
+      bool autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
+      if (autoDownload) {
+        var result = await Connectivity().checkConnectivity();
+        KeyValueStorage autoDownloadStorage =
+            KeyValueStorage(autoDownloadNetworkKey);
+        int autoDownloadNetwork = await autoDownloadStorage.getInt();
+        if (autoDownloadNetwork == 1) {
+          List<EpisodeBrief> episodes =
+              await dbHelper.getNewEpisodes(podcastLocal.id);
+          episodes.forEach((episode) {
+            DownloadState().startTask(episode, showNotification: false);
+          });
+        } else if (result == ConnectivityResult.wifi) {
+          List<EpisodeBrief> episodes =
+              await dbHelper.getNewEpisodes(podcastLocal.id);
+          episodes.forEach((episode) {
+            DownloadState().startTask(episode, showNotification: false);
+          });
+        }
+      }
       //  Provider.of<GroupList>(context, listen: false)
       //      .updatePodcast(podcastLocal.id);
     } else {

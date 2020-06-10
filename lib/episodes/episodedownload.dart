@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,6 +12,7 @@ import '../state/download_state.dart';
 import '../state/audiostate.dart';
 import '../state/settingstate.dart';
 import '../type/episodebrief.dart';
+import '../util/general_dialog.dart';
 
 class DownloadButton extends StatefulWidget {
   final EpisodeBrief episode;
@@ -107,54 +107,31 @@ class _DownloadButtonState extends State<DownloadButton> {
 
   Future<bool> _useDataConfirem() async {
     bool ifUseData = false;
-    await showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (BuildContext context, Animation animaiton,
-              Animation secondaryAnimation) =>
-          AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor:
-              Theme.of(context).brightness == Brightness.light
-                  ? Color.fromRGBO(113, 113, 113, 1)
-                  : Color.fromRGBO(15, 15, 15, 1),
+    await generalDialog(
+      context,
+      title: Text('Cellular data warn'),
+      content: Text('Are you sure you want to use cellular data to download?'),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'CANCEL',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
         ),
-        child: AlertDialog(
-          elevation: 1,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          titlePadding:
-              EdgeInsets.only(top: 20, left: 20, right: 100, bottom: 20),
-          title: Text('Cellular data warn'),
-          content:
-              Text('Are you sure you want to use cellular data to download?'),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'CANCEL',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-            ),
-            FlatButton(
-              onPressed: () {
-                ifUseData = true;
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'CONFIRM',
-                style: TextStyle(color: Colors.red),
-              ),
-            )
-          ],
-        ),
-      ),
+        FlatButton(
+          onPressed: () {
+            ifUseData = true;
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'CONFIRM',
+            style: TextStyle(color: Colors.red),
+          ),
+        )
+      ],
     );
     return ifUseData;
   }
