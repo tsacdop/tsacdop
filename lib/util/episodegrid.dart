@@ -118,36 +118,37 @@ class EpisodeGrid extends StatelessWidget {
 
   Widget _listenIndicater(BuildContext context,
           {EpisodeBrief episode, int isListened}) =>
-      Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
-          selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
-          builder: (_, data, __) {
-            return (episode.enclosureUrl == data.item1?.enclosureUrl &&
-                    data.item2)
-                ? Container(
-                    height: 20,
-                    width: 20,
-                    margin: EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
-                    child: WaveLoader(color: context.accentColor))
-                : layout != Layout.three && isListened > 0
-                    ? Container(
-                        height: 20,
-                        width: 20,
-                        margin: EdgeInsets.symmetric(horizontal: 2),
-                        padding: EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: context.accentColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: CustomPaint(
-                            painter: ListenedAllPainter(
-                          Colors.white,
-                        )),
-                      )
-                    : Center();
-          });
+      Center();
+  // Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
+  //     selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
+  //     builder: (_, data, __) {
+  //       return (episode.enclosureUrl == data.item1?.enclosureUrl &&
+  //               data.item2)
+  //           ? Container(
+  //               height: 20,
+  //               width: 20,
+  //               margin: EdgeInsets.symmetric(horizontal: 2),
+  //               decoration: BoxDecoration(
+  //                 shape: BoxShape.circle,
+  //               ),
+  //               child: WaveLoader(color: context.accentColor))
+  //           : layout != Layout.three && isListened > 0
+  //               ? Container(
+  //                   height: 20,
+  //                   width: 20,
+  //                   margin: EdgeInsets.symmetric(horizontal: 2),
+  //                   padding: EdgeInsets.all(2),
+  //                   decoration: BoxDecoration(
+  //                     color: context.accentColor,
+  //                     shape: BoxShape.circle,
+  //                   ),
+  //                   child: CustomPaint(
+  //                       painter: ListenedAllPainter(
+  //                     Colors.white,
+  //                   )),
+  //                 )
+  //               : Center();
+  //     });
 
   Widget _downloadIndicater(BuildContext context, {EpisodeBrief episode}) =>
       showDownload || layout != Layout.three
@@ -294,7 +295,7 @@ class EpisodeGrid extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 2),
                       ),
-                      isListened > 0.95
+                      isListened > 0
                           ? Text('Listened',
                               style: TextStyle(
                                   color: context.textColor.withOpacity(0.5)))
@@ -359,7 +360,7 @@ class EpisodeGrid extends StatelessWidget {
             }
             break;
           case 3:
-            if (isListened < 0.95) {
+            if (isListened < 1) {
               await _markListened(episode);
               audio.setEpisodeState = true;
               Fluttertoast.showToast(
@@ -368,7 +369,6 @@ class EpisodeGrid extends StatelessWidget {
               );
             }
             break;
-
           case 4:
             if (!isDownload) downloader.startTask(episode);
             break;
@@ -428,7 +428,7 @@ class EpisodeGrid extends StatelessWidget {
                                 BorderRadius.all(Radius.circular(5.0)),
                             color: snapshot.data > 0
                                 ? context.brightness == Brightness.light
-                                    ? context.primaryColor
+                                    ? Colors.grey[200]
                                     : Color.fromRGBO(40, 40, 40, 1)
                                 : context.scaffoldBackgroundColor,
                             boxShadow: [
@@ -488,9 +488,9 @@ class EpisodeGrid extends StatelessWidget {
                                                 episode: episodes[index],
                                                 color: _c),
                                         Spacer(),
-                                        _listenIndicater(context,
-                                            episode: episodes[index],
-                                            isListened: snapshot.data),
+                                     //   _listenIndicater(context,
+                                     //       episode: episodes[index],
+                                     //       isListened: snapshot.data),
                                         _downloadIndicater(context,
                                             episode: episodes[index]),
                                         _isNewIndicator(episodes[index]),

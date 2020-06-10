@@ -269,14 +269,15 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                     padding: EdgeInsets.only(
                                         left: 20.0, right: 20, bottom: 10),
                                     defaultTextStyle:
-                                        GoogleFonts.libreBaskerville(
+                                        // GoogleFonts.libreBaskerville(
+                                        GoogleFonts.martel(
                                       textStyle: TextStyle(
                                         height: 1.8,
                                       ),
                                     ),
                                     data: _description,
                                     linkStyle: TextStyle(
-                                        color: Theme.of(context).accentColor,
+                                        color: context.accentColor,
                                         // decoration: TextDecoration.underline,
                                         textBaseline: TextBaseline.ideographic),
                                     onLinkTap: (url) {
@@ -296,7 +297,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                             _launchUrl(link.url);
                                           },
                                           text: _description,
-                                          style: GoogleFonts.libreBaskerville(
+                                          style: GoogleFonts.martel(
                                             textStyle: TextStyle(
                                               height: 1.8,
                                             ),
@@ -384,8 +385,6 @@ class MenuBar extends StatefulWidget {
 }
 
 class _MenuBarState extends State<MenuBar> {
-  bool _liked = false;
-
   Future<PlayHistory> getPosition(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
     return await dbHelper.getPosition(episode);
@@ -394,17 +393,14 @@ class _MenuBarState extends State<MenuBar> {
   Future<int> saveLiked(String url) async {
     var dbHelper = DBHelper();
     int result = await dbHelper.setLiked(url);
-    if (result == 1 && mounted) setState(() => _liked = true);
+    setState(() {});
     return result;
   }
 
   Future<int> setUnliked(String url) async {
     var dbHelper = DBHelper();
     int result = await dbHelper.setUniked(url);
-    if (result == 1 && mounted)
-      setState(() {
-        _liked = false;
-      });
+    setState(() {});
     return result;
   }
 
@@ -416,12 +412,6 @@ class _MenuBarState extends State<MenuBar> {
   static String _stringForSeconds(double seconds) {
     if (seconds == null) return null;
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _liked = false;
   }
 
   Widget _buttonOnMenu(Widget widget, VoidCallback onTap) => Material(
@@ -495,7 +485,7 @@ class _MenuBarState extends State<MenuBar> {
                     future: _isLiked(widget.episodeItem),
                     initialData: false,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      return (!snapshot.data && !_liked)
+                      return (!snapshot.data)
                           ? _buttonOnMenu(
                               Icon(
                                 Icons.favorite_border,
@@ -508,23 +498,13 @@ class _MenuBarState extends State<MenuBar> {
                               await Future.delayed(Duration(seconds: 2));
                               _overlayEntry?.remove();
                             })
-                          : (snapshot.data && !_liked)
-                              ? _buttonOnMenu(
-                                  Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                  () => setUnliked(
-                                      widget.episodeItem.enclosureUrl))
-                              : _buttonOnMenu(
-                                  Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                  () {
-                                    setUnliked(widget.episodeItem.enclosureUrl);
-                                  },
-                                );
+                          : _buttonOnMenu(
+                              Icon(
+                                Icons.favorite,
+                                color: Colors.red,
+                              ),
+                              () =>
+                                  setUnliked(widget.episodeItem.enclosureUrl));
                     },
                   ),
                   DownloadButton(episode: widget.episodeItem),
@@ -534,7 +514,7 @@ class _MenuBarState extends State<MenuBar> {
                       return data.contains(widget.episodeItem)
                           ? _buttonOnMenu(
                               Icon(Icons.playlist_add_check,
-                                  color: Theme.of(context).accentColor), () {
+                                  color: context.accentColor), () {
                               audio.delFromPlaylist(widget.episodeItem);
                               Fluttertoast.showToast(
                                 msg: 'Removed from playlist',

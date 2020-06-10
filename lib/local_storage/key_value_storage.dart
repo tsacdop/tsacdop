@@ -24,6 +24,7 @@ const String favLayoutKey = 'favLayoutKey';
 const String downloadLayoutKey = 'downloadLayoutKey';
 const String autoDownloadNetworkKey = 'autoDownloadNetwork';
 const String episodePopupMenuKey = 'episodePopupMenuKey';
+const String autoDeleteKey = 'autoDeleteKey';
 
 class KeyValueStorage {
   final String key;

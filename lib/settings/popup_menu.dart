@@ -39,6 +39,21 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
           leading: icon,
           title: Text(text),
           subtitle: Text(description),
+          onTap: e == 0
+              ? null
+              : () {
+                  if (e >= 10) {
+                    int index = menu.indexOf(e);
+                    menu.remove(e);
+                    menu.insert(index, e - 10);
+                    _saveEpisodeMene(menu);
+                  } else if (e < 10) {
+                    int index = menu.indexOf(e);
+                    menu.remove(e);
+                    menu.insert(index, e + 10);
+                    _saveEpisodeMene(menu);
+                  }
+                },
           trailing: Checkbox(
               value: e < 10,
               onChanged: e == 0
@@ -131,11 +146,8 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                               break;
                             case 2:
                               return _popupMenuItem(menu, e,
-                                  icon: Icon(
-                                    LineIcons.heart,
-                                    color: Colors.red,
-                                    size: 21
-                                  ),
+                                  icon: Icon(LineIcons.heart,
+                                      color: Colors.red, size: 21),
                                   text: 'Like',
                                   description: 'Add episode to favorite');
                               break;

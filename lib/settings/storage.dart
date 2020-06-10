@@ -30,11 +30,6 @@ class _StorageSettingState extends State<StorageSetting>
           setState(() => _value = _animation.value);
         });
       _controller.forward();
-      //  _controller.addStatusListener((status) {
-      //    if (status == AnimationStatus.completed) {
-      //      _controller.reset();
-      //    }
-      //  });
     }
   }
 
@@ -42,6 +37,22 @@ class _StorageSettingState extends State<StorageSetting>
     KeyValueStorage storage = KeyValueStorage(autoDownloadNetworkKey);
     int value = await storage.getInt();
     return value != 0;
+  }
+
+  Future<int> _getAutoDeleteDays() async {
+    KeyValueStorage storage = KeyValueStorage(autoDeleteKey);
+    int days = await storage.getInt();
+    if (days == 0) {
+      storage.saveInt(30);
+      return 30;
+    }
+    return days;
+  }
+
+  _setAutoDeleteDays(int days) async {
+    KeyValueStorage storage = KeyValueStorage(autoDeleteKey);
+    await storage.saveInt(days);
+    setState(() {});
   }
 
   _setAudtDownloadNetwork(bool boo) async {
@@ -186,10 +197,41 @@ class _StorageSettingState extends State<StorageSetting>
                         subtitle: Text('Manage downloaded audio files'),
                       ),
                       Divider(height: 2),
+                      FutureBuilder<int>(
+                        future: _getAutoDeleteDays(),
+                        initialData: 30,
+                        builder: (context, snapshot) {
+                          return ListTile(
+                            contentPadding:
+                                EdgeInsets.only(left: 80.0, right: 20),
+                            title: Text('Auto delete downloads after'),
+                            subtitle: Text('Default 30 days.'),
+                            trailing: DropdownButton(
+                                hint: snapshot.data == -1
+                                    ? Text('Never')
+                                    : Text(snapshot.data.toString() + 'days'),
+                                underline: Center(),
+                                elevation: 1,
+                                value: snapshot.data,
+                                onChanged: (value) async {
+                                  await _setAutoDeleteDays(value);
+                                },
+                                items: <int>[-1, 10, 30]
+                                    .map<DropdownMenuItem<int>>((e) {
+                                  return DropdownMenuItem<int>(
+                                      value: e,
+                                      child: e == -1
+                                          ? Text('Never')
+                                          : Text(e.toString() + ' days'));
+                                }).toList()),
+                          );
+                        },
+                      ),
+                      Divider(height: 2),
                       ListTile(
                         contentPadding: EdgeInsets.only(left: 80.0, right: 25),
                         //  leading: Icon(Icons.colorize),
-                        title: Text('Cache'),
+                        title: Text('Audio cache'),
                         subtitle: Text('Audio cache max size'),
                         trailing: Text.rich(TextSpan(
                             text: '${(_value ~/ 100) * 100}',

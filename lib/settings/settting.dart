@@ -179,12 +179,6 @@ class _SettingsState extends State<Settings>
                           leading: Icon(LineIcons.play_circle),
                           title: Text('Play'),
                           subtitle: Text('Playlist and player'),
-                          //  trailing: Selector<AudioPlayerNotifier, bool>(
-                          //    selector: (_, audio) => audio.autoPlay,
-                          //    builder: (_, data, __) => Switch(
-                          //        value: data,
-                          //        onChanged: (boo) => audio.autoPlaySwitch = boo),
-                          //  ),
                         ),
                         Divider(height: 2),
                         ListTile(

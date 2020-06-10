@@ -376,14 +376,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
   }
 }
 
-class PodcastPreview extends StatefulWidget {
+class PodcastPreview extends StatelessWidget {
   final PodcastLocal podcastLocal;
   PodcastPreview({this.podcastLocal, Key key}) : super(key: key);
-  @override
-  _PodcastPreviewState createState() => _PodcastPreviewState();
-}
 
-class _PodcastPreviewState extends State<PodcastPreview> {
   Future<List<EpisodeBrief>> _getRssItemTop(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await dbHelper.getRssItemTop(podcastLocal.id);
@@ -393,8 +389,8 @@ class _PodcastPreviewState extends State<PodcastPreview> {
   @override
   Widget build(BuildContext context) {
     Color _c = (Theme.of(context).brightness == Brightness.light)
-        ? widget.podcastLocal.primaryColor.colorizedark()
-        : widget.podcastLocal.primaryColor.colorizeLight();
+        ? podcastLocal.primaryColor.colorizedark()
+        : podcastLocal.primaryColor.colorizeLight();
     return Column(
       children: <Widget>[
         Expanded(
@@ -402,7 +398,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
               selector: (_, worker) => worker.created,
               builder: (context, created, child) {
                 return FutureBuilder<List<EpisodeBrief>>(
-                  future: _getRssItemTop(widget.podcastLocal),
+                  future: _getRssItemTop(podcastLocal),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       print(snapshot.error);
@@ -411,7 +407,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
                     return (snapshot.hasData)
                         ? ShowEpisode(
                             episodes: snapshot.data,
-                            podcastLocal: widget.podcastLocal,
+                            podcastLocal: podcastLocal,
                           )
                         : Container(
                             padding: EdgeInsets.all(5.0),
@@ -429,7 +425,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
             children: <Widget>[
               Expanded(
                 flex: 4,
-                child: Text(widget.podcastLocal.title,
+                child: Text(podcastLocal.title,
                     maxLines: 1,
                     overflow: TextOverflow.visible,
                     style: TextStyle(fontWeight: FontWeight.bold, color: _c)),
@@ -450,11 +446,11 @@ class _PodcastPreviewState extends State<PodcastPreview> {
                             context,
                             SlideLeftHideRoute(
                                 transitionPage: PodcastDetail(
-                                  podcastLocal: widget.podcastLocal,
+                                  podcastLocal: podcastLocal,
                                   hide: playerRunning,
                                 ),
                                 page: PodcastDetail(
-                                  podcastLocal: widget.podcastLocal,
+                                  podcastLocal: podcastLocal,
                                 )),
                           );
                         },
@@ -606,7 +602,7 @@ class ShowEpisode extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 2),
                     ),
-                    isListened > 0.95
+                    isListened > 0
                         ? Text('Listened',
                             style: TextStyle(
                                 color: context.textColor.withOpacity(0.5)))
@@ -671,7 +667,7 @@ class ShowEpisode extends StatelessWidget {
           }
           break;
         case 3:
-          if (isListened < 0.95) {
+          if (isListened < 1) {
             await _markListened(episode);
             audio.setEpisodeState = true;
             Fluttertoast.showToast(

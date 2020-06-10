@@ -5,9 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../type/episodebrief.dart';
+import '../util/context_extension.dart';
+import '../state/download_state.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 
 class DownloadsManage extends StatefulWidget {
@@ -18,25 +21,23 @@ class DownloadsManage extends StatefulWidget {
 class _DownloadsManageState extends State<DownloadsManage> {
   //Downloaded size
   int _size;
+  int _mode;
   //Downloaded files
   int _fileNum;
-  bool _loadEpisodes;
   bool _clearing;
+  bool _onlyListened;
   List<EpisodeBrief> _selectedList;
-  List<EpisodeBrief> _episodes = [];
 
-  _getDownloadedRssItem() async {
-    _episodes = [];
-    final tasks = await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE status = 3");
+  Future<List<EpisodeBrief>> _getDownloadedEpisode(int mode) async {
+    List<EpisodeBrief> episodes = [];
     var dbHelper = DBHelper();
-    await Future.forEach(tasks, (task) async {
-      EpisodeBrief episode = await dbHelper.getRssItemWithUrl(task.url);
-      _episodes.add(episode);
-    });
-    setState(() {
-      _loadEpisodes = true;
-    });
+    episodes = await dbHelper.getDownloadedEpisode(mode);
+    return episodes;
+  }
+
+  Future<int> _isListened(EpisodeBrief episode) async {
+    DBHelper dbHelper = DBHelper();
+    return await dbHelper.isListened(episode.enclosureUrl);
   }
 
   _getStorageSize() async {
@@ -58,12 +59,13 @@ class _DownloadsManageState extends State<DownloadsManage> {
   _delSelectedEpisodes() async {
     setState(() => _clearing = true);
     await Future.forEach(_selectedList, (EpisodeBrief episode) async {
-      await FlutterDownloader.remove(
-          taskId: episode.downloaded, shouldDeleteContent: true);
-      var dbHelper = DBHelper();
-      await dbHelper.delDownloaded(episode.enclosureUrl);
-      setState(() =>
-          _episodes.removeWhere((e) => e.enclosureUrl == episode.enclosureUrl));
+      var downloader = Provider.of<DownloadState>(context, listen: false);
+      await downloader.removeTask(episode);
+      // await FlutterDownloader.remove(
+      //     taskId: episode.downloaded, shouldDeleteContent: true);
+      // var dbHelper = DBHelper();
+      // await dbHelper.delDownloaded(episode.enclosureUrl);
+      setState(() {});
     });
     await Future.delayed(Duration(seconds: 1));
     setState(() {
@@ -90,10 +92,10 @@ class _DownloadsManageState extends State<DownloadsManage> {
   void initState() {
     super.initState();
     _clearing = false;
-    _loadEpisodes = false;
     _selectedList = [];
+    _mode = 0;
+    _onlyListened = false;
     _getStorageSize();
-    _getDownloadedRssItem();
   }
 
   @override
@@ -107,9 +109,8 @@ class _DownloadsManageState extends State<DownloadsManage> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Downloads'),
           elevation: 0,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: context.primaryColor,
         ),
         body: SafeArea(
           child: Stack(
@@ -119,125 +120,248 @@ class _DownloadsManageState extends State<DownloadsManage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                  ),
                   Container(
-                    height: 100.0,
-                    padding: EdgeInsets.only(bottom: 20, left: 60),
-                    alignment: Alignment.centerLeft,
-                    child: RichText(
-                      text: TextSpan(
-                        text: 'Total ',
-                        style: TextStyle(
-                          color: Theme.of(context).accentColor,
-                          fontSize: 20,
+                    height: 140.0,
+                    color: context.primaryColor,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'Total ',
+                              style: TextStyle(
+                                color: Theme.of(context).accentColor,
+                                fontSize: 20,
+                              ),
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: _fileNum.toString(),
+                                  style: GoogleFonts.cairo(
+                                      textStyle: TextStyle(
+                                    color: Theme.of(context).accentColor,
+                                    fontSize: 40,
+                                  )),
+                                ),
+                                TextSpan(
+                                    text: _fileNum < 2
+                                        ? ' episode'
+                                        : ' episodes ',
+                                    style: TextStyle(
+                                      color: Theme.of(context).accentColor,
+                                      fontSize: 20,
+                                    )),
+                                TextSpan(
+                                  text: (_size ~/ 1000000).toString(),
+                                  style: GoogleFonts.cairo(
+                                      textStyle: TextStyle(
+                                    color: Theme.of(context).accentColor,
+                                    fontSize: 50,
+                                  )),
+                                ),
+                                TextSpan(
+                                    text: ' Mb',
+                                    style: TextStyle(
+                                      color: Theme.of(context).accentColor,
+                                      fontSize: 20,
+                                    )),
+                              ],
+                            ),
+                          ),
                         ),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: _fileNum.toString(),
-                            style: GoogleFonts.cairo(
-                                textStyle: TextStyle(
-                              color: Theme.of(context).accentColor,
-                              fontSize: 40,
-                            )),
-                          ),
-                          TextSpan(
-                              text: _fileNum < 2 ? ' episode' : ' episodes ',
-                              style: TextStyle(
-                                color: Theme.of(context).accentColor,
-                                fontSize: 20,
-                              )),
-                          TextSpan(
-                            text: (_size ~/ 1000000).toString(),
-                            style: GoogleFonts.cairo(
-                                textStyle: TextStyle(
-                              color: Theme.of(context).accentColor,
-                              fontSize: 50,
-                            )),
-                          ),
-                          TextSpan(
-                              text: ' Mb',
-                              style: TextStyle(
-                                color: Theme.of(context).accentColor,
-                                fontSize: 20,
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
-                  _loadEpisodes
-                      ? Expanded(
-                          child: ListView.builder(
-                              itemCount: _episodes.length,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (context, index) {
-                                return Column(
-                                  children: <Widget>[
-                                    ListTile(
-                                      onTap: () {
-                                        if (_selectedList
-                                            .contains(_episodes[index])) {
-                                          setState(() => _selectedList
-                                              .removeWhere((episode) =>
-                                                  episode.enclosureUrl ==
-                                                  _episodes[index]
-                                                      .enclosureUrl));
-                                        } else {
-                                          setState(() => _selectedList
-                                              .add(_episodes[index]));
-                                        }
-                                      },
-                                      leading: CircleAvatar(
-                                        backgroundImage: FileImage(File(
-                                            "${_episodes[index].imagePath}")),
-                                      ),
-                                      title: Text(
-                                        _episodes[index].title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      subtitle: _episodes[index]
-                                                  .enclosureLength !=
-                                              0
-                                          ? Text(((_episodes[index]
-                                                          .enclosureLength) ~/
-                                                      1000000)
-                                                  .toString() +
-                                              ' Mb')
-                                          : Center(),
-                                      trailing: Checkbox(
-                                        value: _selectedList
-                                            .contains(_episodes[index]),
-                                        onChanged: (bool boo) {
-                                          if (boo) {
-                                            setState(() => _selectedList
-                                                .add(_episodes[index]));
-                                          } else {
-                                            setState(() => _selectedList
-                                                .removeWhere((episode) =>
-                                                    episode.enclosureUrl ==
-                                                    _episodes[index]
-                                                        .enclosureUrl));
-                                          }
-                                        },
-                                      ),
+                        Spacer(),
+                        SizedBox(
+                          height: 40,
+                          child: Row(
+                            children: [
+                              Material(
+                                color: Colors.transparent,
+                                child: PopupMenuButton<int>(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                  elevation: 1,
+                                  tooltip: 'Sort By',
+                                  child: Container(
+                                      height: 40,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 20),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Text('Sory by'),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5),
+                                          ),
+                                          Icon(
+                                            _mode == 0
+                                                ? LineIcons
+                                                    .hourglass_start_solid
+                                                : _mode == 1
+                                                    ? LineIcons
+                                                        .hourglass_half_solid
+                                                    : LineIcons.save,
+                                            size: 18,
+                                          )
+                                        ],
+                                      )),
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      value: 0,
+                                      child: Text('Newest first'),
                                     ),
-                                    Divider(
-                                      height: 2,
+                                    PopupMenuItem(
+                                      value: 1,
+                                      child: Text('Oldest first'),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 2,
+                                      child: Text('Size'),
                                     ),
                                   ],
-                                );
-                              }),
-                        )
-                      : CircularProgressIndicator(),
+                                  onSelected: (value) {
+                                    if (value == 0)
+                                      setState(() => _mode = 0);
+                                    else if (value == 1)
+                                      setState(() => _mode = 1);
+                                    else if (value == 2)
+                                      setState(() => _mode = 2);
+                                  },
+                                ),
+                              ),
+                              //Spacer(),
+
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => setState(() {
+                                    _onlyListened = !_onlyListened;
+                                  }),
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 5),
+                                      ),
+                                      Text('Listened Only'),
+                                      Checkbox(
+                                          value: _onlyListened,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _onlyListened = value;
+                                            });
+                                          }),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: FutureBuilder<List<EpisodeBrief>>(
+                      future: _getDownloadedEpisode(_mode),
+                      initialData: [],
+                      builder: (context, snapshot) {
+                        var _episodes = snapshot.data;
+                        return ListView.builder(
+                            itemCount: _episodes.length,
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (context, index) {
+                              return FutureBuilder(
+                                  future: _isListened(_episodes[index]),
+                                  initialData: 0,
+                                  builder: (context, snapshot) {
+                                    return (_onlyListened &&
+                                            snapshot.data > 0)
+                                        ? Center()
+                                        : Column(
+                                            children: <Widget>[
+                                              ListTile(
+                                                onTap: () {
+                                                  if (_selectedList.contains(
+                                                      _episodes[index])) {
+                                                    setState(() => _selectedList
+                                                        .removeWhere((episode) =>
+                                                            episode
+                                                                .enclosureUrl ==
+                                                            _episodes[index]
+                                                                .enclosureUrl));
+                                                  } else {
+                                                    setState(() => _selectedList
+                                                        .add(_episodes[index]));
+                                                  }
+                                                },
+                                                leading: CircleAvatar(
+                                                  backgroundImage: FileImage(File(
+                                                      "${_episodes[index].imagePath}")),
+                                                ),
+                                                title: Text(
+                                                  _episodes[index].title,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                subtitle: Row(
+                                                  children: [
+                                                    Text(_episodes[index]
+                                                        .downloadDateToString()),
+                                                    SizedBox(width: 20),
+                                                    _episodes[index]
+                                                                .enclosureLength !=
+                                                            0
+                                                        ? Text(((_episodes[index]
+                                                                        .enclosureLength) ~/
+                                                                    1000000)
+                                                                .toString() +
+                                                            ' Mb')
+                                                        : SizedBox(
+                                                            width: 1,
+                                                          ),
+                                                  ],
+                                                ),
+                                                trailing: Checkbox(
+                                                  value: _selectedList.contains(
+                                                      _episodes[index]),
+                                                  onChanged: (bool boo) {
+                                                    if (boo) {
+                                                      setState(() =>
+                                                          _selectedList.add(
+                                                              _episodes[
+                                                                  index]));
+                                                    } else {
+                                                      setState(() => _selectedList
+                                                          .removeWhere((episode) =>
+                                                              episode
+                                                                  .enclosureUrl ==
+                                                              _episodes[index]
+                                                                  .enclosureUrl));
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                              Divider(
+                                                height: 2,
+                                              ),
+                                            ],
+                                          );
+                                  });
+                            });
+                      },
+                    ),
+                  )
                 ],
               ),
               AnimatedPositioned(
                 duration: Duration(milliseconds: 800),
                 curve: Curves.elasticInOut,
-                left: MediaQuery.of(context).size.width / 2 - 50,
+                left: context.width / 2 - 50,
                 bottom: _selectedList.length == 0 ? -100 : 30,
                 child: InkWell(
                     onTap: () => _delSelectedEpisodes(),

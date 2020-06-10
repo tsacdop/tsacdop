@@ -21,7 +21,8 @@ List<Libries> google = [
 List<Libries> fonts = [
   Libries('Libre Baskerville', font,
       "https://fonts.google.com/specimen/Libre+Baskerville"),
-  Libries('Teko', font, "https://fonts.google.com/specimen/Teko")
+  Libries('Teko', font, "https://fonts.google.com/specimen/Teko"),
+  Libries('Martel', font, "https://fonts.google.com/specimen/Martel")
 ];
 
 List<Libries> plugins = [
@@ -68,5 +69,6 @@ List<Libries> plugins = [
   Libries('Rxdart', apacheLicense, 'https://pub.dev/packages/rxdart'),
   Libries('flutter_isolate', mit, 'https://pub.dev/packages/flutter_isolate'),
   Libries('auto_animated', mit, 'https://pub.dev/packages/auto_animated'),
-  Libries('wc_flutter_share', apacheLicense, 'https://pub.dev/packages/wc_flutter_share')
+  Libries('wc_flutter_share', apacheLicense,
+      'https://pub.dev/packages/wc_flutter_share')
 ];

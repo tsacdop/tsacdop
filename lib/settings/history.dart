@@ -300,14 +300,13 @@ class _PlayedHistoryState extends State<PlayedHistory>
                 builder: (context, snapshot) {
                   return snapshot.hasData
                       ? ListView.builder(
-                          shrinkWrap: true,
+                         // shrinkWrap: true,
                           scrollDirection: Axis.vertical,
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext context, int index) {
                             bool _status = snapshot.data[index].status;
                             return Container(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              color: context.scaffoldBackgroundColor,
                               child: Column(
                                 children: <Widget>[
                                   ListTile(

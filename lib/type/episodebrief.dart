@@ -3,7 +3,7 @@ import 'package:audio_service/audio_service.dart';
 
 class EpisodeBrief {
   final String title;
-  String description;
+  final String description;
   final int pubDate;
   final int enclosureLength;
   final String enclosureUrl;
@@ -17,6 +17,7 @@ class EpisodeBrief {
   final String mediaId;
   final int isNew;
   final int skipSeconds;
+  final int downloadDate;
   EpisodeBrief(
       this.title,
       this.enclosureUrl,
@@ -31,10 +32,30 @@ class EpisodeBrief {
       this.imagePath,
       this.mediaId,
       this.isNew,
-      this.skipSeconds);
+      this.skipSeconds,
+      {this.description = '',
+      this.downloadDate = 0})
+      : assert(enclosureUrl != null);
 
   String dateToString() {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
+    var diffrence = DateTime.now().toUtc().difference(date);
+    if (diffrence.inHours < 1) {
+      return '1 hour ago';
+    } else if (diffrence.inHours < 24) {
+      return '${diffrence.inHours} hours ago';
+    } else if (diffrence.inHours == 24) {
+      return '1 day ago';
+    } else if (diffrence.inDays < 7) {
+      return '${diffrence.inDays} days ago';
+    } else {
+      return DateFormat.yMMMd().format(
+          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
+    }
+  }
+
+  String downloadDateToString() {
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(downloadDate);
     var diffrence = DateTime.now().toUtc().difference(date);
     if (diffrence.inHours < 1) {
       return '1 hour ago';

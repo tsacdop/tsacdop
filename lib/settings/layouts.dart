@@ -180,7 +180,6 @@ class _LayoutSettingState extends State<LayoutSetting> {
                                 text: 'Favorite tab', key: favLayoutKey),
                             _setDefaultGridView(context,
                                 text: 'Downlaod tab', key: downloadLayoutKey),
-                            Divider(height: 2),
                           ]),
                       Divider(height: 2)
                     ]),

@@ -4,10 +4,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
 
 import '../type/episodebrief.dart';
@@ -37,6 +37,10 @@ class DownloadState extends ChangeNotifier {
   List<EpisodeTask> _episodeTasks = [];
   List<EpisodeTask> get episodeTasks => _episodeTasks;
 
+  DownloadState() {
+    _autoDelete();
+  }
+
   @override
   void addListener(VoidCallback listener) async {
     _loadTasks();
@@ -55,7 +59,6 @@ class DownloadState extends ChangeNotifier {
         _episodeTasks.add(EpisodeTask(episode, task.taskId,
             progress: task.progress, status: task.status));
       });
-    print(_episodeTasks.length);
     notifyListeners();
   }
 
@@ -204,5 +207,20 @@ class DownloadState extends ChangeNotifier {
   _removeTask(EpisodeBrief episode) {
     _episodeTasks.removeWhere(
         (element) => element.episode.enclosureUrl == episode.enclosureUrl);
+  }
+
+  _autoDelete() async {
+    print('Start auto delete outdated episodes');
+    KeyValueStorage autoDeleteStorage = KeyValueStorage(autoDeleteKey);
+    int autoDelete = await autoDeleteStorage.getInt();
+    if (autoDelete == 0)
+      await autoDeleteStorage.saveInt(30);
+    else if (autoDelete > 0) {
+      List<EpisodeBrief> episodes =
+          await dbHelper.getOutdatedEpisode(autoDelete);
+      if (episodes.length > 0) {
+        await Future.forEach(episodes, (episode) => delTask(episode));
+      }
+    }
   }
 }
