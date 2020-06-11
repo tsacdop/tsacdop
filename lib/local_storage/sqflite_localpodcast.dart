@@ -273,8 +273,8 @@ class DBHelper {
   Future<int> isListened(String url) async {
     var dbClient = await database;
     int i = 0;
-    List<Map> list =
-        await dbClient.rawQuery("SELECT listen_time FROM PlayHistory WHERE enclosure_url = ?", [url]);
+    List<Map> list = await dbClient.rawQuery(
+        "SELECT listen_time FROM PlayHistory WHERE enclosure_url = ?", [url]);
     if (list.length == 0)
       return 0;
     else {
@@ -648,7 +648,7 @@ class DBHelper {
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
         E.downloaded, P.primaryColor, E.media_id, E.is_new, P.skip_seconds
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
-        WHERE E.is_new = 1 ORDER BY E.milliseconds ASC""",
+        WHERE E.is_new = 1 AND E.downloaded = 'ND' AND P.auto_download = 1 ORDER BY E.milliseconds ASC""",
       );
     else
       list = await dbClient.rawQuery(
@@ -656,7 +656,7 @@ class DBHelper {
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
         E.downloaded, P.primaryColor, E.media_id, E.is_new, P.skip_seconds
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
-        WHERE E.is_new = 1 AND E.feed_id = ? ORDER BY E.milliseconds ASC""",
+        WHERE E.is_new = 1 AND E.downloaded = 'ND' AND E.feed_id = ? ORDER BY E.milliseconds ASC""",
           [id]);
     if (list.length > 0)
       for (int x = 0; x < list.length; x++) {
@@ -961,9 +961,11 @@ class DBHelper {
     return episodes;
   }
 
-  Future<int> removeAllNewMark() async {
+  removeAllNewMark() async {
     var dbClient = await database;
-    return await dbClient.rawUpdate("UPDATE Episodes SET is_new = 0 ");
+    await dbClient.transaction((txn) async {
+      await txn.rawUpdate("UPDATE Episodes SET is_new = 0 ");
+    });
   }
 
   Future<List<EpisodeBrief>> getGroupNewRssItem(List<String> group) async {
@@ -1000,20 +1002,23 @@ class DBHelper {
     return episodes;
   }
 
-  Future<int> removeGroupNewMark(List<String> group) async {
+  removeGroupNewMark(List<String> group) async {
     var dbClient = await database;
     if (group.length > 0) {
       List<String> s = group.map<String>((e) => "'$e'").toList();
-      return await dbClient.rawUpdate(
-          "UPDATE Episodes SET is_new = 0 WHERE feed_id in (${s.join(',')})");
+      await dbClient.transaction((txn) async {
+        await txn.rawUpdate(
+            "UPDATE Episodes SET is_new = 0 WHERE feed_id in (${s.join(',')})");
+      });
     }
-    return 0;
   }
 
-  Future<int> removeEpisodeNewMark(String url) async {
+  removeEpisodeNewMark(String url) async {
     var dbClient = await database;
-    return await dbClient.rawUpdate(
-        "UPDATE Episodes SET is_new = 0 WHERE enclosure_url = ?", [url]);
+    await dbClient.transaction((txn) async {
+      await txn.rawUpdate(
+          "UPDATE Episodes SET is_new = 0 WHERE enclosure_url = ?", [url]);
+    });
   }
 
   Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy) async {
@@ -1069,20 +1074,22 @@ class DBHelper {
     return episodes;
   }
 
-  Future<int> setLiked(String url) async {
+  setLiked(String url) async {
     var dbClient = await database;
     int milliseconds = DateTime.now().millisecondsSinceEpoch;
-    int count = await dbClient.rawUpdate(
-        "UPDATE Episodes SET liked = 1, liked_date = ? WHERE enclosure_url= ?",
-        [milliseconds, url]);
-    return count;
+    await dbClient.transaction((txn) async {
+      await txn.rawUpdate(
+          "UPDATE Episodes SET liked = 1, liked_date = ? WHERE enclosure_url= ?",
+          [milliseconds, url]);
+    });
   }
 
-  Future<int> setUniked(String url) async {
+  setUniked(String url) async {
     var dbClient = await database;
-    int count = await dbClient.rawUpdate(
-        "UPDATE Episodes SET liked = 0 WHERE enclosure_url = ?", [url]);
-    return count;
+    await dbClient.transaction((txn) async {
+      await txn.rawUpdate(
+          "UPDATE Episodes SET liked = 0 WHERE enclosure_url = ?", [url]);
+    });
   }
 
   Future<bool> isLiked(String url) async {

@@ -32,13 +32,13 @@ void callbackDispatcher() {
             List<EpisodeBrief> episodes =
                 await dbHelper.getNewEpisodes(podcastLocal.id);
             episodes.forEach((episode) {
-              DownloadState().startTask(episode, showNotification: false);
+              DownloadState().startTask(episode, showNotification: true);
             });
           } else if (result == ConnectivityResult.wifi) {
             List<EpisodeBrief> episodes =
                 await dbHelper.getNewEpisodes(podcastLocal.id);
             episodes.forEach((episode) {
-              DownloadState().startTask(episode, showNotification: false);
+              DownloadState().startTask(episode, showNotification: true);
             });
           }
         }

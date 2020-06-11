@@ -1,8 +1,14 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
 import '../state/subscribe_podcast.dart';
+import '../state/download_state.dart';
 import '../state/refresh_podcast.dart';
+import '../type/episodebrief.dart';
 import '../util/context_extension.dart';
 
 class Import extends StatelessWidget {
@@ -24,6 +30,30 @@ class Import extends StatelessWidget {
     );
   }
 
+  _autoDownloadNew(BuildContext context) async {
+    final DBHelper dbHelper = DBHelper();
+    var downloader = Provider.of<DownloadState>(context, listen: false);
+    var result = await Connectivity().checkConnectivity();
+    KeyValueStorage autoDownloadStorage =
+        KeyValueStorage(autoDownloadNetworkKey);
+    int autoDownloadNetwork = await autoDownloadStorage.getInt();
+    if (autoDownloadNetwork == 1) {
+      List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
+      // For safety
+      if (episodes.length < 100)
+        episodes.forEach((episode) {
+          downloader.startTask(episode, showNotification: false);
+        });
+    } else if (result == ConnectivityResult.wifi) {
+      List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
+      //For safety
+      if (episodes.length < 100)
+        episodes.forEach((episode) {
+          downloader.startTask(episode, showNotification: false);
+        });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     GroupList groupList = Provider.of<GroupList>(context, listen: false);
@@ -39,7 +69,7 @@ class Import extends StatelessWidget {
                 groupList.subscribeNewPodcast(item.id);
                 return importColumn("Fetch data ${item.title}", context);
               case SubscribeState.fetch:
-              //  groupList.updatePodcast(item.id);
+                //  groupList.updatePodcast(item.id);
                 return importColumn("Subscribe success ${item.title}", context);
               case SubscribeState.exist:
                 return importColumn(
@@ -57,7 +87,7 @@ class Import extends StatelessWidget {
             RefreshItem item = refreshWorker.currentRefreshItem;
             if (refreshWorker.complete) {
               groupList.updateGroups();
-             // audio.addNewEpisode('all');
+              _autoDownloadNew(context);
             }
             switch (item.refreshState) {
               case RefreshState.fetch:

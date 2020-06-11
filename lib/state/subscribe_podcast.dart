@@ -66,7 +66,6 @@ class SubscribeWorker extends ChangeNotifier {
         _setCurrentSubscribeItem(SubscribeItem(message[1], message[0],
             subscribeState: SubscribeState.values[message[2]],
             id: message.length == 4 ? message[3] : ''));
-        print(message[2]);
       } else if (message is String && message == "done") {
         subIsolate.kill();
         subIsolate = null;

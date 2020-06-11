@@ -267,7 +267,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                             ? (_description.contains('<'))
                                 ? Html(
                                     padding: EdgeInsets.only(
-                                        left: 20.0, right: 20, bottom: 10),
+                                        left: 20.0, right: 20, bottom: 20),
                                     defaultTextStyle:
                                         // GoogleFonts.libreBaskerville(
                                         GoogleFonts.martel(
@@ -290,7 +290,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                         padding: EdgeInsets.only(
                                             left: 20.0,
                                             right: 20.0,
-                                            bottom: 10.0),
+                                            bottom: 20.0),
                                         alignment: Alignment.topLeft,
                                         child: SelectableLinkify(
                                           onOpen: (link) {
@@ -390,18 +390,16 @@ class _MenuBarState extends State<MenuBar> {
     return await dbHelper.getPosition(episode);
   }
 
-  Future<int> saveLiked(String url) async {
+  saveLiked(String url) async {
     var dbHelper = DBHelper();
-    int result = await dbHelper.setLiked(url);
+    await dbHelper.setLiked(url);
     setState(() {});
-    return result;
   }
 
-  Future<int> setUnliked(String url) async {
+  setUnliked(String url) async {
     var dbHelper = DBHelper();
-    int result = await dbHelper.setUniked(url);
+     await dbHelper.setUniked(url);
     setState(() {});
-    return result;
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {

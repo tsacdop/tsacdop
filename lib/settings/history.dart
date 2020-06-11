@@ -300,7 +300,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                 builder: (context, snapshot) {
                   return snapshot.hasData
                       ? ListView.builder(
-                         // shrinkWrap: true,
+                          // shrinkWrap: true,
                           scrollDirection: Axis.vertical,
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext context, int index) {
@@ -498,7 +498,6 @@ class HistoryChart extends StatelessWidget {
                   ]),
               dotData: FlDotData(
                 show: true,
-                dotSize: 5,
               ),
             ),
           ],

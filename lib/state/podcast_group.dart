@@ -80,8 +80,7 @@ class PodcastGroup {
 class GroupList extends ChangeNotifier {
   List<PodcastGroup> _groups;
   DBHelper dbHelper = DBHelper();
-  UnmodifiableListView<PodcastGroup> get groups =>
-      UnmodifiableListView(_groups);
+  List<PodcastGroup> get groups => _groups;
 
   KeyValueStorage storage = KeyValueStorage('groups');
   GroupList({List<PodcastGroup> groups}) : _groups = groups ?? [];
@@ -112,10 +111,18 @@ class GroupList extends ChangeNotifier {
     }
   }
 
+  _initGroup() async {
+    storage.getGroups().then((loadgroups) async {
+      _groups.addAll(loadgroups.map((e) => PodcastGroup.fromEntity(e)));
+      await Future.forEach(_groups, (group) async {
+        await group.getPodcasts();
+      });
+    });
+  }
+
   @override
   void addListener(VoidCallback listener) {
-    super.addListener(listener);
-    loadGroups();
+    loadGroups().then((value) => super.addListener(listener));
   }
 
   Future loadGroups() async {
@@ -142,7 +149,7 @@ class GroupList extends ChangeNotifier {
   Future addGroup(PodcastGroup podcastGroup) async {
     _isLoading = true;
     _groups.add(podcastGroup);
-    _saveGroup();
+    await _saveGroup();
     _isLoading = false;
     notifyListeners();
   }
@@ -154,7 +161,7 @@ class GroupList extends ChangeNotifier {
         _groups[0].podcastList.insert(0, podcast);
       }
     });
-    _saveGroup();
+    await _saveGroup();
     _groups.remove(podcastGroup);
     await _groups[0].getPodcasts();
     _isLoading = false;
@@ -170,13 +177,13 @@ class GroupList extends ChangeNotifier {
     _saveGroup();
   }
 
-  void _saveGroup() {
-    storage.saveGroup(_groups.map((it) => it.toEntity()).toList());
+  _saveGroup() async {
+    await storage.saveGroup(_groups.map((it) => it.toEntity()).toList());
   }
 
   Future subscribe(PodcastLocal podcastLocal) async {
     _groups[0].podcastList.insert(0, podcastLocal.id);
-    _saveGroup();
+    await _saveGroup();
     await dbHelper.savePodcastLocal(podcastLocal);
     await _groups[0].getPodcasts();
     notifyListeners();
@@ -194,8 +201,9 @@ class GroupList extends ChangeNotifier {
   }
 
   Future subscribeNewPodcast(String id) async {
-    _groups[0].podcastList.insert(0, id);
-    _saveGroup();
+    if (!_groups[0].podcastList.contains(id))
+      _groups[0].podcastList.insert(0, id);
+    await _saveGroup();
     await _groups[0].getPodcasts();
     notifyListeners();
   }
@@ -224,7 +232,7 @@ class GroupList extends ChangeNotifier {
     list.forEach((s) {
       s.podcastList.insert(0, id);
     });
-    _saveGroup();
+    await _saveGroup();
     await Future.forEach(_groups, (group) async {
       await group.getPodcasts();
     });
@@ -239,7 +247,7 @@ class GroupList extends ChangeNotifier {
     _groups.forEach((group) async {
       group.podcastList.remove(id);
     });
-    _saveGroup();
+    await _saveGroup();
     await dbHelper.delPodcastLocal(id);
     await Future.forEach(_groups, (group) async {
       await group.getPodcasts();
@@ -250,7 +258,7 @@ class GroupList extends ChangeNotifier {
 
   saveOrder(PodcastGroup group) async {
     group.podcastList = group.ordereddPodcasts.map((e) => e.id).toList();
-    _saveGroup();
+    await _saveGroup();
     await group.getPodcasts();
     notifyListeners();
   }

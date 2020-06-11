@@ -76,7 +76,7 @@ class _PopupMenuState extends State<PopupMenu> {
       try {
         String opml = file.readAsStringSync();
 
-        var content = xml.parse(opml);
+        var content = xml.XmlDocument.parse(opml);
         var total = content
             .findAllElements('outline')
             .map((ele) => OmplOutline.parse(ele))
@@ -184,11 +184,6 @@ class _PopupMenuState extends State<PopupMenu> {
             ),
           ),
         ),
-
-        //  PopupMenuItem(
-        //    value: 3,
-        //    child: setting.theme != 2 ? Text('Night Mode') : Text('Light Mode'),
-        //  ),
         PopupMenuItem(
           value: 4,
           child: Container(

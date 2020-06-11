@@ -74,16 +74,14 @@ class EpisodeGrid extends StatelessWidget {
     }
   }
 
-  Future<int> _saveLiked(String url) async {
+  _saveLiked(String url) async {
     var dbHelper = DBHelper();
-    int result = await dbHelper.setLiked(url);
-    return result;
+    await dbHelper.setLiked(url);
   }
 
-  Future<int> _setUnliked(String url) async {
+  _setUnliked(String url) async {
     var dbHelper = DBHelper();
-    int result = await dbHelper.setUniked(url);
-    return result;
+    await dbHelper.setUniked(url);
   }
 
   String _stringForSeconds(double seconds) {
@@ -116,9 +114,9 @@ class EpisodeGrid extends StatelessWidget {
               ),
       );
 
-  Widget _listenIndicater(BuildContext context,
-          {EpisodeBrief episode, int isListened}) =>
-      Center();
+  //Widget _listenIndicater(BuildContext context,
+  //        {EpisodeBrief episode, int isListened}) =>
+  //    Center();
   // Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
   //     selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
   //     builder: (_, data, __) {
@@ -488,9 +486,9 @@ class EpisodeGrid extends StatelessWidget {
                                                 episode: episodes[index],
                                                 color: _c),
                                         Spacer(),
-                                     //   _listenIndicater(context,
-                                     //       episode: episodes[index],
-                                     //       isListened: snapshot.data),
+                                        //   _listenIndicater(context,
+                                        //       episode: episodes[index],
+                                        //       isListened: snapshot.data),
                                         _downloadIndicater(context,
                                             episode: episodes[index]),
                                         _isNewIndicator(episodes[index]),

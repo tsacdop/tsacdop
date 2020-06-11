@@ -449,7 +449,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       newEpisodes = await dbHelper.getRecentNewRssItem();
     else
       newEpisodes = await dbHelper.getGroupNewRssItem(group);
-    if (newEpisodes.length > 0)
+    if (newEpisodes.length > 0 && newEpisodes.length < 100)
       await Future.forEach(newEpisodes, (episode) async {
         await addToPlaylist(episode);
       });

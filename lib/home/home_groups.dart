@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:feature_discovery/feature_discovery.dart';
 
 import '../type/episodebrief.dart';
 import '../state/podcast_group.dart';
@@ -507,16 +506,14 @@ class ShowEpisode extends StatelessWidget {
     }
   }
 
-  Future<int> _saveLiked(String url) async {
+   _saveLiked(String url) async {
     var dbHelper = DBHelper();
-    int result = await dbHelper.setLiked(url);
-    return result;
+     await dbHelper.setLiked(url);
   }
 
-  Future<int> _setUnliked(String url) async {
+  _setUnliked(String url) async {
     var dbHelper = DBHelper();
-    int result = await dbHelper.setUniked(url);
-    return result;
+  await dbHelper.setUniked(url);
   }
 
   _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,

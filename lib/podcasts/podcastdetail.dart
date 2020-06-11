@@ -46,7 +46,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
   bool _scroll;
   Future _updateRssItem(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
-
     final result = await dbHelper.updatePodcastRss(podcastLocal);
     if (result == 0) {
       Fluttertoast.showToast(
@@ -58,8 +57,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
         msg: 'Updated $result Episodes',
         gravity: ToastGravity.TOP,
       );
+
       bool autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
       if (autoDownload) {
+        var downloader = Provider.of<DownloadState>(context, listen: false);
         var result = await Connectivity().checkConnectivity();
         KeyValueStorage autoDownloadStorage =
             KeyValueStorage(autoDownloadNetworkKey);
@@ -67,19 +68,21 @@ class _PodcastDetailState extends State<PodcastDetail> {
         if (autoDownloadNetwork == 1) {
           List<EpisodeBrief> episodes =
               await dbHelper.getNewEpisodes(podcastLocal.id);
-          episodes.forEach((episode) {
-            DownloadState().startTask(episode, showNotification: false);
-          });
+          // For safety
+          if (episodes.length < 100)
+            episodes.forEach((episode) {
+              downloader.startTask(episode, showNotification: false);
+            });
         } else if (result == ConnectivityResult.wifi) {
           List<EpisodeBrief> episodes =
               await dbHelper.getNewEpisodes(podcastLocal.id);
-          episodes.forEach((episode) {
-            DownloadState().startTask(episode, showNotification: false);
-          });
+          //For safety
+          if (episodes.length < 100)
+            episodes.forEach((episode) {
+              downloader.startTask(episode, showNotification: false);
+            });
         }
       }
-      //  Provider.of<GroupList>(context, listen: false)
-      //      .updatePodcast(podcastLocal.id);
     } else {
       Fluttertoast.showToast(
         msg: 'Update failed, network error',

@@ -361,7 +361,7 @@ class _PodcastCardState extends State<PodcastCard>
                                 builder: (context, snapshot) {
                                   return _buttonOnMenu(
                                     icon: Container(
-                                      child: Icon(Icons.done_all,
+                                      child: Icon(Icons.file_download,
                                           size: _value * 15,
                                           color: snapshot.data
                                               ? Colors.white
@@ -369,20 +369,23 @@ class _PodcastCardState extends State<PodcastCard>
                                       height: _value == 0 ? 1 : 18 * _value,
                                       width: _value == 0 ? 1 : 18 * _value,
                                       decoration: BoxDecoration(
-                                          border: Border.all(
-                                              width: 1,
-                                              color: snapshot.data
-                                                  ? context.accentColor
-                                                  : context.textTheme.subtitle1
-                                                      .color),
+                                          border: snapshot.data
+                                              ? Border.all(
+                                                  width: 1,
+                                                  color: snapshot.data
+                                                      ? context.accentColor
+                                                      : context.textTheme
+                                                          .subtitle1.color)
+                                              : null,
                                           shape: BoxShape.circle,
                                           color: snapshot.data
                                               ? context.accentColor
                                               : null),
                                     ),
                                     tooltip: 'Auto Download',
-                                    onTap: () {
-                                      _setAutoDownload(widget.podcastLocal.id,
+                                    onTap: () async {
+                                      await _setAutoDownload(
+                                          widget.podcastLocal.id,
                                           !snapshot.data);
                                       setState(() {});
                                     },

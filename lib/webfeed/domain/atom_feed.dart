@@ -39,7 +39,7 @@ class AtomFeed {
   });
 
   factory AtomFeed.parse(String xmlString) {
-    var document = parse(xmlString);
+    var document = XmlDocument.parse(xmlString);
     XmlElement feedElement;
     try {
       feedElement = document.findElements("feed").first;

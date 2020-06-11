@@ -59,7 +59,7 @@ class RssFeed {
   });
 
   factory RssFeed.parse(String xmlString) {
-    var document = parse(xmlString);
+    var document = XmlDocument.parse(xmlString);
     XmlElement channelElement;
     try {
       channelElement = document.findAllElements("channel").first;
