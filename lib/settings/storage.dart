@@ -105,7 +105,7 @@ class _StorageSettingState extends State<StorageSetting>
                     ),
                     Container(
                       height: 30.0,
-                      padding: EdgeInsets.symmetric(horizontal: 80),
+                      padding: EdgeInsets.symmetric(horizontal: 70),
                       alignment: Alignment.centerLeft,
                       child: Text('Network',
                           style: Theme.of(context)
@@ -174,7 +174,7 @@ class _StorageSettingState extends State<StorageSetting>
                   ),
                   Container(
                     height: 30.0,
-                    padding: EdgeInsets.symmetric(horizontal: 80),
+                    padding: EdgeInsets.symmetric(horizontal: 70),
                     alignment: Alignment.centerLeft,
                     child: Text('Storage',
                         style: Theme.of(context)

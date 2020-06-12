@@ -42,14 +42,14 @@ class Import extends StatelessWidget {
       // For safety
       if (episodes.length < 100)
         episodes.forEach((episode) {
-          downloader.startTask(episode, showNotification: false);
+          downloader.startTask(episode, showNotification: true);
         });
     } else if (result == ConnectivityResult.wifi) {
       List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
       //For safety
       if (episodes.length < 100)
         episodes.forEach((episode) {
-          downloader.startTask(episode, showNotification: false);
+          downloader.startTask(episode, showNotification: true);
         });
     }
   }
@@ -66,9 +66,9 @@ class Import extends StatelessWidget {
               case SubscribeState.start:
                 return importColumn("Subscribe ${item.title}", context);
               case SubscribeState.subscribe:
-                groupList.subscribeNewPodcast(item.id);
                 return importColumn("Fetch data ${item.title}", context);
               case SubscribeState.fetch:
+                groupList.subscribeNewPodcast(item.id);
                 //  groupList.updatePodcast(item.id);
                 return importColumn("Subscribe success ${item.title}", context);
               case SubscribeState.exist:

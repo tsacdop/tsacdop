@@ -32,7 +32,7 @@ class ThemeSetting extends StatelessWidget {
             ),
             Container(
               height: 30.0,
-              padding: EdgeInsets.symmetric(horizontal: 80),
+              padding: EdgeInsets.symmetric(horizontal: 70),
               alignment: Alignment.centerLeft,
               child: Text('Interface',
                   style: Theme.of(context)

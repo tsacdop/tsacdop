@@ -36,7 +36,7 @@ class PlaySetting extends StatelessWidget {
                   ),
                   Container(
                     height: 30.0,
-                    padding: EdgeInsets.symmetric(horizontal: 80),
+                    padding: EdgeInsets.symmetric(horizontal: 70),
                     alignment: Alignment.centerLeft,
                     child: Text('Playlist',
                         style: Theme.of(context)

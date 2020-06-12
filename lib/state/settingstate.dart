@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
@@ -20,30 +23,27 @@ void callbackDispatcher() {
       KeyValueStorage lastWorkStorage = KeyValueStorage(lastWorkKey);
       int lastWork = await lastWorkStorage.getInt();
       await Future.forEach<PodcastLocal>(podcastList, (podcastLocal) async {
-        int updateCount =
-            await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
-        bool autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
-        if (autoDownload && updateCount > 0) {
-          var result = await Connectivity().checkConnectivity();
-          KeyValueStorage autoDownloadStorage =
-              KeyValueStorage(autoDownloadNetworkKey);
-          int autoDownloadNetwork = await autoDownloadStorage.getInt();
-          if (autoDownloadNetwork == 1) {
-            List<EpisodeBrief> episodes =
-                await dbHelper.getNewEpisodes(podcastLocal.id);
-            episodes.forEach((episode) {
-              DownloadState().startTask(episode, showNotification: true);
-            });
-          } else if (result == ConnectivityResult.wifi) {
-            List<EpisodeBrief> episodes =
-                await dbHelper.getNewEpisodes(podcastLocal.id);
-            episodes.forEach((episode) {
-              DownloadState().startTask(episode, showNotification: true);
-            });
-          }
-        }
+        await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
         print('Refresh ' + podcastLocal.title);
       });
+      await FlutterDownloader.initialize();
+      AutoDownloader downloader = AutoDownloader();
+      downloader.bindBackgroundIsolate();
+      KeyValueStorage autoDownloadStorage =
+          KeyValueStorage(autoDownloadNetworkKey);
+      int autoDownloadNetwork = await autoDownloadStorage.getInt();
+      var result = await Connectivity().checkConnectivity();
+      if (autoDownloadNetwork == 1) {
+        List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
+        // For safety
+        if (episodes.length < 100 && episodes.length > 0)
+          await downloader.startTask(episodes);
+      } else if (result == ConnectivityResult.wifi) {
+        List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
+        //For safety
+        if (episodes.length < 100 && episodes.length > 0)
+          await downloader.startTask(episodes);
+      }
       await lastWorkStorage.saveInt(1);
       KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
       await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);

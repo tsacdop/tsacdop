@@ -40,13 +40,16 @@ class SyncingSetting extends StatelessWidget {
                     ),
                     Container(
                       height: 30.0,
-                      padding: EdgeInsets.symmetric(horizontal: 80),
+                      padding: EdgeInsets.symmetric(horizontal: 70),
                       alignment: Alignment.centerLeft,
                       child: Text('Syncing',
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1
                               .copyWith(color: Theme.of(context).accentColor)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(5.0),
                     ),
                     ListView(
                       physics: const BouncingScrollPhysics(),

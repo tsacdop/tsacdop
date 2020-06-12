@@ -328,36 +328,28 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                         Text(snapshot.data[index].title),
                                       ],
                                     ),
-                                    subtitle: Row(
-                                      children: <Widget>[
-                                        _status
-                                            ? Text(DateTime.now()
-                                                    .difference(snapshot
-                                                        .data[index].subDate)
-                                                    .inDays
-                                                    .toString() +
-                                                ' day ago')
-                                            : Text(snapshot.data[index].delDate
-                                                    .difference(snapshot
-                                                        .data[index].subDate)
-                                                    .inDays
-                                                    .toString() +
-                                                ' day on your device'),
-                                        Spacer(),
-                                        !_status
-                                            ? Text(
-                                                'Removed at ' +
-                                                    DateFormat.yMd()
-                                                        .add_jm()
-                                                        .format(snapshot
-                                                            .data[index]
-                                                            .delDate),
-                                                style: TextStyle(
-                                                    color: Colors.red),
-                                              )
-                                            : Center(),
-                                      ],
-                                    ),
+                                    subtitle: _status
+                                        ? Text(DateTime.now()
+                                                .difference(snapshot
+                                                    .data[index].subDate)
+                                                .inDays
+                                                .toString() +
+                                            ' day ago')
+                                        : Text(
+                                            'Removed at ' +
+                                                DateFormat.yMd()
+                                                    .add_jm()
+                                                    .format(snapshot
+                                                        .data[index].delDate),
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                    // Text(snapshot.data[index].delDate
+                                    //         .difference(snapshot
+                                    //             .data[index].subDate)
+                                    //         .inDays
+                                    //         .toString() +
+                                    //     ' day on your device'),
+
                                     trailing: !_status
                                         ? Material(
                                             color: Colors.transparent,

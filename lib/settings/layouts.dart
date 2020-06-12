@@ -133,7 +133,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                 ),
                 Container(
                   height: 30.0,
-                  padding: EdgeInsets.symmetric(horizontal: 80),
+                  padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text('Episode popup menu',
                       style: Theme.of(context)
@@ -156,9 +156,12 @@ class _LayoutSettingState extends State<LayoutSetting> {
                         subtitle: Text('Change the menu when long tap episode'),
                       ),
                       Divider(height: 2),
+                      Padding(
+                        padding: EdgeInsets.all(10.0),
+                      ),
                       Container(
                         height: 30.0,
-                        padding: EdgeInsets.symmetric(horizontal: 80),
+                        padding: EdgeInsets.symmetric(horizontal: 70),
                         alignment: Alignment.centerLeft,
                         child: Text('Default grid view',
                             style: Theme.of(context)

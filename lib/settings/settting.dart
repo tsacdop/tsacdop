@@ -132,7 +132,7 @@ class _SettingsState extends State<Settings>
                     ),
                     Container(
                       height: 30.0,
-                      padding: EdgeInsets.symmetric(horizontal: 80),
+                      padding: EdgeInsets.symmetric(horizontal: 70),
                       alignment: Alignment.centerLeft,
                       child: Text('Prefrence',
                           style: Theme.of(context)
@@ -241,7 +241,7 @@ class _SettingsState extends State<Settings>
                   children: <Widget>[
                     Container(
                       height: 30.0,
-                      padding: EdgeInsets.symmetric(horizontal: 80),
+                      padding: EdgeInsets.symmetric(horizontal: 70),
                       alignment: Alignment.centerLeft,
                       child: Text('Info',
                           style: Theme.of(context)
