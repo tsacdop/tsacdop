@@ -26,7 +26,7 @@ dependencies:
   permission_handler: ^5.0.0+hotfix.3
   fluttertoast: ^4.0.1
   intl: ^0.16.1
-  url_launcher: ^5.4.7
+  url_launcher: ^5.4.10
   image: ^2.1.12
   shared_preferences: ^0.5.7
   uuid: ^2.0.4
@@ -44,7 +44,8 @@ dependencies:
   wc_flutter_share: ^0.2.1
   video_player: ^0.10.11
   auto_animated: ^2.1.0
-  feature_discovery: ^0.10.0 
+  feature_discovery: ^0.10.0
+  flutter_isolate: ^1.0.0+14
   just_audio:
     git:
       url: https://github.com/stonega/just_audio.git
@@ -57,7 +58,6 @@ dev_dependencies:
     sdk: flutter
 
 dependency_overrides:
-  flutter_isolate: "1.0.0+14"
   xml: "4.2.0"
 
 flutter:

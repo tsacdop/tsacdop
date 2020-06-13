@@ -899,6 +899,7 @@ class DBHelper {
     var dbClient = await database;
     List<EpisodeBrief> episodes = [];
     List<Map> list;
+    //Ordered by date
     if (mode == 0)
       list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,
@@ -908,6 +909,7 @@ class DBHelper {
         WHERE E.enclosure_url != E.media_id
         ORDER BY E.download_date DESC""",
       );
+    //Ordered by date
     else if (mode == 1)
       list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,
@@ -917,6 +919,7 @@ class DBHelper {
         WHERE E.enclosure_url != E.media_id
         ORDER BY E.download_date ASC""",
       );
+    //Ordered by size
     else if (mode == 2)
       list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,
@@ -926,24 +929,12 @@ class DBHelper {
         WHERE E.enclosure_url != E.media_id
         ORDER BY E.enclosure_length DESC""",
       );
-
     for (int x = 0; x < list.length; x++) {
-      int size;
-      if (list[x]['enclosure_length'] == null ||
-          list[x]['enclosure_length'] == 0) {
-        String uri = list[x]['media_id'];
-        FileStat fileStat = await File(uri.substring(6)).stat();
-        size = fileStat.size;
-        await dbClient.rawUpdate(
-            "UPDATE Episodes SET enclosure_length = ?, WHERE media_id = ?",
-            [size, uri]);
-      } else
-        size = list[x]['enclosure_length'];
       episodes.add(
         EpisodeBrief(
             list[x]['title'],
             list[x]['enclosure_url'],
-            size,
+            list[x]['enclosure_length'],
             list[x]['milliseconds'],
             list[x]['feed_title'],
             list[x]['primaryColor'],
@@ -1115,12 +1106,12 @@ class DBHelper {
     return count;
   }
 
-  Future<int> saveMediaId(String url, String path, String id) async {
+  Future<int> saveMediaId(String url, String path, String id, int size) async {
     var dbClient = await database;
     int milliseconds = DateTime.now().millisecondsSinceEpoch;
     int count = await dbClient.rawUpdate(
-        "UPDATE Episodes SET media_id = ?, download_date = ?, downloaded = ? WHERE enclosure_url = ?",
-        [path, milliseconds, id, url]);
+        "UPDATE Episodes SET enclosure_length = ?, media_id = ?, download_date = ?, downloaded = ? WHERE enclosure_url = ?",
+        [size, path, milliseconds, id, url]);
     return count;
   }
 

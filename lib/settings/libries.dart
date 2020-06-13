@@ -39,7 +39,7 @@ class Libries extends StatelessWidget {
                 ),
                 Container(
                   height: 30.0,
-                  padding: EdgeInsets.symmetric(horizontal: 80),
+                  padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text('Google',
                       style: Theme.of(context)
@@ -61,7 +61,7 @@ class Libries extends StatelessWidget {
                 ),
                 Container(
                   height: 30.0,
-                  padding: EdgeInsets.symmetric(horizontal: 80),
+                  padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text('Fonts',
                       style: Theme.of(context)
@@ -83,7 +83,7 @@ class Libries extends StatelessWidget {
                 ),
                 Container(
                   height: 30.0,
-                  padding: EdgeInsets.symmetric(horizontal: 80),
+                  padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text('Plugins',
                       style: Theme.of(context)

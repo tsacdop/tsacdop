@@ -91,8 +91,11 @@ class AutoDownloader {
     String filePath = 'file://' +
         path.join(completeTask.first.savedDir,
             Uri.encodeComponent(completeTask.first.filename));
-    await dbHelper.saveMediaId(
-        episodeTask.episode.enclosureUrl, filePath, episodeTask.taskId);
+    FileStat fileStat = await File(
+            path.join(completeTask.first.savedDir, completeTask.first.filename))
+        .stat();
+    await dbHelper.saveMediaId(episodeTask.episode.enclosureUrl, filePath,
+        episodeTask.taskId, fileStat.size);
     _episodeTasks.removeWhere((element) =>
         element.episode.enclosureUrl == episodeTask.episode.enclosureUrl);
     if (_episodeTasks.length == 0) _unbindBackgroundIsolate();
@@ -200,8 +203,12 @@ class DownloadState extends ChangeNotifier {
     String filePath = 'file://' +
         path.join(completeTask.first.savedDir,
             Uri.encodeComponent(completeTask.first.filename));
-    dbHelper.saveMediaId(
-        episodeTask.episode.enclosureUrl, filePath, episodeTask.taskId);
+    print(filePath);
+    FileStat fileStat = await File(
+            path.join(completeTask.first.savedDir, completeTask.first.filename))
+        .stat();
+    dbHelper.saveMediaId(episodeTask.episode.enclosureUrl, filePath,
+        episodeTask.taskId, fileStat.size);
     EpisodeBrief episode =
         await dbHelper.getRssItemWithUrl(episodeTask.episode.enclosureUrl);
     _removeTask(episodeTask.episode);
@@ -231,33 +238,36 @@ class DownloadState extends ChangeNotifier {
   }
 
   Future startTask(EpisodeBrief episode, {bool showNotification = true}) async {
-    final dir = await getExternalStorageDirectory();
-    String localPath = path.join(dir.path, episode.feedTitle);
-    final saveDir = Directory(localPath);
-    bool hasExisted = await saveDir.exists();
-    if (!hasExisted) {
-      saveDir.create();
-    }
-    DateTime now = DateTime.now();
-    String datePlus = now.year.toString() +
-        now.month.toString() +
-        now.day.toString() +
-        now.second.toString();
-    String fileName = episode.title +
-        datePlus +
-        '.' +
-        episode.enclosureUrl.split('/').last.split('.').last;
-    String taskId = await FlutterDownloader.enqueue(
-      fileName: fileName,
-      url: episode.enclosureUrl,
-      savedDir: localPath,
-      showNotification: showNotification,
-      openFileFromNotification: false,
-    );
-    _episodeTasks.add(EpisodeTask(episode, taskId));
     var dbHelper = DBHelper();
-    await dbHelper.saveDownloaded(episode.enclosureUrl, taskId);
-    notifyListeners();
+    bool isDownloaded = await dbHelper.isDownloaded(episode.enclosureUrl);
+    if (!isDownloaded) {
+      final dir = await getExternalStorageDirectory();
+      String localPath = path.join(dir.path, episode.feedTitle);
+      final saveDir = Directory(localPath);
+      bool hasExisted = await saveDir.exists();
+      if (!hasExisted) {
+        saveDir.create();
+      }
+      DateTime now = DateTime.now();
+      String datePlus = now.year.toString() +
+          now.month.toString() +
+          now.day.toString() +
+          now.second.toString();
+      String fileName = episode.title +
+          datePlus +
+          '.' +
+          episode.enclosureUrl.split('/').last.split('.').last;
+      String taskId = await FlutterDownloader.enqueue(
+        fileName: fileName,
+        url: episode.enclosureUrl,
+        savedDir: localPath,
+        showNotification: showNotification,
+        openFileFromNotification: false,
+      );
+      _episodeTasks.add(EpisodeTask(episode, taskId));
+      await dbHelper.saveDownloaded(episode.enclosureUrl, taskId);
+      notifyListeners();
+    }
   }
 
   Future pauseTask(EpisodeBrief episode) async {

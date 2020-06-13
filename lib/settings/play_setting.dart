@@ -56,9 +56,12 @@ class PlaySetting extends StatelessWidget {
                         subtitle: Text('Autoplay next episode in playlist'),
                         trailing: Selector<AudioPlayerNotifier, bool>(
                           selector: (_, audio) => audio.autoPlay,
-                          builder: (_, data, __) => Switch(
-                              value: data,
-                              onChanged: (boo) => audio.autoPlaySwitch = boo),
+                          builder: (_, data, __) => Transform.scale(
+                            scale: 0.9,
+                            child: Switch(
+                                value: data,
+                                onChanged: (boo) => audio.autoPlaySwitch = boo),
+                          ),
                         ),
                       ),
                       Divider(height: 2),

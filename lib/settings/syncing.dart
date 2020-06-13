@@ -71,15 +71,18 @@ class SyncingSetting extends StatelessWidget {
                           title: Text('Enable syncing'),
                           subtitle: Text(
                               'Refresh all podcasts in the background to get leatest episodes'),
-                          trailing: Switch(
-                              value: data.item1,
-                              onChanged: (boo) async {
-                                settings.autoUpdate = boo;
-                                if (boo)
-                                  settings.setWorkManager(data.item2);
-                                else
-                                  settings.cancelWork();
-                              }),
+                          trailing: Transform.scale(
+                            scale: 0.9,
+                            child: Switch(
+                                value: data.item1,
+                                onChanged: (boo) async {
+                                  settings.autoUpdate = boo;
+                                  if (boo)
+                                    settings.setWorkManager(data.item2);
+                                  else
+                                    settings.cancelWork();
+                                }),
+                          ),
                         ),
                         Divider(height: 2),
                         ListTile(

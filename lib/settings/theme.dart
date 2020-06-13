@@ -126,11 +126,14 @@ class ThemeSetting extends StatelessWidget {
                       Text('Turn on if you think the night is not dark enough'),
                   trailing: Selector<SettingState, bool>(
                     selector: (_, setting) => setting.realDark,
-                    builder: (_, data, __) => Switch(
-                        value: data,
-                        onChanged: (boo) async {
-                          settings.setRealDark = boo;
-                        }),
+                    builder: (_, data, __) => Transform.scale(
+                      scale: 0.9,
+                      child: Switch(
+                          value: data,
+                          onChanged: (boo) async {
+                            settings.setRealDark = boo;
+                          }),
+                    ),
                   ),
                 ),
                 Divider(height: 2),

@@ -366,8 +366,8 @@ class _PodcastCardState extends State<PodcastCard>
                                           color: snapshot.data
                                               ? Colors.white
                                               : null),
-                                      height: _value == 0 ? 1 : 18 * _value,
-                                      width: _value == 0 ? 1 : 18 * _value,
+                                      height: _value == 0 ? 1 : 20 * _value,
+                                      width: _value == 0 ? 1 : 20 * _value,
                                       decoration: BoxDecoration(
                                           border: snapshot.data
                                               ? Border.all(

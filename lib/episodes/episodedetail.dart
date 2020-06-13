@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../state/audiostate.dart';
 import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../local_storage/key_value_storage.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
 import 'episodedownload.dart';
@@ -52,14 +53,16 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   ScrollController _controller;
   _scrollListener() {
     if (_controller.offset > _controller.position.maxScrollExtent * 0.8) {
-      setState(() {
-        _showMenu = true;
-      });
+      if (!_showMenu)
+        setState(() {
+          _showMenu = true;
+        });
     } else if (_controller.offset <
         _controller.position.maxScrollExtent * 0.8) {
-      setState(() {
-        _showMenu = false;
-      });
+      if (_showMenu)
+        setState(() {
+          _showMenu = false;
+        });
     }
   }
 
@@ -267,7 +270,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                             ? (_description.contains('<'))
                                 ? Html(
                                     padding: EdgeInsets.only(
-                                        left: 20.0, right: 20, bottom: 20),
+                                        left: 20.0, right: 20, bottom: 50),
                                     defaultTextStyle:
                                         // GoogleFonts.libreBaskerville(
                                         GoogleFonts.martel(
@@ -290,7 +293,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                         padding: EdgeInsets.only(
                                             left: 20.0,
                                             right: 20.0,
-                                            bottom: 20.0),
+                                            bottom: 50.0),
                                         alignment: Alignment.topLeft,
                                         child: SelectableLinkify(
                                           onOpen: (link) {
@@ -398,7 +401,7 @@ class _MenuBarState extends State<MenuBar> {
 
   setUnliked(String url) async {
     var dbHelper = DBHelper();
-     await dbHelper.setUniked(url);
+    await dbHelper.setUniked(url);
     setState(() {});
   }
 
@@ -423,24 +426,25 @@ class _MenuBarState extends State<MenuBar> {
         ),
       );
 
+  OverlayEntry _createOverlayEntry() {
+    RenderBox renderBox = context.findRenderObject();
+    var offset = renderBox.localToGlobal(Offset.zero);
+    return OverlayEntry(
+      builder: (constext) => Positioned(
+        left: offset.dx + 50,
+        top: offset.dy - 60,
+        child: Container(
+            width: 70,
+            height: 100,
+            //color: Colors.grey[200],
+            child: HeartOpen(width: 50, height: 80)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    OverlayEntry _createOverlayEntry() {
-      RenderBox renderBox = context.findRenderObject();
-      var offset = renderBox.localToGlobal(Offset.zero);
-      return OverlayEntry(
-        builder: (constext) => Positioned(
-          left: offset.dx + 50,
-          top: offset.dy - 60,
-          child: Container(
-              width: 70,
-              height: 100,
-              //color: Colors.grey[200],
-              child: HeartOpen(width: 50, height: 80)),
-        ),
-      );
-    }
 
     return Container(
       height: 50.0,

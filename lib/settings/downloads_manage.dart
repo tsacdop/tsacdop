@@ -43,13 +43,14 @@ class _DownloadsManageState extends State<DownloadsManage> {
     _size = 0;
     _fileNum = 0;
     var dir = await getExternalStorageDirectory();
+    print(dir.path);
     dir.list().forEach((d) {
       var fileDir = Directory(d.path);
       fileDir.list().forEach((file) async {
         await File(file.path).stat().then((value) {
           _size += value.size;
           _fileNum += 1;
-          setState(() {});
+          if (mounted) setState(() {});
         });
       });
     });
@@ -59,19 +60,16 @@ class _DownloadsManageState extends State<DownloadsManage> {
     setState(() => _clearing = true);
     await Future.forEach(_selectedList, (EpisodeBrief episode) async {
       var downloader = Provider.of<DownloadState>(context, listen: false);
-      await downloader.removeTask(episode);
-      // await FlutterDownloader.remove(
-      //     taskId: episode.downloaded, shouldDeleteContent: true);
-      // var dbHelper = DBHelper();
-      // await dbHelper.delDownloaded(episode.enclosureUrl);
-      setState(() {});
+      await downloader.delTask(episode);
+      if (mounted) setState(() {});
     });
     await Future.delayed(Duration(seconds: 1));
-    setState(() {
-      _clearing = false;
-    });
+    if (mounted)
+      setState(() {
+        _clearing = false;
+      });
     await Future.delayed(Duration(seconds: 1));
-    setState(() => _selectedList = []);
+    if (mounted) setState(() => _selectedList = []);
     _getStorageSize();
   }
 
@@ -245,13 +243,16 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                             EdgeInsets.symmetric(horizontal: 5),
                                       ),
                                       Text('Listened Only'),
-                                      Checkbox(
-                                          value: _onlyListened,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              _onlyListened = value;
-                                            });
-                                          }),
+                                      Transform.scale(
+                                        scale: 0.8,
+                                        child: Checkbox(
+                                            value: _onlyListened,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _onlyListened = value;
+                                              });
+                                            }),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -277,8 +278,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   future: _isListened(_episodes[index]),
                                   initialData: 0,
                                   builder: (context, snapshot) {
-                                    return (_onlyListened &&
-                                            snapshot.data > 0)
+                                    return (_onlyListened && snapshot.data == 0)
                                         ? Center()
                                         : Column(
                                             children: <Widget>[

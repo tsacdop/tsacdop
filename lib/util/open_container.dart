@@ -538,6 +538,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
   // the bounds of the enclosing [Navigator].
   final RectTween _rectTween = RectTween();
   final Tween<Offset> _positionTween = Tween<Offset>();
+  final Tween<double> _avatarScaleTween = Tween<double>();
   AnimationStatus _lastAnimationStatus;
   AnimationStatus _currentAnimationStatus;
 
@@ -726,7 +727,10 @@ class _OpenContainerRoute extends ModalRoute<void> {
               playerRunning
                   ? MediaQuery.of(context).size.height - 100
                   : MediaQuery.of(context).size.height - 40);
+
           double _width = MediaQuery.of(context).size.width;
+          _avatarScaleTween.begin = _width / 16;
+          _avatarScaleTween.end = 30;
           return SizedBox.expand(
             child: Stack(
               children: <Widget>[
@@ -804,8 +808,8 @@ class _OpenContainerRoute extends ModalRoute<void> {
                   top: _positionTween.evaluate(secondCurvedAnimation).dy,
                   left: _positionTween.evaluate(secondCurvedAnimation).dx,
                   child: SizedBox(
-                    height: _width / 16,
-                    width: _width / 16,
+                    height: _avatarScaleTween.evaluate(secondCurvedAnimation),
+                    width: _avatarScaleTween.evaluate(secondCurvedAnimation),
                     child: flightWidget,
                   ),
                 ),

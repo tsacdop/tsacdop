@@ -92,7 +92,7 @@ class Playlist {
   savePlaylist() async {
     List<String> urls = [];
     urls.addAll(_playlist.map((e) => e.enclosureUrl));
-    await storage.saveStringList(urls);
+    await storage.saveStringList(urls.toSet().toList());
   }
 
   addToPlayList(EpisodeBrief episodeBrief) async {
@@ -104,15 +104,16 @@ class Playlist {
   }
 
   addToPlayListAt(EpisodeBrief episodeBrief, int index) async {
-    _playlist.insert(index, episodeBrief);
-    await savePlaylist();
-    dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+    if (!_playlist.contains(episodeBrief)) {
+      _playlist.insert(index, episodeBrief);
+      await savePlaylist();
+      dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+    }
   }
 
   Future<int> delFromPlaylist(EpisodeBrief episodeBrief) async {
     int index = _playlist.indexOf(episodeBrief);
-    _playlist
-        .removeWhere((item) => item.enclosureUrl == episodeBrief.enclosureUrl);
+    _playlist.removeWhere((episode) => episode == episodeBrief);
     await savePlaylist();
     return index;
   }

@@ -128,10 +128,13 @@ class _StorageSettingState extends State<StorageSetting>
                               title: Text('Ask before using cellular data'),
                               subtitle: Text(
                                   'Ask to confirm when using cellular data to download episodes.'),
-                              trailing: Switch(
-                                value: data,
-                                onChanged: (value) =>
-                                    settings.downloadUsingData = value,
+                              trailing: Transform.scale(
+                                scale: 0.9,
+                                child: Switch(
+                                  value: data,
+                                  onChanged: (value) =>
+                                      settings.downloadUsingData = value,
+                                ),
                               ),
                             );
                           },
@@ -152,12 +155,15 @@ class _StorageSettingState extends State<StorageSetting>
                                     Text('Auto download using cellular data'),
                                 subtitle: Text(
                                     'You can set podcast auto download in group manage page.'),
-                                trailing: Switch(
-                                  value: snapshot.data,
-                                  onChanged: (value) async {
-                                    await _setAudtDownloadNetwork(value);
-                                    setState(() {});
-                                  },
+                                trailing: Transform.scale(
+                                  scale: 0.9,
+                                  child: Switch(
+                                    value: snapshot.data,
+                                    onChanged: (value) async {
+                                      await _setAudtDownloadNetwork(value);
+                                      setState(() {});
+                                    },
+                                  ),
                                 ),
                               );
                             }),
