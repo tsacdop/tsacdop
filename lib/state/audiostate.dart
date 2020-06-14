@@ -422,7 +422,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   playNext() async {
-    AudioService.skipToNext();
+    await AudioService.skipToNext();
   }
 
   addToPlaylist(EpisodeBrief episode) async {
@@ -678,7 +678,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     });
     var eventSubscription = _audioPlayer.playbackEventStream.listen((event) {
       if (event.playbackError != null) {
-        _setState(state: BasicPlaybackState.error);
+        _setState(state: _skipState ?? BasicPlaybackState.error);
       }
       BasicPlaybackState state;
       if (event.buffering) {
@@ -818,7 +818,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   void onClick(MediaButton button) {
-    playPause();
+    if (button == MediaButton.media)
+      playPause();
+    else if (button == MediaButton.next)
+      _audioPlayer.seek(Duration(
+          milliseconds: AudioServiceBackground.state.position + 30 * 1000));
+    else if (button == MediaButton.previous)
+      _audioPlayer.seek(Duration(
+          milliseconds: AudioServiceBackground.state.position - 10 * 1000));
   }
 
   @override

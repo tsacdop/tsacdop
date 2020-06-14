@@ -12,6 +12,7 @@ import '../state/audiostate.dart';
 import '../type/episodebrief.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
+import '../util/colorize.dart';
 
 class PlaylistPage extends StatefulWidget {
   @override
@@ -306,6 +307,9 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+     Color _c = (Theme.of(context).brightness == Brightness.light)
+        ? widget.episode.primaryColor.colorizedark()
+        : widget.episode.primaryColor.colorizeLight();
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       alignment: Alignment.center,
@@ -381,10 +385,18 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    leading: CircleAvatar(
-                      //backgroundColor: _c.withOpacity(0.5),
-                      backgroundImage:
-                          FileImage(File("${widget.episode.imagePath}")),
+                    leading: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.unfold_more, color: _c),
+                        CircleAvatar(
+                          //backgroundColor: _c.withOpacity(0.5),
+                          backgroundImage:
+                              FileImage(File("${widget.episode.imagePath}")),
+                        ),
+                      ],
                     ),
                     subtitle: Container(
                       padding: EdgeInsets.only(top: 5, bottom: 10),
@@ -418,7 +430,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                         ],
                       ),
                     ),
-                    trailing: Icon(Icons.menu),
+                    //trailing: Icon(Icons.menu),
                   ),
                   // Divider(
                   //   height: 2,

@@ -49,7 +49,7 @@ android {
         applicationId "com.stonegate.tsacdop"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 17 
+        versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
