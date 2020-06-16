@@ -113,7 +113,9 @@ class Playlist {
 
   Future<int> delFromPlaylist(EpisodeBrief episodeBrief) async {
     int index = _playlist.indexOf(episodeBrief);
-    _playlist.removeWhere((episode) => episode == episodeBrief);
+    _playlist.removeWhere(
+        (episode) => episode.enclosureUrl == episodeBrief.enclosureUrl);
+    print('delete' + episodeBrief.title);
     await savePlaylist();
     return index;
   }
@@ -244,6 +246,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   episodeLoad(EpisodeBrief episode, {int startPosition = 0}) async {
+    print(episode.enclosureUrl);
     final EpisodeBrief episodeNew =
         await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     //TODO  load episode from last position when player running
@@ -270,8 +273,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
       notifyListeners();
       //await _queue.savePlaylist();
       _startAudioService(startPosition, episodeNew.enclosureUrl);
-      if (episodeNew.isNew == 1)
-        dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
+      if (episodeNew.isNew == 1) {
+        await dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
+      }
     }
   }
 

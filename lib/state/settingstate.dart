@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:isolate';
 import 'dart:ui';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
@@ -28,7 +27,7 @@ void callbackDispatcher() {
       });
       await FlutterDownloader.initialize();
       AutoDownloader downloader = AutoDownloader();
-      downloader.bindBackgroundIsolate();
+
       KeyValueStorage autoDownloadStorage =
           KeyValueStorage(autoDownloadNetworkKey);
       int autoDownloadNetwork = await autoDownloadStorage.getInt();
@@ -36,13 +35,17 @@ void callbackDispatcher() {
       if (autoDownloadNetwork == 1) {
         List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
         // For safety
-        if (episodes.length < 100 && episodes.length > 0)
+        if (episodes.length < 100 && episodes.length > 0) {
+          downloader.bindBackgroundIsolate();
           await downloader.startTask(episodes);
+        }
       } else if (result == ConnectivityResult.wifi) {
         List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
         //For safety
-        if (episodes.length < 100 && episodes.length > 0)
+        if (episodes.length < 100 && episodes.length > 0) {
+          downloader.bindBackgroundIsolate();
           await downloader.startTask(episodes);
+        }
       }
       await lastWorkStorage.saveInt(1);
       KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
@@ -149,6 +152,7 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  int _initialShowIntor;
   bool _showIntro;
   bool get showIntro => _showIntro;
 
@@ -163,13 +167,18 @@ class SettingState extends ChangeNotifier {
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
-    _getTheme();
-    _getAccentSetColor();
     _getAutoUpdate();
-    _getRealDark();
     _getDownloadUsingData();
-    _getUpdateInterval().then((value) {
-      if (_initUpdateTag == 0) setWorkManager(24);
+    _getUpdateInterval().then((value) async {
+      if (_initUpdateTag == 0)
+        setWorkManager(24);
+      //Restart worker if anythin changed in worker callback.
+      //varsion 2 add auto download new episodes 
+      else if (_autoUpdate && _initialShowIntor == 1) {
+        await cancelWork();
+        setWorkManager(_initUpdateTag);
+        await saveShowIntro(2);
+      }
     });
   }
 
@@ -225,12 +234,12 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _getShowIntro() async {
-    int i = await introStorage.getInt();
-    _showIntro = i == 0 ? true : false;
+    _initialShowIntor = await introStorage.getInt();
+    _showIntro = _initialShowIntor == 0 ? true : false;
   }
 
-  Future saveShowIntro() async {
-    await introStorage.saveInt(1);
+  Future saveShowIntro(int i) async {
+    await introStorage.saveInt(i);
   }
 
   Future _getRealDark() async {

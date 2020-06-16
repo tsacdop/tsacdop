@@ -50,15 +50,15 @@ class AutoDownloader {
   }
 
   bindBackgroundIsolate() {
-    print('start listen');
     ReceivePort _port = ReceivePort();
     bool isSuccess = IsolateNameServer.registerPortWithName(
         _port.sendPort, 'auto_downloader_send_port');
     if (!isSuccess) {
-      _unbindBackgroundIsolate();
-      //bindBackgroundIsolate();
+      IsolateNameServer.removePortNameMapping('auto_downloader_send_port');
+      bindBackgroundIsolate();
       return;
     }
+    print('start listen');
     _port.listen((dynamic data) {
       String id = data[0];
       DownloadTaskStatus status = data[1];
@@ -102,7 +102,7 @@ class AutoDownloader {
   }
 
   Future startTask(List<EpisodeBrief> episodes,
-      {bool showNotification = true}) async {
+      {bool showNotification = false}) async {
     episodes.forEach((episode) async {
       final dir = await getExternalStorageDirectory();
       String localPath = path.join(dir.path, episode.feedTitle);

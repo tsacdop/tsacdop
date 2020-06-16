@@ -99,6 +99,8 @@ class _DownloadListState extends State<DownloadList> {
                                           color: Colors.red),
                                       child: Text(
                                         tasks[index].progress.toString() + '%',
+                                        textAlign: TextAlign.center,
+                                        maxLines: 1,
                                         style: TextStyle(color: Colors.white),
                                       ))
                                   : Container(),
@@ -115,10 +117,7 @@ class _DownloadListState extends State<DownloadList> {
                           backgroundImage: FileImage(
                               File("${tasks[index].episode.imagePath}")),
                         ),
-                        trailing: Container(
-                          width: 50,
-                          height: 50,
-                          child: _downloadButton(tasks[index], context)),
+                        trailing: _downloadButton(tasks[index], context),
                       );
                     },
                     childCount: tasks.length,

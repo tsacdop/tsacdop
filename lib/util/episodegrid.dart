@@ -489,9 +489,9 @@ class EpisodeGrid extends StatelessWidget {
                                         //   _listenIndicater(context,
                                         //       episode: episodes[index],
                                         //       isListened: snapshot.data),
+                                        _isNewIndicator(episodes[index]),
                                         _downloadIndicater(context,
                                             episode: episodes[index]),
-                                        _isNewIndicator(episodes[index]),
                                         _numberIndicater(context,
                                             index: index, color: _c)
                                       ],

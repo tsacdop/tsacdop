@@ -1010,6 +1010,7 @@ class DBHelper {
       await txn.rawUpdate(
           "UPDATE Episodes SET is_new = 0 WHERE enclosure_url = ?", [url]);
     });
+    print('remove new episode');
   }
 
   Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy) async {

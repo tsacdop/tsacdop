@@ -83,11 +83,11 @@ class EpisodeBrief {
   }
 
   @override
-  bool operator ==(Object episode) =>
+  bool operator == (Object episode) =>
       episode is EpisodeBrief &&
       episode.title == title &&
       episode.enclosureUrl == enclosureUrl;
 
   @override
-  int get hashCode => enclosureUrl.hashCode;
+  int get hashCode => enclosureUrl.hashCode + title.hashCode;
 }

@@ -43,7 +43,6 @@ class _DownloadsManageState extends State<DownloadsManage> {
     _size = 0;
     _fileNum = 0;
     var dir = await getExternalStorageDirectory();
-    print(dir.path);
     dir.list().forEach((d) {
       var fileDir = Directory(d.path);
       fileDir.list().forEach((file) async {
@@ -124,7 +123,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 20),
+                          padding: const EdgeInsets.only(left: 10),
                           child: RichText(
                             text: TextSpan(
                               text: 'Total ',
@@ -150,7 +149,9 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                       fontSize: 20,
                                     )),
                                 TextSpan(
-                                  text: (_size ~/ 1000000).toString(),
+                                  text: (_size ~/ 1000000) < 1000
+                                      ? (_size ~/ 1000000).toString()
+                                      : (_size / 1000000000).toStringAsFixed(1),
                                   style: GoogleFonts.cairo(
                                       textStyle: TextStyle(
                                     color: Theme.of(context).accentColor,
@@ -158,7 +159,9 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   )),
                                 ),
                                 TextSpan(
-                                    text: ' Mb',
+                                    text: (_size ~/ 1000000) < 1000
+                                        ? 'Mb'
+                                        : 'Gb',
                                     style: TextStyle(
                                       color: Theme.of(context).accentColor,
                                       fontSize: 20,

@@ -222,7 +222,8 @@ class _StorageSettingState extends State<StorageSetting>
                                 onChanged: (value) async {
                                   await _setAutoDeleteDays(value);
                                 },
-                                items: <int>[-1, 10, 30]
+                                //TODO remove 1 before release
+                                items: <int>[-1, 5, 10, 15, 30]
                                     .map<DropdownMenuItem<int>>((e) {
                                   return DropdownMenuItem<int>(
                                       value: e,

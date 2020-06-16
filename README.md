@@ -56,6 +56,10 @@ If no api key added, the search function in the app won't work. But you can stil
 
 Share_key is used for generate clip.
 
+## Known Issue
+
+- Playlist unstable
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
