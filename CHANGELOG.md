@@ -1,5 +1,14 @@
 # Tsacdop Changelog
 
+## v0.3.5
+Release date 2020/6/20
+This is a energency release.
+### Bugs fixed
+- Crashed in download page or button after remove a podcast. Add episode check when load tasks from flutterdownloader.
+### Minor UI change
+- Add buy me a coffee in about page.
+- Remove progress number in download list in failed task, change refresh icon color to red.
+
 ## v0.3.4
 Release date 2020/6/16
 ### New feature
