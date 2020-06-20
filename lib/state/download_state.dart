@@ -161,8 +161,12 @@ class DownloadState extends ChangeNotifier {
     if (tasks.length != 0)
       await Future.forEach(tasks, (DownloadTask task) async {
         EpisodeBrief episode = await dbHelper.getRssItemWithUrl(task.url);
-        _episodeTasks.add(EpisodeTask(episode, task.taskId,
-            progress: task.progress, status: task.status));
+        if (episode == null)
+          await FlutterDownloader.remove(
+              taskId: task.taskId, shouldDeleteContent: true);
+        else
+          _episodeTasks.add(EpisodeTask(episode, task.taskId,
+              progress: task.progress, status: task.status));
       });
     notifyListeners();
   }
@@ -221,6 +225,7 @@ class DownloadState extends ChangeNotifier {
   }
 
   EpisodeTask episodeToTask(EpisodeBrief episode) {
+    print(_episodeTasks.first.episode.description);
     return _episodeTasks
         .firstWhere((task) => task.episode.enclosureUrl == episode.enclosureUrl,
             orElse: () {

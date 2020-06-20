@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +29,7 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: Icon(Icons.refresh, color: Colors.red),
             onPressed: () => downloader.retryTask(task.episode),
           ),
           IconButton(
@@ -87,7 +88,9 @@ class _DownloadListState extends State<DownloadList> {
                             ),
                             Expanded(
                               flex: 1,
-                              child: tasks[index].progress >= 0
+                              child: tasks[index].progress >= 0 &&
+                                      tasks[index].status !=
+                                          DownloadTaskStatus.failed
                                   ? Container(
                                       width: 40.0,
                                       padding:

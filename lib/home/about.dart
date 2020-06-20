@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tsacdop/util/custompaint.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
 
 import '../util/context_extension.dart';
 
-const String version = '0.3.4';
+const String version = '0.3.5';
 
 class AboutApp extends StatelessWidget {
   _launchUrl(String url) async {
@@ -85,7 +86,7 @@ class AboutApp extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Container(
-                      height: 200.0,
+                      height: 100.0,
                       alignment: Alignment.center,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -100,7 +101,7 @@ class AboutApp extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 50),
+                      padding: const EdgeInsets.all(20),
                       child: Text(
                         'Tsacdop is a podcast player developed in flutter, a clean, simply beautiful and friendly app.',
                         textAlign: TextAlign.center,
@@ -117,6 +118,7 @@ class AboutApp extends StatelessWidget {
                               style: TextStyle(color: context.accentColor)),
                         ),
                         Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
                           height: 4,
                           width: 4,
                           decoration: BoxDecoration(
@@ -126,7 +128,7 @@ class AboutApp extends StatelessWidget {
                         FlatButton(
                           onPressed: () => _launchUrl(
                               'https://tsacdop.stonegate.me/#/changelog'),
-                          child: Text('Changelogs',
+                          child: Text('Changelog',
                               style: TextStyle(color: context.accentColor)),
                         ),
                       ],
@@ -145,13 +147,45 @@ class AboutApp extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          Container(
+                          Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20.0),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Developer',
-                              style: TextStyle(
-                                  color: Theme.of(context).accentColor),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Developer',
+                                  style: TextStyle(
+                                      color: Theme.of(context).accentColor, fontWeight: FontWeight.bold),
+                                ),
+                                Spacer(),
+                                InkWell(
+                                  onTap: () => _launchUrl(
+                                      'https://www.buymeacoffee.com/stonegate'),
+                                  child: Container(
+                                    height: 30.0,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10.0),
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text('Buy a coffee',
+                                            style: TextStyle(
+                                                color: context.accentColor)),
+                                        SizedBox(width: 10),
+                                        Image(
+                                          image: AssetImage(
+                                              'assets/buymeacoffee.png'),
+                                          height: 20,
+                                          fit: BoxFit.fitHeight,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                           _listItem(context, 'Twitter', LineIcons.twitter,

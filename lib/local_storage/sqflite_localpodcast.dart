@@ -218,7 +218,7 @@ class DBHelper {
         [id]);
     for (int i = 0; i < list.length; i++) {
       if (list[i] != null)
-        FlutterDownloader.remove(
+        await FlutterDownloader.remove(
             taskId: list[i]['downloaded'], shouldDeleteContent: true);
       print('Removed all download tasks');
     }
