@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 class PodcastLocal {
   final String title;
   final String imageUrl;
@@ -24,5 +26,5 @@ class PodcastLocal {
       podcastLocal.id == id;
 
   @override
-  int get hashCode => id.hashCode + rssUrl.hashCode;
+  int get hashCode => hashValues(id, rssUrl);
 }

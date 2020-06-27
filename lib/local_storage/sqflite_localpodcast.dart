@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:path/path.dart';
@@ -861,36 +859,32 @@ class DBHelper {
   //  }
   //  return episodes;
   //}
-  Future<List<EpisodeBrief>> getOutdatedEpisode(int days) async {
+  Future<List<EpisodeBrief>> getOutdatedEpisode(int deadline) async {
     var dbClient = await database;
     List<EpisodeBrief> episodes = [];
-    if (days > 0) {
-      int deadline =
-          DateTime.now().subtract(Duration(days: days)).millisecondsSinceEpoch;
-      List<Map> list = await dbClient
-          .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
+    List<Map> list = await dbClient
+        .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, E.liked, 
         E.downloaded, P.imagePath, P.primaryColor, E.media_id, E.is_new, P.skip_seconds
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.download_date < ? AND E.enclosure_url != E.media_id
         ORDER BY E.milliseconds DESC""", [deadline]);
-      for (int x = 0; x < list.length; x++) {
-        episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feed_title'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
-      }
+    for (int x = 0; x < list.length; x++) {
+      episodes.add(EpisodeBrief(
+          list[x]['title'],
+          list[x]['enclosure_url'],
+          list[x]['enclosure_length'],
+          list[x]['milliseconds'],
+          list[x]['feed_title'],
+          list[x]['primaryColor'],
+          list[x]['liked'],
+          list[x]['downloaded'],
+          list[x]['duration'],
+          list[x]['explicit'],
+          list[x]['imagePath'],
+          list[x]['media_id'],
+          list[x]['is_new'],
+          list[x]['skip_seconds']));
     }
     return episodes;
   }
@@ -1101,26 +1095,35 @@ class DBHelper {
   Future<int> saveDownloaded(String url, String id) async {
     var dbClient = await database;
     int milliseconds = DateTime.now().millisecondsSinceEpoch;
-    int count = await dbClient.rawUpdate(
-        "UPDATE Episodes SET downloaded = ?, download_date = ? WHERE enclosure_url = ?",
-        [id, milliseconds, url]);
+    int count;
+    await dbClient.transaction((txn) async {
+      count = await txn.rawUpdate(
+          "UPDATE Episodes SET downloaded = ?, download_date = ? WHERE enclosure_url = ?",
+          [id, milliseconds, url]);
+    });
     return count;
   }
 
   Future<int> saveMediaId(String url, String path, String id, int size) async {
     var dbClient = await database;
     int milliseconds = DateTime.now().millisecondsSinceEpoch;
-    int count = await dbClient.rawUpdate(
-        "UPDATE Episodes SET enclosure_length = ?, media_id = ?, download_date = ?, downloaded = ? WHERE enclosure_url = ?",
-        [size, path, milliseconds, id, url]);
+    int count;
+    await dbClient.transaction((txn) async {
+      count = await txn.rawUpdate(
+          "UPDATE Episodes SET enclosure_length = ?, media_id = ?, download_date = ?, downloaded = ? WHERE enclosure_url = ?",
+          [size, path, milliseconds, id, url]);
+    });
     return count;
   }
 
   Future<int> delDownloaded(String url) async {
     var dbClient = await database;
-    int count = await dbClient.rawUpdate(
-        "UPDATE Episodes SET downloaded = 'ND', media_id = ? WHERE enclosure_url = ?",
-        [url, url]);
+    int count;
+    await dbClient.transaction((txn) async {
+      count = await txn.rawUpdate(
+          "UPDATE Episodes SET downloaded = 'ND', media_id = ? WHERE enclosure_url = ?",
+          [url, url]);
+    });
     print('Deleted ' + url);
     return count;
   }

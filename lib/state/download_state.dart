@@ -225,7 +225,6 @@ class DownloadState extends ChangeNotifier {
   }
 
   EpisodeTask episodeToTask(EpisodeBrief episode) {
-    print(_episodeTasks.first.episode.description);
     return _episodeTasks
         .firstWhere((task) => task.episode.enclosureUrl == episode.enclosureUrl,
             orElse: () {
@@ -322,8 +321,7 @@ class DownloadState extends ChangeNotifier {
   }
 
   _removeTask(EpisodeBrief episode) {
-    _episodeTasks.removeWhere(
-        (element) => element.episode.enclosureUrl == episode.enclosureUrl);
+    _episodeTasks.removeWhere((element) => element.episode == episode);
   }
 
   _autoDelete() async {
@@ -333,11 +331,21 @@ class DownloadState extends ChangeNotifier {
     if (autoDelete == 0)
       await autoDeleteStorage.saveInt(30);
     else if (autoDelete > 0) {
-      List<EpisodeBrief> episodes =
-          await dbHelper.getOutdatedEpisode(autoDelete);
+      int deadline = DateTime.now()
+          .subtract(Duration(days: autoDelete))
+          .millisecondsSinceEpoch;
+      List<EpisodeBrief> episodes = await dbHelper.getOutdatedEpisode(deadline);
       if (episodes.length > 0) {
-        await Future.forEach(episodes, (episode) => delTask(episode));
+        await Future.forEach(
+            episodes, (episode) async => await delTask(episode));
       }
+      final tasks = await FlutterDownloader.loadTasksWithRawQuery(
+          query:
+              'SELECT * FROM task WHERE time_created < $deadline AND status = 3');
+      await Future.forEach(
+          tasks,
+          (task) async => FlutterDownloader.remove(
+              taskId: task.taskId, shouldDeleteContent: true));
     }
   }
 }

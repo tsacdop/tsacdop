@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:intl/intl.dart';
 import 'package:audio_service/audio_service.dart';
 
@@ -83,11 +85,11 @@ class EpisodeBrief {
   }
 
   @override
-  bool operator == (Object episode) =>
+  bool operator ==(Object episode) =>
       episode is EpisodeBrief &&
       episode.title == title &&
       episode.enclosureUrl == enclosureUrl;
 
   @override
-  int get hashCode => enclosureUrl.hashCode + title.hashCode;
+  int get hashCode => hashValues(enclosureUrl, title);
 }
