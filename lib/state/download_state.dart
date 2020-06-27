@@ -287,7 +287,7 @@ class DownloadState extends ChangeNotifier {
     FlutterDownloader.remove(taskId: task.taskId);
     var dbHelper = DBHelper();
     _episodeTasks.insert(index, EpisodeTask(episode, newTaskId));
-    await dbHelper.saveDownloaded(newTaskId, episode.enclosureUrl);
+    await dbHelper.saveDownloaded(episode.enclosureUrl, newTaskId);
   }
 
   Future retryTask(EpisodeBrief episode) async {
@@ -298,7 +298,7 @@ class DownloadState extends ChangeNotifier {
     _removeTask(episode);
     var dbHelper = DBHelper();
     _episodeTasks.insert(index, EpisodeTask(episode, newTaskId));
-    await dbHelper.saveDownloaded(newTaskId, episode.enclosureUrl);
+    await dbHelper.saveDownloaded(episode.enclosureUrl, newTaskId);
   }
 
   Future removeTask(EpisodeBrief episode) async {
@@ -322,6 +322,7 @@ class DownloadState extends ChangeNotifier {
 
   _removeTask(EpisodeBrief episode) {
     _episodeTasks.removeWhere((element) => element.episode == episode);
+    notifyListeners();
   }
 
   _autoDelete() async {

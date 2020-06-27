@@ -6,13 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../state/podcast_group.dart';
 
 const String autoPlayKey = 'autoPlay';
-const String autoAddKey = 'autoAdd';
+//const String autoAddKey = 'autoAdd';
 const String audioPositionKey = 'audioposition';
 const String lastWorkKey = 'lastWork';
 const String refreshdateKey = 'refreshdate';
 const String themesKey = 'themes';
 const String accentsKey = 'accents';
-const String autoUpdateKey = 'autoupdate';
+const String autoUpdateKey = 'autoAdd';
 const String updateIntervalKey = 'updateInterval';
 const String downloadUsingDataKey = 'downloadUsingData';
 const String introKey = 'intro';
@@ -25,6 +25,12 @@ const String downloadLayoutKey = 'downloadLayoutKey';
 const String autoDownloadNetworkKey = 'autoDownloadNetwork';
 const String episodePopupMenuKey = 'episodePopupMenuKey';
 const String autoDeleteKey = 'autoDeleteKey';
+//SleepTImer
+const String autoSleepTimerKey = 'autoSleepTimerKey';
+const String autoSleepTimerStartKey = 'autoSleepTimerStartKey';
+const String autoSleepTimerEndKey = 'autoSleepTimerEndKey';
+const String defaultSleepTimerKey = 'defaultSleepTimerKey';
+const String autoSleepTimerModeKey = 'autoSleepTimerModeKey';
 
 class KeyValueStorage {
   final String key;
@@ -60,9 +66,9 @@ class KeyValueStorage {
     return prefs.setInt(key, setting);
   }
 
-  Future<int> getInt() async {
+  Future<int> getInt({int defaultValue = 0}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getInt(key) == null) await prefs.setInt(key, 0);
+    if (prefs.getInt(key) == null) await prefs.setInt(key, defaultValue);
     return prefs.getInt(key);
   }
 

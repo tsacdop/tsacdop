@@ -11,6 +11,7 @@ import 'package:line_icons/line_icons.dart';
 import '../type/episodebrief.dart';
 import '../state/audiostate.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../local_storage/key_value_storage.dart';
 import '../util/pageroute.dart';
 import '../util/colorize.dart';
 import '../util/context_extension.dart';
@@ -41,6 +42,9 @@ String _stringForSeconds(double seconds) {
   if (seconds == null) return null;
   return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
 }
+
+const List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
+const List speedToSelect = [0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0];
 
 class PlayerWidget extends StatefulWidget {
   @override
@@ -788,13 +792,21 @@ class SleepMode extends StatefulWidget {
 class SleepModeState extends State<SleepMode>
     with SingleTickerProviderStateMixin {
   int _minSelected;
-  List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
   AnimationController _controller;
   Animation<double> _animation;
+
+  Future _getDefaultTime() async {
+    KeyValueStorage defaultSleepTimerStorage =
+        KeyValueStorage(defaultSleepTimerKey);
+    int defaultTime = await defaultSleepTimerStorage.getInt(defaultValue: 30);
+    setState(() => _minSelected = defaultTime);
+  }
+
   @override
   void initState() {
     super.initState();
     _minSelected = 30;
+    _getDefaultTime();
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
@@ -1085,7 +1097,6 @@ class ControlPanel extends StatefulWidget {
 
 class _ControlPanelState extends State<ControlPanel>
     with SingleTickerProviderStateMixin {
-  final _speedToSelect = [0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0];
   double _speedSelected;
   double _setSpeed;
   AnimationController _controller;
@@ -1363,7 +1374,8 @@ class _ControlPanelState extends State<ControlPanel>
                                 velocity: 50.0,
                                 pauseAfterRound: Duration.zero,
                                 startPadding: 30.0,
-                                accelerationDuration: Duration(milliseconds: 100),
+                                accelerationDuration:
+                                    Duration(milliseconds: 100),
                                 accelerationCurve: Curves.linear,
                                 decelerationDuration:
                                     Duration(milliseconds: 100),
@@ -1459,7 +1471,7 @@ class _ControlPanelState extends State<ControlPanel>
                     padding: EdgeInsets.all(10.0),
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: _speedToSelect
+                      children: speedToSelect
                           .map<Widget>((e) => InkWell(
                                 onTap: () {
                                   if (_setSpeed == 1) {

@@ -179,7 +179,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             child: SizedBox(
                                                 width: 20,
                                                 height: 15,
-                                                child: WaveLoader(color: context.accentColor,)),
+                                                child: WaveLoader(
+                                                  color: context.accentColor,
+                                                )),
                                           ),
                                         ],
                                       )
@@ -211,7 +213,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             child: SizedBox(
                                                 width: 20,
                                                 height: 15,
-                                                child: WaveLoader(color: context.accentColor,)),
+                                                child: WaveLoader(
+                                                  color: context.accentColor,
+                                                )),
                                           ),
                                         ],
                                       )
@@ -307,7 +311,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-     Color _c = (Theme.of(context).brightness == Brightness.light)
+    Color _c = (Theme.of(context).brightness == Brightness.light)
         ? widget.episode.primaryColor.colorizedark()
         : widget.episode.primaryColor.colorizeLight();
     return AnimatedContainer(
@@ -363,6 +367,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                   gravity: ToastGravity.BOTTOM,
                 );
                 Scaffold.of(context).showSnackBar(SnackBar(
+                  behavior: SnackBarBehavior.floating,
                   backgroundColor: Colors.grey[800],
                   content: Text('Episode removed',
                       style: TextStyle(color: Colors.white)),

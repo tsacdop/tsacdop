@@ -46,6 +46,7 @@ dependencies:
   auto_animated: ^2.1.0
   feature_discovery: ^0.10.0
   flutter_isolate: ^1.0.0+14
+  flutter_time_picker_spinner: ^1.0.6+1
   just_audio:
     git:
       url: https://github.com/stonega/just_audio.git

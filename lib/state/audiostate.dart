@@ -128,7 +128,15 @@ class AudioPlayerNotifier extends ChangeNotifier {
   DBHelper dbHelper = DBHelper();
   KeyValueStorage positionStorage = KeyValueStorage(audioPositionKey);
   KeyValueStorage autoPlayStorage = KeyValueStorage(autoPlayKey);
-  KeyValueStorage autoAddStorage = KeyValueStorage(autoAddKey);
+  KeyValueStorage autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
+  KeyValueStorage defaultSleepTimerStorage =
+      KeyValueStorage(defaultSleepTimerKey);
+  KeyValueStorage autoSleepTimerModeStorage =
+      KeyValueStorage(autoSleepTimerModeKey);
+  KeyValueStorage autoSleepTimerStartStorage =
+      KeyValueStorage(autoSleepTimerStartKey);
+  KeyValueStorage autoSleepTimerEndStorage =
+      KeyValueStorage(autoSleepTimerEndKey);
 
   EpisodeBrief _episode;
   Playlist _queue = Playlist();
@@ -148,12 +156,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool _startSleepTimer = false;
   double _switchValue = 0;
   SleepTimerMode _sleepTimerMode = SleepTimerMode.undefined;
+  //Auto stop at the end of episode when you start play at scheduled time.
+  bool _autoSleepTimer;
+  //Default sleep timer time.
   ShareStatus _shareStatus = ShareStatus.undefined;
   String _shareFile = '';
   //set autoplay episode in playlist
-  bool _autoPlay = true;
-  //TODO Set auto add episodes to playlist
-  //bool _autoAdd = false;
+  bool _autoPlay;
   DateTime _current;
   int _currentPosition;
   double _currentSpeed = 1;
@@ -177,21 +186,16 @@ class AudioPlayerNotifier extends ChangeNotifier {
   SleepTimerMode get sleepTimerMode => _sleepTimerMode;
   ShareStatus get shareStatus => _shareStatus;
   String get shareFile => _shareFile;
-  bool get autoPlay => _autoPlay;
+  //bool get autoPlay => _autoPlay;
   int get timeLeft => _timeLeft;
   double get switchValue => _switchValue;
   double get currentSpeed => _currentSpeed;
   bool get episodeState => _episodeState;
+  bool get autoSleepTimer => _autoSleepTimer;
 
   set setSwitchValue(double value) {
     _switchValue = value;
     notifyListeners();
-  }
-
-  set autoPlaySwitch(bool boo) {
-    _autoPlay = boo;
-    notifyListeners();
-    _setAutoPlay();
   }
 
   set setShareStatue(ShareStatus status) {
@@ -206,11 +210,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   Future _getAutoPlay() async {
     int i = await autoPlayStorage.getInt();
-    _autoPlay = i == 0 ? true : false;
+    _autoPlay = i == 0;
   }
 
-  Future _setAutoPlay() async {
-    await autoPlayStorage.saveInt(_autoPlay ? 1 : 0);
+  Future _getAutoSleepTimer() async {
+    int i = await autoSleepTimerStorage.getInt();
+    _autoSleepTimer = i == 1;
   }
 
   set setSleepTimerMode(SleepTimerMode timer) {
@@ -222,6 +227,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   void addListener(VoidCallback listener) async {
     super.addListener(listener);
     _queueUpdate = false;
+    await _getAutoSleepTimer();
     await AudioService.connect();
     bool running = AudioService.running;
     if (running) {}
@@ -285,7 +291,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
     if (!AudioService.connected) {
       await AudioService.connect();
     }
-
     await AudioService.start(
         backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
         androidNotificationChannelName: 'Tsacdop',
@@ -294,12 +299,30 @@ class AudioPlayerNotifier extends ChangeNotifier {
         enableQueue: true,
         androidStopOnRemoveTask: true,
         androidStopForegroundOnPause: true);
+    await _getAutoPlay();
     if (_autoPlay) {
       await Future.forEach(_queue.playlist, (episode) async {
         await AudioService.addQueueItem(episode.toMediaItem());
       });
     } else {
       await AudioService.addQueueItem(_queue.playlist.first.toMediaItem());
+    }
+    await _getAutoSleepTimer();
+    if (_autoSleepTimer) {
+      int startTime =
+          await autoSleepTimerStartStorage.getInt(defaultValue: 1380);
+      int endTime = await autoSleepTimerEndStorage.getInt(defaultValue: 360);
+      int currentTime = DateTime.now().hour * 60 + DateTime.now().minute;
+      if ((startTime > endTime &&
+              (currentTime > startTime || currentTime > endTime)) ||
+          ((startTime < endTime) &&
+              (currentTime > startTime && currentTime < endTime))) {
+        int mode = await autoSleepTimerModeStorage.getInt();
+        _sleepTimerMode = SleepTimerMode.values[mode];
+        int defaultTimer =
+            await defaultSleepTimerStorage.getInt(defaultValue: 30);
+        sleepTimer(defaultTimer);
+      }
     }
     _playerRunning = true;
     await AudioService.play();

@@ -78,12 +78,22 @@ ThemeData lightTheme = ThemeData(
 class SettingState extends ChangeNotifier {
   KeyValueStorage themeStorage = KeyValueStorage(themesKey);
   KeyValueStorage accentStorage = KeyValueStorage(accentsKey);
-  KeyValueStorage autoupdateStorage = KeyValueStorage(autoAddKey);
+  KeyValueStorage autoupdateStorage = KeyValueStorage(autoUpdateKey);
   KeyValueStorage intervalStorage = KeyValueStorage(updateIntervalKey);
   KeyValueStorage downloadUsingDataStorage =
       KeyValueStorage(downloadUsingDataKey);
   KeyValueStorage introStorage = KeyValueStorage(introKey);
   KeyValueStorage realDarkStorage = KeyValueStorage(realDarkKey);
+  KeyValueStorage autoPlayStorage = KeyValueStorage(autoPlayKey);
+  KeyValueStorage defaultSleepTimerStorage =
+      KeyValueStorage(defaultSleepTimerKey);
+  KeyValueStorage autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
+  KeyValueStorage autoSleepTimerModeStorage =
+      KeyValueStorage(autoSleepTimerModeKey);
+  KeyValueStorage autoSleepTimerStartStorage =
+      KeyValueStorage(autoSleepTimerStartKey);
+  KeyValueStorage autoSleepTimerEndStorage =
+      KeyValueStorage(autoSleepTimerEndKey);
 
   Future initData() async {
     await _getTheme();
@@ -164,16 +174,65 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  int _defaultSleepTimer;
+  int get defaultSleepTimer => _defaultSleepTimer;
+  set setDefaultSleepTimer(int i) {
+    _defaultSleepTimer = i;
+    _setDefaultSleepTimer();
+    notifyListeners();
+  }
+
+  bool _autoPlay;
+  bool get autoPlay => _autoPlay;
+  set setAutoPlay(bool boo) {
+    _autoPlay = boo;
+    notifyListeners();
+    _saveAutoPlay();
+  }
+
+  bool _autoSleepTimer;
+  bool get autoSleepTimer => _autoSleepTimer;
+  set setAutoSleepTimer(bool boo) {
+    _autoSleepTimer = boo;
+    notifyListeners();
+    _saveAutoSleepTimer();
+  }
+
+  int _autoSleepTimerMode;
+  int get autoSleepTimerMode => _autoSleepTimerMode;
+  set setAutoSleepTimerMode(int mode) {
+    _autoSleepTimerMode = mode;
+    notifyListeners();
+    _saveAutoSleepTimerMode();
+  }
+
+  int _autoSleepTimerStart;
+  int get autoSleepTimerStart => _autoSleepTimerStart;
+  set setAutoSleepTimerStart(int start) {
+    _autoSleepTimerStart = start;
+    notifyListeners();
+    _saveAutoSleepTimerStart();
+  }
+
+  int _autoSleepTimerEnd;
+  int get autoSleepTimerEnd => _autoSleepTimerEnd;
+  set setAutoSleepTimerEnd(int end) {
+    _autoSleepTimerEnd = end;
+    notifyListeners();
+    _saveAutoSleepTimerEnd();
+  }
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
     _getAutoUpdate();
     _getDownloadUsingData();
+    _getSleepTimerData();
     _getUpdateInterval().then((value) async {
       if (_initUpdateTag == 0)
         setWorkManager(24);
       //Restart worker if anythin changed in worker callback.
-      //varsion 2 add auto download new episodes 
+      //varsion 2 add auto download new episodes
       else if (_autoUpdate && _initialShowIntor == 1) {
         await cancelWork();
         setWorkManager(_initUpdateTag);
@@ -249,5 +308,43 @@ class SettingState extends ChangeNotifier {
 
   Future _setRealDark() async {
     await realDarkStorage.saveInt(_realDark ? 1 : 0);
+  }
+
+  Future _getSleepTimerData() async {
+    _defaultSleepTimer =
+        await defaultSleepTimerStorage.getInt(defaultValue: 30);
+    int i = await autoSleepTimerStorage.getInt();
+    _autoSleepTimer = i == 1;
+    _autoSleepTimerStart =
+        await autoSleepTimerStartStorage.getInt(defaultValue: 1380);
+    _autoSleepTimerEnd =
+        await autoSleepTimerEndStorage.getInt(defaultValue: 360);
+    int a = await autoPlayStorage.getInt();
+    _autoPlay = a == 0;
+    _autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
+  }
+
+  Future _saveAutoPlay() async {
+    await autoPlayStorage.saveInt(_autoPlay ? 0 : 1);
+  }
+
+  Future _setDefaultSleepTimer() async {
+    await defaultSleepTimerStorage.saveInt(_defaultSleepTimer);
+  }
+
+  Future _saveAutoSleepTimer() async {
+    await autoSleepTimerStorage.saveInt(_autoSleepTimer ? 1 : 0);
+  }
+
+  Future _saveAutoSleepTimerMode() async {
+    await autoSleepTimerModeStorage.saveInt(_autoSleepTimerMode);
+  }
+
+  Future _saveAutoSleepTimerStart() async {
+    await autoSleepTimerStartStorage.saveInt(_autoSleepTimerStart);
+  }
+
+  Future _saveAutoSleepTimerEnd() async {
+    await autoSleepTimerEndStorage.saveInt(_autoSleepTimerEnd);
   }
 }

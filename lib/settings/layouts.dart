@@ -29,10 +29,10 @@ class _LayoutSettingState extends State<LayoutSetting> {
           onTap: () async {
             KeyValueStorage storage = KeyValueStorage(key);
             await storage.saveInt(option.index);
-            print(option.index);
             setState(() {});
           },
-          child: Container(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 400),
             height: 30,
             width: 50,
             color: layout == option

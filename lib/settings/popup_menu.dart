@@ -88,40 +88,40 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
             elevation: 0,
             backgroundColor: context.primaryColor,
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                    color: context.primaryColor,
-                    height: 200,
-                    // color: Colors.red,
-                    child: FlareActor(
-                      'assets/longtap.flr',
-                      alignment: Alignment.center,
-                      animation: 'longtap',
-                      fit: BoxFit.cover,
-                    )),
-                Divider(height: 2),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                ),
-                Container(
-                  height: 30.0,
-                  padding: EdgeInsets.symmetric(horizontal: 80),
-                  alignment: Alignment.centerLeft,
-                  child: Text('Episode popup menu',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1
-                          .copyWith(color: Theme.of(context).accentColor)),
-                ),
-                FutureBuilder<List<int>>(
-                    future: _getEpisodeMenu(),
-                    initialData: [0, 1, 12, 13, 14],
-                    builder: (context, snapshot) {
-                      List<int> menu = snapshot.data;
-                      return ListView(
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                  color: context.primaryColor,
+                  height: 200,
+                  // color: Colors.red,
+                  child: FlareActor(
+                    'assets/longtap.flr',
+                    alignment: Alignment.center,
+                    animation: 'longtap',
+                    fit: BoxFit.cover,
+                  )),
+              Divider(height: 2),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+              ),
+              Container(
+                height: 30.0,
+                padding: EdgeInsets.symmetric(horizontal: 80),
+                alignment: Alignment.centerLeft,
+                child: Text('Episode popup menu',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        .copyWith(color: Theme.of(context).accentColor)),
+              ),
+              FutureBuilder<List<int>>(
+                  future: _getEpisodeMenu(),
+                  initialData: [0, 1, 12, 13, 14],
+                  builder: (context, snapshot) {
+                    List<int> menu = snapshot.data;
+                    return Expanded(
+                      child: ListView(
                         shrinkWrap: true,
                         children: menu.map<Widget>((int e) {
                           int i = e % 10;
@@ -163,7 +163,6 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                                   text: 'Mark Listened',
                                   description: 'Mark episode as listened');
                               break;
-
                             case 4:
                               return _popupMenuItem(menu, e,
                                   icon: Icon(
@@ -178,10 +177,10 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                               break;
                           }
                         }).toList(),
-                      );
-                    }),
-              ],
-            ),
+                      ),
+                    );
+                  }),
+            ],
           )),
     );
   }

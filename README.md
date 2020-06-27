@@ -5,7 +5,9 @@
 </p>
 
 ![CircleCI](https://img.shields.io/circleci/build/github/stonega/tsacdop?token=efe1331861e017144f2abb363acd95197e436dad)
+
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/stonega/tsacdop)
+
 [![GooglePlay](https://img.shields.io/badge/Google-PlayStore-%2323CCC6)](https://play.google.com/store/apps/details?id=com.stonegate.tsacdop)
 
 ## About
@@ -28,7 +30,7 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 * Listen and subscribe history record
 * Dark mode / Accent color 
 * Download for offline playing
-* Share clip(video format) on twitter
+* Auto download new episodes / Auto delete outdated downloads
 
 More to come...
 
@@ -47,7 +49,7 @@ Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob
 Tsacdop is using ListenNotes api 1.0 pro to search podcast, which is not free. So I can not expose the api key in the repo.
 If you want to build the app, you need to create a new file named .env.dart in lib folder. Add below code in .env.dart.
 
-```
+``` 
 final environment = {"apiKey":"APIKEY", "shareKey":"SHAREKEY"}; 
 ```
 
@@ -58,7 +60,7 @@ Share_key is used for generate clip.
 
 ## Known Issue
 
-- Playlist unstable
+* Playlist unstable
 
 ## Getting Started
 

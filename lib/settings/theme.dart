@@ -115,18 +115,19 @@ class ThemeSetting extends StatelessWidget {
                   title: Text('Theme'),
                   subtitle: Text('System default'),
                 ),
-                ListTile(
-                  contentPadding:
-                      EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
-                  //  leading: Icon(Icons.colorize),
-                  title: Text(
-                    'Real Dark',
-                  ),
-                  subtitle:
-                      Text('Turn on if you think the night is not dark enough'),
-                  trailing: Selector<SettingState, bool>(
-                    selector: (_, setting) => setting.realDark,
-                    builder: (_, data, __) => Transform.scale(
+                Selector<SettingState, bool>(
+                  selector: (_, setting) => setting.realDark,
+                  builder: (_, data, __) => ListTile(
+                    onTap: () => settings.setRealDark = !data,
+                    contentPadding: const EdgeInsets.only(
+                        left: 80.0, right: 20, bottom: 10, top: 10),
+                    //  leading: Icon(Icons.colorize),
+                    title: Text(
+                      'Real Dark',
+                    ),
+                    subtitle: Text(
+                        'Turn on if you think the night is not dark enough'),
+                    trailing: Transform.scale(
                       scale: 0.9,
                       child: Switch(
                           value: data,
