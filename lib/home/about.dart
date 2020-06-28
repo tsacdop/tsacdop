@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:tsacdop/util/custompaint.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
@@ -103,7 +102,7 @@ class AboutApp extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Text(
-                        'Tsacdop is a podcast player developed in flutter, a clean, simply beautiful and friendly app.',
+                        'Tsacdop is a podcast player built with flutter, a clean, simply beautiful and friendly app.',
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -148,14 +147,15 @@ class AboutApp extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.0),
+                            padding: EdgeInsets.only(left: 20.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
                                   'Developer',
                                   style: TextStyle(
-                                      color: Theme.of(context).accentColor, fontWeight: FontWeight.bold),
+                                      color: Theme.of(context).accentColor,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Spacer(),
                                 InkWell(
@@ -171,9 +171,10 @@ class AboutApp extends StatelessWidget {
                                           MainAxisAlignment.center,
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                        Text('Buy a coffee',
+                                        Text('Buy me a coffee',
                                             style: TextStyle(
-                                                color: context.accentColor)),
+                                                color: context.accentColor,
+                                                fontWeight: FontWeight.bold)),
                                         SizedBox(width: 10),
                                         Image(
                                           image: AssetImage(

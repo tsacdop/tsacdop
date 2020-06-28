@@ -137,7 +137,6 @@ class ThemeSetting extends StatelessWidget {
                     ),
                   ),
                 ),
-                Divider(height: 2),
                 ListTile(
                   onTap: () => generalDialog(
                     context,
@@ -220,7 +219,7 @@ class _ColorPickerState extends State<ColorPicker>
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200,
+      width: 400,
       height: 400,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,6 +255,7 @@ class _ColorPickerState extends State<ColorPicker>
           ),
           Expanded(
             child: TabBarView(
+              physics: const ClampingScrollPhysics(),
               key: UniqueKey(),
               controller: _controller,
               children: Colors.primaries

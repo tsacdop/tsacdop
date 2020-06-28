@@ -139,7 +139,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Widget podcastInfo(BuildContext context) {
     return Container(
       height: 170,
-      padding: EdgeInsets.only(top: 40, left: 80, right: 120),
+      padding: EdgeInsets.only(top: 40, left: 80, right: 130),
       alignment: Alignment.topLeft,
       child: Container(
           padding: EdgeInsets.symmetric(vertical: 10),

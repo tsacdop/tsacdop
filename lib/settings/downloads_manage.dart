@@ -43,6 +43,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
     _size = 0;
     _fileNum = 0;
     var dir = await getExternalStorageDirectory();
+    print(dir.path);
     dir.list().forEach((d) {
       var fileDir = Directory(d.path);
       fileDir.list().forEach((file) async {
@@ -159,9 +160,8 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   )),
                                 ),
                                 TextSpan(
-                                    text: (_size ~/ 1000000) < 1000
-                                        ? 'Mb'
-                                        : 'Gb',
+                                    text:
+                                        (_size ~/ 1000000) < 1000 ? 'Mb' : 'Gb',
                                     style: TextStyle(
                                       color: Theme.of(context).accentColor,
                                       fontSize: 20,

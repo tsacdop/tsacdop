@@ -299,6 +299,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         enableQueue: true,
         androidStopOnRemoveTask: true,
         androidStopForegroundOnPause: true);
+    //Check autoplay setting
     await _getAutoPlay();
     if (_autoPlay) {
       await Future.forEach(_queue.playlist, (episode) async {
@@ -307,6 +308,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     } else {
       await AudioService.addQueueItem(_queue.playlist.first.toMediaItem());
     }
+    //Check auto sleep timer setting
     await _getAutoSleepTimer();
     if (_autoSleepTimer) {
       int startTime =

@@ -310,7 +310,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget _expandedPanel(BuildContext context) {
     return DefaultTabController(
       initialIndex: 1,
-      length: 4,
+      length: 3,
       child: Stack(
         children: <Widget>[
           TabBarView(
@@ -318,7 +318,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               SleepMode(),
               ControlPanel(),
               _playlist(context),
-              ShareClip(),
+              //  ShareClip(),
             ],
           ),
           Positioned(
@@ -370,16 +370,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               color: Theme.of(context).accentColor,
                               width: 2.0)),
                     ),
-                    Container(
-                      height: 8.0,
-                      width: 8.0,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                          border: Border.all(
-                              color: Theme.of(context).accentColor,
-                              width: 2.0)),
-                    ),
+                    // Container(
+                    //   height: 8.0,
+                    //   width: 8.0,
+                    //   decoration: BoxDecoration(
+                    //       shape: BoxShape.circle,
+                    //       color: Colors.transparent,
+                    //       border: Border.all(
+                    //           color: Theme.of(context).accentColor,
+                    //           width: 2.0)),
+                    // ),
                   ]),
             ),
           ),

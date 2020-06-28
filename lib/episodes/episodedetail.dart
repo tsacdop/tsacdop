@@ -15,7 +15,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../state/audiostate.dart';
 import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
-import '../local_storage/key_value_storage.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
 import 'episodedownload.dart';
