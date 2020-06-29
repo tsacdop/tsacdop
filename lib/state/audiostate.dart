@@ -315,8 +315,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
           await autoSleepTimerStartStorage.getInt(defaultValue: 1380);
       int endTime = await autoSleepTimerEndStorage.getInt(defaultValue: 360);
       int currentTime = DateTime.now().hour * 60 + DateTime.now().minute;
+      print('CurrentTime' + currentTime.toString());
       if ((startTime > endTime &&
-              (currentTime > startTime || currentTime > endTime)) ||
+              (currentTime > startTime || currentTime < endTime)) ||
           ((startTime < endTime) &&
               (currentTime > startTime && currentTime < endTime))) {
         int mode = await autoSleepTimerModeStorage.getInt();

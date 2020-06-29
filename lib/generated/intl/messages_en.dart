@@ -21,6 +21,18 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
-
+    "homeGroupsSeeAll" : MessageLookupByLibrary.simpleMessage("See All"),
+    "homeMenuPlaylist" : MessageLookupByLibrary.simpleMessage("Playlist"),
+    "homeSubMenuDownloaded" : MessageLookupByLibrary.simpleMessage("Downloaded"),
+    "homeSubMenuLikeData" : MessageLookupByLibrary.simpleMessage("Like Date"),
+    "homeSubMenuSortBy" : MessageLookupByLibrary.simpleMessage("Sort by"),
+    "homeSubMenuUpdateDate" : MessageLookupByLibrary.simpleMessage("UpdateDate"),
+    "homeTabMenuDownload" : MessageLookupByLibrary.simpleMessage("Download"),
+    "homeTabMenuFavotite" : MessageLookupByLibrary.simpleMessage("Favorite"),
+    "homeTabMenuRecent" : MessageLookupByLibrary.simpleMessage("Recent"),
+    "homeToprightMenuAbout" : MessageLookupByLibrary.simpleMessage("About"),
+    "homeToprightMenuImportOMPL" : MessageLookupByLibrary.simpleMessage("Import OMPL"),
+    "homeToprightMenuRefreshAll" : MessageLookupByLibrary.simpleMessage("Refresh all"),
+    "homeToprightMenuSettings" : MessageLookupByLibrary.simpleMessage("Settings")
   };
 }

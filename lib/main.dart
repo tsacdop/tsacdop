@@ -21,6 +21,7 @@ Future main() async {
   timeDilation = 1.0;
   WidgetsFlutterBinding.ensureInitialized();
   await themeSetting.initData();
+  await FlutterDownloader.initialize();
   runApp(
     MultiProvider(
       providers: [
@@ -32,13 +33,13 @@ Future main() async {
         ChangeNotifierProvider(create: (_) => SubscribeWorker()),
         ChangeNotifierProvider(create: (_) => RefreshWorker()),
         ChangeNotifierProvider(
+          lazy: false,
           create: (_) => DownloadState(),
         )
       ],
       child: MyApp(),
     ),
   );
-  await FlutterDownloader.initialize();
   SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent);

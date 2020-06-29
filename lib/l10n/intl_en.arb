@@ -1,1 +1,15 @@
-{}
+{
+    "homeToprightMenuRefreshAll": "Refresh all",
+    "homeToprightMenuImportOMPL": "Import OMPL",
+    "homeToprightMenuSettings": "Settings",
+    "homeToprightMenuAbout": "About",
+    "homeGroupsSeeAll": "See All",
+    "homeTabMenuRecent": "Recent",
+    "homeTabMenuFavotite": "Favorite",
+    "homeTabMenuDownload": "Download",
+    "homeMenuPlaylist": "Playlist",
+    "homeSubMenuSortBy": "Sort by",
+    "homeSubMenuUpdateDate": "UpdateDate",
+    "homeSubMenuLikeData": "Like Date",
+    "homeSubMenuDownloaded": "Downloaded"
+}
