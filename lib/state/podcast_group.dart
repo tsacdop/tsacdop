@@ -201,11 +201,12 @@ class GroupList extends ChangeNotifier {
   }
 
   Future subscribeNewPodcast(String id) async {
-    if (!_groups[0].podcastList.contains(id))
+    if (!_groups[0].podcastList.contains(id)) {
       _groups[0].podcastList.insert(0, id);
-    await _saveGroup();
-    await _groups[0].getPodcasts();
-    notifyListeners();
+      await _saveGroup();
+      await _groups[0].getPodcasts();
+      notifyListeners();
+    }
   }
 
   List<PodcastGroup> getPodcastGroup(String id) {

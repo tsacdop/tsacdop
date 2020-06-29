@@ -127,7 +127,7 @@ class _StorageSettingState extends State<StorageSetting>
                                   left: 80.0, right: 25, bottom: 10, top: 10),
                               title: Text('Ask before using cellular data'),
                               subtitle: Text(
-                                  'Ask to confirm when using cellular data to download episodes.'),
+                                  'Ask to confirm when using cellular data to download episodes'),
                               trailing: Transform.scale(
                                 scale: 0.9,
                                 child: Switch(
@@ -154,7 +154,7 @@ class _StorageSettingState extends State<StorageSetting>
                                 title:
                                     Text('Auto download using cellular data'),
                                 subtitle: Text(
-                                    'You can set podcast auto download in group manage page.'),
+                                    'You can set podcast auto download in group manage page'),
                                 trailing: Transform.scale(
                                   scale: 0.9,
                                   child: Switch(
@@ -211,7 +211,7 @@ class _StorageSettingState extends State<StorageSetting>
                             contentPadding:
                                 EdgeInsets.only(left: 80.0, right: 20),
                             title: Text('Auto delete downloads after'),
-                            subtitle: Text('Default 30 days.'),
+                            subtitle: Text('Default 30 days'),
                             trailing: DropdownButton(
                                 hint: snapshot.data == -1
                                     ? Text('Never')

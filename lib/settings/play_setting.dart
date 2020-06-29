@@ -288,7 +288,7 @@ class PlaySetting extends StatelessWidget {
                       ListTile(
                         contentPadding: EdgeInsets.only(left: 80.0, right: 20),
                         title: Text('Default time'),
-                        subtitle: Text('Default time for sleep timer.'),
+                        subtitle: Text('Default time for sleep timer'),
                         trailing: Selector<SettingState, int>(
                           selector: (_, settings) => settings.defaultSleepTimer,
                           builder: (_, data, __) => DropdownButton(
@@ -315,7 +315,7 @@ class PlaySetting extends StatelessWidget {
                               left: 80.0, right: 20.0, bottom: 10.0, top: 10.0),
                           title: Text('Auto turn on sleep timer'),
                           subtitle:
-                              Text('Auto start sleep timer at scheduled time.'),
+                              Text('Auto start sleep timer at scheduled time'),
                           trailing: Transform.scale(
                             scale: 0.9,
                             child: Switch(
