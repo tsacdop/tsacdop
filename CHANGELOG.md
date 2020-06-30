@@ -11,7 +11,7 @@ Release date 2020/6/30
 ### Bug fixed
 
 * Crash on stop player.
-* Some donwload file didn't auto deleted.
+* Some download file didn't auto deleted.
 
 ## v0.3.5
 

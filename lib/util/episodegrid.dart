@@ -2,12 +2,15 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:auto_animated/auto_animated.dart';
+import 'package:tuple/tuple.dart';
 import 'open_container.dart';
 
 import '../state/audiostate.dart';
@@ -22,6 +25,7 @@ import 'custompaint.dart';
 
 enum Layout { three, two, one }
 
+// ignore: must_be_immutable
 class EpisodeGrid extends StatelessWidget {
   final List<EpisodeBrief> episodes;
   final bool showFavorite;
@@ -43,9 +47,20 @@ class EpisodeGrid extends StatelessWidget {
     this.reverse,
   }) : super(key: key);
 
+  List<int> _menuList = [];
+
   Future<int> _isListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
+    _menuList = await _getEpisodeMenu();
     return await dbHelper.isListened(episode.enclosureUrl);
+  }
+
+  Future<Tuple3<int, bool, bool>> _initData(EpisodeBrief episode) async {
+    int listened = await _isListened(episode);
+    bool liked = await _isLiked(episode);
+    bool downloaded = await _isDownloaded(episode);
+    _menuList = await _getEpisodeMenu();
+    return Tuple3(listened, liked, downloaded);
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
@@ -148,27 +163,26 @@ class EpisodeGrid extends StatelessWidget {
   //               : Center();
   //     });
 
-  Widget _downloadIndicater(BuildContext context, {EpisodeBrief episode}) =>
+  Widget _downloadIndicater(BuildContext context,
+          {EpisodeBrief episode, bool isDownloaded}) =>
       showDownload || layout != Layout.three
-          ? Container(
-              child: (episode.enclosureUrl != episode.mediaId)
-                  ? Container(
-                      height: 20,
-                      width: 20,
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        color: context.accentColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.done_all,
-                        size: 15,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Center(),
-            )
+          ? isDownloaded
+              ? Container(
+                  height: 20,
+                  width: 20,
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    color: context.accentColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.done_all,
+                    size: 15,
+                    color: Colors.white,
+                  ),
+                )
+              : Center()
           : Center();
 
   Widget _isNewIndicator(EpisodeBrief episode) => episode.isNew == 1
@@ -209,172 +223,174 @@ class EpisodeGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double _width = context.width;
-    Offset _offset;
-    _showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
-        {bool isPlaying, bool isInPlaylist}) async {
-      bool isLiked, isDownload;
-      int isListened;
-      var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-      var downloader = Provider.of<DownloadState>(context, listen: false);
-      double left = offset.dx;
-      double top = offset.dy;
-      List<int> menuList = await _getEpisodeMenu();
-      if (menuList.contains(3)) isListened = await _isListened(episode);
-      if (menuList.contains(2)) isLiked = await _isLiked(episode);
-      if (menuList.contains(4)) isDownload = await _isDownloaded(episode);
-      await showMenu<int>(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
-        context: context,
-        position: RelativeRect.fromLTRB(left, top, _width - left, 0),
-        items: <PopupMenuEntry<int>>[
-          PopupMenuItem(
-            value: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Icon(
-                  LineIcons.play_circle_solid,
-                  color: Theme.of(context).accentColor,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2),
-                ),
-                !isPlaying ? Text('Play') : Text('Playing'),
-              ],
-            ),
-          ),
-          menuList.contains(1)
-              ? PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        LineIcons.clock_solid,
-                        color: Colors.cyan,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                      ),
-                      !isInPlaylist ? Text('Later') : Text('Remove')
-                    ],
-                  ))
-              : null,
-          menuList.contains(2)
-              ? PopupMenuItem(
-                  value: 2,
-                  child: Row(
-                    children: <Widget>[
-                      Icon(LineIcons.heart, color: Colors.red, size: 21),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                      ),
-                      isLiked
-                          ? Text(
-                              'Unlike',
-                            )
-                          : Text('Like')
-                    ],
-                  ))
-              : null,
-          menuList.contains(3)
-              ? PopupMenuItem(
-                  value: 3,
-                  child: Row(
-                    children: <Widget>[
-                      SizedBox(
-                        width: 23,
-                        height: 23,
-                        child: CustomPaint(
-                            painter:
-                                ListenedAllPainter(Colors.blue, stroke: 1.5)),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                      ),
-                      isListened > 0
-                          ? Text('Listened',
-                              style: TextStyle(
-                                  color: context.textColor.withOpacity(0.5)))
-                          : Text('Mark\nListened')
-                    ],
-                  ))
-              : null,
-          menuList.contains(4)
-              ? PopupMenuItem(
-                  value: 4,
-                  child: Row(
-                    children: <Widget>[
-                      Icon(LineIcons.download_solid, color: Colors.green),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                      ),
-                      isDownload
-                          ? Text('Downloaded',
-                              style: TextStyle(
-                                  color: context.textColor.withOpacity(0.5)))
-                          : Text('Download')
-                    ],
-                  ))
-              : null,
-        ],
-        elevation: 5.0,
-      ).then((value) async {
-        switch (value) {
-          case 0:
-            if (!isPlaying) audio.episodeLoad(episode);
-            break;
-          case 1:
-            if (!isInPlaylist) {
-              audio.addToPlaylist(episode);
-              Fluttertoast.showToast(
-                msg: 'Added to playlist',
-                gravity: ToastGravity.BOTTOM,
-              );
-            } else {
-              audio.delFromPlaylist(episode);
-              Fluttertoast.showToast(
-                msg: 'Removed from playlist',
-                gravity: ToastGravity.BOTTOM,
-              );
-            }
-            break;
-          case 2:
-            if (isLiked) {
-              await _setUnliked(episode.enclosureUrl);
-              audio.setEpisodeState = true;
-              Fluttertoast.showToast(
-                msg: 'Unliked',
-                gravity: ToastGravity.BOTTOM,
-              );
-            } else {
-              await _saveLiked(episode.enclosureUrl);
-              audio.setEpisodeState = true;
-              Fluttertoast.showToast(
-                msg: 'Liked',
-                gravity: ToastGravity.BOTTOM,
-              );
-            }
-            break;
-          case 3:
-            if (isListened < 1) {
-              await _markListened(episode);
-              audio.setEpisodeState = true;
-              Fluttertoast.showToast(
-                msg: 'Mark listened',
-                gravity: ToastGravity.BOTTOM,
-              );
-            }
-            break;
-          case 4:
-            if (!isDownload) downloader.startTask(episode);
-            break;
-          default:
-            break;
-        }
-      });
-    }
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    var downloader = Provider.of<DownloadState>(context, listen: false);
+    //Offset _offset;
+    //_showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
+    //    {bool isPlaying, bool isInPlaylist}) async {
+    //  bool isLiked, isDownload;
+    //  int isListened;
+    //  var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    //  var downloader = Provider.of<DownloadState>(context, listen: false);
+    //  double left = offset.dx;
+    //  double top = offset.dy;
+    //  List<int> menuList = await _getEpisodeMenu();
+    //  if (menuList.contains(3)) isListened = await _isListened(episode);
+    //  if (menuList.contains(2)) isLiked = await _isLiked(episode);
+    //  if (menuList.contains(4)) isDownload = await _isDownloaded(episode);
+    //  await showMenu<int>(
+    //    shape: RoundedRectangleBorder(
+    //        borderRadius: BorderRadius.all(Radius.circular(10))),
+    //    context: context,
+    //    position: RelativeRect.fromLTRB(left, top, _width - left, 0),
+    //    items: <PopupMenuEntry<int>>[
+    //      PopupMenuItem(
+    //        value: 0,
+    //        child: Row(
+    //          mainAxisAlignment: MainAxisAlignment.start,
+    //          mainAxisSize: MainAxisSize.max,
+    //          children: <Widget>[
+    //            Icon(
+    //              LineIcons.play_circle_solid,
+    //              color: Theme.of(context).accentColor,
+    //            ),
+    //            Padding(
+    //              padding: EdgeInsets.symmetric(horizontal: 2),
+    //            ),
+    //            !isPlaying ? Text('Play') : Text('Playing'),
+    //          ],
+    //        ),
+    //      ),
+    //      menuList.contains(1)
+    //          ? PopupMenuItem(
+    //              value: 1,
+    //              child: Row(
+    //                children: <Widget>[
+    //                  Icon(
+    //                    LineIcons.clock_solid,
+    //                    color: Colors.cyan,
+    //                  ),
+    //                  Padding(
+    //                    padding: EdgeInsets.symmetric(horizontal: 2),
+    //                  ),
+    //                  !isInPlaylist ? Text('Later') : Text('Remove')
+    //                ],
+    //              ))
+    //          : null,
+    //      menuList.contains(2)
+    //          ? PopupMenuItem(
+    //              value: 2,
+    //              child: Row(
+    //                children: <Widget>[
+    //                  Icon(LineIcons.heart, color: Colors.red, size: 21),
+    //                  Padding(
+    //                    padding: EdgeInsets.symmetric(horizontal: 2),
+    //                  ),
+    //                  isLiked
+    //                      ? Text(
+    //                          'Unlike',
+    //                        )
+    //                      : Text('Like')
+    //                ],
+    //              ))
+    //          : null,
+    //      menuList.contains(3)
+    //          ? PopupMenuItem(
+    //              value: 3,
+    //              child: Row(
+    //                children: <Widget>[
+    //                  SizedBox(
+    //                    width: 23,
+    //                    height: 23,
+    //                    child: CustomPaint(
+    //                        painter:
+    //                            ListenedAllPainter(Colors.blue, stroke: 1.5)),
+    //                  ),
+    //                  Padding(
+    //                    padding: EdgeInsets.symmetric(horizontal: 2),
+    //                  ),
+    //                  isListened > 0
+    //                      ? Text('Listened',
+    //                          style: TextStyle(
+    //                              color: context.textColor.withOpacity(0.5)))
+    //                      : Text('Mark\nListened')
+    //                ],
+    //              ))
+    //          : null,
+    //      menuList.contains(4)
+    //          ? PopupMenuItem(
+    //              value: 4,
+    //              child: Row(
+    //                children: <Widget>[
+    //                  Icon(LineIcons.download_solid, color: Colors.green),
+    //                  Padding(
+    //                    padding: EdgeInsets.symmetric(horizontal: 2),
+    //                  ),
+    //                  isDownload
+    //                      ? Text('Downloaded',
+    //                          style: TextStyle(
+    //                              color: context.textColor.withOpacity(0.5)))
+    //                      : Text('Download')
+    //                ],
+    //              ))
+    //          : null,
+    //    ],
+    //    elevation: 5.0,
+    //  ).then((value) async {
+    //    switch (value) {
+    //      case 0:
+    //        if (!isPlaying) audio.episodeLoad(episode);
+    //        break;
+    //      case 1:
+    //        if (!isInPlaylist) {
+    //          audio.addToPlaylist(episode);
+    //          Fluttertoast.showToast(
+    //            msg: 'Added to playlist',
+    //            gravity: ToastGravity.BOTTOM,
+    //          );
+    //        } else {
+    //          audio.delFromPlaylist(episode);
+    //          Fluttertoast.showToast(
+    //            msg: 'Removed from playlist',
+    //            gravity: ToastGravity.BOTTOM,
+    //          );
+    //        }
+    //        break;
+    //      case 2:
+    //        if (isLiked) {
+    //          await _setUnliked(episode.enclosureUrl);
+    //          audio.setEpisodeState = true;
+    //          Fluttertoast.showToast(
+    //            msg: 'Unliked',
+    //            gravity: ToastGravity.BOTTOM,
+    //          );
+    //        } else {
+    //          await _saveLiked(episode.enclosureUrl);
+    //          audio.setEpisodeState = true;
+    //          Fluttertoast.showToast(
+    //            msg: 'Liked',
+    //            gravity: ToastGravity.BOTTOM,
+    //          );
+    //        }
+    //        break;
+    //      case 3:
+    //        if (isListened < 1) {
+    //          await _markListened(episode);
+    //          audio.setEpisodeState = true;
+    //          Fluttertoast.showToast(
+    //            msg: 'Mark listened',
+    //            gravity: ToastGravity.BOTTOM,
+    //          );
+    //        }
+    //        break;
+    //      case 4:
+    //        if (!isDownload) downloader.startTask(episode);
+    //        break;
+    //      default:
+    //        break;
+    //    }
+    //  });
+    //}
 
     final options = LiveOptions(
       delay: Duration.zero,
@@ -402,9 +418,8 @@ class EpisodeGrid extends StatelessWidget {
           Color _c = (Theme.of(context).brightness == Brightness.light)
               ? episodes[index].primaryColor.colorizedark()
               : episodes[index].primaryColor.colorizeLight();
-          scrollController.addListener(() {
-            print(scrollController.offset);
-          });
+          scrollController.addListener(() {});
+
           return FadeTransition(
             opacity: Tween<double>(begin: index < initNum ? 0 : 1, end: 1)
                 .animate(animation),
@@ -416,15 +431,19 @@ class EpisodeGrid extends StatelessWidget {
                   audio.episodeState),
               builder: (_, data, __) => OpenContainerWrapper(
                 episode: episodes[index],
-                closedBuilder: (context, action, boo) => FutureBuilder<int>(
-                    future: _isListened(episodes[index]),
-                    initialData: 0,
+                closedBuilder: (context, action, boo) => FutureBuilder<
+                        Tuple3<int, bool, bool>>(
+                    future: _initData(episodes[index]),
+                    initialData: Tuple3(0, false, false),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      int isListened = snapshot.data.item1;
+                      bool isLiked = snapshot.data.item2;
+                      bool isDownloaded = snapshot.data.item3;
                       return Container(
                         decoration: BoxDecoration(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(5.0)),
-                            color: snapshot.data > 0
+                            color: isListened > 0
                                 ? context.brightness == Brightness.light
                                     ? Colors.grey[200]
                                     : Color.fromRGBO(40, 40, 40, 1)
@@ -439,35 +458,187 @@ class EpisodeGrid extends StatelessWidget {
                               ),
                             ]),
                         alignment: Alignment.center,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
+                        // InkWell(
+                        //   borderRadius:
+                        //       BorderRadius.all(Radius.circular(5.0)),
+                        //   onTapDown: (details) => _offset = Offset(
+                        //       details.globalPosition.dx,
+                        //       details.globalPosition.dy),
+                        //   onLongPress: () => _showPopupMenu(
+                        //     _offset,
+                        //     episodes[index],
+                        //     context,
+                        //     isPlaying: data.item1 == episodes[index],
+                        //     isInPlaylist: data.item2
+                        //         .contains(episodes[index].enclosureUrl),
+                        //   ),
+                        //   onTap: action,
+                        child: Container(
+                          decoration: BoxDecoration(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(5.0)),
-                            onTapDown: (details) => _offset = Offset(
-                                details.globalPosition.dx,
-                                details.globalPosition.dy),
-                            onLongPress: () => _showPopupMenu(
-                              _offset,
-                              episodes[index],
-                              context,
-                              isPlaying: data.item1 == episodes[index],
-                              isInPlaylist: data.item2
-                                  .contains(episodes[index].enclosureUrl),
+                            border: Border.all(
+                              color: context.brightness == Brightness.light
+                                  ? context.primaryColor
+                                  : context.scaffoldBackgroundColor,
+                              width: 1.0,
                             ),
-                            onTap: action,
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
+                          ),
+                          child: FocusedMenuHolder(
+                            blurSize: 0.0,
+                            menuItemExtent: 45,
+                            menuBoxDecoration: BoxDecoration(
+                                color: Colors.transparent,
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                                border: Border.all(
-                                  color: context.brightness == Brightness.light
-                                      ? context.primaryColor
-                                      : context.scaffoldBackgroundColor,
-                                  width: 1.0,
-                                ),
-                              ),
+                                    BorderRadius.all(Radius.circular(15.0))),
+                            duration: Duration(milliseconds: 100),
+                            tapMode: TapMode.onTap,
+                            animateMenuItems: false,
+                            blurBackgroundColor:
+                                context.brightness == Brightness.light
+                                    ? Colors.white38
+                                    : Colors.black38,
+                            bottomOffsetHeight: 10,
+                            menuOffset: 6,
+                            menuItems: <FocusedMenuItem>[
+                              FocusedMenuItem(
+                                  backgroundColor:
+                                      context.brightness == Brightness.light
+                                          ? context.primaryColor
+                                          : context.scaffoldBackgroundColor,
+                                  title: Text(data.item1 != episodes[index]
+                                      ? "Play"
+                                      : "Playing"),
+                                  trailingIcon: Icon(
+                                    LineIcons.play_circle_solid,
+                                    color: Theme.of(context).accentColor,
+                                  ),
+                                  onPressed: () {
+                                    if (data.item1 != episodes[index])
+                                      audio.episodeLoad(episodes[index]);
+                                  }),
+                              _menuList.contains(1)
+                                  ? FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.scaffoldBackgroundColor,
+                                      title: data.item2.contains(
+                                              episodes[index].enclosureUrl)
+                                          ? Text("Remove")
+                                          : Text("Later"),
+                                      trailingIcon: Icon(
+                                        LineIcons.clock_solid,
+                                        color: Colors.cyan,
+                                      ),
+                                      onPressed: () {
+                                        if (!data.item2.contains(
+                                            episodes[index].enclosureUrl)) {
+                                          audio.addToPlaylist(episodes[index]);
+                                          Fluttertoast.showToast(
+                                            msg: 'Added to playlist',
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        } else {
+                                          audio
+                                              .delFromPlaylist(episodes[index]);
+                                          Fluttertoast.showToast(
+                                            msg: 'Removed from playlist',
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      })
+                                  : null,
+                              _menuList.contains(2)
+                                  ? FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.scaffoldBackgroundColor,
+                                      title: isLiked
+                                          ? Text("Unlike")
+                                          : Text("Like"),
+                                      trailingIcon: Icon(LineIcons.heart,
+                                          color: Colors.red, size: 21),
+                                      onPressed: () async {
+                                        if (isLiked) {
+                                          await _setUnliked(
+                                              episodes[index].enclosureUrl);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: 'Unliked',
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        } else {
+                                          await _saveLiked(
+                                              episodes[index].enclosureUrl);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: 'Liked',
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      })
+                                  : null,
+                              _menuList.contains(3)
+                                  ? FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.scaffoldBackgroundColor,
+                                      title: isListened > 0
+                                          ? Text('Listened',
+                                              style: TextStyle(
+                                                  color: context.textColor
+                                                      .withOpacity(0.5)))
+                                          : Text(
+                                              'Mark Listened',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                      trailingIcon: SizedBox(
+                                        width: 23,
+                                        height: 23,
+                                        child: CustomPaint(
+                                            painter: ListenedAllPainter(
+                                                Colors.blue,
+                                                stroke: 1.5)),
+                                      ),
+                                      onPressed: () async {
+                                        if (isListened < 1) {
+                                          await _markListened(episodes[index]);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: 'Mark listened',
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      })
+                                  : null,
+                              _menuList.contains(4)
+                                  ? FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.scaffoldBackgroundColor,
+                                      title: isDownloaded
+                                          ? Text('Downloaded',
+                                              style: TextStyle(
+                                                  color: context.textColor
+                                                      .withOpacity(0.5)))
+                                          : Text('Download'),
+                                      trailingIcon: Icon(
+                                          LineIcons.download_solid,
+                                          color: Colors.green),
+                                      onPressed: () {
+                                        if (!isDownloaded)
+                                          downloader.startTask(episodes[index]);
+                                      })
+                                  : null
+                            ],
+                            action: action,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
@@ -491,7 +662,8 @@ class EpisodeGrid extends StatelessWidget {
                                         //       isListened: snapshot.data),
                                         _isNewIndicator(episodes[index]),
                                         _downloadIndicater(context,
-                                            episode: episodes[index]),
+                                            episode: episodes[index],
+                                            isDownloaded: isDownloaded),
                                         _numberIndicater(context,
                                             index: index, color: _c)
                                       ],
@@ -588,27 +760,17 @@ class EpisodeGrid extends StatelessWidget {
                                           padding: EdgeInsets.all(1),
                                         ),
                                         showFavorite || layout != Layout.three
-                                            ? FutureBuilder<bool>(
-                                                future:
-                                                    _isLiked(episodes[index]),
-                                                initialData: false,
-                                                builder: (context, snapshot) =>
-                                                    Container(
-                                                  alignment: Alignment.center,
-                                                  child: (snapshot.data)
-                                                      ? IconTheme(
-                                                          data: IconThemeData(
-                                                              size:
-                                                                  _width / 35),
-                                                          child: Icon(
-                                                            Icons.favorite,
-                                                            color: Colors.red,
-                                                          ),
-                                                        )
-                                                      : Center(),
-                                                ),
-                                              )
-                                            : Center(),
+                                            ? isLiked
+                                                ? IconTheme(
+                                                    data: IconThemeData(
+                                                        size: _width / 35),
+                                                    child: Icon(
+                                                      Icons.favorite,
+                                                      color: Colors.red,
+                                                    ),
+                                                  )
+                                                : Center()
+                                            : Center()
                                       ],
                                     ),
                                   ),

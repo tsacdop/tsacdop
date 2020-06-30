@@ -53,6 +53,9 @@ dependencies:
   line_icons:
     git:
       url: https://github.com/galonsos/line_icons.git
+  focused_menu:
+    git:
+      url: https://github.com/stonega/focused_menu.git
 
 dev_dependencies:
   flutter_test:

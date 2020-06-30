@@ -6,9 +6,9 @@
 
 ![CircleCI](https://img.shields.io/circleci/build/github/stonega/tsacdop?token=efe1331861e017144f2abb363acd95197e436dad)
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/stonega/tsacdop)
+ 
 
-[![GooglePlay](https://img.shields.io/badge/Google-PlayStore-%2323CCC6)](https://play.google.com/store/apps/details?id=com.stonegate.tsacdop)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/stonega/tsacdop) [![GooglePlay](https://img.shields.io/badge/Google-PlayStore-%2323CCC6)](https://play.google.com/store/apps/details?id=com.stonegate.tsacdop)
 
 ## About
 
@@ -56,8 +56,6 @@ final environment = {"apiKey":"APIKEY", "shareKey":"SHAREKEY"};
 You can get own api key on [ListenNotes](https://www.listennotes.com/api/), basic plan is free to all, and replace "APIKEY" with it.
 If no api key added, the search function in the app won't work. But you can still add podcasts by serach rss link or import ompl file.
 
-Share_key is used for generate clip.
-
 ## Known Issue
 
 * Playlist unstable
@@ -74,3 +72,4 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials, 
 samples, guidance on mobile development, and a full API reference.
+
