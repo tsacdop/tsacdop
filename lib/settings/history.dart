@@ -111,6 +111,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
   double top = 0;
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -137,7 +138,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                       return FlexibleSpaceBar(
                         title: top < 70 + MediaQuery.of(context).padding.top
                             ? Text(
-                                'History',
+                                s.settingsHistory,
                               )
                             : Center(),
                         background: Padding(
@@ -162,11 +163,11 @@ class _PlayedHistoryState extends State<PlayedHistory>
                         indicatorColor: context.accentColor,
                         tabs: <Widget>[
                           Tab(
-                            child: Text('Listen',
+                            child: Text(s.listen,
                                 style: context.textTheme.headline6),
                           ),
                           Tab(
-                            child: Text('Subscribe',
+                            child: Text(s.subscribe,
                                 style: context.textTheme.headline6),
                           )
                         ],

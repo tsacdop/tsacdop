@@ -4,10 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../state/settingstate.dart';
+import '../util/context_extension.dart';
 
 class SyncingSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -18,7 +20,7 @@ class SyncingSetting extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Syncing'),
+          title: Text(s.settingsSyncing),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
@@ -40,16 +42,16 @@ class SyncingSetting extends StatelessWidget {
                     ),
                     Container(
                       height: 30.0,
-                      padding: EdgeInsets.symmetric(horizontal: 70),
+                      padding: const EdgeInsets.symmetric(horizontal: 70),
                       alignment: Alignment.centerLeft,
-                      child: Text('Syncing',
+                      child: Text(s.settingsSyncing,
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1
                               .copyWith(color: Theme.of(context).accentColor)),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(5.0),
+                      padding: const EdgeInsets.all(5.0),
                     ),
                     ListView(
                       physics: const BouncingScrollPhysics(),
@@ -66,11 +68,10 @@ class SyncingSetting extends StatelessWidget {
                               settings.setWorkManager(data.item2);
                             }
                           },
-                          contentPadding: EdgeInsets.only(
+                          contentPadding: const EdgeInsets.only(
                               left: 80.0, right: 20, bottom: 10),
-                          title: Text('Enable syncing'),
-                          subtitle: Text(
-                              'Refresh all podcasts in the background to get leatest episodes'),
+                          title: Text(s.settingsEnableSyncing),
+                          subtitle: Text(s.settingsEnableSyncingDes),
                           trailing: Transform.scale(
                             scale: 0.9,
                             child: Switch(
@@ -87,13 +88,13 @@ class SyncingSetting extends StatelessWidget {
                         Divider(height: 2),
                         ListTile(
                           contentPadding:
-                              EdgeInsets.only(left: 80.0, right: 20),
-                          title: Text('Update Interval'),
-                          subtitle: Text('Default 24 hours'),
+                              const EdgeInsets.only(left: 80.0, right: 20),
+                          title: Text(s.settingsUpdateInterval),
+                          subtitle: Text(s.settingsUpdateIntervalDes),
                           trailing: DropdownButton(
                               hint: data.item2 == 1
                                   ? Text(data.item2.toString() + ' hour')
-                                  : Text(data.item2.toString() + 'hours'),
+                                  : Text(data.item2.toString() + ' hours'),
                               underline: Center(),
                               elevation: 1,
                               value: data.item2,

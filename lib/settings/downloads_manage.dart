@@ -97,6 +97,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -190,7 +191,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
-                                          Text('Sory by'),
+                                          Text(s.homeSubMenuSortBy),
                                           Padding(
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 5),

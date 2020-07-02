@@ -77,6 +77,7 @@ class _StorageSettingState extends State<StorageSetting>
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -87,7 +88,7 @@ class _StorageSettingState extends State<StorageSetting>
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Storage'),
+          title: Text(s.settingStorage),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
@@ -107,7 +108,7 @@ class _StorageSettingState extends State<StorageSetting>
                       height: 30.0,
                       padding: EdgeInsets.symmetric(horizontal: 70),
                       alignment: Alignment.centerLeft,
-                      child: Text('Network',
+                      child: Text(s.network,
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1
@@ -125,9 +126,8 @@ class _StorageSettingState extends State<StorageSetting>
                               onTap: () => settings.downloadUsingData = !data,
                               contentPadding: EdgeInsets.only(
                                   left: 80.0, right: 25, bottom: 10, top: 10),
-                              title: Text('Ask before using cellular data'),
-                              subtitle: Text(
-                                  'Ask to confirm when using cellular data to download episodes'),
+                              title: Text(s.settingsNetworkCellular),
+                              subtitle: Text(s.settingsNetworkCellularDes),
                               trailing: Transform.scale(
                                 scale: 0.9,
                                 child: Switch(
@@ -151,10 +151,9 @@ class _StorageSettingState extends State<StorageSetting>
                                 },
                                 contentPadding: EdgeInsets.only(
                                     left: 80.0, right: 25, bottom: 10, top: 10),
-                                title:
-                                    Text('Auto download using cellular data'),
-                                subtitle: Text(
-                                    'You can set podcast auto download in group manage page'),
+                                title: Text(s.settingsNetworkCellularAuto),
+                                subtitle:
+                                    Text(s.settingsNetworkCellularAutoDes),
                                 trailing: Transform.scale(
                                   scale: 0.9,
                                   child: Switch(
@@ -182,7 +181,7 @@ class _StorageSettingState extends State<StorageSetting>
                     height: 30.0,
                     padding: EdgeInsets.symmetric(horizontal: 70),
                     alignment: Alignment.centerLeft,
-                    child: Text('Storage',
+                    child: Text(s.settingStorage,
                         style: Theme.of(context)
                             .textTheme
                             .bodyText1
@@ -199,8 +198,8 @@ class _StorageSettingState extends State<StorageSetting>
                             MaterialPageRoute(
                                 builder: (context) => DownloadsManage())),
                         contentPadding: EdgeInsets.symmetric(horizontal: 80.0),
-                        title: Text('Downloads'),
-                        subtitle: Text('Manage downloaded audio files'),
+                        title: Text(s.download),
+                        subtitle: Text(s.settingsManageDownloadDes),
                       ),
                       Divider(height: 2),
                       FutureBuilder<int>(
@@ -210,8 +209,8 @@ class _StorageSettingState extends State<StorageSetting>
                           return ListTile(
                             contentPadding:
                                 EdgeInsets.only(left: 80.0, right: 20),
-                            title: Text('Auto delete downloads after'),
-                            subtitle: Text('Default 30 days'),
+                            title: Text(s.settingsAutoDelete),
+                            subtitle: Text(s.settingsAutoDeleteDes),
                             trailing: DropdownButton(
                                 hint: snapshot.data == -1
                                     ? Text('Never')
@@ -238,8 +237,8 @@ class _StorageSettingState extends State<StorageSetting>
                       ListTile(
                         contentPadding: EdgeInsets.only(left: 80.0, right: 25),
                         //  leading: Icon(Icons.colorize),
-                        title: Text('Audio cache'),
-                        subtitle: Text('Audio cache max size'),
+                        title: Text(s.settingsAudioCache),
+                        subtitle: Text(s.settingsAudioCacheDes),
                         trailing: Text.rich(TextSpan(
                             text: '${(_value ~/ 100) * 100}',
                             style: GoogleFonts.teko(

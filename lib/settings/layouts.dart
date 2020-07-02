@@ -111,6 +111,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -120,7 +121,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
       ),
       child: Scaffold(
           appBar: AppBar(
-            title: Text('Layout'),
+            title: Text(s.settingsLayout),
             elevation: 0,
             backgroundColor: context.primaryColor,
           ),
@@ -135,7 +136,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
-                  child: Text('Episode popup menu',
+                  child: Text(s.settingsPopupMenu,
                       style: Theme.of(context)
                           .textTheme
                           .bodyText1
@@ -152,8 +153,8 @@ class _LayoutSettingState extends State<LayoutSetting> {
                             MaterialPageRoute(
                                 builder: (context) => PopupMenuSetting())),
                         contentPadding: EdgeInsets.only(left: 80.0, right: 20),
-                        title: Text('Episode popup menu'),
-                        subtitle: Text('Change the menu when long tap episode'),
+                        title: Text(s.settingsPopupMenu),
+                        subtitle: Text(s.settingsPopupMenuDes),
                       ),
                       Divider(height: 2),
                       Padding(
@@ -163,7 +164,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                         height: 30.0,
                         padding: EdgeInsets.symmetric(horizontal: 70),
                         alignment: Alignment.centerLeft,
-                        child: Text('Default grid view',
+                        child: Text(s.settingsDefaultGrid,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyText1
@@ -176,13 +177,17 @@ class _LayoutSettingState extends State<LayoutSetting> {
                           scrollDirection: Axis.vertical,
                           children: <Widget>[
                             _setDefaultGridView(context,
-                                text: 'Podcast page', key: podcastLayoutKey),
+                                text: s.settingsDefaultGridPodcast,
+                                key: podcastLayoutKey),
                             _setDefaultGridView(context,
-                                text: 'Recent tab', key: recentLayoutKey),
+                                text: s.settingsDefaultGridRecent,
+                                key: recentLayoutKey),
                             _setDefaultGridView(context,
-                                text: 'Favorite tab', key: favLayoutKey),
+                                text: s.settingsDefaultGridFavorite,
+                                key: favLayoutKey),
                             _setDefaultGridView(context,
-                                text: 'Downlaod tab', key: downloadLayoutKey),
+                                text: s.settingsDefaultGridDownload,
+                                key: downloadLayoutKey),
                           ]),
                       Divider(height: 2)
                     ]),

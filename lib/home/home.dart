@@ -94,6 +94,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = (width - 20) / 3 + 140;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
           systemNavigationBarIconBrightness:
@@ -342,13 +343,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     controller: _controller,
                                     tabs: <Widget>[
                                       Tab(
-                                        child: Text('Recent'),
+                                        child: Text(s.homeTabMenuRecent),
                                       ),
                                       Tab(
-                                        child: Text('Favorite'),
+                                        child: Text(s.homeTabMenuFavotite),
                                       ),
                                       Tab(
-                                        child: Text('Download'),
+                                        child: Text(s.download),
                                       )
                                     ],
                                   ),
@@ -547,6 +548,7 @@ class PlaylistButtonState extends State<PlaylistButton> {
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    final s = context.s;
     return MyPopupMenuButton<int>(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -651,7 +653,7 @@ class PlaylistButtonState extends State<PlaylistButton> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
                 ),
-                Text('Playlist'),
+                Text(s.homeMenuPlaylist),
               ],
             ),
           ),
@@ -727,6 +729,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
   Widget build(BuildContext context) {
     super.build(context);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    final s = context.s;
     return Selector<SubscribeWorker, bool>(
         selector: (_, worker) => worker.created,
         builder: (context, created, child) {
@@ -1050,6 +1053,7 @@ class _MyFavoriteState extends State<_MyFavorite>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final s = context.s;
     return Selector<AudioPlayerNotifier, bool>(
         selector: (_, audio) => audio.episodeState,
         builder: (context, episodeState, child) {
@@ -1108,7 +1112,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   children: <Widget>[
-                                                    Text('Sory by'),
+                                                    Text(s.homeSubMenuSortBy),
                                                     Padding(
                                                       padding:
                                                           EdgeInsets.symmetric(
@@ -1259,6 +1263,7 @@ class _MyDownloadState extends State<_MyDownload>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final s = context.s;
     return CustomScrollView(
       key: PageStorageKey<String>('download_list'),
       slivers: <Widget>[
@@ -1273,7 +1278,7 @@ class _MyDownloadState extends State<_MyDownload>
                     children: <Widget>[
                       Container(
                           padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text('Downloaded')),
+                          child: Text(s.homeSubMenuDownloaded)),
                       Spacer(),
                       Material(
                         color: Colors.transparent,

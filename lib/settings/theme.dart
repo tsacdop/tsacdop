@@ -9,6 +9,7 @@ import '../util/general_dialog.dart';
 class ThemeSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -19,7 +20,7 @@ class ThemeSetting extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Appearance'),
+          title: Text(s.settingsAppearance),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
@@ -34,7 +35,7 @@ class ThemeSetting extends StatelessWidget {
               height: 30.0,
               padding: EdgeInsets.symmetric(horizontal: 70),
               alignment: Alignment.centerLeft,
-              child: Text('Interface',
+              child: Text(s.settingsInterface,
                   style: Theme.of(context)
                       .textTheme
                       .bodyText1
@@ -74,7 +75,7 @@ class ThemeSetting extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10.0))),
-                              title: Text('Theme'),
+                              title: Text(s.settingsTheme),
                               content: SingleChildScrollView(
                                 scrollDirection: Axis.vertical,
                                 child: Column(
@@ -82,7 +83,7 @@ class ThemeSetting extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
                                     RadioListTile(
-                                        title: Text('System default'),
+                                        title: Text(s.systemDefault),
                                         value: ThemeMode.system,
                                         groupValue: settings.theme,
                                         onChanged: (value) {
@@ -112,8 +113,8 @@ class ThemeSetting extends StatelessWidget {
                           )),
                   contentPadding: EdgeInsets.symmetric(horizontal: 80.0),
                   //  leading: Icon(Icons.colorize),
-                  title: Text('Theme'),
-                  subtitle: Text('System default'),
+                  title: Text(s.settingsTheme),
+                  subtitle: Text(s.systemDefault),
                 ),
                 Selector<SettingState, bool>(
                   selector: (_, setting) => setting.realDark,
@@ -123,10 +124,9 @@ class ThemeSetting extends StatelessWidget {
                         left: 80.0, right: 20, bottom: 10, top: 10),
                     //  leading: Icon(Icons.colorize),
                     title: Text(
-                      'Real Dark',
+                      s.settingsRealDark,
                     ),
-                    subtitle: Text(
-                        'Turn on if you think the night is not dark enough'),
+                    subtitle: Text(s.settingsRealDarkDes),
                     trailing: Transform.scale(
                       scale: 0.9,
                       child: Switch(
@@ -153,8 +153,8 @@ class ThemeSetting extends StatelessWidget {
                     ),
                   ),
                   contentPadding: EdgeInsets.only(left: 80.0, right: 25),
-                  title: Text('Accent color'),
-                  subtitle: Text('Include the overlay color'),
+                  title: Text(s.settingsAccentColor),
+                  subtitle: Text(s.settingsAccentColorDes),
                   trailing: Container(
                     height: 25,
                     width: 25,

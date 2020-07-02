@@ -102,6 +102,7 @@ class _SettingsState extends State<Settings>
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -111,7 +112,7 @@ class _SettingsState extends State<Settings>
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Settings'),
+          title: Text(s.homeToprightMenuSettings),
           elevation: 0,
           backgroundColor: context.primaryColor,
         ),
@@ -134,7 +135,7 @@ class _SettingsState extends State<Settings>
                       height: 30.0,
                       padding: EdgeInsets.symmetric(horizontal: 70),
                       alignment: Alignment.centerLeft,
-                      child: Text('Prefrence',
+                      child: Text(s.settingsPrefrence,
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1
@@ -153,8 +154,8 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.adjust_solid),
-                          title: Text('Appearance'),
-                          subtitle: Text('Colors and themes'),
+                          title: Text(s.settingsAppearance),
+                          subtitle: Text(s.settingsAppearanceDes),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -165,8 +166,8 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.stop_circle_solid),
-                          title: Text('Layout'),
-                          subtitle: Text('App layout'),
+                          title: Text(s.settingsLayout),
+                          subtitle: Text(s.settingsLayoutDes),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -177,21 +178,20 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.play_circle),
-                          title: Text('Play'),
-                          subtitle: Text('Playlist and player'),
+                          title: Text(s.play),
+                          subtitle: Text(s.settingsPlayDes),
                         ),
                         Divider(height: 2),
                         ListTile(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SyncingSetting())),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.cloud_download_alt_solid),
-                          title: Text('Syncing'),
-                          subtitle: Text('Refresh podcasts in the background'),
-                        ),
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SyncingSetting())),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 25.0),
+                            leading: Icon(LineIcons.cloud_download_alt_solid),
+                            title: Text(s.settingsSyncing),
+                            subtitle: Text(s.settingsSyncingDes)),
                         Divider(height: 2),
                         ListTile(
                           onTap: () => Navigator.push(
@@ -201,8 +201,8 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.save),
-                          title: Text('Storage'),
-                          subtitle: Text('Manage cache and download storage'),
+                          title: Text(s.settingStorage),
+                          subtitle: Text(s.settingsStorageDes),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -213,8 +213,8 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(Icons.update),
-                          title: Text('History'),
-                          subtitle: Text('Listen data'),
+                          title: Text(s.settingsHistory),
+                          subtitle: Text(s.settingsHistoryDes),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -224,8 +224,8 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.file_code_solid),
-                          title: Text('Export'),
-                          subtitle: Text('Export ompl file of all podcasts'),
+                          title: Text(s.settingsExport),
+                          subtitle: Text(s.settingsExportDes),
                         ),
                         Divider(height: 2),
                       ],
@@ -243,7 +243,7 @@ class _SettingsState extends State<Settings>
                       height: 30.0,
                       padding: EdgeInsets.symmetric(horizontal: 70),
                       alignment: Alignment.centerLeft,
-                      child: Text('Info',
+                      child: Text(s.settingsInfo,
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1
@@ -262,9 +262,8 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.book_open_solid),
-                          title: Text('Libraries'),
-                          subtitle:
-                              Text('Open source libraries in application'),
+                          title: Text(s.settingsLibraries),
+                          subtitle: Text(s.settingsLibrariesDes),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -280,8 +279,8 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.bug_solid),
-                          title: Text('Feedback'),
-                          subtitle: Text('Bugs and feature request'),
+                          title: Text(s.settingsFeedback),
+                          subtitle: Text(s.settingsFeedbackDes),
                           trailing: Transform.rotate(
                             angle: math.pi * _value,
                             child: Icon(Icons.keyboard_arrow_down),
@@ -298,19 +297,19 @@ class _SettingsState extends State<Settings>
                                     SizedBox(width: 75),
                                     _feedbackItem(
                                         LineIcons.github,
-                                        'Submit issue',
+                                        s.feedbackGithub,
                                         'https://github.com/stonega/tsacdop/issues'),
                                     _feedbackItem(
                                         LineIcons.telegram,
-                                        'Join group',
+                                        s.feedbackTelegram,
                                         'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
                                     _feedbackItem(
                                         LineIcons.envelope_open_text_solid,
-                                        'Write to me',
+                                        s.feedbackEmail,
                                         'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
                                     _feedbackItem(
                                         LineIcons.google_play,
-                                        'Rate on Play',
+                                        s.feedbackPlay,
                                         'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop')
                                   ],
                                 ),
@@ -341,7 +340,7 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.capsules_solid),
-                          title: Text('Discovery Features Again'),
+                          title: Text(s.settingsDiscovery),
                         ),
                         Divider(height: 2),
                         ListTile(
@@ -353,7 +352,7 @@ class _SettingsState extends State<Settings>
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.columns_solid),
-                          title: Text('App Intro'),
+                          title: Text(s.settingsAppIntro),
                         ),
                         Divider(height: 2),
                       ],

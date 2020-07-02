@@ -207,6 +207,7 @@ class PlaySetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var settings = Provider.of<SettingState>(context, listen: false);
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -216,7 +217,7 @@ class PlaySetting extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Player Setting'),
+          title: Text(s.play),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
@@ -237,7 +238,7 @@ class PlaySetting extends StatelessWidget {
                     height: 30.0,
                     padding: EdgeInsets.symmetric(horizontal: 70),
                     alignment: Alignment.centerLeft,
-                    child: Text('Playlist',
+                    child: Text(s.homeMenuPlaylist,
                         style: Theme.of(context)
                             .textTheme
                             .bodyText1
@@ -254,8 +255,8 @@ class PlaySetting extends StatelessWidget {
                           onTap: () => settings.setAutoPlay = !data,
                           contentPadding:
                               EdgeInsets.only(left: 80.0, right: 20),
-                          title: Text('Autoplay'),
-                          subtitle: Text('Autoplay next episode in playlist'),
+                          title: Text('Auto play next'),
+                          subtitle: Text(s.settingsAutoPlayDes),
                           trailing: Transform.scale(
                             scale: 0.9,
                             child: Switch(
@@ -274,10 +275,8 @@ class PlaySetting extends StatelessWidget {
                     height: 30.0,
                     padding: EdgeInsets.symmetric(horizontal: 70),
                     alignment: Alignment.centerLeft,
-                    child: Text('Sleep timer',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
+                    child: Text(s.sleepTimer,
+                        style: context.textTheme.bodyText1
                             .copyWith(color: Theme.of(context).accentColor)),
                   ),
                   ListView(
@@ -287,8 +286,8 @@ class PlaySetting extends StatelessWidget {
                     children: <Widget>[
                       ListTile(
                         contentPadding: EdgeInsets.only(left: 80.0, right: 20),
-                        title: Text('Default time'),
-                        subtitle: Text('Default time for sleep timer'),
+                        title: Text(s.settingsSTDefaultTime),
+                        subtitle: Text(s.settingsSTDefautTimeDes),
                         trailing: Selector<SettingState, int>(
                           selector: (_, settings) => settings.defaultSleepTimer,
                           builder: (_, data, __) => DropdownButton(
@@ -313,9 +312,8 @@ class PlaySetting extends StatelessWidget {
                           onTap: () => settings.setAutoSleepTimer = !data,
                           contentPadding: const EdgeInsets.only(
                               left: 80.0, right: 20.0, bottom: 10.0, top: 10.0),
-                          title: Text('Auto turn on sleep timer'),
-                          subtitle:
-                              Text('Auto start sleep timer at scheduled time'),
+                          title: Text(s.settingsSTAuto),
+                          subtitle: Text(s.settingsSTAutoDes),
                           trailing: Transform.scale(
                             scale: 0.9,
                             child: Switch(
@@ -328,7 +326,7 @@ class PlaySetting extends StatelessWidget {
                       ListTile(
                           contentPadding: const EdgeInsets.only(
                               left: 80.0, right: 20.0, bottom: 10.0, top: 10.0),
-                          title: Text('Auto sleep timer mode'),
+                          title: Text(s.settingsSTMode),
                           subtitle:
                               context.width > 360 ? null : _modeWidget(context),
                           trailing: context.width > 360
@@ -337,7 +335,7 @@ class PlaySetting extends StatelessWidget {
                       ListTile(
                           contentPadding:
                               EdgeInsets.only(left: 80.0, right: 20),
-                          title: Text('Schedule'),
+                          title: Text(s.schedule),
                           subtitle: context.width > 360
                               ? null
                               : _scheduleWidget(context),

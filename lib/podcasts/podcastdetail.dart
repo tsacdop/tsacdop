@@ -276,6 +276,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   @override
   Widget build(BuildContext context) {
     Color _color = widget.podcastLocal.primaryColor.colorizedark();
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.dark,
@@ -366,7 +367,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                                     horizontal:
                                                                         5.0),
                                                           ),
-                                                          Text('Visit Site'),
+                                                          Text(s.menuVisitSite),
                                                         ],
                                                       ),
                                                     ),
@@ -390,7 +391,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                           EdgeInsets.symmetric(
                                                               horizontal: 5.0),
                                                     ),
-                                                    Text('View Rss Feed'),
+                                                    Text(s.menuViewRSS),
                                                   ],
                                                 ),
                                               ),
@@ -422,7 +423,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                               horizontal: 5.0),
                                                     ),
                                                     Text(
-                                                      'Mark All Listened',
+                                                      s.menuMarkAllListened,
                                                     ),
                                                   ],
                                                 ),
@@ -555,7 +556,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                               Radius.circular(
                                                                   10))),
                                                   elevation: 1,
-                                                  tooltip: 'Sort By',
+                                                  tooltip: s.homeSubMenuSortBy,
                                                   child: Container(
                                                       height: 30,
                                                       padding:
@@ -565,7 +566,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                         mainAxisSize:
                                                             MainAxisSize.min,
                                                         children: <Widget>[
-                                                          Text('Sort by'),
+                                                          Text(s
+                                                              .homeSubMenuSortBy),
                                                           Padding(
                                                             padding: EdgeInsets
                                                                 .symmetric(

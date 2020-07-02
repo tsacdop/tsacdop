@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import '../settings/settting.dart';
 import '../state/refresh_podcast.dart';
 import '../state/subscribe_podcast.dart';
+import '../util/context_extension.dart';
 import 'about.dart';
 
 class OmplOutline {
@@ -70,7 +71,7 @@ class _PopupMenuState extends State<PopupMenu> {
   Widget build(BuildContext context) {
     var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
     var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
-
+    final s = context.s;
     void _saveOmpl(String path) async {
       File file = File(path);
       try {
@@ -150,7 +151,7 @@ class _PopupMenuState extends State<PopupMenu> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'Refresh All',
+                      s.homeToprightMenuRefreshAll,
                     ),
                     FutureBuilder<String>(
                         future: _getRefreshDate(),
@@ -179,7 +180,7 @@ class _PopupMenuState extends State<PopupMenu> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
                 ),
-                Text('Import OMPL'),
+                Text(s.homeToprightMenuImportOMPL),
               ],
             ),
           ),
@@ -194,7 +195,7 @@ class _PopupMenuState extends State<PopupMenu> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
                 ),
-                Text('Settings'),
+                Text(s.homeToprightMenuSettings),
               ],
             ),
           ),
@@ -209,7 +210,7 @@ class _PopupMenuState extends State<PopupMenu> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
                 ),
-                Text('About'),
+                Text(s.homeToprightMenuAbout),
               ],
             ),
           ),

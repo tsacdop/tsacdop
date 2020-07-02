@@ -54,10 +54,10 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
       begin: _disabledThumbRadius,
       end: enabledThumbRadius,
     );
-     final ColorTween colorTween = ColorTween(
-       begin: sliderTheme.disabledThumbColor,
-       end: sliderTheme.thumbColor,
-     );
+    // final ColorTween colorTween = ColorTween(
+    //   begin: sliderTheme.disabledThumbColor,
+    //   end: sliderTheme.thumbColor,
+    // );
 
     canvas.drawCircle(
       center,

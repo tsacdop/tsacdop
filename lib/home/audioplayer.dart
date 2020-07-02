@@ -20,7 +20,6 @@ import '../util/customslider.dart';
 import '../episodes/episodedetail.dart';
 import 'playlist.dart';
 import 'audiopanel.dart';
-import 'share.dart';
 
 final List<BoxShadow> _customShadow = [
   BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),

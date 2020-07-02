@@ -10,7 +10,6 @@ import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:auto_animated/auto_animated.dart';
-import 'package:tuple/tuple.dart';
 import 'open_container.dart';
 
 import '../state/audiostate.dart';
@@ -398,7 +397,7 @@ class EpisodeGrid extends StatelessWidget {
       showItemDuration: Duration(milliseconds: 50),
     );
     final scrollController = ScrollController();
-
+    final s = context.s;
     return SliverPadding(
       padding: const EdgeInsets.only(
           top: 10.0, bottom: 5.0, left: 15.0, right: 15.0),
@@ -507,7 +506,7 @@ class EpisodeGrid extends StatelessWidget {
                                           ? context.primaryColor
                                           : context.scaffoldBackgroundColor,
                                   title: Text(data.item1 != episodes[index]
-                                      ? "Play"
+                                      ? s.play
                                       : "Playing"),
                                   trailingIcon: Icon(
                                     LineIcons.play_circle_solid,
@@ -526,7 +525,7 @@ class EpisodeGrid extends StatelessWidget {
                                       title: data.item2.contains(
                                               episodes[index].enclosureUrl)
                                           ? Text("Remove")
-                                          : Text("Later"),
+                                          : Text(s.later),
                                       trailingIcon: Icon(
                                         LineIcons.clock_solid,
                                         color: Colors.cyan,
@@ -556,8 +555,8 @@ class EpisodeGrid extends StatelessWidget {
                                               ? context.primaryColor
                                               : context.scaffoldBackgroundColor,
                                       title: isLiked
-                                          ? Text("Unlike")
-                                          : Text("Like"),
+                                          ? Text(s.unlike)
+                                          : Text(s.like),
                                       trailingIcon: Icon(LineIcons.heart,
                                           color: Colors.red, size: 21),
                                       onPressed: () async {
@@ -592,7 +591,7 @@ class EpisodeGrid extends StatelessWidget {
                                                   color: context.textColor
                                                       .withOpacity(0.5)))
                                           : Text(
-                                              'Mark Listened',
+                                              s.markListened,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -609,7 +608,7 @@ class EpisodeGrid extends StatelessWidget {
                                           await _markListened(episodes[index]);
                                           audio.setEpisodeState = true;
                                           Fluttertoast.showToast(
-                                            msg: 'Mark listened',
+                                            msg: s.markListened,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         }
@@ -622,11 +621,11 @@ class EpisodeGrid extends StatelessWidget {
                                               ? context.primaryColor
                                               : context.scaffoldBackgroundColor,
                                       title: isDownloaded
-                                          ? Text('Downloaded',
+                                          ? Text(s.homeSubMenuDownloaded,
                                               style: TextStyle(
                                                   color: context.textColor
                                                       .withOpacity(0.5)))
-                                          : Text('Download'),
+                                          : Text(s.download),
                                       trailingIcon: Icon(
                                           LineIcons.download_solid,
                                           color: Colors.green),
