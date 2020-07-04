@@ -77,7 +77,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   // color: context.primaryColorDark,
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Playlist',
+                    context.s.homeMenuPlaylist,
                     style: TextStyle(
                         color: Theme.of(context).accentColor,
                         fontWeight: FontWeight.bold,
@@ -389,6 +389,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Widget _miniPanel(double width, BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    final s = context.s;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
@@ -459,13 +460,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                         BasicPlaybackState.skippingToNext ||
                                     data.item1 == BasicPlaybackState.stopped
                                 ? Text(
-                                    'Buffering...',
+                                    s.buffering,
                                     style: TextStyle(
                                         color: Theme.of(context).accentColor),
                                   )
                                 : Text(
-                                    (_stringForSeconds(data.item2) ?? '') +
-                                        ' Left',
+                                    s.timeLeft(
+                                        _stringForSeconds(data.item2) ?? ''),
                                     maxLines: 2,
                                   ),
                       );
@@ -582,6 +583,7 @@ class _LastPositionState extends State<LastPosition> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Selector<AudioPlayerNotifier, EpisodeBrief>(
       selector: (_, audio) => audio.episode,
@@ -605,7 +607,7 @@ class _LastPositionState extends State<LastPosition> {
                                       .color),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0))),
-                          child: Text('Played before'))
+                          child: Text(s.listened))
                       : snapshot.data.seconds < 10
                           ? Center()
                           : Material(
@@ -628,8 +630,9 @@ class _LastPositionState extends State<LastPosition> {
                                               .color),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10.0))),
-                                  child: Text('Last time ' +
-                                      _stringForSeconds(snapshot.data.seconds)),
+                                  child: Text(s.timeLastPlayed(
+                                      _stringForSeconds(
+                                          snapshot.data.seconds))),
                                 ),
                               ),
                             )
@@ -851,6 +854,7 @@ class SleepModeState extends State<SleepMode>
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     final ColorTween _colorTween =
         ColorTween(begin: context.primaryColor, end: Colors.black);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
@@ -976,7 +980,7 @@ class SleepModeState extends State<SleepMode>
                                         width: 120,
                                         child: Center(
                                             child: Text(
-                                          'End of episode',
+                                          s.endOfEpisode,
                                           style: TextStyle(
                                               // fontWeight: FontWeight.bold,
                                               // fontSize: 20,
@@ -1059,7 +1063,7 @@ class SleepModeState extends State<SleepMode>
                 width: 200,
                 child: Container(
                   alignment: Alignment.center,
-                  child: Text('Good Night',
+                  child: Text(s.goodNight,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
@@ -1072,7 +1076,7 @@ class SleepModeState extends State<SleepMode>
                 width: 200,
                 child: Container(
                   alignment: Alignment.center,
-                  child: Text('Sleep Timer',
+                  child: Text(s.sleepTimer,
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                 ),
@@ -1223,7 +1227,7 @@ class _ControlPanelState extends State<ControlPanel>
                                                   data.audioState ==
                                                       BasicPlaybackState
                                                           .skippingToNext
-                                              ? 'Buffring...'
+                                              ? context.s.buffering
                                               : '',
                                           style: TextStyle(
                                               color: Theme.of(context)

@@ -46,20 +46,18 @@ class EpisodeGrid extends StatelessWidget {
     this.reverse,
   }) : super(key: key);
 
-  List<int> _menuList = [];
-
   Future<int> _isListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
-    _menuList = await _getEpisodeMenu();
     return await dbHelper.isListened(episode.enclosureUrl);
   }
 
-  Future<Tuple3<int, bool, bool>> _initData(EpisodeBrief episode) async {
+  Future<Tuple4<int, bool, bool, List<int>>> _initData(
+      EpisodeBrief episode) async {
     int listened = await _isListened(episode);
     bool liked = await _isLiked(episode);
     bool downloaded = await _isDownloaded(episode);
-    _menuList = await _getEpisodeMenu();
-    return Tuple3(listened, liked, downloaded);
+    List<int> menuList = await _getEpisodeMenu();
+    return Tuple4(listened, liked, downloaded, menuList);
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
@@ -431,13 +429,14 @@ class EpisodeGrid extends StatelessWidget {
               builder: (_, data, __) => OpenContainerWrapper(
                 episode: episodes[index],
                 closedBuilder: (context, action, boo) => FutureBuilder<
-                        Tuple3<int, bool, bool>>(
+                        Tuple4<int, bool, bool, List<int>>>(
                     future: _initData(episodes[index]),
-                    initialData: Tuple3(0, false, false),
+                    initialData: Tuple4(0, false, false, []),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       int isListened = snapshot.data.item1;
                       bool isLiked = snapshot.data.item2;
                       bool isDownloaded = snapshot.data.item3;
+                      List<int> menuList = snapshot.data.item4;
                       return Container(
                         decoration: BoxDecoration(
                             borderRadius:
@@ -457,21 +456,6 @@ class EpisodeGrid extends StatelessWidget {
                               ),
                             ]),
                         alignment: Alignment.center,
-                        // InkWell(
-                        //   borderRadius:
-                        //       BorderRadius.all(Radius.circular(5.0)),
-                        //   onTapDown: (details) => _offset = Offset(
-                        //       details.globalPosition.dx,
-                        //       details.globalPosition.dy),
-                        //   onLongPress: () => _showPopupMenu(
-                        //     _offset,
-                        //     episodes[index],
-                        //     context,
-                        //     isPlaying: data.item1 == episodes[index],
-                        //     isInPlaylist: data.item2
-                        //         .contains(episodes[index].enclosureUrl),
-                        //   ),
-                        //   onTap: action,
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius:
@@ -507,7 +491,7 @@ class EpisodeGrid extends StatelessWidget {
                                           : context.scaffoldBackgroundColor,
                                   title: Text(data.item1 != episodes[index]
                                       ? s.play
-                                      : "Playing"),
+                                      : s.playing),
                                   trailingIcon: Icon(
                                     LineIcons.play_circle_solid,
                                     color: Theme.of(context).accentColor,
@@ -516,7 +500,7 @@ class EpisodeGrid extends StatelessWidget {
                                     if (data.item1 != episodes[index])
                                       audio.episodeLoad(episodes[index]);
                                   }),
-                              _menuList.contains(1)
+                              menuList.contains(1)
                                   ? FocusedMenuItem(
                                       backgroundColor:
                                           context.brightness == Brightness.light
@@ -524,7 +508,7 @@ class EpisodeGrid extends StatelessWidget {
                                               : context.scaffoldBackgroundColor,
                                       title: data.item2.contains(
                                               episodes[index].enclosureUrl)
-                                          ? Text("Remove")
+                                          ? Text(s.remove)
                                           : Text(s.later),
                                       trailingIcon: Icon(
                                         LineIcons.clock_solid,
@@ -535,20 +519,20 @@ class EpisodeGrid extends StatelessWidget {
                                             episodes[index].enclosureUrl)) {
                                           audio.addToPlaylist(episodes[index]);
                                           Fluttertoast.showToast(
-                                            msg: 'Added to playlist',
+                                            msg: s.toastAddPlaylist,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         } else {
                                           audio
                                               .delFromPlaylist(episodes[index]);
                                           Fluttertoast.showToast(
-                                            msg: 'Removed from playlist',
+                                            msg: s.toastRemovePlaylist,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         }
                                       })
                                   : null,
-                              _menuList.contains(2)
+                              menuList.contains(2)
                                   ? FocusedMenuItem(
                                       backgroundColor:
                                           context.brightness == Brightness.light
@@ -565,7 +549,7 @@ class EpisodeGrid extends StatelessWidget {
                                               episodes[index].enclosureUrl);
                                           audio.setEpisodeState = true;
                                           Fluttertoast.showToast(
-                                            msg: 'Unliked',
+                                            msg: s.unliked,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         } else {
@@ -573,20 +557,20 @@ class EpisodeGrid extends StatelessWidget {
                                               episodes[index].enclosureUrl);
                                           audio.setEpisodeState = true;
                                           Fluttertoast.showToast(
-                                            msg: 'Liked',
+                                            msg: s.liked,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         }
                                       })
                                   : null,
-                              _menuList.contains(3)
+                              menuList.contains(3)
                                   ? FocusedMenuItem(
                                       backgroundColor:
                                           context.brightness == Brightness.light
                                               ? context.primaryColor
                                               : context.scaffoldBackgroundColor,
                                       title: isListened > 0
-                                          ? Text('Listened',
+                                          ? Text(s.listened,
                                               style: TextStyle(
                                                   color: context.textColor
                                                       .withOpacity(0.5)))
@@ -614,14 +598,14 @@ class EpisodeGrid extends StatelessWidget {
                                         }
                                       })
                                   : null,
-                              _menuList.contains(4)
+                              menuList.contains(4)
                                   ? FocusedMenuItem(
                                       backgroundColor:
                                           context.brightness == Brightness.light
                                               ? context.primaryColor
                                               : context.scaffoldBackgroundColor,
                                       title: isDownloaded
-                                          ? Text(s.homeSubMenuDownloaded,
+                                          ? Text(s.downloaded,
                                               style: TextStyle(
                                                   color: context.textColor
                                                       .withOpacity(0.5)))

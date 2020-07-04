@@ -205,7 +205,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
             print(e);
           }
         }
-        int count = await dbHelper.savePodcastRss(p, uuid);
+        await dbHelper.savePodcastRss(p, uuid);
 
         sendPort.send([item.title, item.url, 3, uuid]);
 

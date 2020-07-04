@@ -1,11 +1,39 @@
 {
   "@@locale": "zh-Hans",
+  "add": "订阅",
+  "@add": {
+    "description": "Subscribe new podcast"
+  },
+  "addEpisodeGroup": "{count, plural, zero{} other{{group Name}分组{count}集节目添加到播放列表}}",
+  "@addEpisodeGroup": {
+    "placeholders": {
+      "groupName": {}
+    }
+  },
+  "addNewEpisodeAll": "{count, plural, zero{} other{{count}集节目添加到播放列表}}",
+  "@addNewEpisodeAll": {},
+  "addNewEpisodeTooltip": "添加更新节目到播放列表",
+  "@addNewEpisodeTooltip": {},
+  "addSomeGroups": "请添加分组",
+  "@addSomeGroups": {
+    "description": "Please add new groups"
+  },
   "all": "全部",
   "@all": {},
+  "back": "返回",
+  "@back": {},
+  "buffering": "缓冲",
+  "@buffering": {},
   "cancel": "取消",
   "@cancel": {},
+  "changeLayout": "修改布局",
+  "@changeLayout": {},
+  "changelog": "更新日志",
+  "@changelog": {},
   "chooseA": "选择",
   "@chooseA": {},
+  "clear": "清除",
+  "@clear": {},
   "color": "颜色",
   "@color": {},
   "confirm": "确认",
@@ -14,12 +42,42 @@
   "@darkMode": {},
   "delete": "删除",
   "@delete": {},
+  "developer": "关于我",
+  "@developer": {},
+  "dismiss": "忽略",
+  "@dismiss": {},
   "download": "下载",
   "@download": {},
+  "downloaded": "已下载",
+  "@downloaded": {},
   "editName": "修改组名",
   "@editName": {},
   "endOfEpisode": "节目结束",
   "@endOfEpisode": {},
+  "featureDiscoveryEpisode": "节目界面",
+  "@featureDiscoveryEpisode": {},
+  "featureDiscoveryEpisodeDes": "您可以长按播放节目或者添加节目到播放列表。",
+  "@featureDiscoveryEpisodeDes": {},
+  "featureDiscoveryEpisodeTitle": "您可以长按快速播放节目",
+  "@featureDiscoveryEpisodeTitle": {},
+  "featureDiscoveryOMPL": "点击导入 OMPL",
+  "@featureDiscoveryOMPL": {},
+  "featureDiscoveryOMPLDes": "在这里您可以导入OMPL文件，打开设置页面，或者刷新所有播客。",
+  "@featureDiscoveryOMPLDes": {},
+  "featureDiscoveryPlaylist": "点击打开播放列表",
+  "@featureDiscoveryPlaylist": {},
+  "featureDiscoveryPlaylistDes": "您可以添加节目到播放列表，节目在播放后将会从播放列表自动移除。",
+  "@featureDiscoveryPlaylistDes": {},
+  "featureDiscoveryPodcast": "播客界面",
+  "@featureDiscoveryPodcast": {},
+  "featureDiscoveryPodcastDes": "您可以点击“查看所有”新增或管理分组。",
+  "@featureDiscoveryPodcastDes": {},
+  "featureDiscoveryPodcastTitle": "您可以通过上下滑动切换分组",
+  "@featureDiscoveryPodcastTitle": {},
+  "featureDiscoverySearch": "点击搜索播客",
+  "@featureDiscoverySearch": {},
+  "featureDiscoverySearchDes": "您可以通过搜索播客名称、关键字或者RSS链接订阅播客。",
+  "@featureDiscoverySearchDes": {},
   "feedbackEmail": "发送邮件",
   "@feedbackEmail": {},
   "feedbackGithub": "提交Issue",
@@ -30,14 +88,16 @@
   "@feedbackTelegram": {},
   "from": "自",
   "@from": {},
+  "goodNight": "晚安",
+  "@goodNight": {},
+  "groupFilter": "分组",
+  "@groupFilter": {},
   "groups": "分组",
   "@groups": {},
   "homeGroupsSeeAll": "查看全部",
   "@homeGroupsSeeAll": {},
   "homeMenuPlaylist": "播放列表",
   "@homeMenuPlaylist": {},
-  "homeSubMenuDownloaded": "已下载",
-  "@homeSubMenuDownloaded": {},
   "homeSubMenuLikeData": "添加日期",
   "@homeSubMenuLikeData": {},
   "homeSubMenuSortBy": "排序",
@@ -56,6 +116,14 @@
   "@homeToprightMenuRefreshAll": {},
   "homeToprightMenuSettings": "设置",
   "@homeToprightMenuSettings": {},
+  "hostedOn": "平台 {host}",
+  "@hostedOn": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "hoursCount": "{count, plural, zero{} other{{count} 小时}}",
+  "@hoursCount": {},
   "later": "稍后",
   "@later": {},
   "lightMode": "明亮模式",
@@ -64,10 +132,18 @@
   "@like": {},
   "liked": "已收藏",
   "@liked": {},
+  "likeDate": "收藏日期",
+  "@likeDate": {},
   "listen": "收听",
   "@listen": {},
   "listened": "已收听",
   "@listened": {},
+  "loadMore": "加载更多",
+  "@loadMore": {},
+  "markConfirm": "确认标记",
+  "@markConfirm": {},
+  "markConfirmContent": "是否确认标记全部节目为已收听？",
+  "@markConfirmContent": {},
   "markListened": "标记已收听",
   "@markListened": {},
   "menu": "菜单",
@@ -76,18 +152,72 @@
   "@menuAllPodcasts": {},
   "menuMarkAllListened": "标记所有已收听",
   "@menuMarkAllListened": {},
-  "menuMarkListened": "标记已收听",
-  "@menuMarkListened": {},
   "menuViewRSS": "查看 RSS",
   "@menuViewRSS": {},
   "menuVisitSite": "访问网站",
   "@menuVisitSite": {},
+  "minsCount": "{count, plural, zero{} other{{count}分钟}}",
+  "@minsCount": {},
   "network": "网络",
   "@network": {},
+  "newestFirst": "由新到旧",
+  "@newestFirst": {},
   "newGroup": "创建分组",
   "@newGroup": {},
+  "noEpisodeDownload": "暂无下载节目",
+  "@noEpisodeDownload": {},
+  "noEpisodeFavorite": "暂无收藏节目",
+  "@noEpisodeFavorite": {},
+  "noEpisodeRecent": "暂无节目",
+  "@noEpisodeRecent": {},
+  "noPodcastGroup": "分组无播客",
+  "@noPodcastGroup": {},
+  "notificaitonFatch": "获取数据 {title}",
+  "@notificaitonFatch": {},
+  "notificationNetworkError": "订阅失败，网络错误 {title}",
+  "@notificationNetworkError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSubscribe": "订阅{title}",
+  "@notificationSubscribe": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSubscribeExisted": "订阅失败，播客已存在 {title}",
+  "@notificationSubscribeExisted": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSuccess": "订阅成功 {title}",
+  "@notificationSuccess": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdate": "更新 {title}",
+  "@notificationUpdate": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdateError": "更新失败 {title}",
+  "@notificationUpdateError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "oldestFirst": "由旧到新",
+  "@oldestFirst": {},
   "play": "播放",
   "@play": {},
+  "playing": "正在播放",
+  "@playing": {},
+  "podcastSubscribed": "播客已订阅",
+  "@podcastSubscribed": {},
   "popupMenuDownloadDes": "下载节目",
   "@popupMenuDownloadDes": {},
   "popupMenuLaterDes": "添加到播放列表",
@@ -98,10 +228,14 @@
   "@popupMenuMarkDes": {},
   "popupMenuPlayDes": "播放节目",
   "@popupMenuPlayDes": {},
+  "privacyPolicy": "隐私条款",
+  "@privacyPolicy": {},
   "remove": "移除",
   "@remove": {},
   "schedule": "定时",
   "@schedule": {},
+  "searchInvalidRss": "RSS 链接错误",
+  "@searchInvalidRss": {},
   "searchPodcast": "搜索播客",
   "@searchPodcast": {},
   "settingsAccentColor": "次要颜色",
@@ -214,12 +348,26 @@
   "@settingsUpdateInterval": {},
   "settingsUpdateIntervalDes": "默认 24 小时",
   "@settingsUpdateIntervalDes": {},
+  "size": "大小",
+  "@size": {},
   "sleepTimer": "睡眠模式",
   "@sleepTimer": {},
   "subscribe": "订阅",
   "@subscribe": {},
   "systemDefault": "系统默认",
   "@systemDefault": {},
+  "timeLastPlayed": "上次播放{time}",
+  "@timeLastPlayed": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "timeLeft": "剩余 {time}",
+  "@timeLeft": {
+    "placeholders": {
+      "time": {}
+    }
+  },
   "to": "到",
   "@to": {},
   "toastAddPlaylist": "添加到播放列表",
@@ -234,8 +382,22 @@
   "@toastReadFile": {},
   "toastRemovePlaylist": "从播放列表移除",
   "@toastRemovePlaylist": {},
+  "understood": "了解",
+  "@understood": {},
   "unlike": "取消喜欢",
   "@unlike": {},
   "unliked": "从收藏移除",
-  "@unliked": {}
+  "@unliked": {},
+  "updateDate": "更新日期",
+  "@updateDate": {},
+  "updateEpisodesCount": "{count, plural, zero{未有更新} other{更新 {count} 集节目}}",
+  "@updateEpisodesCount": {},
+  "updateFailed": "更新失败",
+  "@updateFailed": {},
+  "version": "版本：{version}",
+  "@version": {
+    "placeholders": {
+      "version": {}
+    }
+  }
 }

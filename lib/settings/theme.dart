@@ -91,7 +91,7 @@ class ThemeSetting extends StatelessWidget {
                                           Navigator.of(context).pop();
                                         }),
                                     RadioListTile(
-                                        title: Text('Dark mode'),
+                                        title: Text(s.darkMode),
                                         value: ThemeMode.dark,
                                         groupValue: settings.theme,
                                         onChanged: (value) {
@@ -99,7 +99,7 @@ class ThemeSetting extends StatelessWidget {
                                           Navigator.of(context).pop();
                                         }),
                                     RadioListTile(
-                                        title: Text('Light mode'),
+                                        title: Text(s.lightMode),
                                         value: ThemeMode.light,
                                         groupValue: settings.theme,
                                         onChanged: (value) {
@@ -140,9 +140,9 @@ class ThemeSetting extends StatelessWidget {
                 ListTile(
                   onTap: () => generalDialog(
                     context,
-                    title: Text.rich(TextSpan(text: 'Choose a ', children: [
+                    title: Text.rich(TextSpan(text: s.chooseA, children: [
                       TextSpan(
-                          text: 'color',
+                          text: s.color,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: context.accentColor))

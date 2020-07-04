@@ -63,6 +63,7 @@ class AboutApp extends StatelessWidget {
       );
     }
 
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -73,7 +74,7 @@ class AboutApp extends StatelessWidget {
       child: Scaffold(
           backgroundColor: Theme.of(context).primaryColor,
           appBar: AppBar(
-            title: Text('About'),
+            title: Text(s.homeToprightMenuAbout),
           ),
           body: SafeArea(
             child: SingleChildScrollView(
@@ -95,7 +96,7 @@ class AboutApp extends StatelessWidget {
                             image: AssetImage('assets/logo.png'),
                             height: 80,
                           ),
-                          Text('Version: $version'),
+                          Text(s.version(version)),
                         ],
                       ),
                     ),
@@ -113,7 +114,7 @@ class AboutApp extends StatelessWidget {
                         FlatButton(
                           onPressed: () => _launchUrl(
                               'https://tsacdop.stonegate.me/#/privacy'),
-                          child: Text('Privacy Policy',
+                          child: Text(s.privacyPolicy,
                               style: TextStyle(color: context.accentColor)),
                         ),
                         Container(
@@ -127,7 +128,7 @@ class AboutApp extends StatelessWidget {
                         FlatButton(
                           onPressed: () => _launchUrl(
                               'https://tsacdop.stonegate.me/#/changelog'),
-                          child: Text('Changelog',
+                          child: Text(s.changelog,
                               style: TextStyle(color: context.accentColor)),
                         ),
                       ],
@@ -152,7 +153,7 @@ class AboutApp extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Developer',
+                                  s.developer,
                                   style: TextStyle(
                                       color: Theme.of(context).accentColor,
                                       fontWeight: FontWeight.bold),

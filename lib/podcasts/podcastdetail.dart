@@ -44,7 +44,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   int _episodeCount;
   Layout _layout;
   bool _scroll;
-  Future _updateRssItem(PodcastLocal podcastLocal) async {
+  Future _updateRssItem(BuildContext context, PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final result = await dbHelper.updatePodcastRss(podcastLocal);
     if (result == 0) {
@@ -54,7 +54,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       );
     } else if (result > 0) {
       Fluttertoast.showToast(
-        msg: 'Updated $result Episodes',
+        msg: context.s.updateEpisodesCount(result),
         gravity: ToastGravity.TOP,
       );
 
@@ -85,7 +85,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       }
     } else {
       Fluttertoast.showToast(
-        msg: 'Update failed, network error',
+        msg: context.s.updateFailed,
         gravity: ToastGravity.TOP,
       );
     }
@@ -226,15 +226,15 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   _confirmMarkListened(BuildContext context) => generalDialog(
         context,
-        title: Text('Mark confirm'),
-        content: Text('Confirm mark all episodes listened?'),
+        title: Text(context.s.markConfirm),
+        content: Text(context.s.markConfirmContent),
         actions: <Widget>[
           FlatButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
             child: Text(
-              'CANCEL',
+              context.s.cancel,
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
@@ -244,7 +244,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
               await _markListened(widget.podcastLocal.id);
             },
             child: Text(
-              'CONFIRM',
+              context.s.confirm,
               style: TextStyle(color: context.accentColor),
             ),
           )
@@ -293,7 +293,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
             key: _refreshIndicatorKey,
             color: Theme.of(context).accentColor,
             onRefresh: () async {
-              await _updateRssItem(widget.podcastLocal);
+              await _updateRssItem(context, widget.podcastLocal);
               //  audio.addNewEpisode(widget.podcastLocal.id);
             },
             child: Stack(
@@ -346,7 +346,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(10))),
                                           elevation: 2,
-                                          tooltip: 'Menu',
+                                          tooltip: s.menu,
                                           itemBuilder: (context) => [
                                             widget.podcastLocal.link != null
                                                 ? PopupMenuItem(
@@ -494,10 +494,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                     widget.podcastLocal.provider
                                                             .isNotEmpty
                                                         ? Text(
-                                                            'Hosted on ' +
-                                                                widget
-                                                                    .podcastLocal
-                                                                    .provider,
+                                                            s.hostedOn(widget
+                                                                .podcastLocal
+                                                                .provider),
                                                             maxLines: 1,
                                                             style: TextStyle(
                                                                 color: Colors
@@ -588,12 +587,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                     PopupMenuItem(
                                                       value: 0,
                                                       child:
-                                                          Text('Newest first'),
+                                                          Text(s.newestFirst),
                                                     ),
                                                     PopupMenuItem(
                                                       value: 1,
                                                       child:
-                                                          Text('Oldest first'),
+                                                          Text(s.oldestFirst),
                                                     )
                                                   ],
                                                   onSelected: (value) {

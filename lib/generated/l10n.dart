@@ -33,6 +33,62 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
+  /// `Add`
+  String get add {
+    return Intl.message(
+      'Add',
+      name: 'add',
+      desc: 'Subscribe new podcast',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, zero{} one{{count} episode in {groupName} added to playlist} other{{count} episodes in {groupName} added to playlist}}`
+  String addEpisodeGroup(Object groupName, num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: '$count episode in $groupName added to playlist',
+      other: '$count episodes in $groupName added to playlist',
+      name: 'addEpisodeGroup',
+      desc: '',
+      args: [groupName, count],
+    );
+  }
+
+  /// `{count, plural, zero{} one{{count} episode added to playlist} other{{count} episodes added to playlist}}`
+  String addNewEpisodeAll(num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: '$count episode added to playlist',
+      other: '$count episodes added to playlist',
+      name: 'addNewEpisodeAll',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Add new episodes to playlist`
+  String get addNewEpisodeTooltip {
+    return Intl.message(
+      'Add new episodes to playlist',
+      name: 'addNewEpisodeTooltip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add some groups`
+  String get addSomeGroups {
+    return Intl.message(
+      'Add some groups',
+      name: 'addSomeGroups',
+      desc: 'Please add new groups',
+      args: [],
+    );
+  }
+
   /// `All`
   String get all {
     return Intl.message(
@@ -43,11 +99,51 @@ class S {
     );
   }
 
-  /// `Cancel`
+  /// `Back`
+  String get back {
+    return Intl.message(
+      'Back',
+      name: 'back',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Buffering`
+  String get buffering {
+    return Intl.message(
+      'Buffering',
+      name: 'buffering',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `CANCEL`
   String get cancel {
     return Intl.message(
-      'Cancel',
+      'CANCEL',
       name: 'cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change layout`
+  String get changeLayout {
+    return Intl.message(
+      'Change layout',
+      name: 'changeLayout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Changelog`
+  String get changelog {
+    return Intl.message(
+      'Changelog',
+      name: 'changelog',
       desc: '',
       args: [],
     );
@@ -63,6 +159,16 @@ class S {
     );
   }
 
+  /// `Clear`
+  String get clear {
+    return Intl.message(
+      'Clear',
+      name: 'clear',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `color`
   String get color {
     return Intl.message(
@@ -73,10 +179,10 @@ class S {
     );
   }
 
-  /// `Confirm`
+  /// `CONFIRM`
   String get confirm {
     return Intl.message(
-      'Confirm',
+      'CONFIRM',
       name: 'confirm',
       desc: '',
       args: [],
@@ -103,11 +209,41 @@ class S {
     );
   }
 
+  /// `Developer`
+  String get developer {
+    return Intl.message(
+      'Developer',
+      name: 'developer',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dismiss`
+  String get dismiss {
+    return Intl.message(
+      'Dismiss',
+      name: 'dismiss',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Download`
   String get download {
     return Intl.message(
       'Download',
       name: 'download',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Downloaded`
+  String get downloaded {
+    return Intl.message(
+      'Downloaded',
+      name: 'downloaded',
       desc: '',
       args: [],
     );
@@ -128,6 +264,126 @@ class S {
     return Intl.message(
       'End of Episode',
       name: 'endOfEpisode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Episode view`
+  String get featureDiscoveryEpisode {
+    return Intl.message(
+      'Episode view',
+      name: 'featureDiscoveryEpisode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can long tap to play episode or add episode to playlist.`
+  String get featureDiscoveryEpisodeDes {
+    return Intl.message(
+      'You can long tap to play episode or add episode to playlist.',
+      name: 'featureDiscoveryEpisodeDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Long tap to play episode instantly`
+  String get featureDiscoveryEpisodeTitle {
+    return Intl.message(
+      'Long tap to play episode instantly',
+      name: 'featureDiscoveryEpisodeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to import OMPL`
+  String get featureDiscoveryOMPL {
+    return Intl.message(
+      'Tap to import OMPL',
+      name: 'featureDiscoveryOMPL',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can import OMPL file, open setting or refresh all podcast at once here.`
+  String get featureDiscoveryOMPLDes {
+    return Intl.message(
+      'You can import OMPL file, open setting or refresh all podcast at once here.',
+      name: 'featureDiscoveryOMPLDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to open playlist`
+  String get featureDiscoveryPlaylist {
+    return Intl.message(
+      'Tap to open playlist',
+      name: 'featureDiscoveryPlaylist',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can add episode to playlist by yourself. Episode will be auto removed from playlist when played.`
+  String get featureDiscoveryPlaylistDes {
+    return Intl.message(
+      'You can add episode to playlist by yourself. Episode will be auto removed from playlist when played.',
+      name: 'featureDiscoveryPlaylistDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Podcast view`
+  String get featureDiscoveryPodcast {
+    return Intl.message(
+      'Podcast view',
+      name: 'featureDiscoveryPodcast',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can tap See All to add groups or manage podcasts.`
+  String get featureDiscoveryPodcastDes {
+    return Intl.message(
+      'You can tap See All to add groups or manage podcasts.',
+      name: 'featureDiscoveryPodcastDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scroll vertically to switch groups`
+  String get featureDiscoveryPodcastTitle {
+    return Intl.message(
+      'Scroll vertically to switch groups',
+      name: 'featureDiscoveryPodcastTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to search podcast`
+  String get featureDiscoverySearch {
+    return Intl.message(
+      'Tap to search podcast',
+      name: 'featureDiscoverySearch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can search podcast title , key word or RSS link to subscribe new podcast.`
+  String get featureDiscoverySearchDes {
+    return Intl.message(
+      'You can search podcast title , key word or RSS link to subscribe new podcast.',
+      name: 'featureDiscoverySearchDes',
       desc: '',
       args: [],
     );
@@ -183,6 +439,26 @@ class S {
     );
   }
 
+  /// `Good Night`
+  String get goodNight {
+    return Intl.message(
+      'Good Night',
+      name: 'goodNight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Group filter`
+  String get groupFilter {
+    return Intl.message(
+      'Group filter',
+      name: 'groupFilter',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Groups`
   String get groups {
     return Intl.message(
@@ -208,16 +484,6 @@ class S {
     return Intl.message(
       'Playlist',
       name: 'homeMenuPlaylist',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Downloaded`
-  String get homeSubMenuDownloaded {
-    return Intl.message(
-      'Downloaded',
-      name: 'homeSubMenuDownloaded',
       desc: '',
       args: [],
     );
@@ -313,6 +579,29 @@ class S {
     );
   }
 
+  /// `Hosted on {host}`
+  String hostedOn(Object host) {
+    return Intl.message(
+      'Hosted on $host',
+      name: 'hostedOn',
+      desc: '',
+      args: [host],
+    );
+  }
+
+  /// `{count, plural, zero{} one{{count} hour} other{{count} hours}}`
+  String hoursCount(num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: '$count hour',
+      other: '$count hours',
+      name: 'hoursCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `Later`
   String get later {
     return Intl.message(
@@ -353,6 +642,16 @@ class S {
     );
   }
 
+  /// `Like date`
+  String get likeDate {
+    return Intl.message(
+      'Like date',
+      name: 'likeDate',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Listen`
   String get listen {
     return Intl.message(
@@ -368,6 +667,36 @@ class S {
     return Intl.message(
       'Listened',
       name: 'listened',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Load more`
+  String get loadMore {
+    return Intl.message(
+      'Load more',
+      name: 'loadMore',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Mark confirm`
+  String get markConfirm {
+    return Intl.message(
+      'Mark confirm',
+      name: 'markConfirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm mark all episodes listened?`
+  String get markConfirmContent {
+    return Intl.message(
+      'Confirm mark all episodes listened?',
+      name: 'markConfirmContent',
       desc: '',
       args: [],
     );
@@ -413,16 +742,6 @@ class S {
     );
   }
 
-  /// `Mark Listened`
-  String get menuMarkListened {
-    return Intl.message(
-      'Mark Listened',
-      name: 'menuMarkListened',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Visit RSS Feed`
   String get menuViewRSS {
     return Intl.message(
@@ -443,11 +762,34 @@ class S {
     );
   }
 
+  /// `{count, plural, zero{} one{{count} min} other{{count} mins}}`
+  String minsCount(num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: '$count min',
+      other: '$count mins',
+      name: 'minsCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `Network`
   String get network {
     return Intl.message(
       'Network',
       name: 'network',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Newest first`
+  String get newestFirst {
+    return Intl.message(
+      'Newest first',
+      name: 'newestFirst',
       desc: '',
       args: [],
     );
@@ -463,11 +805,151 @@ class S {
     );
   }
 
+  /// `No episode downloaded yet`
+  String get noEpisodeDownload {
+    return Intl.message(
+      'No episode downloaded yet',
+      name: 'noEpisodeDownload',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No episode collected yet`
+  String get noEpisodeFavorite {
+    return Intl.message(
+      'No episode collected yet',
+      name: 'noEpisodeFavorite',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No episode received yet`
+  String get noEpisodeRecent {
+    return Intl.message(
+      'No episode received yet',
+      name: 'noEpisodeRecent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No podcast in this group`
+  String get noPodcastGroup {
+    return Intl.message(
+      'No podcast in this group',
+      name: 'noPodcastGroup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fetch data {title}`
+  String notificaitonFatch(Object title) {
+    return Intl.message(
+      'Fetch data $title',
+      name: 'notificaitonFatch',
+      desc: '',
+      args: [title],
+    );
+  }
+
+  /// `Subscribe failed, network error {title}`
+  String notificationNetworkError(Object title) {
+    return Intl.message(
+      'Subscribe failed, network error $title',
+      name: 'notificationNetworkError',
+      desc: '',
+      args: [title],
+    );
+  }
+
+  /// `Subscribe {title}`
+  String notificationSubscribe(Object title) {
+    return Intl.message(
+      'Subscribe $title',
+      name: 'notificationSubscribe',
+      desc: '',
+      args: [title],
+    );
+  }
+
+  /// `Subscribe failed, podcast existed {title}`
+  String notificationSubscribeExisted(Object title) {
+    return Intl.message(
+      'Subscribe failed, podcast existed $title',
+      name: 'notificationSubscribeExisted',
+      desc: '',
+      args: [title],
+    );
+  }
+
+  /// `Subscribe success {title}`
+  String notificationSuccess(Object title) {
+    return Intl.message(
+      'Subscribe success $title',
+      name: 'notificationSuccess',
+      desc: '',
+      args: [title],
+    );
+  }
+
+  /// `Update {title}`
+  String notificationUpdate(Object title) {
+    return Intl.message(
+      'Update $title',
+      name: 'notificationUpdate',
+      desc: '',
+      args: [title],
+    );
+  }
+
+  /// `Update error {title}`
+  String notificationUpdateError(Object title) {
+    return Intl.message(
+      'Update error $title',
+      name: 'notificationUpdateError',
+      desc: '',
+      args: [title],
+    );
+  }
+
+  /// `Oldest first`
+  String get oldestFirst {
+    return Intl.message(
+      'Oldest first',
+      name: 'oldestFirst',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Play`
   String get play {
     return Intl.message(
       'Play',
       name: 'play',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Playing`
+  String get playing {
+    return Intl.message(
+      'Playing',
+      name: 'playing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Podcast subscribed`
+  String get podcastSubscribed {
+    return Intl.message(
+      'Podcast subscribed',
+      name: 'podcastSubscribed',
       desc: '',
       args: [],
     );
@@ -523,6 +1005,16 @@ class S {
     );
   }
 
+  /// `Privacy Policy`
+  String get privacyPolicy {
+    return Intl.message(
+      'Privacy Policy',
+      name: 'privacyPolicy',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Remove`
   String get remove {
     return Intl.message(
@@ -538,6 +1030,16 @@ class S {
     return Intl.message(
       'Schedule',
       name: 'schedule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid RSS link`
+  String get searchInvalidRss {
+    return Intl.message(
+      'Invalid RSS link',
+      name: 'searchInvalidRss',
       desc: '',
       args: [],
     );
@@ -1103,6 +1605,16 @@ class S {
     );
   }
 
+  /// `Size`
+  String get size {
+    return Intl.message(
+      'Size',
+      name: 'size',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Sleep timer`
   String get sleepTimer {
     return Intl.message(
@@ -1130,6 +1642,26 @@ class S {
       name: 'systemDefault',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Last time {time}`
+  String timeLastPlayed(Object time) {
+    return Intl.message(
+      'Last time $time',
+      name: 'timeLastPlayed',
+      desc: '',
+      args: [time],
+    );
+  }
+
+  /// `{time} Left`
+  String timeLeft(Object time) {
+    return Intl.message(
+      '$time Left',
+      name: 'timeLeft',
+      desc: '',
+      args: [time],
     );
   }
 
@@ -1203,6 +1735,16 @@ class S {
     );
   }
 
+  /// `Understood`
+  String get understood {
+    return Intl.message(
+      'Understood',
+      name: 'understood',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Unlike`
   String get unlike {
     return Intl.message(
@@ -1213,13 +1755,56 @@ class S {
     );
   }
 
-  /// `Unliked`
+  /// `Removed from favorite`
   String get unliked {
     return Intl.message(
-      'Unliked',
+      'Removed from favorite',
       name: 'unliked',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Update date`
+  String get updateDate {
+    return Intl.message(
+      'Update date',
+      name: 'updateDate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, zero{No Update} one{Updated {count} Episode} other{Updated {count} Episodes}}`
+  String updateEpisodesCount(num count) {
+    return Intl.plural(
+      count,
+      zero: 'No Update',
+      one: 'Updated $count Episode',
+      other: 'Updated $count Episodes',
+      name: 'updateEpisodesCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Update failed, network error`
+  String get updateFailed {
+    return Intl.message(
+      'Update failed, network error',
+      name: 'updateFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Version : {version}`
+  String version(Object version) {
+    return Intl.message(
+      'Version : $version',
+      name: 'version',
+      desc: '',
+      args: [version],
     );
   }
 }

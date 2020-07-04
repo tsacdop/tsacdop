@@ -56,6 +56,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
+    final s = context.s;
     return Consumer<GroupList>(builder: (_, groupList, __) {
       var groups = groupList.groups;
       bool isLoading = groupList.isLoading;
@@ -75,7 +76,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                             if (event.primaryVelocity > 200) {
                               if (groups.length == 1) {
                                 Fluttertoast.showToast(
-                                  msg: 'Add some groups',
+                                  msg: s.addSomeGroups,
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               } else {
@@ -89,7 +90,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                             } else if (event.primaryVelocity < -200) {
                               if (groups.length == 1) {
                                 Fluttertoast.showToast(
-                                  msg: 'Add some groups',
+                                  msg: s.addSomeGroups,
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               } else {
@@ -136,7 +137,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                             height: 30,
                                             padding: EdgeInsets.all(5.0),
                                             child: Text(
-                                              'See All',
+                                              s.homeGroupsSeeAll,
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodyText1
@@ -189,7 +190,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                       TextSpan(text: ' to subscribe podcasts')
                                     ],
                                   ))
-                                : Text('No podcast in this group',
+                                : Text(s.noPodcastGroup,
                                     style: TextStyle(
                                         color: context.textTheme.bodyText2.color
                                             .withOpacity(0.5)))),
@@ -208,7 +209,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                           if (event.primaryVelocity > 200) {
                             if (groups.length == 1) {
                               Fluttertoast.showToast(
-                                msg: 'Add some groups',
+                                msg: s.addSomeGroups,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             } else {
@@ -222,7 +223,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                           } else if (event.primaryVelocity < -200) {
                             if (groups.length == 1) {
                               Fluttertoast.showToast(
-                                msg: 'Add some groups',
+                                msg: s.addSomeGroups,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             } else {
@@ -268,7 +269,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                           height: 30,
                                           padding: EdgeInsets.all(5.0),
                                           child: Text(
-                                            'See All',
+                                            s.homeGroupsSeeAll,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyText1
@@ -441,7 +442,7 @@ class PodcastPreview extends StatelessWidget {
                       selector: (_, audio) => audio.playerRunning,
                       builder: (_, playerRunning, __) => IconButton(
                         icon: Icon(Icons.arrow_forward),
-                        tooltip: 'See All',
+                        tooltip: context.s.homeGroupsSeeAll,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -471,19 +472,19 @@ class PodcastPreview extends StatelessWidget {
 class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> episodes;
   final PodcastLocal podcastLocal;
-  List<int> _menuList = [];
   ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
   String _stringForSeconds(double seconds) {
     if (seconds == null) return null;
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
-  Future<Tuple3<int, bool, bool>> _initData(EpisodeBrief episode) async {
+  Future<Tuple4<int, bool, bool, List<int>>> _initData(
+      EpisodeBrief episode) async {
     int listened = await _isListened(episode);
     bool liked = await _isLiked(episode);
     bool downloaded = await _isDownloaded(episode);
-    _menuList = await _getEpisodeMenu();
-    return Tuple3(listened, liked, downloaded);
+    List<int> menuList = await _getEpisodeMenu();
+    return Tuple4(listened, liked, downloaded, menuList);
   }
 
   Future<int> _isListened(EpisodeBrief episode) async {
@@ -697,9 +698,9 @@ class ShowEpisode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double _width = context.width;
+    final s = context.s;
     var downloader = Provider.of<DownloadState>(context, listen: false);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    Offset offset;
     return CustomScrollView(
       physics: NeverScrollableScrollPhysics(),
       primary: false,
@@ -727,14 +728,15 @@ class ShowEpisode extends StatelessWidget {
                               .toList(),
                         ),
                     builder: (_, data, __) => FutureBuilder<
-                            Tuple3<int, bool, bool>>(
+                            Tuple4<int, bool, bool, List<int>>>(
                         future: _initData(episodes[index]),
-                        initialData: Tuple3(0, false, false),
+                        initialData: Tuple4(0, false, false, []),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           int isListened = snapshot.data.item1;
                           bool isLiked = snapshot.data.item2;
                           bool isDownloaded = snapshot.data.item3;
+                          List<int> menuList = snapshot.data.item4;
                           return Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -742,24 +744,7 @@ class ShowEpisode extends StatelessWidget {
                               color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                             alignment: Alignment.center,
-                            child:
-                                // InkWell(
-                                //   borderRadius:
-                                //       BorderRadius.all(Radius.circular(5.0)),
-                                //   onTapDown: (details) => offset = Offset(
-                                //       details.globalPosition.dx,
-                                //       details.globalPosition.dy),
-                                //   onLongPress: () => _showPopupMenu(
-                                //       offset,
-                                //       episodes[index],
-                                //       context,
-                                //       data.item1 == episodes[index],
-                                //       data.item2.contains(
-                                //           episodes[index].enclosureUrl)),
-                                //   onTap: () {
-                                //
-                                //   },
-                                FocusedMenuHolder(
+                            child: FocusedMenuHolder(
                               blurSize: 0.0,
                               menuItemExtent: 45,
                               menuBoxDecoration: BoxDecoration(
@@ -782,8 +767,8 @@ class ShowEpisode extends StatelessWidget {
                                             ? context.primaryColor
                                             : context.scaffoldBackgroundColor,
                                     title: Text(data.item1 != episodes[index]
-                                        ? "Play"
-                                        : "Playing"),
+                                        ? s.play
+                                        : s.playing),
                                     trailingIcon: Icon(
                                       LineIcons.play_circle_solid,
                                       color: Theme.of(context).accentColor,
@@ -792,7 +777,7 @@ class ShowEpisode extends StatelessWidget {
                                       if (data.item1 != episodes[index])
                                         audio.episodeLoad(episodes[index]);
                                     }),
-                                _menuList.contains(1)
+                                menuList.contains(1)
                                     ? FocusedMenuItem(
                                         backgroundColor: context.brightness ==
                                                 Brightness.light
@@ -800,8 +785,8 @@ class ShowEpisode extends StatelessWidget {
                                             : context.scaffoldBackgroundColor,
                                         title: data.item2.contains(
                                                 episodes[index].enclosureUrl)
-                                            ? Text("Remove")
-                                            : Text("Later"),
+                                            ? Text(s.remove)
+                                            : Text(s.later),
                                         trailingIcon: Icon(
                                           LineIcons.clock_solid,
                                           color: Colors.cyan,
@@ -812,28 +797,28 @@ class ShowEpisode extends StatelessWidget {
                                             audio
                                                 .addToPlaylist(episodes[index]);
                                             Fluttertoast.showToast(
-                                              msg: 'Added to playlist',
+                                              msg: s.toastAddPlaylist,
                                               gravity: ToastGravity.BOTTOM,
                                             );
                                           } else {
                                             audio.delFromPlaylist(
                                                 episodes[index]);
                                             Fluttertoast.showToast(
-                                              msg: 'Removed from playlist',
+                                              msg: s.toastRemovePlaylist,
                                               gravity: ToastGravity.BOTTOM,
                                             );
                                           }
                                         })
                                     : null,
-                                _menuList.contains(2)
+                                menuList.contains(2)
                                     ? FocusedMenuItem(
                                         backgroundColor: context.brightness ==
                                                 Brightness.light
                                             ? context.primaryColor
                                             : context.scaffoldBackgroundColor,
                                         title: isLiked
-                                            ? Text("Unlike")
-                                            : Text("Like"),
+                                            ? Text(s.unlike)
+                                            : Text(s.like),
                                         trailingIcon: Icon(LineIcons.heart,
                                             color: Colors.red, size: 21),
                                         onPressed: () async {
@@ -842,7 +827,7 @@ class ShowEpisode extends StatelessWidget {
                                                 episodes[index].enclosureUrl);
                                             audio.setEpisodeState = true;
                                             Fluttertoast.showToast(
-                                              msg: 'Unliked',
+                                              msg: s.unliked,
                                               gravity: ToastGravity.BOTTOM,
                                             );
                                           } else {
@@ -850,25 +835,25 @@ class ShowEpisode extends StatelessWidget {
                                                 episodes[index].enclosureUrl);
                                             audio.setEpisodeState = true;
                                             Fluttertoast.showToast(
-                                              msg: 'Liked',
+                                              msg: s.liked,
                                               gravity: ToastGravity.BOTTOM,
                                             );
                                           }
                                         })
                                     : null,
-                                _menuList.contains(3)
+                                menuList.contains(3)
                                     ? FocusedMenuItem(
                                         backgroundColor: context.brightness ==
                                                 Brightness.light
                                             ? context.primaryColor
                                             : context.scaffoldBackgroundColor,
                                         title: isListened > 0
-                                            ? Text('Listened',
+                                            ? Text(s.listened,
                                                 style: TextStyle(
                                                     color: context.textColor
                                                         .withOpacity(0.5)))
                                             : Text(
-                                                'Mark Listened',
+                                                s.markListened,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -886,24 +871,24 @@ class ShowEpisode extends StatelessWidget {
                                                 episodes[index]);
                                             audio.setEpisodeState = true;
                                             Fluttertoast.showToast(
-                                              msg: 'Mark listened',
+                                              msg: s.markListened,
                                               gravity: ToastGravity.BOTTOM,
                                             );
                                           }
                                         })
                                     : null,
-                                _menuList.contains(4)
+                                menuList.contains(4)
                                     ? FocusedMenuItem(
                                         backgroundColor: context.brightness ==
                                                 Brightness.light
                                             ? context.primaryColor
                                             : context.scaffoldBackgroundColor,
                                         title: isDownloaded
-                                            ? Text('Downloaded',
+                                            ? Text(s.downloaded,
                                                 style: TextStyle(
                                                     color: context.textColor
                                                         .withOpacity(0.5)))
-                                            : Text('Download'),
+                                            : Text(s.download),
                                         trailingIcon: Icon(
                                             LineIcons.download_solid,
                                             color: Colors.green),

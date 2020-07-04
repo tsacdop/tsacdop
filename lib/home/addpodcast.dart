@@ -25,21 +25,6 @@ class MyHomePageDelegate extends SearchDelegate<int> {
           searchFieldLabel: searchFieldLabel,
         );
 
-  //static Future<List> getList(String searchText) async {
-  //  String apiKey = environment['apiKey'];
-  //  String url =
-  //      "https://listennotes.p.rapidapi.com/api/v1/search?only_in=title%2Cdescription&q=" +
-  //          "$searchText&type=podcast";
-  //  Response response = await Dio().get(url,
-  //      options: Options(headers: {
-  //        'X-RapidAPI-Key': "$apiKey",
-  //        'Accept': "application/json"
-  //      }));
-  //  Map searchResultMap = jsonDecode(response.toString());
-  //  var searchResult = SearchPodcast.fromJson(searchResultMap);
-  //  return searchResult.results;
-  //}
-
   static Future getRss(String url) async {
     try {
       BaseOptions options = new BaseOptions(
@@ -60,10 +45,10 @@ class MyHomePageDelegate extends SearchDelegate<int> {
   }
 
   RegExp rssExp = RegExp(r'^(https?):\/\/(.*)');
-  Widget invalidRss() => Container(
+  Widget invalidRss(BuildContext context) => Container(
         height: 50,
         alignment: Alignment.center,
-        child: Text('Invalid rss link'),
+        child: Text(context.s.searchInvalidRss),
       );
 
   @override
@@ -72,7 +57,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      tooltip: 'Back',
+      tooltip: context.s.back,
       icon: AnimatedIcon(
         icon: AnimatedIcons.menu_arrow,
         progress: transitionAnimation,
@@ -145,7 +130,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
         Center()
       else
         IconButton(
-          tooltip: 'Clear',
+          tooltip: context.s.clear,
           icon: const Icon(Icons.clear),
           onPressed: () {
             query = '';
@@ -174,7 +159,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
         future: getRss(rssExp.stringMatch(query)),
         builder: (context, snapshot) {
           if (snapshot.hasError)
-            return invalidRss();
+            return invalidRss(context);
           else if (snapshot.hasData)
             return SearchResult(
               onlinePodcast: snapshot.data,
@@ -297,7 +282,7 @@ class _SearchListState extends State<SearchList> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                     ))
-                                : Text('Load more'),
+                                : Text(context.s.loadMore),
                             onPressed: () => _loading
                                 ? null
                                 : setState(() {
@@ -362,7 +347,7 @@ class _SearchResultState extends State<SearchResult>
   @override
   Widget build(BuildContext context) {
     var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
-
+    final s = context.s;
     savePodcast(OnlinePodcast podcast) {
       SubscribeItem item =
           SubscribeItem(podcast.rss, podcast.title, imgUrl: podcast.image);
@@ -437,14 +422,14 @@ class _SearchResultState extends State<SearchResult>
                       ? OutlineButton(
                           highlightedBorderColor: context.accentColor,
                           splashColor: context.accentColor.withOpacity(0.8),
-                          child: Text('Subscribe',
+                          child: Text(s.subscribe,
                               style: TextStyle(
                                   color: Theme.of(context).accentColor)),
                           onPressed: () {
                             savePodcast(widget.onlinePodcast);
                             setState(() => _issubscribe = true);
                             Fluttertoast.showToast(
-                              msg: 'Podcast subscribed',
+                              msg: s.podcastSubscribed,
                               gravity: ToastGravity.BOTTOM,
                             );
                           })
@@ -452,7 +437,7 @@ class _SearchResultState extends State<SearchResult>
                           color: context.accentColor.withOpacity(0.8),
                           highlightedBorderColor: Colors.grey[500],
                           disabledTextColor: Colors.grey[500],
-                          child: Text('Subscribe'),
+                          child: Text(s.subscribe),
                           disabledBorderColor: Colors.grey[500],
                           onPressed: () {}),
                 ),

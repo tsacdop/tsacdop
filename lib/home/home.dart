@@ -42,10 +42,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  final MyHomePageDelegate _delegate = MyHomePageDelegate(
-    searchFieldLabel: 'Search podcast',
-  );
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TabController _controller;
   Decoration _getIndicator(BuildContext context) {
@@ -140,8 +136,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                             featureId: addFeature,
                                             tapTarget:
                                                 Icon(Icons.add_circle_outline),
-                                            title: const Text(
-                                                'Tap to search podcast'),
+                                            title:
+                                                Text(s.featureDiscoverySearch),
                                             backgroundColor: Colors.cyan[600],
                                             overflowMode: feature1OverflowMode,
                                             onDismiss: () {
@@ -151,13 +147,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: <Widget>[
-                                                const Text(
-                                                    'You can search podcast title , key word or RSS link to subscribe new podcast.'),
+                                                Text(s
+                                                    .featureDiscoverySearchDes),
                                                 FlatButton(
                                                   color: Colors.cyan[500],
                                                   padding:
                                                       const EdgeInsets.all(0),
-                                                  child: Text('Understood',
+                                                  child: Text(s.understood,
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .button
@@ -173,7 +169,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                   color: Colors.cyan[500],
                                                   padding:
                                                       const EdgeInsets.all(0),
-                                                  child: Text('Dismiss',
+                                                  child: Text(s.dismiss,
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .button
@@ -187,13 +183,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                               ],
                                             ),
                                             child: IconButton(
-                                              tooltip: 'Add',
+                                              tooltip: s.add,
                                               icon: const Icon(
                                                   Icons.add_circle_outline),
                                               onPressed: () async {
                                                 await showSearch<int>(
                                                   context: context,
-                                                  delegate: _delegate,
+                                                  delegate: MyHomePageDelegate(
+                                                      searchFieldLabel:
+                                                          s.searchPodcast),
                                                 );
                                               },
                                             ),
@@ -213,19 +211,19 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                               backgroundColor: Colors.cyan[500],
                                               onDismiss: () =>
                                                   Future.value(true),
-                                              title: const Text(
-                                                  'Tap to import OMPL'),
+                                              title:
+                                                  Text(s.featureDiscoveryOMPL),
                                               description: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.end,
                                                 children: <Widget>[
-                                                  const Text(
-                                                      'You can import OMPL file, open setting or refresh all podcast at once here.'),
+                                                  Text(s
+                                                      .featureDiscoveryOMPLDes),
                                                   FlatButton(
                                                     color: Colors.cyan[600],
                                                     padding:
                                                         const EdgeInsets.all(0),
-                                                    child: Text('Understood',
+                                                    child: Text(s.understood,
                                                         style: Theme.of(context)
                                                             .textTheme
                                                             .button
@@ -241,7 +239,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                     color: Colors.cyan[600],
                                                     padding:
                                                         const EdgeInsets.all(0),
-                                                    child: Text('Dismiss',
+                                                    child: Text(s.dismiss,
                                                         style: Theme.of(context)
                                                             .textTheme
                                                             .button
@@ -270,27 +268,26 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                       featureId: groupsFeature,
                                       tapTarget: Center(
                                           child: Text(
-                                        'Podcast View',
+                                        s.featureDiscoveryPodcast,
                                         textAlign: TextAlign.center,
                                       )),
                                       backgroundColor: Colors.cyan[500],
                                       enablePulsingAnimation: false,
                                       onDismiss: () => Future.value(true),
-                                      title: const Text(
-                                          'Scroll vertically to switch groups'),
+                                      title:
+                                          Text(s.featureDiscoveryPodcastTitle),
                                       description: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          const Text(
-                                              'You can tap See All to add groups or manage podcasts.'),
+                                          Text(s.featureDiscoveryPodcastDes),
                                           Row(
                                             children: [
                                               FlatButton(
                                                 color: Colors.cyan[600],
                                                 padding:
                                                     const EdgeInsets.all(0),
-                                                child: Text('Understood',
+                                                child: Text(s.understood,
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .button
@@ -309,7 +306,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                 color: Colors.cyan[600],
                                                 padding:
                                                     const EdgeInsets.all(0),
-                                                child: Text('Dismiss',
+                                                child: Text(s.dismiss,
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .button
@@ -365,26 +362,25 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   Key('tab0'),
                                   DescribedFeatureOverlay(
                                       featureId: podcastFeature,
-                                      tapTarget: Text('Episode View',
+                                      tapTarget: Text(s.featureDiscoveryEpisode,
                                           textAlign: TextAlign.center),
                                       backgroundColor: Colors.cyan[500],
                                       enablePulsingAnimation: false,
                                       onDismiss: () => Future.value(true),
-                                      title: const Text(
-                                          'Long tap to play episode instantly'),
+                                      title:
+                                          Text(s.featureDiscoveryEpisodeTitle),
                                       description: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          const Text(
-                                              'You can long tap to play episode or add episode to playlist.'),
+                                          Text(s.featureDiscoveryEpisodeDes),
                                           Row(
                                             children: [
                                               FlatButton(
                                                 color: Colors.cyan[600],
                                                 padding:
                                                     const EdgeInsets.all(0),
-                                                child: Text('Understood',
+                                                child: Text(s.understood,
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .button
@@ -403,7 +399,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                 color: Colors.cyan[600],
                                                 padding:
                                                     const EdgeInsets.all(0),
-                                                child: Text('Dismiss',
+                                                child: Text(s.dismiss,
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .button
@@ -457,6 +453,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final s = context.s;
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Column(
@@ -471,17 +468,16 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                   featureId: playlistFeature,
                   tapTarget: Icon(Icons.playlist_play),
                   backgroundColor: Colors.cyan[500],
-                  title: const Text('Tap to open playlist'),
+                  title: Text(s.featureDiscoveryPlaylist),
                   onDismiss: () => Future.value(true),
                   description: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const Text(
-                          'You can add episode to playlist by yourself. Episode will be auto removed from playlist when played.'),
+                      Text(s.featureDiscoveryPlaylistDes),
                       FlatButton(
                         color: Colors.cyan[600],
                         padding: const EdgeInsets.all(0),
-                        child: Text('Understood',
+                        child: Text(s.understood,
                             style: Theme.of(context)
                                 .textTheme
                                 .button
@@ -492,7 +488,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                       FlatButton(
                         color: Colors.cyan[600],
                         padding: const EdgeInsets.all(0),
-                        child: Text('Dismiss',
+                        child: Text(s.dismiss,
                             style: Theme.of(context)
                                 .textTheme
                                 .button
@@ -554,7 +550,7 @@ class PlaylistButtonState extends State<PlaylistButton> {
           borderRadius: BorderRadius.all(Radius.circular(10))),
       elevation: 1,
       icon: Icon(Icons.playlist_play),
-      tooltip: "Menu",
+      tooltip: s.menu,
       itemBuilder: (context) => [
         MyPopupMenuItem(
           height: 50,
@@ -749,7 +745,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                               Padding(
                                   padding: EdgeInsets.symmetric(vertical: 10)),
                               Text(
-                                'No episode received yet',
+                                s.noEpisodeRecent,
                                 style: TextStyle(color: Colors.grey[500]),
                               )
                             ],
@@ -792,7 +788,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                               Radius.circular(
                                                                   10))),
                                                   elevation: 1,
-                                                  tooltip: 'Groups fliter',
+                                                  tooltip: s.groupFilter,
                                                   child: Container(
                                                       padding:
                                                           EdgeInsets.symmetric(
@@ -863,8 +859,8 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                           color: Colors
                                                               .transparent,
                                                           child: IconButton(
-                                                              tooltip:
-                                                                  'Add new episodes to playlist',
+                                                              tooltip: s
+                                                                  .addNewEpisodeTooltip,
                                                               icon:
                                                                   // Icon(Icons.playlist_add),
                                                                   SizedBox(
@@ -886,8 +882,13 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                                     .showToast(
                                                                   msg: _groupName ==
                                                                           'All'
-                                                                      ? '${snapshot.data} episode added to playlist'
-                                                                      : '${snapshot.data} episode in $_groupName added to playlist',
+                                                                      ? s.addNewEpisodeAll(
+                                                                          snapshot
+                                                                              .data)
+                                                                      : s.addEpisodeGroup(
+                                                                          _groupName,
+                                                                          snapshot
+                                                                              .data),
                                                                   gravity:
                                                                       ToastGravity
                                                                           .BOTTOM,
@@ -898,8 +899,8 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                           color: Colors
                                                               .transparent,
                                                           child: IconButton(
-                                                              tooltip:
-                                                                  'Add new episodes to playlist',
+                                                              tooltip: s
+                                                                  .addNewEpisodeTooltip,
                                                               icon:
                                                                   // Icon(Icons.playlist_add),
                                                                   SizedBox(
@@ -923,7 +924,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                             Material(
                                                 color: Colors.transparent,
                                                 child: IconButton(
-                                                  tooltip: 'Change layout',
+                                                  tooltip: s.changeLayout,
                                                   padding: EdgeInsets.zero,
                                                   onPressed: () {
                                                     if (_layout == Layout.three)
@@ -1073,7 +1074,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                               Padding(
                                   padding: EdgeInsets.symmetric(vertical: 10)),
                               Text(
-                                'No episode collected yet',
+                                s.noEpisodeFavorite,
                                 style: TextStyle(color: Colors.grey[500]),
                               )
                             ],
@@ -1103,7 +1104,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(10))),
                                             elevation: 1,
-                                            tooltip: 'Sort By',
+                                            tooltip: s.homeSubMenuSortBy,
                                             child: Container(
                                                 height: 50,
                                                 padding: EdgeInsets.symmetric(
@@ -1131,11 +1132,11 @@ class _MyFavoriteState extends State<_MyFavorite>
                                             itemBuilder: (context) => [
                                               PopupMenuItem(
                                                 value: 0,
-                                                child: Text('Update Date'),
+                                                child: Text(s.updateDate),
                                               ),
                                               PopupMenuItem(
                                                 value: 1,
-                                                child: Text('Like Date'),
+                                                child: Text(s.likeDate),
                                               )
                                             ],
                                             onSelected: (value) {
@@ -1278,7 +1279,7 @@ class _MyDownloadState extends State<_MyDownload>
                     children: <Widget>[
                       Container(
                           padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(s.homeSubMenuDownloaded)),
+                          child: Text(s.downloaded)),
                       Spacer(),
                       Material(
                         color: Colors.transparent,
@@ -1349,7 +1350,7 @@ class _MyDownloadState extends State<_MyDownload>
                               size: 80, color: Colors.grey[500]),
                           Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                           Text(
-                            'No episode downloaded yet',
+                            s.noEpisodeDownload,
                             style: TextStyle(color: Colors.grey[500]),
                           )
                         ],

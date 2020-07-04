@@ -1,25 +1,83 @@
 {
   "@@locale": "en",
+  "add": "Add",
+  "@add": {
+    "description": "Subscribe new podcast"
+  },
+  "addEpisodeGroup": "{count, plural, zero{} one{{count} episode in {groupName} added to playlist} other{{count} episodes in {groupName} added to playlist}}",
+  "@addEpisodeGroup": {
+    "placeholders": {
+      "groupName": {}
+    }
+  },
+  "addNewEpisodeAll": "{count, plural, zero{} one{{count} episode added to playlist} other{{count} episodes added to playlist}}",
+  "@addNewEpisodeAll": {},
+  "addNewEpisodeTooltip": "Add new episodes to playlist",
+  "@addNewEpisodeTooltip": {},
+  "addSomeGroups": "Add some groups",
+  "@addSomeGroups": {
+    "description": "Please add new groups"
+  },
   "all": "All",
   "@all": {},
-  "cancel": "Cancel",
+  "back": "Back",
+  "@back": {},
+  "buffering": "Buffering",
+  "@buffering": {},
+  "cancel": "CANCEL",
   "@cancel": {},
+  "changeLayout": "Change layout",
+  "@changeLayout": {},
+  "changelog": "Changelog",
+  "@changelog": {},
   "chooseA": "Choose a",
   "@chooseA": {},
+  "clear": "Clear",
+  "@clear": {},
   "color": "color",
   "@color": {},
-  "confirm": "Confirm",
+  "confirm": "CONFIRM",
   "@confirm": {},
   "darkMode": "Dark mode",
   "@darkMode": {},
   "delete": "Delete",
   "@delete": {},
+  "developer": "Developer",
+  "@developer": {},
+  "dismiss": "Dismiss",
+  "@dismiss": {},
   "download": "Download",
   "@download": {},
+  "downloaded": "Downloaded",
+  "@downloaded": {},
   "editName": "Edit name",
   "@editName": {},
   "endOfEpisode": "End of Episode",
   "@endOfEpisode": {},
+  "featureDiscoveryEpisode": "Episode view",
+  "@featureDiscoveryEpisode": {},
+  "featureDiscoveryEpisodeDes": "You can long tap to play episode or add episode to playlist.",
+  "@featureDiscoveryEpisodeDes": {},
+  "featureDiscoveryEpisodeTitle": "Long tap to play episode instantly",
+  "@featureDiscoveryEpisodeTitle": {},
+  "featureDiscoveryOMPL": "Tap to import OMPL",
+  "@featureDiscoveryOMPL": {},
+  "featureDiscoveryOMPLDes": "You can import OMPL file, open setting or refresh all podcast at once here.",
+  "@featureDiscoveryOMPLDes": {},
+  "featureDiscoveryPlaylist": "Tap to open playlist",
+  "@featureDiscoveryPlaylist": {},
+  "featureDiscoveryPlaylistDes": "You can add episode to playlist by yourself. Episode will be auto removed from playlist when played.",
+  "@featureDiscoveryPlaylistDes": {},
+  "featureDiscoveryPodcast": "Podcast view",
+  "@featureDiscoveryPodcast": {},
+  "featureDiscoveryPodcastDes": "You can tap See All to add groups or manage podcasts.",
+  "@featureDiscoveryPodcastDes": {},
+  "featureDiscoveryPodcastTitle": "Scroll vertically to switch groups",
+  "@featureDiscoveryPodcastTitle": {},
+  "featureDiscoverySearch": "Tap to search podcast",
+  "@featureDiscoverySearch": {},
+  "featureDiscoverySearchDes": "You can search podcast title , key word or RSS link to subscribe new podcast.",
+  "@featureDiscoverySearchDes": {},
   "feedbackEmail": "Write to me",
   "@feedbackEmail": {},
   "feedbackGithub": "Submit issue",
@@ -30,14 +88,16 @@
   "@feedbackTelegram": {},
   "from": "From",
   "@from": {},
+  "goodNight": "Good Night",
+  "@goodNight": {},
+  "groupFilter": "Group filter",
+  "@groupFilter": {},
   "groups": "Groups",
   "@groups": {},
   "homeGroupsSeeAll": "See All",
   "@homeGroupsSeeAll": {},
   "homeMenuPlaylist": "Playlist",
   "@homeMenuPlaylist": {},
-  "homeSubMenuDownloaded": "Downloaded",
-  "@homeSubMenuDownloaded": {},
   "homeSubMenuLikeData": "Like Date",
   "@homeSubMenuLikeData": {},
   "homeSubMenuSortBy": "Sort by",
@@ -56,6 +116,14 @@
   "@homeToprightMenuRefreshAll": {},
   "homeToprightMenuSettings": "Settings",
   "@homeToprightMenuSettings": {},
+  "hostedOn": "Hosted on {host}",
+  "@hostedOn": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "hoursCount": "{count, plural, zero{} one{{count} hour} other{{count} hours}}",
+  "@hoursCount": {},
   "later": "Later",
   "@later": {},
   "lightMode": "Light mode",
@@ -64,10 +132,18 @@
   "@like": {},
   "liked": "Liked",
   "@liked": {},
+  "likeDate": "Like date",
+  "@likeDate": {},
   "listen": "Listen",
   "@listen": {},
   "listened": "Listened",
   "@listened": {},
+  "loadMore": "Load more",
+  "@loadMore": {},
+  "markConfirm": "Mark confirm",
+  "@markConfirm": {},
+  "markConfirmContent": "Confirm mark all episodes listened?",
+  "@markConfirmContent": {},
   "markListened": "Mark listened",
   "@markListened": {},
   "menu": "Menu",
@@ -76,18 +152,72 @@
   "@menuAllPodcasts": {},
   "menuMarkAllListened": "Mark All Listened",
   "@menuMarkAllListened": {},
-  "menuMarkListened": "Mark Listened",
-  "@menuMarkListened": {},
   "menuViewRSS": "Visit RSS Feed",
   "@menuViewRSS": {},
   "menuVisitSite": "Visit Site",
   "@menuVisitSite": {},
+  "minsCount": "{count, plural, zero{} one{{count} min} other{{count} mins}}",
+  "@minsCount": {},
   "network": "Network",
   "@network": {},
+  "newestFirst": "Newest first",
+  "@newestFirst": {},
   "newGroup": "Create new group",
   "@newGroup": {},
+  "noEpisodeDownload": "No episode downloaded yet",
+  "@noEpisodeDownload": {},
+  "noEpisodeFavorite": "No episode collected yet",
+  "@noEpisodeFavorite": {},
+  "noEpisodeRecent": "No episode received yet",
+  "@noEpisodeRecent": {},
+  "noPodcastGroup": "No podcast in this group",
+  "@noPodcastGroup": {},
+  "notificaitonFatch": "Fetch data {title}",
+  "@notificaitonFatch": {},
+  "notificationNetworkError": "Subscribe failed, network error {title}",
+  "@notificationNetworkError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSubscribe": "Subscribe {title}",
+  "@notificationSubscribe": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSubscribeExisted": "Subscribe failed, podcast existed {title}",
+  "@notificationSubscribeExisted": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSuccess": "Subscribe success {title}",
+  "@notificationSuccess": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdate": "Update {title}",
+  "@notificationUpdate": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdateError": "Update error {title}",
+  "@notificationUpdateError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "oldestFirst": "Oldest first",
+  "@oldestFirst": {},
   "play": "Play",
   "@play": {},
+  "playing": "Playing",
+  "@playing": {},
+  "podcastSubscribed": "Podcast subscribed",
+  "@podcastSubscribed": {},
   "popupMenuDownloadDes": "Download episode",
   "@popupMenuDownloadDes": {},
   "popupMenuLaterDes": "Add episode to playlist",
@@ -98,10 +228,14 @@
   "@popupMenuMarkDes": {},
   "popupMenuPlayDes": "Play the episode",
   "@popupMenuPlayDes": {},
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {},
   "remove": "Remove",
   "@remove": {},
   "schedule": "Schedule",
   "@schedule": {},
+  "searchInvalidRss": "Invalid RSS link",
+  "@searchInvalidRss": {},
   "searchPodcast": "Search podcast",
   "@searchPodcast": {},
   "settingsAccentColor": "Accent color",
@@ -214,12 +348,26 @@
   "@settingsUpdateInterval": {},
   "settingsUpdateIntervalDes": "Default 24 hours",
   "@settingsUpdateIntervalDes": {},
+  "size": "Size",
+  "@size": {},
   "sleepTimer": "Sleep timer",
   "@sleepTimer": {},
   "subscribe": "Subscribe",
   "@subscribe": {},
   "systemDefault": "System default",
   "@systemDefault": {},
+  "timeLastPlayed": "Last time {time}",
+  "@timeLastPlayed": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "timeLeft": "{time} Left",
+  "@timeLeft": {
+    "placeholders": {
+      "time": {}
+    }
+  },
   "to": "To",
   "@to": {},
   "toastAddPlaylist": "Added to playlist",
@@ -234,8 +382,22 @@
   "@toastReadFile": {},
   "toastRemovePlaylist": "Removed from playlist",
   "@toastRemovePlaylist": {},
+  "understood": "Understood",
+  "@understood": {},
   "unlike": "Unlike",
   "@unlike": {},
-  "unliked": "Unliked",
-  "@unliked": {}
+  "unliked": "Removed from favorite",
+  "@unliked": {},
+  "updateDate": "Update date",
+  "@updateDate": {},
+  "updateEpisodesCount": "{count, plural, zero{No Update} one{Updated {count} Episode} other{Updated {count} Episodes}}",
+  "@updateEpisodesCount": {},
+  "updateFailed": "Update failed, network error",
+  "@updateFailed": {},
+  "version": "Version : {version}",
+  "@version": {
+    "placeholders": {
+      "version": {}
+    }
+  }
 }

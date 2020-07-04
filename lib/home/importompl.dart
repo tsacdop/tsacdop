@@ -56,6 +56,7 @@ class Import extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     GroupList groupList = Provider.of<GroupList>(context, listen: false);
     return Column(
       children: <Widget>[
@@ -64,20 +65,21 @@ class Import extends StatelessWidget {
             SubscribeItem item = subscribeWorker.currentSubscribeItem;
             switch (item.subscribeState) {
               case SubscribeState.start:
-                return importColumn("Subscribe ${item.title}", context);
+                return importColumn(
+                    s.notificationSubscribe(item.title), context);
               case SubscribeState.subscribe:
-                return importColumn("Fetch data ${item.title}", context);
+                return importColumn(s.notificaitonFatch(item.title), context);
               case SubscribeState.fetch:
                 groupList.subscribeNewPodcast(item.id);
                 //  groupList.updatePodcast(item.id);
-                return importColumn("Subscribe success ${item.title}", context);
+                return importColumn(s.notificationSuccess(item.title), context);
               case SubscribeState.exist:
                 //groupList.subscribeNewPodcast(item.id);
                 return importColumn(
-                    "Subscribe failed, podcast existed ${item.title}", context);
+                    s.notificationSubscribeExisted(item.title), context);
               case SubscribeState.error:
                 return importColumn(
-                    "Subscribe failed, network error ${item.title}", context);
+                    s.notificationNetworkError(item.title), context);
               default:
                 return Center();
             }
@@ -92,9 +94,10 @@ class Import extends StatelessWidget {
             }
             switch (item.refreshState) {
               case RefreshState.fetch:
-                return importColumn("Update ${item.title}", context);
+                return importColumn(s.notificationUpdate(item.title), context);
               case RefreshState.error:
-                return importColumn("Update error ${item.title}", context);
+                return importColumn(
+                    s.notificationUpdateError(item.title), context);
               default:
                 return Center();
             }
