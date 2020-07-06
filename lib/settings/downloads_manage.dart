@@ -183,7 +183,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   elevation: 1,
-                                  tooltip: 'Sort By',
+                                  tooltip: s.homeSubMenuSortBy,
                                   child: Container(
                                       height: 40,
                                       padding:
@@ -211,15 +211,15 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   itemBuilder: (context) => [
                                     PopupMenuItem(
                                       value: 0,
-                                      child: Text('Newest first'),
+                                      child: Text(s.newestFirst),
                                     ),
                                     PopupMenuItem(
                                       value: 1,
-                                      child: Text('Oldest first'),
+                                      child: Text(s.oldestFirst),
                                     ),
                                     PopupMenuItem(
                                       value: 2,
-                                      child: Text('Size'),
+                                      child: Text(s.size),
                                     ),
                                   ],
                                   onSelected: (value) {
@@ -246,7 +246,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                         padding:
                                             EdgeInsets.symmetric(horizontal: 5),
                                       ),
-                                      Text('Listened Only'),
+                                      Text(s.listened),
                                       Transform.scale(
                                         scale: 0.8,
                                         child: Checkbox(

@@ -25,7 +25,7 @@ class _SecondPageState extends State<SecondPage> {
               padding:
                   EdgeInsets.only(top: 20, bottom: 20, left: 40, right: 40),
               child: Text(
-                'Subscribe podcast via search or import OMPL file.',
+                context.s.introSecondPage,
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),

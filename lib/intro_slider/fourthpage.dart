@@ -23,13 +23,13 @@ class _FourthPageState extends State<FourthPage> {
               height: 200,
               alignment: Alignment.center,
               padding: EdgeInsets.all(40),
-              child: Text('Long press on episode card for quick actions.', style: TextStyle(
-                fontSize: 30,
-                color: Colors.white
-              ),),
+              child: Text(
+                context.s.introFourthPage,
+                style: TextStyle(fontSize: 30, color: Colors.white),
+              ),
             ),
             Container(
-                height: context.width*3/4,
+                height: context.width * 3 / 4,
                 // color: Colors.red,
                 child: FlareActor(
                   'assets/longtap.flr',

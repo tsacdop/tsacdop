@@ -53,10 +53,10 @@ class EpisodeGrid extends StatelessWidget {
 
   Future<Tuple4<int, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
+    List<int> menuList = await _getEpisodeMenu();
     int listened = await _isListened(episode);
     bool liked = await _isLiked(episode);
     bool downloaded = await _isDownloaded(episode);
-    List<int> menuList = await _getEpisodeMenu();
     return Tuple4(listened, liked, downloaded, menuList);
   }
 

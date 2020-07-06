@@ -24,7 +24,7 @@ class _ThirdPageState extends State<ThirdPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.all(40),
               child: Text(
-                'Swipe on podcast list to change group.',
+                context.s.introThirdPage,
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),

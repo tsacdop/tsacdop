@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../util/context_extension.dart';
 import 'licenses.dart';
 
 class Libries extends StatelessWidget {
@@ -23,7 +24,7 @@ class Libries extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Libraies'),
+          title: Text(context.s.settingsLibraries),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
@@ -63,7 +64,7 @@ class Libries extends StatelessWidget {
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
-                  child: Text('Fonts',
+                  child: Text(context.s.fonts,
                       style: Theme.of(context)
                           .textTheme
                           .bodyText1
@@ -85,7 +86,7 @@ class Libries extends StatelessWidget {
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
-                  child: Text('Plugins',
+                  child: Text(context.s.plugins,
                       style: Theme.of(context)
                           .textTheme
                           .bodyText1

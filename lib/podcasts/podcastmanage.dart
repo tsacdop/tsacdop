@@ -88,6 +88,7 @@ class _PodcastManageState extends State<PodcastManage>
   }
 
   Widget _saveButton(BuildContext context) {
+    final s = context.s;
     return Consumer<GroupList>(
       builder: (_, groupList, __) {
         if (groupList.orderChanged.contains(groupList.groups[_index])) {
@@ -100,7 +101,7 @@ class _PodcastManageState extends State<PodcastManage>
           tapTarget: Icon(Icons.menu),
           title: Padding(
             padding: const EdgeInsets.only(top: 20.0),
-            child: const Text('Tap to edit group'),
+            child: Text(s.featureDiscoveryEditGroup),
           ),
           overflowMode: OverflowMode.clipContent,
           backgroundColor: Colors.cyan[600],
@@ -108,12 +109,11 @@ class _PodcastManageState extends State<PodcastManage>
           description: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Text('You can change group name or delete group here,' +
-                  'but home group can not be edited or deleted.'),
+              Text(s.featureDiscoveryEditGroupDes),
               FlatButton(
                 color: Colors.cyan[500],
                 padding: const EdgeInsets.all(0),
-                child: Text('Understood',
+                child: Text(s.understood,
                     style: Theme.of(context)
                         .textTheme
                         .button
@@ -124,7 +124,7 @@ class _PodcastManageState extends State<PodcastManage>
               FlatButton(
                 color: Colors.cyan[500],
                 padding: const EdgeInsets.all(0),
-                child: Text('Dismiss',
+                child: Text(s.dismiss,
                     style: Theme.of(context)
                         .textTheme
                         .button
@@ -176,7 +176,7 @@ class _PodcastManageState extends State<PodcastManage>
                     groupList
                         .drlFromOrderChanged(groupList.groups[_index].name);
                     Fluttertoast.showToast(
-                      msg: 'Setting Saved',
+                      msg: context.s.toastSettingSaved,
                       gravity: ToastGravity.BOTTOM,
                     );
                     _controller.reverse();
@@ -191,6 +191,7 @@ class _PodcastManageState extends State<PodcastManage>
   }
 
   Widget build(BuildContext context) {
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -202,25 +203,23 @@ class _PodcastManageState extends State<PodcastManage>
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text('Groups'),
+          title: Text(context.s.groups(2)),
           actions: <Widget>[
             DescribedFeatureOverlay(
               featureId: addGroupFeature,
               tapTarget: Icon(Icons.add),
-              title: const Text('Tap to add group'),
+              title: Text(s.featureDiscoveryGroup),
               overflowMode: OverflowMode.clipContent,
               backgroundColor: Colors.cyan[600],
               onDismiss: () => Future.value(true),
               description: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  const Text(
-                      'Default group is home for new podcast, you can create new group and move ' +
-                          'podcast to new group, podcast can be added to muilti-groups.'),
+                  Text(s.featureDiscoveryGroupDes),
                   FlatButton(
                     color: Colors.cyan[500],
                     padding: const EdgeInsets.all(0),
-                    child: Text('Understood',
+                    child: Text(context.s.understood,
                         style: Theme.of(context)
                             .textTheme
                             .button
@@ -231,7 +230,7 @@ class _PodcastManageState extends State<PodcastManage>
                   FlatButton(
                     color: Colors.cyan[500],
                     padding: const EdgeInsets.all(0),
-                    child: Text('Dismiss',
+                    child: Text(context.s.dismiss,
                         style: Theme.of(context)
                             .textTheme
                             .button
@@ -293,8 +292,8 @@ class _PodcastManageState extends State<PodcastManage>
                           pageBuilder: (context, index) =>
                               DescribedFeatureOverlay(
                             featureId: configurePodcast,
-                            tapTarget: Text('Podcast'),
-                            title: const Text('Long tap to reorder podcast'),
+                            tapTarget: Text(s.podcast),
+                            title: Text(s.featureDiscoveryGroupPodcast),
                             overflowMode: OverflowMode.clipContent,
                             onDismiss: () => Future.value(true),
                             enablePulsingAnimation: false,
@@ -302,12 +301,11 @@ class _PodcastManageState extends State<PodcastManage>
                             description: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
-                                const Text('You can tap to see more options,' +
-                                    ' or long tap to reorder podcast in group.'),
+                                Text(s.featureDiscoveryGroupPodcastDes),
                                 FlatButton(
                                   color: Colors.cyan[500],
                                   padding: const EdgeInsets.all(0),
-                                  child: Text('Understood',
+                                  child: Text(context.s.understood,
                                       style: Theme.of(context)
                                           .textTheme
                                           .button
@@ -319,7 +317,7 @@ class _PodcastManageState extends State<PodcastManage>
                                 FlatButton(
                                   color: Colors.cyan[500],
                                   padding: const EdgeInsets.all(0),
-                                  child: Text('Dismiss',
+                                  child: Text(context.s.dismiss,
                                       style: Theme.of(context)
                                           .textTheme
                                           .button
@@ -377,8 +375,8 @@ class _PodcastManageState extends State<PodcastManage>
                                           setState(() => _showSetting = false);
                                           _index == 0
                                               ? Fluttertoast.showToast(
-                                                  msg:
-                                                      'Home group is not supported',
+                                                  msg: s
+                                                      .toastHomeGroupNotSupport,
                                                   gravity: ToastGravity.BOTTOM,
                                                 )
                                               : showGeneralDialog(
@@ -420,7 +418,7 @@ class _PodcastManageState extends State<PodcastManage>
                                                 padding: EdgeInsets.symmetric(
                                                     horizontal: 5.0),
                                               ),
-                                              Text('Edit Name',
+                                              Text(context.s.editGroupName,
                                                   style: TextStyle(
                                                       color: Colors.white)),
                                             ],
@@ -439,23 +437,22 @@ class _PodcastManageState extends State<PodcastManage>
                                           setState(() => _showSetting = false);
                                           _index == 0
                                               ? Fluttertoast.showToast(
-                                                  msg:
-                                                      'Home group is not supported',
+                                                  msg: s
+                                                      .toastHomeGroupNotSupport,
                                                   gravity: ToastGravity.BOTTOM,
                                                 )
                                               : generalDialog(
                                                   context,
-                                                  title: Text('Delete confirm'),
+                                                  title: Text(s.removeConfirm),
                                                   content: Text(
-                                                      'Are you sure you want to delete this group?' +
-                                                          'Podcasts will be moved to Home group.'),
+                                                      s.groupRemoveConfirm),
                                                   actions: <Widget>[
                                                     FlatButton(
                                                       onPressed: () =>
                                                           Navigator.of(context)
                                                               .pop(),
                                                       child: Text(
-                                                        'CANCEL',
+                                                        context.s.cancel,
                                                         style: TextStyle(
                                                             color: Colors
                                                                 .grey[600]),
@@ -482,7 +479,7 @@ class _PodcastManageState extends State<PodcastManage>
                                                             .pop();
                                                       },
                                                       child: Text(
-                                                        'CONFIRM',
+                                                        context.s.confirm,
                                                         style: TextStyle(
                                                             color: Colors.red),
                                                       ),
@@ -509,7 +506,7 @@ class _PodcastManageState extends State<PodcastManage>
                                                 padding: EdgeInsets.symmetric(
                                                     horizontal: 5.0),
                                               ),
-                                              Text('Delete',
+                                              Text(s.remove,
                                                   style: TextStyle(
                                                       color: Colors.red)),
                                             ],
@@ -534,11 +531,12 @@ class _PodcastManageState extends State<PodcastManage>
 class OrderMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return PopupMenuButton(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
       elevation: 2,
-      tooltip: 'Menu',
+      tooltip: s.menu,
       itemBuilder: (context) => [
         PopupMenuItem(
           value: 1,
@@ -548,7 +546,7 @@ class OrderMenu extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
               ),
-              Text('All Podcasts'),
+              Text(s.menuAllPodcasts),
             ],
           ),
         ),
@@ -587,6 +585,7 @@ class _AddGroupState extends State<AddGroup> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     var groupList = Provider.of<GroupList>(context);
     List list = groupList.groups.map((e) => e.name).toList();
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -608,7 +607,7 @@ class _AddGroupState extends State<AddGroup> {
           FlatButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              'CANCEL',
+              s.cancel,
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
@@ -621,19 +620,18 @@ class _AddGroupState extends State<AddGroup> {
                 Navigator.of(context).pop();
               }
             },
-            child: Text('DONE',
+            child: Text(s.confirm,
                 style: TextStyle(color: Theme.of(context).accentColor)),
           )
         ],
-        title: SizedBox(
-            width: context.width - 160, child: Text('Create new group')),
+        title: SizedBox(width: context.width - 160, child: Text(s.newGroup)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             TextField(
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                hintText: 'New Group',
+                hintText: s.newGroup,
                 hintStyle: TextStyle(fontSize: 18),
                 filled: true,
                 focusedBorder: UnderlineInputBorder(
@@ -657,7 +655,7 @@ class _AddGroupState extends State<AddGroup> {
               alignment: Alignment.centerLeft,
               child: (_error == 1)
                   ? Text(
-                      'Group existed',
+                      s.groupExisted,
                       style: TextStyle(color: Colors.red[400]),
                     )
                   : Center(),

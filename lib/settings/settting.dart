@@ -332,8 +332,7 @@ class _SettingsState extends State<Settings>
                               podcastFeature
                             });
                             Fluttertoast.showToast(
-                              msg:
-                                  'Discovery Feature Reopened, pleast restart the app',
+                              msg: s.toastDiscovery,
                               gravity: ToastGravity.BOTTOM,
                             );
                           },

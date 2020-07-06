@@ -92,9 +92,7 @@ class SyncingSetting extends StatelessWidget {
                           title: Text(s.settingsUpdateInterval),
                           subtitle: Text(s.settingsUpdateIntervalDes),
                           trailing: DropdownButton(
-                              hint: data.item2 == 1
-                                  ? Text(data.item2.toString() + ' hour')
-                                  : Text(data.item2.toString() + ' hours'),
+                              hint: Text(s.hoursCount(data.item2)),
                               underline: Center(),
                               elevation: 1,
                               value: data.item2,
@@ -107,10 +105,7 @@ class SyncingSetting extends StatelessWidget {
                               items: <int>[1, 2, 4, 8, 24, 48]
                                   .map<DropdownMenuItem<int>>((e) {
                                 return DropdownMenuItem<int>(
-                                    value: e,
-                                    child: e == 1
-                                        ? Text(e.toString() + ' hour')
-                                        : Text(e.toString() + ' hours'));
+                                    value: e, child: Text(s.hoursCount(e)));
                               }).toList()),
                         ),
                         Divider(height: 2),

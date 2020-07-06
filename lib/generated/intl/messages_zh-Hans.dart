@@ -23,33 +23,51 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(count) => "${Intl.plural(count, zero: '', other: '${count}集节目添加到播放列表')}";
 
-  static m2(host) => "平台 ${host}";
+  static m2(count) => "${Intl.plural(count, zero: '今天', other: '${count}天前')}";
 
-  static m3(count) => "${Intl.plural(count, zero: '', other: '${count} 小时')}";
+  static m3(count) => "${Intl.plural(count, zero: '从不', other: '${count}天')}";
 
-  static m4(count) => "${Intl.plural(count, zero: '', other: '${count}分钟')}";
+  static m4(time) => "自${time}";
 
-  static m5(title) => "获取数据 ${title}";
+  static m5(count) => "${Intl.plural(count, zero: '分组', other: '分组')}";
 
-  static m6(title) => "订阅失败，网络错误 ${title}";
+  static m6(host) => "平台 ${host}";
 
-  static m7(title) => "订阅${title}";
+  static m7(count) => "${Intl.plural(count, zero: '', other: '${count}小时前')}";
 
-  static m8(title) => "订阅失败，播客已存在 ${title}";
+  static m8(count) => "${Intl.plural(count, zero: '', other: '${count} 小时')}";
 
-  static m9(title) => "订阅成功 ${title}";
+  static m9(count) => "${Intl.plural(count, zero: '', other: '${count}分钟前')}";
 
-  static m10(title) => "更新 ${title}";
+  static m10(count) => "${Intl.plural(count, zero: '', other: '${count}分钟')}";
 
-  static m11(title) => "更新失败 ${title}";
+  static m11(title) => "获取数据 ${title}";
 
-  static m12(time) => "上次播放${time}";
+  static m12(title) => "订阅失败，网络错误 ${title}";
 
-  static m13(time) => "剩余 ${time}";
+  static m13(title) => "订阅${title}";
 
-  static m14(count) => "${Intl.plural(count, zero: '未有更新', other: '更新 ${count} 集节目')}";
+  static m14(title) => "订阅失败，播客已存在 ${title}";
 
-  static m15(version) => "版本：${version}";
+  static m15(title) => "订阅成功 ${title}";
+
+  static m16(title) => "更新 ${title}";
+
+  static m17(title) => "更新失败 ${title}";
+
+  static m18(date) => "${date}移除";
+
+  static m19(count) => "${Intl.plural(count, zero: '', other: '${count}秒前')}";
+
+  static m20(time) => "上次播放${time}";
+
+  static m21(time) => "剩余 ${time}";
+
+  static m22(time) => "到${time}";
+
+  static m23(count) => "${Intl.plural(count, zero: '未有更新', other: '更新 ${count} 集节目')}";
+
+  static m24(version) => "版本：${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -59,6 +77,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "addNewEpisodeTooltip" : MessageLookupByLibrary.simpleMessage("添加更新节目到播放列表"),
     "addSomeGroups" : MessageLookupByLibrary.simpleMessage("请添加分组"),
     "all" : MessageLookupByLibrary.simpleMessage("全部"),
+    "autoDownload" : MessageLookupByLibrary.simpleMessage("自动下载"),
     "back" : MessageLookupByLibrary.simpleMessage("返回"),
     "buffering" : MessageLookupByLibrary.simpleMessage("缓冲"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
@@ -69,16 +88,26 @@ class MessageLookup extends MessageLookupByLibrary {
     "color" : MessageLookupByLibrary.simpleMessage("颜色"),
     "confirm" : MessageLookupByLibrary.simpleMessage("确认"),
     "darkMode" : MessageLookupByLibrary.simpleMessage("夜晚模式"),
+    "daysAgo" : m2,
+    "daysCount" : m3,
     "delete" : MessageLookupByLibrary.simpleMessage("删除"),
     "developer" : MessageLookupByLibrary.simpleMessage("关于我"),
     "dismiss" : MessageLookupByLibrary.simpleMessage("忽略"),
+    "done" : MessageLookupByLibrary.simpleMessage("完成"),
     "download" : MessageLookupByLibrary.simpleMessage("下载"),
     "downloaded" : MessageLookupByLibrary.simpleMessage("已下载"),
-    "editName" : MessageLookupByLibrary.simpleMessage("修改组名"),
+    "editGroupName" : MessageLookupByLibrary.simpleMessage("修改组名"),
     "endOfEpisode" : MessageLookupByLibrary.simpleMessage("节目结束"),
+    "episode" : MessageLookupByLibrary.simpleMessage("节目"),
+    "featureDiscoveryEditGroup" : MessageLookupByLibrary.simpleMessage("点击修改分组"),
+    "featureDiscoveryEditGroupDes" : MessageLookupByLibrary.simpleMessage("您可以修改分组名或者删除分组，注意 Home 分组无法修改，也不能被删除。"),
     "featureDiscoveryEpisode" : MessageLookupByLibrary.simpleMessage("节目界面"),
     "featureDiscoveryEpisodeDes" : MessageLookupByLibrary.simpleMessage("您可以长按播放节目或者添加节目到播放列表。"),
     "featureDiscoveryEpisodeTitle" : MessageLookupByLibrary.simpleMessage("您可以长按快速播放节目"),
+    "featureDiscoveryGroup" : MessageLookupByLibrary.simpleMessage("点击添加分组"),
+    "featureDiscoveryGroupDes" : MessageLookupByLibrary.simpleMessage("新订阅播客默认分组为 Home，您可以添加新的分组，移动播客到新的分组，每个播客可以被添加到多个分组。"),
+    "featureDiscoveryGroupPodcast" : MessageLookupByLibrary.simpleMessage("长按可以移动播客位置"),
+    "featureDiscoveryGroupPodcastDes" : MessageLookupByLibrary.simpleMessage("您可以点击对播客进行设置，或者长按重新排序。"),
     "featureDiscoveryOMPL" : MessageLookupByLibrary.simpleMessage("点击导入 OMPL"),
     "featureDiscoveryOMPLDes" : MessageLookupByLibrary.simpleMessage("在这里您可以导入OMPL文件，打开设置页面，或者刷新所有播客。"),
     "featureDiscoveryPlaylist" : MessageLookupByLibrary.simpleMessage("点击打开播放列表"),
@@ -92,23 +121,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "feedbackGithub" : MessageLookupByLibrary.simpleMessage("提交Issue"),
     "feedbackPlay" : MessageLookupByLibrary.simpleMessage("Play评价"),
     "feedbackTelegram" : MessageLookupByLibrary.simpleMessage("加入小组"),
-    "from" : MessageLookupByLibrary.simpleMessage("自"),
+    "fonts" : MessageLookupByLibrary.simpleMessage("字体"),
+    "from" : m4,
     "goodNight" : MessageLookupByLibrary.simpleMessage("晚安"),
+    "groupExisted" : MessageLookupByLibrary.simpleMessage("组名已使用"),
     "groupFilter" : MessageLookupByLibrary.simpleMessage("分组"),
-    "groups" : MessageLookupByLibrary.simpleMessage("分组"),
+    "groupRemoveConfirm" : MessageLookupByLibrary.simpleMessage("您确认要移除该分组吗？播客将被移动到 Home 分组。"),
+    "groups" : m5,
     "homeGroupsSeeAll" : MessageLookupByLibrary.simpleMessage("查看全部"),
     "homeMenuPlaylist" : MessageLookupByLibrary.simpleMessage("播放列表"),
-    "homeSubMenuLikeData" : MessageLookupByLibrary.simpleMessage("添加日期"),
     "homeSubMenuSortBy" : MessageLookupByLibrary.simpleMessage("排序"),
-    "homeSubMenuUpdateDate" : MessageLookupByLibrary.simpleMessage("更新日期"),
     "homeTabMenuFavotite" : MessageLookupByLibrary.simpleMessage("收藏"),
     "homeTabMenuRecent" : MessageLookupByLibrary.simpleMessage("最近更新"),
     "homeToprightMenuAbout" : MessageLookupByLibrary.simpleMessage("关于"),
     "homeToprightMenuImportOMPL" : MessageLookupByLibrary.simpleMessage("导入OMPL"),
     "homeToprightMenuRefreshAll" : MessageLookupByLibrary.simpleMessage("全部刷新"),
     "homeToprightMenuSettings" : MessageLookupByLibrary.simpleMessage("设置"),
-    "hostedOn" : m2,
-    "hoursCount" : m3,
+    "hostedOn" : m6,
+    "hoursAgo" : m7,
+    "hoursCount" : m8,
+    "introFourthPage" : MessageLookupByLibrary.simpleMessage("长按节目打开快捷菜单。"),
+    "introSecondPage" : MessageLookupByLibrary.simpleMessage("您可以通过搜索订阅播客，也可以直接导入OMPL文件。"),
+    "introThirdPage" : MessageLookupByLibrary.simpleMessage("您可以创建分组，上下滑动切换分组。"),
     "later" : MessageLookupByLibrary.simpleMessage("稍后"),
     "lightMode" : MessageLookupByLibrary.simpleMessage("明亮模式"),
     "like" : MessageLookupByLibrary.simpleMessage("喜欢"),
@@ -117,6 +151,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "listen" : MessageLookupByLibrary.simpleMessage("收听"),
     "listened" : MessageLookupByLibrary.simpleMessage("已收听"),
     "loadMore" : MessageLookupByLibrary.simpleMessage("加载更多"),
+    "mark" : MessageLookupByLibrary.simpleMessage("标记"),
     "markConfirm" : MessageLookupByLibrary.simpleMessage("确认标记"),
     "markConfirmContent" : MessageLookupByLibrary.simpleMessage("是否确认标记全部节目为已收听？"),
     "markListened" : MessageLookupByLibrary.simpleMessage("标记已收听"),
@@ -125,24 +160,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "menuMarkAllListened" : MessageLookupByLibrary.simpleMessage("标记所有已收听"),
     "menuViewRSS" : MessageLookupByLibrary.simpleMessage("查看 RSS"),
     "menuVisitSite" : MessageLookupByLibrary.simpleMessage("访问网站"),
-    "minsCount" : m4,
+    "minsAgo" : m9,
+    "minsCount" : m10,
     "network" : MessageLookupByLibrary.simpleMessage("网络"),
     "newGroup" : MessageLookupByLibrary.simpleMessage("创建分组"),
     "newestFirst" : MessageLookupByLibrary.simpleMessage("由新到旧"),
+    "next" : MessageLookupByLibrary.simpleMessage("下一步"),
     "noEpisodeDownload" : MessageLookupByLibrary.simpleMessage("暂无下载节目"),
     "noEpisodeFavorite" : MessageLookupByLibrary.simpleMessage("暂无收藏节目"),
     "noEpisodeRecent" : MessageLookupByLibrary.simpleMessage("暂无节目"),
     "noPodcastGroup" : MessageLookupByLibrary.simpleMessage("分组无播客"),
-    "notificaitonFatch" : m5,
-    "notificationNetworkError" : m6,
-    "notificationSubscribe" : m7,
-    "notificationSubscribeExisted" : m8,
-    "notificationSuccess" : m9,
-    "notificationUpdate" : m10,
-    "notificationUpdateError" : m11,
+    "notificaitonFatch" : m11,
+    "notificationNetworkError" : m12,
+    "notificationSubscribe" : m13,
+    "notificationSubscribeExisted" : m14,
+    "notificationSuccess" : m15,
+    "notificationUpdate" : m16,
+    "notificationUpdateError" : m17,
     "oldestFirst" : MessageLookupByLibrary.simpleMessage("由旧到新"),
     "play" : MessageLookupByLibrary.simpleMessage("播放"),
     "playing" : MessageLookupByLibrary.simpleMessage("正在播放"),
+    "plugins" : MessageLookupByLibrary.simpleMessage("插件"),
+    "podcast" : MessageLookupByLibrary.simpleMessage("播客"),
     "podcastSubscribed" : MessageLookupByLibrary.simpleMessage("播客已订阅"),
     "popupMenuDownloadDes" : MessageLookupByLibrary.simpleMessage("下载节目"),
     "popupMenuLaterDes" : MessageLookupByLibrary.simpleMessage("添加到播放列表"),
@@ -150,10 +189,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "popupMenuMarkDes" : MessageLookupByLibrary.simpleMessage("设置为已收听"),
     "popupMenuPlayDes" : MessageLookupByLibrary.simpleMessage("播放节目"),
     "privacyPolicy" : MessageLookupByLibrary.simpleMessage("隐私条款"),
+    "recoverSubscribe" : MessageLookupByLibrary.simpleMessage("恢复订阅"),
     "remove" : MessageLookupByLibrary.simpleMessage("移除"),
+    "removeConfirm" : MessageLookupByLibrary.simpleMessage("取消订阅"),
+    "removePodcastDes" : MessageLookupByLibrary.simpleMessage("您确认要取消订阅吗？"),
+    "removedAt" : m18,
     "schedule" : MessageLookupByLibrary.simpleMessage("定时"),
     "searchInvalidRss" : MessageLookupByLibrary.simpleMessage("RSS 链接错误"),
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("搜索播客"),
+    "secondsAgo" : m19,
     "settingStorage" : MessageLookupByLibrary.simpleMessage("储存空间"),
     "settingsAccentColor" : MessageLookupByLibrary.simpleMessage("次要颜色"),
     "settingsAccentColorDes" : MessageLookupByLibrary.simpleMessage("包括溢出颜色"),
@@ -184,7 +228,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsLayout" : MessageLookupByLibrary.simpleMessage("布局"),
     "settingsLayoutDes" : MessageLookupByLibrary.simpleMessage("应用布局"),
     "settingsLibraries" : MessageLookupByLibrary.simpleMessage("开源"),
-    "settingsLibrariesDes" : MessageLookupByLibrary.simpleMessage("使用开源项目"),
+    "settingsLibrariesDes" : MessageLookupByLibrary.simpleMessage("开源项目使用"),
     "settingsManageDownload" : MessageLookupByLibrary.simpleMessage("下载管理"),
     "settingsManageDownloadDes" : MessageLookupByLibrary.simpleMessage("管理下载节目文件"),
     "settingsMenuAutoPlay" : MessageLookupByLibrary.simpleMessage("自动播放下一节目"),
@@ -196,7 +240,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsPopupMenu" : MessageLookupByLibrary.simpleMessage("节目弹出菜单"),
     "settingsPopupMenuDes" : MessageLookupByLibrary.simpleMessage("修改节目弹出菜单"),
     "settingsPrefrence" : MessageLookupByLibrary.simpleMessage("首选项"),
-    "settingsRealDark" : MessageLookupByLibrary.simpleMessage("真的黑"),
+    "settingsRealDark" : MessageLookupByLibrary.simpleMessage("极黑"),
     "settingsRealDarkDes" : MessageLookupByLibrary.simpleMessage("如果夜不够黑，请开启"),
     "settingsSTAuto" : MessageLookupByLibrary.simpleMessage("自动睡眠模式"),
     "settingsSTAutoDes" : MessageLookupByLibrary.simpleMessage("定期开启睡眠模式"),
@@ -210,24 +254,33 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsUpdateInterval" : MessageLookupByLibrary.simpleMessage("更新频率"),
     "settingsUpdateIntervalDes" : MessageLookupByLibrary.simpleMessage("默认 24 小时"),
     "size" : MessageLookupByLibrary.simpleMessage("大小"),
+    "skipSecondsAtStart" : MessageLookupByLibrary.simpleMessage("开头跳过秒数"),
     "sleepTimer" : MessageLookupByLibrary.simpleMessage("睡眠模式"),
     "subscribe" : MessageLookupByLibrary.simpleMessage("订阅"),
     "systemDefault" : MessageLookupByLibrary.simpleMessage("系统默认"),
-    "timeLastPlayed" : m12,
-    "timeLeft" : m13,
-    "to" : MessageLookupByLibrary.simpleMessage("到"),
+    "timeLastPlayed" : m20,
+    "timeLeft" : m21,
+    "to" : m22,
     "toastAddPlaylist" : MessageLookupByLibrary.simpleMessage("添加到播放列表"),
-    "toastDescovery" : MessageLookupByLibrary.simpleMessage("重启应用后可查看"),
+    "toastDiscovery" : MessageLookupByLibrary.simpleMessage("重启应用后可查看"),
     "toastFileError" : MessageLookupByLibrary.simpleMessage("文件错误，导入失败"),
-    "toastFileNotVilid" : MessageLookupByLibrary.simpleMessage("文件错误"),
+    "toastFileNotValid" : MessageLookupByLibrary.simpleMessage("文件错误"),
+    "toastHomeGroupNotSupport" : MessageLookupByLibrary.simpleMessage("Home 分组不支持此功能"),
+    "toastOneGroup" : MessageLookupByLibrary.simpleMessage("请至少选择一个分组"),
+    "toastPodcastRecovering" : MessageLookupByLibrary.simpleMessage("恢复中，请稍后"),
     "toastReadFile" : MessageLookupByLibrary.simpleMessage("读取文件成功"),
+    "toastRecoverFailed" : MessageLookupByLibrary.simpleMessage("恢复订阅失败"),
     "toastRemovePlaylist" : MessageLookupByLibrary.simpleMessage("从播放列表移除"),
+    "toastSettingSaved" : MessageLookupByLibrary.simpleMessage("设置已保存"),
+    "toastTimeEqualEnd" : MessageLookupByLibrary.simpleMessage("与结束时间相同"),
+    "toastTimeEqualStart" : MessageLookupByLibrary.simpleMessage("与起始时间相同"),
     "understood" : MessageLookupByLibrary.simpleMessage("了解"),
+    "undo" : MessageLookupByLibrary.simpleMessage("撤销"),
     "unlike" : MessageLookupByLibrary.simpleMessage("取消喜欢"),
     "unliked" : MessageLookupByLibrary.simpleMessage("从收藏移除"),
     "updateDate" : MessageLookupByLibrary.simpleMessage("更新日期"),
-    "updateEpisodesCount" : m14,
+    "updateEpisodesCount" : m23,
     "updateFailed" : MessageLookupByLibrary.simpleMessage("更新失败"),
-    "version" : m15
+    "version" : m24
   };
 }

@@ -67,7 +67,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
 
   Future recoverSub(BuildContext context, String url) async {
     Fluttertoast.showToast(
-      msg: 'Recovering, wait for seconds',
+      msg: context.s.toastPodcastRecovering,
       gravity: ToastGravity.BOTTOM,
     );
     var subscribeWorker = context.read<SubscribeWorker>();
@@ -90,7 +90,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
     } on DioError catch (e) {
       print(e);
       Fluttertoast.showToast(
-        msg: 'Podcast recover failed',
+        msg: context.s.toastRecoverFailed,
         gravity: ToastGravity.BOTTOM,
       );
     }
@@ -273,7 +273,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                           snapshot.data[index]
                                                                   .seekValue ==
                                                               1
-                                                      ? 'Mark'
+                                                      ? s.mark
                                                       : _stringForSeconds(
                                                           snapshot.data[index]
                                                               .seconds),
@@ -330,18 +330,15 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                       ],
                                     ),
                                     subtitle: _status
-                                        ? Text(DateTime.now()
-                                                .difference(snapshot
-                                                    .data[index].subDate)
-                                                .inDays
-                                                .toString() +
-                                            ' day ago')
+                                        ? Text(s.daysAgo(DateTime.now()
+                                            .difference(
+                                                snapshot.data[index].subDate)
+                                            .inDays))
                                         : Text(
-                                            'Removed at ' +
-                                                DateFormat.yMd()
-                                                    .add_jm()
-                                                    .format(snapshot
-                                                        .data[index].delDate),
+                                            s.removedAt(DateFormat.yMd()
+                                                .add_jm()
+                                                .format(snapshot
+                                                    .data[index].delDate)),
                                             style: TextStyle(color: Colors.red),
                                           ),
                                     // Text(snapshot.data[index].delDate
@@ -355,7 +352,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                         ? Material(
                                             color: Colors.transparent,
                                             child: IconButton(
-                                              tooltip: 'Recover subscribe',
+                                              tooltip: s.recoverSubscribe,
                                               icon: Icon(LineIcons
                                                   .trash_restore_alt_solid),
                                               onPressed: () => recoverSub(

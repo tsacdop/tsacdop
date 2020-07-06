@@ -38,8 +38,9 @@ class PopupMenu extends StatefulWidget {
 }
 
 class _PopupMenuState extends State<PopupMenu> {
-  Future<String> _getRefreshDate() async {
+  Future<String> _getRefreshDate(BuildContext context) async {
     int refreshDate;
+    final s = context.s;
     KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
     int i = await refreshstorage.getInt();
     if (i == 0) {
@@ -50,17 +51,15 @@ class _PopupMenuState extends State<PopupMenu> {
       refreshDate = i;
     }
     DateTime date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
-    var diffrence = DateTime.now().difference(date);
-    if (diffrence.inSeconds < 60) {
-      return '${diffrence.inSeconds} seconds ago';
-    } else if (diffrence.inMinutes < 10) {
-      return '${diffrence.inMinutes} minutes ago';
-    } else if (diffrence.inHours < 1) {
-      return 'an hour ago';
-    } else if (diffrence.inHours <= 24) {
-      return '${diffrence.inHours} hours ago';
-    } else if (diffrence.inDays < 7) {
-      return '${diffrence.inDays} days ago';
+    var difference = DateTime.now().difference(date);
+    if (difference.inSeconds < 60) {
+      return s.secondsAgo(difference.inSeconds);
+    } else if (difference.inMinutes < 60) {
+      return s.minsAgo(difference.inMinutes);
+    } else if (difference.inHours < 24) {
+      return s.hoursAgo(difference.inHours);
+    } else if (difference.inDays < 7) {
+      return s.daysAgo(difference.inDays);
     } else {
       return DateFormat.yMMMd()
           .format(DateTime.fromMillisecondsSinceEpoch(refreshDate));
@@ -84,7 +83,7 @@ class _PopupMenuState extends State<PopupMenu> {
             .toList();
         if (total.length == 0) {
           Fluttertoast.showToast(
-            msg: 'File not valid',
+            msg: s.toastFileNotValid,
             gravity: ToastGravity.BOTTOM,
           );
         } else {
@@ -104,7 +103,7 @@ class _PopupMenuState extends State<PopupMenu> {
       } catch (e) {
         print(e);
         Fluttertoast.showToast(
-          msg: 'File error, Subscribe failed',
+          msg: s.toastFileError,
           gravity: ToastGravity.TOP,
         );
         //await Future.delayed(Duration(seconds: 5));
@@ -121,7 +120,7 @@ class _PopupMenuState extends State<PopupMenu> {
         print('File Path' + filePath);
         //importOmpl.importState = ImportState.start;
         Fluttertoast.showToast(
-          msg: 'Read file successfully',
+          msg: s.toastReadFile,
           gravity: ToastGravity.TOP,
         );
         _saveOmpl(filePath);
@@ -134,7 +133,7 @@ class _PopupMenuState extends State<PopupMenu> {
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
       elevation: 1,
-      tooltip: 'Menu',
+      tooltip: s.menu,
       itemBuilder: (context) => [
         PopupMenuItem(
           value: 1,
@@ -154,7 +153,7 @@ class _PopupMenuState extends State<PopupMenu> {
                       s.homeToprightMenuRefreshAll,
                     ),
                     FutureBuilder<String>(
-                        future: _getRefreshDate(),
+                        future: _getRefreshDate(context),
                         builder: (_, snapshot) {
                           if (snapshot.hasData)
                             return Text(

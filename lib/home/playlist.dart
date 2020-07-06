@@ -58,6 +58,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -69,7 +70,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-          title: _topHeight == 60 ? Text('Playlist') : Center(),
+          title: _topHeight == 60 ? Text(s.homeMenuPlaylist) : Center(),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
@@ -98,7 +99,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                             alignment: Alignment.centerLeft,
                             child: RichText(
                               text: TextSpan(
-                                text: _topHeight > 90 ? 'Playlist\n' : '',
+                                text: _topHeight > 90
+                                    ? s.homeMenuPlaylist + '\n'
+                                    : '',
                                 style: TextStyle(
                                   color: Theme.of(context)
                                       .textTheme
@@ -311,6 +314,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    final s = context.s;
     Color _c = (Theme.of(context).brightness == Brightness.light)
         ? widget.episode.primaryColor.colorizedark()
         : widget.episode.primaryColor.colorizeLight();
@@ -363,17 +367,17 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                 int index = await audio.delFromPlaylist(widget.episode);
                 final episodeRemove = widget.episode;
                 Fluttertoast.showToast(
-                  msg: 'Removed From Playlist',
+                  msg: s.toastRemovePlaylist,
                   gravity: ToastGravity.BOTTOM,
                 );
                 Scaffold.of(context).showSnackBar(SnackBar(
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Colors.grey[800],
-                  content: Text('Episode removed',
+                  content: Text(s.toastRemovePlaylist,
                       style: TextStyle(color: Colors.white)),
                   action: SnackBarAction(
                       textColor: context.accentColor,
-                      label: 'Undo',
+                      label: s.undo,
                       onPressed: () {
                         audio.addToPlaylistAt(episodeRemove, index);
                       }),
@@ -421,8 +425,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                               : Center(),
                           widget.episode.duration != 0
                               ? _episodeTag(
-                                  (widget.episode.duration ~/ 60).toString() +
-                                      'min',
+                                  s.minsCount(widget.episode.duration ~/ 60),
                                   Colors.cyan[300])
                               : Center(),
                           widget.episode.enclosureLength != null

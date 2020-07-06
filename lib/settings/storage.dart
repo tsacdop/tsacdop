@@ -213,22 +213,21 @@ class _StorageSettingState extends State<StorageSetting>
                             subtitle: Text(s.settingsAutoDeleteDes),
                             trailing: DropdownButton(
                                 hint: snapshot.data == -1
-                                    ? Text('Never')
-                                    : Text(snapshot.data.toString() + 'days'),
+                                    ? Text(s.daysCount(0))
+                                    : Text(s.daysCount(snapshot.data)),
                                 underline: Center(),
                                 elevation: 1,
                                 value: snapshot.data,
                                 onChanged: (value) async {
                                   await _setAutoDeleteDays(value);
                                 },
-                                //TODO remove 1 before release
                                 items: <int>[-1, 5, 10, 15, 30]
                                     .map<DropdownMenuItem<int>>((e) {
                                   return DropdownMenuItem<int>(
                                       value: e,
                                       child: e == -1
-                                          ? Text('Never')
-                                          : Text(e.toString() + ' days'));
+                                          ? Text(s.daysCount(0))
+                                          : Text(s.daysCount(e)));
                                 }).toList()),
                           );
                         },

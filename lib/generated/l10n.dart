@@ -99,6 +99,16 @@ class S {
     );
   }
 
+  /// `Auto download`
+  String get autoDownload {
+    return Intl.message(
+      'Auto download',
+      name: 'autoDownload',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Back`
   String get back {
     return Intl.message(
@@ -199,6 +209,32 @@ class S {
     );
   }
 
+  /// `{count, plural, zero{Today} one{{count} day ago} other{{count} days ago}}`
+  String daysAgo(num count) {
+    return Intl.plural(
+      count,
+      zero: 'Today',
+      one: '$count day ago',
+      other: '$count days ago',
+      name: 'daysAgo',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, zero{Never} one{{count} day} other{{count} days}}`
+  String daysCount(num count) {
+    return Intl.plural(
+      count,
+      zero: 'Never',
+      one: '$count day',
+      other: '$count days',
+      name: 'daysCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `Delete`
   String get delete {
     return Intl.message(
@@ -214,7 +250,7 @@ class S {
     return Intl.message(
       'Developer',
       name: 'developer',
-      desc: '',
+      desc: 'Can also translate to About me',
       args: [],
     );
   }
@@ -224,6 +260,16 @@ class S {
     return Intl.message(
       'Dismiss',
       name: 'dismiss',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Done`
+  String get done {
+    return Intl.message(
+      'Done',
+      name: 'done',
       desc: '',
       args: [],
     );
@@ -249,11 +295,11 @@ class S {
     );
   }
 
-  /// `Edit name`
-  String get editName {
+  /// `Edit group name`
+  String get editGroupName {
     return Intl.message(
-      'Edit name',
-      name: 'editName',
+      'Edit group name',
+      name: 'editGroupName',
       desc: '',
       args: [],
     );
@@ -264,6 +310,36 @@ class S {
     return Intl.message(
       'End of Episode',
       name: 'endOfEpisode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Episode`
+  String get episode {
+    return Intl.message(
+      'Episode',
+      name: 'episode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to edit group`
+  String get featureDiscoveryEditGroup {
+    return Intl.message(
+      'Tap to edit group',
+      name: 'featureDiscoveryEditGroup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can change group name or delete group here, but home group can not be edited or deleted`
+  String get featureDiscoveryEditGroupDes {
+    return Intl.message(
+      'You can change group name or delete group here, but home group can not be edited or deleted',
+      name: 'featureDiscoveryEditGroupDes',
       desc: '',
       args: [],
     );
@@ -294,6 +370,46 @@ class S {
     return Intl.message(
       'Long tap to play episode instantly',
       name: 'featureDiscoveryEpisodeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to add group`
+  String get featureDiscoveryGroup {
+    return Intl.message(
+      'Tap to add group',
+      name: 'featureDiscoveryGroup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Default group is home for new podcast, you can create new group and move podcast to new group, podcast can be added to multi-groups.`
+  String get featureDiscoveryGroupDes {
+    return Intl.message(
+      'Default group is home for new podcast, you can create new group and move podcast to new group, podcast can be added to multi-groups.',
+      name: 'featureDiscoveryGroupDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Long tap to reorder podcast`
+  String get featureDiscoveryGroupPodcast {
+    return Intl.message(
+      'Long tap to reorder podcast',
+      name: 'featureDiscoveryGroupPodcast',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can tap to see more options, or long tap to reorder podcast in group.`
+  String get featureDiscoveryGroupPodcastDes {
+    return Intl.message(
+      'You can tap to see more options, or long tap to reorder podcast in group.',
+      name: 'featureDiscoveryGroupPodcastDes',
       desc: '',
       args: [],
     );
@@ -429,13 +545,23 @@ class S {
     );
   }
 
-  /// `From`
-  String get from {
+  /// `Fonts`
+  String get fonts {
     return Intl.message(
-      'From',
-      name: 'from',
+      'Fonts',
+      name: 'fonts',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `From {time}`
+  String from(Object time) {
+    return Intl.message(
+      'From $time',
+      name: 'from',
+      desc: '',
+      args: [time],
     );
   }
 
@@ -444,6 +570,16 @@ class S {
     return Intl.message(
       'Good Night',
       name: 'goodNight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Group existed`
+  String get groupExisted {
+    return Intl.message(
+      'Group existed',
+      name: 'groupExisted',
       desc: '',
       args: [],
     );
@@ -459,13 +595,26 @@ class S {
     );
   }
 
-  /// `Groups`
-  String get groups {
+  /// `Are you sure you want to delete this group? Podcasts will be moved to Home group.`
+  String get groupRemoveConfirm {
     return Intl.message(
-      'Groups',
-      name: 'groups',
+      'Are you sure you want to delete this group? Podcasts will be moved to Home group.',
+      name: 'groupRemoveConfirm',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `{count, plural, zero{Group} one{Group} other{Groups}}`
+  String groups(num count) {
+    return Intl.plural(
+      count,
+      zero: 'Group',
+      one: 'Group',
+      other: 'Groups',
+      name: 'groups',
+      desc: '',
+      args: [count],
     );
   }
 
@@ -489,31 +638,11 @@ class S {
     );
   }
 
-  /// `Like Date`
-  String get homeSubMenuLikeData {
-    return Intl.message(
-      'Like Date',
-      name: 'homeSubMenuLikeData',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Sort by`
   String get homeSubMenuSortBy {
     return Intl.message(
       'Sort by',
       name: 'homeSubMenuSortBy',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Update Date`
-  String get homeSubMenuUpdateDate {
-    return Intl.message(
-      'Update Date',
-      name: 'homeSubMenuUpdateDate',
       desc: '',
       args: [],
     );
@@ -589,6 +718,19 @@ class S {
     );
   }
 
+  /// `{count, plural, zero{} one{{count} hour ago} other{{count} hours ago}}`
+  String hoursAgo(num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: '$count hour ago',
+      other: '$count hours ago',
+      name: 'hoursAgo',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `{count, plural, zero{} one{{count} hour} other{{count} hours}}`
   String hoursCount(num count) {
     return Intl.plural(
@@ -599,6 +741,36 @@ class S {
       name: 'hoursCount',
       desc: '',
       args: [count],
+    );
+  }
+
+  /// `Long press on episode card for quick actions.`
+  String get introFourthPage {
+    return Intl.message(
+      'Long press on episode card for quick actions.',
+      name: 'introFourthPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Subscribe podcast via search or import OMPL file.`
+  String get introSecondPage {
+    return Intl.message(
+      'Subscribe podcast via search or import OMPL file.',
+      name: 'introSecondPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can create new group for podcasts, swipe on podcast list to change group.`
+  String get introThirdPage {
+    return Intl.message(
+      'You can create new group for podcasts, swipe on podcast list to change group.',
+      name: 'introThirdPage',
+      desc: '',
+      args: [],
     );
   }
 
@@ -678,6 +850,16 @@ class S {
       'Load more',
       name: 'loadMore',
       desc: '',
+      args: [],
+    );
+  }
+
+  /// `Mark`
+  String get mark {
+    return Intl.message(
+      'Mark',
+      name: 'mark',
+      desc: 'The short the best',
       args: [],
     );
   }
@@ -762,6 +944,19 @@ class S {
     );
   }
 
+  /// `{count, plural, zero{} one{{count} minute ago} other{{count} minutes ago}}`
+  String minsAgo(num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: '$count minute ago',
+      other: '$count minutes ago',
+      name: 'minsAgo',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `{count, plural, zero{} one{{count} min} other{{count} mins}}`
   String minsCount(num count) {
     return Intl.plural(
@@ -800,6 +995,16 @@ class S {
     return Intl.message(
       'Create new group',
       name: 'newGroup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next`
+  String get next {
+    return Intl.message(
+      'Next',
+      name: 'next',
       desc: '',
       args: [],
     );
@@ -945,6 +1150,26 @@ class S {
     );
   }
 
+  /// `Plugins`
+  String get plugins {
+    return Intl.message(
+      'Plugins',
+      name: 'plugins',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Podcast`
+  String get podcast {
+    return Intl.message(
+      'Podcast',
+      name: 'podcast',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Podcast subscribed`
   String get podcastSubscribed {
     return Intl.message(
@@ -1015,11 +1240,51 @@ class S {
     );
   }
 
+  /// `Recover subscribe`
+  String get recoverSubscribe {
+    return Intl.message(
+      'Recover subscribe',
+      name: 'recoverSubscribe',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Remove`
   String get remove {
     return Intl.message(
       'Remove',
       name: 'remove',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove confirm`
+  String get removeConfirm {
+    return Intl.message(
+      'Remove confirm',
+      name: 'removeConfirm',
+      desc: 'unsubscribe podcast dialog',
+      args: [],
+    );
+  }
+
+  /// `Removed at {date}`
+  String removedAt(Object date) {
+    return Intl.message(
+      'Removed at $date',
+      name: 'removedAt',
+      desc: 'For example ：Removed at 2020.10.10',
+      args: [date],
+    );
+  }
+
+  /// `Are you sure you want to unsubscribe?`
+  String get removePodcastDes {
+    return Intl.message(
+      'Are you sure you want to unsubscribe?',
+      name: 'removePodcastDes',
       desc: '',
       args: [],
     );
@@ -1052,6 +1317,19 @@ class S {
       name: 'searchPodcast',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `{count, plural, zero{} one{{count} second ago} other{{count} seconds ago}}`
+  String secondsAgo(num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: '$count second ago',
+      other: '$count seconds ago',
+      name: 'secondsAgo',
+      desc: '',
+      args: [count],
     );
   }
 
@@ -1265,10 +1543,10 @@ class S {
     );
   }
 
-  /// `Bugs and feature request`
+  /// `Bugs and features request`
   String get settingsFeedbackDes {
     return Intl.message(
-      'Bugs and feature request',
+      'Bugs and features request',
       name: 'settingsFeedbackDes',
       desc: '',
       args: [],
@@ -1615,6 +1893,16 @@ class S {
     );
   }
 
+  /// `Skip seconds at start`
+  String get skipSecondsAtStart {
+    return Intl.message(
+      'Skip seconds at start',
+      name: 'skipSecondsAtStart',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Sleep timer`
   String get sleepTimer {
     return Intl.message(
@@ -1665,13 +1953,13 @@ class S {
     );
   }
 
-  /// `To`
-  String get to {
+  /// `To {time}`
+  String to(Object time) {
     return Intl.message(
-      'To',
+      'To $time',
       name: 'to',
       desc: '',
-      args: [],
+      args: [time],
     );
   }
 
@@ -1686,31 +1974,61 @@ class S {
   }
 
   /// `Discovery feature reopened, pleast restart the app`
-  String get toastDescovery {
+  String get toastDiscovery {
     return Intl.message(
       'Discovery feature reopened, pleast restart the app',
-      name: 'toastDescovery',
+      name: 'toastDiscovery',
       desc: '',
       args: [],
     );
   }
 
-  /// `File error, Subscribe failed`
+  /// `File error, subscribe failed`
   String get toastFileError {
     return Intl.message(
-      'File error, Subscribe failed',
+      'File error, subscribe failed',
       name: 'toastFileError',
       desc: '',
       args: [],
     );
   }
 
-  /// `File not vilid`
-  String get toastFileNotVilid {
+  /// `File not valid`
+  String get toastFileNotValid {
     return Intl.message(
-      'File not vilid',
-      name: 'toastFileNotVilid',
+      'File not valid',
+      name: 'toastFileNotValid',
       desc: '',
+      args: [],
+    );
+  }
+
+  /// `Home group is not supported`
+  String get toastHomeGroupNotSupport {
+    return Intl.message(
+      'Home group is not supported',
+      name: 'toastHomeGroupNotSupport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `At least select one group`
+  String get toastOneGroup {
+    return Intl.message(
+      'At least select one group',
+      name: 'toastOneGroup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recovering, wait for a moment`
+  String get toastPodcastRecovering {
+    return Intl.message(
+      'Recovering, wait for a moment',
+      name: 'toastPodcastRecovering',
+      desc: 'Resubscribe removed podcast',
       args: [],
     );
   }
@@ -1725,11 +2043,51 @@ class S {
     );
   }
 
-  /// `Removed from playlist`
+  /// `Podcast recover failed`
+  String get toastRecoverFailed {
+    return Intl.message(
+      'Podcast recover failed',
+      name: 'toastRecoverFailed',
+      desc: 'Resubscribe removed podast',
+      args: [],
+    );
+  }
+
+  /// `Episode removed from playlist`
   String get toastRemovePlaylist {
     return Intl.message(
-      'Removed from playlist',
+      'Episode removed from playlist',
       name: 'toastRemovePlaylist',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Setting saved`
+  String get toastSettingSaved {
+    return Intl.message(
+      'Setting saved',
+      name: 'toastSettingSaved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Time is equal to end time`
+  String get toastTimeEqualEnd {
+    return Intl.message(
+      'Time is equal to end time',
+      name: 'toastTimeEqualEnd',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Time is equal to start time`
+  String get toastTimeEqualStart {
+    return Intl.message(
+      'Time is equal to start time',
+      name: 'toastTimeEqualStart',
       desc: '',
       args: [],
     );
@@ -1745,6 +2103,16 @@ class S {
     );
   }
 
+  /// `UNDO`
+  String get undo {
+    return Intl.message(
+      'UNDO',
+      name: 'undo',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Unlike`
   String get unlike {
     return Intl.message(
@@ -1755,10 +2123,10 @@ class S {
     );
   }
 
-  /// `Removed from favorite`
+  /// `Episode removed from favorite`
   String get unliked {
     return Intl.message(
-      'Removed from favorite',
+      'Episode removed from favorite',
       name: 'unliked',
       desc: '',
       args: [],
@@ -1775,13 +2143,13 @@ class S {
     );
   }
 
-  /// `{count, plural, zero{No Update} one{Updated {count} Episode} other{Updated {count} Episodes}}`
+  /// `{count, plural, zero{No update} one{Updated {count} episode} other{Updated {count} episodes}}`
   String updateEpisodesCount(num count) {
     return Intl.plural(
       count,
-      zero: 'No Update',
-      one: 'Updated $count Episode',
-      other: 'Updated $count Episodes',
+      zero: 'No update',
+      one: 'Updated $count episode',
+      other: 'Updated $count episodes',
       name: 'updateEpisodesCount',
       desc: '',
       args: [count],

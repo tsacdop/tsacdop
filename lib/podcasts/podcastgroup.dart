@@ -173,7 +173,7 @@ class _PodcastCardState extends State<PodcastCard>
     Color _c = (Theme.of(context).brightness == Brightness.light)
         ? widget.podcastLocal.primaryColor.colorizedark()
         : widget.podcastLocal.primaryColor.colorizeLight();
-
+    final s = context.s;
     double _width = MediaQuery.of(context).size.width;
     var groupList = context.watch<GroupList>();
     _belongGroups = groupList.getPodcastGroup(widget.podcastLocal.id);
@@ -326,12 +326,12 @@ class _PodcastCardState extends State<PodcastCard>
                                             _selectedGroups,
                                           );
                                           Fluttertoast.showToast(
-                                            msg: 'Setting Saved',
+                                            msg: s.toastSettingSaved,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         } else
                                           Fluttertoast.showToast(
-                                            msg: 'At least select one group',
+                                            msg: s.toastOneGroup,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                       },
@@ -353,7 +353,7 @@ class _PodcastCardState extends State<PodcastCard>
                                       _addGroup = true;
                                     });
                                   },
-                                  tooltip: 'Group'),
+                                  tooltip: s.groups(0)),
                               FutureBuilder<bool>(
                                 future:
                                     _getAutoDownload(widget.podcastLocal.id),
@@ -382,7 +382,7 @@ class _PodcastCardState extends State<PodcastCard>
                                               ? context.accentColor
                                               : null),
                                     ),
-                                    tooltip: 'Auto Download',
+                                    tooltip: s.autoDownload,
                                     onTap: () async {
                                       await _setAutoDownload(
                                           widget.podcastLocal.id,
@@ -409,7 +409,7 @@ class _PodcastCardState extends State<PodcastCard>
                                         onTap: () {
                                           generalDialog(
                                             context,
-                                            title: Text('Skip seconds at start',
+                                            title: Text(s.skipSecondsAtStart,
                                                 maxLines: 2),
                                             content: DurationPicker(
                                               duration: Duration(
@@ -424,7 +424,7 @@ class _PodcastCardState extends State<PodcastCard>
                                                   _seconds = 0;
                                                 },
                                                 child: Text(
-                                                  'CANCEL',
+                                                  s.cancel,
                                                   style: TextStyle(
                                                       color: Colors.grey[600]),
                                                 ),
@@ -437,7 +437,7 @@ class _PodcastCardState extends State<PodcastCard>
                                                       _seconds);
                                                 },
                                                 child: Text(
-                                                  'CONFIRM',
+                                                  s.confirm,
                                                   style: TextStyle(
                                                       color:
                                                           context.accentColor),
@@ -453,19 +453,18 @@ class _PodcastCardState extends State<PodcastCard>
                                     color: Colors.red,
                                     size: _value == 0 ? 1 : 20 * _value,
                                   ),
-                                  tooltip: 'Remove',
+                                  tooltip: s.remove,
                                   onTap: () {
                                     generalDialog(
                                       context,
-                                      title: Text('Remove confirm'),
-                                      content: Text(
-                                          'Are you sure you want to unsubscribe?'),
+                                      title: Text(s.removeConfirm),
+                                      content: Text(s.removePodcastDes),
                                       actions: <Widget>[
                                         FlatButton(
                                           onPressed: () =>
                                               Navigator.of(context).pop(),
                                           child: Text(
-                                            'CANCEL',
+                                            s.cancel,
                                             style: TextStyle(
                                                 color: Colors.grey[600]),
                                           ),
@@ -477,7 +476,7 @@ class _PodcastCardState extends State<PodcastCard>
                                             Navigator.of(context).pop();
                                           },
                                           child: Text(
-                                            'CONFIRM',
+                                            s.confirm,
                                             style: TextStyle(color: Colors.red),
                                           ),
                                         )
@@ -523,6 +522,7 @@ class _RenameGroupState extends State<RenameGroup> {
   Widget build(BuildContext context) {
     var groupList = Provider.of<GroupList>(context, listen: false);
     List list = groupList.groups.map((e) => e.name).toList();
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,
@@ -542,7 +542,7 @@ class _RenameGroupState extends State<RenameGroup> {
           FlatButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              'CANCEL',
+              s.cancel,
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
@@ -559,12 +559,12 @@ class _RenameGroupState extends State<RenameGroup> {
                 Navigator.of(context).pop();
               }
             },
-            child: Text('DONE',
+            child: Text(s.confirm,
                 style: TextStyle(color: Theme.of(context).accentColor)),
           )
         ],
-        title: SizedBox(
-            width: context.width - 160, child: Text('Edit group name')),
+        title:
+            SizedBox(width: context.width - 160, child: Text(s.editGroupName)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -595,7 +595,7 @@ class _RenameGroupState extends State<RenameGroup> {
               alignment: Alignment.centerLeft,
               child: (_error == 1)
                   ? Text(
-                      'Group existed',
+                      s.groupExisted,
                       style: TextStyle(color: Colors.red[400]),
                     )
                   : Center(),

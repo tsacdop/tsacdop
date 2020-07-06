@@ -76,6 +76,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -109,7 +110,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                 height: 30.0,
                 padding: EdgeInsets.symmetric(horizontal: 80),
                 alignment: Alignment.centerLeft,
-                child: Text('Episode popup menu',
+                child: Text(s.settingsPopupMenu,
                     style: Theme.of(context)
                         .textTheme
                         .bodyText1
@@ -132,8 +133,8 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                                     LineIcons.play_circle_solid,
                                     color: context.accentColor,
                                   ),
-                                  text: 'Play',
-                                  description: 'Play the episode');
+                                  text: s.play,
+                                  description: s.popupMenuPlayDes);
                               break;
                             case 1:
                               return _popupMenuItem(menu, e,
@@ -141,15 +142,15 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                                     LineIcons.clock_solid,
                                     color: Colors.cyan,
                                   ),
-                                  text: 'Later',
-                                  description: 'Add episode to playlist');
+                                  text: s.later,
+                                  description: s.popupMenuLaterDes);
                               break;
                             case 2:
                               return _popupMenuItem(menu, e,
                                   icon: Icon(LineIcons.heart,
                                       color: Colors.red, size: 21),
-                                  text: 'Like',
-                                  description: 'Add episode to favorite');
+                                  text: s.like,
+                                  description: s.popupMenuLikeDes);
                               break;
                             case 3:
                               return _popupMenuItem(menu, e,
@@ -160,8 +161,8 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                                         painter: ListenedAllPainter(Colors.blue,
                                             stroke: 1.5)),
                                   ),
-                                  text: 'Mark Listened',
-                                  description: 'Mark episode as listened');
+                                  text: s.markListened,
+                                  description: s.popupMenuMarkDes);
                               break;
                             case 4:
                               return _popupMenuItem(menu, e,
@@ -169,8 +170,8 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                                     LineIcons.download_solid,
                                     color: Colors.green,
                                   ),
-                                  text: 'Download',
-                                  description: 'Download episode');
+                                  text: s.download,
+                                  description: s.popupMenuDownloadDes);
                               break;
                             default:
                               return Text('Text');

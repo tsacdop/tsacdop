@@ -40,7 +40,7 @@ class PlaySetting extends StatelessWidget {
                       ? context.accentColor
                       : context.primaryColorDark,
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('End of Episode',
+                  child: Text(context.s.endOfEpisode,
                       style: TextStyle(
                           color: data.item1 == 0 ? Colors.white : null)),
                 ),
@@ -56,7 +56,7 @@ class PlaySetting extends StatelessWidget {
                       ? context.accentColor
                       : context.primaryColorDark,
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(data.item2.toString() + 'mins',
+                  child: Text(context.s.minsCount(data.item2),
                       style: TextStyle(
                           color: data.item1 == 1 ? Colors.white : null)),
                 ),
@@ -70,6 +70,7 @@ class PlaySetting extends StatelessWidget {
 
   Widget _scheduleWidget(BuildContext context) {
     var settings = Provider.of<SettingState>(context, listen: false);
+    final s = context.s;
     return Selector<SettingState, Tuple2<int, int>>(
       selector: (_, settings) =>
           Tuple2(settings.autoSleepTimerStart, settings.autoSleepTimerEnd),
@@ -105,7 +106,7 @@ class PlaySetting extends StatelessWidget {
                     FlatButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(
-                        'CANCEL',
+                        s.cancel,
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                     ),
@@ -116,13 +117,13 @@ class PlaySetting extends StatelessWidget {
                           Navigator.of(context).pop();
                         } else {
                           Fluttertoast.showToast(
-                            msg: 'Time is equal to end time',
+                            msg: s.toastTimeEqualEnd,
                             gravity: ToastGravity.BOTTOM,
                           );
                         }
                       },
                       child: Text(
-                        'CONFIRM',
+                        s.confirm,
                         style: TextStyle(color: context.accentColor),
                       ),
                     )
@@ -134,7 +135,7 @@ class PlaySetting extends StatelessWidget {
                 child: Container(
                   color: context.primaryColorDark,
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('From ' + stringForMins(data.item1)),
+                  child: Text(s.from(stringForMins(data.item1))),
                 ),
               ),
             ),
@@ -164,7 +165,7 @@ class PlaySetting extends StatelessWidget {
                     FlatButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(
-                        'CANCEL',
+                        s.cancel,
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                     ),
@@ -175,13 +176,13 @@ class PlaySetting extends StatelessWidget {
                           Navigator.of(context).pop();
                         } else {
                           Fluttertoast.showToast(
-                            msg: 'Time is equal to start time',
+                            msg: s.toastTimeEqualStart,
                             gravity: ToastGravity.BOTTOM,
                           );
                         }
                       },
                       child: Text(
-                        'CONFIRM',
+                        s.confirm,
                         style: TextStyle(color: context.accentColor),
                       ),
                     )
@@ -193,7 +194,7 @@ class PlaySetting extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8.0),
                   color: Colors.black54,
-                  child: Text('To ' + stringForMins(data.item2),
+                  child: Text(s.to(stringForMins(data.item2)),
                       style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -255,7 +256,7 @@ class PlaySetting extends StatelessWidget {
                           onTap: () => settings.setAutoPlay = !data,
                           contentPadding:
                               EdgeInsets.only(left: 80.0, right: 20),
-                          title: Text('Auto play next'),
+                          title: Text(s.settingsMenuAutoPlay),
                           subtitle: Text(s.settingsAutoPlayDes),
                           trailing: Transform.scale(
                             scale: 0.9,
@@ -291,7 +292,7 @@ class PlaySetting extends StatelessWidget {
                         trailing: Selector<SettingState, int>(
                           selector: (_, settings) => settings.defaultSleepTimer,
                           builder: (_, data, __) => DropdownButton(
-                              hint: Text(data.toString() + 'mins'),
+                              hint: Text(s.minsCount(data)),
                               underline: Center(),
                               elevation: 1,
                               isDense: true,
@@ -301,8 +302,7 @@ class PlaySetting extends StatelessWidget {
                               items:
                                   minsToSelect.map<DropdownMenuItem<int>>((e) {
                                 return DropdownMenuItem<int>(
-                                    value: e,
-                                    child: Text(e.toString() + ' mins'));
+                                    value: e, child: Text(s.minsCount(e)));
                               }).toList()),
                         ),
                       ),
