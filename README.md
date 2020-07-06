@@ -18,15 +18,15 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 
 ## Features
 
-- Podcasts group management
-- Playlist support
-- Sleep timer / Speed setting
-- OMPL file export and import
-- Auto syncing in background
-- Listen and subscribe history record
-- Dark mode / Accent color
-- Download for offline playing
-- Auto download new episodes / Auto delete outdated downloads
+* Podcasts group management
+* Playlist support
+* Sleep timer / Speed setting
+* OMPL file export and import
+* Auto syncing in background
+* Listen and subscribe history record
+* Dark mode / Accent color
+* Download for offline playing
+* Auto download new episodes / Auto delete outdated downloads
 
 More to come...
 
@@ -45,16 +45,28 @@ Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob
 Tsacdop is using ListenNotes api 1.0 pro to search podcast, which is not free. So I can not expose the api key in the repo.
 If you want to build the app, you need to create a new file named .env.dart in lib folder. Add below code in .env.dart.
 
-```dart
+``` dart
 final environment = {"apiKey":"APIKEY"};
 ```
 
 You can get own api key on [ListenNotes](https://www.listennotes.com/api/), basic plan is free to all, and replace "APIKEY" with it.
 If no api key added, the search function in the app won't work. But you can still add podcasts by serach rss link or import ompl file.
 
+## Localization
+
+Support languages
+
+* English
+* Chinese Simplified (beta)
+
+  
+Please [email](tsacdop.app@gmail.com) me you'd to contribute to support more languages!
+
+Credit to  [Localizely](https://localizely.com/) for kind support to open source project.
+
 ## Known Issue
 
-- Playlist unstable
+* Playlist unstable
 
 ## Getting Started
 
@@ -62,8 +74,8 @@ This project is a starting point for a Flutter application.
 
 A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+* [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
+* [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials, samples, guidance on mobile development, and a full API reference.
