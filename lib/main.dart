@@ -8,8 +8,8 @@ import 'package:feature_discovery/feature_discovery.dart';
 
 import 'generated/l10n.dart';
 import 'state/podcast_group.dart';
-import 'state/audiostate.dart';
-import 'state/settingstate.dart';
+import 'state/audio_state.dart';
+import 'state/setting_state.dart';
 import 'state/download_state.dart';
 import 'state/refresh_podcast.dart';
 import 'state/subscribe_podcast.dart';

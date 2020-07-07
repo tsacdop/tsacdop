@@ -36,6 +36,18 @@ More to come...
 | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893838840.png" art = "HomePage"/> | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585894051734.png" art = "Groups"/> | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png" art = "Podcast"/> | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585896237809.png" art = "Episode"/> | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png" art = "DarkMode"/> |
 
+## Localization
+
+Support languages
+
+* English
+* Chinese Simplified (beta)
+
+  
+Please [email](tsacdop.app@gmail.com) me you'd like to contribute to support more languages!
+
+Credit to  [Localizely](https://localizely.com/) for kind support to open source project.
+
 ## License
 
 Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
@@ -52,17 +64,48 @@ final environment = {"apiKey":"APIKEY"};
 You can get own api key on [ListenNotes](https://www.listennotes.com/api/), basic plan is free to all, and replace "APIKEY" with it.
 If no api key added, the search function in the app won't work. But you can still add podcasts by serach rss link or import ompl file.
 
-## Localization
+## Archetecture
 
-Support languages
+### Plugins
 
-* English
-* Chinese Simplified (beta)
+* Local storage
+    - sqflite 
+    - share_preference
+* Audio
+    - just_audio
+    - audio_service
+* State management
+    - provider
+* Download
+    - flutter_downloader
 
-  
-Please [email](tsacdop.app@gmail.com) me you'd to contribute to support more languages!
+### Directory Structure
 
-Credit to  [Localizely](https://localizely.com/) for kind support to open source project.
+```
+UI 
+src
+├──home
+   ├──home.dart [Homepage] 
+   ├──addpodcast.dart [Search Page]
+   ├──playlist.dart [Playlist Page]
+├──podcasts
+   ├──podcast_manage.dart [Group Page]
+   ├──podcast_detail.dart [Podcast Page]
+├──episodes
+   ├──episode_detail.dart [Episode Page]
+├──settings
+   ├──setting.dart [Setting Page]
+
+STATES
+src
+├──state
+   ├──audio_state.dart [Audio State] 
+   ├──download_state.dart [Episode Download]
+   ├──podcast_group.dart [Podcast Groups]
+   ├──refresh_podcast.dart [Episode Refresh] 
+   ├──setting_state.dart [Setting]
+   ├──subscribe_podcast.dart [Podcast Subscribe]   
+```     
 
 ## Known Issue
 

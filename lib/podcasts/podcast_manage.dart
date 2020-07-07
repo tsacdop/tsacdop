@@ -9,8 +9,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:feature_discovery/feature_discovery.dart';
 
 import '../state/podcast_group.dart';
-import '../podcasts/podcastgroup.dart';
-import '../podcasts/podcastlist.dart';
+import 'podcastgroup.dart';
+import 'podcastlist.dart';
 import '../util/pageroute.dart';
 import '../util/context_extension.dart';
 import '../util/general_dialog.dart';
@@ -292,7 +292,7 @@ class _PodcastManageState extends State<PodcastManage>
                           pageBuilder: (context, index) =>
                               DescribedFeatureOverlay(
                             featureId: configurePodcast,
-                            tapTarget: Text(s.podcast),
+                            tapTarget: Text(s.podcast(1)),
                             title: Text(s.featureDiscoveryGroupPodcast),
                             overflowMode: OverflowMode.clipContent,
                             onDismiss: () => Future.value(true),

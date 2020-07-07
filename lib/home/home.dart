@@ -10,7 +10,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:feature_discovery/feature_discovery.dart';
 
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tuple/tuple.dart';
@@ -15,16 +16,16 @@ import '../state/podcast_group.dart';
 import '../state/subscribe_podcast.dart';
 import '../state/download_state.dart';
 import '../type/podcastlocal.dart';
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 import '../util/custompaint.dart';
 import '../util/pageroute.dart';
 import '../util/colorize.dart';
 import '../util/context_extension.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
-import '../episodes/episodedetail.dart';
-import '../podcasts/podcastdetail.dart';
-import '../podcasts/podcastmanage.dart';
+import '../episodes/episode_detail.dart';
+import '../podcasts/podcast_detail.dart';
+import '../podcasts/podcast_manage.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -476,6 +477,20 @@ class ShowEpisode extends StatelessWidget {
   String _stringForSeconds(double seconds) {
     if (seconds == null) return null;
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  }
+
+  String _dateToString(BuildContext context, {int pubDate}) {
+    final s = context.s;
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
+    var difference = DateTime.now().toUtc().difference(date);
+    if (difference.inHours < 24) {
+      return s.hoursAgo(difference.inHours);
+    } else if (difference.inDays < 7) {
+      return s.daysAgo(difference.inDays);
+    } else {
+      return DateFormat.yMMMd().format(
+          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
+    }
   }
 
   Future<Tuple4<int, bool, bool, List<int>>> _initData(
@@ -993,8 +1008,9 @@ class ShowEpisode extends StatelessWidget {
                                             Container(
                                               alignment: Alignment.bottomLeft,
                                               child: Text(
-                                                episodes[index].dateToString(),
-                                                //podcast[index].pubDate.substring(4, 16),
+                                                _dateToString(context,
+                                                    pubDate: episodes[index]
+                                                        .pubDate),
                                                 style: TextStyle(
                                                   fontSize: _width / 35,
                                                   color: _c,

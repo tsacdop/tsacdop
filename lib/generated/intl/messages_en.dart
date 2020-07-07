@@ -27,47 +27,53 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m3(count) => "${Intl.plural(count, zero: 'Never', one: '${count} day', other: '${count} days')}";
 
-  static m4(time) => "From ${time}";
+  static m4(count) => "${Intl.plural(count, zero: '', one: 'Episode', other: 'Episodes')}";
 
-  static m5(count) => "${Intl.plural(count, zero: 'Group', one: 'Group', other: 'Groups')}";
+  static m5(time) => "From ${time}";
 
-  static m6(host) => "Hosted on ${host}";
+  static m6(count) => "${Intl.plural(count, zero: 'Group', one: 'Group', other: 'Groups')}";
 
-  static m7(count) => "${Intl.plural(count, zero: '', one: '${count} hour ago', other: '${count} hours ago')}";
+  static m7(host) => "Hosted on ${host}";
 
-  static m8(count) => "${Intl.plural(count, zero: '', one: '${count} hour', other: '${count} hours')}";
+  static m8(count) => "${Intl.plural(count, zero: 'In an hour', one: '${count} hour ago', other: '${count} hours ago')}";
 
-  static m9(count) => "${Intl.plural(count, zero: '', one: '${count} minute ago', other: '${count} minutes ago')}";
+  static m9(count) => "${Intl.plural(count, zero: '', one: '${count} hour', other: '${count} hours')}";
 
-  static m10(count) => "${Intl.plural(count, zero: '', one: '${count} min', other: '${count} mins')}";
+  static m10(count) => "${Intl.plural(count, zero: '', one: '${count} minute ago', other: '${count} minutes ago')}";
 
-  static m11(title) => "Fetch data ${title}";
+  static m11(count) => "${Intl.plural(count, zero: '', one: '${count} min', other: '${count} mins')}";
 
-  static m12(title) => "Subscribe failed, network error ${title}";
+  static m12(title) => "Fetch data ${title}";
 
-  static m13(title) => "Subscribe ${title}";
+  static m13(title) => "Subscribe failed, network error ${title}";
 
-  static m14(title) => "Subscribe failed, podcast existed ${title}";
+  static m14(title) => "Subscribe ${title}";
 
-  static m15(title) => "Subscribe success ${title}";
+  static m15(title) => "Subscribe failed, podcast existed ${title}";
 
-  static m16(title) => "Update ${title}";
+  static m16(title) => "Subscribe success ${title}";
 
-  static m17(title) => "Update error ${title}";
+  static m17(title) => "Update ${title}";
 
-  static m18(date) => "Removed at ${date}";
+  static m18(title) => "Update error ${title}";
 
-  static m19(count) => "${Intl.plural(count, zero: '', one: '${count} second ago', other: '${count} seconds ago')}";
+  static m19(count) => "${Intl.plural(count, zero: '', one: 'Podcast', other: 'Podcasts')}";
 
-  static m20(time) => "Last time ${time}";
+  static m20(date) => "Published at ${date}";
 
-  static m21(time) => "${time} Left";
+  static m21(date) => "Removed at ${date}";
 
-  static m22(time) => "To ${time}";
+  static m22(count) => "${Intl.plural(count, zero: '', one: '${count} second ago', other: '${count} seconds ago')}";
 
-  static m23(count) => "${Intl.plural(count, zero: 'No update', one: 'Updated ${count} episode', other: 'Updated ${count} episodes')}";
+  static m23(time) => "Last time ${time}";
 
-  static m24(version) => "Version : ${version}";
+  static m24(time) => "${time} Left";
+
+  static m25(time) => "To ${time}";
+
+  static m26(count) => "${Intl.plural(count, zero: 'No update', one: 'Updated ${count} episode', other: 'Updated ${count} episodes')}";
+
+  static m27(version) => "Version : ${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -98,7 +104,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "downloaded" : MessageLookupByLibrary.simpleMessage("Downloaded"),
     "editGroupName" : MessageLookupByLibrary.simpleMessage("Edit group name"),
     "endOfEpisode" : MessageLookupByLibrary.simpleMessage("End of Episode"),
-    "episode" : MessageLookupByLibrary.simpleMessage("Episode"),
+    "episode" : m4,
     "featureDiscoveryEditGroup" : MessageLookupByLibrary.simpleMessage("Tap to edit group"),
     "featureDiscoveryEditGroupDes" : MessageLookupByLibrary.simpleMessage("You can change group name or delete group here, but home group can not be edited or deleted"),
     "featureDiscoveryEpisode" : MessageLookupByLibrary.simpleMessage("Episode view"),
@@ -122,12 +128,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "feedbackPlay" : MessageLookupByLibrary.simpleMessage("Rate on Play"),
     "feedbackTelegram" : MessageLookupByLibrary.simpleMessage("Join group"),
     "fonts" : MessageLookupByLibrary.simpleMessage("Fonts"),
-    "from" : m4,
+    "from" : m5,
     "goodNight" : MessageLookupByLibrary.simpleMessage("Good Night"),
     "groupExisted" : MessageLookupByLibrary.simpleMessage("Group existed"),
     "groupFilter" : MessageLookupByLibrary.simpleMessage("Group filter"),
     "groupRemoveConfirm" : MessageLookupByLibrary.simpleMessage("Are you sure you want to delete this group? Podcasts will be moved to Home group."),
-    "groups" : m5,
+    "groups" : m6,
     "homeGroupsSeeAll" : MessageLookupByLibrary.simpleMessage("See All"),
     "homeMenuPlaylist" : MessageLookupByLibrary.simpleMessage("Playlist"),
     "homeSubMenuSortBy" : MessageLookupByLibrary.simpleMessage("Sort by"),
@@ -137,9 +143,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "homeToprightMenuImportOMPL" : MessageLookupByLibrary.simpleMessage("Import OMPL"),
     "homeToprightMenuRefreshAll" : MessageLookupByLibrary.simpleMessage("Refresh all"),
     "homeToprightMenuSettings" : MessageLookupByLibrary.simpleMessage("Settings"),
-    "hostedOn" : m6,
-    "hoursAgo" : m7,
-    "hoursCount" : m8,
+    "hostedOn" : m7,
+    "hoursAgo" : m8,
+    "hoursCount" : m9,
     "introFourthPage" : MessageLookupByLibrary.simpleMessage("Long press on episode card for quick actions."),
     "introSecondPage" : MessageLookupByLibrary.simpleMessage("Subscribe podcast via search or import OMPL file."),
     "introThirdPage" : MessageLookupByLibrary.simpleMessage("You can create new group for podcasts, swipe on podcast list to change group."),
@@ -160,8 +166,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "menuMarkAllListened" : MessageLookupByLibrary.simpleMessage("Mark All Listened"),
     "menuViewRSS" : MessageLookupByLibrary.simpleMessage("Visit RSS Feed"),
     "menuVisitSite" : MessageLookupByLibrary.simpleMessage("Visit Site"),
-    "minsAgo" : m9,
-    "minsCount" : m10,
+    "minsAgo" : m10,
+    "minsCount" : m11,
     "network" : MessageLookupByLibrary.simpleMessage("Network"),
     "newGroup" : MessageLookupByLibrary.simpleMessage("Create new group"),
     "newestFirst" : MessageLookupByLibrary.simpleMessage("Newest first"),
@@ -170,18 +176,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "noEpisodeFavorite" : MessageLookupByLibrary.simpleMessage("No episode collected yet"),
     "noEpisodeRecent" : MessageLookupByLibrary.simpleMessage("No episode received yet"),
     "noPodcastGroup" : MessageLookupByLibrary.simpleMessage("No podcast in this group"),
-    "notificaitonFatch" : m11,
-    "notificationNetworkError" : m12,
-    "notificationSubscribe" : m13,
-    "notificationSubscribeExisted" : m14,
-    "notificationSuccess" : m15,
-    "notificationUpdate" : m16,
-    "notificationUpdateError" : m17,
+    "noShownote" : MessageLookupByLibrary.simpleMessage("Still no show notes received \\nfor this episode."),
+    "notificaitonFatch" : m12,
+    "notificationNetworkError" : m13,
+    "notificationSubscribe" : m14,
+    "notificationSubscribeExisted" : m15,
+    "notificationSuccess" : m16,
+    "notificationUpdate" : m17,
+    "notificationUpdateError" : m18,
     "oldestFirst" : MessageLookupByLibrary.simpleMessage("Oldest first"),
     "play" : MessageLookupByLibrary.simpleMessage("Play"),
     "playing" : MessageLookupByLibrary.simpleMessage("Playing"),
     "plugins" : MessageLookupByLibrary.simpleMessage("Plugins"),
-    "podcast" : MessageLookupByLibrary.simpleMessage("Podcast"),
+    "podcast" : m19,
     "podcastSubscribed" : MessageLookupByLibrary.simpleMessage("Podcast subscribed"),
     "popupMenuDownloadDes" : MessageLookupByLibrary.simpleMessage("Download episode"),
     "popupMenuLaterDes" : MessageLookupByLibrary.simpleMessage("Add episode to playlist"),
@@ -189,15 +196,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "popupMenuMarkDes" : MessageLookupByLibrary.simpleMessage("Mark episode as listened"),
     "popupMenuPlayDes" : MessageLookupByLibrary.simpleMessage("Play the episode"),
     "privacyPolicy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
+    "published" : m20,
     "recoverSubscribe" : MessageLookupByLibrary.simpleMessage("Recover subscribe"),
     "remove" : MessageLookupByLibrary.simpleMessage("Remove"),
     "removeConfirm" : MessageLookupByLibrary.simpleMessage("Remove confirm"),
     "removePodcastDes" : MessageLookupByLibrary.simpleMessage("Are you sure you want to unsubscribe?"),
-    "removedAt" : m18,
+    "removedAt" : m21,
     "schedule" : MessageLookupByLibrary.simpleMessage("Schedule"),
     "searchInvalidRss" : MessageLookupByLibrary.simpleMessage("Invalid RSS link"),
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("Search podcast"),
-    "secondsAgo" : m19,
+    "secondsAgo" : m22,
     "settingStorage" : MessageLookupByLibrary.simpleMessage("Storage"),
     "settingsAccentColor" : MessageLookupByLibrary.simpleMessage("Accent color"),
     "settingsAccentColorDes" : MessageLookupByLibrary.simpleMessage("Include the ovelay color"),
@@ -225,6 +233,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsHistoryDes" : MessageLookupByLibrary.simpleMessage("Listen date"),
     "settingsInfo" : MessageLookupByLibrary.simpleMessage("Info"),
     "settingsInterface" : MessageLookupByLibrary.simpleMessage("Interface"),
+    "settingsLanguages" : MessageLookupByLibrary.simpleMessage("Languages"),
+    "settingsLanguagesDes" : MessageLookupByLibrary.simpleMessage("Change language"),
     "settingsLayout" : MessageLookupByLibrary.simpleMessage("Layout"),
     "settingsLayoutDes" : MessageLookupByLibrary.simpleMessage("App layout"),
     "settingsLibraries" : MessageLookupByLibrary.simpleMessage("Libraries"),
@@ -258,9 +268,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "sleepTimer" : MessageLookupByLibrary.simpleMessage("Sleep timer"),
     "subscribe" : MessageLookupByLibrary.simpleMessage("Subscribe"),
     "systemDefault" : MessageLookupByLibrary.simpleMessage("System default"),
-    "timeLastPlayed" : m20,
-    "timeLeft" : m21,
-    "to" : m22,
+    "timeLastPlayed" : m23,
+    "timeLeft" : m24,
+    "to" : m25,
     "toastAddPlaylist" : MessageLookupByLibrary.simpleMessage("Added to playlist"),
     "toastDiscovery" : MessageLookupByLibrary.simpleMessage("Discovery feature reopened, pleast restart the app"),
     "toastFileError" : MessageLookupByLibrary.simpleMessage("File error, subscribe failed"),
@@ -279,8 +289,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlike" : MessageLookupByLibrary.simpleMessage("Unlike"),
     "unliked" : MessageLookupByLibrary.simpleMessage("Episode removed from favorite"),
     "updateDate" : MessageLookupByLibrary.simpleMessage("Update date"),
-    "updateEpisodesCount" : m23,
+    "updateEpisodesCount" : m26,
     "updateFailed" : MessageLookupByLibrary.simpleMessage("Update failed, network error"),
-    "version" : m24
+    "version" : m27
   };
 }

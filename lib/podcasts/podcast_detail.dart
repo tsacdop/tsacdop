@@ -25,7 +25,7 @@ import '../util/colorize.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
 import '../util/general_dialog.dart';
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, @required this.podcastLocal, this.hide = false})

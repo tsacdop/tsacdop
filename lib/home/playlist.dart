@@ -8,7 +8,7 @@ import 'package:tuple/tuple.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';

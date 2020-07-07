@@ -9,7 +9,7 @@ import 'package:tsacdop/home/preview.dart';
 import 'package:wc_flutter_share/wc_flutter_share.dart';
 import 'package:tuple/tuple.dart';
 
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 import '../util/context_extension.dart';
 import '../util/customslider.dart';
 import '../util/pageroute.dart';

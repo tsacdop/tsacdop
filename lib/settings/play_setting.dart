@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 
-import '../state/settingstate.dart';
+import '../state/setting_state.dart';
 import '../home/audioplayer.dart';
 import '../util/general_dialog.dart';
 import '../util/context_extension.dart';

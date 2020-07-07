@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
-import '../state/settingstate.dart';
+import '../state/setting_state.dart';
 import '../util/context_extension.dart';
 
 class SyncingSetting extends StatelessWidget {

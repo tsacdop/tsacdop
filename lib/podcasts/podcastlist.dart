@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
 import '../local_storage/sqflite_localpodcast.dart';
-import '../podcasts/podcastdetail.dart';
+import 'podcast_detail.dart';
 import '../util/pageroute.dart';
 import '../util/context_extension.dart';
 
@@ -46,6 +46,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
   @override
   Widget build(BuildContext context) {
     var _groupList = Provider.of<GroupList>(context, listen: false);
+    final s = context.s;
     return AlertDialog(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10.0))),
@@ -60,7 +61,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
           },
           textColor: Colors.red,
           child: Text(
-            'UNSUBSCRIBE',
+            s.remove,
           ),
         ),
       ],
@@ -109,7 +110,7 @@ class _PodcastListState extends State<PodcastList> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Podcasts'),
+          title: Text(context.s.podcast(2)),
           centerTitle: true,
         ),
         body: SafeArea(

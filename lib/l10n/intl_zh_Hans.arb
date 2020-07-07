@@ -64,7 +64,7 @@
   "@editGroupName": {},
   "endOfEpisode": "节目结束",
   "@endOfEpisode": {},
-  "episode": "节目",
+  "episode": "{count, plural, zero{} other{节目}}",
   "@episode": {},
   "featureDiscoveryEditGroup": "点击修改分组",
   "@featureDiscoveryEditGroup": {},
@@ -152,7 +152,7 @@
       "host": {}
     }
   },
-  "hoursAgo": "{count, plural, zero{} other{{count}小时前}}",
+  "hoursAgo": "{count, plural, zero{刚刚} other{{count}小时前}}",
   "@hoursAgo": {},
   "hoursCount": "{count, plural, zero{} other{{count} 小时}}",
   "@hoursCount": {},
@@ -218,6 +218,10 @@
   "@noEpisodeRecent": {},
   "noPodcastGroup": "分组无播客",
   "@noPodcastGroup": {},
+  "noShownote": "节目简介暂未收到。",
+  "@noShownote": {
+    "description": "Means this episode have no show notes."
+  },
   "notificaitonFatch": "获取数据 {title}",
   "@notificaitonFatch": {},
   "notificationNetworkError": "订阅失败，网络错误 {title}",
@@ -264,7 +268,7 @@
   "@playing": {},
   "plugins": "插件",
   "@plugins": {},
-  "podcast": "播客",
+  "podcast": "{count, plural, zero{} other{播客}}",
   "@podcast": {},
   "podcastSubscribed": "播客已订阅",
   "@podcastSubscribed": {},
@@ -280,6 +284,12 @@
   "@popupMenuPlayDes": {},
   "privacyPolicy": "隐私条款",
   "@privacyPolicy": {},
+  "published": "{date}上线",
+  "@published": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "recoverSubscribe": "恢复订阅",
   "@recoverSubscribe": {},
   "remove": "移除",
@@ -357,6 +367,10 @@
   "@settingsInfo": {},
   "settingsInterface": "界面",
   "@settingsInterface": {},
+  "settingsLanguages": "语言",
+  "@settingsLanguages": {},
+  "settingsLanguagesDes": "设置语言",
+  "@settingsLanguagesDes": {},
   "settingsLayout": "布局",
   "@settingsLayout": {},
   "settingsLayoutDes": "应用布局",

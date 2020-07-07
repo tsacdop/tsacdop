@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
 import '../state/download_state.dart';
-import '../episodes/episodedetail.dart';
+import '../episodes/episode_detail.dart';
 import '../util/pageroute.dart';
 
 class DownloadList extends StatefulWidget {

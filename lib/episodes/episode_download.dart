@@ -9,8 +9,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
 
 import '../state/download_state.dart';
-import '../state/audiostate.dart';
-import '../state/settingstate.dart';
+import '../state/audio_state.dart';
+import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../util/general_dialog.dart';
 

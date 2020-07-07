@@ -12,12 +12,12 @@ import 'package:tuple/tuple.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
-import 'episodedownload.dart';
+import 'episode_download.dart';
 
 class EpisodeDetail extends StatefulWidget {
   final EpisodeBrief episodeItem;
@@ -101,6 +101,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -118,7 +119,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10))),
               elevation: 1,
-              tooltip: 'Menu',
+              tooltip: s.menu,
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: 0,
@@ -139,7 +140,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                           padding: EdgeInsets.symmetric(horizontal: 5.0),
                         ),
                         Text(
-                          'Mark Listened',
+                          s.markListened,
                         ),
                       ],
                     ),
@@ -152,7 +153,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     await _markListened(widget.episodeItem);
                     if (mounted) setState(() {});
                     Fluttertoast.showToast(
-                      msg: 'Mark as listened',
+                      msg: s.markListened,
                       gravity: ToastGravity.BOTTOM,
                     );
                     break;
@@ -189,10 +190,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
                           height: 30.0,
                           child: Text(
-                              'Published ' +
-                                  DateFormat.yMMMd().format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          widget.episodeItem.pubDate)),
+                              s.published(DateFormat.yMMMd().format(
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      widget.episodeItem.pubDate))),
                               style: TextStyle(
                                   color: Theme.of(context).accentColor)),
                         ),
@@ -226,9 +226,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                           horizontal: 10.0),
                                       alignment: Alignment.center,
                                       child: Text(
-                                          (widget.episodeItem.duration ~/ 60)
-                                                  .toString() +
-                                              'min',
+                                          s.minsCount(
+                                              widget.episodeItem.duration ~/
+                                                  60),
                                           style: textstyle),
                                     )
                                   : Center(),
@@ -326,8 +326,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                             ),
                                             Padding(
                                                 padding: EdgeInsets.all(5.0)),
-                                            Text(
-                                                'Still no shownote received\n for this episode.',
+                                            Text(s.noShownote,
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     color: context.textColor
@@ -444,7 +443,7 @@ class _MenuBarState extends State<MenuBar> {
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-
+    final s = context.s;
     return Container(
       height: 50.0,
       decoration: BoxDecoration(
@@ -518,7 +517,7 @@ class _MenuBarState extends State<MenuBar> {
                                   color: context.accentColor), () {
                               audio.delFromPlaylist(widget.episodeItem);
                               Fluttertoast.showToast(
-                                msg: 'Removed from playlist',
+                                msg: s.toastRemovePlaylist,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             })
@@ -526,7 +525,7 @@ class _MenuBarState extends State<MenuBar> {
                               Icon(Icons.playlist_add, color: Colors.grey[700]),
                               () {
                               Fluttertoast.showToast(
-                                msg: 'Added to playlist',
+                                msg: s.toastAddPlaylist,
                                 gravity: ToastGravity.BOTTOM,
                               );
                               audio.addToPlaylist(widget.episodeItem);
@@ -637,7 +636,7 @@ class _MenuBarState extends State<MenuBar> {
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
                           child: Row(
                             children: <Widget>[
-                              Text('Play',
+                              Text(s.play,
                                   style: TextStyle(
                                     color: Theme.of(context).accentColor,
                                     fontSize: 15,

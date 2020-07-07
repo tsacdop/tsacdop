@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
@@ -71,6 +72,21 @@ class _DownloadsManageState extends State<DownloadsManage> {
     await Future.delayed(Duration(seconds: 1));
     if (mounted) setState(() => _selectedList = []);
     _getStorageSize();
+  }
+
+  String _downloadDateToString(BuildContext context,
+      {int downloadDate, int pubDate}) {
+    final s = context.s;
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(downloadDate);
+    var diffrence = DateTime.now().toUtc().difference(date);
+    if (diffrence.inHours < 24) {
+      return s.hoursAgo(diffrence.inHours);
+    } else if (diffrence.inDays < 7) {
+      return s.daysAgo(diffrence.inDays);
+    } else {
+      return DateFormat.yMMMd().format(
+          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
+    }
   }
 
   int sumSelected() {
@@ -313,8 +329,14 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                                 ),
                                                 subtitle: Row(
                                                   children: [
-                                                    Text(_episodes[index]
-                                                        .downloadDateToString()),
+                                                    Text(_downloadDateToString(
+                                                        context,
+                                                        downloadDate:
+                                                            _episodes[index]
+                                                                .downloadDate,
+                                                        pubDate:
+                                                            _episodes[index]
+                                                                .pubDate)),
                                                     SizedBox(width: 20),
                                                     _episodes[index]
                                                                 .enclosureLength !=

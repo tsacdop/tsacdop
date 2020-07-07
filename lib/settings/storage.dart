@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../settings/downloads_manage.dart';
-import '../state/settingstate.dart';
+import '../state/setting_state.dart';
 import '../local_storage/key_value_storage.dart';
 import '../util/context_extension.dart';
 

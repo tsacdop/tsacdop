@@ -11,7 +11,7 @@ import '../local_storage/sqflite_localpodcast.dart';
 import '../webfeed/webfeed.dart';
 import '../type/searchpodcast.dart';
 import '../util/context_extension.dart';
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 import '../state/subscribe_podcast.dart';
 import '../type/sub_history.dart';
 

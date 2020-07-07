@@ -39,25 +39,8 @@ class EpisodeBrief {
       this.downloadDate = 0})
       : assert(enclosureUrl != null);
 
-  String dateToString() {
+  String ateToString() {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
-    var diffrence = DateTime.now().toUtc().difference(date);
-    if (diffrence.inHours < 1) {
-      return '1 hour ago';
-    } else if (diffrence.inHours < 24) {
-      return '${diffrence.inHours} hours ago';
-    } else if (diffrence.inHours == 24) {
-      return '1 day ago';
-    } else if (diffrence.inDays < 7) {
-      return '${diffrence.inDays} days ago';
-    } else {
-      return DateFormat.yMMMd().format(
-          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
-    }
-  }
-
-  String downloadDateToString() {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(downloadDate);
     var diffrence = DateTime.now().toUtc().difference(date);
     if (diffrence.inHours < 1) {
       return '1 hour ago';

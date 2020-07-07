@@ -17,13 +17,14 @@ import '../intro_slider/app_intro.dart';
 import '../type/podcastlocal.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../home/home.dart';
-import '../podcasts/podcastmanage.dart';
+import '../podcasts/podcast_manage.dart';
 import 'theme.dart';
 import 'layouts.dart';
 import 'storage.dart';
 import 'history.dart';
 import 'syncing.dart';
 import 'libries.dart';
+import 'languages.dart';
 import 'play_setting.dart';
 
 class Settings extends StatefulWidget {
@@ -215,6 +216,18 @@ class _SettingsState extends State<Settings>
                           leading: Icon(Icons.update),
                           title: Text(s.settingsHistory),
                           subtitle: Text(s.settingsHistoryDes),
+                        ),
+                        Divider(height: 2),
+                        ListTile(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LanguagesSetting())),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 25.0),
+                          leading: Icon(LineIcons.language_solid),
+                          title: Text(s.settingsLanguages),
+                          subtitle: Text(s.settingsLanguagesDes),
                         ),
                         Divider(height: 2),
                         ListTile(

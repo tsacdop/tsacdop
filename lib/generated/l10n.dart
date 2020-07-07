@@ -315,13 +315,16 @@ class S {
     );
   }
 
-  /// `Episode`
-  String get episode {
-    return Intl.message(
-      'Episode',
+  /// `{count, plural, zero{} one{Episode} other{Episodes}}`
+  String episode(num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: 'Episode',
+      other: 'Episodes',
       name: 'episode',
       desc: '',
-      args: [],
+      args: [count],
     );
   }
 
@@ -718,11 +721,11 @@ class S {
     );
   }
 
-  /// `{count, plural, zero{} one{{count} hour ago} other{{count} hours ago}}`
+  /// `{count, plural, zero{In an hour} one{{count} hour ago} other{{count} hours ago}}`
   String hoursAgo(num count) {
     return Intl.plural(
       count,
-      zero: '',
+      zero: 'In an hour',
       one: '$count hour ago',
       other: '$count hours ago',
       name: 'hoursAgo',
@@ -1050,6 +1053,16 @@ class S {
     );
   }
 
+  /// `Still no show notes received \nfor this episode.`
+  String get noShownote {
+    return Intl.message(
+      'Still no show notes received \nfor this episode.',
+      name: 'noShownote',
+      desc: 'Means this episode have no show notes.',
+      args: [],
+    );
+  }
+
   /// `Fetch data {title}`
   String notificaitonFatch(Object title) {
     return Intl.message(
@@ -1160,13 +1173,16 @@ class S {
     );
   }
 
-  /// `Podcast`
-  String get podcast {
-    return Intl.message(
-      'Podcast',
+  /// `{count, plural, zero{} one{Podcast} other{Podcasts}}`
+  String podcast(num count) {
+    return Intl.plural(
+      count,
+      zero: '',
+      one: 'Podcast',
+      other: 'Podcasts',
       name: 'podcast',
       desc: '',
-      args: [],
+      args: [count],
     );
   }
 
@@ -1237,6 +1253,16 @@ class S {
       name: 'privacyPolicy',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Published at {date}`
+  String published(Object date) {
+    return Intl.message(
+      'Published at $date',
+      name: 'published',
+      desc: '',
+      args: [date],
     );
   }
 
@@ -1588,6 +1614,26 @@ class S {
     return Intl.message(
       'Interface',
       name: 'settingsInterface',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Languages`
+  String get settingsLanguages {
+    return Intl.message(
+      'Languages',
+      name: 'settingsLanguages',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change language`
+  String get settingsLanguagesDes {
+    return Intl.message(
+      'Change language',
+      name: 'settingsLanguagesDes',
       desc: '',
       args: [],
     );

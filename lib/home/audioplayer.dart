@@ -9,7 +9,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:line_icons/line_icons.dart';
 
 import '../type/episodebrief.dart';
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
 import '../util/pageroute.dart';
@@ -17,7 +17,7 @@ import '../util/colorize.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
 import '../util/customslider.dart';
-import '../episodes/episodedetail.dart';
+import '../episodes/episode_detail.dart';
 import 'playlist.dart';
 import 'audiopanel.dart';
 

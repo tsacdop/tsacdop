@@ -64,7 +64,7 @@
   "@editGroupName": {},
   "endOfEpisode": "End of Episode",
   "@endOfEpisode": {},
-  "episode": "Episode",
+  "episode": "{count, plural, zero{} one{Episode} other{Episodes}}",
   "@episode": {},
   "featureDiscoveryEditGroup": "Tap to edit group",
   "@featureDiscoveryEditGroup": {},
@@ -152,7 +152,7 @@
       "host": {}
     }
   },
-  "hoursAgo": "{count, plural, zero{} one{{count} hour ago} other{{count} hours ago}}",
+  "hoursAgo": "{count, plural, zero{In an hour} one{{count} hour ago} other{{count} hours ago}}",
   "@hoursAgo": {},
   "hoursCount": "{count, plural, zero{} one{{count} hour} other{{count} hours}}",
   "@hoursCount": {},
@@ -218,6 +218,10 @@
   "@noEpisodeRecent": {},
   "noPodcastGroup": "No podcast in this group",
   "@noPodcastGroup": {},
+  "noShownote": "Still no show notes received \\nfor this episode.",
+  "@noShownote": {
+    "description": "Means this episode have no show notes."
+  },
   "notificaitonFatch": "Fetch data {title}",
   "@notificaitonFatch": {},
   "notificationNetworkError": "Subscribe failed, network error {title}",
@@ -264,7 +268,7 @@
   "@playing": {},
   "plugins": "Plugins",
   "@plugins": {},
-  "podcast": "Podcast",
+  "podcast": "{count, plural, zero{} one{Podcast} other{Podcasts}}",
   "@podcast": {},
   "podcastSubscribed": "Podcast subscribed",
   "@podcastSubscribed": {},
@@ -280,6 +284,12 @@
   "@popupMenuPlayDes": {},
   "privacyPolicy": "Privacy Policy",
   "@privacyPolicy": {},
+  "published": "Published at {date}",
+  "@published": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "recoverSubscribe": "Recover subscribe",
   "@recoverSubscribe": {},
   "remove": "Remove",
@@ -357,6 +367,10 @@
   "@settingsInfo": {},
   "settingsInterface": "Interface",
   "@settingsInterface": {},
+  "settingsLanguages": "Languages",
+  "@settingsLanguages": {},
+  "settingsLanguagesDes": "Change language",
+  "@settingsLanguagesDes": {},
   "settingsLayout": "Layout",
   "@settingsLayout": {},
   "settingsLayoutDes": "App layout",

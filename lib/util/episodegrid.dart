@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
@@ -12,10 +13,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:auto_animated/auto_animated.dart';
 import 'open_container.dart';
 
-import '../state/audiostate.dart';
+import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
-import '../episodes/episodedetail.dart';
+import '../episodes/episode_detail.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
 import 'colorize.dart';
@@ -45,6 +46,19 @@ class EpisodeGrid extends StatelessWidget {
     this.layout = Layout.three,
     this.reverse,
   }) : super(key: key);
+  String _dateToString(BuildContext context, {int pubDate}) {
+    final s = context.s;
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
+    var difference = DateTime.now().toUtc().difference(date);
+    if (difference.inHours < 24) {
+      return s.hoursAgo(difference.inHours);
+    } else if (difference.inDays < 7) {
+      return s.daysAgo(difference.inDays);
+    } else {
+      return DateFormat.yMMMd().format(
+          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
+    }
+  }
 
   Future<int> _isListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
@@ -210,7 +224,7 @@ class EpisodeGrid extends StatelessWidget {
 
   Widget _pubDate(BuildContext context, {EpisodeBrief episode, Color color}) =>
       Text(
-        episode.dateToString(),
+        _dateToString(context, pubDate: episode.pubDate),
         style: TextStyle(
             fontSize: context.width / 35,
             color: color,

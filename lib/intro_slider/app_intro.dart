@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../state/settingstate.dart';
+import '../state/setting_state.dart';
 import '../home/home.dart';
 import '../util/pageroute.dart';
 import '../util/context_extension.dart';
