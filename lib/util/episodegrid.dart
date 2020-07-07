@@ -65,13 +65,14 @@ class EpisodeGrid extends StatelessWidget {
     return await dbHelper.isListened(episode.enclosureUrl);
   }
 
-  Future<Tuple4<int, bool, bool, List<int>>> _initData(
+  Future<Tuple5<int, bool, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
     List<int> menuList = await _getEpisodeMenu();
+    bool tapToOpen = await _getTapToOpenPopupMenu();
     int listened = await _isListened(episode);
     bool liked = await _isLiked(episode);
     bool downloaded = await _isDownloaded(episode);
-    return Tuple4(listened, liked, downloaded, menuList);
+    return Tuple5(listened, liked, downloaded, tapToOpen, menuList);
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
@@ -88,6 +89,13 @@ class EpisodeGrid extends StatelessWidget {
   Future<bool> _isDownloaded(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
     return await dbHelper.isDownloaded(episode.enclosureUrl);
+  }
+
+  Future<bool> _getTapToOpenPopupMenu() async {
+    KeyValueStorage tapToOpenPopupMenuStorage =
+        KeyValueStorage(tapToOpenPopupMenuKey);
+    int boo = await tapToOpenPopupMenuStorage.getInt(defaultValue: 0);
+    return boo == 1;
   }
 
   _markListened(EpisodeBrief episode) async {
@@ -139,40 +147,6 @@ class EpisodeGrid extends StatelessWidget {
                 backgroundImage: FileImage(File("${episode.imagePath}")),
               ),
       );
-
-  //Widget _listenIndicater(BuildContext context,
-  //        {EpisodeBrief episode, int isListened}) =>
-  //    Center();
-  // Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
-  //     selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
-  //     builder: (_, data, __) {
-  //       return (episode.enclosureUrl == data.item1?.enclosureUrl &&
-  //               data.item2)
-  //           ? Container(
-  //               height: 20,
-  //               width: 20,
-  //               margin: EdgeInsets.symmetric(horizontal: 2),
-  //               decoration: BoxDecoration(
-  //                 shape: BoxShape.circle,
-  //               ),
-  //               child: WaveLoader(color: context.accentColor))
-  //           : layout != Layout.three && isListened > 0
-  //               ? Container(
-  //                   height: 20,
-  //                   width: 20,
-  //                   margin: EdgeInsets.symmetric(horizontal: 2),
-  //                   padding: EdgeInsets.all(2),
-  //                   decoration: BoxDecoration(
-  //                     color: context.accentColor,
-  //                     shape: BoxShape.circle,
-  //                   ),
-  //                   child: CustomPaint(
-  //                       painter: ListenedAllPainter(
-  //                     Colors.white,
-  //                   )),
-  //                 )
-  //               : Center();
-  //     });
 
   Widget _downloadIndicater(BuildContext context,
           {EpisodeBrief episode, bool isDownloaded}) =>
@@ -236,173 +210,6 @@ class EpisodeGrid extends StatelessWidget {
     double _width = context.width;
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     var downloader = Provider.of<DownloadState>(context, listen: false);
-    //Offset _offset;
-    //_showPopupMenu(Offset offset, EpisodeBrief episode, BuildContext context,
-    //    {bool isPlaying, bool isInPlaylist}) async {
-    //  bool isLiked, isDownload;
-    //  int isListened;
-    //  var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    //  var downloader = Provider.of<DownloadState>(context, listen: false);
-    //  double left = offset.dx;
-    //  double top = offset.dy;
-    //  List<int> menuList = await _getEpisodeMenu();
-    //  if (menuList.contains(3)) isListened = await _isListened(episode);
-    //  if (menuList.contains(2)) isLiked = await _isLiked(episode);
-    //  if (menuList.contains(4)) isDownload = await _isDownloaded(episode);
-    //  await showMenu<int>(
-    //    shape: RoundedRectangleBorder(
-    //        borderRadius: BorderRadius.all(Radius.circular(10))),
-    //    context: context,
-    //    position: RelativeRect.fromLTRB(left, top, _width - left, 0),
-    //    items: <PopupMenuEntry<int>>[
-    //      PopupMenuItem(
-    //        value: 0,
-    //        child: Row(
-    //          mainAxisAlignment: MainAxisAlignment.start,
-    //          mainAxisSize: MainAxisSize.max,
-    //          children: <Widget>[
-    //            Icon(
-    //              LineIcons.play_circle_solid,
-    //              color: Theme.of(context).accentColor,
-    //            ),
-    //            Padding(
-    //              padding: EdgeInsets.symmetric(horizontal: 2),
-    //            ),
-    //            !isPlaying ? Text('Play') : Text('Playing'),
-    //          ],
-    //        ),
-    //      ),
-    //      menuList.contains(1)
-    //          ? PopupMenuItem(
-    //              value: 1,
-    //              child: Row(
-    //                children: <Widget>[
-    //                  Icon(
-    //                    LineIcons.clock_solid,
-    //                    color: Colors.cyan,
-    //                  ),
-    //                  Padding(
-    //                    padding: EdgeInsets.symmetric(horizontal: 2),
-    //                  ),
-    //                  !isInPlaylist ? Text('Later') : Text('Remove')
-    //                ],
-    //              ))
-    //          : null,
-    //      menuList.contains(2)
-    //          ? PopupMenuItem(
-    //              value: 2,
-    //              child: Row(
-    //                children: <Widget>[
-    //                  Icon(LineIcons.heart, color: Colors.red, size: 21),
-    //                  Padding(
-    //                    padding: EdgeInsets.symmetric(horizontal: 2),
-    //                  ),
-    //                  isLiked
-    //                      ? Text(
-    //                          'Unlike',
-    //                        )
-    //                      : Text('Like')
-    //                ],
-    //              ))
-    //          : null,
-    //      menuList.contains(3)
-    //          ? PopupMenuItem(
-    //              value: 3,
-    //              child: Row(
-    //                children: <Widget>[
-    //                  SizedBox(
-    //                    width: 23,
-    //                    height: 23,
-    //                    child: CustomPaint(
-    //                        painter:
-    //                            ListenedAllPainter(Colors.blue, stroke: 1.5)),
-    //                  ),
-    //                  Padding(
-    //                    padding: EdgeInsets.symmetric(horizontal: 2),
-    //                  ),
-    //                  isListened > 0
-    //                      ? Text('Listened',
-    //                          style: TextStyle(
-    //                              color: context.textColor.withOpacity(0.5)))
-    //                      : Text('Mark\nListened')
-    //                ],
-    //              ))
-    //          : null,
-    //      menuList.contains(4)
-    //          ? PopupMenuItem(
-    //              value: 4,
-    //              child: Row(
-    //                children: <Widget>[
-    //                  Icon(LineIcons.download_solid, color: Colors.green),
-    //                  Padding(
-    //                    padding: EdgeInsets.symmetric(horizontal: 2),
-    //                  ),
-    //                  isDownload
-    //                      ? Text('Downloaded',
-    //                          style: TextStyle(
-    //                              color: context.textColor.withOpacity(0.5)))
-    //                      : Text('Download')
-    //                ],
-    //              ))
-    //          : null,
-    //    ],
-    //    elevation: 5.0,
-    //  ).then((value) async {
-    //    switch (value) {
-    //      case 0:
-    //        if (!isPlaying) audio.episodeLoad(episode);
-    //        break;
-    //      case 1:
-    //        if (!isInPlaylist) {
-    //          audio.addToPlaylist(episode);
-    //          Fluttertoast.showToast(
-    //            msg: 'Added to playlist',
-    //            gravity: ToastGravity.BOTTOM,
-    //          );
-    //        } else {
-    //          audio.delFromPlaylist(episode);
-    //          Fluttertoast.showToast(
-    //            msg: 'Removed from playlist',
-    //            gravity: ToastGravity.BOTTOM,
-    //          );
-    //        }
-    //        break;
-    //      case 2:
-    //        if (isLiked) {
-    //          await _setUnliked(episode.enclosureUrl);
-    //          audio.setEpisodeState = true;
-    //          Fluttertoast.showToast(
-    //            msg: 'Unliked',
-    //            gravity: ToastGravity.BOTTOM,
-    //          );
-    //        } else {
-    //          await _saveLiked(episode.enclosureUrl);
-    //          audio.setEpisodeState = true;
-    //          Fluttertoast.showToast(
-    //            msg: 'Liked',
-    //            gravity: ToastGravity.BOTTOM,
-    //          );
-    //        }
-    //        break;
-    //      case 3:
-    //        if (isListened < 1) {
-    //          await _markListened(episode);
-    //          audio.setEpisodeState = true;
-    //          Fluttertoast.showToast(
-    //            msg: 'Mark listened',
-    //            gravity: ToastGravity.BOTTOM,
-    //          );
-    //        }
-    //        break;
-    //      case 4:
-    //        if (!isDownload) downloader.startTask(episode);
-    //        break;
-    //      default:
-    //        break;
-    //    }
-    //  });
-    //}
-
     final options = LiveOptions(
       delay: Duration.zero,
       showItemInterval: Duration(milliseconds: 50),
@@ -443,14 +250,15 @@ class EpisodeGrid extends StatelessWidget {
               builder: (_, data, __) => OpenContainerWrapper(
                 episode: episodes[index],
                 closedBuilder: (context, action, boo) => FutureBuilder<
-                        Tuple4<int, bool, bool, List<int>>>(
+                        Tuple5<int, bool, bool, bool, List<int>>>(
                     future: _initData(episodes[index]),
-                    initialData: Tuple4(0, false, false, []),
+                    initialData: Tuple5(0, false, false, false, []),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       int isListened = snapshot.data.item1;
                       bool isLiked = snapshot.data.item2;
                       bool isDownloaded = snapshot.data.item3;
-                      List<int> menuList = snapshot.data.item4;
+                      bool tapToOpen = snapshot.data.item4;
+                      List<int> menuList = snapshot.data.item5;
                       return Container(
                         decoration: BoxDecoration(
                             borderRadius:
@@ -489,7 +297,8 @@ class EpisodeGrid extends StatelessWidget {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(15.0))),
                             duration: Duration(milliseconds: 100),
-                            tapMode: TapMode.onTap,
+                            tapMode:
+                                tapToOpen ? TapMode.onTap : TapMode.onLongPress,
                             animateMenuItems: false,
                             blurBackgroundColor:
                                 context.brightness == Brightness.light

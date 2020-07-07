@@ -1889,6 +1889,26 @@ class S {
     );
   }
 
+  /// `Tap to open popup menu`
+  String get settingsTapToOpenPopupMenu {
+    return Intl.message(
+      'Tap to open popup menu',
+      name: 'settingsTapToOpenPopupMenu',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You need to long press to open episode page`
+  String get settingsTapToOpenPopupMenuDes {
+    return Intl.message(
+      'You need to long press to open episode page',
+      name: 'settingsTapToOpenPopupMenuDes',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Theme`
   String get settingsTheme {
     return Intl.message(

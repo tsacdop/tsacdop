@@ -260,6 +260,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsStorageDes" : MessageLookupByLibrary.simpleMessage("管理缓存和下载空间"),
     "settingsSyncing" : MessageLookupByLibrary.simpleMessage("同步"),
     "settingsSyncingDes" : MessageLookupByLibrary.simpleMessage("在后台更新播客"),
+    "settingsTapToOpenPopupMenu" : MessageLookupByLibrary.simpleMessage("轻点打开弹出菜单"),
+    "settingsTapToOpenPopupMenuDes" : MessageLookupByLibrary.simpleMessage("开启后您需长按打开节目页"),
     "settingsTheme" : MessageLookupByLibrary.simpleMessage("主题"),
     "settingsUpdateInterval" : MessageLookupByLibrary.simpleMessage("更新频率"),
     "settingsUpdateIntervalDes" : MessageLookupByLibrary.simpleMessage("默认 24 小时"),

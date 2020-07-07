@@ -32,13 +32,20 @@ class PlaySetting extends StatelessWidget {
           children: [
             InkWell(
               onTap: () => settings.setAutoSleepTimerMode = 0,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(5), topLeft: Radius.circular(5)),
               child: Material(
                 color: Colors.transparent,
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 400),
-                  color: data.item1 == 0
-                      ? context.accentColor
-                      : context.primaryColorDark,
+                  decoration: BoxDecoration(
+                    color: data.item1 == 0
+                        ? context.accentColor
+                        : context.primaryColorDark,
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(5),
+                        topLeft: Radius.circular(5)),
+                  ),
                   padding: const EdgeInsets.all(8.0),
                   child: Text(context.s.endOfEpisode,
                       style: TextStyle(
@@ -48,13 +55,21 @@ class PlaySetting extends StatelessWidget {
             ),
             InkWell(
               onTap: () => settings.setAutoSleepTimerMode = 1,
+              borderRadius: BorderRadius.only(
+                  bottomRight: Radius.circular(5),
+                  topRight: Radius.circular(5)),
               child: Material(
                 color: Colors.transparent,
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 400),
-                  color: data.item1 == 1
-                      ? context.accentColor
-                      : context.primaryColorDark,
+                  decoration: BoxDecoration(
+                    color: data.item1 == 1
+                        ? context.accentColor
+                        : context.primaryColorDark,
+                    borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(5),
+                        topRight: Radius.circular(5)),
+                  ),
                   padding: const EdgeInsets.all(8.0),
                   child: Text(context.s.minsCount(data.item2),
                       style: TextStyle(
@@ -130,10 +145,17 @@ class PlaySetting extends StatelessWidget {
                   ],
                 );
               },
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(5), topLeft: Radius.circular(5)),
               child: Material(
                 color: Colors.transparent,
                 child: Container(
-                  color: context.primaryColorDark,
+                  decoration: BoxDecoration(
+                    color: context.primaryColorDark,
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(5),
+                        topLeft: Radius.circular(5)),
+                  ),
                   padding: const EdgeInsets.all(8.0),
                   child: Text(s.from(stringForMins(data.item1))),
                 ),
@@ -189,11 +211,18 @@ class PlaySetting extends StatelessWidget {
                   ],
                 );
               },
+              borderRadius: BorderRadius.only(
+                  bottomRight: Radius.circular(5),
+                  topRight: Radius.circular(5)),
               child: Material(
                 color: Colors.transparent,
                 child: Container(
                   padding: const EdgeInsets.all(8.0),
-                  color: Colors.black54,
+                  decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(5),
+                          topRight: Radius.circular(5))),
                   child: Text(s.to(stringForMins(data.item2)),
                       style: TextStyle(color: Colors.white)),
                 ),

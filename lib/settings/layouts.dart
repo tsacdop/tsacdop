@@ -22,7 +22,11 @@ class _LayoutSettingState extends State<LayoutSetting> {
   }
 
   Widget _gridOptions(BuildContext context,
-          {String key, Layout layout, Layout option, double scale}) =>
+          {String key,
+          Layout layout,
+          Layout option,
+          double scale,
+          BorderRadiusGeometry borderRadius}) =>
       Padding(
         padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
         child: InkWell(
@@ -31,13 +35,17 @@ class _LayoutSettingState extends State<LayoutSetting> {
             await storage.saveInt(option.index);
             setState(() {});
           },
+          borderRadius: borderRadius,
           child: AnimatedContainer(
             duration: Duration(milliseconds: 400),
             height: 30,
             width: 50,
-            color: layout == option
-                ? context.accentColor
-                : context.primaryColorDark,
+            decoration: BoxDecoration(
+              borderRadius: borderRadius,
+              color: layout == option
+                  ? context.accentColor
+                  : context.primaryColorDark,
+            ),
             alignment: Alignment.center,
             child: SizedBox(
               height: 10,
@@ -62,21 +70,31 @@ class _LayoutSettingState extends State<LayoutSetting> {
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    _gridOptions(context,
-                        key: key,
-                        layout: snapshot.data,
-                        option: Layout.one,
-                        scale: 4),
-                    _gridOptions(context,
-                        key: key,
-                        layout: snapshot.data,
-                        option: Layout.two,
-                        scale: 1),
+                    _gridOptions(
+                      context,
+                      key: key,
+                      layout: snapshot.data,
+                      option: Layout.one,
+                      scale: 4,
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(5),
+                          topLeft: Radius.circular(5)),
+                    ),
+                    _gridOptions(
+                      context,
+                      key: key,
+                      layout: snapshot.data,
+                      option: Layout.two,
+                      scale: 1,
+                    ),
                     _gridOptions(context,
                         key: key,
                         layout: snapshot.data,
                         option: Layout.three,
-                        scale: 0),
+                        scale: 0,
+                        borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(5),
+                            topRight: Radius.circular(5))),
                   ],
                 )
               : Center();

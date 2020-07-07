@@ -21,10 +21,24 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
     return list;
   }
 
+  Future<bool> _getTapToOpenPopupMenu() async {
+    KeyValueStorage tapToOpenPopupMenuStorage =
+        KeyValueStorage(tapToOpenPopupMenuKey);
+    int boo = await tapToOpenPopupMenuStorage.getInt(defaultValue: 0);
+    return boo == 1;
+  }
+
   _saveEpisodeMene(List<int> list) async {
     KeyValueStorage popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
     await popupMenuStorage.saveMenu(list);
-    setState(() {});
+    if (mounted) setState(() {});
+  }
+
+  _saveTapToOpenPopupMenu(bool boo) async {
+    KeyValueStorage tapToOpenPopupMenuStorage =
+        KeyValueStorage(tapToOpenPopupMenuKey);
+    await tapToOpenPopupMenuStorage.saveInt(boo ? 1 : 0);
+    if (mounted) setState(() {});
   }
 
   Widget _popupMenuItem(List<int> menu, int e,
@@ -115,6 +129,20 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                         .textTheme
                         .bodyText1
                         .copyWith(color: Theme.of(context).accentColor)),
+              ),
+              FutureBuilder<bool>(
+                future: _getTapToOpenPopupMenu(),
+                initialData: false,
+                builder: (context, snapshot) => ListTile(
+                  contentPadding:
+                      EdgeInsets.only(left: 80, top: 10, bottom: 10, right: 30),
+                  onTap: () => _saveTapToOpenPopupMenu(!snapshot.data),
+                  title: Text(s.settingsTapToOpenPopupMenu),
+                  subtitle: Text(s.settingsTapToOpenPopupMenuDes),
+                  trailing: Switch(
+                      value: snapshot.data,
+                      onChanged: (bool boo) => _saveTapToOpenPopupMenu(boo)),
+                ),
               ),
               FutureBuilder<List<int>>(
                   future: _getEpisodeMenu(),

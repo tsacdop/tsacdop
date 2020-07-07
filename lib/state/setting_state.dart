@@ -94,6 +94,8 @@ class SettingState extends ChangeNotifier {
       KeyValueStorage(autoSleepTimerStartKey);
   KeyValueStorage autoSleepTimerEndStorage =
       KeyValueStorage(autoSleepTimerEndKey);
+  KeyValueStorage tapToOpenPopupMenuStorage =
+      KeyValueStorage(tapToOpenPopupMenuKey);
 
   Future initData() async {
     await _getTheme();

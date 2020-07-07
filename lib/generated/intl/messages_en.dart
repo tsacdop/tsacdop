@@ -260,6 +260,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsStorageDes" : MessageLookupByLibrary.simpleMessage("Manange cache and download storage"),
     "settingsSyncing" : MessageLookupByLibrary.simpleMessage("Syncing"),
     "settingsSyncingDes" : MessageLookupByLibrary.simpleMessage("Refresh podcasts in the background"),
+    "settingsTapToOpenPopupMenu" : MessageLookupByLibrary.simpleMessage("Tap to open popup menu"),
+    "settingsTapToOpenPopupMenuDes" : MessageLookupByLibrary.simpleMessage("You need to long press to open episode page"),
     "settingsTheme" : MessageLookupByLibrary.simpleMessage("Theme"),
     "settingsUpdateInterval" : MessageLookupByLibrary.simpleMessage("Update interval"),
     "settingsUpdateIntervalDes" : MessageLookupByLibrary.simpleMessage("Default 24 hours"),

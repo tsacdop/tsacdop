@@ -31,6 +31,7 @@ const String autoSleepTimerStartKey = 'autoSleepTimerStartKey';
 const String autoSleepTimerEndKey = 'autoSleepTimerEndKey';
 const String defaultSleepTimerKey = 'defaultSleepTimerKey';
 const String autoSleepTimerModeKey = 'autoSleepTimerModeKey';
+const String tapToOpenPopupMenuKey = 'tapToOpenPopupMenuKey';
 
 class KeyValueStorage {
   final String key;

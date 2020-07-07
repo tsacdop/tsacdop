@@ -307,7 +307,7 @@ class _SettingsState extends State<Settings>
                                       MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
-                                    SizedBox(width: 75),
+                                    SizedBox(width: 45),
                                     _feedbackItem(
                                         LineIcons.github,
                                         s.feedbackGithub,
