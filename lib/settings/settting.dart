@@ -154,7 +154,8 @@ class _SettingsState extends State<Settings>
                                   builder: (context) => ThemeSetting())),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.adjust_solid),
+                          leading: Icon(LineIcons.adjust_solid,
+                              color: context.accentColor),
                           title: Text(s.settingsAppearance),
                           subtitle: Text(s.settingsAppearanceDes),
                         ),
@@ -166,7 +167,8 @@ class _SettingsState extends State<Settings>
                                   builder: (context) => LayoutSetting())),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.stop_circle_solid),
+                          leading: Icon(LineIcons.stop_circle_solid,
+                              color: Colors.blueAccent),
                           title: Text(s.settingsLayout),
                           subtitle: Text(s.settingsLayoutDes),
                         ),
@@ -178,7 +180,8 @@ class _SettingsState extends State<Settings>
                                   builder: (context) => PlaySetting())),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.play_circle),
+                          leading: Icon(LineIcons.play_circle,
+                              color: Colors.redAccent),
                           title: Text(s.play),
                           subtitle: Text(s.settingsPlayDes),
                         ),
@@ -190,7 +193,8 @@ class _SettingsState extends State<Settings>
                                     builder: (context) => SyncingSetting())),
                             contentPadding:
                                 EdgeInsets.symmetric(horizontal: 25.0),
-                            leading: Icon(LineIcons.cloud_download_alt_solid),
+                            leading: Icon(LineIcons.cloud_download_alt_solid,
+                                color: Colors.yellow[700]),
                             title: Text(s.settingsSyncing),
                             subtitle: Text(s.settingsSyncingDes)),
                         Divider(height: 2),
@@ -201,7 +205,8 @@ class _SettingsState extends State<Settings>
                                   builder: (context) => StorageSetting())),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.save),
+                          leading:
+                              Icon(LineIcons.save, color: Colors.green[700]),
                           title: Text(s.settingStorage),
                           subtitle: Text(s.settingsStorageDes),
                         ),
@@ -213,7 +218,8 @@ class _SettingsState extends State<Settings>
                                   builder: (context) => PlayedHistory())),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(Icons.update),
+                          leading:
+                              Icon(Icons.update, color: Colors.indigo[700]),
                           title: Text(s.settingsHistory),
                           subtitle: Text(s.settingsHistoryDes),
                         ),
@@ -225,7 +231,8 @@ class _SettingsState extends State<Settings>
                                   builder: (context) => LanguagesSetting())),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.language_solid),
+                          leading: Icon(LineIcons.language_solid,
+                              color: Colors.purpleAccent),
                           title: Text(s.settingsLanguages),
                           subtitle: Text(s.settingsLanguagesDes),
                         ),
@@ -236,7 +243,8 @@ class _SettingsState extends State<Settings>
                           },
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.file_code_solid),
+                          leading: Icon(LineIcons.file_code_solid,
+                              color: Colors.lightGreen[700]),
                           title: Text(s.settingsExport),
                           subtitle: Text(s.settingsExportDes),
                         ),
@@ -274,7 +282,8 @@ class _SettingsState extends State<Settings>
                                   builder: (context) => Libries())),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.book_open_solid),
+                          leading: Icon(LineIcons.book_open_solid,
+                              color: Colors.purple[700]),
                           title: Text(s.settingsLibraries),
                           subtitle: Text(s.settingsLibrariesDes),
                         ),
@@ -291,7 +300,8 @@ class _SettingsState extends State<Settings>
                           },
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.bug_solid),
+                          leading: Icon(LineIcons.bug_solid,
+                              color: Colors.pink[700]),
                           title: Text(s.settingsFeedback),
                           subtitle: Text(s.settingsFeedbackDes),
                           trailing: Transform.rotate(
@@ -351,7 +361,8 @@ class _SettingsState extends State<Settings>
                           },
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.capsules_solid),
+                          leading: Icon(LineIcons.capsules_solid,
+                              color: Colors.pinkAccent),
                           title: Text(s.settingsDiscovery),
                         ),
                         Divider(height: 2),
@@ -363,7 +374,8 @@ class _SettingsState extends State<Settings>
                                       SlideIntro(goto: Goto.settings))),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
-                          leading: Icon(LineIcons.columns_solid),
+                          leading: Icon(LineIcons.columns_solid,
+                              color: Colors.blueGrey),
                           title: Text(s.settingsAppIntro),
                         ),
                         Divider(height: 2),

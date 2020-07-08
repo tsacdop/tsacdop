@@ -98,7 +98,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     subtitle: Text(
                         "If you'd like to contribute to support more languages, please contact me."),
                     trailing: IconButton(
-                        icon: Icon(LineIcons.envelope_open_solid),
+                        icon: Icon(LineIcons.heart),
                         onPressed: () => _launchUrl(
                             'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project')),
                   ),
