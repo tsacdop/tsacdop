@@ -16,7 +16,7 @@ import '../util/pageroute.dart';
 import '../util/colorize.dart';
 import '../util/context_extension.dart';
 import '../util/custompaint.dart';
-import '../util/customslider.dart';
+import '../util/custom_slider.dart';
 import '../episodes/episode_detail.dart';
 import 'playlist.dart';
 import 'audiopanel.dart';

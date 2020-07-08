@@ -5,6 +5,7 @@ import 'package:tuple/tuple.dart';
 
 import '../state/setting_state.dart';
 import '../util/context_extension.dart';
+import '../util/custom_dropdown.dart';
 
 class SyncingSetting extends StatelessWidget {
   @override
@@ -91,10 +92,11 @@ class SyncingSetting extends StatelessWidget {
                               const EdgeInsets.only(left: 80.0, right: 20),
                           title: Text(s.settingsUpdateInterval),
                           subtitle: Text(s.settingsUpdateIntervalDes),
-                          trailing: DropdownButton(
+                          trailing: MyDropdownButton(
                               hint: Text(s.hoursCount(data.item2)),
                               underline: Center(),
                               elevation: 1,
+                              displayItemCount: 5,
                               value: data.item2,
                               onChanged: data.item1
                                   ? (value) async {

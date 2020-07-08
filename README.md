@@ -74,7 +74,7 @@ If no api key added, the search function in the app won't work. But you can stil
 
 * Local storage
     - sqflite 
-    - share_preference
+    - shared_preferences
 * Audio
     - just_audio
     - audio_service

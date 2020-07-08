@@ -111,14 +111,14 @@ class GroupList extends ChangeNotifier {
     }
   }
 
-  _initGroup() async {
-    storage.getGroups().then((loadgroups) async {
-      _groups.addAll(loadgroups.map((e) => PodcastGroup.fromEntity(e)));
-      await Future.forEach(_groups, (group) async {
-        await group.getPodcasts();
-      });
-    });
-  }
+  // _initGroup() async {
+  //   storage.getGroups().then((loadgroups) async {
+  //     _groups.addAll(loadgroups.map((e) => PodcastGroup.fromEntity(e)));
+  //     await Future.forEach(_groups, (group) async {
+  //       await group.getPodcasts();
+  //     });
+  //   });
+  // }
 
   @override
   void addListener(VoidCallback listener) {

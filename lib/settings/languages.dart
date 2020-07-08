@@ -49,6 +49,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                       await S.load(Locale(Intl.systemLocale));
                       setState(() {});
                     },
+                    contentPadding: const EdgeInsets.only(left: 75, right: 20),
                     trailing: Radio<Locale>(
                         value: Locale(Intl.systemLocale),
                         groupValue: Locale(Intl.getCurrentLocale()),
@@ -64,6 +65,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                       await S.load(Locale('en'));
                       setState(() {});
                     },
+                    contentPadding: const EdgeInsets.only(left: 75, right: 20),
                     trailing: Radio<Locale>(
                         value: Locale('en'),
                         groupValue: Locale(Intl.getCurrentLocale()),
@@ -79,6 +81,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                       await S.load(Locale('zh_Hans'));
                       setState(() {});
                     },
+                    contentPadding: const EdgeInsets.only(left: 75, right: 20),
                     trailing: Radio<Locale>(
                         value: Locale('zh_Hans'),
                         groupValue: Locale(Intl.getCurrentLocale()),
@@ -91,6 +94,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                   ListTile(
                     onTap: () => _launchUrl(
                         'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project'),
+                    contentPadding: const EdgeInsets.only(left: 75, right: 20),
                     subtitle: Text(
                         "If you'd like to contribute to support more languages, please contact me."),
                     trailing: IconButton(

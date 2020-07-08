@@ -12,6 +12,7 @@ import '../state/setting_state.dart';
 import '../home/audioplayer.dart';
 import '../util/general_dialog.dart';
 import '../util/context_extension.dart';
+import '../util/custom_dropdown.dart';
 
 String stringForMins(int mins) {
   if (mins == null) return null;
@@ -320,10 +321,11 @@ class PlaySetting extends StatelessWidget {
                         subtitle: Text(s.settingsSTDefautTimeDes),
                         trailing: Selector<SettingState, int>(
                           selector: (_, settings) => settings.defaultSleepTimer,
-                          builder: (_, data, __) => DropdownButton(
+                          builder: (_, data, __) => MyDropdownButton(
                               hint: Text(s.minsCount(data)),
                               underline: Center(),
                               elevation: 1,
+                              displayItemCount: 5,
                               isDense: true,
                               value: data,
                               onChanged: (int value) =>

@@ -11,7 +11,7 @@ import 'package:tuple/tuple.dart';
 
 import '../state/audio_state.dart';
 import '../util/context_extension.dart';
-import '../util/customslider.dart';
+import '../util/custom_slider.dart';
 import '../util/pageroute.dart';
 
 final List<BoxShadow> _customShadow = [
