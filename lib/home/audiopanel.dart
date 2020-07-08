@@ -1,28 +1,43 @@
 import 'package:flutter/material.dart';
 
+enum SlideDirection { up, down }
+
 class AudioPanel extends StatefulWidget {
   final Widget miniPanel;
   final Widget expandedPanel;
-  AudioPanel({this.miniPanel, this.expandedPanel, Key key}) : super(key: key);
+  final double minHeight;
+  final double maxHeight;
+  AudioPanel(
+      {@required this.miniPanel,
+      @required this.expandedPanel,
+      this.minHeight = 60,
+      this.maxHeight = 300,
+      Key key})
+      : super(key: key);
   @override
   _AudioPanelState createState() => _AudioPanelState();
 }
 
-class _AudioPanelState extends State<AudioPanel>
-    with SingleTickerProviderStateMixin {
+class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   double initSize;
-  final double minSize = 60;
-  final double maxSize = 300;
   double _startdy;
   double _move = 0;
   AnimationController _controller;
+  AnimationController _slowController;
   Animation _animation;
+  SlideDirection _slideDirection;
 
   @override
   void initState() {
-    initSize = minSize;
+    initSize = widget.minHeight;
+    _slideDirection = SlideDirection.up;
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 50))
+          ..addListener(() {
+            setState(() {});
+          });
+    _slowController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200))
           ..addListener(() {
             setState(() {});
           });
@@ -34,6 +49,7 @@ class _AudioPanelState extends State<AudioPanel>
   @override
   void dispose() {
     _controller.dispose();
+    _slowController.dispose();
     super.dispose();
   }
 
@@ -41,7 +57,7 @@ class _AudioPanelState extends State<AudioPanel>
   Widget build(BuildContext context) {
     return Stack(children: <Widget>[
       Container(
-        child: (_animation.value > minSize + 30)
+        child: (_animation.value > widget.minHeight + 30)
             ? Positioned.fill(
                 child: GestureDetector(
                   onTap: () => _backToMini(),
@@ -61,15 +77,17 @@ class _AudioPanelState extends State<AudioPanel>
           onVerticalDragUpdate: (event) => _update(event),
           onVerticalDragEnd: (event) => _end(),
           child: Container(
-            height: (_animation.value >= maxSize)
-                ? maxSize
-                : (_animation.value <= minSize) ? minSize : _animation.value,
-            child: _animation.value < minSize + 30
+            height: (_animation.value >= widget.maxHeight)
+                ? widget.maxHeight
+                : (_animation.value <= widget.minHeight)
+                    ? widget.minHeight
+                    : _animation.value,
+            child: _animation.value < widget.minHeight + 30
                 ? Container(
                     color: Theme.of(context).primaryColor,
                     child: Opacity(
-                      opacity: _animation.value > minSize
-                          ? (minSize + 30 - _animation.value) / 40
+                      opacity: _animation.value > widget.minHeight
+                          ? (widget.minHeight + 30 - _animation.value) / 40
                           : 1,
                       child: Container(
                         child: widget.miniPanel,
@@ -91,13 +109,14 @@ class _AudioPanelState extends State<AudioPanel>
                       ],
                     ),
                     child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
                       child: Opacity(
-                        opacity: _animation.value < (maxSize - 50)
-                            ? (_animation.value - minSize) /
-                                (maxSize - minSize - 50)
+                        opacity: _animation.value < (widget.maxHeight - 50)
+                            ? (_animation.value - widget.minHeight) /
+                                (widget.maxHeight - widget.minHeight - 50)
                             : 1,
                         child: Container(
-                          height: maxSize,
+                          height: widget.maxHeight,
                           child: widget.expandedPanel,
                         ),
                       ),
@@ -111,11 +130,11 @@ class _AudioPanelState extends State<AudioPanel>
 
   _backToMini() {
     setState(() {
-      _animation =
-          Tween<double>(begin: initSize, end: minSize).animate(_controller);
-      initSize = minSize;
+      _animation = Tween<double>(begin: initSize, end: widget.minHeight)
+          .animate(_slowController);
+      initSize = widget.minHeight;
     });
-    _controller.forward();
+    _slowController.forward();
   }
 
   _start(DragStartDetails event) {
@@ -132,35 +151,56 @@ class _AudioPanelState extends State<AudioPanel>
       _move = _startdy - event.localPosition.dy;
       _animation = Tween<double>(begin: initSize, end: initSize + _move)
           .animate(_controller);
+      _slideDirection = _move > 0 ? SlideDirection.up : SlideDirection.down;
     });
     _controller.forward();
   }
 
   _end() {
-    if (_animation.value >= (maxSize + minSize) / 4 &&
-            _animation.value < maxSize ||
-        (_move - _startdy > 20)) {
+    if (_slideDirection == SlideDirection.up) {
+      if (_move > 20) {
+        setState(() {
+          _animation =
+              Tween<double>(begin: _animation.value, end: widget.maxHeight)
+                  .animate(_slowController);
+          initSize = widget.maxHeight;
+        });
+        _slowController.forward();
+      } else {
+        setState(() {
+          _animation =
+              Tween<double>(begin: _animation.value, end: widget.minHeight)
+                  .animate(_controller);
+          initSize = widget.minHeight;
+        });
+        _controller.forward();
+      }
+    } else if (_slideDirection == SlideDirection.down) {
+      if (_move > -50) {
+        setState(() {
+          _animation =
+              Tween<double>(begin: _animation.value, end: widget.maxHeight)
+                  .animate(_slowController);
+          initSize = widget.maxHeight;
+        });
+        _slowController.forward();
+      } else {
+        setState(() {
+          _animation =
+              Tween<double>(begin: _animation.value, end: widget.minHeight)
+                  .animate(_controller);
+          initSize = widget.minHeight;
+        });
+        _controller.forward();
+      }
+    }
+    if (_animation.value >= widget.maxHeight) {
       setState(() {
-        _animation = Tween<double>(begin: _animation.value, end: maxSize)
-            .animate(_controller);
-        initSize = maxSize;
+        initSize = widget.maxHeight;
       });
-      _controller.forward();
-    } else if (_animation.value < (maxSize + minSize) / 4 &&
-        _animation.value > minSize) {
+    } else if (_animation.value < widget.minHeight) {
       setState(() {
-        _animation = Tween<double>(begin: _animation.value, end: minSize)
-            .animate(_controller);
-        initSize = minSize;
-      });
-      _controller.forward();
-    } else if (_animation.value >= maxSize) {
-      setState(() {
-        initSize = maxSize;
-      });
-    } else if (_animation.value < minSize) {
-      setState(() {
-        initSize = minSize;
+        initSize = widget.minHeight;
       });
     }
   }
