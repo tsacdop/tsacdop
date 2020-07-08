@@ -2,12 +2,19 @@
 
 ## v0.4.0
 
-Release date 2020/7/8
+Release date 2020/7/9
 
 ### New features
 
 * Localization, changed all UI strings in app to support locale, support languages include en & zh right now.
 * Changed episode popup menu UI, add a switch to tap to open popup men.
+
+### Minor UI change
+
+* Improve dropdown menu UI.
+* Change icons color in setting page.
+* Improve player panel animation.
+* Add scroll bar in libraries page.
 
 ## v0.3.6
 
