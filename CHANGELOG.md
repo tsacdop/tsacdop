@@ -1,5 +1,14 @@
 # Tsacdop Changelog
 
+## v0.4.0
+
+Release date 2020/7/8
+
+### New features
+
+* Localization, changed all UI strings in app to support locale, support languages include en & zh right now.
+* Changed episode popup menu UI, add a switch to tap to open popup men.
+
 ## v0.3.6
 
 Release date 2020/6/30
@@ -52,4 +61,3 @@ Release date 2020/6/16
 ### Other
 
 * Add privacy policy.
-

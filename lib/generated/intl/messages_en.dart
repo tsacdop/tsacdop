@@ -37,11 +37,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m8(count) => "${Intl.plural(count, zero: 'In an hour', one: '${count} hour ago', other: '${count} hours ago')}";
 
-  static m9(count) => "${Intl.plural(count, zero: '', one: '${count} hour', other: '${count} hours')}";
+  static m9(count) => "${Intl.plural(count, zero: '0 hour', one: '${count} hour', other: '${count} hours')}";
 
-  static m10(count) => "${Intl.plural(count, zero: '', one: '${count} minute ago', other: '${count} minutes ago')}";
+  static m10(count) => "${Intl.plural(count, zero: 'Just now', one: '${count} minute ago', other: '${count} minutes ago')}";
 
-  static m11(count) => "${Intl.plural(count, zero: '', one: '${count} min', other: '${count} mins')}";
+  static m11(count) => "${Intl.plural(count, zero: '0 min', one: '${count} min', other: '${count} mins')}";
 
   static m12(title) => "Fetch data ${title}";
 

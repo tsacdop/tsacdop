@@ -37,11 +37,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m8(count) => "${Intl.plural(count, zero: '刚刚', other: '${count}小时前')}";
 
-  static m9(count) => "${Intl.plural(count, zero: '', other: '${count} 小时')}";
+  static m9(count) => "${Intl.plural(count, zero: '0小时', other: '${count} 小时')}";
 
-  static m10(count) => "${Intl.plural(count, zero: '', other: '${count}分钟前')}";
+  static m10(count) => "${Intl.plural(count, zero: '刚刚', other: '${count}分钟前')}";
 
-  static m11(count) => "${Intl.plural(count, zero: '', other: '${count}分钟')}";
+  static m11(count) => "${Intl.plural(count, zero: '0分钟', other: '${count}分钟')}";
 
   static m12(title) => "获取数据 ${title}";
 

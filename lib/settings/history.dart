@@ -143,7 +143,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                             : Center(),
                         background: Padding(
                           padding: EdgeInsets.only(
-                              top: 50, left: 50, right: 50, bottom: 30),
+                              top: 50, left: 20, right: 20, bottom: 20),
                           child: FutureBuilder<List<FlSpot>>(
                               future: getData(),
                               builder: (context, snapshot) {
@@ -161,14 +161,14 @@ class _PlayedHistoryState extends State<PlayedHistory>
                       TabBar(
                         controller: _controller,
                         indicatorColor: context.accentColor,
+                        labelColor: context.textColor,
+                        labelStyle: context.textTheme.headline6,
                         tabs: <Widget>[
                           Tab(
-                            child: Text(s.listen,
-                                style: context.textTheme.headline6),
+                            child: Text(s.listen),
                           ),
                           Tab(
-                            child: Text(s.subscribe,
-                                style: context.textTheme.headline6),
+                            child: Text(s.subscribe),
                           )
                         ],
                       ),
@@ -195,11 +195,13 @@ class _PlayedHistoryState extends State<PlayedHistory>
                               scrollDirection: Axis.vertical,
                               itemCount: snapshot.data.length,
                               itemBuilder: (BuildContext context, int index) {
+                                double seekValue =
+                                    snapshot.data[index].seekValue;
+                                double seconds = snapshot.data[index].seconds;
                                 return Container(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 5),
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
+                                  color: context.scaffoldBackgroundColor,
                                   child: Column(
                                     children: <Widget>[
                                       ListTile(
@@ -214,8 +216,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                   snapshot
                                                       .data[index].playdate),
                                               style: TextStyle(
-                                                  color:
-                                                      const Color(0xff67727d),
+                                                  color: context.textColor
+                                                      .withOpacity(0.8),
                                                   fontSize: 15,
                                                   fontStyle: FontStyle.italic),
                                             ),
@@ -226,73 +228,60 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                             ),
                                           ],
                                         ),
-                                        subtitle: Container(
-                                          width: double.infinity,
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.timelapse,
-                                                color: Colors.grey[400],
+                                        subtitle: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.timelapse,
+                                              color: Colors.grey[400],
+                                            ),
+                                            Container(
+                                              height: 2,
+                                              decoration: BoxDecoration(
+                                                  border: Border(
+                                                      bottom: BorderSide(
+                                                          color:
+                                                              Colors.grey[400],
+                                                          width: 2.0))),
+                                              width: _width * seekValue <
+                                                      (_width - 120)
+                                                  ? _width * seekValue
+                                                  : _width - 120,
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 2),
+                                            ),
+                                            Container(
+                                              width: 50,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  color: context.accentColor,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(10))),
+                                              padding: EdgeInsets.all(2),
+                                              child: Text(
+                                                seconds == 0 && seekValue == 1
+                                                    ? s.mark
+                                                    : _stringForSeconds(
+                                                        seconds),
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               ),
-                                              Container(
-                                                height: 2,
-                                                decoration: BoxDecoration(
-                                                    border: Border(
-                                                        bottom: BorderSide(
-                                                            color: Colors
-                                                                .grey[400],
-                                                            width: 2.0))),
-                                                width: _width *
-                                                            snapshot.data[index]
-                                                                .seekValue <
-                                                        (_width - 120)
-                                                    ? _width *
-                                                        snapshot.data[index]
-                                                            .seekValue
-                                                    : _width - 120,
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 2),
-                                              ),
-                                              Container(
-                                                width: 50,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                    color: Theme.of(context)
-                                                        .accentColor,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10))),
-                                                padding: EdgeInsets.all(2),
-                                                child: Text(
-                                                  snapshot.data[index]
-                                                                  .seconds ==
-                                                              0 &&
-                                                          snapshot.data[index]
-                                                                  .seekValue ==
-                                                              1
-                                                      ? s.mark
-                                                      : _stringForSeconds(
-                                                          snapshot.data[index]
-                                                              .seconds),
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      //  Divider(height: 2),
                                     ],
                                   ),
                                 );
                               }),
                         )
                       : Center(
-                          child: CircularProgressIndicator(),
+                          child: SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator()),
                         );
                 },
               ),
@@ -322,7 +311,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                           DateFormat.yMd().add_jm().format(
                                               snapshot.data[index].subDate),
                                           style: TextStyle(
-                                              color: const Color(0xff67727d),
+                                              color: context.textColor
+                                                  .withOpacity(0.8),
                                               fontSize: 15,
                                               fontStyle: FontStyle.italic),
                                         ),
@@ -341,13 +331,6 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                     .data[index].delDate)),
                                             style: TextStyle(color: Colors.red),
                                           ),
-                                    // Text(snapshot.data[index].delDate
-                                    //         .difference(snapshot
-                                    //             .data[index].subDate)
-                                    //         .inDays
-                                    //         .toString() +
-                                    //     ' day on your device'),
-
                                     trailing: !_status
                                         ? Material(
                                             color: Colors.transparent,
@@ -370,7 +353,10 @@ class _PlayedHistoryState extends State<PlayedHistory>
                             );
                           })
                       : Center(
-                          child: CircularProgressIndicator(),
+                          child: SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator()),
                         );
                 },
               ),
@@ -465,13 +451,40 @@ class HistoryChart extends StatelessWidget {
               border: Border(
                 left: BorderSide(color: Colors.red, width: 2),
               )),
+          lineTouchData: LineTouchData(
+            enabled: true,
+            touchTooltipData: LineTouchTooltipData(
+              tooltipBgColor: context.scaffoldBackgroundColor,
+              fitInsideHorizontally: true,
+              getTooltipItems: (touchedBarSpots) {
+                return touchedBarSpots.map((barSpot) {
+                  return LineTooltipItem(context.s.minsCount(barSpot.y.toInt()),
+                      context.textTheme.subtitle1);
+                }).toList();
+              },
+            ),
+            getTouchedSpotIndicator: (barData, spotIndexes) {
+              return spotIndexes.map((spotIndex) {
+                return TouchedSpotIndicatorData(
+                    FlLine(color: Colors.transparent),
+                    FlDotData(
+                        show: true,
+                        getDotPainter: (spot, percent, barData, index) {
+                          return FlDotCirclePainter(
+                              radius: 3,
+                              color: context.accentColor,
+                              strokeWidth: 4,
+                              strokeColor: context.primaryColor);
+                        }));
+              }).toList();
+            },
+          ),
           lineBarsData: [
             LineChartBarData(
               spots: this.stats,
-              isCurved: false,
-              colors: [
-                context.accentColor,
-              ],
+              isCurved: true,
+              colors: [context.accentColor],
+              preventCurveOverShooting: true,
               barWidth: 3,
               isStrokeCapRound: true,
               belowBarData: BarAreaData(
@@ -480,15 +493,23 @@ class HistoryChart extends StatelessWidget {
                   gradientTo: Offset(0, 1),
                   gradientColorStops: [
                     0.3,
-                    0.8
+                    0.8,
+                    0.99
                   ],
                   colors: [
                     context.accentColor.withOpacity(0.6),
-                    context.accentColor.withOpacity(0.1)
+                    context.accentColor.withOpacity(0.1),
+                    context.accentColor.withOpacity(0)
                   ]),
               dotData: FlDotData(
-                show: true,
-              ),
+                  show: true,
+                  getDotPainter: (spot, percent, barData, index) {
+                    return FlDotCirclePainter(
+                        radius: 2,
+                        color: context.primaryColor,
+                        strokeWidth: 3,
+                        strokeColor: context.accentColor);
+                  }),
             ),
           ],
         ),

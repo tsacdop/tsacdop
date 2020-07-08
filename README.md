@@ -4,13 +4,17 @@
 <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/text.png" art = "Tsacdop"/>
 </p>
 
-![CircleCI](https://img.shields.io/circleci/build/github/stonega/tsacdop?token=efe1331861e017144f2abb363acd95197e436dad) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/stonega/tsacdop) [![GooglePlay](https://img.shields.io/badge/Google-PlayStore-%2323CCC6)](https://play.google.com/store/apps/details?id=com.stonegate.tsacdop)
+[![Build Status - Cirrus][]][Build status]
+[![GitHub Release][]][Github Release - Recent]
+[![Github Downloads][]][Github Release - Recent]
+[![Localizely][]][Localizely - Website]
+[![Google Play - Icon][]][Google Play]
 
 ## About
 
 Enjoy podcasts with Tsacdop.
 
-Tsacdop is a podcast player developed with flutter, a clean, simply beautiful and friendly app, only support Android right now.
+Tsacdop is a podcast player developed with flutter, a clean, simply beautiful and friendly app, and is free and opensource.
 
 Credit to flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) and [Just_Audio](https://pub.dev/packages/just_audio).
 
@@ -122,3 +126,13 @@ A few resources to get you started if this is your first Flutter project:
 
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials, samples, guidance on mobile development, and a full API reference.
+
+[Build Status - Cirrus]: https://circleci.com/gh/stonega/tsacdop/tree/master.svg?style=shield
+[Build status]: https://circleci.com/gh/stonega/tsacdop/tree/master
+[Github Release]: https://img.shields.io/github/v/release/stonega/tsacdop
+[Github Release - Recent]: https://github.com/stonega/tsacdop/releases
+[Github Downloads]: https://img.shields.io/github/downloads/stonega/tsacdop/total?color=%230000d&label=downloads
+[Localizely]: https://img.shields.io/badge/dynamic/json?color=%2326c6da&label=localizely&query=%24.languages.length&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
+[Localizely - Website]: https://localizely.com/
+[Google Play - Icon]: https://img.shields.io/badge/google-playStore-%2323CCC6
+[Google Play]: https://play.google.com/store/apps/details?id=com.stonegate.tsacdop

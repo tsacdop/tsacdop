@@ -734,11 +734,11 @@ class S {
     );
   }
 
-  /// `{count, plural, zero{} one{{count} hour} other{{count} hours}}`
+  /// `{count, plural, zero{0 hour} one{{count} hour} other{{count} hours}}`
   String hoursCount(num count) {
     return Intl.plural(
       count,
-      zero: '',
+      zero: '0 hour',
       one: '$count hour',
       other: '$count hours',
       name: 'hoursCount',
@@ -947,11 +947,11 @@ class S {
     );
   }
 
-  /// `{count, plural, zero{} one{{count} minute ago} other{{count} minutes ago}}`
+  /// `{count, plural, zero{Just now} one{{count} minute ago} other{{count} minutes ago}}`
   String minsAgo(num count) {
     return Intl.plural(
       count,
-      zero: '',
+      zero: 'Just now',
       one: '$count minute ago',
       other: '$count minutes ago',
       name: 'minsAgo',
@@ -960,11 +960,11 @@ class S {
     );
   }
 
-  /// `{count, plural, zero{} one{{count} min} other{{count} mins}}`
+  /// `{count, plural, zero{0 min} one{{count} min} other{{count} mins}}`
   String minsCount(num count) {
     return Intl.plural(
       count,
-      zero: '',
+      zero: '0 min',
       one: '$count min',
       other: '$count mins',
       name: 'minsCount',
