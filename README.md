@@ -1,20 +1,15 @@
-<p align="center">
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/ic_notification.png" art = "Logo"/>
-</br>
-<img src="https://raw.githubusercontent.com/stonega/tsacdop/master/android/app/src/main/res/mipmap-xhdpi/text.png" art = "Tsacdop"/>
-</p>
+[![Tsacdop Banner][]][google play]
 
-[![Build Status - Cirrus][]][Build status]
-[![GitHub Release][]][Github Release - Recent]
-[![Github Downloads][]][Github Release - Recent]
-[![Localizely][]][Localizely - Website]
-[![Google Play - Icon][]][Google Play]
+[![Build Status - Cirrus][]][build status]
+[![GitHub Release][]][github release - recent]
+[![Github Downloads][]][github release - recent]
+[![Localizely][]][localizely - website]
 
 ## About
 
-Enjoy podcasts with Tsacdop.
+Enjoy podcast with Tsacdop.
 
-Tsacdop is a podcast player developed with flutter, a clean, simply beautiful and friendly app, and is free and opensource.
+Tsacdop is a podcast player developed with flutter, a clean, simply beautiful and friendly app, and is free and open source.
 
 Credit to flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) and [Just_Audio](https://pub.dev/packages/just_audio).
 
@@ -38,7 +33,7 @@ More to come...
 
 | HomePage                                                                                                         | Group                                                                                                          | Podcast                                                                                                         | Episode                                                                                                         | DarkMode                                                                                                         |
 | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893838840.png" art = "HomePage"/> | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585894051734.png" art = "Groups"/> | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png" art = "Podcast"/> | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585896237809.png" art = "Episode"/> | <img src="https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png" art = "DarkMode"/> |
+|![][Homepage ScreenShot]|![][Group Screenshot] | ![][Podcast Screenshot] | ![][Episode Screenshot]| ![][Darkmode Screenshot] |
 
 ## Localization
 
@@ -47,10 +42,9 @@ Support languages
 * English
 * Chinese Simplified (beta)
 
-  
 Please [Email](mailto:<tsacdop.app@gmail.com>) me you'd like to contribute to support more languages!
 
-Credit to  [Localizely](https://localizely.com/) for kind support to open source project.
+Credit to [Localizely](https://localizely.com/) for kind support to open source project.
 
 ## License
 
@@ -73,23 +67,23 @@ If no api key added, the search function in the app won't work. But you can stil
 ### Plugins
 
 * Local storage
-    - sqflite 
-    - shared_preferences
+  + sqflite
+  + shared_preferences
 * Audio
-    - just_audio
-    - audio_service
+  + just_audio
+  + audio_service
 * State management
-    - provider
+  + provider
 * Download
-    - flutter_downloader
+  + flutter_downloader
 
 ### Directory Structure
 
-```
-UI 
+``` 
+UI
 src
 ├──home
-   ├──home.dart [Homepage] 
+   ├──home.dart [Homepage]
    ├──addpodcast.dart [Search Page]
    ├──playlist.dart [Playlist Page]
 ├──podcasts
@@ -103,13 +97,13 @@ src
 STATES
 src
 ├──state
-   ├──audio_state.dart [Audio State] 
+   ├──audio_state.dart [Audio State]
    ├──download_state.dart [Episode Download]
    ├──podcast_group.dart [Podcast Groups]
-   ├──refresh_podcast.dart [Episode Refresh] 
+   ├──refresh_podcast.dart [Episode Refresh]
    ├──setting_state.dart [Setting]
-   ├──subscribe_podcast.dart [Podcast Subscribe]   
-```     
+   ├──subscribe_podcast.dart [Podcast Subscribe]
+```
 
 ## Known Issue
 
@@ -127,12 +121,18 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials, samples, guidance on mobile development, and a full API reference.
 
-[Build Status - Cirrus]: https://circleci.com/gh/stonega/tsacdop/tree/master.svg?style=shield
-[Build status]: https://circleci.com/gh/stonega/tsacdop/tree/master
-[Github Release]: https://img.shields.io/github/v/release/stonega/tsacdop
-[Github Release - Recent]: https://github.com/stonega/tsacdop/releases
-[Github Downloads]: https://img.shields.io/github/downloads/stonega/tsacdop/total?color=%230000d&label=downloads
-[Localizely]: https://img.shields.io/badge/dynamic/json?color=%2326c6da&label=localizely&query=%24.languages.length&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
-[Localizely - Website]: https://localizely.com/
-[Google Play - Icon]: https://img.shields.io/badge/google-playStore-%2323CCC6
-[Google Play]: https://play.google.com/store/apps/details?id=com.stonegate.tsacdop
+[tsacdop banner]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/banner.png
+[build status - cirrus]: https://circleci.com/gh/stonega/tsacdop/tree/master.svg?style=shield
+[build status]: https://circleci.com/gh/stonega/tsacdop/tree/master
+[github release]: https://img.shields.io/github/v/release/stonega/tsacdop
+[github release - recent]: https://github.com/stonega/tsacdop/releases
+[github downloads]: https://img.shields.io/github/downloads/stonega/tsacdop/total?color=%230000d&label=downloads
+[localizely]: https://img.shields.io/badge/dynamic/json?color=%2326c6da&label=localizely&query=%24.languages.length&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
+[localizely - website]: https://localizely.com/
+[google play - icon]: https://img.shields.io/badge/google-playStore-%2323CCC6
+[google play]: https://play.google.com/store/apps/details?id=com.stonegate.tsacdop
+[Homepage ScreenShot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893838840.png
+[Group Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585894051734.png
+[Podcast Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png
+[Episode Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585896237809.png
+[Darkmode Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png
