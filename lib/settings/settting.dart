@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:tsacdop/state/podcast_group.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:feature_discovery/feature_discovery.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
-import '../util/ompl_build.dart';
+import '../service/ompl_build.dart';
 import '../util/context_extension.dart';
 import '../intro_slider/app_intro.dart';
 import '../type/podcastlocal.dart';
@@ -42,13 +44,11 @@ class _SettingsState extends State<Settings>
     }
   }
 
-  _exportOmpl() async {
-    var dbHelper = DBHelper();
-    List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-    var ompl = omplBuilder(podcastList.reversed.toList());
+  _exportOmpl(BuildContext context) async {
+    var groups = context.read<GroupList>().groups;
+    var ompl = PodcastsBackup(groups).omplBuilder();
     var tempdir = await getTemporaryDirectory();
     var file = File(join(tempdir.path, 'tsacdop_ompl.xml'));
-    print(file.path);
     await file.writeAsString(ompl.toString());
     final params = SaveFileDialogParams(sourceFilePath: file.path);
     final filePath = await FlutterFileDialog.saveFile(params: params);
@@ -239,7 +239,7 @@ class _SettingsState extends State<Settings>
                         Divider(height: 2),
                         ListTile(
                           onTap: () {
-                            _exportOmpl();
+                            _exportOmpl(context);
                           },
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
