@@ -338,17 +338,14 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                                             _episodes[index]
                                                                 .pubDate)),
                                                     SizedBox(width: 20),
-                                                    _episodes[index]
-                                                                .enclosureLength !=
-                                                            0
-                                                        ? Text(((_episodes[index]
-                                                                        .enclosureLength) ~/
-                                                                    1000000)
-                                                                .toString() +
-                                                            ' Mb')
-                                                        : SizedBox(
-                                                            width: 1,
-                                                          ),
+                                                    if (_episodes[index]
+                                                            .enclosureLength !=
+                                                        0)
+                                                      Text(((_episodes[index]
+                                                                      .enclosureLength) ~/
+                                                                  1000000)
+                                                              .toString() +
+                                                          ' Mb'),
                                                   ],
                                                 ),
                                                 trailing: Checkbox(
