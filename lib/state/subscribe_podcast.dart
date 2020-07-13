@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,17 +12,29 @@ import 'package:flutter_isolate/flutter_isolate.dart';
 
 import '../webfeed/webfeed.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../local_storage/key_value_storage.dart';
 import '../type/fireside_data.dart';
 import '../type/podcastlocal.dart';
+import 'podcast_group.dart';
 
 enum SubscribeState { none, start, subscribe, fetch, stop, exist, error }
 
 class SubscribeItem {
+  ///Rss url.
   String url;
+
+  ///Rss title.
   String title;
+
   SubscribeState subscribeState;
+
+  ///Uuid for podcast.
   String id;
+
+  ///Avatat image link.
   String imgUrl;
+
+  ///Podcast group, default Home.
   String group;
   SubscribeItem(this.url, this.title,
       {this.subscribeState = SubscribeState.none,
@@ -84,8 +97,12 @@ class SubscribeWorker extends ChangeNotifier {
       _created = true;
       listen();
     } else
-      subSendPort.send(
-          [_subscribeItem.url, _subscribeItem.title, _subscribeItem.imgUrl]);
+      subSendPort.send([
+        _subscribeItem.url,
+        _subscribeItem.title,
+        _subscribeItem.imgUrl,
+        _subscribeItem.group
+      ]);
   }
 
   void dispose() {
@@ -98,6 +115,12 @@ class SubscribeWorker extends ChangeNotifier {
 Future<void> subIsolateEntryPoint(SendPort sendPort) async {
   List<SubscribeItem> items = [];
   bool _running = false;
+  final List<String> listColor = [
+    '388E3C',
+    '1976D2'
+        'D32F2F',
+    '00796B',
+  ];
   ReceivePort subReceivePort = ReceivePort();
   sendPort.send(subReceivePort.sendPort);
 
@@ -130,7 +153,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         await Future.delayed(Duration(seconds: 2));
         sendPort.send([item.title, item.url, 4]);
         items.removeWhere((element) => element.url == item.url);
-        if (items.length > 0) {
+        if (items.isNotEmpty) {
           await _subscribe(items.first);
         } else
           sendPort.send("done");
@@ -164,11 +187,13 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
           } catch (e) {
             print(e);
             try {
+              int index = math.Random().nextInt(3);
               Response<List<int>> imageResponse = await Dio().get<List<int>>(
-                  "https://ui-avatars.com/api/?size=300&background=4D91BE&color=fff&name=${item.title}&length=2&bold=true",
+                  "https://ui-avatars.com/api/?size=300&background="
+                  "${listColor[index]}&color=fff&name=${item.title}&length=2&bold=true",
                   options: Options(responseType: ResponseType.bytes));
-              imageUrl =
-                  "https://ui-avatars.com/api/?size=300&background=4D91BE&color=fff&name=${item.title}&length=2&bold=true";
+              imageUrl = "https://ui-avatars.com/api/?size=300&background="
+                  "${listColor[index]}&color=fff&name=${item.title}&length=2&bold=true";
               thumbnail = img.decodeImage(imageResponse.data);
             } catch (e) {
               print(e);

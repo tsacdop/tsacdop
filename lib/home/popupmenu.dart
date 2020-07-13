@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/service/ompl_build.dart';
+import 'package:tsacdop/webfeed/webfeed.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -73,13 +74,13 @@ class _PopupMenuState extends State<PopupMenu> {
     File file = File(path);
     try {
       Map data = PodcastsBackup.parseOMPL(file);
-      data.forEach((title, total) async {
-        for (int i = 0; i < total.length; i++) {
-          if (total[i].xmlUrl != null) {
-            SubscribeItem item = SubscribeItem(total[i].xmlUrl, total[i].text);
+      data.forEach((title, list) async {
+        for (var rss in list) {
+          if (rss.xmlUrl != null) {
+            SubscribeItem item = SubscribeItem(rss.xmlUrl, rss.text);
             await subscribeWorker.setSubscribeItem(item);
             await Future.delayed(Duration(milliseconds: 500));
-            print(total[i].text);
+            print(rss.text);
           }
         }
       });

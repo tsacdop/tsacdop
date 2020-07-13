@@ -747,10 +747,10 @@ class S {
     );
   }
 
-  /// `Long press on episode card for quick actions.`
+  /// `You can long press on episode card for quick actions.`
   String get introFourthPage {
     return Intl.message(
-      'Long press on episode card for quick actions.',
+      'You can long press on episode card for quick actions.',
       name: 'introFourthPage',
       desc: '',
       args: [],
@@ -767,10 +767,10 @@ class S {
     );
   }
 
-  /// `You can create new group for podcasts, swipe on podcast list to change group.`
+  /// `You can create new group for podcasts.`
   String get introThirdPage {
     return Intl.message(
-      'You can create new group for podcasts, swipe on podcast list to change group.',
+      'You can create new group for podcasts.',
       name: 'introThirdPage',
       desc: '',
       args: [],
@@ -1346,11 +1346,11 @@ class S {
     );
   }
 
-  /// `{count, plural, zero{} one{{count} second ago} other{{count} seconds ago}}`
+  /// `{count, plural, zero{Just now} one{{count} second ago} other{{count} seconds ago}}`
   String secondsAgo(num count) {
     return Intl.plural(
       count,
-      zero: '',
+      zero: 'Just now',
       one: '$count second ago',
       other: '$count seconds ago',
       name: 'secondsAgo',

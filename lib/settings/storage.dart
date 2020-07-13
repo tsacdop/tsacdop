@@ -7,6 +7,7 @@ import '../settings/downloads_manage.dart';
 import '../state/setting_state.dart';
 import '../local_storage/key_value_storage.dart';
 import '../util/context_extension.dart';
+import '../util/custom_dropdown.dart';
 
 class StorageSetting extends StatefulWidget {
   @override
@@ -211,7 +212,7 @@ class _StorageSettingState extends State<StorageSetting>
                                 EdgeInsets.only(left: 80.0, right: 20),
                             title: Text(s.settingsAutoDelete),
                             subtitle: Text(s.settingsAutoDeleteDes),
-                            trailing: DropdownButton(
+                            trailing: MyDropdownButton(
                                 hint: snapshot.data == -1
                                     ? Text(s.daysCount(0))
                                     : Text(s.daysCount(snapshot.data)),

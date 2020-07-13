@@ -35,7 +35,6 @@ class FiresideData {
           .toString());
       var ul = doc.body.getElementsByClassName('episode-hosts').first.children;
       List<PodcastHost> hosts = [];
-
       for (var element in ul) {
         PodcastHost host;
         String name = element.text.trim();

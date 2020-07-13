@@ -54,7 +54,10 @@ class PodcastGroup {
     }
   }
 
+  ///Podcast in group.
   List<PodcastLocal> _podcasts;
+
+  ///Ordered podcast list.
   List<PodcastLocal> _orderedPodcasts;
   List<PodcastLocal> get ordereddPodcasts => _orderedPodcasts;
   List<PodcastLocal> get podcasts => _podcasts;

@@ -63,7 +63,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m21(date) => "Removed at ${date}";
 
-  static m22(count) => "${Intl.plural(count, zero: '', one: '${count} second ago', other: '${count} seconds ago')}";
+  static m22(count) => "${Intl.plural(count, zero: 'Just now', one: '${count} second ago', other: '${count} seconds ago')}";
 
   static m23(time) => "Last time ${time}";
 
@@ -146,9 +146,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "hostedOn" : m7,
     "hoursAgo" : m8,
     "hoursCount" : m9,
-    "introFourthPage" : MessageLookupByLibrary.simpleMessage("Long press on episode card for quick actions."),
+    "introFourthPage" : MessageLookupByLibrary.simpleMessage("You can long press on episode card for quick actions."),
     "introSecondPage" : MessageLookupByLibrary.simpleMessage("Subscribe podcast via search or import OMPL file."),
-    "introThirdPage" : MessageLookupByLibrary.simpleMessage("You can create new group for podcasts, swipe on podcast list to change group."),
+    "introThirdPage" : MessageLookupByLibrary.simpleMessage("You can create new group for podcasts."),
     "later" : MessageLookupByLibrary.simpleMessage("Later"),
     "lightMode" : MessageLookupByLibrary.simpleMessage("Light mode"),
     "like" : MessageLookupByLibrary.simpleMessage("Like"),

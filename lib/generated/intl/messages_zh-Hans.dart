@@ -63,7 +63,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m21(date) => "${date}移除";
 
-  static m22(count) => "${Intl.plural(count, zero: '', other: '${count}秒前')}";
+  static m22(count) => "${Intl.plural(count, zero: '刚刚', other: '${count}秒前')}";
 
   static m23(time) => "上次播放${time}";
 
@@ -146,7 +146,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "hostedOn" : m7,
     "hoursAgo" : m8,
     "hoursCount" : m9,
-    "introFourthPage" : MessageLookupByLibrary.simpleMessage("长按节目打开快捷菜单。"),
+    "introFourthPage" : MessageLookupByLibrary.simpleMessage("您可以长按节目打开快捷菜单。"),
     "introSecondPage" : MessageLookupByLibrary.simpleMessage("您可以通过搜索订阅播客，也可以直接导入OMPL文件。"),
     "introThirdPage" : MessageLookupByLibrary.simpleMessage("您可以创建分组，上下滑动切换分组。"),
     "later" : MessageLookupByLibrary.simpleMessage("稍后"),
