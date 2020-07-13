@@ -502,14 +502,13 @@ class EpisodeGrid extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: <Widget>[
-                                        layout != Layout.one
-                                            ? Align(
-                                                alignment: Alignment.bottomLeft,
-                                                child: _pubDate(context,
-                                                    episode: episodes[index],
-                                                    color: _c),
-                                              )
-                                            : SizedBox(width: 1),
+                                        if (layout != Layout.one)
+                                          Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: _pubDate(context,
+                                                episode: episodes[index],
+                                                color: _c),
+                                          ),
                                         Spacer(),
                                         layout != Layout.three &&
                                                 episodes[index].duration != 0
