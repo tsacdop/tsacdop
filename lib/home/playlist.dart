@@ -27,9 +27,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
     if (episodes.length == 0) {
       return sum;
     } else {
-      episodes.forEach((episode) {
+      for (var episode in episodes) {
         sum += episode.duration ~/ 60;
-      });
+      }
       return sum;
     }
   }

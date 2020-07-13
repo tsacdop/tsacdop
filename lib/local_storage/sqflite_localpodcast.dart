@@ -63,7 +63,8 @@ class DBHelper {
   Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts) async {
     var dbClient = await database;
     List<PodcastLocal> podcastLocal = [];
-    await Future.forEach(podcasts, (s) async {
+
+    for (var s in podcasts) {
       List<Map> list;
       list = await dbClient.rawQuery(
           """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
@@ -82,7 +83,7 @@ class DBHelper {
             list.first['link'],
             upateCount: list.first['update_count'],
             episodeCount: list.first['episode_count']));
-    });
+    }
     return podcastLocal;
   }
 
@@ -260,11 +261,11 @@ class DBHelper {
          ORDER BY add_date DESC LIMIT ?
      """, [top]);
     List<PlayHistory> playHistory = [];
-    list.forEach((record) {
+    for (var record in list) {
       playHistory.add(PlayHistory(record['title'], record['enclosure_url'],
           record['seconds'], record['seek_value'],
           playdate: DateTime.fromMillisecondsSinceEpoch(record['add_date'])));
-    });
+    }
     return playHistory;
   }
 
@@ -276,9 +277,9 @@ class DBHelper {
     if (list.length == 0)
       return 0;
     else {
-      list.forEach((element) {
+      for (var element in list) {
         i += element['listen_time'];
-      });
+      }
       return i;
     }
   }
@@ -311,10 +312,10 @@ class DBHelper {
         "SELECT seconds FROM PlayHistory WHERE add_date > ? AND add_date < ?",
         [start, end]);
     double sum = 0;
-    if (list.length == 0) {
+    if (list.isEmpty) {
       sum = 0;
     } else {
-      list.forEach((record) => sum += record['seconds']);
+      for (var record in list) sum += record['seconds'];
     }
     return (sum ~/ 60).toDouble();
   }
@@ -325,7 +326,7 @@ class DBHelper {
         """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory 
         WHERE enclosure_url = ? ORDER BY add_date DESC LIMIT 1""",
         [episodeBrief.enclosureUrl]);
-    return list.length > 0
+    return list.isEmpty
         ? PlayHistory(list.first['title'], list.first['enclosure_url'],
             list.first['seconds'], list.first['seek_value'],
             playdate:
@@ -340,7 +341,7 @@ class DBHelper {
         """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory 
         WHERE enclosure_url = ? AND seek_value = 1 ORDER BY add_date DESC LIMIT 1""",
         [episodeBrief.enclosureUrl]);
-    return list.length > 0;
+    return list.isEmpty;
   }
 
   DateTime _parsePubDate(String pubDate) {

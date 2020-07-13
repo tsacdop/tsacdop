@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:tsacdop/local_storage/key_value_storage.dart';
+import 'package:tsacdop/service/ompl_build.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -66,68 +67,98 @@ class _PopupMenuState extends State<PopupMenu> {
     }
   }
 
+  void _saveOmpl(String path) async {
+    var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
+    final s = context.s;
+    File file = File(path);
+    try {
+      Map data = PodcastsBackup.parseOMPL(file);
+      data.forEach((title, total) async {
+        for (int i = 0; i < total.length; i++) {
+          if (total[i].xmlUrl != null) {
+            SubscribeItem item = SubscribeItem(total[i].xmlUrl, total[i].text);
+            await subscribeWorker.setSubscribeItem(item);
+            await Future.delayed(Duration(milliseconds: 500));
+            print(total[i].text);
+          }
+        }
+      });
+    } catch (e) {
+      print(e);
+      Fluttertoast.showToast(
+        msg: s.toastFileError,
+        gravity: ToastGravity.TOP,
+      );
+      // try {
+      //   String opml = file.readAsStringSync();
+      //   var content = xml.XmlDocument.parse(opml);
+      //   String title = content
+      //       .findAllElements('head')
+      //       .first
+      //       .findElements('title')
+      //       .first
+      //       .text;
+      //   print(title);
+      //   if (title != 'Tsacdop Subscriptions') {
+      //     var total = content
+      //         .findAllElements('outline')
+      //         .map((ele) => OmplOutline.parse(ele))
+      //         .toList();
+      //     if (total.length == 0) {
+      //       Fluttertoast.showToast(
+      //         msg: s.toastFileNotValid,
+      //         gravity: ToastGravity.BOTTOM,
+      //       );
+      //     } else {
+      //       for (int i = 0; i < total.length; i++) {
+      //         if (total[i].xmlUrl != null) {
+      //           //  importOmpl.rssTitle = total[i].text;
+      //           //await saveOmpl(total[i].xmlUrl);
+      //           SubscribeItem item =
+      //               SubscribeItem(total[i].xmlUrl, total[i].text);
+      //           await subscribeWorker.setSubscribeItem(item);
+      //           await Future.delayed(Duration(milliseconds: 500));
+      //           print(total[i].text);
+      //         }
+      //       }
+      //     }
+      //     print('Import fisnished');
+      //   }
+      // } catch (e) {
+      //   print(e);
+      //   Fluttertoast.showToast(
+      //     msg: s.toastFileError,
+      //     gravity: ToastGravity.TOP,
+      //   );
+      //await Future.delayed(Duration(seconds: 5));
+      //  importOmpl.importState = ImportState.stop;
+    }
+  }
+
+  void _getFilePath() async {
+    final s = context.s;
+    try {
+      String filePath = await FilePicker.getFilePath(type: FileType.any);
+      if (filePath == '') {
+        return;
+      }
+      print('File Path' + filePath);
+      //importOmpl.importState = ImportState.start;
+      Fluttertoast.showToast(
+        msg: s.toastReadFile,
+        gravity: ToastGravity.TOP,
+      );
+      _saveOmpl(filePath);
+    } on PlatformException catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
-    var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
+
     final s = context.s;
-    void _saveOmpl(String path) async {
-      File file = File(path);
-      try {
-        String opml = file.readAsStringSync();
-
-        var content = xml.XmlDocument.parse(opml);
-        var total = content
-            .findAllElements('outline')
-            .map((ele) => OmplOutline.parse(ele))
-            .toList();
-        if (total.length == 0) {
-          Fluttertoast.showToast(
-            msg: s.toastFileNotValid,
-            gravity: ToastGravity.BOTTOM,
-          );
-        } else {
-          for (int i = 0; i < total.length; i++) {
-            if (total[i].xmlUrl != null) {
-              //  importOmpl.rssTitle = total[i].text;
-              //await saveOmpl(total[i].xmlUrl);
-              SubscribeItem item =
-                  SubscribeItem(total[i].xmlUrl, total[i].text);
-              await subscribeWorker.setSubscribeItem(item);
-              await Future.delayed(Duration(milliseconds: 500));
-              print(total[i].text);
-            }
-          }
-          print('Import fisnished');
-        }
-      } catch (e) {
-        print(e);
-        Fluttertoast.showToast(
-          msg: s.toastFileError,
-          gravity: ToastGravity.TOP,
-        );
-        //await Future.delayed(Duration(seconds: 5));
-        //  importOmpl.importState = ImportState.stop;
-      }
-    }
-
-    void _getFilePath() async {
-      try {
-        String filePath = await FilePicker.getFilePath(type: FileType.any);
-        if (filePath == '') {
-          return;
-        }
-        print('File Path' + filePath);
-        //importOmpl.importState = ImportState.start;
-        Fluttertoast.showToast(
-          msg: s.toastReadFile,
-          gravity: ToastGravity.TOP,
-        );
-        _saveOmpl(filePath);
-      } on PlatformException catch (e) {
-        print(e.toString());
-      }
-    }
 
     return PopupMenuButton<int>(
       shape: RoundedRectangleBorder(

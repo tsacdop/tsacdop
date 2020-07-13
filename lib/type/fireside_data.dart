@@ -35,7 +35,8 @@ class FiresideData {
           .toString());
       var ul = doc.body.getElementsByClassName('episode-hosts').first.children;
       List<PodcastHost> hosts = [];
-      ul.forEach((element) {
+
+      for (var element in ul) {
         PodcastHost host;
         String name = element.text.trim();
         String image =
@@ -48,7 +49,7 @@ class FiresideData {
                 'http://xuanmei.us/assets/default/avatar_small-170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg');
 
         hosts.add(host);
-      });
+      }
       List<String> data = [
         id,
         backgroundImage,

@@ -63,7 +63,8 @@ class AutoDownloader {
       String id = data[0];
       DownloadTaskStatus status = data[1];
       int progress = data[2];
-      _episodeTasks.forEach((episodeTask) {
+
+      for (var episodeTask in _episodeTasks) {
         if (episodeTask.taskId == id) {
           episodeTask.status = status;
           episodeTask.progress = progress;
@@ -76,7 +77,7 @@ class AutoDownloader {
             if (_episodeTasks.length == 0) _unbindBackgroundIsolate();
           }
         }
-      });
+      }
     });
   }
 
@@ -103,7 +104,7 @@ class AutoDownloader {
 
   Future startTask(List<EpisodeBrief> episodes,
       {bool showNotification = false}) async {
-    episodes.forEach((episode) async {
+    for (var episode in episodes) {
       final dir = await getExternalStorageDirectory();
       String localPath = path.join(dir.path, episode.feedTitle);
       final saveDir = Directory(localPath);
@@ -130,7 +131,7 @@ class AutoDownloader {
       _episodeTasks.add(EpisodeTask(episode, taskId));
       var dbHelper = DBHelper();
       await dbHelper.saveDownloaded(episode.enclosureUrl, taskId);
-    });
+    }
     await _completer.future;
     return;
   }
@@ -159,7 +160,7 @@ class DownloadState extends ChangeNotifier {
     DBHelper dbHelper = DBHelper();
     var tasks = await FlutterDownloader.loadTasks();
     if (tasks.length != 0)
-      await Future.forEach(tasks, (DownloadTask task) async {
+      for (var task in tasks) {
         EpisodeBrief episode = await dbHelper.getRssItemWithUrl(task.url);
         if (episode == null)
           await FlutterDownloader.remove(
@@ -167,7 +168,7 @@ class DownloadState extends ChangeNotifier {
         else
           _episodeTasks.add(EpisodeTask(episode, task.taskId,
               progress: task.progress, status: task.status));
-      });
+      }
     notifyListeners();
   }
 
@@ -185,7 +186,8 @@ class DownloadState extends ChangeNotifier {
       String id = data[0];
       DownloadTaskStatus status = data[1];
       int progress = data[2];
-      _episodeTasks.forEach((episodeTask) {
+
+      for (var episodeTask in _episodeTasks) {
         if (episodeTask.taskId == id) {
           episodeTask.status = status;
           episodeTask.progress = progress;
@@ -196,7 +198,7 @@ class DownloadState extends ChangeNotifier {
           } else
             notifyListeners();
         }
-      });
+      }
     });
   }
 
@@ -312,11 +314,12 @@ class DownloadState extends ChangeNotifier {
     await FlutterDownloader.remove(
         taskId: task.taskId, shouldDeleteContent: true);
     await dbHelper.delDownloaded(episode.enclosureUrl);
-    _episodeTasks.forEach((episodeTask) {
+
+    for (var episodeTask in _episodeTasks) {
       if (episodeTask.taskId == task.taskId)
         episodeTask.status = DownloadTaskStatus.undefined;
       notifyListeners();
-    });
+    }
     _removeTask(episode);
   }
 
@@ -336,17 +339,15 @@ class DownloadState extends ChangeNotifier {
           .subtract(Duration(days: autoDelete))
           .millisecondsSinceEpoch;
       List<EpisodeBrief> episodes = await dbHelper.getOutdatedEpisode(deadline);
-      if (episodes.length > 0) {
-        await Future.forEach(
-            episodes, (episode) async => await delTask(episode));
+      if (episodes.isNotEmpty) {
+        for (var episode in episodes) await delTask(episode);
       }
       final tasks = await FlutterDownloader.loadTasksWithRawQuery(
           query:
               'SELECT * FROM task WHERE time_created < $deadline AND status = 3');
-      await Future.forEach(
-          tasks,
-          (task) async => FlutterDownloader.remove(
-              taskId: task.taskId, shouldDeleteContent: true));
+      for (var task in tasks)
+        FlutterDownloader.remove(
+            taskId: task.taskId, shouldDeleteContent: true);
     }
   }
 }

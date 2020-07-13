@@ -82,10 +82,11 @@ class Playlist {
       _playlist = [];
     } else {
       _playlist = [];
-      await Future.forEach(urls, (url) async {
+
+      for (String url in urls) {
         EpisodeBrief episode = await dbHelper.getRssItemWithUrl(url);
         if (episode != null) _playlist.add(episode);
-      });
+      }
     }
   }
 
@@ -302,9 +303,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
     //Check autoplay setting
     await _getAutoPlay();
     if (_autoPlay) {
-      await Future.forEach(_queue.playlist, (episode) async {
+      for (var episode in _queue.playlist)
         await AudioService.addQueueItem(episode.toMediaItem());
-      });
     } else {
       await AudioService.addQueueItem(_queue.playlist.first.toMediaItem());
     }
@@ -481,9 +481,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     else
       newEpisodes = await dbHelper.getGroupNewRssItem(group);
     if (newEpisodes.length > 0 && newEpisodes.length < 100)
-      await Future.forEach(newEpisodes, (episode) async {
-        await addToPlaylist(episode);
-      });
+      for (var episode in newEpisodes) await addToPlaylist(episode);
     if (group.first == 'All')
       await dbHelper.removeAllNewMark();
     else

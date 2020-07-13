@@ -41,16 +41,16 @@ class Import extends StatelessWidget {
       List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
       // For safety
       if (episodes.length < 100 && episodes.length > 0)
-        episodes.forEach((episode) async {
+        for (var episode in episodes) {
           await downloader.startTask(episode, showNotification: true);
-        });
+        }
     } else if (result == ConnectivityResult.wifi) {
       List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
       //For safety
       if (episodes.length < 100 && episodes.length > 0)
-        episodes.forEach((episode) async {
+        for (var episode in episodes) {
           await downloader.startTask(episode, showNotification: true);
-        });
+        }
     }
   }
 

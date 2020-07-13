@@ -26,9 +26,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
     DBHelper dbHelper = DBHelper();
     List<PlayHistory> playHistory;
     playHistory = await dbHelper.getPlayHistory(top);
-    await Future.forEach(playHistory, (playHistory) async {
-      await playHistory.getEpisode();
-    });
+    for (var record in playHistory) await record.getEpisode();
     return playHistory;
   }
 
@@ -58,10 +56,11 @@ class _PlayedHistoryState extends State<PlayedHistory>
   Future<List<FlSpot>> getData() async {
     var dbHelper = DBHelper();
     List<FlSpot> stats = [];
-    await Future.forEach(list, (day) async {
+
+    for (var day in list) {
       double mins = await dbHelper.listenMins(7 - day);
       stats.add(FlSpot(day.toDouble(), mins));
-    });
+    }
     return stats;
   }
 

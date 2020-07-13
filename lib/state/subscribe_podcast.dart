@@ -22,10 +22,12 @@ class SubscribeItem {
   SubscribeState subscribeState;
   String id;
   String imgUrl;
+  String group;
   SubscribeItem(this.url, this.title,
       {this.subscribeState = SubscribeState.none,
       this.id = '',
-      this.imgUrl = ''});
+      this.imgUrl = '',
+      this.group = 'Home'});
 }
 
 class SubscribeWorker extends ChangeNotifier {

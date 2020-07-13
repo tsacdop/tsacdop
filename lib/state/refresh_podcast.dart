@@ -71,10 +71,10 @@ Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
   await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
   var dbHelper = DBHelper();
   List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
-  await Future.forEach<PodcastLocal>(podcastList, (podcastLocal) async {
+  for (var podcastLocal in podcastList) {
     sendPort.send([podcastLocal.title, 1]);
     int updateCount = await dbHelper.updatePodcastRss(podcastLocal);
     print('Refresh ' + podcastLocal.title + updateCount.toString());
-  });
+  }
   sendPort.send("done");
 }

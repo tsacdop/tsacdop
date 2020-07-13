@@ -832,8 +832,8 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                         _group = ['All'];
                                                       });
                                                     } else {
-                                                      groupList.groups
-                                                          .forEach((group) {
+                                                      for (var group
+                                                          in groupList.groups) {
                                                         if (group.name ==
                                                             value) {
                                                           setState(() {
@@ -842,7 +842,8 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                                 .podcastList;
                                                           });
                                                         }
-                                                      });
+                                                      }
+                                                      ;
                                                     }
                                                   },
                                                 ),

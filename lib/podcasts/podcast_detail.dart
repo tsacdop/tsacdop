@@ -70,17 +70,15 @@ class _PodcastDetailState extends State<PodcastDetail> {
               await dbHelper.getNewEpisodes(podcastLocal.id);
           // For safety
           if (episodes.length < 100)
-            episodes.forEach((episode) {
+            for (var episode in episodes)
               downloader.startTask(episode, showNotification: false);
-            });
         } else if (result == ConnectivityResult.wifi) {
           List<EpisodeBrief> episodes =
               await dbHelper.getNewEpisodes(podcastLocal.id);
           //For safety
           if (episodes.length < 100)
-            episodes.forEach((episode) {
+            for (var episode in episodes)
               downloader.startTask(episode, showNotification: false);
-            });
         }
       }
     } else {
@@ -125,7 +123,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     DBHelper dbHelper = DBHelper();
     List<EpisodeBrief> episodes =
         await dbHelper.getRssItem(podcastId, -1, true);
-    await Future.forEach(episodes, (episode) async {
+    for (var episode in episodes) {
       bool marked = await dbHelper.checkMarked(episode);
       if (!marked) {
         final PlayHistory history =
@@ -133,7 +131,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
         await dbHelper.saveHistory(history);
         if (mounted) setState(() {});
       }
-    });
+    }
   }
 
   Widget podcastInfo(BuildContext context) {

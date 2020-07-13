@@ -21,10 +21,11 @@ void callbackDispatcher() {
       //if the app wes opend,then the old marked new episode would be marked not new.
       KeyValueStorage lastWorkStorage = KeyValueStorage(lastWorkKey);
       int lastWork = await lastWorkStorage.getInt();
-      await Future.forEach<PodcastLocal>(podcastList, (podcastLocal) async {
+      for (PodcastLocal podcastLocal in podcastList) {
         await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
         print('Refresh ' + podcastLocal.title);
-      });
+      }
+      ;
       await FlutterDownloader.initialize();
       AutoDownloader downloader = AutoDownloader();
 

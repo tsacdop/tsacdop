@@ -103,9 +103,7 @@ class GroupList extends ChangeNotifier {
 
   clearOrderChanged() async {
     if (_orderChanged.length > 0) {
-      await Future.forEach(_orderChanged, (PodcastGroup group) async {
-        await group.getPodcasts();
-      });
+      for (var group in _orderChanged) await group.getPodcasts();
       _orderChanged.clear();
       // notifyListeners();
     }
@@ -130,9 +128,7 @@ class GroupList extends ChangeNotifier {
     notifyListeners();
     storage.getGroups().then((loadgroups) async {
       _groups.addAll(loadgroups.map((e) => PodcastGroup.fromEntity(e)));
-      await Future.forEach(_groups, (group) async {
-        await group.getPodcasts();
-      });
+      for (var group in _groups) await group.getPodcasts();
       _isLoading = false;
       notifyListeners();
     });
@@ -140,9 +136,7 @@ class GroupList extends ChangeNotifier {
 
 //update podcasts of each group
   Future updateGroups() async {
-    await Future.forEach(_groups, (group) async {
-      await group.getPodcasts();
-    });
+    for (var group in _groups) await group.getPodcasts();
     notifyListeners();
   }
 
@@ -156,11 +150,10 @@ class GroupList extends ChangeNotifier {
 
   Future delGroup(PodcastGroup podcastGroup) async {
     _isLoading = true;
-    podcastGroup.podcastList.forEach((podcast) {
+    for (var podcast in podcastGroup.podcastList)
       if (!_groups.first.podcastList.contains(podcast)) {
         _groups[0].podcastList.insert(0, podcast);
       }
-    });
     await _saveGroup();
     _groups.remove(podcastGroup);
     await _groups[0].getPodcasts();
@@ -191,13 +184,12 @@ class GroupList extends ChangeNotifier {
 
   Future updatePodcast(String id) async {
     int counts = await dbHelper.getPodcastCounts(id);
-    _groups.forEach((group) {
+    for (var group in _groups)
       if (group.podcastList.contains(id)) {
         group.podcasts.firstWhere((podcast) => podcast.id == id)
           ..episodeCount = counts;
         notifyListeners();
       }
-    });
   }
 
   Future subscribeNewPodcast(String id) async {
@@ -211,11 +203,10 @@ class GroupList extends ChangeNotifier {
 
   List<PodcastGroup> getPodcastGroup(String id) {
     List<PodcastGroup> result = [];
-    _groups.forEach((group) {
+    for (var group in _groups)
       if (group.podcastList.contains(id)) {
         result.add(group);
       }
-    });
     return result;
   }
 
@@ -223,20 +214,21 @@ class GroupList extends ChangeNotifier {
   changeGroup(String id, List<PodcastGroup> list) async {
     _isLoading = true;
     notifyListeners();
-    getPodcastGroup(id).forEach((group) {
+
+    for (var group in getPodcastGroup(id)) {
       if (list.contains(group)) {
         list.remove(group);
       } else {
         group.podcastList.remove(id);
       }
-    });
-    list.forEach((s) {
-      s.podcastList.insert(0, id);
-    });
+    }
+
+    for (var s in list) s.podcastList.insert(0, id);
+
     await _saveGroup();
-    await Future.forEach(_groups, (group) async {
-      await group.getPodcasts();
-    });
+
+    for (var group in _groups) await group.getPodcasts();
+
     _isLoading = false;
     notifyListeners();
   }
@@ -245,14 +237,10 @@ class GroupList extends ChangeNotifier {
   removePodcast(String id) async {
     _isLoading = true;
     notifyListeners();
-    _groups.forEach((group) async {
-      group.podcastList.remove(id);
-    });
+    for (var group in _groups) group.podcastList.remove(id);
     await _saveGroup();
     await dbHelper.delPodcastLocal(id);
-    await Future.forEach(_groups, (group) async {
-      await group.getPodcasts();
-    });
+    for (var group in _groups) await group.getPodcasts();
     _isLoading = false;
     notifyListeners();
   }

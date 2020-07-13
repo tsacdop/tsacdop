@@ -59,11 +59,12 @@ class _DownloadsManageState extends State<DownloadsManage> {
 
   _delSelectedEpisodes() async {
     setState(() => _clearing = true);
-    await Future.forEach(_selectedList, (EpisodeBrief episode) async {
+    // await Future.forEach(_selectedList, (EpisodeBrief episode) async
+    for (EpisodeBrief episode in _selectedList) {
       var downloader = Provider.of<DownloadState>(context, listen: false);
       await downloader.delTask(episode);
       if (mounted) setState(() {});
-    });
+    }
     await Future.delayed(Duration(seconds: 1));
     if (mounted)
       setState(() {
@@ -94,9 +95,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
     if (_selectedList.length == 0) {
       return sum;
     } else {
-      _selectedList.forEach((episode) {
-        sum += episode.enclosureLength;
-      });
+      for (var episode in _selectedList) sum += episode.enclosureLength;
       return sum;
     }
   }
