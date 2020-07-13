@@ -31,7 +31,7 @@ class DBHelper {
         .execute("""CREATE TABLE PodcastLocal(id TEXT PRIMARY KEY,title TEXT, 
         imageUrl TEXT,rssUrl TEXT UNIQUE, primaryColor TEXT, author TEXT, 
         description TEXT, add_date INTEGER, imagePath TEXT, provider TEXT, link TEXT, 
-        background_image TEXT DEFAULT '',hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0,
+        background_image TEXT DEFAULT '', hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0,
         episode_count INTEGER DEFAULT 0, skip_seconds INTEGER DEFAULT 0, auto_download INTEGER DEFAULT 0)""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
@@ -62,7 +62,7 @@ class DBHelper {
 
   Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts) async {
     var dbClient = await database;
-    List<PodcastLocal> podcastLocal = List();
+    List<PodcastLocal> podcastLocal = [];
     await Future.forEach(podcasts, (s) async {
       List<Map> list;
       list = await dbClient.rawQuery(
@@ -91,17 +91,17 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath, provider, link FROM PodcastLocal ORDER BY add_date DESC');
 
-    List<PodcastLocal> podcastLocal = List();
+    List<PodcastLocal> podcastLocal = [];
 
-    for (int i = 0; i < list.length; i++) {
+    for (var i in list) {
       podcastLocal.add(PodcastLocal(
-          list[i]['title'],
-          list[i]['imageUrl'],
-          list[i]['rssUrl'],
-          list[i]['primaryColor'],
-          list[i]['author'],
-          list[i]['id'],
-          list[i]['imagePath'],
+          i['title'],
+          i['imageUrl'],
+          i['rssUrl'],
+          i['primaryColor'],
+          i['author'],
+          i['id'],
+          i['imagePath'],
           list.first['provider'],
           list.first['link']));
     }
@@ -214,10 +214,10 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT downloaded FROM Episodes WHERE downloaded != 'ND' AND feed_id = ?""",
         [id]);
-    for (int i = 0; i < list.length; i++) {
-      if (list[i] != null)
+    for (var i in list) {
+      if (i != null)
         await FlutterDownloader.remove(
-            taskId: list[i]['downloaded'], shouldDeleteContent: true);
+            taskId: i['downloaded'], shouldDeleteContent: true);
       print('Removed all download tasks');
     }
     await dbClient.rawDelete('DELETE FROM Episodes WHERE feed_id=?', [id]);
@@ -333,6 +333,7 @@ class DBHelper {
         : PlayHistory(episodeBrief.title, episodeBrief.enclosureUrl, 0, 0);
   }
 
+  /// Check if episode was marked listend.
   Future<bool> checkMarked(EpisodeBrief episodeBrief) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
@@ -498,26 +499,24 @@ class DBHelper {
           await dbClient.rawUpdate(
               "UPDATE Episodes SET is_new = 0 WHERE feed_id = ?",
               [podcastLocal.id]);
-        for (int i = 0; i < result; i++) {
-          print(feed.items[i].title);
-          description = _getDescription(
-              feed.items[i].content.value ?? '',
-              feed.items[i].description ?? '',
-              feed.items[i].itunes.summary ?? '');
+        for (var item in feed.items) {
+          print(item.title);
+          description = _getDescription(item.content.value ?? '',
+              item.description ?? '', item.itunes.summary ?? '');
 
-          if (feed.items[i].enclosure?.url != null) {
-            _isXimalaya(feed.items[i].enclosure.url)
-                ? url = feed.items[i].enclosure.url.split('=').last
-                : url = feed.items[i].enclosure.url;
+          if (item.enclosure?.url != null) {
+            _isXimalaya(item.enclosure.url)
+                ? url = item.enclosure.url.split('=').last
+                : url = item.enclosure.url;
           }
 
-          final title = feed.items[i].itunes.title ?? feed.items[i].title;
-          final length = feed.items[i]?.enclosure?.length ?? 0;
-          final pubDate = feed.items[i].pubDate;
+          final title = item.itunes.title ?? item.title;
+          final length = item?.enclosure?.length ?? 0;
+          final pubDate = item.pubDate;
           final date = _parsePubDate(pubDate);
           final milliseconds = date.millisecondsSinceEpoch;
-          final duration = feed.items[i].itunes.duration?.inSeconds ?? 0;
-          final explicit = _getExplicit(feed.items[i].itunes.explicit);
+          final duration = item.itunes.duration?.inSeconds ?? 0;
+          final explicit = _getExplicit(item.itunes.explicit);
 
           if (url != null) {
             await dbClient.transaction((txn) async {
@@ -565,22 +564,22 @@ class DBHelper {
         E.downloaded,  P.primaryColor , E.media_id, E.is_new, P.skip_seconds
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? ORDER BY E.milliseconds ASC""", [id]);
-      for (int x = 0; x < list.length; x++) {
+      for (var i in list) {
         episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feedTitle'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feedTitle'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds']));
       }
       return episodes;
     } else if (reverse) {
@@ -590,22 +589,22 @@ class DBHelper {
         E.downloaded,  P.primaryColor , E.media_id, E.is_new, P.skip_seconds
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? ORDER BY E.milliseconds ASC LIMIT ?""", [id, i]);
-      for (int x = 0; x < list.length; x++) {
+      for (var i in list) {
         episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feedTitle'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feedTitle'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds']));
       }
       return episodes;
     } else {
@@ -615,22 +614,22 @@ class DBHelper {
         E.downloaded,  P.primaryColor , E.media_id, E.is_new, P.skip_seconds
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? ORDER BY E.milliseconds DESC LIMIT ?""", [id, i]);
-      for (int x = 0; x < list.length; x++) {
+      for (var i in list) {
         episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feedTitle'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feedTitle'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds']));
       }
       return episodes;
     }
@@ -656,52 +655,52 @@ class DBHelper {
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.is_new = 1 AND E.downloaded = 'ND' AND E.feed_id = ? ORDER BY E.milliseconds ASC""",
           [id]);
-    if (list.length > 0)
-      for (int x = 0; x < list.length; x++) {
+    if (list.isNotEmpty)
+      for (var i in list) {
         episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feed_title'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feed_title'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds']));
       }
     return episodes;
   }
 
   Future<List<EpisodeBrief>> getRssItemTop(String id) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = List();
+    List<EpisodeBrief> episodes = [];
     List<Map> list = await dbClient
         .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, E.liked, 
         E.downloaded, P.primaryColor, E.media_id, E.is_new, P.skip_seconds
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         where E.feed_id = ? ORDER BY E.milliseconds DESC LIMIT 2""", [id]);
-    for (int x = 0; x < list.length; x++) {
+    for (var i in list) {
       episodes.add(EpisodeBrief(
-          list[x]['title'],
-          list[x]['enclosure_url'],
-          list[x]['enclosure_length'],
-          list[x]['milliseconds'],
-          list[x]['feed_title'],
-          list[x]['primaryColor'],
-          list[x]['liked'],
-          list[x]['downloaded'],
-          list[x]['duration'],
-          list[x]['explicit'],
-          list[x]['imagePath'],
-          list[x]['media_id'],
-          list[x]['is_new'],
-          list[x]['skip_seconds']));
+          i['title'],
+          i['enclosure_url'],
+          i['enclosure_length'],
+          i['milliseconds'],
+          i['feed_title'],
+          i['primaryColor'],
+          i['liked'],
+          i['downloaded'],
+          i['duration'],
+          i['explicit'],
+          i['imagePath'],
+          i['media_id'],
+          i['is_new'],
+          i['skip_seconds']));
     }
     return episodes;
   }
@@ -738,29 +737,29 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getRecentRssItem(int top) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = List();
+    List<EpisodeBrief> episodes = [];
     List<Map> list = await dbClient
         .rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, E.liked, 
         E.downloaded, P.imagePath, P.primaryColor, E.media_id, E.is_new, P.skip_seconds
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         ORDER BY E.milliseconds DESC LIMIT ? """, [top]);
-    for (int x = 0; x < list.length; x++) {
+    for (var i in list) {
       episodes.add(EpisodeBrief(
-          list[x]['title'],
-          list[x]['enclosure_url'],
-          list[x]['enclosure_length'],
-          list[x]['milliseconds'],
-          list[x]['feed_title'],
-          list[x]['primaryColor'],
-          list[x]['liked'],
-          list[x]['downloaded'],
-          list[x]['duration'],
-          list[x]['explicit'],
-          list[x]['imagePath'],
-          list[x]['media_id'],
-          list[x]['is_new'],
-          list[x]['skip_seconds']));
+          i['title'],
+          i['enclosure_url'],
+          i['enclosure_length'],
+          i['milliseconds'],
+          i['feed_title'],
+          i['primaryColor'],
+          i['liked'],
+          i['downloaded'],
+          i['duration'],
+          i['explicit'],
+          i['imagePath'],
+          i['media_id'],
+          i['is_new'],
+          i['skip_seconds']));
     }
     return episodes;
   }
@@ -778,22 +777,22 @@ class DBHelper {
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE P.id in (${s.join(',')})
         ORDER BY E.milliseconds DESC LIMIT ? """, [top]);
-      for (int x = 0; x < list.length; x++) {
+      for (var i in list) {
         episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feed_title'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feed_title'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds']));
       }
     }
     return episodes;
@@ -809,22 +808,22 @@ class DBHelper {
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE is_new = 1 ORDER BY E.milliseconds DESC  """,
     );
-    for (int x = 0; x < list.length; x++) {
+    for (var i in list) {
       episodes.add(EpisodeBrief(
-          list[x]['title'],
-          list[x]['enclosure_url'],
-          list[x]['enclosure_length'],
-          list[x]['milliseconds'],
-          list[x]['feed_title'],
-          list[x]['primaryColor'],
-          list[x]['liked'],
-          list[x]['downloaded'],
-          list[x]['duration'],
-          list[x]['explicit'],
-          list[x]['imagePath'],
-          list[x]['media_id'],
-          list[x]['is_new'],
-          list[x]['skip_seconds']));
+          i['title'],
+          i['enclosure_url'],
+          i['enclosure_length'],
+          i['milliseconds'],
+          i['feed_title'],
+          i['primaryColor'],
+          i['liked'],
+          i['downloaded'],
+          i['duration'],
+          i['explicit'],
+          i['imagePath'],
+          i['media_id'],
+          i['is_new'],
+          i['skip_seconds']));
     }
     return episodes;
   }
@@ -869,22 +868,22 @@ class DBHelper {
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.download_date < ? AND E.enclosure_url != E.media_id
         ORDER BY E.milliseconds DESC""", [deadline]);
-    for (int x = 0; x < list.length; x++) {
+    for (var i in list) {
       episodes.add(EpisodeBrief(
-          list[x]['title'],
-          list[x]['enclosure_url'],
-          list[x]['enclosure_length'],
-          list[x]['milliseconds'],
-          list[x]['feed_title'],
-          list[x]['primaryColor'],
-          list[x]['liked'],
-          list[x]['downloaded'],
-          list[x]['duration'],
-          list[x]['explicit'],
-          list[x]['imagePath'],
-          list[x]['media_id'],
-          list[x]['is_new'],
-          list[x]['skip_seconds']));
+          i['title'],
+          i['enclosure_url'],
+          i['enclosure_length'],
+          i['milliseconds'],
+          i['feed_title'],
+          i['primaryColor'],
+          i['liked'],
+          i['downloaded'],
+          i['duration'],
+          i['explicit'],
+          i['imagePath'],
+          i['media_id'],
+          i['is_new'],
+          i['skip_seconds']));
     }
     return episodes;
   }
@@ -923,24 +922,24 @@ class DBHelper {
         WHERE E.enclosure_url != E.media_id
         ORDER BY E.enclosure_length DESC""",
       );
-    for (int x = 0; x < list.length; x++) {
+    for (var i in list) {
       episodes.add(
         EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feed_title'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds'],
-            downloadDate: list[x]['download_date']),
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feed_title'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds'],
+            downloadDate: i['download_date']),
       );
     }
     return episodes;
@@ -966,22 +965,22 @@ class DBHelper {
         WHERE P.id in (${s.join(',')}) AND is_new = 1
         ORDER BY E.milliseconds DESC""",
       );
-      for (int x = 0; x < list.length; x++) {
+      for (var i in list) {
         episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feed_title'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feed_title'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds']));
       }
     }
     return episodes;
@@ -1009,29 +1008,29 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = List();
+    List<EpisodeBrief> episodes = [];
     if (sortBy == 0) {
       List<Map> list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded, 
         P.primaryColor, E.media_id, E.is_new, P.skip_seconds FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE E.liked = 1 ORDER BY E.milliseconds DESC LIMIT ?""", [i]);
-      for (int x = 0; x < list.length; x++) {
+      for (var i in list) {
         episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feed_title'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feed_title'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds']));
       }
     } else {
       List<Map> list = await dbClient.rawQuery(
@@ -1039,22 +1038,22 @@ class DBHelper {
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded, 
         P.primaryColor, E.media_id, E.is_new, P.skip_seconds FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE E.liked = 1 ORDER BY E.liked_date DESC LIMIT ?""", [i]);
-      for (int x = 0; x < list.length; x++) {
+      for (var i in list) {
         episodes.add(EpisodeBrief(
-            list[x]['title'],
-            list[x]['enclosure_url'],
-            list[x]['enclosure_length'],
-            list[x]['milliseconds'],
-            list[x]['feed_title'],
-            list[x]['primaryColor'],
-            list[x]['liked'],
-            list[x]['downloaded'],
-            list[x]['duration'],
-            list[x]['explicit'],
-            list[x]['imagePath'],
-            list[x]['media_id'],
-            list[x]['is_new'],
-            list[x]['skip_seconds']));
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feed_title'],
+            i['primaryColor'],
+            i['liked'],
+            i['downloaded'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['media_id'],
+            i['is_new'],
+            i['skip_seconds']));
       }
     }
     return episodes;
@@ -1152,7 +1151,7 @@ class DBHelper {
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
         P.primaryColor, E.media_id, E.is_new, P.skip_seconds FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.enclosure_url = ?""", [url]);
-    if (list.length == 0) {
+    if (list.isEmpty) {
       return null;
     } else {
       episode = EpisodeBrief(
@@ -1182,7 +1181,7 @@ class DBHelper {
         P.title as feed_title, E.duration, E.explicit, E.liked, E.downloaded,  
         P.primaryColor, E.media_id, E.is_new, P.skip_seconds FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.media_id = ?""", [id]);
-    if (list.length == 0)
+    if (list.isEmpty)
       return null;
     else {
       episode = EpisodeBrief(
@@ -1209,7 +1208,7 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT P.imageUrl FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.enclosure_url = ?""", [url]);
-    if (list.length == 0) return null;
+    if (list.isEmpty) return null;
     return list.first["imageUrl"];
   }
 }
