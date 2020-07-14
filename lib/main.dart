@@ -12,7 +12,6 @@ import 'state/audio_state.dart';
 import 'state/setting_state.dart';
 import 'state/download_state.dart';
 import 'state/refresh_podcast.dart';
-import 'state/subscribe_podcast.dart';
 import 'home/home.dart';
 import 'intro_slider/app_intro.dart';
 
@@ -30,7 +29,6 @@ Future main() async {
         ),
         ChangeNotifierProvider(create: (_) => AudioPlayerNotifier()),
         ChangeNotifierProvider(create: (_) => GroupList()),
-        ChangeNotifierProvider(create: (_) => SubscribeWorker()),
         ChangeNotifierProvider(create: (_) => RefreshWorker()),
         ChangeNotifierProvider(
           lazy: false,

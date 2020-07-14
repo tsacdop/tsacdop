@@ -9,7 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:feature_discovery/feature_discovery.dart';
 
 import '../state/podcast_group.dart';
-import 'podcastgroup.dart';
+import 'podcast_group.dart';
 import 'podcastlist.dart';
 import '../util/pageroute.dart';
 import '../util/context_extension.dart';
@@ -586,7 +586,7 @@ class _AddGroupState extends State<AddGroup> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    var groupList = Provider.of<GroupList>(context);
+    var groupList = Provider.of<GroupList>(context, listen: false);
     List list = groupList.groups.map((e) => e.name).toList();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -600,8 +600,9 @@ class _AddGroupState extends State<AddGroup> {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
         elevation: 1,
-        contentPadding: EdgeInsets.symmetric(horizontal: 20),
-        titlePadding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+        titlePadding:
+            const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
         actionsPadding: EdgeInsets.all(0),
         actions: <Widget>[
           FlatButton(

@@ -10,9 +10,10 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:tsacdop/state/podcast_group.dart';
 
 import '../type/searchpodcast.dart';
-import '../state/subscribe_podcast.dart';
+import '../state/podcast_group.dart';
 import '../util/context_extension.dart';
 import '../webfeed/webfeed.dart';
 import '../.env.dart';
@@ -346,7 +347,7 @@ class _SearchResultState extends State<SearchResult>
 
   @override
   Widget build(BuildContext context) {
-    var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
+    var subscribeWorker = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
     savePodcast(OnlinePodcast podcast) {
       SubscribeItem item =

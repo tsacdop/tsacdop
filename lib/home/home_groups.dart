@@ -13,7 +13,6 @@ import 'package:line_icons/line_icons.dart';
 
 import '../type/episodebrief.dart';
 import '../state/podcast_group.dart';
-import '../state/subscribe_podcast.dart';
 import '../state/download_state.dart';
 import '../type/podcastlocal.dart';
 import '../state/audio_state.dart';
@@ -397,7 +396,7 @@ class PodcastPreview extends StatelessWidget {
     return Column(
       children: <Widget>[
         Expanded(
-          child: Selector<SubscribeWorker, bool>(
+          child: Selector<GroupList, bool>(
               selector: (_, worker) => worker.created,
               builder: (context, created, child) {
                 return FutureBuilder<List<EpisodeBrief>>(

@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
-import '../state/subscribe_podcast.dart';
 import '../state/download_state.dart';
 import '../state/refresh_podcast.dart';
 import '../type/episodebrief.dart';
@@ -60,7 +59,7 @@ class Import extends StatelessWidget {
     GroupList groupList = Provider.of<GroupList>(context, listen: false);
     return Column(
       children: <Widget>[
-        Consumer<SubscribeWorker>(
+        Consumer<GroupList>(
           builder: (_, subscribeWorker, __) {
             SubscribeItem item = subscribeWorker.currentSubscribeItem;
             switch (item.subscribeState) {
@@ -70,11 +69,8 @@ class Import extends StatelessWidget {
               case SubscribeState.subscribe:
                 return importColumn(s.notificaitonFatch(item.title), context);
               case SubscribeState.fetch:
-                groupList.subscribeNewPodcast(item.id);
-                //  groupList.updatePodcast(item.id);
                 return importColumn(s.notificationSuccess(item.title), context);
               case SubscribeState.exist:
-                //groupList.subscribeNewPodcast(item.id);
                 return importColumn(
                     s.notificationSubscribeExisted(item.title), context);
               case SubscribeState.error:

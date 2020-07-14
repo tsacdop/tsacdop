@@ -1,23 +1,14 @@
-import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path/path.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:tsacdop/state/podcast_group.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:feature_discovery/feature_discovery.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 
-import '../service/ompl_build.dart';
 import '../util/context_extension.dart';
 import '../intro_slider/app_intro.dart';
-import '../type/podcastlocal.dart';
-import '../local_storage/sqflite_localpodcast.dart';
 import '../home/home.dart';
 import '../podcasts/podcast_manage.dart';
 import 'theme.dart';
@@ -28,6 +19,7 @@ import 'syncing.dart';
 import 'libries.dart';
 import 'languages.dart';
 import 'play_setting.dart';
+import 'data_backup.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -42,18 +34,6 @@ class _SettingsState extends State<Settings>
     } else {
       throw 'Could not launch $url';
     }
-  }
-
-  _exportOmpl(BuildContext context) async {
-    var groups = context.read<GroupList>().groups;
-    var ompl = PodcastsBackup(groups).omplBuilder();
-    var tempdir = await getTemporaryDirectory();
-    var file = File(join(tempdir.path, 'tsacdop_ompl.xml'));
-    await file.writeAsString(ompl.toString());
-    final params = SaveFileDialogParams(sourceFilePath: file.path);
-    final filePath = await FlutterFileDialog.saveFile(params: params);
-    print(filePath);
-    print(ompl.toString());
   }
 
   bool _showFeedback;
@@ -239,14 +219,18 @@ class _SettingsState extends State<Settings>
                         Divider(height: 2),
                         ListTile(
                           onTap: () {
-                            _exportOmpl(context);
+                            //_exportOmpl(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DataBackup()));
                           },
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.file_code_solid,
                               color: Colors.lightGreen[700]),
-                          title: Text(s.settingsExport),
-                          subtitle: Text(s.settingsExportDes),
+                          title: Text(s.settingsBackup),
+                          subtitle: Text(s.settingsBackupDes),
                         ),
                         Divider(height: 2),
                       ],

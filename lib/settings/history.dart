@@ -6,13 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:tsacdop/state/podcast_group.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
 import '../webfeed/webfeed.dart';
 import '../type/searchpodcast.dart';
 import '../util/context_extension.dart';
 import '../state/audio_state.dart';
-import '../state/subscribe_podcast.dart';
+import '../state/podcast_group.dart';
 import '../type/sub_history.dart';
 
 class PlayedHistory extends StatefulWidget {
@@ -69,7 +70,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
       msg: context.s.toastPodcastRecovering,
       gravity: ToastGravity.BOTTOM,
     );
-    var subscribeWorker = context.read<SubscribeWorker>();
+    var subscribeWorker = context.watch<GroupList>();
     try {
       BaseOptions options = new BaseOptions(
         connectTimeout: 10000,

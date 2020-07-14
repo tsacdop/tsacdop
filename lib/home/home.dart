@@ -20,7 +20,6 @@ import '../util/context_extension.dart';
 import '../util/custompaint.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
-import '../state/subscribe_podcast.dart';
 import 'playlist.dart';
 import 'importompl.dart';
 import 'audioplayer.dart';
@@ -726,7 +725,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     super.build(context);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
-    return Selector<SubscribeWorker, bool>(
+    return Selector<GroupList, bool>(
         selector: (_, worker) => worker.created,
         builder: (context, created, child) {
           return FutureBuilder<List<EpisodeBrief>>(

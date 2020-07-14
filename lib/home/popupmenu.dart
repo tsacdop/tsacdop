@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/service/ompl_build.dart';
-import 'package:tsacdop/webfeed/webfeed.dart';
+import 'package:tsacdop/state/podcast_group.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -16,23 +16,8 @@ import 'package:intl/intl.dart';
 
 import '../settings/settting.dart';
 import '../state/refresh_podcast.dart';
-import '../state/subscribe_podcast.dart';
 import '../util/context_extension.dart';
 import 'about.dart';
-
-class OmplOutline {
-  final String text;
-  final String xmlUrl;
-  OmplOutline({this.text, this.xmlUrl});
-
-  factory OmplOutline.parse(xml.XmlElement element) {
-    if (element == null) return null;
-    return OmplOutline(
-      text: element.getAttribute("text")?.trim(),
-      xmlUrl: element.getAttribute("xmlUrl")?.trim(),
-    );
-  }
-}
 
 class PopupMenu extends StatefulWidget {
   @override
@@ -69,70 +54,30 @@ class _PopupMenuState extends State<PopupMenu> {
   }
 
   void _saveOmpl(String path) async {
-    var subscribeWorker = Provider.of<SubscribeWorker>(context, listen: false);
+    var subscribeWorker = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
     File file = File(path);
     try {
-      Map data = PodcastsBackup.parseOMPL(file);
-      data.forEach((title, list) async {
+      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(file);
+      for (var entry in data.entries) {
+        String title = entry.key;
+        var list = entry.value;
         for (var rss in list) {
           if (rss.xmlUrl != null) {
-            SubscribeItem item = SubscribeItem(rss.xmlUrl, rss.text);
+            SubscribeItem item =
+                SubscribeItem(rss.xmlUrl, rss.text, group: title);
             await subscribeWorker.setSubscribeItem(item);
-            await Future.delayed(Duration(milliseconds: 500));
+            await Future.delayed(Duration(seconds: 1));
             print(rss.text);
           }
         }
-      });
+      }
     } catch (e) {
       print(e);
       Fluttertoast.showToast(
         msg: s.toastFileError,
         gravity: ToastGravity.TOP,
       );
-      // try {
-      //   String opml = file.readAsStringSync();
-      //   var content = xml.XmlDocument.parse(opml);
-      //   String title = content
-      //       .findAllElements('head')
-      //       .first
-      //       .findElements('title')
-      //       .first
-      //       .text;
-      //   print(title);
-      //   if (title != 'Tsacdop Subscriptions') {
-      //     var total = content
-      //         .findAllElements('outline')
-      //         .map((ele) => OmplOutline.parse(ele))
-      //         .toList();
-      //     if (total.length == 0) {
-      //       Fluttertoast.showToast(
-      //         msg: s.toastFileNotValid,
-      //         gravity: ToastGravity.BOTTOM,
-      //       );
-      //     } else {
-      //       for (int i = 0; i < total.length; i++) {
-      //         if (total[i].xmlUrl != null) {
-      //           //  importOmpl.rssTitle = total[i].text;
-      //           //await saveOmpl(total[i].xmlUrl);
-      //           SubscribeItem item =
-      //               SubscribeItem(total[i].xmlUrl, total[i].text);
-      //           await subscribeWorker.setSubscribeItem(item);
-      //           await Future.delayed(Duration(milliseconds: 500));
-      //           print(total[i].text);
-      //         }
-      //       }
-      //     }
-      //     print('Import fisnished');
-      //   }
-      // } catch (e) {
-      //   print(e);
-      //   Fluttertoast.showToast(
-      //     msg: s.toastFileError,
-      //     gravity: ToastGravity.TOP,
-      //   );
-      //await Future.delayed(Duration(seconds: 5));
-      //  importOmpl.importState = ImportState.stop;
     }
   }
 

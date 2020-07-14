@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:xml/xml.dart' as xml;
 import '../state/podcast_group.dart';
 
@@ -29,7 +28,7 @@ class PodcastsBackup {
     builder.element('ompl', nest: () {
       builder.attribute('version', '1.0');
       builder.element('head', nest: () {
-        builder.element('title', nest: 'Tsacdop Subscriptions');
+        builder.element('title', nest: 'Tsacdop Feed Groups');
       });
       builder.element('body', nest: () {
         for (var group in groups) {
@@ -55,20 +54,20 @@ class PodcastsBackup {
   }
 
   static parseOMPL(File file) {
-    var data = Map();
+    Map<String, List<OmplOutline>> data = Map();
     String opml = file.readAsStringSync();
     var content = xml.XmlDocument.parse(opml);
     String title =
         content.findAllElements('head').first.findElements('title').first.text;
+    print(title);
     var groups = content.findAllElements('body').first.findElements('outline');
-    if (title != 'Tsacdop Subscriptions' &&
-        groups.first.getAttribute('title') != 'Home') {
-      var total = content
+    if (title != 'Tsacdop Feed Groups') {
+      List<OmplOutline> total = content
           .findAllElements('outline')
           .map((ele) => OmplOutline.parse(ele))
-          .toList()
-            ..removeWhere((element) => element == null);
+          .toList();
       data['Home'] = total;
+      print(data.toString());
       return data;
     }
 
@@ -77,11 +76,10 @@ class PodcastsBackup {
       var total = element
           .findElements('outline')
           .map((ele) => OmplOutline.parse(ele))
-          .toList()
-            ..removeWhere((element) => element == null);
-
+          .toList();
       data[title] = total;
     }
+    print(data.toString());
     return data;
   }
 }

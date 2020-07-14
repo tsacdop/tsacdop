@@ -1316,6 +1316,16 @@ class S {
     );
   }
 
+  /// `Save`
+  String get save {
+    return Intl.message(
+      'Save',
+      name: 'save',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Schedule`
   String get schedule {
     return Intl.message(
@@ -1454,6 +1464,26 @@ class S {
     return Intl.message(
       'Auto play next episode in playlist',
       name: 'settingsAutoPlayDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup`
+  String get settingsBackup {
+    return Intl.message(
+      'Backup',
+      name: 'settingsBackup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup app data`
+  String get settingsBackupDes {
+    return Intl.message(
+      'Backup app data',
+      name: 'settingsBackupDes',
       desc: '',
       args: [],
     );
@@ -1944,6 +1974,16 @@ class S {
     return Intl.message(
       'Default 24 hours',
       name: 'settingsUpdateIntervalDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share`
+  String get share {
+    return Intl.message(
+      'Share',
+      name: 'share',
       desc: '',
       args: [],
     );
