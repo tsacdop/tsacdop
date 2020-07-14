@@ -10,6 +10,7 @@ import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
 import '../type/podcastlocal.dart';
 import '../type/episodebrief.dart';
+import '../type/settings_backup.dart';
 import 'download_state.dart';
 
 void callbackDispatcher() {
@@ -25,7 +26,6 @@ void callbackDispatcher() {
         await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
         print('Refresh ' + podcastLocal.title);
       }
-      ;
       await FlutterDownloader.initialize();
       AutoDownloader downloader = AutoDownloader();
 
@@ -97,6 +97,13 @@ class SettingState extends ChangeNotifier {
       KeyValueStorage(autoSleepTimerEndKey);
   KeyValueStorage tapToOpenPopupMenuStorage =
       KeyValueStorage(tapToOpenPopupMenuKey);
+  KeyValueStorage cacheStorage = KeyValueStorage(cacheMaxKey);
+  KeyValueStorage podcastLayoutStorage = KeyValueStorage(podcastLayoutKey);
+  KeyValueStorage favLayoutStorage = KeyValueStorage(favLayoutKey);
+  KeyValueStorage downloadLayoutStorage = KeyValueStorage(downloadLayoutKey);
+  KeyValueStorage recentLayoutStorage = KeyValueStorage(recentLayoutKey);
+  KeyValueStorage autoDeleteStorage = KeyValueStorage(autoDeleteKey);
+  KeyValueStorage autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
 
   Future initData() async {
     await _getTheme();
@@ -249,10 +256,6 @@ class SettingState extends ChangeNotifier {
     _theme = ThemeMode.values[mode];
   }
 
-  Future _saveTheme() async {
-    await themeStorage.saveInt(_theme.index);
-  }
-
   Future _getAccentSetColor() async {
     String colorString = await accentStorage.getString();
     if (colorString.isNotEmpty) {
@@ -263,27 +266,14 @@ class SettingState extends ChangeNotifier {
     }
   }
 
-  Future _saveAccentSetColor() async {
-    await accentStorage
-        .saveString(_accentSetColor.toString().substring(10, 16));
-  }
-
   Future _getAutoUpdate() async {
     int i = await autoupdateStorage.getInt();
     _autoUpdate = i == 0 ? true : false;
   }
 
-  Future _saveAutoUpdate() async {
-    await autoupdateStorage.saveInt(_autoUpdate ? 0 : 1);
-  }
-
   Future _getUpdateInterval() async {
     _initUpdateTag = await intervalStorage.getInt();
     _updateInterval = _initUpdateTag;
-  }
-
-  Future _saveUpdateInterval() async {
-    await intervalStorage.saveInt(_updateInterval);
   }
 
   Future _getDownloadUsingData() async {
@@ -300,17 +290,9 @@ class SettingState extends ChangeNotifier {
     _showIntro = _initialShowIntor == 0 ? true : false;
   }
 
-  Future saveShowIntro(int i) async {
-    await introStorage.saveInt(i);
-  }
-
   Future _getRealDark() async {
     int i = await realDarkStorage.getInt();
     _realDark = i == 0 ? false : true;
-  }
-
-  Future _setRealDark() async {
-    await realDarkStorage.saveInt(_realDark ? 1 : 0);
   }
 
   Future _getSleepTimerData() async {
@@ -325,6 +307,31 @@ class SettingState extends ChangeNotifier {
     int a = await autoPlayStorage.getInt();
     _autoPlay = a == 0;
     _autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
+  }
+
+  Future _saveAccentSetColor() async {
+    await accentStorage
+        .saveString(_accentSetColor.toString().substring(10, 16));
+  }
+
+  Future _setRealDark() async {
+    await realDarkStorage.saveInt(_realDark ? 1 : 0);
+  }
+
+  Future saveShowIntro(int i) async {
+    await introStorage.saveInt(i);
+  }
+
+  Future _saveUpdateInterval() async {
+    await intervalStorage.saveInt(_updateInterval);
+  }
+
+  Future _saveTheme() async {
+    await themeStorage.saveInt(_theme.index);
+  }
+
+  Future _saveAutoUpdate() async {
+    await autoupdateStorage.saveInt(_autoUpdate ? 0 : 1);
   }
 
   Future _saveAutoPlay() async {
@@ -349,5 +356,54 @@ class SettingState extends ChangeNotifier {
 
   Future _saveAutoSleepTimerEnd() async {
     await autoSleepTimerEndStorage.saveInt(_autoSleepTimerEnd);
+  }
+
+  Future<SettingsBackup> backup() async {
+    int theme = await themeStorage.getInt();
+    String accentColor = await accentStorage.getString();
+    int realDark = await realDarkStorage.getInt();
+    int autoPlay = await autoPlayStorage.getInt();
+    int autoUpdate = await autoupdateStorage.getInt();
+    int updateInterval = await intervalStorage.getInt();
+    int downloadUsingData = await downloadUsingDataStorage.getInt();
+    int cacheMax = await cacheStorage.getInt();
+    int podcastLayout = await podcastLayoutStorage.getInt();
+    int recentLayout = await recentLayoutStorage.getInt();
+    int favLayout = await favLayoutStorage.getInt();
+    int downloadLayout = await downloadLayoutStorage.getInt();
+    int autoDownloadNetwork = await autoDownloadStorage.getInt();
+    List<String> episodePopupMenu =
+        await KeyValueStorage(episodePopupMenuKey).getStringList();
+    int autoDelete = await autoDeleteStorage.getInt();
+    int autoSleepTimer = await autoSleepTimerStorage.getInt();
+    int autoSleepTimerStart = await autoSleepTimerStartStorage.getInt();
+    int autoSleepTimerEnd = await autoSleepTimerEndStorage.getInt();
+    int autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
+    int defaultSleepTime = await defaultSleepTimerStorage.getInt();
+    int tapToOpenPopupMenu =
+        await KeyValueStorage(tapToOpenPopupMenuKey).getInt(defaultValue: 0);
+
+    return SettingsBackup(
+        theme: theme,
+        accentColor: accentColor,
+        realDark: realDark,
+        autoPlay: autoPlay,
+        autoUpdate: autoUpdate,
+        updateInterval: updateInterval,
+        downloadUsingData: downloadUsingData,
+        cacheMax: cacheMax,
+        podcastLayout: podcastLayout,
+        recentLayout: recentLayout,
+        favLayout: favLayout,
+        downloadLayout: downloadLayout,
+        autoDownloadNetwork: autoDownloadNetwork,
+        episodePopupMenu: episodePopupMenu,
+        autoDelete: autoDelete,
+        autoSleepTimer: autoSleepTimer,
+        autoSleepTimerStart: autoSleepTimerStart,
+        autoSleepTimerEnd: autoSleepTimerEnd,
+        autoSleepTimerMode: autoSleepTimerMode,
+        defaultSleepTime: defaultSleepTime,
+        tapToOpenPopupMenu: tapToOpenPopupMenu);
   }
 }

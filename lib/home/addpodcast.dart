@@ -350,8 +350,8 @@ class _SearchResultState extends State<SearchResult>
     var subscribeWorker = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
     savePodcast(OnlinePodcast podcast) {
-      SubscribeItem item =
-          SubscribeItem(podcast.rss, podcast.title, imgUrl: podcast.image);
+      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title,
+          imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
     }
 

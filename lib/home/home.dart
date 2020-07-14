@@ -21,7 +21,7 @@ import '../util/custompaint.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
 import 'playlist.dart';
-import 'importompl.dart';
+import 'import_ompl.dart';
 import 'audioplayer.dart';
 import 'addpodcast.dart';
 import 'popupmenu.dart';

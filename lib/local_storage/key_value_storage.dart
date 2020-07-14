@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../state/podcast_group.dart';
 
 const String autoPlayKey = 'autoPlay';
-//const String autoAddKey = 'autoAdd';
 const String audioPositionKey = 'audioposition';
 const String lastWorkKey = 'lastWork';
 const String refreshdateKey = 'refreshdate';

@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/service/ompl_build.dart';
 import 'package:tsacdop/state/podcast_group.dart';
-import 'package:xml/xml.dart' as xml;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -67,7 +66,7 @@ class _PopupMenuState extends State<PopupMenu> {
             SubscribeItem item =
                 SubscribeItem(rss.xmlUrl, rss.text, group: title);
             await subscribeWorker.setSubscribeItem(item);
-            await Future.delayed(Duration(seconds: 1));
+            await Future.delayed(Duration(milliseconds: 500));
             print(rss.text);
           }
         }
