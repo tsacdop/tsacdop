@@ -781,8 +781,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
     if (_skipState == null) {
       if (_playing == null) {
         _playing = true;
-        int cache = await cacheStorage.getInt();
-        cacheMax = cache == 0 ? 500 * 1024 * 1024 : cache;
+        int cacheMax =
+            await cacheStorage.getInt(defaultValue: 500 * 1024 * 1024);
+
         // await AudioServiceBackground.setQueue(_queue);
         await _audioPlayer.setUrl(mediaItem.id, cacheMax);
         var duration = await _audioPlayer.durationFuture;

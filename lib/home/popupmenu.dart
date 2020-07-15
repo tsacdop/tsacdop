@@ -102,9 +102,7 @@ class _PopupMenuState extends State<PopupMenu> {
   @override
   Widget build(BuildContext context) {
     var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
-
     final s = context.s;
-
     return PopupMenuButton<int>(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -170,7 +168,7 @@ class _PopupMenuState extends State<PopupMenu> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
                 ),
-                Text(s.homeToprightMenuSettings),
+                Text(s.settings),
               ],
             ),
           ),

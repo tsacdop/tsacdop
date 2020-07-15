@@ -139,9 +139,12 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                   onTap: () => _saveTapToOpenPopupMenu(!snapshot.data),
                   title: Text(s.settingsTapToOpenPopupMenu),
                   subtitle: Text(s.settingsTapToOpenPopupMenuDes),
-                  trailing: Switch(
-                      value: snapshot.data,
-                      onChanged: (bool boo) => _saveTapToOpenPopupMenu(boo)),
+                  trailing: Transform.scale(
+                    scale: 0.9,
+                    child: Switch(
+                        value: snapshot.data,
+                        onChanged: (bool boo) => _saveTapToOpenPopupMenu(boo)),
+                  ),
                 ),
               ),
               FutureBuilder<List<int>>(
@@ -151,6 +154,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                     List<int> menu = snapshot.data;
                     return Expanded(
                       child: ListView(
+                        physics: const BouncingScrollPhysics(),
                         shrinkWrap: true,
                         children: menu.map<Widget>((int e) {
                           int i = e % 10;

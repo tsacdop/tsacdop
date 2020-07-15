@@ -701,16 +701,6 @@ class S {
     );
   }
 
-  /// `Settings`
-  String get homeToprightMenuSettings {
-    return Intl.message(
-      'Settings',
-      name: 'homeToprightMenuSettings',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Hosted on {host}`
   String hostedOn(Object host) {
     return Intl.message(
@@ -744,6 +734,16 @@ class S {
       name: 'hoursCount',
       desc: '',
       args: [count],
+    );
+  }
+
+  /// `Import`
+  String get import {
+    return Intl.message(
+      'Import',
+      name: 'import',
+      desc: '',
+      args: [],
     );
   }
 
@@ -1369,6 +1369,16 @@ class S {
     );
   }
 
+  /// `Settings`
+  String get settings {
+    return Intl.message(
+      'Settings',
+      name: 'settings',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Accent color`
   String get settingsAccentColor {
     return Intl.message(
@@ -1569,20 +1579,10 @@ class S {
     );
   }
 
-  /// `Export`
-  String get settingsExport {
-    return Intl.message(
-      'Export',
-      name: 'settingsExport',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Export OMPL file of all podcasts`
+  /// `Export and import app settings`
   String get settingsExportDes {
     return Intl.message(
-      'Export OMPL file of all podcasts',
+      'Export and import app settings',
       name: 'settingsExportDes',
       desc: '',
       args: [],
@@ -2024,6 +2024,16 @@ class S {
     return Intl.message(
       'Subscribe',
       name: 'subscribe',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export OMPL file of all podcasts`
+  String get subscribeExportDes {
+    return Intl.message(
+      'Export OMPL file of all podcasts',
+      name: 'subscribeExportDes',
       desc: '',
       args: [],
     );

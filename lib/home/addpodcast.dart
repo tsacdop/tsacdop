@@ -422,6 +422,9 @@ class _SearchResultState extends State<SearchResult>
                   child: !_issubscribe
                       ? OutlineButton(
                           highlightedBorderColor: context.accentColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100.0),
+                              side: BorderSide(color: context.accentColor)),
                           splashColor: context.accentColor.withOpacity(0.8),
                           child: Text(s.subscribe,
                               style: TextStyle(
@@ -436,6 +439,9 @@ class _SearchResultState extends State<SearchResult>
                           })
                       : OutlineButton(
                           color: context.accentColor.withOpacity(0.8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100.0),
+                              side: BorderSide(color: Colors.grey[500])),
                           highlightedBorderColor: Colors.grey[500],
                           disabledTextColor: Colors.grey[500],
                           child: Text(s.subscribe),

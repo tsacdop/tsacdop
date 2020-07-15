@@ -93,7 +93,7 @@ class _SettingsState extends State<Settings>
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(s.homeToprightMenuSettings),
+          title: Text(s.settings),
           elevation: 0,
           backgroundColor: context.primaryColor,
         ),

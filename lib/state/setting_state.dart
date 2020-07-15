@@ -263,6 +263,7 @@ class SettingState extends ChangeNotifier {
       _accentSetColor = Color(color).withOpacity(1.0);
     } else {
       _accentSetColor = Colors.teal[500];
+      await _saveAccentSetColor();
     }
   }
 
@@ -366,7 +367,7 @@ class SettingState extends ChangeNotifier {
     int autoUpdate = await autoupdateStorage.getInt();
     int updateInterval = await intervalStorage.getInt();
     int downloadUsingData = await downloadUsingDataStorage.getInt();
-    int cacheMax = await cacheStorage.getInt();
+    int cacheMax = await cacheStorage.getInt(defaultValue: 500 * 1024 * 1024);
     int podcastLayout = await podcastLayoutStorage.getInt();
     int recentLayout = await recentLayoutStorage.getInt();
     int favLayout = await favLayoutStorage.getInt();
@@ -405,5 +406,42 @@ class SettingState extends ChangeNotifier {
         autoSleepTimerMode: autoSleepTimerMode,
         defaultSleepTime: defaultSleepTime,
         tapToOpenPopupMenu: tapToOpenPopupMenu);
+  }
+
+  Future<void> restore(SettingsBackup backup) async {
+    await themeStorage.saveInt(backup.theme);
+    await accentStorage.saveString(backup.accentColor);
+    await realDarkStorage.saveInt(backup.realDark);
+    await autoPlayStorage.saveInt(backup.autoPlay);
+    await autoupdateStorage.saveInt(backup.autoUpdate);
+    await intervalStorage.saveInt(backup.updateInterval);
+    await downloadUsingDataStorage.saveInt(backup.downloadUsingData);
+    await cacheStorage.saveInt(backup.cacheMax);
+    await podcastLayoutStorage.saveInt(backup.podcastLayout);
+    await recentLayoutStorage.saveInt(backup.recentLayout);
+    await favLayoutStorage.saveInt(backup.favLayout);
+    await downloadLayoutStorage.saveInt(backup.downloadLayout);
+    await autoDownloadStorage.saveInt(backup.autoDownloadNetwork);
+    await KeyValueStorage(episodePopupMenuKey)
+        .saveStringList(backup.episodePopupMenu);
+    await autoDeleteStorage.saveInt(backup.autoDelete);
+    await autoSleepTimerStorage.saveInt(backup.autoSleepTimer);
+    await autoSleepTimerStartStorage.saveInt(backup.autoSleepTimerStart);
+    await autoSleepTimerEndStorage.saveInt(backup.autoSleepTimerEnd);
+    await autoSleepTimerModeStorage.saveInt(backup.autoSleepTimerMode);
+    await defaultSleepTimerStorage.saveInt(backup.defaultSleepTime);
+    await KeyValueStorage(tapToOpenPopupMenuKey)
+        .saveInt(backup.tapToOpenPopupMenu);
+    await initData();
+    await _getAutoUpdate();
+    await _getDownloadUsingData();
+    await _getSleepTimerData();
+    await _getUpdateInterval().then((value) async {
+      if (_autoUpdate) {
+        await cancelWork();
+        setWorkManager(_initUpdateTag);
+        await saveShowIntro(2);
+      }
+    });
   }
 }

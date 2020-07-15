@@ -326,7 +326,7 @@ class DBHelper {
         """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory 
         WHERE enclosure_url = ? ORDER BY add_date DESC LIMIT 1""",
         [episodeBrief.enclosureUrl]);
-    return list.isEmpty
+    return list.isNotEmpty
         ? PlayHistory(list.first['title'], list.first['enclosure_url'],
             list.first['seconds'], list.first['seek_value'],
             playdate:
