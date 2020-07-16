@@ -1,5 +1,27 @@
 # Tsacdop Changelog
 
+## v0.4.5
+
+Release date 2020/7/16
+
+## New features
+
+* OMPL backup file supports group.
+* Add settings backup and restore.
+* Enable R8 and dart obfuscate.
+
+  
+
+## Bugs fixed
+
+* OMPL import not shown in group.
+
+## Minor UI change
+
+* Tap logo in homepage to toggle theme mode.
+* Change subscribe button style.
+* Improve history chart style.
+
 ## v0.4.0
 
 Release date 2020/7/9

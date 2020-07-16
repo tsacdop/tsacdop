@@ -1053,10 +1053,10 @@ class S {
     );
   }
 
-  /// `Still no show notes received \nfor this episode.`
+  /// `Still no show notes received for this episode.`
   String get noShownote {
     return Intl.message(
-      'Still no show notes received \nfor this episode.',
+      'Still no show notes received for this episode.',
       name: 'noShownote',
       desc: 'Means this episode have no show notes.',
       args: [],
@@ -1889,10 +1889,10 @@ class S {
     );
   }
 
-  /// `Manange cache and download storage`
+  /// `Manage cache and download storage`
   String get settingsStorageDes {
     return Intl.message(
-      'Manange cache and download storage',
+      'Manage cache and download storage',
       name: 'settingsStorageDes',
       desc: '',
       args: [],

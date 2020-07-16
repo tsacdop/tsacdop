@@ -218,7 +218,7 @@
   "@noEpisodeRecent": {},
   "noPodcastGroup": "No podcast in this group",
   "@noPodcastGroup": {},
-  "noShownote": "Still no show notes received \\nfor this episode.",
+  "noShownote": "Still no show notes received for this episode.",
   "@noShownote": {
     "description": "Means this episode have no show notes."
   },
@@ -421,7 +421,7 @@
   "@settingsSTDefautTimeDes": {},
   "settingsSTMode": "Auto sleep timer mode",
   "@settingsSTMode": {},
-  "settingsStorageDes": "Manange cache and download storage",
+  "settingsStorageDes": "Manage cache and download storage",
   "@settingsStorageDes": {},
   "settingsSyncing": "Syncing",
   "@settingsSyncing": {},
