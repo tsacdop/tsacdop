@@ -323,25 +323,34 @@ class GroupList extends ChangeNotifier {
   }
 
   /// Subscribe podcast from OMPL.
-  Future _subscribeNewPodcast({String id, String groupName = 'Home'}) async {
+  Future<bool> _subscribeNewPodcast(
+      {String id, String groupName = 'Home'}) async {
+    //List<String> groupNames = _groups.map((e) => e.name).toList();
     for (PodcastGroup group in _groups) {
       if (group.name == groupName) {
-        if (!group.podcastList.contains(id)) {
+        if (group.podcastList.contains(id))
+          return true;
+        else {
+          _isLoading = true;
+          notifyListeners();
           group.podcastList.insert(0, id);
           await _saveGroup();
           await group.getPodcasts();
+          _isLoading = false;
           notifyListeners();
-          return;
+          return true;
         }
       }
     }
     _isLoading = true;
-    _groups.add(PodcastGroup(groupName));
-    _groups.last.podcastList.insert(0, id);
+    notifyListeners();
+    _groups.add(PodcastGroup(groupName, podcastList: [id]));
+    //_groups.last.podcastList.insert(0, id);
     await _saveGroup();
     await _groups.last.getPodcasts();
     _isLoading = false;
     notifyListeners();
+    return true;
   }
 
   List<PodcastGroup> getPodcastGroup(String id) {
@@ -519,7 +528,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         await Future.delayed(Duration(seconds: 2));
 
         sendPort.send([item.title, item.url, 4]);
-        items.removeWhere((element) => element.url == item.url);
+        items.removeAt(0);
         if (items.length > 0) {
           await _subscribe(items.first);
         } else
@@ -528,7 +537,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         sendPort.send([item.title, realUrl, 5, checkUrl, item.group]);
         await Future.delayed(Duration(seconds: 2));
         sendPort.send([item.title, item.url, 4]);
-        items.removeWhere((element) => element.url == item.url);
+        items.removeAt(0);
         if (items.length > 0) {
           await _subscribe(items.first);
         } else

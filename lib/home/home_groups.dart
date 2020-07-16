@@ -168,7 +168,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                           )),
                       Container(
                         height: (_width - 20) / 3 + 40,
-                        color: Theme.of(context).primaryColor,
+                        color: context.primaryColor,
                         margin: EdgeInsets.symmetric(horizontal: 15),
                         child: Center(
                             child: _groupIndex == 0
@@ -302,6 +302,11 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                 tabs: groups[_groupIndex]
                                     .podcasts
                                     .map<Widget>((PodcastLocal podcastLocal) {
+                                  Color color = (Theme.of(context).brightness ==
+                                          Brightness.light)
+                                      ? podcastLocal.primaryColor.colorizedark()
+                                      : podcastLocal.primaryColor
+                                          .colorizeLight();
                                   return Tab(
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.all(
@@ -312,8 +317,14 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                           LimitedBox(
                                             maxHeight: 50,
                                             maxWidth: 50,
-                                            child: Image.file(File(
-                                                "${podcastLocal.imagePath}")),
+                                            child: CircleAvatar(
+                                              backgroundColor:
+                                                  color.withOpacity(0.5),
+                                              backgroundImage: FileImage(File(
+                                                  "${podcastLocal.imagePath}")),
+                                            ),
+                                            // child: Image.file(File(
+                                            //      "${podcastLocal.imagePath}")),
                                           ),
                                           FutureBuilder<int>(
                                               future: getPodcastUpdateCounts(
