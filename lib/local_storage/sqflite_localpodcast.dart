@@ -151,11 +151,12 @@ class DBHelper {
         [boo ? 1 : 0, id]);
   }
 
-  Future<bool> checkPodcast(String url) async {
+  Future<String> checkPodcast(String url) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT id FROM PodcastLocal WHERE rssUrl = ?', [url]);
-    return list.length == 0;
+    if (list.isEmpty) return '';
+    return list.first['id'];
   }
 
   Future savePodcastLocal(PodcastLocal podcastLocal) async {

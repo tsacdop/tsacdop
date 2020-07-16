@@ -59,6 +59,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
     final s = context.s;
     return Consumer<GroupList>(builder: (_, groupList, __) {
       var groups = groupList.groups;
+      bool import = groupList.created;
       bool isLoading = groupList.isLoading;
       return isLoading
           ? Container(
@@ -127,24 +128,26 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                       alignment: Alignment.bottomRight,
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            SlideLeftRoute(
-                                                page: PodcastManage()),
-                                          );
+                                          if (!import)
+                                            Navigator.push(
+                                              context,
+                                              SlideLeftRoute(
+                                                  page: PodcastManage()),
+                                            );
                                         },
                                         child: Container(
-                                            height: 30,
-                                            padding: EdgeInsets.all(5.0),
-                                            child: Text(
-                                              s.homeGroupsSeeAll,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1
-                                                  .copyWith(
-                                                      color: Theme.of(context)
-                                                          .accentColor),
-                                            )),
+                                          height: 30,
+                                          padding: EdgeInsets.all(5.0),
+                                          child: Text(
+                                            s.homeGroupsSeeAll,
+                                            style: context.textTheme.bodyText1
+                                                .copyWith(
+                                                    color: import
+                                                        ? context
+                                                            .primaryColorDark
+                                                        : context.accentColor),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -245,9 +248,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                           horizontal: 15.0),
                                       child: Text(
                                         groups[_groupIndex].name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1
+                                        style: context.textTheme.bodyText1
                                             .copyWith(
                                                 color: Theme.of(context)
                                                     .accentColor),
@@ -260,23 +261,25 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     alignment: Alignment.bottomRight,
                                     child: InkWell(
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          SlideLeftRoute(page: PodcastManage()),
-                                        );
+                                        if (!import)
+                                          Navigator.push(
+                                            context,
+                                            SlideLeftRoute(
+                                                page: PodcastManage()),
+                                          );
                                       },
                                       child: Container(
-                                          height: 30,
-                                          padding: EdgeInsets.all(5.0),
-                                          child: Text(
-                                            s.homeGroupsSeeAll,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyText1
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .accentColor),
-                                          )),
+                                        height: 30,
+                                        padding: EdgeInsets.all(5.0),
+                                        child: Text(
+                                          s.homeGroupsSeeAll,
+                                          style: context.textTheme.bodyText1
+                                              .copyWith(
+                                                  color: import
+                                                      ? context.primaryColorDark
+                                                      : context.accentColor),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -294,8 +297,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     left: 6.0,
                                     right: 6.0),
                                 indicator: CircleTabIndicator(
-                                    color: Theme.of(context).accentColor,
-                                    radius: 3),
+                                    color: context.accentColor, radius: 3),
                                 isScrollable: true,
                                 tabs: groups[_groupIndex]
                                     .podcasts

@@ -444,9 +444,10 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       String realUrl =
           response.redirects.isEmpty ? rss : response.realUri.toString();
 
-      bool checkUrl = await dbHelper.checkPodcast(realUrl);
+      String checkUrl = await dbHelper.checkPodcast(realUrl);
 
-      if (checkUrl) {
+      /// If url not existe in database.
+      if (checkUrl == '') {
         img.Image thumbnail;
         String imageUrl;
         try {
@@ -524,7 +525,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         } else
           sendPort.send("done");
       } else {
-        sendPort.send([item.title, item.url, 5]);
+        sendPort.send([item.title, realUrl, 5, checkUrl, item.group]);
         await Future.delayed(Duration(seconds: 2));
         sendPort.send([item.title, item.url, 4]);
         items.removeWhere((element) => element.url == item.url);
