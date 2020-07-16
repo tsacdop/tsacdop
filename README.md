@@ -26,6 +26,7 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 * Dark mode / Accent color
 * Download for offline play
 * Auto download new episodes / Auto delete outdated downloads
+* Settings backup
 
 More to come...
 
@@ -84,7 +85,7 @@ UI
 src
 ├──home
    ├──home.dart [Homepage]
-   ├──addpodcast.dart [Search Page]
+   ├──searc_podcast.dart [Search Page]
    ├──playlist.dart [Playlist Page]
 ├──podcasts
    ├──podcast_manage.dart [Group Page]
@@ -102,7 +103,6 @@ src
    ├──podcast_group.dart [Podcast Groups]
    ├──refresh_podcast.dart [Episode Refresh]
    ├──setting_state.dart [Setting]
-   ├──subscribe_podcast.dart [Podcast Subscribe]
 ```
 
 ## Known Issue

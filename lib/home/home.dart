@@ -24,7 +24,7 @@ import '../state/setting_state.dart';
 import 'playlist.dart';
 import 'import_ompl.dart';
 import 'audioplayer.dart';
-import 'addpodcast.dart';
+import 'search_podcast.dart';
 import 'home_menu.dart';
 import 'home_groups.dart';
 import 'download_list.dart';
