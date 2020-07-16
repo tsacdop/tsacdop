@@ -24,8 +24,8 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
   Future<bool> _getTapToOpenPopupMenu() async {
     KeyValueStorage tapToOpenPopupMenuStorage =
         KeyValueStorage(tapToOpenPopupMenuKey);
-    int boo = await tapToOpenPopupMenuStorage.getInt(defaultValue: 0);
-    return boo == 1;
+    bool boo = await tapToOpenPopupMenuStorage.getBool(defaultValue: false);
+    return boo;
   }
 
   _saveEpisodeMene(List<int> list) async {
@@ -37,7 +37,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
   _saveTapToOpenPopupMenu(bool boo) async {
     KeyValueStorage tapToOpenPopupMenuStorage =
         KeyValueStorage(tapToOpenPopupMenuKey);
-    await tapToOpenPopupMenuStorage.saveInt(boo ? 1 : 0);
+    await tapToOpenPopupMenuStorage.saveBool(boo);
     if (mounted) setState(() {});
   }
 

@@ -112,6 +112,7 @@ class SettingState extends ChangeNotifier {
     await _getRealDark();
   }
 
+  /// Spp thememode. default auto.
   ThemeMode _theme;
   ThemeMode get theme => _theme;
 
@@ -156,6 +157,8 @@ class SettingState extends ChangeNotifier {
   int get updateInterval => _updateInterval;
 
   int _initUpdateTag;
+
+  /// Auto syncing podcasts in background, default true.
   bool _autoUpdate;
   bool get autoUpdate => _autoUpdate;
   set autoUpdate(bool boo) {
@@ -164,6 +167,7 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Confirem before using data to download episode, default true(reverse).
   bool _downloadUsingData;
   bool get downloadUsingData => _downloadUsingData;
   set downloadUsingData(bool boo) {
@@ -176,6 +180,7 @@ class SettingState extends ChangeNotifier {
   bool _showIntro;
   bool get showIntro => _showIntro;
 
+  /// Real dark theme, default false.
   bool _realDark;
   bool get realDark => _realDark;
   set setRealDark(bool boo) {
@@ -200,6 +205,7 @@ class SettingState extends ChangeNotifier {
     _saveAutoPlay();
   }
 
+  /// Auto start sleep timer at night. Defualt false.
   bool _autoSleepTimer;
   bool get autoSleepTimer => _autoSleepTimer;
   set setAutoSleepTimer(bool boo) {
@@ -268,8 +274,8 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _getAutoUpdate() async {
-    int i = await autoupdateStorage.getInt();
-    _autoUpdate = i == 0 ? true : false;
+    _autoUpdate =
+        await autoupdateStorage.getBool(defaultValue: true, reverse: true);
   }
 
   Future _getUpdateInterval() async {
@@ -278,12 +284,12 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _getDownloadUsingData() async {
-    int i = await downloadUsingDataStorage.getInt();
-    _downloadUsingData = i == 0 ? true : false;
+    _downloadUsingData = await downloadUsingDataStorage.getBool(
+        defaultValue: true, reverse: true);
   }
 
   Future _saveDownloadUsingData() async {
-    await downloadUsingDataStorage.saveInt(_downloadUsingData ? 0 : 1);
+    await downloadUsingDataStorage.saveBool(_downloadUsingData, reverse: true);
   }
 
   Future _getShowIntro() async {
@@ -292,21 +298,19 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _getRealDark() async {
-    int i = await realDarkStorage.getInt();
-    _realDark = i == 0 ? false : true;
+    _realDark = await realDarkStorage.getBool(defaultValue: false);
   }
 
   Future _getSleepTimerData() async {
     _defaultSleepTimer =
         await defaultSleepTimerStorage.getInt(defaultValue: 30);
-    int i = await autoSleepTimerStorage.getInt();
-    _autoSleepTimer = i == 1;
+    _autoSleepTimer = await autoSleepTimerStorage.getBool(defaultValue: false);
     _autoSleepTimerStart =
         await autoSleepTimerStartStorage.getInt(defaultValue: 1380);
     _autoSleepTimerEnd =
         await autoSleepTimerEndStorage.getInt(defaultValue: 360);
-    int a = await autoPlayStorage.getInt();
-    _autoPlay = a == 0;
+    _autoPlay =
+        await autoPlayStorage.getBool(defaultValue: true, reverse: true);
     _autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
   }
 
@@ -316,7 +320,7 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _setRealDark() async {
-    await realDarkStorage.saveInt(_realDark ? 1 : 0);
+    await realDarkStorage.saveBool(_realDark);
   }
 
   Future saveShowIntro(int i) async {
@@ -332,11 +336,11 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _saveAutoUpdate() async {
-    await autoupdateStorage.saveInt(_autoUpdate ? 0 : 1);
+    await autoupdateStorage.saveBool(_autoUpdate, reverse: true);
   }
 
   Future _saveAutoPlay() async {
-    await autoPlayStorage.saveInt(_autoPlay ? 0 : 1);
+    await autoPlayStorage.saveBool(_autoPlay, reverse: true);
   }
 
   Future _setDefaultSleepTimer() async {
@@ -344,7 +348,7 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _saveAutoSleepTimer() async {
-    await autoSleepTimerStorage.saveInt(_autoSleepTimer ? 1 : 0);
+    await autoSleepTimerStorage.saveBool(_autoSleepTimer);
   }
 
   Future _saveAutoSleepTimerMode() async {
@@ -362,27 +366,32 @@ class SettingState extends ChangeNotifier {
   Future<SettingsBackup> backup() async {
     int theme = await themeStorage.getInt();
     String accentColor = await accentStorage.getString();
-    int realDark = await realDarkStorage.getInt();
-    int autoPlay = await autoPlayStorage.getInt();
-    int autoUpdate = await autoupdateStorage.getInt();
+    bool realDark = await realDarkStorage.getBool(defaultValue: false);
+    bool autoPlay =
+        await autoPlayStorage.getBool(defaultValue: true, reverse: true);
+    bool autoUpdate =
+        await autoupdateStorage.getBool(defaultValue: true, reverse: true);
     int updateInterval = await intervalStorage.getInt();
-    int downloadUsingData = await downloadUsingDataStorage.getInt();
+    bool downloadUsingData = await downloadUsingDataStorage.getBool(
+        defaultValue: true, reverse: true);
     int cacheMax = await cacheStorage.getInt(defaultValue: 500 * 1024 * 1024);
     int podcastLayout = await podcastLayoutStorage.getInt();
     int recentLayout = await recentLayoutStorage.getInt();
     int favLayout = await favLayoutStorage.getInt();
     int downloadLayout = await downloadLayoutStorage.getInt();
-    int autoDownloadNetwork = await autoDownloadStorage.getInt();
+    bool autoDownloadNetwork =
+        await autoDownloadStorage.getBool(defaultValue: false);
     List<String> episodePopupMenu =
         await KeyValueStorage(episodePopupMenuKey).getStringList();
     int autoDelete = await autoDeleteStorage.getInt();
-    int autoSleepTimer = await autoSleepTimerStorage.getInt();
+    bool autoSleepTimer =
+        await autoSleepTimerStorage.getBool(defaultValue: false);
     int autoSleepTimerStart = await autoSleepTimerStartStorage.getInt();
     int autoSleepTimerEnd = await autoSleepTimerEndStorage.getInt();
     int autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
     int defaultSleepTime = await defaultSleepTimerStorage.getInt();
-    int tapToOpenPopupMenu =
-        await KeyValueStorage(tapToOpenPopupMenuKey).getInt(defaultValue: 0);
+    bool tapToOpenPopupMenu = await KeyValueStorage(tapToOpenPopupMenuKey)
+        .getBool(defaultValue: false);
 
     return SettingsBackup(
         theme: theme,
@@ -411,27 +420,28 @@ class SettingState extends ChangeNotifier {
   Future<void> restore(SettingsBackup backup) async {
     await themeStorage.saveInt(backup.theme);
     await accentStorage.saveString(backup.accentColor);
-    await realDarkStorage.saveInt(backup.realDark);
-    await autoPlayStorage.saveInt(backup.autoPlay);
-    await autoupdateStorage.saveInt(backup.autoUpdate);
+    await realDarkStorage.saveBool(backup.realDark);
+    await autoPlayStorage.saveBool(backup.autoPlay, reverse: true);
+    await autoupdateStorage.saveBool(backup.autoUpdate, reverse: true);
     await intervalStorage.saveInt(backup.updateInterval);
-    await downloadUsingDataStorage.saveInt(backup.downloadUsingData);
+    await downloadUsingDataStorage.saveBool(backup.downloadUsingData,
+        reverse: true);
     await cacheStorage.saveInt(backup.cacheMax);
     await podcastLayoutStorage.saveInt(backup.podcastLayout);
     await recentLayoutStorage.saveInt(backup.recentLayout);
     await favLayoutStorage.saveInt(backup.favLayout);
     await downloadLayoutStorage.saveInt(backup.downloadLayout);
-    await autoDownloadStorage.saveInt(backup.autoDownloadNetwork);
+    await autoDownloadStorage.saveBool(backup.autoDownloadNetwork);
     await KeyValueStorage(episodePopupMenuKey)
         .saveStringList(backup.episodePopupMenu);
     await autoDeleteStorage.saveInt(backup.autoDelete);
-    await autoSleepTimerStorage.saveInt(backup.autoSleepTimer);
+    await autoSleepTimerStorage.saveBool(backup.autoSleepTimer);
     await autoSleepTimerStartStorage.saveInt(backup.autoSleepTimerStart);
     await autoSleepTimerEndStorage.saveInt(backup.autoSleepTimerEnd);
     await autoSleepTimerModeStorage.saveInt(backup.autoSleepTimerMode);
     await defaultSleepTimerStorage.saveInt(backup.defaultSleepTime);
     await KeyValueStorage(tapToOpenPopupMenuKey)
-        .saveInt(backup.tapToOpenPopupMenu);
+        .saveBool(backup.tapToOpenPopupMenu);
     await initData();
     await _getAutoUpdate();
     await _getDownloadUsingData();

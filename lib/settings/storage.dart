@@ -36,8 +36,8 @@ class _StorageSettingState extends State<StorageSetting>
 
   Future<bool> _getAutoDownloadNetwork() async {
     KeyValueStorage storage = KeyValueStorage(autoDownloadNetworkKey);
-    int value = await storage.getInt();
-    return value != 0;
+    bool value = await storage.getBool(defaultValue: false);
+    return value;
   }
 
   Future<int> _getAutoDeleteDays() async {
@@ -58,7 +58,7 @@ class _StorageSettingState extends State<StorageSetting>
 
   _setAudtDownloadNetwork(bool boo) async {
     KeyValueStorage storage = KeyValueStorage(autoDownloadNetworkKey);
-    await storage.saveInt(boo ? 1 : 0);
+    await storage.saveBool(boo);
   }
 
   double _value;

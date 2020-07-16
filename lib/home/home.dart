@@ -673,7 +673,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group) async {
     KeyValueStorage storage = KeyValueStorage(recentLayoutKey);
-    int index = await storage.getInt();
+    int index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
 
     var dbHelper = DBHelper();
@@ -695,6 +695,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     return episodes.length;
   }
 
+  /// Load more episodes.
   _loadMoreEpisode() async {
     if (mounted) setState(() => _loadMore = true);
     await Future.delayed(Duration(seconds: 3));
@@ -705,8 +706,13 @@ class _RecentUpdateState extends State<_RecentUpdate>
       });
   }
 
+  /// Episodes loaded first time.
   int _top = 99;
+
+  /// Load more episodes when scroll to bottom.
   bool _loadMore;
+
+  /// For group fliter.
   String _groupName;
   List<String> _group;
   Layout _layout;
@@ -1023,7 +1029,7 @@ class _MyFavoriteState extends State<_MyFavorite>
     with AutomaticKeepAliveClientMixin {
   Future<List<EpisodeBrief>> _getLikedRssItem(int top, int sortBy) async {
     KeyValueStorage storage = KeyValueStorage(favLayoutKey);
-    int index = await storage.getInt();
+    int index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes = await dbHelper.getLikedRssItem(top, sortBy);
@@ -1248,7 +1254,7 @@ class _MyDownloadState extends State<_MyDownload>
   Layout _layout;
   _getLayout() async {
     KeyValueStorage keyValueStorage = KeyValueStorage(downloadLayoutKey);
-    int layout = await keyValueStorage.getInt();
+    int layout = await keyValueStorage.getInt(defaultValue: 1);
     if (_layout == null)
       setState(() {
         _layout = Layout.values[layout];

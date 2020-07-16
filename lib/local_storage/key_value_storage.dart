@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../state/podcast_group.dart';
@@ -110,5 +111,23 @@ class KeyValueStorage {
     }
     List<String> list = prefs.getStringList(key);
     return list.map((e) => int.parse(e)).toList();
+  }
+
+  /// Rreverse is used for compatite bool value save before which set true = 0, false = 1
+  Future<bool> getBool(
+      {@required bool defaultValue, bool reverse = false}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getInt(key) == null)
+      reverse
+          ? await prefs.setInt(key, defaultValue ? 0 : 1)
+          : await prefs.setInt(key, defaultValue ? 1 : 0);
+    int i = prefs.getInt(key);
+    return reverse ? i == 0 : i == 1;
+  }
+
+  /// Rreverse is used for compatite bool value save before which set true = 0, false = 1
+  saveBool(bool boo, {bool reverse = false}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    reverse ? prefs.setInt(key, boo ? 0 : 1) : prefs.setInt(key, boo ? 1 : 0);
   }
 }

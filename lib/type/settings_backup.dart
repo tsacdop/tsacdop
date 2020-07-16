@@ -1,25 +1,25 @@
 class SettingsBackup {
   final int theme;
   final String accentColor;
-  final int realDark;
-  final int autoPlay;
-  final int autoUpdate;
+  final bool realDark;
+  final bool autoPlay;
+  final bool autoUpdate;
   final int updateInterval;
-  final int downloadUsingData;
+  final bool downloadUsingData;
   final int cacheMax;
   final int podcastLayout;
   final int recentLayout;
   final int favLayout;
   final int downloadLayout;
-  final int autoDownloadNetwork;
+  final bool autoDownloadNetwork;
   final List<String> episodePopupMenu;
   final int autoDelete;
-  final int autoSleepTimer;
+  final bool autoSleepTimer;
   final int autoSleepTimerStart;
   final int autoSleepTimerEnd;
   final int defaultSleepTime;
   final int autoSleepTimerMode;
-  final int tapToOpenPopupMenu;
+  final bool tapToOpenPopupMenu;
   SettingsBackup(
       {this.theme,
       this.accentColor,
@@ -73,23 +73,23 @@ class SettingsBackup {
     return SettingsBackup(
         theme: json['theme'] as int,
         accentColor: json['accentColor'] as String,
-        realDark: json['realDark'] as int,
-        autoPlay: json['autoPlay'] as int,
-        autoUpdate: json['autoUpdate'] as int,
+        realDark: json['realDark'] as bool,
+        autoPlay: json['autoPlay'] as bool,
+        autoUpdate: json['autoUpdate'] as bool,
         updateInterval: json['updateInterval'] as int,
-        downloadUsingData: json['downloadUsingData'] as int,
+        downloadUsingData: json['downloadUsingData'] as bool,
         cacheMax: json['cacheMax'] as int,
         podcastLayout: json['podcastLayout'] as int,
         recentLayout: json['recentLayout'] as int,
         favLayout: json['favLayout'] as int,
         downloadLayout: json['downloadLayout'] as int,
-        autoDownloadNetwork: json['autoDownloadNetwork'] as int,
+        autoDownloadNetwork: json['autoDownloadNetwork'] as bool,
         episodePopupMenu: list,
         autoDelete: json['autoDelete'] as int,
-        autoSleepTimer: json['autoSleepTimer'] as int,
+        autoSleepTimer: json['autoSleepTimer'] as bool,
         autoSleepTimerStart: json['autoSleepeTimerStart'] as int,
         autoSleepTimerEnd: json['autoSleepTimerEnd'] as int,
         autoSleepTimerMode: json['autoSleepTimerMode'] as int,
-        tapToOpenPopupMenu: json['tapToOpenPopupMenu'] as int);
+        tapToOpenPopupMenu: json['tapToOpenPopupMenu'] as bool);
   }
 }

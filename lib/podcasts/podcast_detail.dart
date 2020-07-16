@@ -39,10 +39,19 @@ class PodcastDetail extends StatefulWidget {
 class _PodcastDetailState extends State<PodcastDetail> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+
+  /// Fireside background if hosted on fireside.
   String _backgroundImage;
+
+  /// Fireside hosts if hosted on fireside.
   List<PodcastHost> _hosts;
+
+  /// Episodes total count.
   int _episodeCount;
+
+  /// Default layout.
   Layout _layout;
+
   bool _scroll;
   Future _updateRssItem(BuildContext context, PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
@@ -95,7 +104,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     var dbHelper = DBHelper();
     _episodeCount = await dbHelper.getPodcastCounts(podcastLocal.id);
     KeyValueStorage storage = KeyValueStorage(podcastLayoutKey);
-    int index = await storage.getInt();
+    int index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
     List<EpisodeBrief> episodes =
         await dbHelper.getRssItem(podcastLocal.id, i, reverse);
@@ -252,8 +261,14 @@ class _PodcastDetailState extends State<PodcastDetail> {
   double _topHeight = 0;
 
   ScrollController _controller;
+
+  /// Episodes num load first time.
   int _top;
+
+  /// Load more episodes when scroll to bottom.
   bool _loadMore;
+
+  /// Change sort by.
   bool _reverse;
   @override
   void initState() {
