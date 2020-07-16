@@ -95,12 +95,21 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     onTap: () => _launchUrl(
                         'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project'),
                     contentPadding: const EdgeInsets.only(left: 75, right: 20),
+                    title: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Image(
+                          image: Theme.of(context).brightness ==
+                                  Brightness.light
+                              ? AssetImage('assets/localizely_logo.png')
+                              : AssetImage('assets/localizely_logo_light.png'),
+                          height: 20),
+                    ),
                     subtitle: Text(
                         "If you'd like to contribute to support more languages, please contact me."),
-                    trailing: IconButton(
-                        icon: Icon(LineIcons.heart),
-                        onPressed: () => _launchUrl(
-                            'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project')),
+                    // trailing: IconButton(
+                    //     icon: Icon(LineIcons.heart),
+                    //     onPressed: () => _launchUrl(
+                    //         'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project')),
                   ),
                 ],
               ))),

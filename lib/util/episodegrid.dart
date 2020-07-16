@@ -94,8 +94,8 @@ class EpisodeGrid extends StatelessWidget {
   Future<bool> _getTapToOpenPopupMenu() async {
     KeyValueStorage tapToOpenPopupMenuStorage =
         KeyValueStorage(tapToOpenPopupMenuKey);
-    int boo = await tapToOpenPopupMenuStorage.getInt(defaultValue: 0);
-    return boo == 1;
+    bool boo = await tapToOpenPopupMenuStorage.getBool(defaultValue: false);
+    return boo;
   }
 
   _markListened(EpisodeBrief episode) async {

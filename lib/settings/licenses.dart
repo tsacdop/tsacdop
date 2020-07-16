@@ -70,5 +70,8 @@ List<Libries> plugins = [
   Libries('flutter_isolate', mit, 'https://pub.dev/packages/flutter_isolate'),
   Libries('auto_animated', mit, 'https://pub.dev/packages/auto_animated'),
   Libries('wc_flutter_share', apacheLicense,
-      'https://pub.dev/packages/wc_flutter_share')
+      'https://pub.dev/packages/wc_flutter_share'),
+  Libries('flutter_time_picker_spinner', 'unknow',
+      'https://pub.dev/packages/flutter_time_picker_spinner'),
+  Libries('focused_menu', mit, 'https://pub.dev/packages/focused_menu')
 ];

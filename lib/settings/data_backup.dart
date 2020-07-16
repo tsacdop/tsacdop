@@ -64,7 +64,7 @@ class _DataBackupState extends State<DataBackup> {
         now.day.toString() +
         now.second.toString();
     var file = File(join(tempdir.path, 'tsacdop_settings_$datePlus.json'));
-    await file.writeAsString(json.toString());
+    await file.writeAsString(jsonEncode(json));
     return file;
   }
 
@@ -76,11 +76,15 @@ class _DataBackupState extends State<DataBackup> {
       String json = file.readAsStringSync();
       SettingsBackup backup = SettingsBackup.fromJson(jsonDecode(json));
       await settings.restore(backup);
+      Fluttertoast.showToast(
+        msg: s.toastImportSettingsSuccess,
+        gravity: ToastGravity.BOTTOM,
+      );
     } catch (e) {
       print(e);
       Fluttertoast.showToast(
         msg: s.toastFileError,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
     }
   }
@@ -95,7 +99,7 @@ class _DataBackupState extends State<DataBackup> {
       print('File Path' + filePath);
       Fluttertoast.showToast(
         msg: s.toastReadFile,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
       _importSetting(filePath, context);
     } on PlatformException catch (e) {
@@ -262,7 +266,7 @@ class _DataBackupState extends State<DataBackup> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            LineIcons.file_import_solid,
+                            LineIcons.paperclip_solid,
                             size: context.textTheme.headline6.fontSize,
                             color: Colors.red[700],
                           ),

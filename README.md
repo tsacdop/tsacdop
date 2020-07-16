@@ -24,7 +24,7 @@ The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
 * Auto syncing in background
 * Listen and subscribe history record
 * Dark mode / Accent color
-* Download for offline playing
+* Download for offline play
 * Auto download new episodes / Auto delete outdated downloads
 
 More to come...

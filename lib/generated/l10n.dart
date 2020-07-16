@@ -1559,10 +1559,10 @@ class S {
     );
   }
 
-  /// `Enable Syncing`
+  /// `Enable syncing`
   String get settingsEnableSyncing {
     return Intl.message(
-      'Enable Syncing',
+      'Enable syncing',
       name: 'settingsEnableSyncing',
       desc: '',
       args: [],
@@ -1619,10 +1619,10 @@ class S {
     );
   }
 
-  /// `Listen date`
+  /// `Listen data`
   String get settingsHistoryDes {
     return Intl.message(
-      'Listen date',
+      'Listen data',
       name: 'settingsHistoryDes',
       desc: '',
       args: [],
@@ -1769,10 +1769,10 @@ class S {
     );
   }
 
-  /// `Ask to confirm when using cellulae data to download episodes`
+  /// `Ask to confirm when using cellular data to download episodes`
   String get settingsNetworkCellularDes {
     return Intl.message(
-      'Ask to confirm when using cellulae data to download episodes',
+      'Ask to confirm when using cellular data to download episodes',
       name: 'settingsNetworkCellularDes',
       desc: '',
       args: [],
@@ -2124,6 +2124,16 @@ class S {
     return Intl.message(
       'Home group is not supported',
       name: 'toastHomeGroupNotSupport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import settings successfully`
+  String get toastImportSettingsSuccess {
+    return Intl.message(
+      'Import settings successfully',
+      name: 'toastImportSettingsSuccess',
       desc: '',
       args: [],
     );

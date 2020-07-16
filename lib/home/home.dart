@@ -20,11 +20,12 @@ import '../util/context_extension.dart';
 import '../util/custompaint.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
+import '../state/setting_state.dart';
 import 'playlist.dart';
 import 'import_ompl.dart';
 import 'audioplayer.dart';
 import 'addpodcast.dart';
-import 'popupmenu.dart';
+import 'home_menu.dart';
 import 'home_groups.dart';
 import 'download_list.dart';
 
@@ -89,6 +90,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = (width - 20) / 3 + 140;
+    var settings = Provider.of<SettingState>(context, listen: false);
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
@@ -195,14 +197,25 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                               },
                                             ),
                                           ),
-                                          Image(
-                                            image: Theme.of(context)
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? AssetImage('assets/text.png')
-                                                : AssetImage(
-                                                    'assets/text_light.png'),
-                                            height: 30,
+                                          GestureDetector(
+                                            onTap: () => {
+                                              Theme.of(context).brightness ==
+                                                      Brightness.light
+                                                  ? settings.setTheme =
+                                                      ThemeMode.dark
+                                                  : settings.setTheme =
+                                                      ThemeMode.light
+                                            },
+                                            child: Image(
+                                              image: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.light
+                                                  ? AssetImage(
+                                                      'assets/text.png')
+                                                  : AssetImage(
+                                                      'assets/text_light.png'),
+                                              height: 30,
+                                            ),
                                           ),
                                           DescribedFeatureOverlay(
                                               featureId: menuFeature,
