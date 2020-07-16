@@ -20,9 +20,9 @@ jobs:
       - run: dart tool/env.dart
       - run:
           name: Build the Android version
-          command: flutter build appbundle --obfuscate --split-debug-info=debug/
+          command: flutter build appbundle --no-shirink --obfuscate --split-debug-info=debug/
       - run:
           name: Build the Android apk
-          command: flutter build apk --split-per-abi --obfuscate --split-debug-info=debug/
+          command: flutter build apk --split-per-abi --no-shrink --obfuscate --split-debug-info=debug/
       - store_artifacts:
           path: build/app/outputs/
