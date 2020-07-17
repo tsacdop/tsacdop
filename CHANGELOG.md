@@ -1,5 +1,14 @@
 # Tsacdop Changelog
 
+## v0.4.6
+
+Release date 2020/7/17
+
+### Bugs fixed
+
+* Mark listened not work.
+* Recover subscribe wrong group.
+
 ## v0.4.5
 
 Release date 2020/7/16
