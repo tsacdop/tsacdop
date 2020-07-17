@@ -84,8 +84,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
           publisher: p.author,
           description: p.description,
           image: p.itunes.image.href);
-      SubscribeItem item =
-          SubscribeItem(podcast.rss, podcast.title, imgUrl: podcast.image);
+      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title,
+          imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
     } on DioError catch (e) {
       print(e);

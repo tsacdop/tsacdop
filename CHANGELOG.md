@@ -10,8 +10,6 @@ Release date 2020/7/16
 * Add settings backup and restore.
 * Enable R8 and dart obfuscate.
 
-  
-
 ## Bugs fixed
 
 * OMPL import not shown in group.

@@ -342,7 +342,7 @@ class DBHelper {
         """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory 
         WHERE enclosure_url = ? AND seek_value = 1 ORDER BY add_date DESC LIMIT 1""",
         [episodeBrief.enclosureUrl]);
-    return list.isEmpty;
+    return list.isNotEmpty;
   }
 
   DateTime _parsePubDate(String pubDate) {

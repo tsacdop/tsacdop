@@ -34,6 +34,8 @@ class EpisodeDetail extends StatefulWidget {
 class _EpisodeDetailState extends State<EpisodeDetail> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
   double downloadProgress;
+
+  /// Load shownote.
   bool _loaddes;
   bool _showMenu;
   String path;
@@ -76,6 +78,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   _markListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
     bool marked = await dbHelper.checkMarked(episode);
+    print(marked);
     if (!marked) {
       final PlayHistory history =
           PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
@@ -394,13 +397,13 @@ class _MenuBarState extends State<MenuBar> {
   saveLiked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setLiked(url);
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   setUnliked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setUniked(url);
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
