@@ -35,11 +35,15 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
   double downloadProgress;
 
+  /// Show page title.
+  bool _showTitle;
+
   /// Load shownote.
   bool _loaddes;
   bool _showMenu;
   String path;
   String _description;
+
   Future getSDescription(String url) async {
     var dbHelper = DBHelper();
     _description = (await dbHelper.getDescription(url))
@@ -65,6 +69,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
           _showMenu = false;
         });
     }
+    if (_controller.offset > context.textTheme.headline5.fontSize) {
+      if (!_showTitle) setState(() => _showTitle = true);
+    } else if (_showTitle) setState(() => _showTitle = false);
   }
 
   _launchUrl(String url) async {
@@ -78,7 +85,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   _markListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
     bool marked = await dbHelper.checkMarked(episode);
-    print(marked);
     if (!marked) {
       final PlayHistory history =
           PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
@@ -91,6 +97,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     super.initState();
     _loaddes = false;
     _showMenu = false;
+    _showTitle = false;
     getSDescription(widget.episodeItem.enclosureUrl);
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
@@ -115,8 +122,14 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-          //  title: Text(widget.episodeItem.feedTitle),
-          centerTitle: true,
+          title: _showTitle
+              ? Text(
+                  widget.episodeItem.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : Center(),
+          elevation: _showTitle ? 1 : 0,
           actions: [
             PopupMenuButton(
               shape: RoundedRectangleBorder(
@@ -171,184 +184,160 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
           children: <Widget>[
             Container(
               color: Theme.of(context).primaryColor,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            widget.episodeItem.title,
-                            style: Theme.of(context).textTheme.headline5,
-                          ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                controller: _controller,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.episodeItem.title,
+                          textAlign: TextAlign.left,
+                          style: Theme.of(context).textTheme.headline5,
                         ),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          height: 30.0,
-                          child: Text(
-                              s.published(DateFormat.yMMMd().format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      widget.episodeItem.pubDate))),
-                              style: TextStyle(
-                                  color: Theme.of(context).accentColor)),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          height: 50.0,
-                          child: Row(
-                            children: <Widget>[
-                              (widget.episodeItem.explicit == 1)
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.red[800],
-                                          shape: BoxShape.circle),
-                                      height: 25.0,
-                                      width: 25.0,
-                                      margin: EdgeInsets.only(right: 10.0),
-                                      alignment: Alignment.center,
-                                      child: Text('E',
-                                          style:
-                                              TextStyle(color: Colors.white)))
-                                  : Center(),
-                              widget.episodeItem.duration != 0
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.cyan[300],
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(15.0))),
-                                      height: 25.0,
-                                      margin: EdgeInsets.only(right: 10.0),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.0),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                          s.minsCount(
-                                              widget.episodeItem.duration ~/
-                                                  60),
-                                          style: textstyle),
-                                    )
-                                  : Center(),
-                              widget.episodeItem.enclosureLength != null &&
-                                      widget.episodeItem.enclosureLength != 0
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.lightBlue[300],
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(15.0))),
-                                      height: 25.0,
-                                      margin: EdgeInsets.only(right: 10.0),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.0),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                          ((widget.episodeItem
-                                                          .enclosureLength) ~/
-                                                      1000000)
-                                                  .toString() +
-                                              'MB',
-                                          style: textstyle),
-                                    )
-                                  : Center(),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(top: 5.0),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        controller: _controller,
-                        child: _loaddes
-                            ? (_description.contains('<'))
-                                ? Html(
-                                    padding: EdgeInsets.only(
-                                        left: 20.0, right: 20, bottom: 50),
-                                    defaultTextStyle:
-                                        // GoogleFonts.libreBaskerville(
-                                        GoogleFonts.martel(
-                                      textStyle: TextStyle(
-                                        height: 1.8,
-                                      ),
-                                    ),
-                                    data: _description,
-                                    linkStyle: TextStyle(
-                                        color: context.accentColor,
-                                        // decoration: TextDecoration.underline,
-                                        textBaseline: TextBaseline.ideographic),
-                                    onLinkTap: (url) {
-                                      _launchUrl(url);
-                                    },
-                                    useRichText: true,
-                                  )
-                                : _description.length > 0
-                                    ? Container(
-                                        padding: EdgeInsets.only(
-                                            left: 20.0,
-                                            right: 20.0,
-                                            bottom: 50.0),
-                                        alignment: Alignment.topLeft,
-                                        child: SelectableLinkify(
-                                          onOpen: (link) {
-                                            _launchUrl(link.url);
-                                          },
-                                          text: _description,
-                                          style: GoogleFonts.martel(
-                                            textStyle: TextStyle(
-                                              height: 1.8,
-                                            ),
-                                          ),
-                                          linkStyle: TextStyle(
-                                            color:
-                                                Theme.of(context).accentColor,
-                                            //  decoration:
-                                            //      TextDecoration.underline,
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        height: context.width,
-                                        alignment: Alignment.center,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Image(
-                                              image: AssetImage(
-                                                  'assets/shownote.png'),
-                                              height: 100.0,
-                                            ),
-                                            Padding(
-                                                padding: EdgeInsets.all(5.0)),
-                                            Text(s.noShownote,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    color: context.textColor
-                                                        .withOpacity(0.5))),
-                                          ],
-                                        ),
-                                      )
-                            : Center(),
                       ),
                     ),
-                  ),
-                  Selector<AudioPlayerNotifier, bool>(
-                      selector: (_, audio) => audio.playerRunning,
-                      builder: (_, data, __) {
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
-                        );
-                      }),
-                ],
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.only(
+                          left: 20.0, right: 20, top: 10, bottom: 10),
+                      child: Text(
+                          s.published(DateFormat.yMMMd().format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                  widget.episodeItem.pubDate))),
+                          style:
+                              TextStyle(color: Theme.of(context).accentColor)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: 20.0, right: 20, top: 10, bottom: 10),
+                      child: Row(
+                        children: <Widget>[
+                          if (widget.episodeItem.explicit == 1)
+                            Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.red[800],
+                                    shape: BoxShape.circle),
+                                height: 25.0,
+                                width: 25.0,
+                                margin: EdgeInsets.only(right: 10.0),
+                                alignment: Alignment.center,
+                                child: Text('E',
+                                    style: TextStyle(color: Colors.white))),
+                          if (widget.episodeItem.duration != 0)
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.cyan[300],
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.0))),
+                              height: 25.0,
+                              margin: EdgeInsets.only(right: 10.0),
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                  s.minsCount(
+                                      widget.episodeItem.duration ~/ 60),
+                                  style: textstyle),
+                            ),
+                          if (widget.episodeItem.enclosureLength != null &&
+                              widget.episodeItem.enclosureLength != 0)
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.lightBlue[300],
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.0))),
+                              height: 25.0,
+                              margin: EdgeInsets.only(right: 10.0),
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                  ((widget.episodeItem.enclosureLength) ~/
+                                              1000000)
+                                          .toString() +
+                                      'MB',
+                                  style: textstyle),
+                            ),
+                        ],
+                      ),
+                    ),
+                    _loaddes
+                        ? (_description.contains('<'))
+                            ? Html(
+                                padding: EdgeInsets.only(
+                                    left: 20.0, right: 20, bottom: 50),
+                                defaultTextStyle:
+                                    // GoogleFonts.libreBaskerville(
+                                    GoogleFonts.martel(
+                                  textStyle: TextStyle(
+                                    height: 1.8,
+                                  ),
+                                ),
+                                data: _description,
+                                linkStyle: TextStyle(
+                                    color: context.accentColor,
+                                    // decoration: TextDecoration.underline,
+                                    textBaseline: TextBaseline.ideographic),
+                                onLinkTap: (url) {
+                                  _launchUrl(url);
+                                },
+                                useRichText: true,
+                              )
+                            : _description.length > 0
+                                ? Container(
+                                    padding: EdgeInsets.only(
+                                        left: 20.0, right: 20.0, bottom: 50.0),
+                                    alignment: Alignment.topLeft,
+                                    child: SelectableLinkify(
+                                      onOpen: (link) {
+                                        _launchUrl(link.url);
+                                      },
+                                      text: _description,
+                                      style: GoogleFonts.martel(
+                                        textStyle: TextStyle(
+                                          height: 1.8,
+                                        ),
+                                      ),
+                                      linkStyle: TextStyle(
+                                        color: Theme.of(context).accentColor,
+                                        //  decoration:
+                                        //      TextDecoration.underline,
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: context.width,
+                                    alignment: Alignment.center,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Image(
+                                          image:
+                                              AssetImage('assets/shownote.png'),
+                                          height: 100.0,
+                                        ),
+                                        Padding(padding: EdgeInsets.all(5.0)),
+                                        Text(s.noShownote,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: context.textColor
+                                                    .withOpacity(0.5))),
+                                      ],
+                                    ),
+                                  )
+                        : Center(),
+                    Selector<AudioPlayerNotifier, bool>(
+                        selector: (_, audio) => audio.playerRunning,
+                        builder: (_, data, __) {
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
+                          );
+                        }),
+                  ],
+                ),
               ),
             ),
             Selector<AudioPlayerNotifier, bool>(
