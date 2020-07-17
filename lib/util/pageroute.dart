@@ -38,7 +38,7 @@ class SlideLeftHideRoute extends PageRouteBuilder {
             Animation<double> secondaryAnimation,
           ) =>
               page,
-          transitionDuration: Duration(milliseconds: 500),
+          transitionDuration: Duration(milliseconds: 300),
           transitionsBuilder: (
             BuildContext context,
             Animation<double> animation,
