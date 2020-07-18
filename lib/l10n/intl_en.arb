@@ -107,7 +107,9 @@
   "feedbackGithub": "Submit issue",
   "@feedbackGithub": {},
   "feedbackPlay": "Rate on Play",
-  "@feedbackPlay": {},
+  "@feedbackPlay": {
+    "description": "Rate on Google Play Store.\nUser can tap to open play link."
+  },
   "feedbackTelegram": "Join group",
   "@feedbackTelegram": {},
   "fonts": "Fonts",
@@ -121,7 +123,9 @@
   "goodNight": "Good Night",
   "@goodNight": {},
   "groupExisted": "Group existed",
-  "@groupExisted": {},
+  "@groupExisted": {
+    "description": "Group name validate in add group dialog. User can't add group with same name."
+  },
   "groupFilter": "Group filter",
   "@groupFilter": {},
   "groupRemoveConfirm": "Are you sure you want to delete this group? Podcasts will be moved to Home group.",
@@ -171,7 +175,9 @@
   "liked": "Liked",
   "@liked": {},
   "likeDate": "Like date",
-  "@likeDate": {},
+  "@likeDate": {
+    "description": "Favorite tab, sort by like date."
+  },
   "listen": "Listen",
   "@listen": {},
   "listened": "Listened",
@@ -180,7 +186,7 @@
   "@loadMore": {},
   "mark": "Mark",
   "@mark": {
-    "description": "The short the best"
+    "description": "In listen history page, if a episode is marked as listened."
   },
   "markConfirm": "Mark confirm",
   "@markConfirm": {},
@@ -291,9 +297,15 @@
     }
   },
   "recoverSubscribe": "Recover subscribe",
-  "@recoverSubscribe": {},
+  "@recoverSubscribe": {
+    "description": "User can recover subscribe podcast after remove it in subscribe history page."
+  },
+  "refreshArtwork": "Update artwork",
+  "@refreshArtwork": {},
   "remove": "Remove",
-  "@remove": {},
+  "@remove": {
+    "description": "Remove not \"removed\". \nRemove a podcast or a group."
+  },
   "removeConfirm": "Remove confirm",
   "@removeConfirm": {
     "description": "unsubscribe podcast dialog"
@@ -354,7 +366,9 @@
   "settingsDefaultGridRecent": "Recent tab",
   "@settingsDefaultGridRecent": {},
   "settingsDiscovery": "Discovery Features Again",
-  "@settingsDiscovery": {},
+  "@settingsDiscovery": {
+    "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
+  },
   "settingsEnableSyncing": "Enable syncing",
   "@settingsEnableSyncing": {},
   "settingsEnableSyncingDes": "Refresh all podcasts in the background to get leatest episodes",
@@ -455,6 +469,7 @@
   "@systemDefault": {},
   "timeLastPlayed": "Last time {time}",
   "@timeLastPlayed": {
+    "description": "Show last time stop position  in player when a episode have been played.",
     "placeholders": {
       "time": {}
     }
@@ -474,7 +489,9 @@
   "toastAddPlaylist": "Added to playlist",
   "@toastAddPlaylist": {},
   "toastDiscovery": "Discovery feature reopened, pleast restart the app",
-  "@toastDiscovery": {},
+  "@toastDiscovery": {
+    "description": "Toast displayed when user tap Discovery Features Again in settings page."
+  },
   "toastFileError": "File error, subscribe failed",
   "@toastFileError": {},
   "toastFileNotValid": "File not valid",
@@ -500,9 +517,13 @@
   "toastSettingSaved": "Setting saved",
   "@toastSettingSaved": {},
   "toastTimeEqualEnd": "Time is equal to end time",
-  "@toastTimeEqualEnd": {},
+  "@toastTimeEqualEnd": {
+    "description": "User can't choose the same time as schedule end time."
+  },
   "toastTimeEqualStart": "Time is equal to start time",
-  "@toastTimeEqualStart": {},
+  "@toastTimeEqualStart": {
+    "description": "User can't choose the same time as schedule start time."
+  },
   "understood": "Understood",
   "@understood": {},
   "undo": "UNDO",

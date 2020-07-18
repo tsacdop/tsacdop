@@ -7,12 +7,13 @@ import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../type/podcastlocal.dart';
 
-enum RefreshState { none, fetch, error }
+enum RefreshState { none, fetch, error, artwork }
 
 class RefreshItem {
   String title;
   RefreshState refreshState;
-  RefreshItem(this.title, this.refreshState);
+  bool artwork;
+  RefreshItem(this.title, this.refreshState, {this.artwork = false});
 }
 
 class RefreshWorker extends ChangeNotifier {

@@ -20,8 +20,13 @@ class _StorageSettingState extends State<StorageSetting>
   AnimationController _controller;
   Animation<double> _animation;
   _getCacheMax() async {
-    int cache = await cacheStorage.getInt();
-    int value = cache == 0 ? 200 : cache ~/ (1024 * 1024);
+    int cache =
+        await cacheStorage.getInt(defaultValue: (200 * 1024 * 1024).toInt());
+    if (cache == 0) {
+      await cacheStorage.saveInt((200 * 1024 * 1024).toInt());
+      cache = 200 * 1024 * 1024;
+    }
+    int value = cache ~/ (1024 * 1024);
     if (value > 100) {
       _controller = AnimationController(
           vsync: this, duration: Duration(milliseconds: value * 2));

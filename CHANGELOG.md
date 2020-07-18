@@ -1,5 +1,14 @@
 # Tsacdop Changelog
 
+## v0.4.7
+
+Release date 2020/7/18
+
+### Bugs fixed
+
+* Ompl files form other platform import error.
+* Audio cache did't work.
+
 ## v0.4.6
 
 Release date 2020/7/17

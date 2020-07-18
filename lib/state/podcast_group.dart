@@ -464,18 +464,19 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
               await Dio().get<List<int>>(p.itunes.image.href,
                   options: Options(
                     responseType: ResponseType.bytes,
-                    receiveTimeout: 60000,
+                    receiveTimeout: 90000,
                   ));
           imageUrl = p.itunes.image.href;
           img.Image image = img.decodeImage(imageResponse.data);
           thumbnail = img.copyResize(image, width: 300);
         } catch (e) {
           try {
-            Response<List<int>> imageResponse = await Dio(BaseOptions(
-              connectTimeout: 20000,
-              receiveTimeout: 60000,
-            )).get<List<int>>(item.imgUrl,
-                options: Options(responseType: ResponseType.bytes));
+            Response<List<int>> imageResponse =
+                await Dio().get<List<int>>(item.imgUrl,
+                    options: Options(
+                      responseType: ResponseType.bytes,
+                      receiveTimeout: 90000,
+                    ));
             imageUrl = item.imgUrl;
             img.Image image = img.decodeImage(imageResponse.data);
             thumbnail = img.copyResize(image, width: 300);

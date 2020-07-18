@@ -107,7 +107,9 @@
   "feedbackGithub": "提交Issue",
   "@feedbackGithub": {},
   "feedbackPlay": "Play评价",
-  "@feedbackPlay": {},
+  "@feedbackPlay": {
+    "description": "Rate on Google Play Store.\nUser can tap to open play link."
+  },
   "feedbackTelegram": "加入小组",
   "@feedbackTelegram": {},
   "fonts": "字体",
@@ -121,7 +123,9 @@
   "goodNight": "晚安",
   "@goodNight": {},
   "groupExisted": "组名已使用",
-  "@groupExisted": {},
+  "@groupExisted": {
+    "description": "Group name validate in add group dialog. User can't add group with same name."
+  },
   "groupFilter": "分组",
   "@groupFilter": {},
   "groupRemoveConfirm": "您确认要移除该分组吗？播客将被移动到 Home 分组。",
@@ -171,7 +175,9 @@
   "liked": "已收藏",
   "@liked": {},
   "likeDate": "收藏日期",
-  "@likeDate": {},
+  "@likeDate": {
+    "description": "Favorite tab, sort by like date."
+  },
   "listen": "收听",
   "@listen": {},
   "listened": "已收听",
@@ -180,7 +186,7 @@
   "@loadMore": {},
   "mark": "标记",
   "@mark": {
-    "description": "The short the best"
+    "description": "In listen history page, if a episode is marked as listened."
   },
   "markConfirm": "确认标记",
   "@markConfirm": {},
@@ -291,9 +297,15 @@
     }
   },
   "recoverSubscribe": "恢复订阅",
-  "@recoverSubscribe": {},
+  "@recoverSubscribe": {
+    "description": "User can recover subscribe podcast after remove it in subscribe history page."
+  },
+  "refreshArtwork": "更新头像",
+  "@refreshArtwork": {},
   "remove": "移除",
-  "@remove": {},
+  "@remove": {
+    "description": "Remove not \"removed\". \nRemove a podcast or a group."
+  },
   "removeConfirm": "取消订阅",
   "@removeConfirm": {
     "description": "unsubscribe podcast dialog"
@@ -354,7 +366,9 @@
   "settingsDefaultGridRecent": "最近页",
   "@settingsDefaultGridRecent": {},
   "settingsDiscovery": "再次功能介绍",
-  "@settingsDiscovery": {},
+  "@settingsDiscovery": {
+    "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
+  },
   "settingsEnableSyncing": "开启自动更新",
   "@settingsEnableSyncing": {},
   "settingsEnableSyncingDes": "在后台更新所有订阅播客",
@@ -455,6 +469,7 @@
   "@systemDefault": {},
   "timeLastPlayed": "上次播放{time}",
   "@timeLastPlayed": {
+    "description": "Show last time stop position  in player when a episode have been played.",
     "placeholders": {
       "time": {}
     }
@@ -474,7 +489,9 @@
   "toastAddPlaylist": "添加到播放列表",
   "@toastAddPlaylist": {},
   "toastDiscovery": "重启应用后可查看",
-  "@toastDiscovery": {},
+  "@toastDiscovery": {
+    "description": "Toast displayed when user tap Discovery Features Again in settings page."
+  },
   "toastFileError": "文件错误，导入失败",
   "@toastFileError": {},
   "toastFileNotValid": "文件错误",
@@ -499,10 +516,14 @@
   "@toastRemovePlaylist": {},
   "toastSettingSaved": "设置已保存",
   "@toastSettingSaved": {},
-  "toastTimeEqualEnd": "与结束时间相同",
-  "@toastTimeEqualEnd": {},
-  "toastTimeEqualStart": "与起始时间相同",
-  "@toastTimeEqualStart": {},
+  "toastTimeEqualEnd": "与结束时刻相同",
+  "@toastTimeEqualEnd": {
+    "description": "User can't choose the same time as schedule end time."
+  },
+  "toastTimeEqualStart": "与起始时刻相同",
+  "@toastTimeEqualStart": {
+    "description": "User can't choose the same time as schedule start time."
+  },
   "understood": "了解",
   "@understood": {},
   "undo": "撤销",

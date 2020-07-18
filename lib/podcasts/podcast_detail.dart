@@ -149,14 +149,17 @@ class _PodcastDetailState extends State<PodcastDetail> {
       padding: EdgeInsets.only(top: 40, left: 80, right: 130),
       alignment: Alignment.topLeft,
       child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text(widget.podcastLocal.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5
-                  .copyWith(color: Colors.white))),
+        padding: EdgeInsets.symmetric(vertical: 10),
+        child: Text(
+          widget.podcastLocal.title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context)
+              .textTheme
+              .headline5
+              .copyWith(color: Colors.white),
+        ),
+      ),
     );
   }
 

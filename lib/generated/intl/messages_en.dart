@@ -198,6 +198,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacyPolicy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
     "published" : m20,
     "recoverSubscribe" : MessageLookupByLibrary.simpleMessage("Recover subscribe"),
+    "refreshArtwork" : MessageLookupByLibrary.simpleMessage("Update artwork"),
     "remove" : MessageLookupByLibrary.simpleMessage("Remove"),
     "removeConfirm" : MessageLookupByLibrary.simpleMessage("Remove confirm"),
     "removePodcastDes" : MessageLookupByLibrary.simpleMessage("Are you sure you want to unsubscribe?"),

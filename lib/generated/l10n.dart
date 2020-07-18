@@ -533,7 +533,7 @@ class S {
     return Intl.message(
       'Rate on Play',
       name: 'feedbackPlay',
-      desc: '',
+      desc: 'Rate on Google Play Store.\nUser can tap to open play link.',
       args: [],
     );
   }
@@ -583,7 +583,7 @@ class S {
     return Intl.message(
       'Group existed',
       name: 'groupExisted',
-      desc: '',
+      desc: 'Group name validate in add group dialog. User can\'t add group with same name.',
       args: [],
     );
   }
@@ -822,7 +822,7 @@ class S {
     return Intl.message(
       'Like date',
       name: 'likeDate',
-      desc: '',
+      desc: 'Favorite tab, sort by like date.',
       args: [],
     );
   }
@@ -862,7 +862,7 @@ class S {
     return Intl.message(
       'Mark',
       name: 'mark',
-      desc: 'The short the best',
+      desc: 'In listen history page, if a episode is marked as listened.',
       args: [],
     );
   }
@@ -1271,6 +1271,16 @@ class S {
     return Intl.message(
       'Recover subscribe',
       name: 'recoverSubscribe',
+      desc: 'User can recover subscribe podcast after remove it in subscribe history page.',
+      args: [],
+    );
+  }
+
+  /// `Update artwork`
+  String get refreshArtwork {
+    return Intl.message(
+      'Update artwork',
+      name: 'refreshArtwork',
       desc: '',
       args: [],
     );
@@ -1281,7 +1291,7 @@ class S {
     return Intl.message(
       'Remove',
       name: 'remove',
-      desc: '',
+      desc: 'Remove not "removed". \nRemove a podcast or a group.',
       args: [],
     );
   }
@@ -1554,7 +1564,7 @@ class S {
     return Intl.message(
       'Discovery Features Again',
       name: 'settingsDiscovery',
-      desc: '',
+      desc: 'Reset feature discovery state. User tap it and restart app, will see features tutorial again.',
       args: [],
     );
   }
@@ -2054,7 +2064,7 @@ class S {
     return Intl.message(
       'Last time $time',
       name: 'timeLastPlayed',
-      desc: '',
+      desc: 'Show last time stop position  in player when a episode have been played.',
       args: [time],
     );
   }
@@ -2094,7 +2104,7 @@ class S {
     return Intl.message(
       'Discovery feature reopened, pleast restart the app',
       name: 'toastDiscovery',
-      desc: '',
+      desc: 'Toast displayed when user tap Discovery Features Again in settings page.',
       args: [],
     );
   }
@@ -2204,7 +2214,7 @@ class S {
     return Intl.message(
       'Time is equal to end time',
       name: 'toastTimeEqualEnd',
-      desc: '',
+      desc: 'User can\'t choose the same time as schedule end time.',
       args: [],
     );
   }
@@ -2214,7 +2224,7 @@ class S {
     return Intl.message(
       'Time is equal to start time',
       name: 'toastTimeEqualStart',
-      desc: '',
+      desc: 'User can\'t choose the same time as schedule start time.',
       args: [],
     );
   }
