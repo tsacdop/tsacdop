@@ -76,7 +76,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
         child: Container(
       padding: EdgeInsets.only(top: 400),
       child: Image(
-        image: Theme.of(context).brightness == Brightness.light
+        image: context.brightness == Brightness.light
             ? AssetImage('assets/listennotes.png')
             : AssetImage('assets/listennotes_light.png'),
         height: 20,

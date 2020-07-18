@@ -54,6 +54,7 @@ class _PopupMenuState extends State<PopupMenu> {
 
   void _saveOmpl(String path) async {
     var subscribeWorker = Provider.of<GroupList>(context, listen: false);
+    RegExp rssExp = RegExp(r'^(https?):\/\/(.*)');
     final s = context.s;
     File file = File(path);
     try {
@@ -63,9 +64,9 @@ class _PopupMenuState extends State<PopupMenu> {
         print(title);
         var list = entry.value.reversed;
         for (var rss in list) {
-          if (rss.xmlUrl != null) {
-            SubscribeItem item =
-                SubscribeItem(rss.xmlUrl, rss.text, group: title);
+          String rssLink = rssExp.stringMatch(rss.xmlUrl);
+          if (rssLink != null) {
+            SubscribeItem item = SubscribeItem(rssLink, rss.text, group: title);
             await subscribeWorker.setSubscribeItem(item);
             await Future.delayed(Duration(milliseconds: 200));
             print(rss.text);

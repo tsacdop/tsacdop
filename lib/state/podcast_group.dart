@@ -425,7 +425,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
     var dbHelper = DBHelper();
     String rss = item.url;
     sendPort.send([item.title, item.url, 1]);
-    BaseOptions options = new BaseOptions(
+    BaseOptions options = BaseOptions(
       connectTimeout: 20000,
       receiveTimeout: 20000,
     );
@@ -436,7 +436,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       RssFeed p;
       try {
         p = RssFeed.parse(response.data);
-      } on ArgumentError catch (e) {
+      } catch (e) {
         print(e);
         sendPort.send([item.title, item.url, 6]);
         await Future.delayed(Duration(seconds: 2));
@@ -460,16 +460,21 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         img.Image thumbnail;
         String imageUrl;
         try {
-          Response<List<int>> imageResponse = await Dio().get<List<int>>(
-              p.itunes.image.href,
-              options: Options(responseType: ResponseType.bytes));
+          Response<List<int>> imageResponse =
+              await Dio().get<List<int>>(p.itunes.image.href,
+                  options: Options(
+                    responseType: ResponseType.bytes,
+                    receiveTimeout: 60000,
+                  ));
           imageUrl = p.itunes.image.href;
           img.Image image = img.decodeImage(imageResponse.data);
           thumbnail = img.copyResize(image, width: 300);
         } catch (e) {
           try {
-            Response<List<int>> imageResponse = await Dio().get<List<int>>(
-                item.imgUrl,
+            Response<List<int>> imageResponse = await Dio(BaseOptions(
+              connectTimeout: 20000,
+              receiveTimeout: 60000,
+            )).get<List<int>>(item.imgUrl,
                 options: Options(responseType: ResponseType.bytes));
             imageUrl = item.imgUrl;
             img.Image image = img.decodeImage(imageResponse.data);
@@ -543,7 +548,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         } else
           sendPort.send("done");
       }
-    } on DioError catch (e) {
+    } catch (e) {
       print(e);
       sendPort.send([item.title, item.url, 6]);
       await Future.delayed(Duration(seconds: 2));
