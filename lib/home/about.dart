@@ -1,26 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tsacdop/util/custompaint.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
 
 import '../util/extension_helper.dart';
 
-const String version = '0.4.7';
+const String version = '0.4.8';
 
 class AboutApp extends StatelessWidget {
-  _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
   Widget _listItem(
           BuildContext context, String text, IconData icons, String url) =>
       InkWell(
-        onTap: () => _launchUrl(url),
+        onTap: () => url.launchUrl,
         child: Container(
           height: 50.0,
           padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -112,8 +103,9 @@ class AboutApp extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         FlatButton(
-                          onPressed: () => _launchUrl(
-                              'https://tsacdop.stonegate.me/#/privacy'),
+                          onPressed: () =>
+                              'https://tsacdop.stonegate.me/#/privacy'
+                                  .launchUrl,
                           child: Text(s.privacyPolicy,
                               style: TextStyle(color: context.accentColor)),
                         ),
@@ -126,8 +118,9 @@ class AboutApp extends StatelessWidget {
                               shape: BoxShape.circle),
                         ),
                         FlatButton(
-                          onPressed: () => _launchUrl(
-                              'https://tsacdop.stonegate.me/#/changelog'),
+                          onPressed: () =>
+                              'https://tsacdop.stonegate.me/#/changelog'
+                                  .launchUrl,
                           child: Text(s.changelog,
                               style: TextStyle(color: context.accentColor)),
                         ),
@@ -160,8 +153,9 @@ class AboutApp extends StatelessWidget {
                                 ),
                                 Spacer(),
                                 InkWell(
-                                  onTap: () => _launchUrl(
-                                      'https://www.buymeacoffee.com/stonegate'),
+                                  onTap: () =>
+                                      'https://www.buymeacoffee.com/stonegate'
+                                          .launchUrl,
                                   child: Container(
                                     height: 30.0,
                                     padding:
@@ -196,6 +190,75 @@ class AboutApp extends StatelessWidget {
                               'https://github.com/stonega'),
                           _listItem(context, 'Medium', LineIcons.medium,
                               'https://medium.com/@stonegate'),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        border:
+                            Border.all(color: context.accentColor, width: 1),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  s.translators,
+                                  style: TextStyle(
+                                      color: Theme.of(context).accentColor,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(width: 2),
+                                Icon(Icons.favorite,
+                                    color: Colors.red, size: 20),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 50.0,
+                            padding: EdgeInsets.symmetric(horizontal: 20.0),
+                            alignment: Alignment.centerLeft,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: Divider.createBorderSide(context),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Icon(LineIcons.user,
+                                    color: Theme.of(context).accentColor),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                ),
+                                Expanded(
+                                    child: Text(
+                                  'ppp(oza987@protonmail.com)',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.fade,
+                                )),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: Image(
+                                    image: AssetImage('assets/fr.png'),
+                                    height: 20,
+                                    fit: BoxFit.fitHeight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),

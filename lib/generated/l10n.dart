@@ -1266,6 +1266,46 @@ class S {
     );
   }
 
+  /// `Published daily`
+  String get publishedDaily {
+    return Intl.message(
+      'Published daily',
+      name: 'publishedDaily',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Published monthly`
+  String get publishedMonthly {
+    return Intl.message(
+      'Published monthly',
+      name: 'publishedMonthly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Published weekly`
+  String get publishedWeekly {
+    return Intl.message(
+      'Published weekly',
+      name: 'publishedWeekly',
+      desc: 'In search podcast detail page.',
+      args: [],
+    );
+  }
+
+  /// `Published yearly`
+  String get publishedYearly {
+    return Intl.message(
+      'Published yearly',
+      name: 'publishedYearly',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Recover subscribe`
   String get recoverSubscribe {
     return Intl.message(
@@ -2229,6 +2269,16 @@ class S {
     );
   }
 
+  /// `Translators`
+  String get translators {
+    return Intl.message(
+      'Translators',
+      name: 'translators',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Understood`
   String get understood {
     return Intl.message(
@@ -2319,6 +2369,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
   List<Locale> get supportedLocales {
     return const <Locale>[
       Locale.fromSubtags(languageCode: 'en'),
+      Locale.fromSubtags(languageCode: 'fr'),
       Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
     ];
   }

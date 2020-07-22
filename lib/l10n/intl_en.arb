@@ -296,6 +296,16 @@
       "date": {}
     }
   },
+  "publishedDaily": "Published daily",
+  "@publishedDaily": {},
+  "publishedMonthly": "Published monthly",
+  "@publishedMonthly": {},
+  "publishedWeekly": "Published weekly",
+  "@publishedWeekly": {
+    "description": "In search podcast detail page."
+  },
+  "publishedYearly": "Published yearly",
+  "@publishedYearly": {},
   "recoverSubscribe": "Recover subscribe",
   "@recoverSubscribe": {
     "description": "User can recover subscribe podcast after remove it in subscribe history page."
@@ -524,6 +534,8 @@
   "@toastTimeEqualStart": {
     "description": "User can't choose the same time as schedule start time."
   },
+  "translators": "Translators",
+  "@translators": {},
   "understood": "Understood",
   "@understood": {},
   "undo": "UNDO",

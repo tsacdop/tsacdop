@@ -42,13 +42,13 @@ extension IntExtension on int {
     final s = context.s;
     var interval = Duration(milliseconds: this);
     if (interval.inHours <= 48)
-      return 'Published daily';
+      return s.publishedDaily;
     else if (interval.inDays > 2 && interval.inDays <= 14)
-      return 'Published weekly';
+      return s.publishedWeekly;
     else if (interval.inDays > 14 && interval.inDays < 60)
-      return 'Published monthly';
+      return s.publishedMonthly;
     else
-      return 'Published yearly';
+      return s.publishedYearly;
   }
 }
 

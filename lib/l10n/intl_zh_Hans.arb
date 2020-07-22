@@ -296,6 +296,16 @@
       "date": {}
     }
   },
+  "publishedDaily": "每日更新",
+  "@publishedDaily": {},
+  "publishedMonthly": "每月更新",
+  "@publishedMonthly": {},
+  "publishedWeekly": "每周更新",
+  "@publishedWeekly": {
+    "description": "In search podcast detail page."
+  },
+  "publishedYearly": "每年更新",
+  "@publishedYearly": {},
   "recoverSubscribe": "恢复订阅",
   "@recoverSubscribe": {
     "description": "User can recover subscribe podcast after remove it in subscribe history page."
@@ -524,6 +534,8 @@
   "@toastTimeEqualStart": {
     "description": "User can't choose the same time as schedule start time."
   },
+  "translators": "翻译者",
+  "@translators": {},
   "understood": "了解",
   "@understood": {},
   "undo": "撤销",

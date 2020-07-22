@@ -92,6 +92,22 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                   ),
                   Divider(height: 2),
                   ListTile(
+                    title: Text('LE françAIS'),
+                    onTap: () async {
+                      await S.load(Locale('fr'));
+                      setState(() {});
+                    },
+                    contentPadding: const EdgeInsets.only(left: 75, right: 20),
+                    trailing: Radio<Locale>(
+                        value: Locale('fr'),
+                        groupValue: Locale(Intl.getCurrentLocale()),
+                        onChanged: (Locale locale) async {
+                          await S.load(locale);
+                          setState(() {});
+                        }),
+                  ),
+                  Divider(height: 2),
+                  ListTile(
                     onTap: () => _launchUrl(
                         'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project'),
                     contentPadding: const EdgeInsets.only(left: 75, right: 20),
@@ -106,10 +122,6 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     ),
                     subtitle: Text(
                         "If you'd like to contribute to support more languages, please contact me."),
-                    // trailing: IconButton(
-                    //     icon: Icon(LineIcons.heart),
-                    //     onPressed: () => _launchUrl(
-                    //         'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project')),
                   ),
                 ],
               ))),
