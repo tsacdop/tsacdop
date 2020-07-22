@@ -4,7 +4,7 @@ import 'package:tsacdop/util/custompaint.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
 
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 
 const String version = '0.4.7';
 

@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'context_extension.dart';
+import 'extension_helper.dart';
 
 /// Signature for a function that creates a [Widget] to be used within an
 /// [OpenContainer].

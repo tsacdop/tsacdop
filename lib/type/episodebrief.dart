@@ -62,7 +62,7 @@ class EpisodeBrief {
         title: title,
         artist: feedTitle,
         album: feedTitle,
-        // duration: 0,
+        duration: Duration.zero,
         artUri: 'file://$imagePath',
         extras: {'skip': skipSeconds});
   }

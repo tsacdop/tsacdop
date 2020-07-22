@@ -8,7 +8,7 @@ import '../state/podcast_group.dart';
 import '../state/download_state.dart';
 import '../state/refresh_podcast.dart';
 import '../type/episodebrief.dart';
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 
 class Import extends StatelessWidget {
   Widget importColumn(String text, BuildContext context) {

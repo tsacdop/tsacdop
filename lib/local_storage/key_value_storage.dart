@@ -25,13 +25,14 @@ const String downloadLayoutKey = 'downloadLayoutKey';
 const String autoDownloadNetworkKey = 'autoDownloadNetwork';
 const String episodePopupMenuKey = 'episodePopupMenuKey';
 const String autoDeleteKey = 'autoDeleteKey';
-//SleepTImer
 const String autoSleepTimerKey = 'autoSleepTimerKey';
 const String autoSleepTimerStartKey = 'autoSleepTimerStartKey';
 const String autoSleepTimerEndKey = 'autoSleepTimerEndKey';
 const String defaultSleepTimerKey = 'defaultSleepTimerKey';
 const String autoSleepTimerModeKey = 'autoSleepTimerModeKey';
 const String tapToOpenPopupMenuKey = 'tapToOpenPopupMenuKey';
+const String fastForwardSecondsKey = 'fastForwardSecondsKey';
+const String rewindSecondsKey = 'rewindSecondsKey';
 
 class KeyValueStorage {
   final String key;

@@ -34,12 +34,12 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 50))
           ..addListener(() {
-            setState(() {});
+            if (mounted) setState(() {});
           });
     _slowController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200))
           ..addListener(() {
-            setState(() {});
+            if (mounted) setState(() {});
           });
     _animation =
         Tween<double>(begin: initSize, end: initSize).animate(_controller);

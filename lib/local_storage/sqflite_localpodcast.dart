@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:dio/dio.dart';
 import '../type/podcastlocal.dart';
-import '../state/audio_state.dart';
+import '../type/play_histroy.dart';
 import '../type/episodebrief.dart';
 import '../webfeed/webfeed.dart';
 import '../type/sub_history.dart';

@@ -11,12 +11,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:feature_discovery/feature_discovery.dart';
 
 import '../state/audio_state.dart';
+import '../type/playlist.dart';
 import '../type/episodebrief.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
 import '../util/episodegrid.dart';
 import '../util/mypopupmenu.dart';
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 import '../util/custompaint.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';

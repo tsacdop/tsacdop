@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../settings/downloads_manage.dart';
 import '../state/setting_state.dart';
 import '../local_storage/key_value_storage.dart';
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 import '../util/custom_dropdown.dart';
 
 class StorageSetting extends StatefulWidget {

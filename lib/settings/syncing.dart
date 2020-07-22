@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../state/setting_state.dart';
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 import '../util/custom_dropdown.dart';
 
 class SyncingSetting extends StatelessWidget {

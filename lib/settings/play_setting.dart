@@ -11,7 +11,7 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import '../state/setting_state.dart';
 import '../home/audioplayer.dart';
 import '../util/general_dialog.dart';
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 import '../util/custom_dropdown.dart';
 
 String stringForMins(int mins) {

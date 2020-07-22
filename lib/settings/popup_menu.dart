@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:flare_flutter/flare_actor.dart';
 
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 import '../util/custompaint.dart';
 import '../local_storage/key_value_storage.dart';
 

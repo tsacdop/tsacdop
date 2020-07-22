@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 import '../generated/l10n.dart';
 
 class LanguagesSetting extends StatefulWidget {

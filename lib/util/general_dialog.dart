@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'context_extension.dart';
+import 'extension_helper.dart';
 
 generalDialog(BuildContext context,
         {Widget title, Widget content, List<Widget> actions}) =>
@@ -26,7 +26,7 @@ generalDialog(BuildContext context,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             titlePadding: EdgeInsets.all(20),
-            title: SizedBox(width: context.width-160, child: title),
+            title: SizedBox(width: context.width - 160, child: title),
             content: content,
             actionsPadding: EdgeInsets.all(10),
             actions: actions),

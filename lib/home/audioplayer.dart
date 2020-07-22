@@ -9,17 +9,18 @@ import 'package:audio_service/audio_service.dart';
 import 'package:line_icons/line_icons.dart';
 
 import '../type/episodebrief.dart';
+import '../type/play_histroy.dart';
 import '../state/audio_state.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
 import '../util/pageroute.dart';
 import '../util/colorize.dart';
-import '../util/context_extension.dart';
+import '../util/extension_helper.dart';
 import '../util/custompaint.dart';
 import '../util/custom_slider.dart';
 import '../episodes/episode_detail.dart';
 import 'playlist.dart';
-import 'audiopanel.dart';
+import '../util/audiopanel.dart';
 
 final List<BoxShadow> _customShadow = [
   BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),
@@ -438,9 +439,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 Expanded(
                   flex: 2,
                   child: Selector<AudioPlayerNotifier,
-                      Tuple3<BasicPlaybackState, double, String>>(
+                      Tuple3<bool, double, String>>(
                     selector: (_, audio) => Tuple3(
-                        audio.audioState,
+                        audio.buffering,
                         (audio.backgroundAudioDuration -
                                 audio.backgroundAudioPosition) /
                             1000,
@@ -453,12 +454,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             ? Text(data.item3,
                                 style: const TextStyle(
                                     color: const Color(0xFFFF0000)))
-                            : data.item1 == BasicPlaybackState.buffering ||
-                                    data.item1 ==
-                                        BasicPlaybackState.connecting ||
-                                    data.item1 ==
-                                        BasicPlaybackState.skippingToNext ||
-                                    data.item1 == BasicPlaybackState.stopped
+                            : data.item1
                                 ? Text(
                                     s.buffering,
                                     style: TextStyle(
@@ -475,35 +471,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ),
                 Expanded(
                   flex: 2,
-                  child: Selector<AudioPlayerNotifier, BasicPlaybackState>(
-                      selector: (_, audio) => audio.audioState,
-                      builder: (_, audioplay, __) {
+                  child: Selector<AudioPlayerNotifier, Tuple2<bool, bool>>(
+                      selector: (_, audio) =>
+                          Tuple2(audio.buffering, audio.playing),
+                      builder: (_, data, __) {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             //Spacer(),
-                            audioplay == BasicPlaybackState.playing
-                                ? InkWell(
-                                    onTap:
-                                        audioplay == BasicPlaybackState.playing
-                                            ? () {
-                                                audio.pauseAduio();
-                                              }
-                                            : null,
-                                    child: ImageRotate(
-                                        title: audio.episode?.title,
-                                        path: audio.episode?.imagePath),
-                                  )
-                                : InkWell(
-                                    onTap:
-                                        audioplay == BasicPlaybackState.playing
-                                            ? null
-                                            : () {
-                                                audio.resumeAudio();
-                                              },
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: <Widget>[
+                            data.item1
+                                ? Stack(
+                                    alignment: Alignment.center,
+                                    children: <Widget>[
                                         Container(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 10.0),
@@ -521,13 +500,48 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                               shape: BoxShape.circle,
                                               color: Colors.black),
                                         ),
-                                        Icon(
-                                          Icons.play_arrow,
-                                          color: Colors.white,
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                      ])
+                                : data.item2
+                                    ? InkWell(
+                                        onTap: data.item2
+                                            ? () => audio.pauseAduio()
+                                            : null,
+                                        child: ImageRotate(
+                                            title: audio.episode?.title,
+                                            path: audio.episode?.imagePath),
+                                      )
+                                    : InkWell(
+                                        onTap: data.item2
+                                            ? null
+                                            : () => audio.resumeAudio(),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: <Widget>[
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10.0),
+                                              child: Container(
+                                                  height: 30.0,
+                                                  width: 30.0,
+                                                  child: CircleAvatar(
+                                                    backgroundImage: FileImage(File(
+                                                        "${audio.episode.imagePath}")),
+                                                  )),
+                                            ),
+                                            Container(
+                                              height: 40.0,
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.black),
+                                            ),
+                                            if (!data.item1)
+                                              Icon(
+                                                Icons.play_arrow,
+                                                color: Colors.white,
+                                              )
+                                          ],
+                                        ),
+                                      ),
                             IconButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: () => audio.playNext(),
@@ -1148,7 +1162,7 @@ class _ControlPanelState extends State<ControlPanel>
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Container(
-      color: Theme.of(context).primaryColor,
+      color: context.primaryColor,
       height: 300,
       padding: EdgeInsets.symmetric(horizontal: 10.0),
       child: Stack(
@@ -1159,10 +1173,9 @@ class _ControlPanelState extends State<ControlPanel>
               children: <Widget>[
                 Consumer<AudioPlayerNotifier>(
                   builder: (_, data, __) {
-                    Color _c =
-                        (Theme.of(context).brightness == Brightness.light)
-                            ? data.episode.primaryColor.colorizedark()
-                            : data.episode.primaryColor.colorizeLight();
+                    Color _c = (context.brightness == Brightness.light)
+                        ? data.episode.primaryColor.colorizedark()
+                        : data.episode.primaryColor.colorizeLight();
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -1217,15 +1230,16 @@ class _ControlPanelState extends State<ControlPanel>
                                               color: const Color(0xFFFF0000)))
                                       : Text(
                                           data.audioState ==
-                                                      BasicPlaybackState
+                                                      AudioProcessingState
                                                           .buffering ||
                                                   data.audioState ==
-                                                      BasicPlaybackState
+                                                      AudioProcessingState
                                                           .connecting ||
                                                   data.audioState ==
-                                                      BasicPlaybackState.none ||
+                                                      AudioProcessingState
+                                                          .none ||
                                                   data.audioState ==
-                                                      BasicPlaybackState
+                                                      AudioProcessingState
                                                           .skippingToNext
                                               ? context.s.buffering
                                               : '',
@@ -1250,9 +1264,9 @@ class _ControlPanelState extends State<ControlPanel>
                 ),
                 Container(
                   height: 100,
-                  child: Selector<AudioPlayerNotifier, BasicPlaybackState>(
-                    selector: (_, audio) => audio.audioState,
-                    builder: (_, backplay, __) {
+                  child: Selector<AudioPlayerNotifier, bool>(
+                    selector: (_, audio) => audio.playing,
+                    builder: (_, playing, __) {
                       return Material(
                         color: Colors.transparent,
                         child: Row(
@@ -1261,10 +1275,9 @@ class _ControlPanelState extends State<ControlPanel>
                           children: [
                             IconButton(
                                 padding: EdgeInsets.symmetric(horizontal: 25.0),
-                                onPressed:
-                                    backplay == BasicPlaybackState.playing
-                                        ? () => audio.forwardAudio(-10)
-                                        : null,
+                                onPressed: playing
+                                    ? () => audio.forwardAudio(-10)
+                                    : null,
                                 iconSize: 32.0,
                                 icon: Icon(Icons.replay_10),
                                 color: Colors.grey[500]),
@@ -1285,14 +1298,13 @@ class _ControlPanelState extends State<ControlPanel>
                                           Brightness.dark
                                       ? _customShadowNight
                                       : _customShadow),
-                              child: backplay == BasicPlaybackState.playing
+                              child: playing
                                   ? Material(
                                       color: Colors.transparent,
                                       child: InkWell(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(30)),
-                                        onTap: backplay ==
-                                                BasicPlaybackState.playing
+                                        onTap: playing
                                             ? () {
                                                 audio.pauseAduio();
                                               }
@@ -1312,8 +1324,7 @@ class _ControlPanelState extends State<ControlPanel>
                                       child: InkWell(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(30)),
-                                        onTap: backplay ==
-                                                BasicPlaybackState.playing
+                                        onTap: playing
                                             ? null
                                             : () {
                                                 audio.resumeAudio();
@@ -1333,10 +1344,9 @@ class _ControlPanelState extends State<ControlPanel>
                             ),
                             IconButton(
                                 padding: EdgeInsets.symmetric(horizontal: 25.0),
-                                onPressed:
-                                    backplay == BasicPlaybackState.playing
-                                        ? () => audio.forwardAudio(30)
-                                        : null,
+                                onPressed: playing
+                                    ? () => audio.forwardAudio(30)
+                                    : null,
                                 iconSize: 32.0,
                                 icon: Icon(Icons.forward_30),
                                 color: Colors.grey[500]),
