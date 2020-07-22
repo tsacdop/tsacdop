@@ -20,7 +20,6 @@ import '../type/play_histroy.dart';
 import '../episodes/episode_detail.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
-import 'colorize.dart';
 import 'extension_helper.dart';
 import 'custompaint.dart';
 

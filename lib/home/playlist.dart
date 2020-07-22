@@ -13,7 +13,6 @@ import '../type/episodebrief.dart';
 import '../type/playlist.dart';
 import '../util/extension_helper.dart';
 import '../util/custompaint.dart';
-import '../util/colorize.dart';
 
 class PlaylistPage extends StatefulWidget {
   @override

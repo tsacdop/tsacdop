@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:tsacdop/type/searchpodcast.dart';
 part 'searchepisodes.g.dart';
 
 @JsonSerializable()

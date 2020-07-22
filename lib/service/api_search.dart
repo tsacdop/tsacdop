@@ -7,7 +7,8 @@ import '../type/searchepisodes.dart';
 import '../.env.dart';
 
 class SearchEngine {
-  searchPodcasts({String searchText, int nextOffset}) async {
+  Future<SearchPodcast<dynamic>> searchPodcasts(
+      {String searchText, int nextOffset}) async {
     String apiKey = environment['apiKey'];
     String url = "https://listen-api.listennotes.com/api/v2/search?q=" +
         Uri.encodeComponent(searchText) +

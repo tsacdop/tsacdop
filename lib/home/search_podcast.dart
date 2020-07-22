@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -67,7 +66,6 @@ class MyHomePageDelegate extends SearchDelegate<int> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // if (query.isEmpty)
     return Center(
         child: Container(
       padding: EdgeInsets.only(top: 100),
@@ -240,20 +238,20 @@ class _RssResultState extends State<RssResult> {
                   imageUrl: _onlinePodcast.image,
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
                       Container(
-                    height: 40,
-                    width: 40,
+                    height: 120,
+                    width: 120,
                     alignment: Alignment.center,
                     color: context.primaryColorDark,
                     child: SizedBox(
-                      width: 20,
+                      width: 40,
                       height: 2,
                       child: LinearProgressIndicator(
                           value: downloadProgress.progress),
                     ),
                   ),
                   errorWidget: (context, url, error) => Container(
-                      width: 40,
-                      height: 40,
+                      width: 120,
+                      height: 120,
                       alignment: Alignment.center,
                       color: context.primaryColorDark,
                       child: Icon(Icons.error)),
@@ -290,16 +288,24 @@ class _RssResultState extends State<RssResult> {
           ),
           Expanded(
             child: TabBarView(children: [
-              Html(
-                data: _onlinePodcast.description,
-                padding: EdgeInsets.only(left: 20.0, right: 20, bottom: 50),
-                defaultTextStyle:
-                    // GoogleFonts.libreBaskerville(
-                    GoogleFonts.martel(
-                  textStyle: TextStyle(
-                    height: 1.8,
+              ListView(
+                children: [
+                  Html(
+                    onLinkTap: (url) {
+                      url.launchUrl;
+                    },
+                    linkStyle: TextStyle(
+                        color: context.accentColor,
+                        // decoration: TextDecoration.underline,
+                        textBaseline: TextBaseline.ideographic),
+                    shrinkToFit: true,
+                    data: _onlinePodcast.description,
+                    padding: EdgeInsets.only(left: 20.0, right: 20, bottom: 20),
+                    defaultTextStyle: TextStyle(
+                      height: 1.8,
+                    ),
                   ),
-                ),
+                ],
               ),
               ListView.builder(
                   itemCount: math.min(_loadItems + 1, items.length),
@@ -318,9 +324,7 @@ class _RssResultState extends State<RssResult> {
                                     BorderRadius.all(Radius.circular(100))),
                             child: Text(context.s.loadMore),
                             onPressed: () => setState(
-                              () {
-                                _loadItems += 10;
-                              },
+                              () => _loadItems += 10,
                             ),
                           ),
                         ),
@@ -364,7 +368,7 @@ class _SearchListState extends State<SearchList> {
   Future<List<OnlinePodcast>> _getList(
       String searchText, int nextOffset) async {
     SearchEngine searchEngine = SearchEngine();
-    var searchResult = searchEngine.searchPodcasts(
+    var searchResult = await searchEngine.searchPodcasts(
         searchText: searchText, nextOffset: nextOffset);
     _offset = searchResult.nextOffset;
     _podcastList.addAll(searchResult.results.cast());
@@ -458,8 +462,7 @@ class _SearchListState extends State<SearchList> {
             child: GestureDetector(
               onTap: () => setState(() => _selectedPodcast = null),
               child: Container(
-                color:
-                    Theme.of(context).scaffoldBackgroundColor.withOpacity(0.8),
+                color: context.scaffoldBackgroundColor.withOpacity(0.8),
               ),
             ),
           ),
@@ -495,14 +498,6 @@ class SearchResult extends StatelessWidget {
       this.isSubscribed,
       Key key})
       : super(key: key);
-
-  Future<String> getColor(File file) async {
-    final imageProvider = FileImage(file);
-    var colorImage = await getImageFromProvider(imageProvider);
-    var color = await getColorFromImage(colorImage);
-    String primaryColor = color.toString();
-    return primaryColor;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -801,6 +796,8 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                               Text(
                                 '${widget.onlinePodcast.interval.toInterval(context)} | '
                                 '${widget.onlinePodcast.latestPubDate.toDate(context)}',
+                                maxLines: 1,
+                                overflow: TextOverflow.fade,
                                 style: TextStyle(color: context.accentColor),
                               ),
                               Padding(
@@ -857,20 +854,20 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                         imageUrl: widget.onlinePodcast.image,
                         progressIndicatorBuilder:
                             (context, url, downloadProgress) => Container(
-                          height: 40,
-                          width: 40,
+                          height: 120,
+                          width: 120,
                           alignment: Alignment.center,
                           color: context.primaryColorDark,
                           child: SizedBox(
-                            width: 20,
+                            width: 40,
                             height: 2,
                             child: LinearProgressIndicator(
                                 value: downloadProgress.progress),
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(
-                            width: 40,
-                            height: 40,
+                            width: 120,
+                            height: 120,
                             alignment: Alignment.center,
                             color: context.primaryColorDark,
                             child: Icon(Icons.error)),
@@ -907,10 +904,27 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                 ),
                 Expanded(
                   child: TabBarView(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Text(widget.onlinePodcast.description,
-                          style: TextStyle(height: 1.8)),
+                    ListView(
+                      physics: _animation.value != widget.maxHeight
+                          ? NeverScrollableScrollPhysics()
+                          : null,
+                      children: [
+                        Html(
+                          onLinkTap: (url) {
+                            url.launchUrl;
+                          },
+                          linkStyle: TextStyle(
+                              color: context.accentColor,
+                              textBaseline: TextBaseline.ideographic),
+                          shrinkToFit: true,
+                          data: widget.onlinePodcast.description,
+                          padding: const EdgeInsets.only(
+                              left: 20.0, right: 20, bottom: 20),
+                          defaultTextStyle: TextStyle(
+                            height: 1.8,
+                          ),
+                        ),
+                      ],
                     ),
                     FutureBuilder<List<OnlineEpisode>>(
                         future: _searchFuture,
