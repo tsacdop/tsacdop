@@ -121,7 +121,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                           height: 20),
                     ),
                     subtitle: Text(
-                        "If you'd like to contribute to support more languages, please contact me."),
+                        "If you'd like to contribute to localization project, please contact me."),
                   ),
                 ],
               ))),
