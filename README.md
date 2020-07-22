@@ -129,9 +129,9 @@ For help getting started with Flutter, view our
 [github release - recent]: https://github.com/stonega/tsacdop/releases
 [github downloads]: https://img.shields.io/github/downloads/stonega/tsacdop/total?color=%230000d&label=downloads
 [localizely]: https://img.shields.io/badge/dynamic/json?color=%2326c6da&label=localizely&query=%24.languages.length&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
-[English]: https://img.shields.io/badge/dynamic/json?color=%2323CCC6&label=English&query=%24.languages%5B0%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
-[Chinese Simplified]: https://img.shields.io/badge/dynamic/json?color=%2323CCC6&label=Chinese%20Simplified&query=%24.languages%5B1%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
-[Franch]: https://img.shields.io/badge/dynamic/json?color=%2323CCC6&label=Franch&query=%24.languages%5B3%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
+[English]: https://img.shields.io/badge/dynamic/json?color=%2323CCC6&label=English&query=%24.languages%5B0%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus&suffix=%
+[Chinese Simplified]: https://img.shields.io/badge/dynamic/json?color=%2323CCC6&label=Chinese%20Simplified&query=%24.languages%5B1%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus&suffix=%
+[Franch]: https://img.shields.io/badge/dynamic/json?color=%2323CCC6&label=Franch&query=%24.languages%5B3%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus&suffix=%
 [localizely - website]: https://localizely.com/
 [google play - icon]: https://img.shields.io/badge/google-playStore-%2323CCC6
 [google play]: https://play.google.com/store/apps/details?id=com.stonegate.tsacdop

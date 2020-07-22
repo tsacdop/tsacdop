@@ -64,7 +64,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                   child: Container(
                     color: Theme.of(context)
                         .scaffoldBackgroundColor
-                        .withOpacity(0.5),
+                        .withOpacity(0.8),
                   ),
                 ),
               )

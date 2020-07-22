@@ -352,7 +352,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     }),
                                   physics:
                                       const AlwaysScrollableScrollPhysics(),
-                                  //primary: true,
                                   slivers: <Widget>[
                                     SliverAppBar(
                                       brightness: Brightness.dark,
@@ -567,9 +566,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                 child: PopupMenuButton<int>(
                                                   shape: RoundedRectangleBorder(
                                                       borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  10))),
+                                                          BorderRadius.circular(
+                                                              10)),
                                                   elevation: 1,
                                                   tooltip: s.homeSubMenuSortBy,
                                                   child: Container(
