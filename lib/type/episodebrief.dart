@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:intl/intl.dart';
 import 'package:audio_service/audio_service.dart';
 
 class EpisodeBrief {
@@ -27,34 +26,17 @@ class EpisodeBrief {
       this.pubDate,
       this.feedTitle,
       this.primaryColor,
-      this.liked,
-      this.downloaded,
       this.duration,
       this.explicit,
       this.imagePath,
-      this.mediaId,
+      {this.mediaId,
+      this.liked,
+      this.downloaded,
       this.isNew,
       this.skipSeconds,
-      {this.description = '',
+      this.description = '',
       this.downloadDate = 0})
       : assert(enclosureUrl != null);
-
-  String ateToString() {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
-    var diffrence = DateTime.now().toUtc().difference(date);
-    if (diffrence.inHours < 1) {
-      return '1 hour ago';
-    } else if (diffrence.inHours < 24) {
-      return '${diffrence.inHours} hours ago';
-    } else if (diffrence.inHours == 24) {
-      return '1 day ago';
-    } else if (diffrence.inDays < 7) {
-      return '${diffrence.inDays} days ago';
-    } else {
-      return DateFormat.yMMMd().format(
-          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
-    }
-  }
 
   MediaItem toMediaItem() {
     return MediaItem(

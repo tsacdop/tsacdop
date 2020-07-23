@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../generated/l10n.dart';
@@ -14,6 +15,7 @@ extension ContextExtension on BuildContext {
   Brightness get brightness => Theme.of(this).brightness;
   double get width => MediaQuery.of(this).size.width;
   double get height => MediaQuery.of(this).size.height;
+  double get paddingTop => MediaQuery.of(this).padding.top;
   TextTheme get textTheme => Theme.of(this).textTheme;
   S get s => S.of(this);
 }
@@ -58,6 +60,10 @@ extension StringExtension on String {
       await launch(this);
     } else {
       print('Could not launch $this');
+      Fluttertoast.showToast(
+        msg: '$this Invalid Link',
+        gravity: ToastGravity.TOP,
+      );
     }
   }
 

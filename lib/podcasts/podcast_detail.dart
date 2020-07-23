@@ -52,7 +52,46 @@ class _PodcastDetailState extends State<PodcastDetail> {
   /// Default layout.
   Layout _layout;
 
-  bool _scroll;
+  /// If true, stop grid load animation.
+  bool _scroll = false;
+
+  double _topHeight = 0;
+
+  ScrollController _controller;
+
+  /// Episodes num load first time.
+  int _top = 96;
+
+  /// Load more episodes when scroll to bottom.
+  bool _loadMore = false;
+
+  /// Change sort by.
+  bool _reverse = false;
+
+  /// Filter type.
+  Filter _filter = Filter.all;
+
+  /// Query string
+  String _query = '';
+
+  ///Hide listened.
+  bool _hideListened = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMore = false;
+    _reverse = false;
+    _controller = ScrollController();
+    _scroll = false;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Future _updateRssItem(BuildContext context, PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final result = await dbHelper.updatePodcastRss(podcastLocal);
@@ -99,15 +138,16 @@ class _PodcastDetailState extends State<PodcastDetail> {
     if (mounted) setState(() {});
   }
 
-  Future<List<EpisodeBrief>> _getRssItem(
-      PodcastLocal podcastLocal, int i, bool reverse) async {
+  Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal,
+      {int count, bool reverse, Filter filter, String query}) async {
     var dbHelper = DBHelper();
+    List<EpisodeBrief> episodes = [];
     _episodeCount = await dbHelper.getPodcastCounts(podcastLocal.id);
     KeyValueStorage storage = KeyValueStorage(podcastLayoutKey);
     int index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
-    List<EpisodeBrief> episodes =
-        await dbHelper.getRssItem(podcastLocal.id, i, reverse);
+    episodes = await dbHelper.getRssItem(podcastLocal.id, count, reverse,
+        filter: filter, query: query);
     if (podcastLocal.provider.contains('fireside')) {
       FiresideData data = FiresideData(podcastLocal.id, podcastLocal.link);
       await data.getData();
@@ -115,17 +155,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
       _hosts = data.hosts;
     }
     return episodes;
-  }
-
-  _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      Fluttertoast.showToast(
-        msg: '$url Invalid Link',
-        gravity: ToastGravity.TOP,
-      );
-    }
   }
 
   _markListened(String podcastId) async {
@@ -234,6 +263,24 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
+  _customPopupMenu(
+          {Widget child,
+          String tooltip,
+          List<PopupMenuEntry<int>> itemBuilder,
+          Function(int) onSelected}) =>
+      Material(
+        color: Colors.transparent,
+        child: PopupMenuButton<int>(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          elevation: 1,
+          tooltip: tooltip,
+          child: child,
+          itemBuilder: (context) => itemBuilder,
+          onSelected: (value) => onSelected(value),
+        ),
+      );
+
   _confirmMarkListened(BuildContext context) => generalDialog(
         context,
         title: Text(context.s.markConfirm),
@@ -260,34 +307,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
           )
         ],
       );
-
-  double _topHeight = 0;
-
-  ScrollController _controller;
-
-  /// Episodes num load first time.
-  int _top;
-
-  /// Load more episodes when scroll to bottom.
-  bool _loadMore;
-
-  /// Change sort by.
-  bool _reverse;
-  @override
-  void initState() {
-    super.initState();
-    _loadMore = false;
-    _top = 99;
-    _reverse = false;
-    _controller = ScrollController();
-    _scroll = false;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -321,8 +340,11 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   children: <Widget>[
                     Expanded(
                       child: FutureBuilder<List<EpisodeBrief>>(
-                        future:
-                            _getRssItem(widget.podcastLocal, _top, _reverse),
+                        future: _getRssItem(widget.podcastLocal,
+                            count: _top,
+                            reverse: _reverse,
+                            filter: _filter,
+                            query: _query),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           return (snapshot.hasData)
@@ -339,16 +361,14 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                             Duration(seconds: 3));
                                         if (mounted)
                                           setState(() {
-                                            _top = _top + 33;
+                                            _top = _top + 36;
                                             _loadMore = false;
                                           });
                                       }
                                       if (_controller.offset > 0 &&
                                           mounted &&
                                           !_scroll)
-                                        setState(() {
-                                          _scroll = true;
-                                        });
+                                        setState(() => _scroll = true);
                                     }),
                                   physics:
                                       const AlwaysScrollableScrollPhysics(),
@@ -356,38 +376,47 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     SliverAppBar(
                                       brightness: Brightness.dark,
                                       actions: <Widget>[
-                                        PopupMenuButton<int>(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10))),
-                                          elevation: 2,
+                                        _customPopupMenu(
                                           tooltip: s.menu,
-                                          itemBuilder: (context) => [
-                                            widget.podcastLocal.link != null
-                                                ? PopupMenuItem(
-                                                    value: 0,
-                                                    child: Container(
-                                                      padding: EdgeInsets.only(
-                                                          left: 10),
-                                                      child: Row(
-                                                        children: <Widget>[
-                                                          Icon(Icons.link,
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .tabBarTheme
-                                                                  .labelColor),
-                                                          Padding(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        5.0),
-                                                          ),
-                                                          Text(s.menuVisitSite),
-                                                        ],
+                                          onSelected: (int value) {
+                                            switch (value) {
+                                              case 0:
+                                                widget.podcastLocal.link
+                                                    .launchUrl;
+                                                break;
+                                              case 1:
+                                                widget.podcastLocal.rssUrl
+                                                    .launchUrl;
+                                                break;
+                                              case 2:
+                                                _confirmMarkListened(context);
+                                                break;
+                                            }
+                                          },
+                                          itemBuilder: [
+                                            if (widget.podcastLocal.link !=
+                                                null)
+                                              PopupMenuItem(
+                                                value: 0,
+                                                child: Container(
+                                                  padding:
+                                                      EdgeInsets.only(left: 10),
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Icon(Icons.link,
+                                                          color: context
+                                                              .textColor),
+                                                      Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    5.0),
                                                       ),
-                                                    ),
-                                                  )
-                                                : Center(),
+                                                      Text(s.menuVisitSite),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
                                             PopupMenuItem(
                                               value: 1,
                                               child: Container(
@@ -397,9 +426,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                   children: <Widget>[
                                                     Icon(
                                                       Icons.rss_feed,
-                                                      color: Theme.of(context)
-                                                          .tabBarTheme
-                                                          .labelColor,
+                                                      color: context.textColor,
                                                     ),
                                                     Padding(
                                                       padding:
@@ -427,9 +454,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                           painter:
                                                               ListenedAllPainter(
                                                                   context
-                                                                      .textTheme
-                                                                      .bodyText1
-                                                                      .color,
+                                                                      .textColor,
                                                                   stroke: 2)),
                                                     ),
                                                     Padding(
@@ -445,35 +470,18 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                               ),
                                             ),
                                           ],
-                                          onSelected: (int value) {
-                                            switch (value) {
-                                              case 0:
-                                                _launchUrl(
-                                                    widget.podcastLocal.link);
-                                                break;
-                                              case 1:
-                                                _launchUrl(
-                                                    widget.podcastLocal.rssUrl);
-                                                break;
-                                              case 2:
-                                                _confirmMarkListened(context);
-                                                break;
-                                            }
-                                          },
-                                        )
+                                        ),
                                       ],
                                       elevation: 0,
                                       iconTheme: IconThemeData(
                                         color: Colors.white,
                                       ),
-                                      expandedHeight: 150 +
-                                          MediaQuery.of(context).padding.top,
+                                      expandedHeight: 150 + context.paddingTop,
                                       backgroundColor: _color,
                                       floating: true,
                                       pinned: true,
-                                      flexibleSpace: LayoutBuilder(builder:
-                                          (BuildContext context,
-                                              BoxConstraints constraints) {
+                                      flexibleSpace: LayoutBuilder(
+                                          builder: (context, constraints) {
                                         _topHeight = constraints.biggest.height;
                                         return FlexibleSpaceBar(
                                           background: Stack(
@@ -481,9 +489,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                               Container(
                                                 margin: EdgeInsets.only(
                                                     top: 120 +
-                                                        MediaQuery.of(context)
-                                                            .padding
-                                                            .top),
+                                                        context.paddingTop),
                                                 padding: EdgeInsets.only(
                                                     left: 80, right: 120),
                                                 color: Colors.white10,
@@ -506,18 +512,17 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.white)),
-                                                    widget.podcastLocal.provider
-                                                            .isNotEmpty
-                                                        ? Text(
-                                                            s.hostedOn(widget
-                                                                .podcastLocal
-                                                                .provider),
-                                                            maxLines: 1,
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
-                                                          )
-                                                        : Center(),
+                                                    if (widget.podcastLocal
+                                                        .provider.isNotEmpty)
+                                                      Text(
+                                                        s.hostedOn(widget
+                                                            .podcastLocal
+                                                            .provider),
+                                                        maxLines: 1,
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
                                                   ],
                                                 ),
                                               ),
@@ -539,10 +544,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                             ],
                                           ),
                                           title: _topHeight <
-                                                  70 +
-                                                      MediaQuery.of(context)
-                                                          .padding
-                                                          .top
+                                                  70 + context.paddingTop
                                               ? Text(widget.podcastLocal.title,
                                                   maxLines: 1,
                                                   overflow:
@@ -563,12 +565,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                             children: <Widget>[
                                               Material(
                                                 color: Colors.transparent,
-                                                child: PopupMenuButton<int>(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  elevation: 1,
+                                                child: _customPopupMenu(
                                                   tooltip: s.homeSubMenuSortBy,
                                                   child: Container(
                                                       height: 30,
@@ -581,12 +578,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                         children: <Widget>[
                                                           Text(s
                                                               .homeSubMenuSortBy),
-                                                          Padding(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        5),
-                                                          ),
+                                                          SizedBox(width: 10),
                                                           Icon(
                                                             _reverse
                                                                 ? LineIcons
@@ -597,7 +589,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                           )
                                                         ],
                                                       )),
-                                                  itemBuilder: (context) => [
+                                                  itemBuilder: [
                                                     PopupMenuItem(
                                                       value: 0,
                                                       child:
@@ -618,6 +610,124 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                           _reverse = true);
                                                   },
                                                 ),
+                                              ),
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: _customPopupMenu(
+                                                    tooltip: 'Filter',
+                                                    child: Container(
+                                                      height: 30,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 15),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: <Widget>[
+                                                          Text('Filter'),
+                                                          SizedBox(width: 10),
+                                                          Icon(
+                                                            LineIcons
+                                                                .filter_solid,
+                                                            size: 18,
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    itemBuilder: [
+                                                      PopupMenuItem(
+                                                        value: 0,
+                                                        child: Text('All'),
+                                                      ),
+                                                      PopupMenuItem(
+                                                        value: 1,
+                                                        child: Text(
+                                                            'Not listened'),
+                                                      ),
+                                                      PopupMenuItem(
+                                                        value: 2,
+                                                        child: Text('Liked'),
+                                                      ),
+                                                      PopupMenuItem(
+                                                        value: 3,
+                                                        child:
+                                                            Text('Downloaded'),
+                                                      ),
+                                                      PopupMenuItem(
+                                                        value: 4,
+                                                        child: Text('Search'),
+                                                      ),
+                                                    ],
+                                                    onSelected: (value) {
+                                                      switch (value) {
+                                                        case 0:
+                                                          if (_filter !=
+                                                              Filter.all)
+                                                            setState(() {
+                                                              _hideListened =
+                                                                  false;
+                                                              _filter =
+                                                                  Filter.all;
+                                                            });
+                                                          break;
+                                                        case 1:
+                                                          setState(() =>
+                                                              _hideListened =
+                                                                  true);
+                                                          break;
+                                                        case 2:
+                                                          if (_filter !=
+                                                              Filter.liked)
+                                                            setState(() =>
+                                                                _filter = Filter
+                                                                    .liked);
+                                                          break;
+                                                        case 3:
+                                                          if (_filter !=
+                                                              Filter.downloaded)
+                                                            setState(() =>
+                                                                _filter = Filter
+                                                                    .downloaded);
+                                                          break;
+                                                        case 4:
+                                                          showGeneralDialog(
+                                                              context: context,
+                                                              barrierDismissible:
+                                                                  true,
+                                                              barrierLabel:
+                                                                  MaterialLocalizations
+                                                                          .of(
+                                                                              context)
+                                                                      .modalBarrierDismissLabel,
+                                                              barrierColor:
+                                                                  Colors
+                                                                      .black54,
+                                                              transitionDuration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          200),
+                                                              pageBuilder: (BuildContext
+                                                                          context,
+                                                                      Animation
+                                                                          animaiton,
+                                                                      Animation
+                                                                          secondaryAnimation) =>
+                                                                  SearchEpisdoe(
+                                                                    onSearch:
+                                                                        (query) {
+                                                                      setState(
+                                                                          () {
+                                                                        _query =
+                                                                            query;
+                                                                        _filter =
+                                                                            Filter.search;
+                                                                      });
+                                                                    },
+                                                                  ));
+                                                          break;
+                                                        default:
+                                                      }
+                                                    }),
                                               ),
                                               Spacer(),
                                               Material(
@@ -692,6 +802,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       reverse: _reverse,
                                       episodeCount: _episodeCount,
                                       initNum: _scroll ? 0 : 12,
+                                      hideListened: _hideListened,
                                     ),
                                     SliverList(
                                       delegate: SliverChildBuilderDelegate(
@@ -832,5 +943,113 @@ class _AboutPodcastState extends State<AboutPodcast> {
               }
             },
           );
+  }
+}
+
+class SearchEpisdoe extends StatefulWidget {
+  SearchEpisdoe({this.onSearch, Key key}) : super(key: key);
+  final ValueChanged<String> onSearch;
+  @override
+  _SearchEpisodeState createState() => _SearchEpisodeState();
+}
+
+class _SearchEpisodeState extends State<SearchEpisdoe> {
+  TextEditingController _controller;
+  String _query;
+  int _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _error = 0;
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.s;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor:
+            Theme.of(context).brightness == Brightness.light
+                ? Color.fromRGBO(113, 113, 113, 1)
+                : Color.fromRGBO(5, 5, 5, 1),
+      ),
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        elevation: 1,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+        titlePadding:
+            const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
+        actionsPadding: EdgeInsets.all(0),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              s.cancel,
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          ),
+          FlatButton(
+            onPressed: (_query != null && _query != '')
+                ? () {
+                    {
+                      widget.onSearch(_query);
+                      Navigator.of(context).pop();
+                    }
+                  }
+                : null,
+            child: Text(s.confirm,
+                style: TextStyle(color: Theme.of(context).accentColor)),
+          )
+        ],
+        title: SizedBox(width: context.width - 160, child: Text(s.newGroup)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                hintText: s.newGroup,
+                hintStyle: TextStyle(fontSize: 18),
+                filled: true,
+                focusedBorder: UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: context.accentColor, width: 2.0),
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: context.accentColor, width: 2.0),
+                ),
+              ),
+              cursorRadius: Radius.circular(2),
+              autofocus: true,
+              maxLines: 1,
+              controller: _controller,
+              onChanged: (value) {
+                _query = value;
+              },
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              child: (_error == 1)
+                  ? Text(
+                      s.groupExisted,
+                      style: TextStyle(color: Colors.red[400]),
+                    )
+                  : Center(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
