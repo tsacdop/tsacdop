@@ -77,33 +77,29 @@ ThemeData lightTheme = ThemeData(
 );
 
 class SettingState extends ChangeNotifier {
-  KeyValueStorage themeStorage = KeyValueStorage(themesKey);
-  KeyValueStorage accentStorage = KeyValueStorage(accentsKey);
-  KeyValueStorage autoupdateStorage = KeyValueStorage(autoUpdateKey);
-  KeyValueStorage intervalStorage = KeyValueStorage(updateIntervalKey);
-  KeyValueStorage downloadUsingDataStorage =
-      KeyValueStorage(downloadUsingDataKey);
-  KeyValueStorage introStorage = KeyValueStorage(introKey);
-  KeyValueStorage realDarkStorage = KeyValueStorage(realDarkKey);
-  KeyValueStorage autoPlayStorage = KeyValueStorage(autoPlayKey);
-  KeyValueStorage defaultSleepTimerStorage =
-      KeyValueStorage(defaultSleepTimerKey);
-  KeyValueStorage autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
-  KeyValueStorage autoSleepTimerModeStorage =
-      KeyValueStorage(autoSleepTimerModeKey);
-  KeyValueStorage autoSleepTimerStartStorage =
-      KeyValueStorage(autoSleepTimerStartKey);
-  KeyValueStorage autoSleepTimerEndStorage =
-      KeyValueStorage(autoSleepTimerEndKey);
-  KeyValueStorage tapToOpenPopupMenuStorage =
-      KeyValueStorage(tapToOpenPopupMenuKey);
-  KeyValueStorage cacheStorage = KeyValueStorage(cacheMaxKey);
-  KeyValueStorage podcastLayoutStorage = KeyValueStorage(podcastLayoutKey);
-  KeyValueStorage favLayoutStorage = KeyValueStorage(favLayoutKey);
-  KeyValueStorage downloadLayoutStorage = KeyValueStorage(downloadLayoutKey);
-  KeyValueStorage recentLayoutStorage = KeyValueStorage(recentLayoutKey);
-  KeyValueStorage autoDeleteStorage = KeyValueStorage(autoDeleteKey);
-  KeyValueStorage autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+  var themeStorage = KeyValueStorage(themesKey);
+  var accentStorage = KeyValueStorage(accentsKey);
+  var autoupdateStorage = KeyValueStorage(autoUpdateKey);
+  var intervalStorage = KeyValueStorage(updateIntervalKey);
+  var downloadUsingDataStorage = KeyValueStorage(downloadUsingDataKey);
+  var introStorage = KeyValueStorage(introKey);
+  var realDarkStorage = KeyValueStorage(realDarkKey);
+  var autoPlayStorage = KeyValueStorage(autoPlayKey);
+  var defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
+  var autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
+  var autoSleepTimerModeStorage = KeyValueStorage(autoSleepTimerModeKey);
+  var autoSleepTimerStartStorage = KeyValueStorage(autoSleepTimerStartKey);
+  var autoSleepTimerEndStorage = KeyValueStorage(autoSleepTimerEndKey);
+  var tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
+  var cacheStorage = KeyValueStorage(cacheMaxKey);
+  var podcastLayoutStorage = KeyValueStorage(podcastLayoutKey);
+  var favLayoutStorage = KeyValueStorage(favLayoutKey);
+  var downloadLayoutStorage = KeyValueStorage(downloadLayoutKey);
+  var recentLayoutStorage = KeyValueStorage(recentLayoutKey);
+  var autoDeleteStorage = KeyValueStorage(autoDeleteKey);
+  var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+  var fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
+  var rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
 
   Future initData() async {
     await _getTheme();
@@ -238,17 +234,35 @@ class SettingState extends ChangeNotifier {
     _saveAutoSleepTimerEnd();
   }
 
+  int _fastForwardSeconds;
+  int get fastForwardSeconds => _fastForwardSeconds;
+  set setFastForwardSeconds(int sec) {
+    _fastForwardSeconds = sec;
+    notifyListeners();
+    _saveFastForwardSeconds();
+  }
+
+  int _rewindSeconds;
+  int get rewindSeconds => _rewindSeconds;
+  set setRewindSeconds(int sec) {
+    _rewindSeconds = sec;
+    notifyListeners();
+    _saveRewindSeconds();
+  }
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
     _getAutoUpdate();
     _getDownloadUsingData();
     _getSleepTimerData();
+    _getPlayerSeconds();
     _getUpdateInterval().then((value) async {
       if (_initUpdateTag == 0)
         setWorkManager(24);
-      //Restart worker if anythin changed in worker callback.
-      //varsion 2 add auto download new episodes
+
+      /// Restart worker if anythin changed in worker callback.
+      /// varsion 2 add auto download new episodes
       else if (_autoUpdate && _initialShowIntor == 1) {
         await cancelWork();
         setWorkManager(_initUpdateTag);
@@ -314,6 +328,12 @@ class SettingState extends ChangeNotifier {
     _autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
   }
 
+  Future _getPlayerSeconds() async {
+    _rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
+    _fastForwardSeconds =
+        await fastForwardSecondsStorage.getInt(defaultValue: 30);
+  }
+
   Future _saveAccentSetColor() async {
     await accentStorage
         .saveString(_accentSetColor.toString().substring(10, 16));
@@ -363,6 +383,14 @@ class SettingState extends ChangeNotifier {
     await autoSleepTimerEndStorage.saveInt(_autoSleepTimerEnd);
   }
 
+  Future _saveFastForwardSeconds() async {
+    await fastForwardSecondsStorage.saveInt(_fastForwardSeconds);
+  }
+
+  Future _saveRewindSeconds() async {
+    await rewindSecondsStorage.saveInt(_rewindSeconds);
+  }
+
   Future<SettingsBackup> backup() async {
     int theme = await themeStorage.getInt();
     String accentColor = await accentStorage.getString();
@@ -392,6 +420,9 @@ class SettingState extends ChangeNotifier {
     int defaultSleepTime = await defaultSleepTimerStorage.getInt();
     bool tapToOpenPopupMenu = await KeyValueStorage(tapToOpenPopupMenuKey)
         .getBool(defaultValue: false);
+    int fastForwardSeconds =
+        await fastForwardSecondsStorage.getInt(defaultValue: 30);
+    int rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
 
     return SettingsBackup(
         theme: theme,
@@ -414,7 +445,9 @@ class SettingState extends ChangeNotifier {
         autoSleepTimerEnd: autoSleepTimerEnd,
         autoSleepTimerMode: autoSleepTimerMode,
         defaultSleepTime: defaultSleepTime,
-        tapToOpenPopupMenu: tapToOpenPopupMenu);
+        tapToOpenPopupMenu: tapToOpenPopupMenu,
+        fastForwardSeconds: fastForwardSeconds,
+        rewindSeconds: rewindSeconds);
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -440,6 +473,8 @@ class SettingState extends ChangeNotifier {
     await autoSleepTimerEndStorage.saveInt(backup.autoSleepTimerEnd);
     await autoSleepTimerModeStorage.saveInt(backup.autoSleepTimerMode);
     await defaultSleepTimerStorage.saveInt(backup.defaultSleepTime);
+    await fastForwardSecondsStorage.saveInt(backup.fastForwardSeconds);
+    await rewindSecondsStorage.saveInt(backup.rewindSeconds);
     await KeyValueStorage(tapToOpenPopupMenuKey)
         .saveBool(backup.tapToOpenPopupMenu);
     await initData();

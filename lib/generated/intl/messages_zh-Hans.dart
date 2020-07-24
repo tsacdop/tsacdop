@@ -63,17 +63,19 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m21(date) => "${date}移除";
 
-  static m22(count) => "${Intl.plural(count, zero: '刚刚', other: '${count}秒前')}";
+  static m22(count) => "${Intl.plural(count, zero: '0 秒', other: '${count} 秒')}";
 
-  static m23(time) => "上次播放${time}";
+  static m23(count) => "${Intl.plural(count, zero: '刚刚', other: '${count}秒前')}";
 
-  static m24(time) => "剩余 ${time}";
+  static m24(time) => "上次播放${time}";
 
-  static m25(time) => "到${time}";
+  static m25(time) => "剩余 ${time}";
 
-  static m26(count) => "${Intl.plural(count, zero: '未有更新', other: '更新 ${count} 集节目')}";
+  static m26(time) => "到${time}";
 
-  static m27(version) => "版本：${version}";
+  static m27(count) => "${Intl.plural(count, zero: '未有更新', other: '更新 ${count} 集节目')}";
+
+  static m28(version) => "版本：${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -187,6 +189,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationUpdateError" : m18,
     "oldestFirst" : MessageLookupByLibrary.simpleMessage("由旧到新"),
     "play" : MessageLookupByLibrary.simpleMessage("播放"),
+    "playback" : MessageLookupByLibrary.simpleMessage("播放控制"),
     "playing" : MessageLookupByLibrary.simpleMessage("正在播放"),
     "plugins" : MessageLookupByLibrary.simpleMessage("插件"),
     "podcast" : m19,
@@ -214,7 +217,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "searchEpisode" : MessageLookupByLibrary.simpleMessage("搜索节目"),
     "searchInvalidRss" : MessageLookupByLibrary.simpleMessage("RSS 链接错误"),
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("搜索播客"),
-    "secondsAgo" : m22,
+    "secCount" : m22,
+    "secondsAgo" : m23,
     "settingStorage" : MessageLookupByLibrary.simpleMessage("储存空间"),
     "settings" : MessageLookupByLibrary.simpleMessage("设置"),
     "settingsAccentColor" : MessageLookupByLibrary.simpleMessage("次要颜色"),
@@ -238,6 +242,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsEnableSyncing" : MessageLookupByLibrary.simpleMessage("开启自动更新"),
     "settingsEnableSyncingDes" : MessageLookupByLibrary.simpleMessage("在后台更新所有订阅播客"),
     "settingsExportDes" : MessageLookupByLibrary.simpleMessage("导出及恢复所有设置项"),
+    "settingsFastForwardSec" : MessageLookupByLibrary.simpleMessage("快进时间"),
+    "settingsFastForwardSecDes" : MessageLookupByLibrary.simpleMessage("修改播放器快进时间"),
     "settingsFeedback" : MessageLookupByLibrary.simpleMessage("反馈"),
     "settingsFeedbackDes" : MessageLookupByLibrary.simpleMessage("意见与建议"),
     "settingsHistory" : MessageLookupByLibrary.simpleMessage("历史记录"),
@@ -263,6 +269,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsPrefrence" : MessageLookupByLibrary.simpleMessage("首选项"),
     "settingsRealDark" : MessageLookupByLibrary.simpleMessage("极黑"),
     "settingsRealDarkDes" : MessageLookupByLibrary.simpleMessage("如果夜不够黑，请开启"),
+    "settingsRewindSec" : MessageLookupByLibrary.simpleMessage("快退时间"),
+    "settingsRewindSecDes" : MessageLookupByLibrary.simpleMessage("修改播放器快退时间"),
     "settingsSTAuto" : MessageLookupByLibrary.simpleMessage("自动睡眠模式"),
     "settingsSTAutoDes" : MessageLookupByLibrary.simpleMessage("定期开启睡眠模式"),
     "settingsSTDefaultTime" : MessageLookupByLibrary.simpleMessage("默认时长"),
@@ -283,9 +291,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "subscribe" : MessageLookupByLibrary.simpleMessage("订阅"),
     "subscribeExportDes" : MessageLookupByLibrary.simpleMessage("导出 OMPL 文件"),
     "systemDefault" : MessageLookupByLibrary.simpleMessage("系统默认"),
-    "timeLastPlayed" : m23,
-    "timeLeft" : m24,
-    "to" : m25,
+    "timeLastPlayed" : m24,
+    "timeLeft" : m25,
+    "to" : m26,
     "toastAddPlaylist" : MessageLookupByLibrary.simpleMessage("添加到播放列表"),
     "toastDiscovery" : MessageLookupByLibrary.simpleMessage("重启应用后可查看"),
     "toastFileError" : MessageLookupByLibrary.simpleMessage("文件错误，导入失败"),
@@ -306,8 +314,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlike" : MessageLookupByLibrary.simpleMessage("取消喜欢"),
     "unliked" : MessageLookupByLibrary.simpleMessage("从收藏移除"),
     "updateDate" : MessageLookupByLibrary.simpleMessage("更新日期"),
-    "updateEpisodesCount" : m26,
+    "updateEpisodesCount" : m27,
     "updateFailed" : MessageLookupByLibrary.simpleMessage("更新失败"),
-    "version" : m27
+    "version" : m28
   };
 }

@@ -20,6 +20,8 @@ class SettingsBackup {
   final int defaultSleepTime;
   final int autoSleepTimerMode;
   final bool tapToOpenPopupMenu;
+  final int fastForwardSeconds;
+  final int rewindSeconds;
   SettingsBackup(
       {this.theme,
       this.accentColor,
@@ -41,7 +43,9 @@ class SettingsBackup {
       this.autoSleepTimerEnd,
       this.defaultSleepTime,
       this.autoSleepTimerMode,
-      this.tapToOpenPopupMenu});
+      this.tapToOpenPopupMenu,
+      this.fastForwardSeconds,
+      this.rewindSeconds});
 
   Map<String, Object> toJson() {
     return {
@@ -64,7 +68,9 @@ class SettingsBackup {
       'autoSleepTimerStart': autoSleepTimerStart,
       'autoSleepTimerEnd': autoSleepTimerEnd,
       'autoSleepTimerMode': autoSleepTimerMode,
-      'tapToOpenPopupMenu': tapToOpenPopupMenu
+      'tapToOpenPopupMenu': tapToOpenPopupMenu,
+      'fastForwardSeconds': fastForwardSeconds,
+      'rewindSeconds': rewindSeconds
     };
   }
 
@@ -90,6 +96,8 @@ class SettingsBackup {
         autoSleepTimerStart: json['autoSleepeTimerStart'] as int,
         autoSleepTimerEnd: json['autoSleepTimerEnd'] as int,
         autoSleepTimerMode: json['autoSleepTimerMode'] as int,
-        tapToOpenPopupMenu: json['tapToOpenPopupMenu'] as bool);
+        tapToOpenPopupMenu: json['tapToOpenPopupMenu'] as bool,
+        fastForwardSeconds: json['fastForwardSeconds'] as int,
+        rewindSeconds: json['rewindSeconds'] as int);
   }
 }

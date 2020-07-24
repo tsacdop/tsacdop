@@ -18,8 +18,8 @@ import '../util/extension_helper.dart';
 import '../util/custom_widget.dart';
 import '../util/custom_slider.dart';
 import '../episodes/episode_detail.dart';
-import 'playlist.dart';
 import '../util/audiopanel.dart';
+import 'playlist.dart';
 
 final List<BoxShadow> _customShadow = [
   BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),
@@ -1274,11 +1274,10 @@ class _ControlPanelState extends State<ControlPanel>
                           children: [
                             IconButton(
                                 padding: EdgeInsets.symmetric(horizontal: 25.0),
-                                onPressed: playing
-                                    ? () => audio.forwardAudio(-10)
-                                    : null,
+                                onPressed:
+                                    playing ? () => audio.rewind() : null,
                                 iconSize: 32.0,
-                                icon: Icon(Icons.replay_10),
+                                icon: Icon(Icons.replay),
                                 color: Colors.grey[500]),
                             Container(
                               margin: EdgeInsets.symmetric(horizontal: 30),
@@ -1343,11 +1342,10 @@ class _ControlPanelState extends State<ControlPanel>
                             ),
                             IconButton(
                                 padding: EdgeInsets.symmetric(horizontal: 25.0),
-                                onPressed: playing
-                                    ? () => audio.forwardAudio(30)
-                                    : null,
+                                onPressed:
+                                    playing ? () => audio.fastForward() : null,
                                 iconSize: 32.0,
-                                icon: Icon(Icons.forward_30),
+                                icon: Icon(Icons.forward),
                                 color: Colors.grey[500]),
                           ],
                         ),

@@ -14,10 +14,7 @@ import '../util/general_dialog.dart';
 import '../util/extension_helper.dart';
 import '../util/custom_dropdown.dart';
 
-String stringForMins(int mins) {
-  if (mins == null) return null;
-  return '${(mins ~/ 60)}:${(mins.truncate() % 60).toString().padLeft(2, '0')}';
-}
+const List secondsToSelect = [10, 15, 20, 25, 30, 45, 60];
 
 class PlaySetting extends StatelessWidget {
   Widget _modeWidget(BuildContext context) {
@@ -158,7 +155,7 @@ class PlaySetting extends StatelessWidget {
                         topLeft: Radius.circular(5)),
                   ),
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(s.from(stringForMins(data.item1))),
+                  child: Text(s.from(data.item1.toTime)),
                 ),
               ),
             ),
@@ -224,7 +221,7 @@ class PlaySetting extends StatelessWidget {
                       borderRadius: BorderRadius.only(
                           bottomRight: Radius.circular(5),
                           topRight: Radius.circular(5))),
-                  child: Text(s.to(stringForMins(data.item2)),
+                  child: Text(s.to(data.item2.toTime),
                       style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -306,6 +303,73 @@ class PlaySetting extends StatelessWidget {
                     height: 30.0,
                     padding: EdgeInsets.symmetric(horizontal: 70),
                     alignment: Alignment.centerLeft,
+                    child: Text(s.playback,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Theme.of(context).accentColor)),
+                  ),
+                  ListView(
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      children: <Widget>[
+                        ListTile(
+                          contentPadding: EdgeInsets.only(
+                              left: 80.0, right: 20, bottom: 10, top: 10),
+                          title: Text(s.settingsFastForwardSec),
+                          subtitle: Text(s.settingsFastForwardSecDes),
+                          trailing: Selector<SettingState, int>(
+                            selector: (_, settings) =>
+                                settings.fastForwardSeconds,
+                            builder: (_, data, __) => MyDropdownButton(
+                                hint: Text(s.secCount(data)),
+                                underline: Center(),
+                                elevation: 1,
+                                displayItemCount: 5,
+                                isDense: true,
+                                value: data,
+                                onChanged: (int value) =>
+                                    settings.setFastForwardSeconds = value,
+                                items: secondsToSelect
+                                    .map<DropdownMenuItem<int>>((e) {
+                                  return DropdownMenuItem<int>(
+                                      value: e, child: Text(s.secCount(e)));
+                                }).toList()),
+                          ),
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.only(
+                              left: 80.0, right: 20, bottom: 10, top: 10),
+                          title: Text(s.settingsRewindSec),
+                          subtitle: Text(s.settingsRewindSecDes),
+                          trailing: Selector<SettingState, int>(
+                            selector: (_, settings) => settings.rewindSeconds,
+                            builder: (_, data, __) => MyDropdownButton(
+                                hint: Text(s.secCount(data)),
+                                underline: Center(),
+                                elevation: 1,
+                                displayItemCount: 5,
+                                isDense: true,
+                                value: data,
+                                onChanged: (int value) =>
+                                    settings.setRewindSeconds = value,
+                                items: secondsToSelect
+                                    .map<DropdownMenuItem<int>>((e) {
+                                  return DropdownMenuItem<int>(
+                                      value: e, child: Text(s.secCount(e)));
+                                }).toList()),
+                          ),
+                        ),
+                        Divider(),
+                      ]),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                  ),
+                  Container(
+                    height: 30.0,
+                    padding: EdgeInsets.symmetric(horizontal: 70),
+                    alignment: Alignment.centerLeft,
                     child: Text(s.sleepTimer,
                         style: context.textTheme.bodyText1
                             .copyWith(color: Theme.of(context).accentColor)),
@@ -337,6 +401,7 @@ class PlaySetting extends StatelessWidget {
                               }).toList()),
                         ),
                       ),
+                      Divider(),
                       Selector<SettingState, bool>(
                         selector: (_, settings) => settings.autoSleepTimer,
                         builder: (_, data, __) => ListTile(
@@ -376,6 +441,7 @@ class PlaySetting extends StatelessWidget {
                       Divider(height: 2)
                     ],
                   ),
+                  SizedBox(height: 20)
                 ],
               ),
             ],

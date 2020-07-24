@@ -63,17 +63,19 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m21(date) => "Removed at ${date}";
 
-  static m22(count) => "${Intl.plural(count, zero: 'Just now', one: '${count} second ago', other: '${count} seconds ago')}";
+  static m22(count) => "${Intl.plural(count, zero: '0 sec', one: '${count} sec', other: '${count} sec')}";
 
-  static m23(time) => "Last time ${time}";
+  static m23(count) => "${Intl.plural(count, zero: 'Just now', one: '${count} second ago', other: '${count} seconds ago')}";
 
-  static m24(time) => "${time} Left";
+  static m24(time) => "Last time ${time}";
 
-  static m25(time) => "To ${time}";
+  static m25(time) => "${time} Left";
 
-  static m26(count) => "${Intl.plural(count, zero: 'No update', one: 'Updated ${count} episode', other: 'Updated ${count} episodes')}";
+  static m26(time) => "To ${time}";
 
-  static m27(version) => "Version : ${version}";
+  static m27(count) => "${Intl.plural(count, zero: 'No update', one: 'Updated ${count} episode', other: 'Updated ${count} episodes')}";
+
+  static m28(version) => "Version : ${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -187,6 +189,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationUpdateError" : m18,
     "oldestFirst" : MessageLookupByLibrary.simpleMessage("Oldest first"),
     "play" : MessageLookupByLibrary.simpleMessage("Play"),
+    "playback" : MessageLookupByLibrary.simpleMessage("Playback control"),
     "playing" : MessageLookupByLibrary.simpleMessage("Playing"),
     "plugins" : MessageLookupByLibrary.simpleMessage("Plugins"),
     "podcast" : m19,
@@ -214,7 +217,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "searchEpisode" : MessageLookupByLibrary.simpleMessage("Search episode"),
     "searchInvalidRss" : MessageLookupByLibrary.simpleMessage("Invalid RSS link"),
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("Search podcast"),
-    "secondsAgo" : m22,
+    "secCount" : m22,
+    "secondsAgo" : m23,
     "settingStorage" : MessageLookupByLibrary.simpleMessage("Storage"),
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "settingsAccentColor" : MessageLookupByLibrary.simpleMessage("Accent color"),
@@ -238,6 +242,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsEnableSyncing" : MessageLookupByLibrary.simpleMessage("Enable syncing"),
     "settingsEnableSyncingDes" : MessageLookupByLibrary.simpleMessage("Refresh all podcasts in the background to get leatest episodes"),
     "settingsExportDes" : MessageLookupByLibrary.simpleMessage("Export and import app settings"),
+    "settingsFastForwardSec" : MessageLookupByLibrary.simpleMessage("Fast forward seconds"),
+    "settingsFastForwardSecDes" : MessageLookupByLibrary.simpleMessage("Change the fast forward seconds in player"),
     "settingsFeedback" : MessageLookupByLibrary.simpleMessage("Feedback"),
     "settingsFeedbackDes" : MessageLookupByLibrary.simpleMessage("Bugs and features request"),
     "settingsHistory" : MessageLookupByLibrary.simpleMessage("History"),
@@ -263,6 +269,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsPrefrence" : MessageLookupByLibrary.simpleMessage("Prefrence"),
     "settingsRealDark" : MessageLookupByLibrary.simpleMessage("Real dark"),
     "settingsRealDarkDes" : MessageLookupByLibrary.simpleMessage("Turn on if you think the night is not dark enough"),
+    "settingsRewindSec" : MessageLookupByLibrary.simpleMessage("Rewind seconds"),
+    "settingsRewindSecDes" : MessageLookupByLibrary.simpleMessage("Change the rewind seconds in player"),
     "settingsSTAuto" : MessageLookupByLibrary.simpleMessage("Auto turn on sleep timer"),
     "settingsSTAutoDes" : MessageLookupByLibrary.simpleMessage("Auto start sleep timer at scheduled time"),
     "settingsSTDefaultTime" : MessageLookupByLibrary.simpleMessage("Default time"),
@@ -283,9 +291,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "subscribe" : MessageLookupByLibrary.simpleMessage("Subscribe"),
     "subscribeExportDes" : MessageLookupByLibrary.simpleMessage("Export OMPL file of all podcasts"),
     "systemDefault" : MessageLookupByLibrary.simpleMessage("System default"),
-    "timeLastPlayed" : m23,
-    "timeLeft" : m24,
-    "to" : m25,
+    "timeLastPlayed" : m24,
+    "timeLeft" : m25,
+    "to" : m26,
     "toastAddPlaylist" : MessageLookupByLibrary.simpleMessage("Added to playlist"),
     "toastDiscovery" : MessageLookupByLibrary.simpleMessage("Discovery feature reopened, pleast restart the app"),
     "toastFileError" : MessageLookupByLibrary.simpleMessage("File error, subscribe failed"),
@@ -306,8 +314,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlike" : MessageLookupByLibrary.simpleMessage("Unlike"),
     "unliked" : MessageLookupByLibrary.simpleMessage("Episode removed from favorite"),
     "updateDate" : MessageLookupByLibrary.simpleMessage("Update date"),
-    "updateEpisodesCount" : m26,
+    "updateEpisodesCount" : m27,
     "updateFailed" : MessageLookupByLibrary.simpleMessage("Update failed, network error"),
-    "version" : m27
+    "version" : m28
   };
 }

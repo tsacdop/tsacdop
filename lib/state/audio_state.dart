@@ -36,9 +36,9 @@ MediaControl stopControl = MediaControl(
   label: 'Stop',
   action: MediaAction.stop,
 );
-MediaControl forward30 = MediaControl(
-  androidIcon: 'drawable/ic_stat_forward_30',
-  label: 'forward30',
+MediaControl forward = MediaControl(
+  androidIcon: 'drawable/baseline_fast_forward_white_24',
+  label: 'forward',
   action: MediaAction.fastForward,
 );
 
@@ -530,6 +530,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
     AudioService.seekTo(Duration(milliseconds: pos));
   }
 
+  fastForward() async {
+    await AudioService.fastForward();
+  }
+
+  rewind() async {
+    await AudioService.rewind();
+  }
+
   seekTo(int position) async {
     if (_audioState != AudioProcessingState.connecting &&
         _audioState != AudioProcessingState.none)
@@ -848,7 +856,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   void onRewind() {
-    _seekRelative(rewindInterval);
+    _seekRelative(-rewindInterval);
   }
 
   @override
@@ -930,9 +938,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   List<MediaControl> getControls() {
     if (_playing) {
-      return [pauseControl, forward30, skipToNextControl, stopControl];
+      return [pauseControl, forward, skipToNextControl, stopControl];
     } else {
-      return [playControl, forward30, skipToNextControl, stopControl];
+      return [playControl, forward, skipToNextControl, stopControl];
     }
   }
 }

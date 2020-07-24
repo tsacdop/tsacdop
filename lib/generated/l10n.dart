@@ -1163,6 +1163,16 @@ class S {
     );
   }
 
+  /// `Playback control`
+  String get playback {
+    return Intl.message(
+      'Playback control',
+      name: 'playback',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Playing`
   String get playing {
     return Intl.message(
@@ -1436,6 +1446,19 @@ class S {
     );
   }
 
+  /// `{count, plural, zero{0 sec} one{{count} sec} other{{count} sec}}`
+  String secCount(num count) {
+    return Intl.plural(
+      count,
+      zero: '0 sec',
+      one: '$count sec',
+      other: '$count sec',
+      name: 'secCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `{count, plural, zero{Just now} one{{count} second ago} other{{count} seconds ago}}`
   String secondsAgo(num count) {
     return Intl.plural(
@@ -1664,6 +1687,26 @@ class S {
     return Intl.message(
       'Export and import app settings',
       name: 'settingsExportDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fast forward seconds`
+  String get settingsFastForwardSec {
+    return Intl.message(
+      'Fast forward seconds',
+      name: 'settingsFastForwardSec',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change the fast forward seconds in player`
+  String get settingsFastForwardSecDes {
+    return Intl.message(
+      'Change the fast forward seconds in player',
+      name: 'settingsFastForwardSecDes',
       desc: '',
       args: [],
     );
@@ -1914,6 +1957,26 @@ class S {
     return Intl.message(
       'Turn on if you think the night is not dark enough',
       name: 'settingsRealDarkDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rewind seconds`
+  String get settingsRewindSec {
+    return Intl.message(
+      'Rewind seconds',
+      name: 'settingsRewindSec',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change the rewind seconds in player`
+  String get settingsRewindSecDes {
+    return Intl.message(
+      'Change the rewind seconds in player',
+      name: 'settingsRewindSecDes',
       desc: '',
       args: [],
     );
