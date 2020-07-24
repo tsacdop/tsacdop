@@ -17,7 +17,7 @@ import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../util/extension_helper.dart';
-import '../util/custompaint.dart';
+import '../util/custom_widget.dart';
 import 'episode_download.dart';
 
 class EpisodeDetail extends StatefulWidget {

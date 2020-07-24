@@ -12,7 +12,7 @@ import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../type/playlist.dart';
 import '../util/extension_helper.dart';
-import '../util/custompaint.dart';
+import '../util/custom_widget.dart';
 
 class PlaylistPage extends StatefulWidget {
   @override

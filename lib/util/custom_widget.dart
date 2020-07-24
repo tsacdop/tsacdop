@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
+import 'extension_helper.dart';
+
 //Layout change indicator
 class LayoutPainter extends CustomPainter {
   double scale;
@@ -175,8 +177,8 @@ class MarkListenedPainter extends CustomPainter {
     _path.lineTo(size.width / 3, size.height * 3 / 4);
     _path.moveTo(size.width / 2, size.height * 3 / 8);
     _path.lineTo(size.width / 2, size.height * 5 / 8);
-   // _path.moveTo(size.width * 2 / 3, size.height * 4 / 9);
-   // _path.lineTo(size.width * 2 / 3, size.height * 5 / 9);
+    // _path.moveTo(size.width * 2 / 3, size.height * 4 / 9);
+    // _path.lineTo(size.width * 2 / 3, size.height * 5 / 9);
     _path.moveTo(size.width / 2, size.height * 13 / 18);
     _path.lineTo(size.width * 5 / 6, size.height * 13 / 18);
     _path.moveTo(size.width * 2 / 3, size.height * 5 / 9);
@@ -188,6 +190,108 @@ class MarkListenedPainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
+  }
+}
+
+/// Hide listened painter.
+class HideListenedPainter extends CustomPainter {
+  Color color;
+  Color backgroundColor;
+  double fraction;
+  double stroke;
+  HideListenedPainter(
+      {this.color, this.stroke = 1.0, this.backgroundColor, this.fraction});
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint _paint = Paint()
+      ..color = color
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    Paint _linePaint = Paint()
+      ..color = backgroundColor
+      ..strokeWidth = stroke * 2
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    Path _path = Path();
+
+    _path.moveTo(size.width / 6, size.height * 3 / 8);
+    _path.lineTo(size.width / 6, size.height * 5 / 8);
+    _path.moveTo(size.width / 3, size.height / 4);
+    _path.lineTo(size.width / 3, size.height * 3 / 4);
+    _path.moveTo(size.width / 2, size.height / 8);
+    _path.lineTo(size.width / 2, size.height * 7 / 8);
+    _path.moveTo(size.width * 5 / 6, size.height * 3 / 8);
+    _path.lineTo(size.width * 5 / 6, size.height * 5 / 8);
+    _path.moveTo(size.width * 2 / 3, size.height / 4);
+    _path.lineTo(size.width * 2 / 3, size.height * 3 / 4);
+
+    canvas.drawPath(_path, _paint);
+    if (fraction > 0)
+      canvas.drawLine(
+          Offset(size.width, size.height) / 5,
+          Offset(size.width, size.height) / 5 +
+              Offset(size.width, size.height) * 3 / 5 * fraction,
+          _linePaint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class HideListened extends StatefulWidget {
+  final bool hideListened;
+  HideListened({this.hideListened, Key key}) : super(key: key);
+  @override
+  _HideListenedState createState() => _HideListenedState();
+}
+
+class _HideListenedState extends State<HideListened>
+    with SingleTickerProviderStateMixin {
+  double _fraction = 0.0;
+  Animation animation;
+  AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
+    animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        if (mounted)
+          setState(() {
+            _fraction = animation.value;
+          });
+      });
+    if (widget.hideListened) _controller.forward();
+  }
+
+  @override
+  void didUpdateWidget(HideListened oldWidget) {
+    if (oldWidget.hideListened != widget.hideListened) {
+      if (widget.hideListened)
+        _controller.forward();
+      else
+        _controller.reverse();
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+        painter: HideListenedPainter(
+            fraction: _fraction,
+            color: context.textColor,
+            backgroundColor: context.accentColor));
   }
 }
 
@@ -725,5 +829,41 @@ class _HeartOpenState extends State<HeartOpen>
         ..._index.map<Widget>((e) => _position(e)).toList(),
       ],
     );
+  }
+}
+
+/// Icon painter.
+class IconPainter extends StatelessWidget {
+  const IconPainter(this.painter, {this.height = 10, this.width = 30, Key key})
+      : super(key: key);
+  final double height;
+  final double width;
+  final CustomPainter painter;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      width: width,
+      child: CustomPaint(
+        painter: painter,
+      ),
+    );
+  }
+}
+
+/// A dot.
+class DotIndicator extends StatelessWidget {
+  DotIndicator({this.radius = 8, Key key})
+      : assert(radius > 0),
+        super(key: key);
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: radius,
+        height: radius,
+        decoration:
+            BoxDecoration(shape: BoxShape.circle, color: context.accentColor));
   }
 }

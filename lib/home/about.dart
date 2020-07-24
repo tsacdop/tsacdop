@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tsacdop/util/custompaint.dart';
+import 'package:tsacdop/util/custom_widget.dart';
 import 'package:line_icons/line_icons.dart';
 
 import '../util/extension_helper.dart';
@@ -64,9 +64,9 @@ class AboutApp extends StatelessWidget {
       ),
       child: Scaffold(
           backgroundColor: Theme.of(context).primaryColor,
-          appBar: AppBar(
-            title: Text(s.homeToprightMenuAbout),
-          ),
+          appBar: AppBar(title: Center()
+              // Text(s.homeToprightMenuAbout),
+              ),
           body: SafeArea(
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,

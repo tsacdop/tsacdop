@@ -21,7 +21,7 @@ import '../episodes/episode_detail.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
 import 'extension_helper.dart';
-import 'custompaint.dart';
+import 'custom_widget.dart';
 
 enum Layout { three, two, one }
 
@@ -35,23 +35,20 @@ class EpisodeGrid extends StatelessWidget {
   final Layout layout;
   final bool reverse;
 
+  /// Count of animation items.
   final int initNum;
 
-  /// Hide listened episode.
-  final bool hideListened;
-
-  EpisodeGrid(
-      {Key key,
-      @required this.episodes,
-      this.initNum = 12,
-      this.showDownload = false,
-      this.showFavorite = false,
-      this.showNumber = false,
-      this.episodeCount = 0,
-      this.layout = Layout.three,
-      this.reverse,
-      this.hideListened = false})
-      : super(key: key);
+  EpisodeGrid({
+    Key key,
+    @required this.episodes,
+    this.initNum = 12,
+    this.showDownload = false,
+    this.showFavorite = false,
+    this.showNumber = false,
+    this.episodeCount = 0,
+    this.layout = Layout.three,
+    this.reverse,
+  }) : super(key: key);
 
   Future<int> _isListened(EpisodeBrief episode) async {
     DBHelper dbHelper = DBHelper();
@@ -257,364 +254,332 @@ class EpisodeGrid extends StatelessWidget {
                       bool isDownloaded = snapshot.data.item3;
                       bool tapToOpen = snapshot.data.item4;
                       List<int> menuList = snapshot.data.item5;
-                      return (hideListened && isListened > 0)
-                          ? Center()
-                          : Container(
-                              decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0)),
-                                  color: isListened > 0
-                                      ? context.brightness == Brightness.light
-                                          ? Colors.grey[200]
-                                          : Color.fromRGBO(40, 40, 40, 1)
-                                      : context.scaffoldBackgroundColor,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
+                      return Container(
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                            color: isListened > 0
+                                ? context.brightness == Brightness.light
+                                    ? Colors.grey[200]
+                                    : Color.fromRGBO(40, 40, 40, 1)
+                                : context.scaffoldBackgroundColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: context.brightness == Brightness.light
+                                    ? context.primaryColor
+                                    : Color.fromRGBO(40, 40, 40, 1),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                              ),
+                            ]),
+                        alignment: Alignment.center,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                            border: Border.all(
+                              color: context.brightness == Brightness.light
+                                  ? context.primaryColor
+                                  : context.scaffoldBackgroundColor,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: FocusedMenuHolder(
+                            blurSize: 0.0,
+                            menuItemExtent: 45,
+                            menuBoxDecoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15.0))),
+                            duration: Duration(milliseconds: 100),
+                            tapMode:
+                                tapToOpen ? TapMode.onTap : TapMode.onLongPress,
+                            animateMenuItems: false,
+                            blurBackgroundColor:
+                                context.brightness == Brightness.light
+                                    ? Colors.white38
+                                    : Colors.black38,
+                            bottomOffsetHeight: 10,
+                            menuOffset: 6,
+                            menuItems: <FocusedMenuItem>[
+                              FocusedMenuItem(
+                                  backgroundColor:
+                                      context.brightness == Brightness.light
+                                          ? context.primaryColor
+                                          : context.scaffoldBackgroundColor,
+                                  title: Text(data.item1 != episodes[index]
+                                      ? s.play
+                                      : s.playing),
+                                  trailingIcon: Icon(
+                                    LineIcons.play_circle_solid,
+                                    color: Theme.of(context).accentColor,
+                                  ),
+                                  onPressed: () {
+                                    if (data.item1 != episodes[index])
+                                      audio.episodeLoad(episodes[index]);
+                                  }),
+                              menuList.contains(1)
+                                  ? FocusedMenuItem(
+                                      backgroundColor:
                                           context.brightness == Brightness.light
                                               ? context.primaryColor
-                                              : Color.fromRGBO(40, 40, 40, 1),
-                                      blurRadius: 0.5,
-                                      spreadRadius: 0.5,
-                                    ),
-                                  ]),
-                              alignment: Alignment.center,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0)),
-                                  border: Border.all(
-                                    color:
-                                        context.brightness == Brightness.light
-                                            ? context.primaryColor
-                                            : context.scaffoldBackgroundColor,
-                                    width: 1.0,
-                                  ),
-                                ),
-                                child: FocusedMenuHolder(
-                                  blurSize: 0.0,
-                                  menuItemExtent: 45,
-                                  menuBoxDecoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(15.0))),
-                                  duration: Duration(milliseconds: 100),
-                                  tapMode: tapToOpen
-                                      ? TapMode.onTap
-                                      : TapMode.onLongPress,
-                                  animateMenuItems: false,
-                                  blurBackgroundColor:
-                                      context.brightness == Brightness.light
-                                          ? Colors.white38
-                                          : Colors.black38,
-                                  bottomOffsetHeight: 10,
-                                  menuOffset: 6,
-                                  menuItems: <FocusedMenuItem>[
-                                    FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.scaffoldBackgroundColor,
-                                        title: Text(
-                                            data.item1 != episodes[index]
-                                                ? s.play
-                                                : s.playing),
-                                        trailingIcon: Icon(
-                                          LineIcons.play_circle_solid,
-                                          color: Theme.of(context).accentColor,
-                                        ),
-                                        onPressed: () {
-                                          if (data.item1 != episodes[index])
-                                            audio.episodeLoad(episodes[index]);
-                                        }),
-                                    menuList.contains(1)
-                                        ? FocusedMenuItem(
-                                            backgroundColor: context
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context
-                                                    .scaffoldBackgroundColor,
-                                            title: data.item2.contains(
-                                                    episodes[index]
-                                                        .enclosureUrl)
-                                                ? Text(s.remove)
-                                                : Text(s.later),
-                                            trailingIcon: Icon(
-                                              LineIcons.clock_solid,
-                                              color: Colors.cyan,
+                                              : context.scaffoldBackgroundColor,
+                                      title: data.item2.contains(
+                                              episodes[index].enclosureUrl)
+                                          ? Text(s.remove)
+                                          : Text(s.later),
+                                      trailingIcon: Icon(
+                                        LineIcons.clock_solid,
+                                        color: Colors.cyan,
+                                      ),
+                                      onPressed: () {
+                                        if (!data.item2.contains(
+                                            episodes[index].enclosureUrl)) {
+                                          audio.addToPlaylist(episodes[index]);
+                                          Fluttertoast.showToast(
+                                            msg: s.toastAddPlaylist,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        } else {
+                                          audio
+                                              .delFromPlaylist(episodes[index]);
+                                          Fluttertoast.showToast(
+                                            msg: s.toastRemovePlaylist,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      })
+                                  : null,
+                              menuList.contains(2)
+                                  ? FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.scaffoldBackgroundColor,
+                                      title: isLiked
+                                          ? Text(s.unlike)
+                                          : Text(s.like),
+                                      trailingIcon: Icon(LineIcons.heart,
+                                          color: Colors.red, size: 21),
+                                      onPressed: () async {
+                                        if (isLiked) {
+                                          await _setUnliked(
+                                              episodes[index].enclosureUrl);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: s.unliked,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        } else {
+                                          await _saveLiked(
+                                              episodes[index].enclosureUrl);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: s.liked,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      })
+                                  : null,
+                              menuList.contains(3)
+                                  ? FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.scaffoldBackgroundColor,
+                                      title: isListened > 0
+                                          ? Text(s.listened,
+                                              style: TextStyle(
+                                                  color: context.textColor
+                                                      .withOpacity(0.5)))
+                                          : Text(
+                                              s.markListened,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                            onPressed: () {
-                                              if (!data.item2.contains(
-                                                  episodes[index]
-                                                      .enclosureUrl)) {
-                                                audio.addToPlaylist(
-                                                    episodes[index]);
-                                                Fluttertoast.showToast(
-                                                  msg: s.toastAddPlaylist,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              } else {
-                                                audio.delFromPlaylist(
-                                                    episodes[index]);
-                                                Fluttertoast.showToast(
-                                                  msg: s.toastRemovePlaylist,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              }
-                                            })
-                                        : null,
-                                    menuList.contains(2)
-                                        ? FocusedMenuItem(
-                                            backgroundColor: context
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context
-                                                    .scaffoldBackgroundColor,
-                                            title: isLiked
-                                                ? Text(s.unlike)
-                                                : Text(s.like),
-                                            trailingIcon: Icon(LineIcons.heart,
-                                                color: Colors.red, size: 21),
-                                            onPressed: () async {
-                                              if (isLiked) {
-                                                await _setUnliked(
-                                                    episodes[index]
-                                                        .enclosureUrl);
-                                                audio.setEpisodeState = true;
-                                                Fluttertoast.showToast(
-                                                  msg: s.unliked,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              } else {
-                                                await _saveLiked(episodes[index]
-                                                    .enclosureUrl);
-                                                audio.setEpisodeState = true;
-                                                Fluttertoast.showToast(
-                                                  msg: s.liked,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              }
-                                            })
-                                        : null,
-                                    menuList.contains(3)
-                                        ? FocusedMenuItem(
-                                            backgroundColor: context
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context
-                                                    .scaffoldBackgroundColor,
-                                            title: isListened > 0
-                                                ? Text(s.listened,
-                                                    style: TextStyle(
-                                                        color: context.textColor
-                                                            .withOpacity(0.5)))
-                                                : Text(
-                                                    s.markListened,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                            trailingIcon: SizedBox(
-                                              width: 23,
-                                              height: 23,
-                                              child: CustomPaint(
-                                                  painter: ListenedAllPainter(
-                                                      Colors.blue,
-                                                      stroke: 1.5)),
-                                            ),
-                                            onPressed: () async {
-                                              if (isListened < 1) {
-                                                await _markListened(
-                                                    episodes[index]);
-                                                audio.setEpisodeState = true;
-                                                Fluttertoast.showToast(
-                                                  msg: s.markListened,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              }
-                                            })
-                                        : null,
-                                    menuList.contains(4)
-                                        ? FocusedMenuItem(
-                                            backgroundColor: context
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context
-                                                    .scaffoldBackgroundColor,
-                                            title: isDownloaded
-                                                ? Text(s.downloaded,
-                                                    style: TextStyle(
-                                                        color: context.textColor
-                                                            .withOpacity(0.5)))
-                                                : Text(s.download),
-                                            trailingIcon: Icon(
-                                                LineIcons.download_solid,
-                                                color: Colors.green),
-                                            onPressed: () {
-                                              if (!isDownloaded)
-                                                downloader
-                                                    .startTask(episodes[index]);
-                                            })
-                                        : null
-                                  ],
-                                  action: action,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
+                                      trailingIcon: SizedBox(
+                                        width: 23,
+                                        height: 23,
+                                        child: CustomPaint(
+                                            painter: ListenedAllPainter(
+                                                Colors.blue,
+                                                stroke: 1.5)),
+                                      ),
+                                      onPressed: () async {
+                                        if (isListened < 1) {
+                                          await _markListened(episodes[index]);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: s.markListened,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      })
+                                  : null,
+                              menuList.contains(4)
+                                  ? FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.scaffoldBackgroundColor,
+                                      title: isDownloaded
+                                          ? Text(s.downloaded,
+                                              style: TextStyle(
+                                                  color: context.textColor
+                                                      .withOpacity(0.5)))
+                                          : Text(s.download),
+                                      trailingIcon: Icon(
+                                          LineIcons.download_solid,
+                                          color: Colors.green),
+                                      onPressed: () {
+                                        if (!isDownloaded)
+                                          downloader.startTask(episodes[index]);
+                                      })
+                                  : null
+                            ],
+                            action: action,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Expanded(
+                                    flex: layout == Layout.one ? 1 : 2,
+                                    child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: <Widget>[
-                                        Expanded(
-                                          flex: layout == Layout.one ? 1 : 2,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              layout != Layout.one
-                                                  ? _circleImage(context,
-                                                      episode: episodes[index],
-                                                      color: _c,
-                                                      boo: boo)
-                                                  : _pubDate(context,
-                                                      episode: episodes[index],
-                                                      color: _c),
-                                              Spacer(),
-                                              //   _listenIndicater(context,
-                                              //       episode: episodes[index],
-                                              //       isListened: snapshot.data),
-                                              _isNewIndicator(episodes[index]),
-                                              _downloadIndicater(context,
-                                                  episode: episodes[index],
-                                                  isDownloaded: isDownloaded),
-                                              _numberIndicater(context,
-                                                  index: index, color: _c)
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: layout == Layout.one ? 3 : 5,
-                                          child: layout != Layout.one
-                                              ? _title(episodes[index])
-                                              : Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    _circleImage(context,
-                                                        episode:
-                                                            episodes[index],
-                                                        color: _c,
-                                                        boo: boo),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Expanded(
-                                                        child: _title(
-                                                            episodes[index]))
-                                                  ],
-                                                ),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: <Widget>[
-                                              if (layout != Layout.one)
-                                                Align(
-                                                  alignment:
-                                                      Alignment.bottomLeft,
-                                                  child: _pubDate(context,
-                                                      episode: episodes[index],
-                                                      color: _c),
-                                                ),
-                                              Spacer(),
-                                              layout != Layout.three &&
-                                                      episodes[index]
-                                                              .duration !=
-                                                          0
-                                                  ? Container(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Text(
-                                                        _stringForSeconds(
-                                                            episodes[index]
-                                                                .duration
-                                                                .toDouble()),
-                                                        style: TextStyle(
-                                                            fontSize:
-                                                                _width / 35),
-                                                      ),
-                                                    )
-                                                  : Center(),
-                                              episodes[index].duration == 0 ||
-                                                      episodes[index]
-                                                              .enclosureLength ==
-                                                          null ||
-                                                      episodes[index]
-                                                              .enclosureLength ==
-                                                          0 ||
-                                                      layout == Layout.three
-                                                  ? Center()
-                                                  : Text(
-                                                      '|',
-                                                      style: TextStyle(
-                                                        fontSize: _width / 35,
-                                                        // color: _c,
-                                                        // fontStyle: FontStyle.italic,
-                                                      ),
-                                                    ),
-                                              layout != Layout.three &&
-                                                      episodes[index]
-                                                              .enclosureLength !=
-                                                          null &&
-                                                      episodes[index]
-                                                              .enclosureLength !=
-                                                          0
-                                                  ? Container(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Text(
-                                                        ((episodes[index]
-                                                                        .enclosureLength) ~/
-                                                                    1000000)
-                                                                .toString() +
-                                                            'MB',
-                                                        style: TextStyle(
-                                                            fontSize:
-                                                                _width / 35),
-                                                      ),
-                                                    )
-                                                  : Center(),
-                                              Padding(
-                                                padding: EdgeInsets.all(1),
-                                              ),
-                                              showFavorite ||
-                                                      layout != Layout.three
-                                                  ? isLiked
-                                                      ? IconTheme(
-                                                          data: IconThemeData(
-                                                              size:
-                                                                  _width / 35),
-                                                          child: Icon(
-                                                            Icons.favorite,
-                                                            color: Colors.red,
-                                                          ),
-                                                        )
-                                                      : Center()
-                                                  : Center()
-                                            ],
-                                          ),
-                                        ),
+                                        layout != Layout.one
+                                            ? _circleImage(context,
+                                                episode: episodes[index],
+                                                color: _c,
+                                                boo: boo)
+                                            : _pubDate(context,
+                                                episode: episodes[index],
+                                                color: _c),
+                                        Spacer(),
+                                        //   _listenIndicater(context,
+                                        //       episode: episodes[index],
+                                        //       isListened: snapshot.data),
+                                        _isNewIndicator(episodes[index]),
+                                        _downloadIndicater(context,
+                                            episode: episodes[index],
+                                            isDownloaded: isDownloaded),
+                                        _numberIndicater(context,
+                                            index: index, color: _c)
                                       ],
                                     ),
                                   ),
-                                ),
+                                  Expanded(
+                                    flex: layout == Layout.one ? 3 : 5,
+                                    child: layout != Layout.one
+                                        ? _title(episodes[index])
+                                        : Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              _circleImage(context,
+                                                  episode: episodes[index],
+                                                  color: _c,
+                                                  boo: boo),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Expanded(
+                                                  child:
+                                                      _title(episodes[index]))
+                                            ],
+                                          ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        if (layout != Layout.one)
+                                          Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: _pubDate(context,
+                                                episode: episodes[index],
+                                                color: _c),
+                                          ),
+                                        Spacer(),
+                                        layout != Layout.three &&
+                                                episodes[index].duration != 0
+                                            ? Container(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  _stringForSeconds(
+                                                      episodes[index]
+                                                          .duration
+                                                          .toDouble()),
+                                                  style: TextStyle(
+                                                      fontSize: _width / 35),
+                                                ),
+                                              )
+                                            : Center(),
+                                        episodes[index].duration == 0 ||
+                                                episodes[index]
+                                                        .enclosureLength ==
+                                                    null ||
+                                                episodes[index]
+                                                        .enclosureLength ==
+                                                    0 ||
+                                                layout == Layout.three
+                                            ? Center()
+                                            : Text(
+                                                '|',
+                                                style: TextStyle(
+                                                  fontSize: _width / 35,
+                                                  // color: _c,
+                                                  // fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                        layout != Layout.three &&
+                                                episodes[index]
+                                                        .enclosureLength !=
+                                                    null &&
+                                                episodes[index]
+                                                        .enclosureLength !=
+                                                    0
+                                            ? Container(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  ((episodes[index]
+                                                                  .enclosureLength) ~/
+                                                              1000000)
+                                                          .toString() +
+                                                      'MB',
+                                                  style: TextStyle(
+                                                      fontSize: _width / 35),
+                                                ),
+                                              )
+                                            : Center(),
+                                        Padding(
+                                          padding: EdgeInsets.all(1),
+                                        ),
+                                        showFavorite || layout != Layout.three
+                                            ? isLiked
+                                                ? IconTheme(
+                                                    data: IconThemeData(
+                                                        size: _width / 35),
+                                                    child: Icon(
+                                                      Icons.favorite,
+                                                      color: Colors.red,
+                                                    ),
+                                                  )
+                                                : Center()
+                                            : Center()
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            );
+                            ),
+                          ),
+                        ),
+                      );
                     }),
               ),
             ),

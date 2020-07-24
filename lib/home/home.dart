@@ -18,7 +18,7 @@ import '../local_storage/key_value_storage.dart';
 import '../util/episodegrid.dart';
 import '../util/mypopupmenu.dart';
 import '../util/extension_helper.dart';
-import '../util/custompaint.dart';
+import '../util/custom_widget.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
 import '../state/setting_state.dart';

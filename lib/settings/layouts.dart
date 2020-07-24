@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../util/extension_helper.dart';
 import '../util/episodegrid.dart';
-import '../util/custompaint.dart';
+import '../util/custom_widget.dart';
 import '../local_storage/key_value_storage.dart';
 import 'popup_menu.dart';
 

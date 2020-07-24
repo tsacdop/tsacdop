@@ -15,7 +15,7 @@ import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
 import '../util/pageroute.dart';
 import '../util/extension_helper.dart';
-import '../util/custompaint.dart';
+import '../util/custom_widget.dart';
 import '../util/custom_slider.dart';
 import '../episodes/episode_detail.dart';
 import 'playlist.dart';

@@ -23,7 +23,7 @@ import '../util/episodegrid.dart';
 import '../home/audioplayer.dart';
 import '../type/fireside_data.dart';
 import '../util/extension_helper.dart';
-import '../util/custompaint.dart';
+import '../util/custom_widget.dart';
 import '../util/general_dialog.dart';
 import '../state/audio_state.dart';
 
@@ -147,7 +147,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
     int index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
     episodes = await dbHelper.getRssItem(podcastLocal.id, count, reverse,
-        filter: filter, query: query);
+        filter: filter, query: query, hideListened: _hideListened);
+
     if (podcastLocal.provider.contains('fireside')) {
       FiresideData data = FiresideData(podcastLocal.id, podcastLocal.link);
       await data.getData();
@@ -263,24 +264,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
-  _customPopupMenu(
-          {Widget child,
-          String tooltip,
-          List<PopupMenuEntry<int>> itemBuilder,
-          Function(int) onSelected}) =>
-      Material(
-        color: Colors.transparent,
-        child: PopupMenuButton<int>(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 1,
-          tooltip: tooltip,
-          child: child,
-          itemBuilder: (context) => itemBuilder,
-          onSelected: (value) => onSelected(value),
-        ),
-      );
-
   _confirmMarkListened(BuildContext context) => generalDialog(
         context,
         title: Text(context.s.markConfirm),
@@ -307,6 +290,350 @@ class _PodcastDetailState extends State<PodcastDetail> {
           )
         ],
       );
+
+  _customPopupMenu(
+          {Widget child,
+          String tooltip,
+          List<PopupMenuEntry<int>> itemBuilder,
+          Function(int) onSelected,
+          bool clip = true}) =>
+      Material(
+        key: UniqueKey(),
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(100),
+        clipBehavior: clip ? Clip.hardEdge : Clip.none,
+        child: PopupMenuButton<int>(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          elevation: 1,
+          tooltip: tooltip,
+          child: child,
+          itemBuilder: (context) => itemBuilder,
+          onSelected: (value) => onSelected(value),
+        ),
+      );
+  Widget _rightTopMenu(BuildContext context) {
+    final s = context.s;
+    return _customPopupMenu(
+        tooltip: s.menu,
+        clip: false,
+        onSelected: (int value) {
+          switch (value) {
+            case 0:
+              widget.podcastLocal.link.launchUrl;
+              break;
+            case 1:
+              widget.podcastLocal.rssUrl.launchUrl;
+              break;
+            case 2:
+              _confirmMarkListened(context);
+              break;
+          }
+        },
+        itemBuilder: [
+          if (widget.podcastLocal.link != null)
+            PopupMenuItem(
+              value: 0,
+              child: Container(
+                padding: EdgeInsets.only(left: 10),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.link, color: context.textColor),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    ),
+                    Text(s.menuVisitSite),
+                  ],
+                ),
+              ),
+            ),
+          PopupMenuItem(
+            value: 1,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.rss_feed,
+                    color: context.textColor,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Text(s.menuViewRSS),
+                ],
+              ),
+            ),
+          ),
+          PopupMenuItem(
+            value: 2,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    width: 25,
+                    height: 25,
+                    child: CustomPaint(
+                        painter:
+                            ListenedAllPainter(context.textColor, stroke: 2)),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Text(
+                    s.menuMarkAllListened,
+                  ),
+                ],
+              ),
+            ),
+          )
+        ]);
+  }
+
+  Widget _actionBar(BuildContext context) {
+    final s = context.s;
+    return Container(
+        height: 30,
+        child: Row(
+          children: <Widget>[
+            SizedBox(width: 10),
+            _customPopupMenu(
+              tooltip: s.homeSubMenuSortBy,
+              child: Container(
+                  height: 30,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100.0),
+                    border: Border.all(color: context.primaryColorDark),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(s.homeSubMenuSortBy),
+                      SizedBox(width: 5),
+                      Icon(
+                        _reverse
+                            ? LineIcons.hourglass_start_solid
+                            : LineIcons.hourglass_end_solid,
+                        size: 18,
+                      )
+                    ],
+                  )),
+              itemBuilder: [
+                PopupMenuItem(
+                  value: 0,
+                  child: Row(
+                    children: [
+                      Text(s.newestFirst),
+                      Spacer(),
+                      if (!_reverse) DotIndicator()
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 1,
+                  child: Row(
+                    children: [
+                      Text(s.oldestFirst),
+                      Spacer(),
+                      if (_reverse) DotIndicator()
+                    ],
+                  ),
+                )
+              ],
+              onSelected: (value) {
+                if (value == 0)
+                  setState(() => _reverse = false);
+                else if (value == 1) setState(() => _reverse = true);
+              },
+            ),
+            SizedBox(width: 10),
+            _customPopupMenu(
+                tooltip: s.filter,
+                child: Container(
+                  height: 30,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      border: Border.all(color: context.primaryColorDark)),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(s.filter),
+                      SizedBox(width: 5),
+                      Icon(
+                        LineIcons.filter_solid,
+                        size: 18,
+                      )
+                    ],
+                  ),
+                ),
+                itemBuilder: [
+                  PopupMenuItem(
+                    value: 0,
+                    child: Row(
+                      children: [
+                        Text(s.all),
+                        Spacer(),
+                        if (_filter == Filter.all) DotIndicator(),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 1,
+                    child: Row(
+                      children: [
+                        Text(s.homeTabMenuFavotite),
+                        Spacer(),
+                        if (_filter == Filter.liked) DotIndicator()
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 2,
+                    child: Row(
+                      children: [
+                        Text(s.downloaded),
+                        Spacer(),
+                        if (_filter == Filter.downloaded) DotIndicator()
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 3,
+                    child: Container(
+                        padding: EdgeInsets.only(
+                            top: 5, bottom: 5, left: 2, right: 2),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                                width: 2,
+                                color: context.textColor.withOpacity(0.2))),
+                        child: _query == ''
+                            ? Row(
+                                children: [
+                                  Text(s.search,
+                                      style: TextStyle(
+                                          color: context.textColor
+                                              .withOpacity(0.4))),
+                                  Spacer()
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(_query,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            color: context.accentColor)),
+                                  ),
+                                ],
+                              )),
+                  ),
+                ],
+                onSelected: (value) {
+                  switch (value) {
+                    case 0:
+                      if (_filter != Filter.all)
+                        setState(() {
+                          _filter = Filter.all;
+                          _query = '';
+                        });
+                      break;
+                    case 1:
+                      if (_filter != Filter.liked)
+                        setState(() {
+                          _query = '';
+                          _filter = Filter.liked;
+                        });
+                      break;
+                    case 2:
+                      if (_filter != Filter.downloaded)
+                        setState(() {
+                          _query = '';
+                          _filter = Filter.downloaded;
+                        });
+                      break;
+                    case 3:
+                      showGeneralDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          barrierLabel: MaterialLocalizations.of(context)
+                              .modalBarrierDismissLabel,
+                          barrierColor: Colors.black54,
+                          transitionDuration: const Duration(milliseconds: 200),
+                          pageBuilder: (BuildContext context,
+                                  Animation animaiton,
+                                  Animation secondaryAnimation) =>
+                              SearchEpisdoe(
+                                onSearch: (query) {
+                                  setState(() {
+                                    _query = query;
+                                    _filter = Filter.search;
+                                  });
+                                },
+                              ));
+                      break;
+                    default:
+                  }
+                }),
+            Spacer(),
+            Material(
+                color: Colors.transparent,
+                clipBehavior: Clip.hardEdge,
+                borderRadius: BorderRadius.circular(100),
+                child: IconButton(
+                  icon: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: HideListened(
+                      hideListened: _hideListened,
+                    ),
+                  ),
+                  onPressed: () {
+                    setState(() => _hideListened = !_hideListened);
+                  },
+                )),
+            Material(
+              color: Colors.transparent,
+              clipBehavior: Clip.hardEdge,
+              borderRadius: BorderRadius.circular(100),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  if (_layout == Layout.three)
+                    setState(() {
+                      _layout = Layout.one;
+                    });
+                  else if (_layout == Layout.two)
+                    setState(() {
+                      _layout = Layout.three;
+                    });
+                  else
+                    setState(() {
+                      _layout = Layout.two;
+                    });
+                },
+                icon: _layout == Layout.three
+                    ? IconPainter(
+                        LayoutPainter(0, context.textColor),
+                      )
+                    : _layout == Layout.two
+                        ? IconPainter(
+                            LayoutPainter(1, context.textColor),
+                          )
+                        : IconPainter(
+                            LayoutPainter(4, context.textColor),
+                          ),
+              ),
+            ),
+            SizedBox(width: 10)
+          ],
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -375,103 +702,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   slivers: <Widget>[
                                     SliverAppBar(
                                       brightness: Brightness.dark,
-                                      actions: <Widget>[
-                                        _customPopupMenu(
-                                          tooltip: s.menu,
-                                          onSelected: (int value) {
-                                            switch (value) {
-                                              case 0:
-                                                widget.podcastLocal.link
-                                                    .launchUrl;
-                                                break;
-                                              case 1:
-                                                widget.podcastLocal.rssUrl
-                                                    .launchUrl;
-                                                break;
-                                              case 2:
-                                                _confirmMarkListened(context);
-                                                break;
-                                            }
-                                          },
-                                          itemBuilder: [
-                                            if (widget.podcastLocal.link !=
-                                                null)
-                                              PopupMenuItem(
-                                                value: 0,
-                                                child: Container(
-                                                  padding:
-                                                      EdgeInsets.only(left: 10),
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      Icon(Icons.link,
-                                                          color: context
-                                                              .textColor),
-                                                      Padding(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    5.0),
-                                                      ),
-                                                      Text(s.menuVisitSite),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            PopupMenuItem(
-                                              value: 1,
-                                              child: Container(
-                                                padding:
-                                                    EdgeInsets.only(left: 10),
-                                                child: Row(
-                                                  children: <Widget>[
-                                                    Icon(
-                                                      Icons.rss_feed,
-                                                      color: context.textColor,
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 5.0),
-                                                    ),
-                                                    Text(s.menuViewRSS),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 2,
-                                              child: Container(
-                                                padding:
-                                                    EdgeInsets.only(left: 10),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: <Widget>[
-                                                    SizedBox(
-                                                      width: 25,
-                                                      height: 25,
-                                                      child: CustomPaint(
-                                                          painter:
-                                                              ListenedAllPainter(
-                                                                  context
-                                                                      .textColor,
-                                                                  stroke: 2)),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 5.0),
-                                                    ),
-                                                    Text(
-                                                      s.menuMarkAllListened,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                      actions: <Widget>[_rightTopMenu(context)],
                                       elevation: 0,
                                       iconTheme: IconThemeData(
                                         color: Colors.white,
@@ -559,250 +790,18 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       child: hostsList(context, _hosts),
                                     ),
                                     SliverToBoxAdapter(
-                                      child: Container(
-                                          height: 30,
-                                          child: Row(
-                                            children: <Widget>[
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: _customPopupMenu(
-                                                  tooltip: s.homeSubMenuSortBy,
-                                                  child: Container(
-                                                      height: 30,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 15),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: <Widget>[
-                                                          Text(s
-                                                              .homeSubMenuSortBy),
-                                                          SizedBox(width: 10),
-                                                          Icon(
-                                                            _reverse
-                                                                ? LineIcons
-                                                                    .hourglass_start_solid
-                                                                : LineIcons
-                                                                    .hourglass_end_solid,
-                                                            size: 18,
-                                                          )
-                                                        ],
-                                                      )),
-                                                  itemBuilder: [
-                                                    PopupMenuItem(
-                                                      value: 0,
-                                                      child:
-                                                          Text(s.newestFirst),
-                                                    ),
-                                                    PopupMenuItem(
-                                                      value: 1,
-                                                      child:
-                                                          Text(s.oldestFirst),
-                                                    )
-                                                  ],
-                                                  onSelected: (value) {
-                                                    if (value == 0)
-                                                      setState(() =>
-                                                          _reverse = false);
-                                                    else if (value == 1)
-                                                      setState(() =>
-                                                          _reverse = true);
-                                                  },
-                                                ),
-                                              ),
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: _customPopupMenu(
-                                                    tooltip: 'Filter',
-                                                    child: Container(
-                                                      height: 30,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 15),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: <Widget>[
-                                                          Text('Filter'),
-                                                          SizedBox(width: 10),
-                                                          Icon(
-                                                            LineIcons
-                                                                .filter_solid,
-                                                            size: 18,
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    itemBuilder: [
-                                                      PopupMenuItem(
-                                                        value: 0,
-                                                        child: Text('All'),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 1,
-                                                        child: Text(
-                                                            'Not listened'),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 2,
-                                                        child: Text('Liked'),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 3,
-                                                        child:
-                                                            Text('Downloaded'),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 4,
-                                                        child: Text('Search'),
-                                                      ),
-                                                    ],
-                                                    onSelected: (value) {
-                                                      switch (value) {
-                                                        case 0:
-                                                          if (_filter !=
-                                                              Filter.all)
-                                                            setState(() {
-                                                              _hideListened =
-                                                                  false;
-                                                              _filter =
-                                                                  Filter.all;
-                                                            });
-                                                          break;
-                                                        case 1:
-                                                          setState(() =>
-                                                              _hideListened =
-                                                                  true);
-                                                          break;
-                                                        case 2:
-                                                          if (_filter !=
-                                                              Filter.liked)
-                                                            setState(() =>
-                                                                _filter = Filter
-                                                                    .liked);
-                                                          break;
-                                                        case 3:
-                                                          if (_filter !=
-                                                              Filter.downloaded)
-                                                            setState(() =>
-                                                                _filter = Filter
-                                                                    .downloaded);
-                                                          break;
-                                                        case 4:
-                                                          showGeneralDialog(
-                                                              context: context,
-                                                              barrierDismissible:
-                                                                  true,
-                                                              barrierLabel:
-                                                                  MaterialLocalizations
-                                                                          .of(
-                                                                              context)
-                                                                      .modalBarrierDismissLabel,
-                                                              barrierColor:
-                                                                  Colors
-                                                                      .black54,
-                                                              transitionDuration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          200),
-                                                              pageBuilder: (BuildContext
-                                                                          context,
-                                                                      Animation
-                                                                          animaiton,
-                                                                      Animation
-                                                                          secondaryAnimation) =>
-                                                                  SearchEpisdoe(
-                                                                    onSearch:
-                                                                        (query) {
-                                                                      setState(
-                                                                          () {
-                                                                        _query =
-                                                                            query;
-                                                                        _filter =
-                                                                            Filter.search;
-                                                                      });
-                                                                    },
-                                                                  ));
-                                                          break;
-                                                        default:
-                                                      }
-                                                    }),
-                                              ),
-                                              Spacer(),
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  onPressed: () {
-                                                    if (_layout == Layout.three)
-                                                      setState(() {
-                                                        _layout = Layout.one;
-                                                      });
-                                                    else if (_layout ==
-                                                        Layout.two)
-                                                      setState(() {
-                                                        _layout = Layout.three;
-                                                      });
-                                                    else
-                                                      setState(() {
-                                                        _layout = Layout.two;
-                                                      });
-                                                  },
-                                                  icon: _layout == Layout.three
-                                                      ? SizedBox(
-                                                          height: 10,
-                                                          width: 30,
-                                                          child: CustomPaint(
-                                                            painter: LayoutPainter(
-                                                                0,
-                                                                context
-                                                                    .textTheme
-                                                                    .bodyText1
-                                                                    .color),
-                                                          ),
-                                                        )
-                                                      : _layout == Layout.two
-                                                          ? SizedBox(
-                                                              height: 10,
-                                                              width: 30,
-                                                              child:
-                                                                  CustomPaint(
-                                                                painter: LayoutPainter(
-                                                                    1,
-                                                                    context
-                                                                        .textTheme
-                                                                        .bodyText1
-                                                                        .color),
-                                                              ),
-                                                            )
-                                                          : SizedBox(
-                                                              height: 10,
-                                                              width: 30,
-                                                              child:
-                                                                  CustomPaint(
-                                                                painter: LayoutPainter(
-                                                                    4,
-                                                                    context
-                                                                        .textTheme
-                                                                        .bodyText1
-                                                                        .color),
-                                                              ),
-                                                            ),
-                                                ),
-                                              ),
-                                            ],
-                                          )),
-                                    ),
+                                        child: _actionBar(context)),
                                     EpisodeGrid(
                                       episodes: snapshot.data,
                                       showFavorite: true,
-                                      showNumber: true,
+                                      showNumber: _filter == Filter.all &&
+                                              !_hideListened
+                                          ? true
+                                          : false,
                                       layout: _layout,
                                       reverse: _reverse,
                                       episodeCount: _episodeCount,
                                       initNum: _scroll ? 0 : 12,
-                                      hideListened: _hideListened,
                                     ),
                                     SliverList(
                                       delegate: SliverChildBuilderDelegate(
@@ -866,14 +865,6 @@ class _AboutPodcastState extends State<AboutPodcast> {
     if (mounted) setState(() => _load = true);
   }
 
-  _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -906,7 +897,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
                           children: <Widget>[
                             Linkify(
                               onOpen: (link) {
-                                _launchUrl(link.url);
+                                link.url.launchUrl;
                               },
                               text: _description,
                               linkStyle: TextStyle(
@@ -920,7 +911,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
                         )
                       : Linkify(
                           onOpen: (link) {
-                            _launchUrl(link.url);
+                            link.url.launchUrl;
                           },
                           text: _description,
                           linkStyle: TextStyle(
@@ -933,7 +924,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
                 return Linkify(
                   text: _description,
                   onOpen: (link) {
-                    _launchUrl(link.url);
+                    link.url.launchUrl;
                   },
                   linkStyle: TextStyle(
                       color: Theme.of(context).accentColor,
@@ -956,12 +947,10 @@ class SearchEpisdoe extends StatefulWidget {
 class _SearchEpisodeState extends State<SearchEpisdoe> {
   TextEditingController _controller;
   String _query;
-  int _error;
 
   @override
   void initState() {
     super.initState();
-    _error = 0;
     _controller = TextEditingController();
   }
 
@@ -1007,18 +996,18 @@ class _SearchEpisodeState extends State<SearchEpisdoe> {
                     }
                   }
                 : null,
-            child: Text(s.confirm,
-                style: TextStyle(color: Theme.of(context).accentColor)),
+            child:
+                Text(s.confirm, style: TextStyle(color: context.accentColor)),
           )
         ],
-        title: SizedBox(width: context.width - 160, child: Text(s.newGroup)),
+        title: SizedBox(width: context.width - 160, child: Text(s.search)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             TextField(
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                hintText: s.newGroup,
+                hintText: s.searchEpisode,
                 hintStyle: TextStyle(fontSize: 18),
                 filled: true,
                 focusedBorder: UnderlineInputBorder(
@@ -1037,15 +1026,6 @@ class _SearchEpisodeState extends State<SearchEpisdoe> {
               onChanged: (value) {
                 _query = value;
               },
-            ),
-            Container(
-              alignment: Alignment.centerLeft,
-              child: (_error == 1)
-                  ? Text(
-                      s.groupExisted,
-                      style: TextStyle(color: Colors.red[400]),
-                    )
-                  : Center(),
             ),
           ],
         ),

@@ -29,10 +29,10 @@ class EpisodeBrief {
       this.duration,
       this.explicit,
       this.imagePath,
+      this.isNew,
       {this.mediaId,
       this.liked,
       this.downloaded,
-      this.isNew,
       this.skipSeconds,
       this.description = '',
       this.downloadDate = 0})

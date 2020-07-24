@@ -548,6 +548,16 @@ class S {
     );
   }
 
+  /// `Filter`
+  String get filter {
+    return Intl.message(
+      'Filter',
+      name: 'filter',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Fonts`
   String get fonts {
     return Intl.message(
@@ -1381,6 +1391,26 @@ class S {
     return Intl.message(
       'Schedule',
       name: 'schedule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search`
+  String get search {
+    return Intl.message(
+      'Search',
+      name: 'search',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search episode`
+  String get searchEpisode {
+    return Intl.message(
+      'Search episode',
+      name: 'searchEpisode',
       desc: '',
       args: [],
     );
