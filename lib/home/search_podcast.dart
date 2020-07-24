@@ -175,132 +175,149 @@ class _RssResultState extends State<RssResult> {
       length: 2,
       child: Column(
         children: [
-          SizedBox(
-            height: 140,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Text(_onlinePodcast.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: context.textTheme.headline5),
+          ListView(
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: 140,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Text(_onlinePodcast.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: context.textTheme.headline5),
+                            ),
+                            !_isSubscribed
+                                ? OutlineButton(
+                                    highlightedBorderColor: context.accentColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(100.0),
+                                        side: BorderSide(
+                                            color: context.accentColor)),
+                                    splashColor:
+                                        context.accentColor.withOpacity(0.5),
+                                    child: Text(s.subscribe,
+                                        style: TextStyle(
+                                            color: context.accentColor)),
+                                    onPressed: () {
+                                      _subscribePodcast(_onlinePodcast);
+                                      setState(() {
+                                        _isSubscribed = true;
+                                      });
+                                      Fluttertoast.showToast(
+                                        msg: s.podcastSubscribed,
+                                        gravity: ToastGravity.BOTTOM,
+                                      );
+                                    })
+                                : OutlineButton(
+                                    color: context.accentColor.withOpacity(0.5),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(100.0),
+                                        side: BorderSide(
+                                            color: Colors.grey[500])),
+                                    highlightedBorderColor: Colors.grey[500],
+                                    disabledTextColor: Colors.grey[500],
+                                    child: Text(s.subscribe),
+                                    disabledBorderColor: Colors.grey[500],
+                                    onPressed: () {})
+                          ],
                         ),
-                        !_isSubscribed
-                            ? OutlineButton(
-                                highlightedBorderColor: context.accentColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100.0),
-                                    side:
-                                        BorderSide(color: context.accentColor)),
-                                splashColor:
-                                    context.accentColor.withOpacity(0.5),
-                                child: Text(s.subscribe,
-                                    style:
-                                        TextStyle(color: context.accentColor)),
-                                onPressed: () {
-                                  _subscribePodcast(_onlinePodcast);
-                                  setState(() {
-                                    _isSubscribed = true;
-                                  });
-                                  Fluttertoast.showToast(
-                                    msg: s.podcastSubscribed,
-                                    gravity: ToastGravity.BOTTOM,
-                                  );
-                                })
-                            : OutlineButton(
-                                color: context.accentColor.withOpacity(0.5),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100.0),
-                                    side: BorderSide(color: Colors.grey[500])),
-                                highlightedBorderColor: Colors.grey[500],
-                                disabledTextColor: Colors.grey[500],
-                                child: Text(s.subscribe),
-                                disabledBorderColor: Colors.grey[500],
-                                onPressed: () {})
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                CachedNetworkImage(
-                  height: 120.0,
-                  width: 120.0,
-                  fit: BoxFit.fitWidth,
-                  alignment: Alignment.center,
-                  imageUrl: _onlinePodcast.image,
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      Container(
-                    height: 120,
-                    width: 120,
-                    alignment: Alignment.center,
-                    color: context.primaryColorDark,
-                    child: SizedBox(
-                      width: 40,
-                      height: 2,
-                      child: LinearProgressIndicator(
-                          value: downloadProgress.progress),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                      width: 120,
-                      height: 120,
+                    CachedNetworkImage(
+                      height: 120.0,
+                      width: 120.0,
+                      fit: BoxFit.fitWidth,
                       alignment: Alignment.center,
-                      color: context.primaryColorDark,
-                      child: Icon(Icons.error)),
+                      imageUrl: _onlinePodcast.image,
+                      progressIndicatorBuilder:
+                          (context, url, downloadProgress) => Container(
+                        height: 120,
+                        width: 120,
+                        alignment: Alignment.center,
+                        color: context.primaryColorDark,
+                        child: SizedBox(
+                          width: 40,
+                          height: 2,
+                          child: LinearProgressIndicator(
+                              value: downloadProgress.progress),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                          width: 120,
+                          height: 120,
+                          alignment: Alignment.center,
+                          color: context.primaryColorDark,
+                          child: Icon(Icons.error)),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Container(
-            height: 50,
-            color: context.scaffoldBackgroundColor,
-            child: TabBar(
-                indicatorColor: context.accentColor,
-                labelColor: context.textColor,
-                indicatorWeight: 3,
-                indicatorSize: TabBarIndicatorSize.label,
-                tabs: [
-                  Text(s.homeToprightMenuAbout),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(s.episode(2)),
-                      SizedBox(width: 2),
-                      Container(
-                          padding: const EdgeInsets.only(
-                              left: 5, right: 5, top: 2, bottom: 2),
-                          decoration: BoxDecoration(
-                              color: context.accentColor,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Text(_onlinePodcast.count.toString(),
-                              style: TextStyle(color: Colors.white)))
-                    ],
-                  )
-                ]),
+          ListView(
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              Container(
+                height: 50,
+                color: context.scaffoldBackgroundColor,
+                child: TabBar(
+                    indicatorColor: context.accentColor,
+                    labelColor: context.textColor,
+                    indicatorWeight: 3,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    tabs: [
+                      Text(s.homeToprightMenuAbout),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(s.episode(2)),
+                          SizedBox(width: 2),
+                          Container(
+                              padding: const EdgeInsets.only(
+                                  left: 5, right: 5, top: 2, bottom: 2),
+                              decoration: BoxDecoration(
+                                  color: context.accentColor,
+                                  borderRadius: BorderRadius.circular(100)),
+                              child: Text(_onlinePodcast.count.toString(),
+                                  style: TextStyle(color: Colors.white)))
+                        ],
+                      )
+                    ]),
+              ),
+            ],
           ),
           Expanded(
             child: TabBarView(children: [
               ListView(
                 children: [
-                  Html(
-                    onLinkTap: (url) {
-                      url.launchUrl;
-                    },
-                    linkStyle: TextStyle(
-                        color: context.accentColor,
-                        // decoration: TextDecoration.underline,
-                        textBaseline: TextBaseline.ideographic),
-                    shrinkToFit: true,
-                    data: _onlinePodcast.description,
-                    padding: EdgeInsets.only(left: 20.0, right: 20, bottom: 20),
-                    defaultTextStyle: TextStyle(
-                      height: 1.8,
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Html(
+                      onLinkTap: (url) {
+                        url.launchUrl;
+                      },
+                      linkStyle: TextStyle(
+                          color: context.accentColor,
+                          // decoration: TextDecoration.underline,
+                          textBaseline: TextBaseline.ideographic),
+                      shrinkToFit: true,
+                      data: _onlinePodcast.description,
+                      padding:
+                          EdgeInsets.only(left: 20.0, right: 20, bottom: 20),
+                      defaultTextStyle: TextStyle(
+                        height: 1.8,
+                      ),
                     ),
                   ),
                 ],

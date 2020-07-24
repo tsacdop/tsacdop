@@ -257,27 +257,30 @@ class _DataBackupState extends State<DataBackup> {
                         await _shareFile(file);
                       }),
                   SizedBox(width: 10),
-                  OutlineButton(
-                      highlightedBorderColor: Colors.red[700],
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(color: Colors.red[700])),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LineIcons.paperclip_solid,
-                            size: context.textTheme.headline6.fontSize,
-                            color: Colors.red[700],
-                          ),
-                          SizedBox(width: 10),
-                          Text(s.import,
-                              style: TextStyle(color: Colors.red[700])),
-                        ],
-                      ),
-                      onPressed: () {
-                        _getFilePath(context);
-                      }),
+                  ButtonTheme(
+                    height: 32,
+                    child: OutlineButton(
+                        highlightedBorderColor: Colors.red[700],
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100.0),
+                            side: BorderSide(color: Colors.red[700])),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              LineIcons.paperclip_solid,
+                              size: context.textTheme.headline6.fontSize,
+                              color: Colors.red[700],
+                            ),
+                            SizedBox(width: 10),
+                            Text(s.import,
+                                style: TextStyle(color: Colors.red[700])),
+                          ],
+                        ),
+                        onPressed: () {
+                          _getFilePath(context);
+                        }),
+                  ),
                 ]),
               ),
               Divider()

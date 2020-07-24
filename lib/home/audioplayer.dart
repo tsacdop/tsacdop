@@ -1277,7 +1277,7 @@ class _ControlPanelState extends State<ControlPanel>
                                 onPressed:
                                     playing ? () => audio.rewind() : null,
                                 iconSize: 32.0,
-                                icon: Icon(Icons.replay),
+                                icon: Icon(Icons.fast_rewind),
                                 color: Colors.grey[500]),
                             Container(
                               margin: EdgeInsets.symmetric(horizontal: 30),
@@ -1345,7 +1345,7 @@ class _ControlPanelState extends State<ControlPanel>
                                 onPressed:
                                     playing ? () => audio.fastForward() : null,
                                 iconSize: 32.0,
-                                icon: Icon(Icons.forward),
+                                icon: Icon(Icons.fast_forward),
                                 color: Colors.grey[500]),
                           ],
                         ),
