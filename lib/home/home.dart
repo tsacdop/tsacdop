@@ -817,7 +817,10 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                         mainAxisSize:
                                                             MainAxisSize.min,
                                                         children: <Widget>[
-                                                          Text(_groupName),
+                                                          Text(_groupName ==
+                                                                  'All'
+                                                              ? s.all
+                                                              : _groupName),
                                                           Padding(
                                                             padding: EdgeInsets
                                                                 .symmetric(
@@ -833,16 +836,29 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                       )),
                                                   itemBuilder: (context) => [
                                                     PopupMenuItem(
-                                                        child: Text('All'),
+                                                        child: Row(children: [
+                                                          Text(s.all),
+                                                          Spacer(),
+                                                          if (_groupName ==
+                                                              'All')
+                                                            DotIndicator()
+                                                        ]),
                                                         value: 'All')
                                                   ]..addAll(groupList.groups
                                                       .map<
-                                                          PopupMenuEntry<
-                                                              String>>((e) =>
-                                                          PopupMenuItem(
+                                                              PopupMenuEntry<
+                                                                  String>>(
+                                                          (e) => PopupMenuItem(
                                                               value: e.name,
-                                                              child:
-                                                                  Text(e.name)))
+                                                              child: Row(
+                                                                children: [
+                                                                  Text(e.name),
+                                                                  Spacer(),
+                                                                  if (e.name ==
+                                                                      _groupName)
+                                                                    DotIndicator()
+                                                                ],
+                                                              )))
                                                       .toList()),
                                                   onSelected: (value) {
                                                     if (value == 'All') {
@@ -862,7 +878,6 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                           });
                                                         }
                                                       }
-                                                      ;
                                                     }
                                                   },
                                                 ),
@@ -881,17 +896,19 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                           child: IconButton(
                                                               tooltip: s
                                                                   .addNewEpisodeTooltip,
-                                                              icon:
-                                                                  // Icon(Icons.playlist_add),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          16,
-                                                                      width: 21,
-                                                                      child: CustomPaint(
-                                                                          painter: AddToPlaylistPainter(
-                                                                              context.textTheme.bodyText1.color,
-                                                                              Colors.red))),
-                                                              onPressed: () async {
+                                                              icon: SizedBox(
+                                                                  height: 16,
+                                                                  width: 21,
+                                                                  child: CustomPaint(
+                                                                      painter: AddToPlaylistPainter(
+                                                                          context
+                                                                              .textTheme
+                                                                              .bodyText1
+                                                                              .color,
+                                                                          Colors
+                                                                              .red))),
+                                                              onPressed:
+                                                                  () async {
                                                                 await audio
                                                                     .addNewEpisode(
                                                                         _group);
@@ -930,19 +947,18 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                                       child: CustomPaint(
                                                                           painter: AddToPlaylistPainter(
                                                                         context
-                                                                            .textTheme
-                                                                            .bodyText1
-                                                                            .color,
+                                                                            .textColor,
                                                                         context
-                                                                            .textTheme
-                                                                            .bodyText1
-                                                                            .color,
+                                                                            .textColor,
                                                                       ))),
                                                               onPressed: () {}),
                                                         );
                                                 }),
                                             Material(
                                                 color: Colors.transparent,
+                                                clipBehavior: Clip.hardEdge,
+                                                borderRadius:
+                                                    BorderRadius.circular(100),
                                                 child: IconButton(
                                                   tooltip: s.changeLayout,
                                                   padding: EdgeInsets.zero,
@@ -1140,11 +1156,8 @@ class _MyFavoriteState extends State<_MyFavorite>
                                                               horizontal: 5),
                                                     ),
                                                     Icon(
-                                                      _sortBy == 0
-                                                          ? LineIcons
-                                                              .cloud_download_alt_solid
-                                                          : LineIcons
-                                                              .heartbeat_solid,
+                                                      LineIcons
+                                                          .hourglass_start_solid,
                                                       size: 18,
                                                     )
                                                   ],
@@ -1152,11 +1165,25 @@ class _MyFavoriteState extends State<_MyFavorite>
                                             itemBuilder: (context) => [
                                               PopupMenuItem(
                                                 value: 0,
-                                                child: Text(s.updateDate),
+                                                child: Row(
+                                                  children: [
+                                                    Text(s.updateDate),
+                                                    Spacer(),
+                                                    if (_sortBy == 0)
+                                                      DotIndicator()
+                                                  ],
+                                                ),
                                               ),
                                               PopupMenuItem(
                                                 value: 1,
-                                                child: Text(s.likeDate),
+                                                child: Row(
+                                                  children: [
+                                                    Text(s.likeDate),
+                                                    Spacer(),
+                                                    if (_sortBy == 1)
+                                                      DotIndicator()
+                                                  ],
+                                                ),
                                               )
                                             ],
                                             onSelected: (value) {

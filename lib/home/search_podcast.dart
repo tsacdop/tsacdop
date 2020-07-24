@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
