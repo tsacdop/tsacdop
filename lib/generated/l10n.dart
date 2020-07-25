@@ -139,6 +139,26 @@ class S {
     );
   }
 
+  /// `Cellular data warn`
+  String get cellularConfirm {
+    return Intl.message(
+      'Cellular data warn',
+      name: 'cellularConfirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to use cellular data to download?`
+  String get cellularConfirmDes {
+    return Intl.message(
+      'Are you sure you want to use cellular data to download?',
+      name: 'cellularConfirmDes',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Change layout`
   String get changeLayout {
     return Intl.message(

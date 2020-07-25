@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:marquee/marquee.dart';
 import 'package:tuple/tuple.dart';
@@ -1271,31 +1272,41 @@ class _ControlPanelState extends State<ControlPanel>
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             IconButton(
-                                padding: EdgeInsets.symmetric(horizontal: 25.0),
+                                padding: EdgeInsets.symmetric(horizontal: 0),
                                 onPressed:
                                     playing ? () => audio.rewind() : null,
                                 iconSize: 32.0,
                                 icon: Icon(Icons.fast_rewind),
                                 color: Colors.grey[500]),
+                            Selector<AudioPlayerNotifier, int>(
+                                selector: (_, audio) => audio.rewindSeconds,
+                                builder: (_, seconds, __) => Text('$seconds s',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.teko(
+                                      textStyle: TextStyle(
+                                          color: Colors.grey[500],
+                                          fontSize: 20),
+                                    ))),
                             Container(
                               margin: EdgeInsets.symmetric(horizontal: 30),
                               height: 60,
                               width: 60,
                               decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor,
+                                  color: context.primaryColor,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.black12
-                                          : Colors.white10,
+                                      color:
+                                          context.brightness == Brightness.dark
+                                              ? Colors.black12
+                                              : Colors.white10,
                                       width: 1),
-                                  boxShadow: Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? _customShadowNight
-                                      : _customShadow),
+                                  boxShadow:
+                                      context.brightness == Brightness.dark
+                                          ? _customShadowNight
+                                          : _customShadow),
                               child: playing
                                   ? Material(
                                       color: Colors.transparent,
@@ -1333,20 +1344,29 @@ class _ControlPanelState extends State<ControlPanel>
                                           child: Icon(
                                             Icons.play_arrow,
                                             size: 40,
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: context.accentColor,
                                           ),
                                         ),
                                       ),
                                     ),
                             ),
+                            Selector<AudioPlayerNotifier, int>(
+                                selector: (_, audio) =>
+                                    audio.fastForwardSeconds,
+                                builder: (_, seconds, __) => Text('$seconds s',
+                                    style: GoogleFonts.teko(
+                                      textStyle: TextStyle(
+                                          color: Colors.grey[500],
+                                          fontSize: 20),
+                                    ))),
                             IconButton(
-                                padding: EdgeInsets.symmetric(horizontal: 25.0),
-                                onPressed:
-                                    playing ? () => audio.fastForward() : null,
-                                iconSize: 32.0,
-                                icon: Icon(Icons.fast_forward),
-                                color: Colors.grey[500]),
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              onPressed:
+                                  playing ? () => audio.fastForward() : null,
+                              iconSize: 32.0,
+                              icon: Icon(Icons.fast_forward),
+                              color: Colors.grey[500],
+                            )
                           ],
                         ),
                       );

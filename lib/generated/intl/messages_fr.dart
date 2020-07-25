@@ -89,6 +89,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "back" : MessageLookupByLibrary.simpleMessage("Retour"),
     "buffering" : MessageLookupByLibrary.simpleMessage("Buffering"),
     "cancel" : MessageLookupByLibrary.simpleMessage("ANNULER"),
+    "cellularConfirm" : MessageLookupByLibrary.simpleMessage("Cellular data warn"),
+    "cellularConfirmDes" : MessageLookupByLibrary.simpleMessage("Are you sure you want to use cellular data to download?"),
     "changeLayout" : MessageLookupByLibrary.simpleMessage("Modifier l\'interface"),
     "changelog" : MessageLookupByLibrary.simpleMessage("Historique des modifications"),
     "chooseA" : MessageLookupByLibrary.simpleMessage("Choisir un"),

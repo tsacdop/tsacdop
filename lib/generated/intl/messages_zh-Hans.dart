@@ -89,6 +89,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "back" : MessageLookupByLibrary.simpleMessage("返回"),
     "buffering" : MessageLookupByLibrary.simpleMessage("缓冲"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
+    "cellularConfirm" : MessageLookupByLibrary.simpleMessage("流量确认"),
+    "cellularConfirmDes" : MessageLookupByLibrary.simpleMessage("您确定使用流量下载吗"),
     "changeLayout" : MessageLookupByLibrary.simpleMessage("修改布局"),
     "changelog" : MessageLookupByLibrary.simpleMessage("更新日志"),
     "chooseA" : MessageLookupByLibrary.simpleMessage("选择"),

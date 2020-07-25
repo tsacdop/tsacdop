@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:audio_service/audio_service.dart';
@@ -79,10 +80,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool _playing = false;
 
   /// Fastforward second.
-  int _fastForwardSeconds;
+  int _fastForwardSeconds = 0;
 
   /// Rewind seconds.
-  int _rewindSeconds;
+  int _rewindSeconds = 0;
 
   /// No slide, set true if slide on seekbar.
   bool _noSlide = true;
@@ -158,6 +159,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   double get currentSpeed => _currentSpeed;
   bool get episodeState => _episodeState;
   bool get autoSleepTimer => _autoSleepTimer;
+  int get fastForwardSeconds => _fastForwardSeconds;
+  int get rewindSeconds => _rewindSeconds;
 
   set setSwitchValue(double value) {
     _switchValue = value;
@@ -340,38 +343,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
       }
     });
 
-    // AudioService.queueStream
-    //     .distinct()
-    //     .where((event) => event != null)
-    //     .listen((event) {
-    //   if (event.length == _queue.playlist.length - 1 &&
-    //       _audioState == AudioProcessingState.skippingToNext) {
-    //     if (event.length == 0 || _stopOnComplete) {
-    //       _queue.delFromPlaylist(_episode);
-    //       _lastPostion = 0;
-    //       notifyListeners();
-    //       positionStorage.saveInt(_lastPostion);
-    //       final PlayHistory history = PlayHistory(
-    //           _episode.title,
-    //           _episode.enclosureUrl,
-    //           backgroundAudioPosition / 1000,
-    //           seekSliderValue);
-    //       dbHelper.saveHistory(history);
-    //     } else if (event.first.id != _episode.mediaId) {
-    //       _lastPostion = 0;
-    //       notifyListeners();
-    //       positionStorage.saveInt(_lastPostion);
-    //       _queue.delFromPlaylist(_episode);
-    //       final PlayHistory history = PlayHistory(
-    //           _episode.title,
-    //           _episode.enclosureUrl,
-    //           backgroundAudioPosition / 1000,
-    //           seekSliderValue);
-    //       dbHelper.saveHistory(history);
-    //     }
-    //   }
-    // });
-
     AudioService.playbackStateStream
         .distinct()
         .where((event) => event != null)
@@ -403,13 +374,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
     Timer.periodic(Duration(milliseconds: 500), (timer) {
       double s = _currentSpeed ?? 1.0;
       if (_noSlide) {
-        if (_playing) {
+        if (_playing && !buffering) {
           getPosition = _currentPosition +
               ((DateTime.now().difference(_current).inMilliseconds) * s)
                   .toInt();
-          _backgroundAudioPosition = getPosition < _backgroundAudioDuration
-              ? getPosition
-              : _backgroundAudioDuration;
+          _backgroundAudioPosition =
+              math.min(getPosition, _backgroundAudioDuration);
         } else
           _backgroundAudioPosition = _currentPosition ?? 0;
 
@@ -708,7 +678,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
       _queue.removeAt(0);
     }
     await AudioServiceBackground.setQueue(_queue);
-    // }
     if (_queue.length == 0 || _stopAtEnd) {
       _skipState = null;
       onStop();
@@ -801,9 +770,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   Future<void> _seekRelative(Duration offset) async {
     var newPosition = _audioPlayer.playbackEvent.position + offset;
-    if (newPosition < Duration.zero) newPosition = Duration.zero;
-    if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
-    await _audioPlayer.seek(newPosition);
+    print(newPosition.inSeconds);
+    //  if (newPosition < Duration.zero) newPosition = Duration.zero;
+    //  if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
+
+    print(newPosition.inSeconds);
+    onSeekTo(newPosition);
   }
 
   @override
@@ -850,13 +822,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  void onFastForward() {
-    _seekRelative(fastForwardInterval);
+  void onFastForward() async {
+    await _seekRelative(fastForwardInterval);
+    print('test');
   }
 
   @override
-  void onRewind() {
-    _seekRelative(-rewindInterval);
+  void onRewind() async {
+    await _seekRelative(-rewindInterval);
   }
 
   @override

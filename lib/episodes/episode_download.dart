@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -12,6 +13,7 @@ import '../state/download_state.dart';
 import '../state/audio_state.dart';
 import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
+import '../util/extension_helper.dart';
 import '../util/general_dialog.dart';
 
 class DownloadButton extends StatefulWidget {
@@ -50,10 +52,6 @@ class _DownloadButtonState extends State<DownloadButton> {
       }
       if (_dataConfirm) {
         Provider.of<DownloadState>(context, listen: false).startTask(episode);
-        Fluttertoast.showToast(
-          msg: 'Downloading',
-          gravity: ToastGravity.BOTTOM,
-        );
       }
     }
   }
@@ -66,28 +64,16 @@ class _DownloadButtonState extends State<DownloadButton> {
     );
   }
 
-  void _pauseDownload(EpisodeBrief episode) async {
+  _pauseDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).pauseTask(episode);
-    Fluttertoast.showToast(
-      msg: 'Download paused',
-      gravity: ToastGravity.BOTTOM,
-    );
   }
 
-  void _resumeDownload(EpisodeBrief episode) async {
+  _resumeDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).resumeTask(episode);
-    Fluttertoast.showToast(
-      msg: 'Download resumed',
-      gravity: ToastGravity.BOTTOM,
-    );
   }
 
-  void _retryDownload(EpisodeBrief episode) async {
+  _retryDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).retryTask(episode);
-    Fluttertoast.showToast(
-      msg: 'Download again',
-      gravity: ToastGravity.BOTTOM,
-    );
   }
 
   Future<bool> _checkPermmison() async {
@@ -107,17 +93,18 @@ class _DownloadButtonState extends State<DownloadButton> {
 
   Future<bool> _useDataConfirem() async {
     bool ifUseData = false;
+    final s = context.s;
     await generalDialog(
       context,
-      title: Text('Cellular data warn'),
-      content: Text('Are you sure you want to use cellular data to download?'),
+      title: Text(s.cellularConfirm),
+      content: Text(s.cellularConfirmDes),
       actions: <Widget>[
         FlatButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
           child: Text(
-            'CANCEL',
+            s.cancel,
             style: TextStyle(color: Colors.grey[600]),
           ),
         ),
@@ -127,7 +114,7 @@ class _DownloadButtonState extends State<DownloadButton> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'CONFIRM',
+            s.confirm,
             style: TextStyle(color: Colors.red),
           ),
         )
@@ -180,7 +167,8 @@ class _DownloadButtonState extends State<DownloadButton> {
           selector: (_, settings) => settings.downloadUsingData,
           builder: (_, data, __) => _buttonOnMenu(
               Icon(
-                Icons.arrow_downward,
+                LineIcons.download_solid,
+                //size: 15,
                 color: Colors.grey[700],
               ),
               () => _requestDownload(task.episode, data)),

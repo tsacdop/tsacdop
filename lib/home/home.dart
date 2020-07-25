@@ -956,9 +956,6 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                 }),
                                             Material(
                                                 color: Colors.transparent,
-                                                clipBehavior: Clip.hardEdge,
-                                                borderRadius:
-                                                    BorderRadius.circular(100),
                                                 child: IconButton(
                                                   tooltip: s.changeLayout,
                                                   padding: EdgeInsets.zero,
