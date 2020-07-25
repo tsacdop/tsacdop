@@ -820,7 +820,7 @@ class DBHelper {
     var dbClient = await database;
     List<EpisodeBrief> episodes = [];
     List<Map> list = await dbClient.rawQuery(
-      """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
+      """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new, E.media_id,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE is_new = 1 ORDER BY E.milliseconds DESC  """,
@@ -836,7 +836,8 @@ class DBHelper {
           i['duration'],
           i['explicit'],
           i['imagePath'],
-          i['is_new']));
+          i['is_new'],
+          mediaId: i['media_id']));
     }
     return episodes;
   }
@@ -929,7 +930,7 @@ class DBHelper {
     if (group.length > 0) {
       List<String> s = group.map<String>((e) => "'$e'").toList();
       List<Map> list = await dbClient.rawQuery(
-        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
+        """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new, E.media_id,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE P.id in (${s.join(',')}) AND is_new = 1
@@ -946,7 +947,8 @@ class DBHelper {
             i['duration'],
             i['explicit'],
             i['imagePath'],
-            i['is_new']));
+            i['is_new'],
+            mediaId: i['media_id']));
       }
     }
     return episodes;

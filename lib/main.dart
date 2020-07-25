@@ -66,9 +66,12 @@ class MyApp extends StatelessWidget {
                 scaffoldBackgroundColor:
                     setting.realDark ? Colors.black87 : null,
                 primaryColor: setting.realDark ? Colors.black : null,
-                popupMenuTheme: PopupMenuThemeData()
-                    .copyWith(color: setting.realDark ? Colors.black87 : null),
+                popupMenuTheme: PopupMenuThemeData().copyWith(
+                    color: setting.realDark ? Colors.grey[900] : null),
                 appBarTheme: AppBarTheme(elevation: 0),
+                buttonTheme: ButtonThemeData(height: 32),
+                dialogBackgroundColor:
+                    setting.realDark ? Colors.grey[900] : null,
                 cursorColor: setting.accentSetColor),
             localizationsDelegates: [
               S.delegate,

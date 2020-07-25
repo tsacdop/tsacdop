@@ -12,6 +12,7 @@ extension ContextExtension on BuildContext {
   Color get scaffoldBackgroundColor => Theme.of(this).scaffoldBackgroundColor;
   Color get primaryColorDark => Theme.of(this).primaryColorDark;
   Color get textColor => Theme.of(this).textTheme.bodyText1.color;
+  Color get dialogBackgroundColor => Theme.of(this).dialogBackgroundColor;
   Brightness get brightness => Theme.of(this).brightness;
   double get width => MediaQuery.of(this).size.width;
   double get height => MediaQuery.of(this).size.height;

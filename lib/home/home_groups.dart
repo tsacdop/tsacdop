@@ -638,13 +638,13 @@ class ShowEpisode extends StatelessWidget {
                                     backgroundColor:
                                         context.brightness == Brightness.light
                                             ? context.primaryColor
-                                            : context.scaffoldBackgroundColor,
+                                            : context.dialogBackgroundColor,
                                     title: Text(data.item1 != episodes[index]
                                         ? s.play
                                         : s.playing),
                                     trailingIcon: Icon(
                                       LineIcons.play_circle_solid,
-                                      color: Theme.of(context).accentColor,
+                                      color: context.accentColor,
                                     ),
                                     onPressed: () {
                                       if (data.item1 != episodes[index])
@@ -655,7 +655,7 @@ class ShowEpisode extends StatelessWidget {
                                         backgroundColor: context.brightness ==
                                                 Brightness.light
                                             ? context.primaryColor
-                                            : context.scaffoldBackgroundColor,
+                                            : context.dialogBackgroundColor,
                                         title: data.item2.contains(
                                                 episodes[index].enclosureUrl)
                                             ? Text(s.remove)
@@ -688,7 +688,7 @@ class ShowEpisode extends StatelessWidget {
                                         backgroundColor: context.brightness ==
                                                 Brightness.light
                                             ? context.primaryColor
-                                            : context.scaffoldBackgroundColor,
+                                            : context.dialogBackgroundColor,
                                         title: isLiked
                                             ? Text(s.unlike)
                                             : Text(s.like),
@@ -719,7 +719,7 @@ class ShowEpisode extends StatelessWidget {
                                         backgroundColor: context.brightness ==
                                                 Brightness.light
                                             ? context.primaryColor
-                                            : context.scaffoldBackgroundColor,
+                                            : context.dialogBackgroundColor,
                                         title: isListened > 0
                                             ? Text(s.listened,
                                                 style: TextStyle(
@@ -755,7 +755,7 @@ class ShowEpisode extends StatelessWidget {
                                         backgroundColor: context.brightness ==
                                                 Brightness.light
                                             ? context.primaryColor
-                                            : context.scaffoldBackgroundColor,
+                                            : context.dialogBackgroundColor,
                                         title: isDownloaded
                                             ? Text(s.downloaded,
                                                 style: TextStyle(

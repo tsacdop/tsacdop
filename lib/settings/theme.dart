@@ -163,7 +163,7 @@ class ThemeSetting extends StatelessWidget {
                     context,
                     title: Text.rich(TextSpan(text: s.chooseA, children: [
                       TextSpan(
-                          text: s.color,
+                          text: ' ${s.color}',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: context.accentColor))

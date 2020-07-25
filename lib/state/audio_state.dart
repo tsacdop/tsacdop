@@ -348,8 +348,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         .where((event) => event != null)
         .listen((event) async {
       _current = DateTime.now();
-      if (event.processingState != AudioProcessingState.none)
-        _audioState = event.processingState;
+      _audioState = event.processingState;
       _playing = event?.playing;
       _currentSpeed = event.speed;
       _currentPosition = event.currentPosition.inMilliseconds ?? 0;
@@ -422,20 +421,22 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   addToPlaylist(EpisodeBrief episode) async {
-    if (!_queue.playlist.contains(episode)) {
+    var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    if (!_queue.playlist.contains(episodeNew)) {
       if (playerRunning) {
-        await AudioService.addQueueItem(episode.toMediaItem());
+        await AudioService.addQueueItem(episodeNew.toMediaItem());
       }
-      await _queue.addToPlayList(episode);
+      await _queue.addToPlayList(episodeNew);
       notifyListeners();
     }
   }
 
   addToPlaylistAt(EpisodeBrief episode, int index) async {
+    var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (playerRunning) {
-      await AudioService.addQueueItemAt(episode.toMediaItem(), index);
+      await AudioService.addQueueItemAt(episodeNew.toMediaItem(), index);
     }
-    await _queue.addToPlayListAt(episode, index);
+    await _queue.addToPlayListAt(episodeNew, index);
     _queueUpdate = !_queueUpdate;
     notifyListeners();
   }
@@ -466,10 +467,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<int> delFromPlaylist(EpisodeBrief episode) async {
+    var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (playerRunning) {
-      await AudioService.removeQueueItem(episode.toMediaItem());
+      await AudioService.removeQueueItem(episodeNew.toMediaItem());
     }
-    int index = await _queue.delFromPlaylist(episode);
+    int index = await _queue.delFromPlaylist(episodeNew);
     _queueUpdate = !_queueUpdate;
     notifyListeners();
     return index;

@@ -1187,13 +1187,12 @@ class _ControlPanelState extends State<ControlPanel>
                             data: SliderTheme.of(context).copyWith(
                               activeTrackColor: Theme.of(context).brightness ==
                                       Brightness.dark
-                                  ? Colors.black38
+                                  ? Colors.grey[900]
                                   : Colors.grey[400],
-                              inactiveTrackColor:
-                                  Theme.of(context).primaryColorDark,
+                              inactiveTrackColor: context.primaryColorDark,
                               trackHeight: 20.0,
                               trackShape: MyRectangularTrackShape(),
-                              thumbColor: Theme.of(context).accentColor,
+                              thumbColor: context.accentColor,
                               thumbShape: MyRoundSliderThumpShape(
                                   enabledThumbRadius: 10.0,
                                   disabledThumbRadius: 10.0,
@@ -1283,13 +1282,17 @@ class _ControlPanelState extends State<ControlPanel>
                                 color: Colors.grey[500]),
                             Selector<AudioPlayerNotifier, int>(
                                 selector: (_, audio) => audio.rewindSeconds,
-                                builder: (_, seconds, __) => Text('$seconds s',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.teko(
-                                      textStyle: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 20),
-                                    ))),
+                                builder: (_, seconds, __) => Padding(
+                                      padding: const EdgeInsets.only(top: 5.0),
+                                      child: Text('$seconds s',
+                                          style: GoogleFonts.teko(
+                                            textBaseline:
+                                                TextBaseline.ideographic,
+                                            textStyle: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 20),
+                                          )),
+                                    )),
                             Container(
                               margin: EdgeInsets.symmetric(horizontal: 30),
                               height: 60,
@@ -1353,12 +1356,15 @@ class _ControlPanelState extends State<ControlPanel>
                             Selector<AudioPlayerNotifier, int>(
                                 selector: (_, audio) =>
                                     audio.fastForwardSeconds,
-                                builder: (_, seconds, __) => Text('$seconds s',
-                                    style: GoogleFonts.teko(
-                                      textStyle: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 20),
-                                    ))),
+                                builder: (_, seconds, __) => Padding(
+                                      padding: const EdgeInsets.only(top: 5.0),
+                                      child: Text('$seconds s',
+                                          style: GoogleFonts.teko(
+                                            textStyle: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 20),
+                                          )),
+                                    )),
                             IconButton(
                               padding: EdgeInsets.symmetric(horizontal: 10.0),
                               onPressed:

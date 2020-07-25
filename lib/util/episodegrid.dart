@@ -305,7 +305,7 @@ class EpisodeGrid extends StatelessWidget {
                                   backgroundColor:
                                       context.brightness == Brightness.light
                                           ? context.primaryColor
-                                          : context.scaffoldBackgroundColor,
+                                          : context.dialogBackgroundColor,
                                   title: Text(data.item1 != episodes[index]
                                       ? s.play
                                       : s.playing),
@@ -322,7 +322,7 @@ class EpisodeGrid extends StatelessWidget {
                                       backgroundColor:
                                           context.brightness == Brightness.light
                                               ? context.primaryColor
-                                              : context.scaffoldBackgroundColor,
+                                              : context.dialogBackgroundColor,
                                       title: data.item2.contains(
                                               episodes[index].enclosureUrl)
                                           ? Text(s.remove)
@@ -354,7 +354,7 @@ class EpisodeGrid extends StatelessWidget {
                                       backgroundColor:
                                           context.brightness == Brightness.light
                                               ? context.primaryColor
-                                              : context.scaffoldBackgroundColor,
+                                              : context.dialogBackgroundColor,
                                       title: isLiked
                                           ? Text(s.unlike)
                                           : Text(s.like),
@@ -385,7 +385,7 @@ class EpisodeGrid extends StatelessWidget {
                                       backgroundColor:
                                           context.brightness == Brightness.light
                                               ? context.primaryColor
-                                              : context.scaffoldBackgroundColor,
+                                              : context.dialogBackgroundColor,
                                       title: isListened > 0
                                           ? Text(s.listened,
                                               style: TextStyle(
@@ -420,7 +420,7 @@ class EpisodeGrid extends StatelessWidget {
                                       backgroundColor:
                                           context.brightness == Brightness.light
                                               ? context.primaryColor
-                                              : context.scaffoldBackgroundColor,
+                                              : context.dialogBackgroundColor,
                                       title: isDownloaded
                                           ? Text(s.downloaded,
                                               style: TextStyle(
