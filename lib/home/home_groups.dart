@@ -57,22 +57,164 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
     final s = context.s;
-    return Consumer<GroupList>(builder: (_, groupList, __) {
-      var groups = groupList.groups;
-      bool import = groupList.created;
-      bool isLoading = groupList.isLoading;
-      return isLoading
-          ? Container(
-              height: (_width - 20) / 3 + 140,
-            )
-          : groups[_groupIndex].podcastList.length == 0
-              ? Container(
-                  height: (_width - 20) / 3 + 140,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      GestureDetector(
+    return Selector<GroupList, Tuple3<List<PodcastGroup>, bool, bool>>(
+      selector: (_, groupList) =>
+          Tuple3(groupList.groups, groupList.created, groupList.isLoading),
+      builder: (_, data, __) {
+        var groups = data.item1;
+        bool import = data.item2;
+        bool isLoading = data.item3;
+        return isLoading
+            ? Container(
+                height: (_width - 20) / 3 + 140,
+              )
+            : groups[_groupIndex].podcastList.length == 0
+                ? Container(
+                    height: (_width - 20) / 3 + 140,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        GestureDetector(
+                            onVerticalDragEnd: (event) {
+                              if (event.primaryVelocity > 200) {
+                                if (groups.length == 1) {
+                                  Fluttertoast.showToast(
+                                    msg: s.addSomeGroups,
+                                    gravity: ToastGravity.BOTTOM,
+                                  );
+                                } else {
+                                  if (mounted)
+                                    setState(() {
+                                      (_groupIndex != 0)
+                                          ? _groupIndex--
+                                          : _groupIndex = groups.length - 1;
+                                    });
+                                }
+                              } else if (event.primaryVelocity < -200) {
+                                if (groups.length == 1) {
+                                  Fluttertoast.showToast(
+                                    msg: s.addSomeGroups,
+                                    gravity: ToastGravity.BOTTOM,
+                                  );
+                                } else {
+                                  setState(() {
+                                    (_groupIndex < groups.length - 1)
+                                        ? _groupIndex++
+                                        : _groupIndex = 0;
+                                  });
+                                }
+                              }
+                            },
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 15.0),
+                                          child: Text(
+                                            groups[_groupIndex].name,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1
+                                                .copyWith(
+                                                    color: Theme.of(context)
+                                                        .accentColor),
+                                          )),
+                                      Spacer(),
+                                      Container(
+                                        height: 30,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        alignment: Alignment.bottomRight,
+                                        child: InkWell(
+                                          onTap: () {
+                                            if (!import)
+                                              Navigator.push(
+                                                context,
+                                                SlideLeftRoute(
+                                                    page: PodcastManage()),
+                                              );
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            padding: EdgeInsets.all(5.0),
+                                            child: Text(
+                                              s.homeGroupsSeeAll,
+                                              style: context.textTheme.bodyText1
+                                                  .copyWith(
+                                                      color: import
+                                                          ? context
+                                                              .primaryColorDark
+                                                          : context
+                                                              .accentColor),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                    height: 70,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    child: Row(
+                                      children: <Widget>[
+                                        _circleContainer(context),
+                                        _circleContainer(context),
+                                        _circleContainer(context)
+                                      ],
+                                    )),
+                              ],
+                            )),
+                        Container(
+                          height: (_width - 20) / 3 + 40,
+                          color: context.primaryColor,
+                          margin: EdgeInsets.symmetric(horizontal: 15),
+                          child: Center(
+                              child: _groupIndex == 0
+                                  ? Text.rich(TextSpan(
+                                      style: context.textTheme.headline6
+                                          .copyWith(height: 2),
+                                      children: [
+                                        TextSpan(
+                                            text: 'Welcome to Tsacdop\n',
+                                            style: context.textTheme.headline6
+                                                .copyWith(
+                                                    color:
+                                                        context.accentColor)),
+                                        TextSpan(
+                                            text: 'Get started\n',
+                                            style: context.textTheme.headline6
+                                                .copyWith(
+                                                    color:
+                                                        context.accentColor)),
+                                        TextSpan(text: 'Tap '),
+                                        WidgetSpan(
+                                            child:
+                                                Icon(Icons.add_circle_outline)),
+                                        TextSpan(text: ' to subscribe podcasts')
+                                      ],
+                                    ))
+                                  : Text(s.noPodcastGroup,
+                                      style: TextStyle(
+                                          color: context
+                                              .textTheme.bodyText2.color
+                                              .withOpacity(0.5)))),
+                        ),
+                      ],
+                    ),
+                  )
+                : DefaultTabController(
+                    length: groups[_groupIndex].podcastList.length,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        GestureDetector(
                           onVerticalDragEnd: (event) {
                             if (event.primaryVelocity > 200) {
                               if (groups.length == 1) {
@@ -113,16 +255,14 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                             horizontal: 15.0),
                                         child: Text(
                                           groups[_groupIndex].name,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText1
+                                          style: context.textTheme.bodyText1
                                               .copyWith(
                                                   color: Theme.of(context)
                                                       .accentColor),
                                         )),
                                     Spacer(),
                                     Container(
-                                      height: 30,
+                                      height: 30.0,
                                       padding:
                                           EdgeInsets.symmetric(horizontal: 15),
                                       alignment: Alignment.bottomRight,
@@ -154,240 +294,111 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                 ),
                               ),
                               Container(
-                                  height: 70,
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  child: Row(
-                                    children: <Widget>[
-                                      _circleContainer(context),
-                                      _circleContainer(context),
-                                      _circleContainer(context)
-                                    ],
-                                  )),
-                            ],
-                          )),
-                      Container(
-                        height: (_width - 20) / 3 + 40,
-                        color: context.primaryColor,
-                        margin: EdgeInsets.symmetric(horizontal: 15),
-                        child: Center(
-                            child: _groupIndex == 0
-                                ? Text.rich(TextSpan(
-                                    style: context.textTheme.headline6
-                                        .copyWith(height: 2),
-                                    children: [
-                                      TextSpan(
-                                          text: 'Welcome to Tsacdop\n',
-                                          style: context.textTheme.headline6
-                                              .copyWith(
-                                                  color: context.accentColor)),
-                                      TextSpan(
-                                          text: 'Get started\n',
-                                          style: context.textTheme.headline6
-                                              .copyWith(
-                                                  color: context.accentColor)),
-                                      TextSpan(text: 'Tap '),
-                                      WidgetSpan(
-                                          child:
-                                              Icon(Icons.add_circle_outline)),
-                                      TextSpan(text: ' to subscribe podcasts')
-                                    ],
-                                  ))
-                                : Text(s.noPodcastGroup,
-                                    style: TextStyle(
-                                        color: context.textTheme.bodyText2.color
-                                            .withOpacity(0.5)))),
-                      ),
-                    ],
-                  ),
-                )
-              : DefaultTabController(
-                  length: groups[_groupIndex].podcastList.length,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      GestureDetector(
-                        onVerticalDragEnd: (event) {
-                          if (event.primaryVelocity > 200) {
-                            if (groups.length == 1) {
-                              Fluttertoast.showToast(
-                                msg: s.addSomeGroups,
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            } else {
-                              if (mounted)
-                                setState(() {
-                                  (_groupIndex != 0)
-                                      ? _groupIndex--
-                                      : _groupIndex = groups.length - 1;
-                                });
-                            }
-                          } else if (event.primaryVelocity < -200) {
-                            if (groups.length == 1) {
-                              Fluttertoast.showToast(
-                                msg: s.addSomeGroups,
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            } else {
-                              setState(() {
-                                (_groupIndex < groups.length - 1)
-                                    ? _groupIndex++
-                                    : _groupIndex = 0;
-                              });
-                            }
-                          }
-                        },
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 15.0),
-                                      child: Text(
-                                        groups[_groupIndex].name,
-                                        style: context.textTheme.bodyText1
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .accentColor),
-                                      )),
-                                  Spacer(),
-                                  Container(
-                                    height: 30.0,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 15),
-                                    alignment: Alignment.bottomRight,
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (!import)
-                                          Navigator.push(
-                                            context,
-                                            SlideLeftRoute(
-                                                page: PodcastManage()),
-                                          );
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        padding: EdgeInsets.all(5.0),
-                                        child: Text(
-                                          s.homeGroupsSeeAll,
-                                          style: context.textTheme.bodyText1
-                                              .copyWith(
-                                                  color: import
-                                                      ? context.primaryColorDark
-                                                      : context.accentColor),
+                                height: 70,
+                                width: _width,
+                                alignment: Alignment.centerLeft,
+                                color: context.scaffoldBackgroundColor,
+                                child: TabBar(
+                                  labelPadding: EdgeInsets.only(
+                                      top: 5.0,
+                                      bottom: 10.0,
+                                      left: 6.0,
+                                      right: 6.0),
+                                  indicator: CircleTabIndicator(
+                                      color: context.accentColor, radius: 3),
+                                  isScrollable: true,
+                                  tabs: groups[_groupIndex]
+                                      .podcasts
+                                      .map<Widget>((PodcastLocal podcastLocal) {
+                                    Color color =
+                                        (Theme.of(context).brightness ==
+                                                Brightness.light)
+                                            ? podcastLocal.primaryColor
+                                                .colorizedark()
+                                            : podcastLocal.primaryColor
+                                                .colorizeLight();
+                                    return Tab(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(25.0)),
+                                        child: Stack(
+                                          alignment: Alignment.bottomCenter,
+                                          children: <Widget>[
+                                            LimitedBox(
+                                              maxHeight: 50,
+                                              maxWidth: 50,
+                                              child: CircleAvatar(
+                                                backgroundColor:
+                                                    color.withOpacity(0.5),
+                                                backgroundImage: FileImage(File(
+                                                    "${podcastLocal.imagePath}")),
+                                              ),
+                                              // child: Image.file(File(
+                                              //      "${podcastLocal.imagePath}")),
+                                            ),
+                                            FutureBuilder<int>(
+                                                future: getPodcastUpdateCounts(
+                                                    podcastLocal.id),
+                                                initialData: 0,
+                                                builder: (context, snapshot) {
+                                                  return snapshot.data > 0
+                                                      ? Container(
+                                                          alignment:
+                                                              Alignment.center,
+                                                          height: 10,
+                                                          width: 40,
+                                                          color: Colors.black54,
+                                                          child: Text('New',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontSize: 8,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic)),
+                                                        )
+                                                      : Center();
+                                                }),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ],
+                                    );
+                                  }).toList(),
+                                ),
                               ),
-                            ),
-                            Container(
-                              height: 70,
-                              width: _width,
-                              alignment: Alignment.centerLeft,
-                              color: context.scaffoldBackgroundColor,
-                              child: TabBar(
-                                labelPadding: EdgeInsets.only(
-                                    top: 5.0,
-                                    bottom: 10.0,
-                                    left: 6.0,
-                                    right: 6.0),
-                                indicator: CircleTabIndicator(
-                                    color: context.accentColor, radius: 3),
-                                isScrollable: true,
-                                tabs: groups[_groupIndex]
-                                    .podcasts
-                                    .map<Widget>((PodcastLocal podcastLocal) {
-                                  Color color = (Theme.of(context).brightness ==
-                                          Brightness.light)
-                                      ? podcastLocal.primaryColor.colorizedark()
-                                      : podcastLocal.primaryColor
-                                          .colorizeLight();
-                                  return Tab(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(25.0)),
-                                      child: Stack(
-                                        alignment: Alignment.bottomCenter,
-                                        children: <Widget>[
-                                          LimitedBox(
-                                            maxHeight: 50,
-                                            maxWidth: 50,
-                                            child: CircleAvatar(
-                                              backgroundColor:
-                                                  color.withOpacity(0.5),
-                                              backgroundImage: FileImage(File(
-                                                  "${podcastLocal.imagePath}")),
-                                            ),
-                                            // child: Image.file(File(
-                                            //      "${podcastLocal.imagePath}")),
-                                          ),
-                                          FutureBuilder<int>(
-                                              future: getPodcastUpdateCounts(
-                                                  podcastLocal.id),
-                                              initialData: 0,
-                                              builder: (context, snapshot) {
-                                                return snapshot.data > 0
-                                                    ? Container(
-                                                        alignment:
-                                                            Alignment.center,
-                                                        height: 10,
-                                                        width: 40,
-                                                        color: Colors.black54,
-                                                        child: Text('New',
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.red,
-                                                                fontSize: 8,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .italic)),
-                                                      )
-                                                    : Center();
-                                              }),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Container(
-                        height: (_width - 20) / 3 + 40,
-                        margin: EdgeInsets.only(left: 10, right: 10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
+                        Container(
+                          height: (_width - 20) / 3 + 40,
+                          margin: EdgeInsets.only(left: 10, right: 10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                          child: TabBarView(
+                            children: groups[_groupIndex]
+                                .podcasts
+                                .map<Widget>((PodcastLocal podcastLocal) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.black12),
+                                margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                key: ObjectKey(podcastLocal.title),
+                                child: PodcastPreview(
+                                  podcastLocal: podcastLocal,
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
-                        child: TabBarView(
-                          children: groups[_groupIndex]
-                              .podcasts
-                              .map<Widget>((PodcastLocal podcastLocal) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.black12),
-                              margin: EdgeInsets.symmetric(horizontal: 5.0),
-                              key: ObjectKey(podcastLocal.title),
-                              child: PodcastPreview(
-                                podcastLocal: podcastLocal,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-    });
+                      ],
+                    ),
+                  );
+      },
+    );
   }
 }
 
