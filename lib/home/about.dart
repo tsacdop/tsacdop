@@ -264,7 +264,7 @@ class AboutApp extends StatelessWidget {
                     ),
                     //Spacer(),
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 50),
+                      padding: EdgeInsets.symmetric(vertical: 10),
                     ),
                     Container(
                       height: 50,

@@ -555,10 +555,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
         _stopOnComplete = false;
         _startSleepTimer = false;
         _switchValue = 0;
-        //_playerRunning = false;
         AudioService.stop();
         notifyListeners();
-        AudioService.disconnect();
+        // AudioService.disconnect();
       });
     } else if (_sleepTimerMode == SleepTimerMode.endOfEpisode) {
       _stopOnComplete = true;

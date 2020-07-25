@@ -1,5 +1,30 @@
 # Tsacdop Changelog
 
+## v0.4.8
+
+Release date 2020/7/25
+
+### New features
+
+* Filter in podcast detail page, you can also hide listened episodes.
+* Search result ui improved, you can see more info for result.
+* Update audio service to latest version.
+* Support fast forward seconds and rewind seconds costomize.
+* Add Franch language support(beta).
+* Add translators in about page.
+
+### Bugs fixed
+
+* Icon issue on below android 8 devices.
+
+### Minor change
+
+* Download button ui improved.
+* Title changed to scrollable in episode detail page.
+* Real dark theme improved.
+* Add dot indicator in popup menu.
+* Tap logo in homepage to toggle theme.
+
 ## v0.4.7
 
 Release date 2020/7/18
