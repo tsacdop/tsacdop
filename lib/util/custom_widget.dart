@@ -832,7 +832,7 @@ class _HeartOpenState extends State<HeartOpen>
   }
 }
 
-/// Icon painter.
+/// Icon using a painter.
 class IconPainter extends StatelessWidget {
   const IconPainter(this.painter, {this.height = 10, this.width = 30, Key key})
       : super(key: key);
@@ -851,7 +851,7 @@ class IconPainter extends StatelessWidget {
   }
 }
 
-/// A dot.
+/// A dot just a dot.
 class DotIndicator extends StatelessWidget {
   DotIndicator({this.radius = 8, Key key})
       : assert(radius > 0),
@@ -865,5 +865,85 @@ class DotIndicator extends StatelessWidget {
         height: radius,
         decoration:
             BoxDecoration(shape: BoxShape.circle, color: context.accentColor));
+  }
+}
+
+class DownloadPainter extends CustomPainter {
+  double fraction;
+  Color color;
+  Color progressColor;
+  double progress;
+  double pauseProgress;
+  DownloadPainter(
+      {this.fraction,
+      this.color,
+      this.progressColor,
+      this.progress = 0,
+      this.pauseProgress = 0});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var _paint = Paint()
+      ..color = color
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+    var _linePaint = Paint()
+      ..color = color.withAlpha(70)
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+    var _circlePaint = Paint()
+      ..color = color.withAlpha(70)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    var _progressPaint = Paint()
+      ..color = progressColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    double width = size.width;
+    double height = size.height;
+    var center = Offset(size.width / 2, size.height / 2);
+    if (pauseProgress == 0) {
+      canvas.drawLine(
+          Offset(width / 2, 0), Offset(width / 2, height * 4 / 5), _paint);
+      canvas.drawLine(Offset(width / 5, height / 2),
+          Offset(width / 2, height * 4 / 5), _paint);
+      canvas.drawLine(Offset(width * 4 / 5, height / 2),
+          Offset(width / 2, height * 4 / 5), _paint);
+    }
+
+    if (fraction == 0)
+      canvas.drawLine(
+          Offset(width / 5, height), Offset(width * 4 / 5, height), _paint);
+    else {
+      canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
+          math.pi / 2, math.pi * fraction, false, _circlePaint);
+      canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
+          math.pi / 2, -math.pi * fraction, false, _circlePaint);
+    }
+
+    if (fraction == 1) {
+      canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
+          -math.pi / 2, math.pi * 2 * progress, false, _progressPaint);
+    }
+
+    if (pauseProgress > 0) {
+      canvas.drawLine(
+          Offset(width / 5 + height * 3 * pauseProgress / 20,
+              height / 2 - height * 3 * pauseProgress / 10),
+          Offset(width / 2 - height * 3 * pauseProgress / 20, height * 4 / 5),
+          _paint);
+      canvas.drawLine(
+          Offset(width * 4 / 5 - height * 3 * pauseProgress / 20,
+              height / 2 - height * 3 * pauseProgress / 10),
+          Offset(width / 2 + height * 3 * pauseProgress / 20, height * 4 / 5),
+          _paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(DownloadPainter oldDelegate) {
+    return oldDelegate.fraction != fraction ||
+        oldDelegate.progress != progress ||
+        oldDelegate.pauseProgress != pauseProgress;
   }
 }

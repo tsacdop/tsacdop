@@ -348,7 +348,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
         .where((event) => event != null)
         .listen((event) async {
       _current = DateTime.now();
-      _audioState = event?.processingState;
+      if (event.processingState != AudioProcessingState.none)
+        _audioState = event.processingState;
       _playing = event?.playing;
       _currentSpeed = event.speed;
       _currentPosition = event.currentPosition.inMilliseconds ?? 0;

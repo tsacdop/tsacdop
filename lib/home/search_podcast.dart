@@ -815,48 +815,43 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                 overflow: TextOverflow.fade,
                                 style: TextStyle(color: context.accentColor),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: !_isSubscribed
-                                    ? OutlineButton(
-                                        highlightedBorderColor:
-                                            context.accentColor,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(100.0),
-                                            side: BorderSide(
-                                                color: context.accentColor)),
-                                        splashColor: context.accentColor
-                                            .withOpacity(0.5),
-                                        child: Text(s.subscribe,
-                                            style: TextStyle(
-                                                color: context.accentColor)),
-                                        onPressed: () {
-                                          subscribePodcast(
-                                              widget.onlinePodcast);
-                                          setState(() {
-                                            _isSubscribed = true;
-                                          });
-                                          Fluttertoast.showToast(
-                                            msg: s.podcastSubscribed,
-                                            gravity: ToastGravity.BOTTOM,
-                                          );
-                                        })
-                                    : OutlineButton(
-                                        color: context.accentColor
-                                            .withOpacity(0.5),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(100.0),
-                                            side: BorderSide(
-                                                color: Colors.grey[500])),
-                                        highlightedBorderColor:
-                                            Colors.grey[500],
-                                        disabledTextColor: Colors.grey[500],
-                                        child: Text(s.subscribe),
-                                        disabledBorderColor: Colors.grey[500],
-                                        onPressed: () {}),
-                              )
+                              !_isSubscribed
+                                  ? OutlineButton(
+                                      highlightedBorderColor:
+                                          context.accentColor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(100.0),
+                                          side: BorderSide(
+                                              color: context.accentColor)),
+                                      splashColor:
+                                          context.accentColor.withOpacity(0.5),
+                                      child: Text(s.subscribe,
+                                          style: TextStyle(
+                                              color: context.accentColor)),
+                                      onPressed: () {
+                                        subscribePodcast(widget.onlinePodcast);
+                                        setState(() {
+                                          _isSubscribed = true;
+                                        });
+                                        Fluttertoast.showToast(
+                                          msg: s.podcastSubscribed,
+                                          gravity: ToastGravity.BOTTOM,
+                                        );
+                                      })
+                                  : OutlineButton(
+                                      color:
+                                          context.accentColor.withOpacity(0.5),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(100.0),
+                                          side: BorderSide(
+                                              color: Colors.grey[500])),
+                                      highlightedBorderColor: Colors.grey[500],
+                                      disabledTextColor: Colors.grey[500],
+                                      child: Text(s.subscribe),
+                                      disabledBorderColor: Colors.grey[500],
+                                      onPressed: () {})
                             ],
                           ),
                         ),

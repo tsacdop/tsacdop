@@ -8,6 +8,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:tsacdop/util/custom_widget.dart';
 
 import '../state/download_state.dart';
 import '../state/audio_state.dart';
@@ -166,10 +167,18 @@ class _DownloadButtonState extends State<DownloadButton> {
         return Selector<SettingState, bool>(
           selector: (_, settings) => settings.downloadUsingData,
           builder: (_, data, __) => _buttonOnMenu(
-              Icon(
-                LineIcons.download_solid,
-                //size: 15,
-                color: Colors.grey[700],
+              Center(
+                child: SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CustomPaint(
+                    painter: DownloadPainter(
+                      color: Colors.grey[700],
+                      fraction: 0,
+                      progressColor: context.accentColor,
+                    ),
+                  ),
+                ),
               ),
               () => _requestDownload(task.episode, data)),
         );
@@ -185,15 +194,19 @@ class _DownloadButtonState extends State<DownloadButton> {
               height: 50.0,
               alignment: Alignment.center,
               padding: EdgeInsets.symmetric(horizontal: 18.0),
-              child: SizedBox(
-                height: 18,
-                width: 18,
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.grey[500],
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).accentColor),
-                  value: task.progress / 100,
+              child: TweenAnimationBuilder(
+                duration: Duration(milliseconds: 1000),
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, fraction, child) => SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CustomPaint(
+                    painter: DownloadPainter(
+                        color: Colors.grey[700],
+                        fraction: fraction,
+                        progressColor: context.accentColor,
+                        progress: task.progress / 100),
+                  ),
                 ),
               ),
             ),
@@ -211,14 +224,20 @@ class _DownloadButtonState extends State<DownloadButton> {
               height: 50.0,
               alignment: Alignment.center,
               padding: EdgeInsets.symmetric(horizontal: 18),
-              child: SizedBox(
-                height: 18,
-                width: 18,
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.grey[500],
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                  value: task.progress / 100,
+              child: TweenAnimationBuilder(
+                duration: Duration(milliseconds: 500),
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, fraction, child) => SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CustomPaint(
+                    painter: DownloadPainter(
+                        color: Colors.grey[700],
+                        fraction: 1,
+                        progressColor: context.accentColor,
+                        progress: task.progress / 100,
+                        pauseProgress: fraction),
+                  ),
                 ),
               ),
             ),

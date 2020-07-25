@@ -41,8 +41,8 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
           ..addListener(() {
             if (mounted) setState(() {});
           });
-    _animation =
-        Tween<double>(begin: initSize, end: initSize).animate(_controller);
+    _animation = Tween<double>(begin: 0, end: initSize).animate(_controller);
+    _controller.forward();
     super.initState();
   }
 
