@@ -1,8 +1,10 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
+import 'episodegrid.dart';
 import 'extension_helper.dart';
 
 //Layout change indicator
@@ -12,7 +14,7 @@ class LayoutPainter extends CustomPainter {
   LayoutPainter(this.scale, this.color);
   @override
   void paint(Canvas canvas, Size size) {
-    Paint _paint = Paint()
+    var _paint = Paint()
       ..color = color
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke
@@ -76,7 +78,7 @@ class StarSky extends CustomPainter {
       Offset(10, 26)
     ].map((e) => Offset(e.dx * 10 + 250, e.dy * 10)).toList();
 
-    Paint paint = Paint()
+    var paint = Paint()
       ..color = Colors.white
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
@@ -93,17 +95,17 @@ class StarSky extends CustomPainter {
 
 //Listened indicator
 class ListenedPainter extends CustomPainter {
-  Color _color;
+  final Color _color;
   double stroke;
   ListenedPainter(this._color, {this.stroke = 1.0});
   @override
   void paint(Canvas canvas, Size size) {
-    Paint _paint = Paint()
+    var _paint = Paint()
       ..color = _color
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    Path _path = Path();
+    var _path = Path();
     _path.moveTo(size.width / 6, size.height * 3 / 8);
     _path.lineTo(size.width / 6, size.height * 5 / 8);
     _path.moveTo(size.width / 3, size.height / 4);
@@ -126,17 +128,17 @@ class ListenedPainter extends CustomPainter {
 
 //Listened Completely indicator
 class ListenedAllPainter extends CustomPainter {
-  Color _color;
-  double stroke;
-  ListenedAllPainter(this._color, {this.stroke = 1.0});
+  final Color color;
+  final double stroke;
+  ListenedAllPainter(this.color, {this.stroke = 1.0});
   @override
   void paint(Canvas canvas, Size size) {
-    Paint _paint = Paint()
-      ..color = _color
+    var _paint = Paint()
+      ..color = color
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    Path _path = Path();
+    var _path = Path();
     _path.moveTo(size.width / 6, size.height * 3 / 8);
     _path.lineTo(size.width / 6, size.height * 5 / 8);
     _path.moveTo(size.width / 3, size.height / 4);
@@ -160,17 +162,17 @@ class ListenedAllPainter extends CustomPainter {
 
 //Mark Listened indicator
 class MarkListenedPainter extends CustomPainter {
-  Color _color;
+  final Color color;
   double stroke;
-  MarkListenedPainter(this._color, {this.stroke = 1.0});
+  MarkListenedPainter(this.color, {this.stroke = 1.0});
   @override
   void paint(Canvas canvas, Size size) {
-    Paint _paint = Paint()
-      ..color = _color
+    var _paint = Paint()
+      ..color = color
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    Path _path = Path();
+    var _path = Path();
     _path.moveTo(size.width / 6, size.height * 3 / 8);
     _path.lineTo(size.width / 6, size.height * 5 / 8);
     _path.moveTo(size.width / 3, size.height / 4);
@@ -203,17 +205,17 @@ class HideListenedPainter extends CustomPainter {
       {this.color, this.stroke = 1.0, this.backgroundColor, this.fraction});
   @override
   void paint(Canvas canvas, Size size) {
-    Paint _paint = Paint()
+    var _paint = Paint()
       ..color = color
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    Paint _linePaint = Paint()
+    var _linePaint = Paint()
       ..color = backgroundColor
       ..strokeWidth = stroke * 2
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    Path _path = Path();
+    var _path = Path();
 
     _path.moveTo(size.width / 6, size.height * 3 / 8);
     _path.lineTo(size.width / 6, size.height * 5 / 8);
@@ -227,12 +229,13 @@ class HideListenedPainter extends CustomPainter {
     _path.lineTo(size.width * 2 / 3, size.height * 3 / 4);
 
     canvas.drawPath(_path, _paint);
-    if (fraction > 0)
+    if (fraction > 0) {
       canvas.drawLine(
           Offset(size.width, size.height) / 5,
           Offset(size.width, size.height) / 5 +
               Offset(size.width, size.height) * 3 / 5 * fraction,
           _linePaint);
+    }
   }
 
   @override
@@ -260,10 +263,11 @@ class _HideListenedState extends State<HideListened>
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _fraction = animation.value;
           });
+        }
       });
     if (widget.hideListened) _controller.forward();
   }
@@ -271,10 +275,11 @@ class _HideListenedState extends State<HideListened>
   @override
   void didUpdateWidget(HideListened oldWidget) {
     if (oldWidget.hideListened != widget.hideListened) {
-      if (widget.hideListened)
+      if (widget.hideListened) {
         _controller.forward();
-      else
+      } else {
         _controller.reverse();
+      }
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -297,17 +302,17 @@ class _HideListenedState extends State<HideListened>
 
 //Add new episode to palylist
 class AddToPlaylistPainter extends CustomPainter {
-  Color _color;
-  Color _textColor;
-  AddToPlaylistPainter(this._color, this._textColor);
+  final Color color;
+  final Color textColor;
+  AddToPlaylistPainter(this.color, this.textColor);
   @override
   void paint(Canvas canvas, Size size) {
-    Paint _paint = Paint()
-      ..color = _color
+    var _paint = Paint()
+      ..color = color
       ..strokeWidth = 1
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    Path _path = Path();
+    var _path = Path();
     _path.moveTo(0, 0);
     _path.lineTo(size.width * 4 / 7, 0);
     _path.moveTo(0, size.height / 3);
@@ -328,7 +333,7 @@ class AddToPlaylistPainter extends CustomPainter {
         text: TextSpan(
           text: 'N',
           style: TextStyle(
-              fontStyle: FontStyle.italic, color: _textColor, fontSize: 10),
+              fontStyle: FontStyle.italic, color: textColor, fontSize: 10),
         ))
       ..layout();
     textPainter.paint(canvas, Offset(size.width * 4 / 7, size.height / 3));
@@ -343,9 +348,9 @@ class AddToPlaylistPainter extends CustomPainter {
 
 //Wave play indicator
 class WavePainter extends CustomPainter {
-  double _fraction;
+  final double _fraction;
   double _value;
-  Color _color;
+  final Color _color;
   WavePainter(this._fraction, this._color);
   @override
   void paint(Canvas canvas, Size size) {
@@ -354,8 +359,8 @@ class WavePainter extends CustomPainter {
     } else {
       _value = 1 - _fraction;
     }
-    Path _path = Path();
-    Paint _paint = Paint()
+    var _path = Path();
+    var _paint = Paint()
       ..color = _color
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round
@@ -410,10 +415,11 @@ class _WaveLoaderState extends State<WaveLoader>
         vsync: this, duration: Duration(milliseconds: 1000));
     animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _fraction = animation.value;
           });
+        }
       });
     _controller.forward();
     _controller.addStatusListener((status) {
@@ -442,8 +448,8 @@ class _WaveLoaderState extends State<WaveLoader>
 class LovePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    Path _path = Path();
-    Paint _paint = Paint()
+    var _path = Path();
+    var _paint = Paint()
       ..color = Colors.red
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
@@ -473,9 +479,9 @@ class LovePainter extends CustomPainter {
 //Line buffer indicator
 //Not used
 class LinePainter extends CustomPainter {
-  double _fraction;
+  final double _fraction;
   Paint _paint;
-  Color _maincolor;
+  final Color _maincolor;
   LinePainter(this._fraction, this._maincolor) {
     _paint = Paint()
       ..color = _maincolor
@@ -512,10 +518,11 @@ class _LineLoaderState extends State<LineLoader>
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     animation = Tween(begin: 0.0, end: 1.0).animate(controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _fraction = animation.value;
           });
+        }
       });
     controller.forward();
     controller.addStatusListener((status) {
@@ -563,10 +570,11 @@ class _ImageRotateState extends State<ImageRotate>
     );
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _value = _animation.value;
           });
+        }
       });
     _controller.forward();
     _controller.addStatusListener((status) {
@@ -721,10 +729,11 @@ class _HeartSetState extends State<HeartSet>
 
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _value = _animation.value;
           });
+        }
       });
 
     _controller.forward();
@@ -778,10 +787,11 @@ class _HeartOpenState extends State<HeartOpen>
 
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _value = _animation.value;
           });
+        }
       });
 
     _controller.forward();
@@ -799,8 +809,8 @@ class _HeartOpenState extends State<HeartOpen>
   }
 
   Widget _position(int i) {
-    double scale = _list[i];
-    double position = _list[i + 1];
+    var scale = _list[i];
+    var position = _list[i + 1];
     return Positioned(
       left: widget.width * position,
       bottom: widget.height * _value * scale,
@@ -812,9 +822,9 @@ class _HeartOpenState extends State<HeartOpen>
     );
   }
 
-  List<double> _list =
+  final List<double> _list =
       List<double>.generate(20, (index) => math.Random().nextDouble());
-  List<int> _index = List<int>.generate(19, (index) => index);
+  final List<int> _index = List<int>.generate(19, (index) => index);
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -826,7 +836,7 @@ class _HeartOpenState extends State<HeartOpen>
           child: Icon(Icons.favorite,
               color: Colors.blue.withOpacity(0.7), size: 20 * _value),
         ),
-        ..._index.map<Widget>((e) => _position(e)).toList(),
+        ..._index.map<Widget>(_position).toList(),
       ],
     );
   }
@@ -887,10 +897,6 @@ class DownloadPainter extends CustomPainter {
       ..color = color
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
-    var _linePaint = Paint()
-      ..color = color.withAlpha(70)
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
     var _circlePaint = Paint()
       ..color = color.withAlpha(70)
       ..style = PaintingStyle.stroke
@@ -899,8 +905,8 @@ class DownloadPainter extends CustomPainter {
       ..color = progressColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
-    double width = size.width;
-    double height = size.height;
+    var width = size.width;
+    var height = size.height;
     var center = Offset(size.width / 2, size.height / 2);
     if (pauseProgress == 0) {
       canvas.drawLine(
@@ -911,10 +917,10 @@ class DownloadPainter extends CustomPainter {
           Offset(width / 2, height * 4 / 5), _paint);
     }
 
-    if (fraction == 0)
+    if (fraction == 0) {
       canvas.drawLine(
           Offset(width / 5, height), Offset(width * 4 / 5, height), _paint);
-    else {
+    } else {
       canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
           math.pi / 2, math.pi * fraction, false, _circlePaint);
       canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
@@ -945,5 +951,52 @@ class DownloadPainter extends CustomPainter {
     return oldDelegate.fraction != fraction ||
         oldDelegate.progress != progress ||
         oldDelegate.pauseProgress != pauseProgress;
+  }
+}
+
+/// Layout icon button.
+class LayoutButton extends StatelessWidget {
+  const LayoutButton({this.layout, this.onPressed, Key key}) : super(key: key);
+  final Layout layout;
+  final ValueChanged<Layout> onPressed;
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      padding: EdgeInsets.zero,
+      onPressed: () {
+        if (layout == Layout.three) {
+          onPressed(Layout.one);
+        } else if (layout == Layout.two) {
+          onPressed(Layout.three);
+        } else {
+          onPressed(Layout.two);
+        }
+      },
+      icon: layout == Layout.three
+          ? SizedBox(
+              height: 10,
+              width: 30,
+              child: CustomPaint(
+                painter: LayoutPainter(0, context.textTheme.bodyText1.color),
+              ),
+            )
+          : layout == Layout.two
+              ? SizedBox(
+                  height: 10,
+                  width: 30,
+                  child: CustomPaint(
+                    painter:
+                        LayoutPainter(1, context.textTheme.bodyText1.color),
+                  ),
+                )
+              : SizedBox(
+                  height: 10,
+                  width: 30,
+                  child: CustomPaint(
+                    painter:
+                        LayoutPainter(4, context.textTheme.bodyText1.color),
+                  ),
+                ),
+    );
   }
 }

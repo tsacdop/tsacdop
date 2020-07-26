@@ -4,6 +4,7 @@
 [![GitHub Release][]][github release - recent]
 [![Github Downloads][]][github release - recent]
 [![Localizely][]][localizely - website]
+[![style: effective dart][]][effective dart pub]
 
 ## About
 
@@ -140,3 +141,5 @@ For help getting started with Flutter, view our
 [Podcast Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png
 [Episode Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585896237809.png
 [Darkmode Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png
+[style: effective dart]: https://img.shields.io/badge/style-effective_dart-40c4ff.svg
+[effective dart pub]: https://pub.dev/packages/effective_dart

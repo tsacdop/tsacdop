@@ -6,16 +6,16 @@ class SlideLeftRoute extends PageRouteBuilder {
   SlideLeftRoute({this.page})
       : super(
           pageBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
+            context,
+            animation,
+            secondaryAnimation,
           ) =>
               page,
           transitionsBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child,
+            context,
+            animation,
+            secondaryAnimation,
+            child,
           ) =>
               SlideTransition(
             position: Tween<Offset>(
@@ -33,17 +33,17 @@ class SlideLeftHideRoute extends PageRouteBuilder {
   SlideLeftHideRoute({this.page, this.transitionPage})
       : super(
           pageBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
+            context,
+            animation,
+            secondaryAnimation,
           ) =>
               page,
           transitionDuration: Duration(milliseconds: 300),
           transitionsBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child,
+            context,
+            animation,
+            secondaryAnimation,
+            child,
           ) {
             return SlideTransition(
                 position: Tween<Offset>(
@@ -60,16 +60,16 @@ class SlideUptRoute extends PageRouteBuilder {
   SlideUptRoute({this.page})
       : super(
           pageBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
+            context,
+            animation,
+            secondaryAnimation,
           ) =>
               page,
           transitionsBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child,
+            context,
+            animation,
+            secondaryAnimation,
+            child,
           ) =>
               SlideTransition(
             position: Tween<Offset>(
@@ -87,16 +87,16 @@ class ScaleRoute extends PageRouteBuilder {
   ScaleRoute({this.page})
       : super(
           pageBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
+            context,
+            animation,
+            secondaryAnimation,
           ) =>
               page,
           transitionsBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child,
+            context,
+            animation,
+            secondaryAnimation,
+            child,
           ) =>
               ScaleTransition(
             scale: Tween<double>(

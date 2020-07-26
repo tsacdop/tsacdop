@@ -69,7 +69,9 @@ class OnlinePodcast {
   int get hashCode => hashValues(id, title);
 
   int get interval {
-    if (count < 1) return null;
+    if (count < 1) {
+      return null;
+    }
     return (latestPubDate - earliestPubDate) ~/ count;
   }
 }

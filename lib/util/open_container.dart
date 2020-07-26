@@ -265,7 +265,7 @@ class _OpenContainerState extends State<OpenContainer> {
           //  shape: widget.closedShape,
           child: Builder(
             key: _closedBuilderKey,
-            builder: (BuildContext context) {
+            builder: (context) {
               return widget.closedBuilder(context, openContainer, false);
             },
           ),
@@ -546,7 +546,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
   TickerFuture didPush() {
     _takeMeasurements(navigatorContext: hideableKey.currentContext);
 
-    animation.addStatusListener((AnimationStatus status) {
+    animation.addStatusListener((status) {
       _lastAnimationStatus = _currentAnimationStatus;
       _currentAnimationStatus = status;
       switch (status) {
@@ -584,7 +584,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
   }) {
     final RenderBox navigator =
         Navigator.of(navigatorContext).context.findRenderObject();
-    final Size navSize = _getSize(navigator);
+    final navSize = _getSize(navigator);
     _rectTween.end = Offset.zero & navSize;
     void takeMeasurementsInSourceRoute([Duration _]) {
       if (!navigator.attached || hideableKey.currentContext == null) {
@@ -622,8 +622,8 @@ class _OpenContainerRoute extends ModalRoute<void> {
   }
 
   bool get _transitionWasInterrupted {
-    bool wasInProgress = false;
-    bool isInProgress = false;
+    var wasInProgress = false;
+    var isInProgress = false;
 
     switch (_currentAnimationStatus) {
       case AnimationStatus.completed:
@@ -662,7 +662,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
       alignment: Alignment.topLeft,
       child: AnimatedBuilder(
         animation: animation,
-        builder: (BuildContext context, Widget child) {
+        builder: (context, child) {
           if (animation.isCompleted) {
             return SizedBox.expand(
               child: Material(
@@ -671,7 +671,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
                 shape: openShape,
                 child: Builder(
                   key: _openBuilderKey,
-                  builder: (BuildContext context) {
+                  builder: (context) {
                     return openBuilder(context, closeContainer, false);
                   },
                 ),
@@ -719,7 +719,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
           assert(closedOpacityTween != null);
           assert(openOpacityTween != null);
 
-          final Rect rect = _rectTween.evaluate(curvedAnimation);
+          final rect = _rectTween.evaluate(curvedAnimation);
           _positionTween.begin =
               Offset(_rectTween.begin.left + 10, _rectTween.begin.top + 10);
           _positionTween.end = Offset(
@@ -728,7 +728,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
                   ? MediaQuery.of(context).size.height - 100
                   : MediaQuery.of(context).size.height - 40);
 
-          double _width = MediaQuery.of(context).size.width;
+          var _width = MediaQuery.of(context).size.width;
           _avatarScaleTween.begin = _width / 16;
           _avatarScaleTween.end = 30;
           return SizedBox.expand(
@@ -766,7 +766,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
                                               .evaluate(animation),
                                           child: Builder(
                                             key: closedBuilderKey,
-                                            builder: (BuildContext context) {
+                                            builder: (context) {
                                               // Use dummy "open container" callback
                                               // since we are in the process of opening.
                                               return closedBuilder(
@@ -789,7 +789,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
                                         openOpacityTween.evaluate(animation),
                                     child: Builder(
                                       key: _openBuilderKey,
-                                      builder: (BuildContext context) {
+                                      builder: (context) {
                                         return openBuilder(
                                             context, closeContainer, true);
                                       },
@@ -845,8 +845,8 @@ class _FlippableTweenSequence<T> extends TweenSequence<T> {
 
   _FlippableTweenSequence<T> get flipped {
     if (_flipped == null) {
-      final List<TweenSequenceItem<T>> newItems = <TweenSequenceItem<T>>[];
-      for (int i = 0; i < _items.length; i++) {
+      final newItems = <TweenSequenceItem<T>>[];
+      for (var i = 0; i < _items.length; i++) {
         newItems.add(TweenSequenceItem<T>(
           tween: _items[i].tween,
           weight: _items[_items.length - 1 - i].weight,

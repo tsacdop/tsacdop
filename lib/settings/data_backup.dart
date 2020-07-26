@@ -1,23 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/type/settings_backup.dart';
 import 'package:wc_flutter_share/wc_flutter_share.dart';
 
+import '../service/ompl_build.dart';
 import '../state/podcast_group.dart';
 import '../state/setting_state.dart';
+import '../type/settings_backup.dart';
 import '../util/extension_helper.dart';
-import '../service/ompl_build.dart';
 
 class DataBackup extends StatefulWidget {
   @override
@@ -29,8 +28,8 @@ class _DataBackupState extends State<DataBackup> {
     var groups = context.read<GroupList>().groups;
     var ompl = PodcastsBackup(groups).omplBuilder();
     var tempdir = await getTemporaryDirectory();
-    DateTime now = DateTime.now();
-    String datePlus = now.year.toString() +
+    var now = DateTime.now();
+    var datePlus = now.year.toString() +
         now.month.toString() +
         now.day.toString() +
         now.second.toString();
@@ -45,7 +44,7 @@ class _DataBackupState extends State<DataBackup> {
   }
 
   Future<void> _shareFile(File file) async {
-    final Uint8List bytes = await file.readAsBytes();
+    final bytes = await file.readAsBytes();
     await WcFlutterShare.share(
         sharePopupTitle: 'share Clip',
         fileName: file.path.split('/').last,
@@ -55,11 +54,11 @@ class _DataBackupState extends State<DataBackup> {
 
   Future<File> _exportSetting(BuildContext context) async {
     var settings = context.read<SettingState>();
-    SettingsBackup settingsBack = await settings.backup();
+    var settingsBack = await settings.backup();
     var json = settingsBack.toJson();
     var tempdir = await getTemporaryDirectory();
-    DateTime now = DateTime.now();
-    String datePlus = now.year.toString() +
+    var now = DateTime.now();
+    var datePlus = now.year.toString() +
         now.month.toString() +
         now.day.toString() +
         now.second.toString();
@@ -71,10 +70,10 @@ class _DataBackupState extends State<DataBackup> {
   Future _importSetting(String path, BuildContext context) async {
     final s = context.s;
     var settings = context.read<SettingState>();
-    File file = File(path);
+    var file = File(path);
     try {
-      String json = file.readAsStringSync();
-      SettingsBackup backup = SettingsBackup.fromJson(jsonDecode(json));
+      var json = file.readAsStringSync();
+      var backup = SettingsBackup.fromJson(jsonDecode(json));
       await settings.restore(backup);
       Fluttertoast.showToast(
         msg: s.toastImportSettingsSuccess,
@@ -92,11 +91,11 @@ class _DataBackupState extends State<DataBackup> {
   void _getFilePath(BuildContext context) async {
     final s = context.s;
     try {
-      String filePath = await FilePicker.getFilePath(type: FileType.any);
+      var filePath = await FilePicker.getFilePath(type: FileType.any);
       if (filePath == '') {
         return;
       }
-      print('File Path' + filePath);
+      print('File Path$filePath');
       Fluttertoast.showToast(
         msg: s.toastReadFile,
         gravity: ToastGravity.BOTTOM,
@@ -166,7 +165,7 @@ class _DataBackupState extends State<DataBackup> {
                           ],
                         ),
                         onPressed: () async {
-                          File file = await _exportOmpl(context);
+                          var file = await _exportOmpl(context);
                           await _saveFile(file);
                         }),
                     SizedBox(width: 10),
@@ -188,7 +187,7 @@ class _DataBackupState extends State<DataBackup> {
                           ],
                         ),
                         onPressed: () async {
-                          File file = await _exportOmpl(context);
+                          var file = await _exportOmpl(context);
                           await _shareFile(file);
                         })
                   ],
@@ -230,7 +229,7 @@ class _DataBackupState extends State<DataBackup> {
                         ],
                       ),
                       onPressed: () async {
-                        File file = await _exportSetting(context);
+                        var file = await _exportSetting(context);
                         await _saveFile(file);
                       }),
                   SizedBox(width: 10),
@@ -253,7 +252,7 @@ class _DataBackupState extends State<DataBackup> {
                         ],
                       ),
                       onPressed: () async {
-                        File file = await _exportSetting(context);
+                        var file = await _exportSetting(context);
                         await _shareFile(file);
                       }),
                   SizedBox(width: 10),

@@ -75,7 +75,7 @@ class SettingsBackup {
   }
 
   static SettingsBackup fromJson(Map<String, Object> json) {
-    List<String> list = List.from(json['episodePopupMenu']);
+    var list = List<String>.from(json['episodePopupMenu']);
     return SettingsBackup(
         theme: json['theme'] as int,
         accentColor: json['accentColor'] as String,

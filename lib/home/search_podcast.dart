@@ -1,19 +1,18 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:tsacdop/state/podcast_group.dart';
+import 'package:provider/provider.dart';
 
-import '../type/searchpodcast.dart';
-import '../type/searchepisodes.dart';
 import '../service/api_search.dart';
 import '../state/podcast_group.dart';
+import '../type/searchepisodes.dart';
+import '../type/searchpodcast.dart';
 import '../util/extension_helper.dart';
 import '../webfeed/webfeed.dart';
 
@@ -27,14 +26,14 @@ class MyHomePageDelegate extends SearchDelegate<int> {
 
   static Future getRss(String url) async {
     try {
-      BaseOptions options = new BaseOptions(
+      var options = BaseOptions(
         connectTimeout: 10000,
         receiveTimeout: 10000,
       );
-      Response response = await Dio(options).get(url);
+      var response = await Dio(options).get(url);
       return RssFeed.parse(response.data);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -94,7 +93,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
 
   @override
   Widget buildResults(BuildContext context) {
-    if (query.isEmpty)
+    if (query.isEmpty) {
       return Container(
         height: 10,
         width: 10,
@@ -107,29 +106,31 @@ class MyHomePageDelegate extends SearchDelegate<int> {
           ),
         ),
       );
-    else if (rssExp.stringMatch(query) != null)
+    } else if (rssExp.stringMatch(query) != null) {
       return FutureBuilder(
         future: getRss(rssExp.stringMatch(query)),
         builder: (context, snapshot) {
-          if (snapshot.hasError)
+          if (snapshot.hasError) {
             return invalidRss(context);
-          else if (snapshot.hasData)
+          } else if (snapshot.hasData) {
             return RssResult(
               url: rssExp.stringMatch(query),
               rssFeed: snapshot.data,
             );
-          else
+          } else {
             return Container(
               padding: EdgeInsets.only(top: 200),
               alignment: Alignment.topCenter,
               child: CircularProgressIndicator(),
             );
+          }
         },
       );
-    else
+    } else {
       return SearchList(
         query: query,
       );
+    }
   }
 }
 
@@ -165,7 +166,7 @@ class _RssResultState extends State<RssResult> {
     var subscribeWorker = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
     _subscribePodcast(OnlinePodcast podcast) {
-      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title,
+      var item = SubscribeItem(podcast.rss, podcast.title,
           imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
     }
@@ -325,7 +326,7 @@ class _RssResultState extends State<RssResult> {
               ListView.builder(
                   itemCount: math.min(_loadItems + 1, items.length),
                   itemBuilder: (context, index) {
-                    if (index == _loadItems)
+                    if (index == _loadItems) {
                       return Container(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                         alignment: Alignment.center,
@@ -344,6 +345,7 @@ class _RssResultState extends State<RssResult> {
                           ),
                         ),
                       );
+                    }
                     return ListTile(
                       title: Text(items[index].title),
                       subtitle: Text('${items[index].pubDate}',
@@ -368,12 +370,12 @@ class SearchList extends StatefulWidget {
 
 class _SearchListState extends State<SearchList> {
   int _nextOffset = 0;
-  List<OnlinePodcast> _podcastList = [];
+  final List<OnlinePodcast> _podcastList = [];
   int _offset;
   bool _loading;
   OnlinePodcast _selectedPodcast;
   Future _searchFuture;
-  List<OnlinePodcast> _subscribed = [];
+  final List<OnlinePodcast> _subscribed = [];
   @override
   void initState() {
     super.initState();
@@ -382,7 +384,7 @@ class _SearchListState extends State<SearchList> {
 
   Future<List<OnlinePodcast>> _getList(
       String searchText, int nextOffset) async {
-    SearchEngine searchEngine = SearchEngine();
+    var searchEngine = SearchEngine();
     var searchResult = await searchEngine.searchPodcasts(
         searchText: searchText, nextOffset: nextOffset);
     _offset = searchResult.nextOffset;
@@ -398,13 +400,14 @@ class _SearchListState extends State<SearchList> {
       children: [
         FutureBuilder<List>(
           future: _searchFuture,
-          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-            if (!snapshot.hasData && widget.query != null)
+          builder: (context, snapshot) {
+            if (!snapshot.hasData && widget.query != null) {
               return Container(
                 padding: EdgeInsets.only(top: 200),
                 alignment: Alignment.topCenter,
                 child: CircularProgressIndicator(),
               );
+            }
             var content = snapshot.data;
             return CustomScrollView(
               slivers: [
@@ -519,7 +522,7 @@ class SearchResult extends StatelessWidget {
     var subscribeWorker = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
     subscribePodcast(OnlinePodcast podcast) {
-      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title,
+      var item = SubscribeItem(podcast.rss, podcast.title,
           imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
       onSubscribe(podcast);
@@ -647,7 +650,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
   int _nextEpisdoeDate = DateTime.now().millisecondsSinceEpoch;
 
   /// Search result.
-  List<OnlineEpisode> _episodeList = [];
+  final List<OnlineEpisode> _episodeList = [];
 
   Future _searchFuture;
 
@@ -683,7 +686,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
 
   Future<List<OnlineEpisode>> _getEpisodes(
       {String id, int nextEpisodeDate}) async {
-    SearchEngine searchEngine = SearchEngine();
+    var searchEngine = SearchEngine();
     var searchResult = await searchEngine.fetchEpisode(
         id: id, nextEpisodeDate: nextEpisodeDate);
     _nextEpisdoeDate = searchResult.nextEpisodeDate;
@@ -761,15 +764,15 @@ class _SearchResultDetailState extends State<SearchResultDetail>
     var subscribeWorker = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
     subscribePodcast(OnlinePodcast podcast) {
-      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title,
+      var item = SubscribeItem(podcast.rss, podcast.title,
           imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
       widget.onSubscribe(podcast);
     }
 
     return GestureDetector(
-      onVerticalDragStart: (event) => _start(event),
-      onVerticalDragUpdate: (event) => _update(event),
+      onVerticalDragStart: _start,
+      onVerticalDragUpdate: _update,
       onVerticalDragEnd: (event) => _end(),
       child: SingleChildScrollView(
         child: Container(
@@ -947,7 +950,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                   : null,
                               itemCount: content.length + 1,
                               itemBuilder: (context, index) {
-                                if (index == content.length)
+                                if (index == content.length) {
                                   return Container(
                                     padding: const EdgeInsets.only(
                                         top: 10.0, bottom: 20.0),
@@ -986,6 +989,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                       ),
                                     ),
                                   );
+                                }
                                 return ListTile(
                                   title: Text(content[index].title),
                                   subtitle: Text(

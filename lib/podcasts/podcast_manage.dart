@@ -1,20 +1,20 @@
 import 'dart:math' as math;
 
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:feature_discovery/feature_discovery.dart';
+import 'package:line_icons/line_icons.dart';
+import 'package:provider/provider.dart';
 
 import '../state/podcast_group.dart';
-import 'podcast_group.dart';
-import 'podcastlist.dart';
-import '../util/pageroute.dart';
 import '../util/extension_helper.dart';
 import '../util/general_dialog.dart';
+import '../util/pageroute.dart';
 import 'custom_tabview.dart';
+import 'podcast_group.dart';
+import 'podcastlist.dart';
 
 const String addGroupFeature = 'addGroupFeature';
 const String configureGroup = 'configureFeature';
@@ -50,10 +50,11 @@ class _PodcastManageState extends State<PodcastManage>
         duration: const Duration(milliseconds: 500), vsync: this);
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _fraction = _animation.value;
           });
+        }
       });
     _menuAnimation = Tween(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(parent: _menuController, curve: Curves.easeIn))
@@ -69,7 +70,7 @@ class _PodcastManageState extends State<PodcastManage>
       }
     });
     FeatureDiscovery.isDisplayed(context, addGroupFeature).then((value) {
-      if (!value)
+      if (!value) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           FeatureDiscovery.discoverFeatures(context, const <String>{
             addGroupFeature,
@@ -77,6 +78,7 @@ class _PodcastManageState extends State<PodcastManage>
             configurePodcast
           });
         });
+      }
     });
   }
 
@@ -247,8 +249,7 @@ class _PodcastManageState extends State<PodcastManage>
                           .modalBarrierDismissLabel,
                       barrierColor: Colors.black54,
                       transitionDuration: const Duration(milliseconds: 200),
-                      pageBuilder: (BuildContext context, Animation animaiton,
-                              Animation secondaryAnimation) =>
+                      pageBuilder: (context, animaiton, secondaryAnimation) =>
                           AddGroup()),
                   icon: Icon(Icons.add)),
             ),
@@ -262,8 +263,8 @@ class _PodcastManageState extends State<PodcastManage>
             return true;
           },
           child: Consumer<GroupList>(builder: (_, groupList, __) {
-            bool _isLoading = groupList.isLoading;
-            List<PodcastGroup> _groups = groupList.groups;
+            var _isLoading = groupList.isLoading;
+            var _groups = groupList.groups;
             return _isLoading
                 ? Center()
                 : Stack(
@@ -390,11 +391,9 @@ class _PodcastManageState extends State<PodcastManage>
                                                   transitionDuration:
                                                       const Duration(
                                                           milliseconds: 300),
-                                                  pageBuilder: (BuildContext
-                                                              context,
-                                                          Animation animaiton,
-                                                          Animation
-                                                              secondaryAnimation) =>
+                                                  pageBuilder: (context,
+                                                          animaiton,
+                                                          secondaryAnimation) =>
                                                       RenameGroup(
                                                         group: _groups[_index],
                                                       ));

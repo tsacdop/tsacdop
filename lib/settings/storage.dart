@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
+import '../local_storage/key_value_storage.dart';
 import '../settings/downloads_manage.dart';
 import '../state/setting_state.dart';
-import '../local_storage/key_value_storage.dart';
-import '../util/extension_helper.dart';
 import '../util/custom_dropdown.dart';
+import '../util/extension_helper.dart';
 
 class StorageSetting extends StatefulWidget {
   @override
@@ -20,13 +20,13 @@ class _StorageSettingState extends State<StorageSetting>
   AnimationController _controller;
   Animation<double> _animation;
   _getCacheMax() async {
-    int cache =
+    var cache =
         await cacheStorage.getInt(defaultValue: (200 * 1024 * 1024).toInt());
     if (cache == 0) {
       await cacheStorage.saveInt((200 * 1024 * 1024).toInt());
       cache = 200 * 1024 * 1024;
     }
-    int value = cache ~/ (1024 * 1024);
+    var value = cache ~/ (1024 * 1024);
     if (value > 100) {
       _controller = AnimationController(
           vsync: this, duration: Duration(milliseconds: value * 2));
@@ -40,14 +40,14 @@ class _StorageSettingState extends State<StorageSetting>
   }
 
   Future<bool> _getAutoDownloadNetwork() async {
-    KeyValueStorage storage = KeyValueStorage(autoDownloadNetworkKey);
-    bool value = await storage.getBool(defaultValue: false);
+    var storage = KeyValueStorage(autoDownloadNetworkKey);
+    var value = await storage.getBool(defaultValue: false);
     return value;
   }
 
   Future<int> _getAutoDeleteDays() async {
-    KeyValueStorage storage = KeyValueStorage(autoDeleteKey);
-    int days = await storage.getInt();
+    var storage = KeyValueStorage(autoDeleteKey);
+    var days = await storage.getInt();
     if (days == 0) {
       storage.saveInt(30);
       return 30;
@@ -56,13 +56,13 @@ class _StorageSettingState extends State<StorageSetting>
   }
 
   _setAutoDeleteDays(int days) async {
-    KeyValueStorage storage = KeyValueStorage(autoDeleteKey);
+    var storage = KeyValueStorage(autoDeleteKey);
     await storage.saveInt(days);
     setState(() {});
   }
 
   _setAudtDownloadNetwork(bool boo) async {
-    KeyValueStorage storage = KeyValueStorage(autoDownloadNetworkKey);
+    var storage = KeyValueStorage(autoDownloadNetworkKey);
     await storage.saveBool(boo);
   }
 
@@ -272,7 +272,7 @@ class _StorageSettingState extends State<StorageSetting>
                               min: 100,
                               max: 1000,
                               divisions: 9,
-                              onChanged: (double val) {
+                              onChanged: (val) {
                                 setState(() {
                                   _value = val;
                                 });

@@ -8,9 +8,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
-import '../local_storage/sqflite_localpodcast.dart';
 import '../util/duraiton_picker.dart';
 import '../util/extension_helper.dart';
 import '../util/general_dialog.dart';
@@ -33,20 +33,18 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
         : Container(
             color: Theme.of(context).primaryColor,
             child: ReorderableListView(
-              onReorder: (int oldIndex, int newIndex) {
+              onReorder: (oldIndex, newIndex) {
                 setState(() {
                   if (newIndex > oldIndex) {
                     newIndex -= 1;
                   }
-                  final PodcastLocal podcast =
-                      widget.group.podcasts.removeAt(oldIndex);
+                  final podcast = widget.group.podcasts.removeAt(oldIndex);
                   widget.group.podcasts.insert(newIndex, podcast);
                 });
                 widget.group.setOrderedPodcasts = widget.group.podcasts;
                 groupList.addToOrderChanged(widget.group);
               },
-              children: widget.group.podcasts
-                  .map<Widget>((PodcastLocal podcastLocal) {
+              children: widget.group.podcasts.map<Widget>((podcastLocal) {
                 return Container(
                   decoration:
                       BoxDecoration(color: Theme.of(context).primaryColor),
@@ -84,7 +82,7 @@ class _PodcastCardState extends State<PodcastCard>
 
   Future<int> getSkipSecond(String id) async {
     var dbHelper = DBHelper();
-    int seconds = await dbHelper.getSkipSeconds(id);
+    var seconds = await dbHelper.getSkipSeconds(id);
     _skipSeconds = seconds;
     return seconds;
   }
@@ -95,23 +93,22 @@ class _PodcastCardState extends State<PodcastCard>
   }
 
   _setAutoDownload(String id, bool boo) async {
-    bool permission = await _checkPermmison();
+    var permission = await _checkPermmison();
     if (permission) {
-      DBHelper dbHelper = DBHelper();
-      await dbHelper.saveAutoDownload(id, boo);
+      var dbHelper = DBHelper();
+      await dbHelper.saveAutoDownload(id, boo: boo);
     }
   }
 
   Future<bool> _getAutoDownload(String id) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.getAutoDownload(id);
   }
 
   Future<bool> _checkPermmison() async {
-    PermissionStatus permission = await Permission.storage.status;
+    var permission = await Permission.storage.status;
     if (permission != PermissionStatus.granted) {
-      Map<Permission, PermissionStatus> permissions =
-          await [Permission.storage].request();
+      var permissions = await [Permission.storage].request();
       if (permissions[Permission.storage] == PermissionStatus.granted) {
         return true;
       } else {
@@ -169,11 +166,11 @@ class _PodcastCardState extends State<PodcastCard>
 
   @override
   Widget build(BuildContext context) {
-    Color _c = (Theme.of(context).brightness == Brightness.light)
+    var _c = (Theme.of(context).brightness == Brightness.light)
         ? widget.podcastLocal.primaryColor.colorizedark()
         : widget.podcastLocal.primaryColor.colorizeLight();
     final s = context.s;
-    double _width = MediaQuery.of(context).size.width;
+    var _width = MediaQuery.of(context).size.width;
     var groupList = context.watch<GroupList>();
     _belongGroups = groupList.getPodcastGroup(widget.podcastLocal.id);
 
@@ -190,10 +187,11 @@ class _PodcastCardState extends State<PodcastCard>
             onTap: () => setState(
               () {
                 _loadMenu = !_loadMenu;
-                if (_value == 0)
+                if (_value == 0) {
                   _controller.forward();
-                else
+                } else {
                   _controller.reverse();
+                }
               },
             ),
             child: Container(
@@ -278,8 +276,8 @@ class _PodcastCardState extends State<PodcastCard>
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
-                                      children: groupList.groups
-                                          .map<Widget>((PodcastGroup group) {
+                                      children:
+                                          groupList.groups.map<Widget>((group) {
                                     return Container(
                                       padding: EdgeInsets.only(left: 5.0),
                                       child: FilterChip(
@@ -287,7 +285,7 @@ class _PodcastCardState extends State<PodcastCard>
                                         label: Text(group.name),
                                         selected:
                                             _selectedGroups.contains(group),
-                                        onSelected: (bool value) {
+                                        onSelected: (value) {
                                           setState(() {
                                             if (!value) {
                                               _selectedGroups.remove(group);
@@ -328,11 +326,12 @@ class _PodcastCardState extends State<PodcastCard>
                                             msg: s.toastSettingSaved,
                                             gravity: ToastGravity.BOTTOM,
                                           );
-                                        } else
+                                        } else {
                                           Fluttertoast.showToast(
                                             msg: s.toastOneGroup,
                                             gravity: ToastGravity.BOTTOM,
                                           );
+                                        }
                                       },
                                       icon: Icon(Icons.done),
                                     ),
@@ -400,11 +399,8 @@ class _PodcastCardState extends State<PodcastCard>
                                           Icons.fast_forward,
                                           size: _value == 0 ? 1 : 20 * (_value),
                                         ),
-                                        tooltip: 'Skip' +
-                                            (snapshot.data == 0
-                                                ? ''
-                                                : _stringForSeconds(
-                                                    snapshot.data.toDouble())),
+                                        tooltip:
+                                            'Skip${snapshot.data == 0 ? '' : _stringForSeconds(snapshot.data.toDouble())}',
                                         onTap: () {
                                           generalDialog(
                                             context,
@@ -550,7 +546,7 @@ class _RenameGroupState extends State<RenameGroup> {
               if (list.contains(_newName)) {
                 setState(() => _error = 1);
               } else {
-                PodcastGroup newGroup = PodcastGroup(_newName,
+                var newGroup = PodcastGroup(_newName,
                     color: widget.group.color,
                     id: widget.group.id,
                     podcastList: widget.group.podcastList);

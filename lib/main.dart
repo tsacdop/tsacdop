@@ -1,19 +1,19 @@
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:feature_discovery/feature_discovery.dart';
+import 'package:provider/provider.dart';
 
 import 'generated/l10n.dart';
-import 'state/podcast_group.dart';
-import 'state/audio_state.dart';
-import 'state/setting_state.dart';
-import 'state/download_state.dart';
-import 'state/refresh_podcast.dart';
 import 'home/home.dart';
 import 'intro_slider/app_intro.dart';
+import 'state/audio_state.dart';
+import 'state/download_state.dart';
+import 'state/podcast_group.dart';
+import 'state/refresh_podcast.dart';
+import 'state/setting_state.dart';
 
 final SettingState themeSetting = SettingState();
 Future main() async {
@@ -38,7 +38,7 @@ Future main() async {
       child: MyApp(),
     ),
   );
-  SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
+  var systemUiOverlayStyle = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent);
   SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);

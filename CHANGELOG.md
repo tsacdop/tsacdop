@@ -9,7 +9,7 @@ Release date 2020/7/25
 * Filter in podcast detail page, you can also hide listened episodes.
 * Search result ui improved, you can see more info for result.
 * Update audio service to latest version.
-* Support fast forward seconds and rewind seconds costomize.
+* Support fast forward seconds and rewind seconds customize.
 * Add Franch language support(beta).
 * Add translators in about page.
 

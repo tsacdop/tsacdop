@@ -2,17 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tuple/tuple.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
 import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../type/playlist.dart';
-import '../util/extension_helper.dart';
 import '../util/custom_widget.dart';
+import '../util/extension_helper.dart';
 
 class PlaylistPage extends StatefulWidget {
   @override
@@ -23,7 +23,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
 
   int _sumPlaylistLength(List<EpisodeBrief> episodes) {
-    int sum = 0;
+    var sum = 0;
     if (episodes.length == 0) {
       return sum;
     } else {
@@ -36,7 +36,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
   ScrollController _controller;
   _scrollListener() {
-    double value = _controller.offset;
+    var value = _controller.offset;
     setState(() => _topHeight = (100 - value) > 60 ? 100 - value : 60);
   }
 
@@ -79,7 +79,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
             selector: (_, audio) =>
                 Tuple3(audio.queue, audio.playerRunning, audio.queueUpdate),
             builder: (_, data, __) {
-              final List<EpisodeBrief> episodes = data.item1.playlist;
+              final episodes = data.item1.playlist;
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +100,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                             child: RichText(
                               text: TextSpan(
                                 text: _topHeight > 90
-                                    ? s.homeMenuPlaylist + '\n'
+                                    ? '${s.homeMenuPlaylist}\n'
                                     : '',
                                 style: TextStyle(
                                   color: Theme.of(context)
@@ -243,11 +243,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
                   Expanded(
                     child: ReorderableListView(
                         scrollController: _controller,
-                        onReorder: (int oldIndex, int newIndex) {
+                        onReorder: (oldIndex, newIndex) {
                           if (newIndex > oldIndex) {
                             newIndex -= 1;
                           }
-                          final EpisodeBrief episodeRemove = episodes[oldIndex];
+                          final episodeRemove = episodes[oldIndex];
                           audio.delFromPlaylist(episodeRemove);
                           audio.addToPlaylistAt(episodeRemove, newIndex);
                           setState(() {});
@@ -256,15 +256,16 @@ class _PlaylistPageState extends State<PlaylistPage> {
                         children: data.item2
                             ? episodes.map<Widget>((episode) {
                                 if (episode.enclosureUrl !=
-                                    episodes.first.enclosureUrl)
+                                    episodes.first.enclosureUrl) {
                                   return DismissibleContainer(
                                     episode: episode,
                                     key: ValueKey(episode.enclosureUrl),
                                   );
-                                else
+                                } else {
                                   return Container(
                                     key: ValueKey('sd'),
                                   );
+                                }
                               }).toList()
                             : episodes
                                 .map<Widget>((episode) => DismissibleContainer(
@@ -315,7 +316,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
-    Color _c = (Theme.of(context).brightness == Brightness.light)
+    var _c = (Theme.of(context).brightness == Brightness.light)
         ? widget.episode.primaryColor.colorizedark()
         : widget.episode.primaryColor.colorizeLight();
     return AnimatedContainer(
@@ -327,7 +328,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
               color: Colors.transparent,
             )
           : Dismissible(
-              key: ValueKey(widget.episode.enclosureUrl + 't'),
+              key: ValueKey('${widget.episode.enclosureUrl}t'),
               background: Container(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Row(
@@ -364,7 +365,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                 setState(() {
                   _delete = true;
                 });
-                int index = await audio.delFromPlaylist(widget.episode);
+                var index = await audio.delFromPlaylist(widget.episode);
                 final episodeRemove = widget.episode;
                 Fluttertoast.showToast(
                   msg: s.toastRemovePlaylist,
@@ -430,9 +431,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                               : Center(),
                           widget.episode.enclosureLength != null
                               ? _episodeTag(
-                                  ((widget.episode.enclosureLength) ~/ 1000000)
-                                          .toString() +
-                                      'MB',
+                                  '${(widget.episode.enclosureLength) ~/ 1000000}MB',
                                   Colors.lightBlue[300])
                               : Center(),
                         ],

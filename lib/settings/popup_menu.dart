@@ -1,11 +1,11 @@
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:flare_flutter/flare_actor.dart';
 
-import '../util/extension_helper.dart';
-import '../util/custom_widget.dart';
 import '../local_storage/key_value_storage.dart';
+import '../util/custom_widget.dart';
+import '../util/extension_helper.dart';
 
 class PopupMenuSetting extends StatefulWidget {
   const PopupMenuSetting({Key key}) : super(key: key);
@@ -16,27 +16,25 @@ class PopupMenuSetting extends StatefulWidget {
 
 class _PopupMenuSettingState extends State<PopupMenuSetting> {
   Future<List<int>> _getEpisodeMenu() async {
-    KeyValueStorage popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
-    List<int> list = await popupMenuStorage.getMenu();
+    var popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
+    var list = await popupMenuStorage.getMenu();
     return list;
   }
 
   Future<bool> _getTapToOpenPopupMenu() async {
-    KeyValueStorage tapToOpenPopupMenuStorage =
-        KeyValueStorage(tapToOpenPopupMenuKey);
-    bool boo = await tapToOpenPopupMenuStorage.getBool(defaultValue: false);
+    var tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
+    var boo = await tapToOpenPopupMenuStorage.getBool(defaultValue: false);
     return boo;
   }
 
   _saveEpisodeMene(List<int> list) async {
-    KeyValueStorage popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
+    var popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
     await popupMenuStorage.saveMenu(list);
     if (mounted) setState(() {});
   }
 
   _saveTapToOpenPopupMenu(bool boo) async {
-    KeyValueStorage tapToOpenPopupMenuStorage =
-        KeyValueStorage(tapToOpenPopupMenuKey);
+    var tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
     await tapToOpenPopupMenuStorage.saveBool(boo);
     if (mounted) setState(() {});
   }
@@ -57,12 +55,12 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
               ? null
               : () {
                   if (e >= 10) {
-                    int index = menu.indexOf(e);
+                    var index = menu.indexOf(e);
                     menu.remove(e);
                     menu.insert(index, e - 10);
                     _saveEpisodeMene(menu);
                   } else if (e < 10) {
-                    int index = menu.indexOf(e);
+                    var index = menu.indexOf(e);
                     menu.remove(e);
                     menu.insert(index, e + 10);
                     _saveEpisodeMene(menu);
@@ -72,14 +70,14 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
               value: e < 10,
               onChanged: e == 0
                   ? null
-                  : (bool boo) {
+                  : (boo) {
                       if (boo && e >= 10) {
-                        int index = menu.indexOf(e);
+                        var index = menu.indexOf(e);
                         menu.remove(e);
                         menu.insert(index, e - 10);
                         _saveEpisodeMene(menu);
                       } else if (e < 10) {
-                        int index = menu.indexOf(e);
+                        var index = menu.indexOf(e);
                         menu.remove(e);
                         menu.insert(index, e + 10);
                         _saveEpisodeMene(menu);
@@ -143,7 +141,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                     scale: 0.9,
                     child: Switch(
                         value: snapshot.data,
-                        onChanged: (bool boo) => _saveTapToOpenPopupMenu(boo)),
+                        onChanged: _saveTapToOpenPopupMenu),
                   ),
                 ),
               ),
@@ -151,13 +149,13 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                   future: _getEpisodeMenu(),
                   initialData: [0, 1, 12, 13, 14],
                   builder: (context, snapshot) {
-                    List<int> menu = snapshot.data;
+                    var menu = snapshot.data;
                     return Expanded(
                       child: ListView(
                         physics: const BouncingScrollPhysics(),
                         shrinkWrap: true,
-                        children: menu.map<Widget>((int e) {
-                          int i = e % 10;
+                        children: menu.map<Widget>((e) {
+                          var i = e % 10;
                           switch (i) {
                             case 0:
                               return _popupMenuItem(menu, e,

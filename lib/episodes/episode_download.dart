@@ -1,19 +1,18 @@
-import 'dart:ui';
 import 'dart:async';
+import 'dart:ui';
 
-import 'package:flutter/material.dart';
-import 'package:line_icons/line_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:tsacdop/util/custom_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
-import '../state/download_state.dart';
 import '../state/audio_state.dart';
+import '../state/download_state.dart';
 import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 import '../util/general_dialog.dart';
 
@@ -46,7 +45,7 @@ class _DownloadButtonState extends State<DownloadButton> {
 
   void _requestDownload(EpisodeBrief episode, bool downloadUsingData) async {
     _permissionReady = await _checkPermmison();
-    bool _dataConfirm = true;
+    var _dataConfirm = true;
     if (_permissionReady) {
       if (downloadUsingData && _usingData) {
         _dataConfirm = await _useDataConfirem();
@@ -78,10 +77,9 @@ class _DownloadButtonState extends State<DownloadButton> {
   }
 
   Future<bool> _checkPermmison() async {
-    PermissionStatus permission = await Permission.storage.status;
+    var permission = await Permission.storage.status;
     if (permission != PermissionStatus.granted) {
-      Map<Permission, PermissionStatus> permissions =
-          await [Permission.storage].request();
+      var permissions = await [Permission.storage].request();
       if (permissions[Permission.storage] == PermissionStatus.granted) {
         return true;
       } else {
@@ -93,7 +91,7 @@ class _DownloadButtonState extends State<DownloadButton> {
   }
 
   Future<bool> _useDataConfirem() async {
-    bool ifUseData = false;
+    var ifUseData = false;
     final s = context.s;
     await generalDialog(
       context,
@@ -138,7 +136,7 @@ class _DownloadButtonState extends State<DownloadButton> {
   @override
   Widget build(BuildContext context) {
     return Consumer<DownloadState>(builder: (_, downloader, __) {
-      EpisodeTask _task = Provider.of<DownloadState>(context, listen: false)
+      var _task = Provider.of<DownloadState>(context, listen: false)
           .episodeToTask(widget.episode);
       return Row(
         children: <Widget>[

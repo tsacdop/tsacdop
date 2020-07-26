@@ -51,20 +51,20 @@ class _DropdownMenuPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double selectedItemOffset = getSelectedItemOffset();
-    final Tween<double> top = Tween<double>(
+    final selectedItemOffset = getSelectedItemOffset();
+    final top = Tween<double>(
       begin: selectedItemOffset.clamp(0.0, size.height - _kMenuItemHeight)
           as double,
       end: 0.0,
     );
 
-    final Tween<double> bottom = Tween<double>(
+    final bottom = Tween<double>(
       begin: (top.begin + _kMenuItemHeight).clamp(_kMenuItemHeight, size.height)
           as double,
       end: size.height,
     );
 
-    final Rect rect = Rect.fromLTRB(
+    final rect = Rect.fromLTRB(
         0.0, top.evaluate(resize), size.width, bottom.evaluate(resize));
 
     _painter.paint(canvas, rect.topLeft, ImageConfiguration(size: rect.size));
@@ -134,7 +134,7 @@ class _DropdownMenuItemButtonState<T>
     }
 
     if (focused && inTraditionalMode) {
-      final _MenuLimits menuLimits = widget.route.getMenuLimits(
+      final menuLimits = widget.route.getMenuLimits(
           widget.buttonRect, widget.constraints.maxHeight, widget.itemIndex);
       widget.route.scrollController.animateTo(
         menuLimits.scrollOffset,
@@ -145,8 +145,7 @@ class _DropdownMenuItemButtonState<T>
   }
 
   void _handleOnTap() {
-    final DropdownMenuItem<T> dropdownMenuItem =
-        widget.route.items[widget.itemIndex].item;
+    final dropdownMenuItem = widget.route.items[widget.itemIndex].item;
 
     if (dropdownMenuItem.onTap != null) {
       dropdownMenuItem.onTap();
@@ -161,14 +160,14 @@ class _DropdownMenuItemButtonState<T>
   @override
   Widget build(BuildContext context) {
     CurvedAnimation opacity;
-    final double unit = 0.5 / (widget.route.items.length + 1.5);
+    final unit = 0.5 / (widget.route.items.length + 1.5);
     if (widget.itemIndex == widget.route.selectedIndex) {
       opacity = CurvedAnimation(
           parent: widget.route.animation, curve: const Threshold(0.0));
     } else {
-      final double start =
+      final start =
           (0.5 + (widget.itemIndex + 1) * unit).clamp(0.0, 1.0) as double;
-      final double end = (start + 1.5 * unit).clamp(0.0, 1.0) as double;
+      final end = (start + 1.5 * unit).clamp(0.0, 1.0) as double;
       opacity = CurvedAnimation(
           parent: widget.route.animation, curve: Interval(start, end));
     }
@@ -244,10 +243,9 @@ class _DropdownMenuState<T> extends State<_DropdownMenu<T>> {
     // When the menu is dismissed we just fade the entire thing out
     // in the first 0.25s.
     assert(debugCheckHasMaterialLocalizations(context));
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
-    final _DropdownRoute<T> route = widget.route;
-    final List<Widget> children = <Widget>[
+    final localizations = MaterialLocalizations.of(context);
+    final route = widget.route;
+    final children = <Widget>[
       for (int itemIndex = 0; itemIndex < route.items.length; ++itemIndex)
         _DropdownMenuItemButton<T>(
           route: widget.route,
@@ -315,13 +313,13 @@ class _DropdownMenuRouteLayout<T> extends SingleChildLayoutDelegate {
     // the view height. This ensures a tappable area outside of the simple menu
     // with which to dismiss the menu.
     //   -- https://material.io/design/components/menus.html#usage
-    final double maxHeight = displayItemCount == null
+    final maxHeight = displayItemCount == null
         ? math.max(0.0, constraints.maxHeight - 2 * _kMenuItemHeight)
         : math.min(_kMenuItemHeight * displayItemCount,
             constraints.maxHeight - 2 * _kMenuItemHeight);
     // The width of a menu should be at most the view width. This ensures that
     // the menu does not extend past the left and right edges of the screen.
-    final double width = math.min(constraints.maxWidth, buttonRect.width);
+    final width = math.min(constraints.maxWidth, buttonRect.width);
     return BoxConstraints(
       minWidth: width,
       maxWidth: width,
@@ -332,11 +330,11 @@ class _DropdownMenuRouteLayout<T> extends SingleChildLayoutDelegate {
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    final _MenuLimits menuLimits =
+    final menuLimits =
         route.getMenuLimits(buttonRect, size.height, route.selectedIndex);
 
     assert(() {
-      final Rect container = Offset.zero & size;
+      final container = Offset.zero & size;
       if (container.intersect(buttonRect) == buttonRect) {
         // If the button was entirely on-screen, then verify
         // that the menu is also on-screen.
@@ -440,8 +438,7 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(builder: (context, constraints) {
       return _DropdownRoutePage<T>(
         route: this,
         constraints: constraints,
@@ -463,12 +460,12 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
   }
 
   double getItemOffset(int index) {
-    double offset = kMaterialListPadding.top;
+    var offset = kMaterialListPadding.top;
     if (items.isNotEmpty && index > 0) {
       assert(items.length == itemHeights?.length);
       offset += itemHeights
           .sublist(0, index)
-          .reduce((double total, double height) => total + height);
+          .reduce((total, height) => total + height);
     }
     return offset;
   }
@@ -479,30 +476,31 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
   // that's possible given availableHeight.
   _MenuLimits getMenuLimits(
       Rect buttonRect, double availableHeight, int index) {
-    final double maxMenuHeight = availableHeight - 2.0 * _kMenuItemHeight;
-    final double buttonTop = buttonRect.top;
-    final double buttonBottom = math.min(buttonRect.bottom, availableHeight);
-    final double selectedItemOffset = getItemOffset(index);
+    final maxMenuHeight = availableHeight - 2.0 * _kMenuItemHeight;
+    final buttonTop = buttonRect.top;
+    final buttonBottom = math.min(buttonRect.bottom, availableHeight);
+    final selectedItemOffset = getItemOffset(index);
 
     // If the button is placed on the bottom or top of the screen, its top or
     // bottom may be less than [_kMenuItemHeight] from the edge of the screen.
     // In this case, we want to change the menu limits to align with the top
     // or bottom edge of the button.
-    final double topLimit = math.min(_kMenuItemHeight, buttonTop);
-    final double bottomLimit =
+    final topLimit = math.min(_kMenuItemHeight, buttonTop);
+    final bottomLimit =
         math.max(availableHeight - _kMenuItemHeight, buttonBottom);
 
-    double menuTop = (buttonTop - selectedItemOffset) -
+    var menuTop = (buttonTop - selectedItemOffset) -
         (itemHeights[selectedIndex] - buttonRect.height) / 2.0;
-    double preferredMenuHeight = kMaterialListPadding.vertical;
-    if (items.isNotEmpty)
+    var preferredMenuHeight = kMaterialListPadding.vertical;
+    if (items.isNotEmpty) {
       preferredMenuHeight +=
-          itemHeights.reduce((double total, double height) => total + height);
+          itemHeights.reduce((total, height) => total + height);
+    }
 
     // If there are too many elements in the menu, we need to shrink it down
     // so it is at most the maxMenuHeight.
-    final double menuHeight = math.min(maxMenuHeight, preferredMenuHeight);
-    double menuBottom = menuTop + menuHeight;
+    final menuHeight = math.min(maxMenuHeight, preferredMenuHeight);
+    var menuBottom = menuTop + menuHeight;
 
     // If the computed top or bottom of the menu are outside of the range
     // specified, we need to bring them into range. If the item height is larger
@@ -522,7 +520,7 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
     // shown - subsequently we leave the scroll offset where the user left
     // it. This scroll offset is only accurate for fixed height menu items
     // (the default).
-    final double scrollOffset = preferredMenuHeight <= maxMenuHeight
+    final scrollOffset = preferredMenuHeight <= maxMenuHeight
         ? 0
         : math.max(0.0, selectedItemOffset - (buttonTop - menuTop));
 
@@ -569,13 +567,13 @@ class _DropdownRoutePage<T> extends StatelessWidget {
     // Otherwise the initialScrollOffset is just a rough approximation based on
     // treating the items as if their heights were all equal to kMinInteractveDimension.
     if (route.scrollController == null) {
-      final _MenuLimits menuLimits =
+      final menuLimits =
           route.getMenuLimits(buttonRect, constraints.maxHeight, selectedIndex);
       route.scrollController =
           ScrollController(initialScrollOffset: menuLimits.scrollOffset);
     }
 
-    final TextDirection textDirection = Directionality.of(context);
+    final textDirection = Directionality.of(context);
     Widget menu = _DropdownMenu<T>(
       route: route,
       padding: padding.resolve(textDirection),
@@ -593,7 +591,7 @@ class _DropdownRoutePage<T> extends StatelessWidget {
       removeLeft: true,
       removeRight: true,
       child: Builder(
-        builder: (BuildContext context) {
+        builder: (context) {
           return CustomSingleChildLayout(
             delegate: _DropdownMenuRouteLayout<T>(
               buttonRect: buttonRect,
@@ -850,7 +848,7 @@ class MyDropdownButton<T> extends StatefulWidget {
           items == null ||
               items.isEmpty ||
               value == null ||
-              items.where((DropdownMenuItem<T> item) {
+              items.where((item) {
                     return item.value == value;
                   }).length ==
                   1,
@@ -1128,7 +1126,7 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
     //   ActivateAction.key: _createAction,
     // };
     focusNode.addListener(_handleFocusChanged);
-    final FocusManager focusManager = WidgetsBinding.instance.focusManager;
+    final focusManager = WidgetsBinding.instance.focusManager;
     _focusHighlightMode = focusManager.highlightMode;
     focusManager.addHighlightModeListener(_handleFocusHighlightModeChange);
   }
@@ -1187,12 +1185,9 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
     }
 
     assert(widget.value == null ||
-        widget.items
-                .where((DropdownMenuItem<T> item) => item.value == widget.value)
-                .length ==
-            1);
+        widget.items.where((item) => item.value == widget.value).length == 1);
     _selectedIndex = null;
-    for (int itemIndex = 0; itemIndex < widget.items.length; itemIndex++) {
+    for (var itemIndex = 0; itemIndex < widget.items.length; itemIndex++) {
       if (widget.items[itemIndex].value == widget.value) {
         _selectedIndex = itemIndex;
         return;
@@ -1204,20 +1199,18 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
       widget.style ?? Theme.of(context).textTheme.subtitle1;
 
   void _handleTap() {
-    final RenderBox itemBox = context.findRenderObject() as RenderBox;
-    final Rect itemRect = itemBox.localToGlobal(Offset.zero) & itemBox.size;
-    final TextDirection textDirection = Directionality.of(context);
-    final EdgeInsetsGeometry menuMargin =
-        ButtonTheme.of(context).alignedDropdown
-            ? _kAlignedMenuMargin
-            : _kUnalignedMenuMargin;
+    final itemBox = context.findRenderObject() as RenderBox;
+    final itemRect = itemBox.localToGlobal(Offset.zero) & itemBox.size;
+    final textDirection = Directionality.of(context);
+    final menuMargin = ButtonTheme.of(context).alignedDropdown
+        ? _kAlignedMenuMargin
+        : _kUnalignedMenuMargin;
 
-    final List<_MenuItem<T>> menuItems =
-        List<_MenuItem<T>>(widget.items.length);
-    for (int index = 0; index < widget.items.length; index += 1) {
+    final menuItems = List<_MenuItem<T>>(widget.items.length);
+    for (var index = 0; index < widget.items.length; index += 1) {
       menuItems[index] = _MenuItem<T>(
         item: widget.items[index],
-        onLayout: (Size size) {
+        onLayout: (size) {
           // If [_dropdownRoute] is null and onLayout is called, this means
           // that performLayout was called on a _DropdownRoute that has not
           // left the widget tree but is already on its way out.
@@ -1248,8 +1241,7 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
       displayItemCount: widget.displayItemCount,
     );
 
-    Navigator.push(context, _dropdownRoute)
-        .then<void>((_DropdownRouteResult<T> newValue) {
+    Navigator.push(context, _dropdownRoute).then<void>((newValue) {
       _removeDropdownRoute();
       if (!mounted || newValue == null) return;
       if (widget.onChanged != null) widget.onChanged(newValue.result);
@@ -1274,7 +1266,7 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
   // Similarly, we don't reduce the height of the button so much that its icon
   // would be clipped.
   double get _denseButtonHeight {
-    final double fontSize =
+    final fontSize =
         _textStyle.fontSize ?? Theme.of(context).textTheme.subtitle1.fontSize;
     return math.max(fontSize, math.max(widget.iconSize, _kDenseButtonHeight));
   }
@@ -1311,11 +1303,11 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
       widget.onChanged != null;
 
   Orientation _getOrientation(BuildContext context) {
-    Orientation result = MediaQuery.of(context, nullOk: true)?.orientation;
+    var result = MediaQuery.of(context, nullOk: true)?.orientation;
     if (result == null) {
       // If there's no MediaQuery, then use the window aspect to determine
       // orientation.
-      final Size size = window.physicalSize;
+      final size = window.physicalSize;
       result = size.width > size.height
           ? Orientation.landscape
           : Orientation.portrait;
@@ -1337,7 +1329,7 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
     assert(debugCheckHasMaterialLocalizations(context));
-    final Orientation newOrientation = _getOrientation(context);
+    final newOrientation = _getOrientation(context);
     _lastOrientation ??= newOrientation;
     if (newOrientation != _lastOrientation) {
       _removeDropdownRoute();
@@ -1359,10 +1351,11 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
 
     int hintIndex;
     if (widget.hint != null || (!_enabled && widget.disabledHint != null)) {
-      Widget displayedHint =
+      var displayedHint =
           _enabled ? widget.hint : widget.disabledHint ?? widget.hint;
-      if (widget.selectedItemBuilder == null)
+      if (widget.selectedItemBuilder == null) {
         displayedHint = _DropdownMenuItemContainer(child: displayedHint);
+      }
 
       hintIndex = items.length;
       items.add(DefaultTextStyle(
@@ -1374,13 +1367,13 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
       ));
     }
 
-    final EdgeInsetsGeometry padding = ButtonTheme.of(context).alignedDropdown
+    final padding = ButtonTheme.of(context).alignedDropdown
         ? _kAlignedButtonPadding
         : _kUnalignedButtonPadding;
 
     // If value is null (then _selectedIndex is null) or if disabled then we
     // display the hint or nothing at all.
-    final int index = _enabled ? (_selectedIndex ?? hintIndex) : hintIndex;
+    final index = _enabled ? (_selectedIndex ?? hintIndex) : hintIndex;
     Widget innerItemsWidget;
     if (items.isEmpty) {
       innerItemsWidget = Container();
@@ -1390,7 +1383,7 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
         alignment: AlignmentDirectional.centerStart,
         children: widget.isDense
             ? items
-            : items.map((Widget item) {
+            : items.map((item) {
                 return widget.itemHeight != null
                     ? SizedBox(height: widget.itemHeight, child: item)
                     : Column(
@@ -1400,7 +1393,7 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
       );
     }
 
-    const Icon defaultIcon = Icon(Icons.arrow_drop_down);
+    const defaultIcon = Icon(Icons.arrow_drop_down);
 
     Widget result = DefaultTextStyle(
       style: _textStyle,
@@ -1434,8 +1427,7 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
     );
 
     if (!DropdownButtonHideUnderline.at(context)) {
-      final double bottom =
-          (widget.isDense || widget.itemHeight == null) ? 0.0 : 8.0;
+      final bottom = (widget.isDense || widget.itemHeight == null) ? 0.0 : 8.0;
       result = Stack(
         children: <Widget>[
           result,
@@ -1508,7 +1500,7 @@ class DropdownButtonFormField<T> extends FormField<T> {
           items == null ||
               items.isEmpty ||
               value == null ||
-              items.where((DropdownMenuItem<T> item) {
+              items.where((item) {
                     return item.value == value;
                   }).length ==
                   1,
@@ -1529,11 +1521,9 @@ class DropdownButtonFormField<T> extends FormField<T> {
           initialValue: value,
           validator: validator,
           autovalidate: autovalidate,
-          builder: (FormFieldState<T> field) {
-            final _DropdownButtonFormFieldState<T> state =
-                field as _DropdownButtonFormFieldState<T>;
-            final InputDecoration effectiveDecoration =
-                decoration.applyDefaults(
+          builder: (field) {
+            final state = field as _DropdownButtonFormFieldState<T>;
+            final effectiveDecoration = decoration.applyDefaults(
               Theme.of(field.context).inputDecorationTheme,
             );
             return InputDecorator(

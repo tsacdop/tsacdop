@@ -1,34 +1,34 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-import 'package:line_icons/line_icons.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:feature_discovery/feature_discovery.dart';
 
-import '../state/audio_state.dart';
-import '../type/playlist.dart';
-import '../type/episodebrief.dart';
-import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
-import '../util/episodegrid.dart';
-import '../util/mypopupmenu.dart';
-import '../util/extension_helper.dart';
-import '../util/custom_widget.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
 import '../state/setting_state.dart';
-import 'playlist.dart';
-import 'import_ompl.dart';
+import '../type/episodebrief.dart';
+import '../type/playlist.dart';
+import '../util/custom_widget.dart';
+import '../util/episodegrid.dart';
+import '../util/extension_helper.dart';
+import '../util/mypopupmenu.dart';
 import 'audioplayer.dart';
-import 'search_podcast.dart';
-import 'home_menu.dart';
-import 'home_groups.dart';
 import 'download_list.dart';
+import 'home_groups.dart';
+import 'home_menu.dart';
+import 'import_ompl.dart';
+import 'playlist.dart';
+import 'search_podcast.dart';
 
 const String addFeature = 'addFeature';
 const String menuFeature = 'menuFeature';
@@ -55,7 +55,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         ));
   }
 
-  var _androidAppRetain = MethodChannel("android_app_retain");
+  final _androidAppRetain = MethodChannel("android_app_retain");
   var feature1OverflowMode = OverflowMode.clipContent;
   var feature1EnablePulsingAnimation = false;
 
@@ -64,7 +64,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     super.initState();
     _controller = TabController(length: 3, vsync: this);
     FeatureDiscovery.isDisplayed(context, addFeature).then((value) {
-      if (!value)
+      if (!value) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           FeatureDiscovery.discoverFeatures(
             context,
@@ -77,6 +77,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             },
           );
         });
+      }
     });
   }
 
@@ -89,8 +90,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   double top = 0;
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = (width - 20) / 3 + 140;
+    var width = MediaQuery.of(context).size.width;
+    var height = (width - 20) / 3 + 140;
     var settings = Provider.of<SettingState>(context, listen: false);
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -119,11 +120,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       Expanded(
                         child: NestedScrollView(
                           innerScrollPositionKeyBuilder: () {
-                            return Key('tab' + _controller.index.toString());
+                            return Key('tab${_controller.index}');
                           },
                           pinnedHeaderSliverHeightBuilder: () => 50,
-                          headerSliverBuilder:
-                              (BuildContext context, bool innerBoxScrolled) {
+                          headerSliverBuilder: (context, innerBoxScrolled) {
                             return <Widget>[
                               SliverToBoxAdapter(
                                 child: Column(
@@ -276,7 +276,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               ),
                               SliverList(
                                 delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, int index) {
+                                  (context, index) {
                                     return DescribedFeatureOverlay(
                                       featureId: groupsFeature,
                                       tapTarget: Center(
@@ -686,26 +686,28 @@ class _RecentUpdate extends StatefulWidget {
 class _RecentUpdateState extends State<_RecentUpdate>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group) async {
-    KeyValueStorage storage = KeyValueStorage(recentLayoutKey);
-    int index = await storage.getInt(defaultValue: 1);
+    var storage = KeyValueStorage(recentLayoutKey);
+    var index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
 
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes;
-    if (group.first == 'All')
+    if (group.first == 'All') {
       episodes = await dbHelper.getRecentRssItem(top);
-    else
+    } else {
       episodes = await dbHelper.getGroupRssItem(top, group);
+    }
     return episodes;
   }
 
   Future<int> _getUpdateCounts(List<String> group) async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = [];
-    if (group.first == 'All')
+    var episodes = <EpisodeBrief>[];
+    if (group.first == 'All') {
       episodes = await dbHelper.getRecentNewRssItem();
-    else
+    } else {
       episodes = await dbHelper.getGroupNewRssItem(group);
+    }
     return episodes.length;
   }
 
@@ -713,11 +715,12 @@ class _RecentUpdateState extends State<_RecentUpdate>
   _loadMoreEpisode() async {
     if (mounted) setState(() => _loadMore = true);
     await Future.delayed(Duration(seconds: 3));
-    if (mounted)
+    if (mounted) {
       setState(() {
         _top = _top + 33;
         _loadMore = false;
       });
+    }
   }
 
   /// Episodes loaded first time.
@@ -771,7 +774,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                           ),
                         )
                       : NotificationListener<ScrollNotification>(
-                          onNotification: (ScrollNotification scrollInfo) {
+                          onNotification: (scrollInfo) {
                             if (scrollInfo is ScrollStartNotification &&
                                 mounted &&
                                 !_scroll) {
@@ -779,8 +782,9 @@ class _RecentUpdateState extends State<_RecentUpdate>
                             }
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data.length == _top)
+                                snapshot.data.length == _top) {
                               _loadMoreEpisode();
+                            }
                             return true;
                           },
                           child: CustomScrollView(
@@ -912,9 +916,10 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                                 await audio
                                                                     .addNewEpisode(
                                                                         _group);
-                                                                if (mounted)
+                                                                if (mounted) {
                                                                   setState(
                                                                       () {});
+                                                                }
                                                                 Fluttertoast
                                                                     .showToast(
                                                                   msg: _groupName ==
@@ -960,19 +965,21 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                   tooltip: s.changeLayout,
                                                   padding: EdgeInsets.zero,
                                                   onPressed: () {
-                                                    if (_layout == Layout.three)
+                                                    if (_layout ==
+                                                        Layout.three) {
                                                       setState(() {
                                                         _layout = Layout.one;
                                                       });
-                                                    else if (_layout ==
-                                                        Layout.two)
+                                                    } else if (_layout ==
+                                                        Layout.two) {
                                                       setState(() {
                                                         _layout = Layout.three;
                                                       });
-                                                    else
+                                                    } else {
                                                       setState(() {
                                                         _layout = Layout.two;
                                                       });
+                                                    }
                                                   },
                                                   icon: _layout == Layout.three
                                                       ? SizedBox(
@@ -1026,7 +1033,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                 ),
                                 SliverList(
                                   delegate: SliverChildBuilderDelegate(
-                                    (BuildContext context, int index) {
+                                    (context, index) {
                                       return _loadMore
                                           ? Container(
                                               height: 2,
@@ -1055,22 +1062,23 @@ class _MyFavorite extends StatefulWidget {
 class _MyFavoriteState extends State<_MyFavorite>
     with AutomaticKeepAliveClientMixin {
   Future<List<EpisodeBrief>> _getLikedRssItem(int top, int sortBy) async {
-    KeyValueStorage storage = KeyValueStorage(favLayoutKey);
-    int index = await storage.getInt(defaultValue: 1);
+    var storage = KeyValueStorage(favLayoutKey);
+    var index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await dbHelper.getLikedRssItem(top, sortBy);
+    var episodes = await dbHelper.getLikedRssItem(top, sortBy);
     return episodes;
   }
 
   _loadMoreEpisode() async {
     if (mounted) setState(() => _loadMore = true);
     await Future.delayed(Duration(seconds: 3));
-    if (mounted)
+    if (mounted) {
       setState(() {
         _top = _top + 33;
         _loadMore = false;
       });
+    }
   }
 
   int _top = 99;
@@ -1114,11 +1122,12 @@ class _MyFavoriteState extends State<_MyFavorite>
                           ),
                         )
                       : NotificationListener<ScrollNotification>(
-                          onNotification: (ScrollNotification scrollInfo) {
+                          onNotification: (scrollInfo) {
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data.length == _top)
+                                snapshot.data.length == _top) {
                               _loadMoreEpisode();
+                            }
                             return true;
                           },
                           child: CustomScrollView(
@@ -1184,10 +1193,11 @@ class _MyFavoriteState extends State<_MyFavorite>
                                               )
                                             ],
                                             onSelected: (value) {
-                                              if (value == 0)
+                                              if (value == 0) {
                                                 setState(() => _sortBy = 0);
-                                              else if (value == 1)
+                                              } else if (value == 1) {
                                                 setState(() => _sortBy = 1);
+                                              }
                                             },
                                           ),
                                         ),
@@ -1197,18 +1207,20 @@ class _MyFavoriteState extends State<_MyFavorite>
                                           child: IconButton(
                                               padding: EdgeInsets.zero,
                                               onPressed: () {
-                                                if (_layout == Layout.three)
+                                                if (_layout == Layout.three) {
                                                   setState(() {
                                                     _layout = Layout.one;
                                                   });
-                                                else if (_layout == Layout.two)
+                                                } else if (_layout ==
+                                                    Layout.two) {
                                                   setState(() {
                                                     _layout = Layout.three;
                                                   });
-                                                else
+                                                } else {
                                                   setState(() {
                                                     _layout = Layout.two;
                                                   });
+                                                }
                                               },
                                               icon: _layout == Layout.three
                                                   ? SizedBox(
@@ -1259,7 +1271,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                               ),
                               SliverList(
                                 delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, int index) {
+                                  (context, index) {
                                     return _loadMore
                                         ? Container(
                                             height: 2,
@@ -1291,12 +1303,13 @@ class _MyDownloadState extends State<_MyDownload>
     with AutomaticKeepAliveClientMixin {
   Layout _layout;
   _getLayout() async {
-    KeyValueStorage keyValueStorage = KeyValueStorage(downloadLayoutKey);
-    int layout = await keyValueStorage.getInt(defaultValue: 1);
-    if (_layout == null)
+    var keyValueStorage = KeyValueStorage(downloadLayoutKey);
+    var layout = await keyValueStorage.getInt(defaultValue: 1);
+    if (_layout == null) {
       setState(() {
         _layout = Layout.values[layout];
       });
+    }
   }
 
   @override
@@ -1327,48 +1340,11 @@ class _MyDownloadState extends State<_MyDownload>
                       Spacer(),
                       Material(
                         color: Colors.transparent,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            if (_layout == Layout.three)
-                              setState(() {
-                                _layout = Layout.one;
-                              });
-                            else if (_layout == Layout.two)
-                              setState(() {
-                                _layout = Layout.three;
-                              });
-                            else
-                              setState(() {
-                                _layout = Layout.two;
-                              });
-                          },
-                          icon: _layout == Layout.three
-                              ? SizedBox(
-                                  height: 10,
-                                  width: 30,
-                                  child: CustomPaint(
-                                    painter: LayoutPainter(
-                                        0, context.textTheme.bodyText1.color),
-                                  ),
-                                )
-                              : _layout == Layout.two
-                                  ? SizedBox(
-                                      height: 10,
-                                      width: 30,
-                                      child: CustomPaint(
-                                        painter: LayoutPainter(1,
-                                            context.textTheme.bodyText1.color),
-                                      ),
-                                    )
-                                  : SizedBox(
-                                      height: 10,
-                                      width: 30,
-                                      child: CustomPaint(
-                                        painter: LayoutPainter(4,
-                                            context.textTheme.bodyText1.color),
-                                      ),
-                                    ),
+                        child: LayoutButton(
+                          layout: _layout,
+                          onPressed: (layout) => setState(() {
+                            _layout = layout;
+                          }),
                         ),
                       ),
                     ],

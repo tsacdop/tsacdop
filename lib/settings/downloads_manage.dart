@@ -2,16 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:line_icons/line_icons.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:line_icons/line_icons.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
+import '../local_storage/sqflite_localpodcast.dart';
+import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../util/extension_helper.dart';
-import '../state/download_state.dart';
-import '../local_storage/sqflite_localpodcast.dart';
 
 class DownloadsManage extends StatefulWidget {
   @override
@@ -29,14 +29,14 @@ class _DownloadsManageState extends State<DownloadsManage> {
   List<EpisodeBrief> _selectedList;
 
   Future<List<EpisodeBrief>> _getDownloadedEpisode(int mode) async {
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     var dbHelper = DBHelper();
     episodes = await dbHelper.getDownloadedEpisode(mode);
     return episodes;
   }
 
   Future<int> _isListened(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.isListened(episode.enclosureUrl);
   }
 
@@ -60,16 +60,17 @@ class _DownloadsManageState extends State<DownloadsManage> {
   _delSelectedEpisodes() async {
     setState(() => _clearing = true);
     // await Future.forEach(_selectedList, (EpisodeBrief episode) async
-    for (EpisodeBrief episode in _selectedList) {
+    for (var episode in _selectedList) {
       var downloader = Provider.of<DownloadState>(context, listen: false);
       await downloader.delTask(episode);
       if (mounted) setState(() {});
     }
     await Future.delayed(Duration(seconds: 1));
-    if (mounted)
+    if (mounted) {
       setState(() {
         _clearing = false;
       });
+    }
     await Future.delayed(Duration(seconds: 1));
     if (mounted) setState(() => _selectedList = []);
     _getStorageSize();
@@ -78,7 +79,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
   String _downloadDateToString(BuildContext context,
       {int downloadDate, int pubDate}) {
     final s = context.s;
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(downloadDate);
+    var date = DateTime.fromMillisecondsSinceEpoch(downloadDate);
     var diffrence = DateTime.now().toUtc().difference(date);
     if (diffrence.inHours < 24) {
       return s.hoursAgo(diffrence.inHours);
@@ -91,11 +92,13 @@ class _DownloadsManageState extends State<DownloadsManage> {
   }
 
   int sumSelected() {
-    int sum = 0;
+    var sum = 0;
     if (_selectedList.length == 0) {
       return sum;
     } else {
-      for (var episode in _selectedList) sum += episode.enclosureLength;
+      for (var episode in _selectedList) {
+        sum += episode.enclosureLength;
+      }
       return sum;
     }
   }
@@ -238,12 +241,13 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                     ),
                                   ],
                                   onSelected: (value) {
-                                    if (value == 0)
+                                    if (value == 0) {
                                       setState(() => _mode = 0);
-                                    else if (value == 1)
+                                    } else if (value == 1) {
                                       setState(() => _mode = 1);
-                                    else if (value == 2)
+                                    } else if (value == 2) {
                                       setState(() => _mode = 2);
+                                    }
                                   },
                                 ),
                               ),
@@ -340,17 +344,14 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                                     if (_episodes[index]
                                                             .enclosureLength !=
                                                         0)
-                                                      Text(((_episodes[index]
-                                                                      .enclosureLength) ~/
-                                                                  1000000)
-                                                              .toString() +
-                                                          ' Mb'),
+                                                      Text(
+                                                          '${(_episodes[index].enclosureLength) ~/ 1000000} Mb'),
                                                   ],
                                                 ),
                                                 trailing: Checkbox(
                                                   value: _selectedList.contains(
                                                       _episodes[index]),
-                                                  onChanged: (bool boo) {
+                                                  onChanged: (boo) {
                                                     if (boo) {
                                                       setState(() =>
                                                           _selectedList.add(
@@ -385,7 +386,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                 left: context.width / 2 - 50,
                 bottom: _selectedList.length == 0 ? -100 : 30,
                 child: InkWell(
-                    onTap: () => _delSelectedEpisodes(),
+                    onTap: _delSelectedEpisodes,
                     child: Stack(
                       alignment: _clearing
                           ? Alignment.centerLeft
@@ -407,7 +408,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                 LineIcons.trash_alt_solid,
                                 color: Colors.white,
                               ),
-                              Text((sumSelected() ~/ 1000000).toString() + 'Mb',
+                              Text('${sumSelected() ~/ 1000000}Mb',
                                   style: TextStyle(color: Colors.white)),
                             ],
                           ),

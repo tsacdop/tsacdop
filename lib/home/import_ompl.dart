@@ -4,10 +4,9 @@ import 'package:provider/provider.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
-import '../state/podcast_group.dart';
 import '../state/download_state.dart';
+import '../state/podcast_group.dart';
 import '../state/refresh_podcast.dart';
-import '../type/episodebrief.dart';
 import '../util/extension_helper.dart';
 
 class Import extends StatelessWidget {
@@ -30,38 +29,39 @@ class Import extends StatelessWidget {
   }
 
   _autoDownloadNew(BuildContext context) async {
-    final DBHelper dbHelper = DBHelper();
+    final dbHelper = DBHelper();
     var downloader = Provider.of<DownloadState>(context, listen: false);
     var result = await Connectivity().checkConnectivity();
-    KeyValueStorage autoDownloadStorage =
-        KeyValueStorage(autoDownloadNetworkKey);
-    int autoDownloadNetwork = await autoDownloadStorage.getInt();
+    var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+    var autoDownloadNetwork = await autoDownloadStorage.getInt();
     if (autoDownloadNetwork == 1) {
-      List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
+      var episodes = await dbHelper.getNewEpisodes('all');
       // For safety
-      if (episodes.length < 100 && episodes.length > 0)
+      if (episodes.length < 100 && episodes.length > 0) {
         for (var episode in episodes) {
           await downloader.startTask(episode, showNotification: true);
         }
+      }
     } else if (result == ConnectivityResult.wifi) {
-      List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
+      var episodes = await dbHelper.getNewEpisodes('all');
       //For safety
-      if (episodes.length < 100 && episodes.length > 0)
+      if (episodes.length < 100 && episodes.length > 0) {
         for (var episode in episodes) {
           await downloader.startTask(episode, showNotification: true);
         }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    GroupList groupList = Provider.of<GroupList>(context, listen: false);
+    var groupList = Provider.of<GroupList>(context, listen: false);
     return Column(
       children: <Widget>[
         Consumer<GroupList>(
           builder: (_, subscribeWorker, __) {
-            SubscribeItem item = subscribeWorker.currentSubscribeItem;
+            var item = subscribeWorker.currentSubscribeItem;
             switch (item.subscribeState) {
               case SubscribeState.start:
                 return importColumn(
@@ -83,7 +83,7 @@ class Import extends StatelessWidget {
         ),
         Consumer<RefreshWorker>(
           builder: (context, refreshWorker, child) {
-            RefreshItem item = refreshWorker.currentRefreshItem;
+            var item = refreshWorker.currentRefreshItem;
             if (refreshWorker.complete) {
               groupList.updateGroups();
               _autoDownloadNew(context);

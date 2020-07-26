@@ -54,8 +54,7 @@ class ThemeSetting extends StatelessWidget {
                           .modalBarrierDismissLabel,
                       barrierColor: Colors.black54,
                       transitionDuration: const Duration(milliseconds: 200),
-                      pageBuilder: (BuildContext context, Animation animaiton,
-                              Animation secondaryAnimation) =>
+                      pageBuilder: (context, animaiton, secondaryAnimation) =>
                           AnnotatedRegion<SystemUiOverlayStyle>(
                             value: SystemUiOverlayStyle(
                               statusBarIconBrightness: Brightness.light,

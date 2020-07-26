@@ -1,30 +1,30 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:html/parser.dart';
-import 'package:tsacdop/state/download_state.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:html/parser.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 
-import '../type/podcastlocal.dart';
-import '../type/episodebrief.dart';
-import '../type/play_histroy.dart';
-import '../local_storage/sqflite_localpodcast.dart';
-import '../local_storage/key_value_storage.dart';
-import '../util/episodegrid.dart';
 import '../home/audioplayer.dart';
-import '../type/fireside_data.dart';
-import '../util/extension_helper.dart';
-import '../util/custom_widget.dart';
-import '../util/general_dialog.dart';
+import '../local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';
+import '../state/download_state.dart';
+import '../type/episodebrief.dart';
+import '../type/fireside_data.dart';
+import '../type/play_histroy.dart';
+import '../type/podcastlocal.dart';
+import '../util/custom_widget.dart';
+import '../util/episodegrid.dart';
+import '../util/extension_helper.dart';
+import '../util/general_dialog.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, @required this.podcastLocal, this.hide = false})
@@ -105,27 +105,28 @@ class _PodcastDetailState extends State<PodcastDetail> {
         gravity: ToastGravity.TOP,
       );
 
-      bool autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
+      var autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
       if (autoDownload) {
         var downloader = Provider.of<DownloadState>(context, listen: false);
         var result = await Connectivity().checkConnectivity();
-        KeyValueStorage autoDownloadStorage =
-            KeyValueStorage(autoDownloadNetworkKey);
-        int autoDownloadNetwork = await autoDownloadStorage.getInt();
+        var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+        var autoDownloadNetwork = await autoDownloadStorage.getInt();
         if (autoDownloadNetwork == 1) {
-          List<EpisodeBrief> episodes =
-              await dbHelper.getNewEpisodes(podcastLocal.id);
+          var episodes = await dbHelper.getNewEpisodes(podcastLocal.id);
           // For safety
-          if (episodes.length < 100)
-            for (var episode in episodes)
+          if (episodes.length < 100) {
+            for (var episode in episodes) {
               downloader.startTask(episode, showNotification: false);
+            }
+          }
         } else if (result == ConnectivityResult.wifi) {
-          List<EpisodeBrief> episodes =
-              await dbHelper.getNewEpisodes(podcastLocal.id);
+          var episodes = await dbHelper.getNewEpisodes(podcastLocal.id);
           //For safety
-          if (episodes.length < 100)
-            for (var episode in episodes)
+          if (episodes.length < 100) {
+            for (var episode in episodes) {
               downloader.startTask(episode, showNotification: false);
+            }
+          }
         }
       }
     } else {
@@ -140,16 +141,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal,
       {int count, bool reverse, Filter filter, String query}) async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     _episodeCount = await dbHelper.getPodcastCounts(podcastLocal.id);
-    KeyValueStorage storage = KeyValueStorage(podcastLayoutKey);
-    int index = await storage.getInt(defaultValue: 1);
+    var storage = KeyValueStorage(podcastLayoutKey);
+    var index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
-    episodes = await dbHelper.getRssItem(podcastLocal.id, count, reverse,
-        filter: filter, query: query, hideListened: _hideListened);
+    episodes = await dbHelper.getRssItem(podcastLocal.id, count,
+        reverse: reverse,
+        filter: filter,
+        query: query,
+        hideListened: _hideListened);
 
     if (podcastLocal.provider.contains('fireside')) {
-      FiresideData data = FiresideData(podcastLocal.id, podcastLocal.link);
+      var data = FiresideData(podcastLocal.id, podcastLocal.link);
       await data.getData();
       _backgroundImage = data.background;
       _hosts = data.hosts;
@@ -158,14 +162,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
   }
 
   _markListened(String podcastId) async {
-    DBHelper dbHelper = DBHelper();
-    List<EpisodeBrief> episodes =
-        await dbHelper.getRssItem(podcastId, -1, true);
+    var dbHelper = DBHelper();
+    var episodes = await dbHelper.getRssItem(podcastId, -1, reverse: true);
     for (var episode in episodes) {
-      bool marked = await dbHelper.checkMarked(episode);
+      var marked = await dbHelper.checkMarked(episode);
       if (!marked) {
-        final PlayHistory history =
-            PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+        final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
         await dbHelper.saveHistory(history);
         if (mounted) setState(() {});
       }
@@ -316,7 +318,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     return _customPopupMenu(
         tooltip: s.menu,
         clip: false,
-        onSelected: (int value) {
+        onSelected: (value) {
           switch (value) {
             case 0:
               widget.podcastLocal.link.launchUrl;
@@ -443,9 +445,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                 )
               ],
               onSelected: (value) {
-                if (value == 0)
+                if (value == 0) {
                   setState(() => _reverse = false);
-                else if (value == 1) setState(() => _reverse = true);
+                } else if (value == 1) setState(() => _reverse = true);
               },
             ),
             SizedBox(width: 10),
@@ -538,25 +540,28 @@ class _PodcastDetailState extends State<PodcastDetail> {
                 onSelected: (value) {
                   switch (value) {
                     case 0:
-                      if (_filter != Filter.all)
+                      if (_filter != Filter.all) {
                         setState(() {
                           _filter = Filter.all;
                           _query = '';
                         });
+                      }
                       break;
                     case 1:
-                      if (_filter != Filter.liked)
+                      if (_filter != Filter.liked) {
                         setState(() {
                           _query = '';
                           _filter = Filter.liked;
                         });
+                      }
                       break;
                     case 2:
-                      if (_filter != Filter.downloaded)
+                      if (_filter != Filter.downloaded) {
                         setState(() {
                           _query = '';
                           _filter = Filter.downloaded;
                         });
+                      }
                       break;
                     case 3:
                       showGeneralDialog(
@@ -566,17 +571,16 @@ class _PodcastDetailState extends State<PodcastDetail> {
                               .modalBarrierDismissLabel,
                           barrierColor: Colors.black54,
                           transitionDuration: const Duration(milliseconds: 200),
-                          pageBuilder: (BuildContext context,
-                                  Animation animaiton,
-                                  Animation secondaryAnimation) =>
-                              SearchEpisdoe(
-                                onSearch: (query) {
-                                  setState(() {
-                                    _query = query;
-                                    _filter = Filter.search;
-                                  });
-                                },
-                              ));
+                          pageBuilder:
+                              (context, animaiton, secondaryAnimation) =>
+                                  SearchEpisdoe(
+                                    onSearch: (query) {
+                                      setState(() {
+                                        _query = query;
+                                        _filter = Filter.search;
+                                      });
+                                    },
+                                  ));
                       break;
                     default:
                   }
@@ -605,18 +609,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
               child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () {
-                  if (_layout == Layout.three)
+                  if (_layout == Layout.three) {
                     setState(() {
                       _layout = Layout.one;
                     });
-                  else if (_layout == Layout.two)
+                  } else if (_layout == Layout.two) {
                     setState(() {
                       _layout = Layout.three;
                     });
-                  else
+                  } else {
                     setState(() {
                       _layout = Layout.two;
                     });
+                  }
                 },
                 icon: _layout == Layout.three
                     ? IconPainter(
@@ -638,7 +643,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   @override
   Widget build(BuildContext context) {
-    Color _color = widget.podcastLocal.primaryColor.colorizedark();
+    var _color = widget.podcastLocal.primaryColor.colorizedark();
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -683,20 +688,23 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                               _controller
                                                   .position.maxScrollExtent &&
                                           snapshot.data.length == _top) {
-                                        if (mounted)
+                                        if (mounted) {
                                           setState(() => _loadMore = true);
+                                        }
                                         await Future.delayed(
                                             Duration(seconds: 3));
-                                        if (mounted)
+                                        if (mounted) {
                                           setState(() {
                                             _top = _top + 36;
                                             _loadMore = false;
                                           });
+                                        }
                                       }
                                       if (_controller.offset > 0 &&
                                           mounted &&
-                                          !_scroll)
+                                          !_scroll) {
                                         setState(() => _scroll = true);
+                                      }
                                     }),
                                   physics:
                                       const AlwaysScrollableScrollPhysics(),
@@ -806,7 +814,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     ),
                                     SliverList(
                                       delegate: SliverChildBuilderDelegate(
-                                        (BuildContext context, int index) {
+                                        (context, index) {
                                           return _loadMore
                                               ? Container(
                                                   height: 2,
@@ -856,7 +864,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
   bool _expand;
   void getDescription(String id) async {
     var dbHelper = DBHelper();
-    String description = await dbHelper.getFeedDescription(id);
+    var description = await dbHelper.getFeedDescription(id);
     if (description == null || description.isEmpty) {
       _description = '';
     } else {

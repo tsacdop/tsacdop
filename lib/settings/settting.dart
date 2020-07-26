@@ -1,25 +1,25 @@
 import 'dart:math' as math;
 
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:feature_discovery/feature_discovery.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
-import '../util/extension_helper.dart';
-import '../intro_slider/app_intro.dart';
 import '../home/home.dart';
+import '../intro_slider/app_intro.dart';
 import '../podcasts/podcast_manage.dart';
-import 'theme.dart';
-import 'layouts.dart';
-import 'storage.dart';
-import 'history.dart';
-import 'syncing.dart';
-import 'libries.dart';
-import 'languages.dart';
-import 'play_setting.dart';
+import '../util/extension_helper.dart';
 import 'data_backup.dart';
+import 'history.dart';
+import 'languages.dart';
+import 'layouts.dart';
+import 'libries.dart';
+import 'play_setting.dart';
+import 'storage.dart';
+import 'syncing.dart';
+import 'theme.dart';
 
 class Settings extends StatefulWidget {
   @override

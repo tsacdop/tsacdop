@@ -1,14 +1,16 @@
-import 'package:sqflite/sqflite.dart';
 import 'dart:async';
-import 'package:path/path.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
+
 import 'package:dio/dio.dart';
-import '../type/podcastlocal.dart';
-import '../type/play_histroy.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:intl/intl.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
 import '../type/episodebrief.dart';
-import '../webfeed/webfeed.dart';
+import '../type/play_histroy.dart';
+import '../type/podcastlocal.dart';
 import '../type/sub_history.dart';
+import '../webfeed/webfeed.dart';
 
 enum Filter { downloaded, liked, search, all }
 
@@ -22,8 +24,8 @@ class DBHelper {
 
   initDb() async {
     var documentsDirectory = await getDatabasesPath();
-    String path = join(documentsDirectory, "podcasts.db");
-    Database theDb = await openDatabase(path,
+    var path = join(documentsDirectory, "podcasts.db");
+    var theDb = await openDatabase(path,
         version: 3, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
@@ -64,7 +66,7 @@ class DBHelper {
 
   Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts) async {
     var dbClient = await database;
-    List<PodcastLocal> podcastLocal = [];
+    var podcastLocal = <PodcastLocal>[];
 
     for (var s in podcasts) {
       List<Map> list;
@@ -72,7 +74,7 @@ class DBHelper {
           """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
           link ,update_count, episode_count FROM PodcastLocal WHERE id = ?""",
           [s]);
-      if (list.length > 0)
+      if (list.length > 0) {
         podcastLocal.add(PodcastLocal(
             list.first['title'],
             list.first['imageUrl'],
@@ -85,6 +87,7 @@ class DBHelper {
             list.first['link'],
             upateCount: list.first['update_count'],
             episodeCount: list.first['episode_count']));
+      }
     }
     return podcastLocal;
   }
@@ -94,7 +97,7 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath, provider, link FROM PodcastLocal ORDER BY add_date DESC');
 
-    List<PodcastLocal> podcastLocal = [];
+    var podcastLocal = <PodcastLocal>[];
 
     for (var i in list) {
       podcastLocal.add(PodcastLocal(
@@ -146,7 +149,7 @@ class DBHelper {
     return list.first['auto_download'] == 1;
   }
 
-  Future<int> saveAutoDownload(String id, bool boo) async {
+  Future<int> saveAutoDownload(String id, {bool boo}) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET auto_download = ? WHERE id = ?",
@@ -162,7 +165,7 @@ class DBHelper {
   }
 
   Future savePodcastLocal(PodcastLocal podcastLocal) async {
-    int _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var _milliseconds = DateTime.now().millisecondsSinceEpoch;
     var dbClient = await database;
     await dbClient.transaction((txn) async {
       await txn.rawInsert(
@@ -194,7 +197,7 @@ class DBHelper {
 
   Future<int> saveFiresideData(List<String> list) async {
     var dbClient = await database;
-    int result = await dbClient.rawUpdate(
+    var result = await dbClient.rawUpdate(
         'UPDATE PodcastLocal SET background_image = ? , hosts = ? WHERE id = ?',
         [list[1], list[2], list[0]]);
     print('Fireside data save in sqllite');
@@ -206,7 +209,7 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         'SELECT background_image, hosts FROM PodcastLocal WHERE id = ?', [id]);
     if (list.length > 0) {
-      List<String> data = [list.first['background_image'], list.first['hosts']];
+      var data = <String>[list.first['background_image'], list.first['hosts']];
       return data;
     }
     return ['', ''];
@@ -219,13 +222,14 @@ class DBHelper {
         """SELECT downloaded FROM Episodes WHERE downloaded != 'ND' AND feed_id = ?""",
         [id]);
     for (var i in list) {
-      if (i != null)
+      if (i != null) {
         await FlutterDownloader.remove(
             taskId: i['downloaded'], shouldDeleteContent: true);
+      }
       print('Removed all download tasks');
     }
     await dbClient.rawDelete('DELETE FROM Episodes WHERE feed_id=?', [id]);
-    int _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var _milliseconds = DateTime.now().millisecondsSinceEpoch;
     await dbClient.rawUpdate(
         """UPDATE SubscribeHistory SET remove_date = ? , status = ? WHERE id = ?""",
         [_milliseconds, 1, id]);
@@ -233,15 +237,15 @@ class DBHelper {
 
   Future<int> saveHistory(PlayHistory history) async {
     var dbClient = await database;
-    int _milliseconds = DateTime.now().millisecondsSinceEpoch;
-    List<PlayHistory> recent = await getPlayHistory(1);
+    var _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var recent = await getPlayHistory(1);
     if (recent.length == 1) {
       if (recent.first.url == history.url) {
         await dbClient.rawDelete("DELETE FROM PlayHistory WHERE add_date = ?",
             [recent.first.playdate.millisecondsSinceEpoch]);
       }
     }
-    int result = await dbClient.transaction((txn) async {
+    var result = await dbClient.transaction((txn) async {
       return await txn.rawInsert(
           """REPLACE INTO PlayHistory (title, enclosure_url, seconds, seek_value, add_date, listen_time)
        VALUES (?, ?, ?, ?, ?, ?) """,
@@ -263,7 +267,7 @@ class DBHelper {
         """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory
          ORDER BY add_date DESC LIMIT ?
      """, [top]);
-    List<PlayHistory> playHistory = [];
+    var playHistory = <PlayHistory>[];
     for (var record in list) {
       playHistory.add(PlayHistory(record['title'], record['enclosure_url'],
           record['seconds'], record['seek_value'],
@@ -274,12 +278,12 @@ class DBHelper {
 
   Future<int> isListened(String url) async {
     var dbClient = await database;
-    int i = 0;
+    var i = 0;
     List<Map> list = await dbClient.rawQuery(
         "SELECT listen_time FROM PlayHistory WHERE enclosure_url = ?", [url]);
-    if (list.length == 0)
+    if (list.length == 0) {
       return 0;
-    else {
+    } else {
       for (var element in list) {
         i += element['listen_time'];
       }
@@ -314,11 +318,13 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         "SELECT seconds FROM PlayHistory WHERE add_date > ? AND add_date < ?",
         [start, end]);
-    double sum = 0;
+    var sum = 0;
     if (list.isEmpty) {
       sum = 0;
     } else {
-      for (var record in list) sum += record['seconds'];
+      for (var record in list) {
+        sum += record['seconds'];
+      }
     }
     return (sum ~/ 60).toDouble();
   }
@@ -350,14 +356,14 @@ class DBHelper {
   DateTime _parsePubDate(String pubDate) {
     if (pubDate == null) return DateTime.now();
     DateTime date;
-    RegExp yyyy = RegExp(r'[1-2][0-9]{3}');
-    RegExp hhmm = RegExp(r'[0-2][0-9]\:[0-5][0-9]');
-    RegExp ddmmm = RegExp(r'[0-3][0-9]\s[A-Z][a-z]{2}');
-    RegExp mmDd = RegExp(r'([1-2][0-9]{3}\-[0-1]|\s)[0-9]\-[0-3][0-9]');
+    var yyyy = RegExp(r'[1-2][0-9]{3}');
+    var hhmm = RegExp(r'[0-2][0-9]\:[0-5][0-9]');
+    var ddmmm = RegExp(r'[0-3][0-9]\s[A-Z][a-z]{2}');
+    var mmDd = RegExp(r'([1-2][0-9]{3}\-[0-1]|\s)[0-9]\-[0-3][0-9]');
     // RegExp timezone
-    RegExp z = RegExp(r'(\+|\-)[0-1][0-9]00');
-    String timezone = z.stringMatch(pubDate);
-    int timezoneInt = 0;
+    var z = RegExp(r'(\+|\-)[0-1][0-9]00');
+    var timezone = z.stringMatch(pubDate);
+    var timezoneInt = 0;
     if (timezone != null) {
       if (timezone.substring(0, 1) == '-') {
         timezoneInt = int.parse(timezone.substring(1, 2));
@@ -375,16 +381,16 @@ class DBHelper {
           date = DateFormat('EEE, dd MMM yyyy HH:mm Z', 'en_US').parse(pubDate);
         } catch (e) {
           //parse date using regex, still have issue in parse maonth/day
-          String year = yyyy.stringMatch(pubDate);
-          String time = hhmm.stringMatch(pubDate);
-          String month = ddmmm.stringMatch(pubDate);
+          var year = yyyy.stringMatch(pubDate);
+          var time = hhmm.stringMatch(pubDate);
+          var month = ddmmm.stringMatch(pubDate);
           if (year != null && time != null && month != null) {
             date = DateFormat('dd MMM yyyy HH:mm', 'en_US')
                 .parse(month + year + time);
           } else if (year != null && time != null && month == null) {
-            String month = mmDd.stringMatch(pubDate);
-            date = DateFormat('yyyy-MM-dd HH:mm', 'en_US')
-                .parse(month + ' ' + time);
+            var month = mmDd.stringMatch(pubDate);
+            date =
+                DateFormat('yyyy-MM-dd HH:mm', 'en_US').parse('$month $time');
             print(date.toString());
           } else {
             date = DateTime.now();
@@ -392,7 +398,7 @@ class DBHelper {
         }
       }
     }
-    DateTime result = date
+    var result = date
         .add(Duration(hours: timezoneInt))
         .add(DateTime.now().timeZoneOffset);
     return result;
@@ -410,7 +416,7 @@ class DBHelper {
   }
 
   bool _isXimalaya(String input) {
-    RegExp ximalaya = RegExp(r"ximalaya.com");
+    var ximalaya = RegExp(r"ximalaya.com");
     return ximalaya.hasMatch(input);
   }
 
@@ -430,10 +436,10 @@ class DBHelper {
 
   Future<int> savePodcastRss(RssFeed feed, String id) async {
     feed.items.removeWhere((item) => item == null);
-    int result = feed.items.length;
+    var result = feed.items.length;
     var dbClient = await database;
     String description, url;
-    for (int i = 0; i < result; i++) {
+    for (var i = 0; i < result; i++) {
       print(feed.items[i].title);
       description = _getDescription(feed.items[i].content.value ?? '',
           feed.items[i].description ?? '', feed.items[i].itunes.summary ?? '');
@@ -472,7 +478,7 @@ class DBHelper {
         });
       }
     }
-    int countUpdate = Sqflite.firstIntValue(await dbClient
+    var countUpdate = Sqflite.firstIntValue(await dbClient
         .rawQuery('SELECT COUNT(*) FROM Episodes WHERE feed_id = ?', [id]));
 
     await dbClient.rawUpdate(
@@ -483,25 +489,26 @@ class DBHelper {
 
   Future<int> updatePodcastRss(PodcastLocal podcastLocal,
       {int removeMark = 0}) async {
-    BaseOptions options = BaseOptions(
+    var options = BaseOptions(
       connectTimeout: 20000,
       receiveTimeout: 20000,
     );
     try {
-      Response response = await Dio(options).get(podcastLocal.rssUrl);
+      var response = await Dio(options).get(podcastLocal.rssUrl);
       if (response.statusCode == 200) {
         var feed = RssFeed.parse(response.data);
         String url, description;
         feed.items.removeWhere((item) => item == null);
 
         var dbClient = await database;
-        int count = Sqflite.firstIntValue(await dbClient.rawQuery(
+        var count = Sqflite.firstIntValue(await dbClient.rawQuery(
             'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?',
             [podcastLocal.id]));
-        if (removeMark == 0)
+        if (removeMark == 0) {
           await dbClient.rawUpdate(
               "UPDATE Episodes SET is_new = 0 WHERE feed_id = ?",
               [podcastLocal.id]);
+        }
         for (var item in feed.items) {
           print(item.title);
           description = _getDescription(item.content.value ?? '',
@@ -541,7 +548,7 @@ class DBHelper {
             });
           }
         }
-        int countUpdate = Sqflite.firstIntValue(await dbClient.rawQuery(
+        var countUpdate = Sqflite.firstIntValue(await dbClient.rawQuery(
             'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?',
             [podcastLocal.id]));
 
@@ -557,13 +564,14 @@ class DBHelper {
     }
   }
 
-  Future<List<EpisodeBrief>> getRssItem(String id, int count, bool reverse,
-      {Filter filter = Filter.all,
+  Future<List<EpisodeBrief>> getRssItem(String id, int count,
+      {bool reverse,
+      Filter filter = Filter.all,
       String query = '',
       bool hideListened = false}) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
-    List<Map> list = [];
+    var episodes = <EpisodeBrief>[];
+    var list = <Map>[];
     if (count == -1) {
       switch (filter) {
         case Filter.all:
@@ -670,7 +678,7 @@ class DBHelper {
       }
     }
     if (list.isNotEmpty) {
-      if (!hideListened)
+      if (!hideListened) {
         for (var i in list) {
           episodes.add(EpisodeBrief(
               i['title'],
@@ -684,10 +692,10 @@ class DBHelper {
               i['imagePath'],
               i['is_new']));
         }
-      else
+      } else {
         for (var i in list) {
-          int listened = await isListened(i['enclosure_url']);
-          if (listened == 0)
+          var listened = await isListened(i['enclosure_url']);
+          if (listened == 0) {
             episodes.add(EpisodeBrief(
                 i['title'],
                 i['enclosure_url'],
@@ -699,30 +707,33 @@ class DBHelper {
                 i['explicit'],
                 i['imagePath'],
                 i['is_new']));
+          }
         }
+      }
     }
     return episodes;
   }
 
   Future<List<EpisodeBrief>> getNewEpisodes(String id) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     List<Map> list;
-    if (id == 'all')
+    if (id == 'all') {
       list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.is_new = 1 AND E.downloaded = 'ND' AND P.auto_download = 1 ORDER BY E.milliseconds ASC""",
       );
-    else
+    } else {
       list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.is_new = 1 AND E.downloaded = 'ND' AND E.feed_id = ? ORDER BY E.milliseconds ASC""",
           [id]);
-    if (list.isNotEmpty)
+    }
+    if (list.isNotEmpty) {
       for (var i in list) {
         episodes.add(EpisodeBrief(
             i['title'],
@@ -736,12 +747,13 @@ class DBHelper {
             i['imagePath'],
             i['is_new']));
       }
+    }
     return episodes;
   }
 
   Future<List<EpisodeBrief>> getRssItemTop(String id) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
@@ -765,7 +777,7 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getRecentRssItem(int top) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -790,9 +802,9 @@ class DBHelper {
   Future<List<EpisodeBrief>> getGroupRssItem(
       int top, List<String> group) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     if (group.length > 0) {
-      List<String> s = group.map<String>((e) => "'$e'").toList();
+      var s = group.map<String>((e) => "'$e'").toList();
       List<Map> list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -818,7 +830,7 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getRecentNewRssItem() async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     List<Map> list = await dbClient.rawQuery(
       """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new, E.media_id,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -844,7 +856,7 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getOutdatedEpisode(int deadline) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -869,10 +881,10 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getDownloadedEpisode(int mode) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     List<Map> list;
     //Ordered by date
-    if (mode == 0)
+    if (mode == 0) {
       list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -880,8 +892,7 @@ class DBHelper {
         WHERE E.enclosure_url != E.media_id
         ORDER BY E.download_date DESC""",
       );
-    //Ordered by date
-    else if (mode == 1)
+    } else if (mode == 1) {
       list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -889,8 +900,7 @@ class DBHelper {
         WHERE E.enclosure_url != E.media_id
         ORDER BY E.download_date ASC""",
       );
-    //Ordered by size
-    else if (mode == 2)
+    } else if (mode == 2) {
       list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -898,6 +908,7 @@ class DBHelper {
         WHERE E.enclosure_url != E.media_id
         ORDER BY E.enclosure_length DESC""",
       );
+    }
     for (var i in list) {
       episodes.add(
         EpisodeBrief(
@@ -926,9 +937,9 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getGroupNewRssItem(List<String> group) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     if (group.length > 0) {
-      List<String> s = group.map<String>((e) => "'$e'").toList();
+      var s = group.map<String>((e) => "'$e'").toList();
       List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new, E.media_id,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -957,7 +968,7 @@ class DBHelper {
   removeGroupNewMark(List<String> group) async {
     var dbClient = await database;
     if (group.length > 0) {
-      List<String> s = group.map<String>((e) => "'$e'").toList();
+      var s = group.map<String>((e) => "'$e'").toList();
       await dbClient.transaction((txn) async {
         await txn.rawUpdate(
             "UPDATE Episodes SET is_new = 0 WHERE feed_id in (${s.join(',')})");
@@ -976,7 +987,7 @@ class DBHelper {
 
   Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy) async {
     var dbClient = await database;
-    List<EpisodeBrief> episodes = [];
+    var episodes = <EpisodeBrief>[];
     if (sortBy == 0) {
       List<Map> list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
@@ -1021,7 +1032,7 @@ class DBHelper {
 
   setLiked(String url) async {
     var dbClient = await database;
-    int milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var milliseconds = DateTime.now().millisecondsSinceEpoch;
     await dbClient.transaction((txn) async {
       await txn.rawUpdate(
           "UPDATE Episodes SET liked = 1, liked_date = ? WHERE enclosure_url= ?",
@@ -1053,7 +1064,7 @@ class DBHelper {
 
   Future<int> saveDownloaded(String url, String id) async {
     var dbClient = await database;
-    int milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var milliseconds = DateTime.now().millisecondsSinceEpoch;
     int count;
     await dbClient.transaction((txn) async {
       count = await txn.rawUpdate(
@@ -1065,7 +1076,7 @@ class DBHelper {
 
   Future<int> saveMediaId(String url, String path, String id, int size) async {
     var dbClient = await database;
-    int milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var milliseconds = DateTime.now().millisecondsSinceEpoch;
     int count;
     await dbClient.transaction((txn) async {
       count = await txn.rawUpdate(
@@ -1083,7 +1094,7 @@ class DBHelper {
           "UPDATE Episodes SET downloaded = 'ND', media_id = ? WHERE enclosure_url = ?",
           [url, url]);
     });
-    print('Deleted ' + url);
+    print('Deleted $url');
     return count;
   }
 
@@ -1139,9 +1150,9 @@ class DBHelper {
         P.title as feed_title, E.duration, E.explicit, P.skip_seconds,E.is_new,
         P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.media_id = ?""", [id]);
-    if (list.isEmpty)
+    if (list.isEmpty) {
       return null;
-    else {
+    } else {
       episode = EpisodeBrief(
           list.first['title'],
           list.first['enclosure_url'],

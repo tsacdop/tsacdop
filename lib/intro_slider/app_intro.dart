@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../state/setting_state.dart';
+
 import '../home/home.dart';
-import '../util/pageroute.dart';
+import '../state/setting_state.dart';
 import '../util/extension_helper.dart';
+import '../util/pageroute.dart';
+import 'firstpage.dart';
 import 'fourthpage.dart';
 import 'secondpage.dart';
 import 'thirdpage.dart';
-import 'firstpage.dart';
 
 enum Goto { home, settings }
 
@@ -21,7 +22,7 @@ class SlideIntro extends StatefulWidget {
 }
 
 class _SlideIntroState extends State<SlideIntro> {
-  List<BoxShadow> _customShadow = [
+  final List<BoxShadow> _customShadow = [
     BoxShadow(blurRadius: 2, offset: Offset(-2, -2), color: Colors.white54),
     BoxShadow(
         blurRadius: 8,

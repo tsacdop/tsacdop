@@ -1,26 +1,26 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:auto_animated/auto_animated.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
-import 'package:line_icons/line_icons.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:auto_animated/auto_animated.dart';
-import 'open_container.dart';
 
+import '../episodes/episode_detail.dart';
+import '../local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
-import '../episodes/episode_detail.dart';
-import '../local_storage/sqflite_localpodcast.dart';
-import '../local_storage/key_value_storage.dart';
-import 'extension_helper.dart';
 import 'custom_widget.dart';
+import 'extension_helper.dart';
+import 'open_container.dart';
 
 enum Layout { three, two, one }
 
@@ -50,49 +50,47 @@ class EpisodeGrid extends StatelessWidget {
   }) : super(key: key);
 
   Future<int> _isListened(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.isListened(episode.enclosureUrl);
   }
 
   Future<Tuple5<int, bool, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
-    List<int> menuList = await _getEpisodeMenu();
-    bool tapToOpen = await _getTapToOpenPopupMenu();
-    int listened = await _isListened(episode);
-    bool liked = await _isLiked(episode);
-    bool downloaded = await _isDownloaded(episode);
+    var menuList = await _getEpisodeMenu();
+    var tapToOpen = await _getTapToOpenPopupMenu();
+    var listened = await _isListened(episode);
+    var liked = await _isLiked(episode);
+    var downloaded = await _isDownloaded(episode);
     return Tuple5(listened, liked, downloaded, tapToOpen, menuList);
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.isLiked(episode.enclosureUrl);
   }
 
   Future<List<int>> _getEpisodeMenu() async {
-    KeyValueStorage popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
-    List<int> list = await popupMenuStorage.getMenu();
+    var popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
+    var list = await popupMenuStorage.getMenu();
     return list;
   }
 
   Future<bool> _isDownloaded(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.isDownloaded(episode.enclosureUrl);
   }
 
   Future<bool> _getTapToOpenPopupMenu() async {
-    KeyValueStorage tapToOpenPopupMenuStorage =
-        KeyValueStorage(tapToOpenPopupMenuKey);
-    bool boo = await tapToOpenPopupMenuStorage.getBool(defaultValue: false);
+    var tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
+    var boo = await tapToOpenPopupMenuStorage.getBool(defaultValue: false);
     return boo;
   }
 
   _markListened(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
-    bool marked = await dbHelper.checkMarked(episode);
+    var dbHelper = DBHelper();
+    var marked = await dbHelper.checkMarked(episode);
     if (!marked) {
-      final PlayHistory history =
-          PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+      final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
       await dbHelper.saveHistory(history);
     }
   }
@@ -105,11 +103,6 @@ class EpisodeGrid extends StatelessWidget {
   _setUnliked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setUniked(url);
-  }
-
-  String _stringForSeconds(double seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
   /// Episode title widget.
@@ -201,7 +194,7 @@ class EpisodeGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double _width = context.width;
+    var _width = context.width;
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     var downloader = Provider.of<DownloadState>(context, listen: false);
     final options = LiveOptions(
@@ -227,7 +220,7 @@ class EpisodeGrid extends StatelessWidget {
           crossAxisSpacing: 6.0,
         ),
         itemBuilder: (context, index, animation) {
-          Color _c = (Theme.of(context).brightness == Brightness.light)
+          var _c = (Theme.of(context).brightness == Brightness.light)
               ? episodes[index].primaryColor.colorizedark()
               : episodes[index].primaryColor.colorizeLight();
           scrollController.addListener(() {});
@@ -247,12 +240,12 @@ class EpisodeGrid extends StatelessWidget {
                         Tuple5<int, bool, bool, bool, List<int>>>(
                     future: _initData(episodes[index]),
                     initialData: Tuple5(0, false, false, false, []),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      int isListened = snapshot.data.item1;
-                      bool isLiked = snapshot.data.item2;
-                      bool isDownloaded = snapshot.data.item3;
-                      bool tapToOpen = snapshot.data.item4;
-                      List<int> menuList = snapshot.data.item5;
+                    builder: (context, snapshot) {
+                      var isListened = snapshot.data.item1;
+                      var isLiked = snapshot.data.item2;
+                      var isDownloaded = snapshot.data.item3;
+                      var tapToOpen = snapshot.data.item4;
+                      var menuList = snapshot.data.item5;
                       return Container(
                         decoration: BoxDecoration(
                             borderRadius:
@@ -314,8 +307,9 @@ class EpisodeGrid extends StatelessWidget {
                                     color: Theme.of(context).accentColor,
                                   ),
                                   onPressed: () {
-                                    if (data.item1 != episodes[index])
+                                    if (data.item1 != episodes[index]) {
                                       audio.episodeLoad(episodes[index]);
+                                    }
                                   }),
                               menuList.contains(1)
                                   ? FocusedMenuItem(
@@ -431,8 +425,9 @@ class EpisodeGrid extends StatelessWidget {
                                           LineIcons.download_solid,
                                           color: Colors.green),
                                       onPressed: () {
-                                        if (!isDownloaded)
+                                        if (!isDownloaded) {
                                           downloader.startTask(episodes[index]);
+                                        }
                                       })
                                   : null
                             ],
@@ -509,10 +504,9 @@ class EpisodeGrid extends StatelessWidget {
                                             ? Container(
                                                 alignment: Alignment.center,
                                                 child: Text(
-                                                  _stringForSeconds(
-                                                      episodes[index]
-                                                          .duration
-                                                          .toDouble()),
+                                                  episodes[index]
+                                                      .duration
+                                                      .toTime,
                                                   style: TextStyle(
                                                       fontSize: _width / 35),
                                                 ),
@@ -545,11 +539,7 @@ class EpisodeGrid extends StatelessWidget {
                                             ? Container(
                                                 alignment: Alignment.center,
                                                 child: Text(
-                                                  ((episodes[index]
-                                                                  .enclosureLength) ~/
-                                                              1000000)
-                                                          .toString() +
-                                                      'MB',
+                                                  '${(episodes[index].enclosureLength) ~/ 1000000}MB',
                                                   style: TextStyle(
                                                       fontSize: _width / 35),
                                                 ),
@@ -623,7 +613,7 @@ class OpenContainerWrapper extends StatelessWidget {
         closedShape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(5.0))),
         transitionType: ContainerTransitionType.fadeThrough,
-        openBuilder: (BuildContext context, VoidCallback _, bool boo) {
+        openBuilder: (context, _, boo) {
           return EpisodeDetail(
             episodeItem: episode,
             hide: boo,

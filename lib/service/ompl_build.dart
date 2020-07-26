@@ -35,7 +35,7 @@ class PodcastsBackup {
           builder.element('outline', nest: () {
             builder.attribute('text', '${group.name}');
             builder.attribute('title', '${group.name}');
-            for (var e in group.podcasts)
+            for (var e in group.podcasts) {
               builder.element(
                 'outline',
                 nest: () {
@@ -46,6 +46,7 @@ class PodcastsBackup {
                 },
                 isSelfClosing: true,
               );
+            }
           });
         }
       });
@@ -54,15 +55,15 @@ class PodcastsBackup {
   }
 
   static parseOMPL(File file) {
-    Map<String, List<OmplOutline>> data = Map();
-    String opml = file.readAsStringSync();
+    var data = <String, List<OmplOutline>>{};
+    var opml = file.readAsStringSync();
     var content = xml.XmlDocument.parse(opml);
-    String title =
+    var title =
         content.findAllElements('head').first.findElements('title').first.text;
     print(title);
     var groups = content.findAllElements('body').first.findElements('outline');
     if (title != 'Tsacdop Feed Groups') {
-      List<OmplOutline> total = content
+      var total = content
           .findAllElements('outline')
           .map((ele) => OmplOutline.parse(ele))
           .toList();
@@ -72,7 +73,7 @@ class PodcastsBackup {
     }
 
     for (var element in groups) {
-      String title = element.getAttribute('title');
+      var title = element.getAttribute('title');
       var total = element
           .findElements('outline')
           .map((ele) => OmplOutline.parse(ele))

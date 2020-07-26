@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:tsacdop/home/audioplayer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -12,12 +11,13 @@ import 'package:tuple/tuple.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../home/audioplayer.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
-import '../local_storage/sqflite_localpodcast.dart';
-import '../util/extension_helper.dart';
 import '../util/custom_widget.dart';
+import '../util/extension_helper.dart';
 import 'episode_download.dart';
 
 class EpisodeDetail extends StatefulWidget {
@@ -50,25 +50,28 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     _description = (await dbHelper.getDescription(url))
         .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '')
         .replaceAll('\r', '');
-    if (mounted)
+    if (mounted) {
       setState(() {
         _loaddes = true;
       });
+    }
   }
 
   ScrollController _controller;
   _scrollListener() {
     if (_controller.offset > _controller.position.maxScrollExtent * 0.8) {
-      if (!_showMenu)
+      if (!_showMenu) {
         setState(() {
           _showMenu = true;
         });
+      }
     } else if (_controller.offset <
         _controller.position.maxScrollExtent * 0.8) {
-      if (_showMenu)
+      if (_showMenu) {
         setState(() {
           _showMenu = false;
         });
+      }
     }
     if (_controller.offset > context.textTheme.headline5.fontSize) {
       if (!_showTitle) setState(() => _showTitle = true);
@@ -84,11 +87,10 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   }
 
   _markListened(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
-    bool marked = await dbHelper.checkMarked(episode);
+    var dbHelper = DBHelper();
+    var marked = await dbHelper.checkMarked(episode);
     if (!marked) {
-      final PlayHistory history =
-          PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+      final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
       await dbHelper.saveHistory(history);
     }
   }
@@ -164,7 +166,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                   ),
                 ),
               ],
-              onSelected: (int value) async {
+              onSelected: (value) async {
                 switch (value) {
                   case 0:
                     await _markListened(widget.episodeItem);
@@ -255,10 +257,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                               padding: EdgeInsets.symmetric(horizontal: 10.0),
                               alignment: Alignment.center,
                               child: Text(
-                                  ((widget.episodeItem.enclosureLength) ~/
-                                              1000000)
-                                          .toString() +
-                                      'MB',
+                                  '${(widget.episodeItem.enclosureLength) ~/ 1000000}MB',
                                   style: textstyle),
                             ),
                         ],
@@ -397,13 +396,8 @@ class _MenuBarState extends State<MenuBar> {
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.isLiked(episode.enclosureUrl);
-  }
-
-  static String _stringForSeconds(double seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
   Widget _buttonOnMenu(Widget widget, VoidCallback onTap) => Material(
@@ -477,7 +471,7 @@ class _MenuBarState extends State<MenuBar> {
                   FutureBuilder<bool>(
                     future: _isLiked(widget.episodeItem),
                     initialData: false,
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    builder: (context, snapshot) {
                       return (!snapshot.data)
                           ? _buttonOnMenu(
                               Icon(
@@ -589,8 +583,8 @@ class _MenuBarState extends State<MenuBar> {
                                                     color: context.accentColor,
                                                   ),
                                                   child: Text(
-                                                    _stringForSeconds(
-                                                        snapshot.data.seconds),
+                                                    snapshot
+                                                        .data.seconds.toTime,
                                                     style: TextStyle(
                                                         color: Colors.white),
                                                   ),

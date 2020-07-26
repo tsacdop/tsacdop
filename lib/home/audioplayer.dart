@@ -1,25 +1,25 @@
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:marquee/marquee.dart';
-import 'package:tuple/tuple.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:marquee/marquee.dart';
+import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
+import '../episodes/episode_detail.dart';
+import '../local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
+import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
-import '../state/audio_state.dart';
-import '../local_storage/sqflite_localpodcast.dart';
-import '../local_storage/key_value_storage.dart';
-import '../util/pageroute.dart';
-import '../util/extension_helper.dart';
-import '../util/custom_widget.dart';
-import '../util/custom_slider.dart';
-import '../episodes/episode_detail.dart';
 import '../util/audiopanel.dart';
+import '../util/custom_slider.dart';
+import '../util/custom_widget.dart';
+import '../util/extension_helper.dart';
+import '../util/pageroute.dart';
 import 'playlist.dart';
 
 final List<BoxShadow> _customShadow = [
@@ -40,7 +40,8 @@ final List<BoxShadow> _customShadowNight = [
 
 String _stringForSeconds(double seconds) {
   if (seconds == null) return null;
-  return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
+  return '${(seconds ~/ 60)}:'
+      '${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
 }
 
 const List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
@@ -402,7 +403,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           selector: (_, audio) =>
               Tuple2(audio.episode?.primaryColor, audio.seekSliderValue),
           builder: (_, data, __) {
-            Color _c = (Theme.of(context).brightness == Brightness.light)
+            var _c = (Theme.of(context).brightness == Brightness.light)
                 ? data.item1.colorizedark()
                 : data.item1.colorizeLight();
             return SizedBox(
@@ -452,8 +453,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         alignment: Alignment.center,
                         child: data.item3 != null
                             ? Text(data.item3,
-                                style: const TextStyle(
-                                    color: const Color(0xFFFF0000)))
+                                style:
+                                    const TextStyle(color: Color(0xFFFF0000)))
                             : data.item1
                                 ? Text(
                                     s.buffering,
@@ -563,7 +564,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
+    var _width = MediaQuery.of(context).size.width;
     return Selector<AudioPlayerNotifier, bool>(
       selector: (_, audio) => audio.playerRunning,
       builder: (_, playerrunning, __) {
@@ -585,11 +586,6 @@ class LastPosition extends StatefulWidget {
 }
 
 class _LastPositionState extends State<LastPosition> {
-  static String _stringForSeconds(double seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
-  }
-
   Future<PlayHistory> getPosition(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
     return await dbHelper.getPosition(episode);
@@ -645,8 +641,7 @@ class _LastPositionState extends State<LastPosition> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10.0))),
                                   child: Text(s.timeLastPlayed(
-                                      _stringForSeconds(
-                                          snapshot.data.seconds))),
+                                      snapshot.data.seconds.toTime)),
                                 ),
                               ),
                             )
@@ -680,10 +675,11 @@ class _ImageRotateState extends State<ImageRotate>
     );
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _value = _animation.value;
           });
+        }
       });
     _controller.forward();
     _controller.addStatusListener((status) {
@@ -759,7 +755,7 @@ class _MeteorLoaderState extends State<MeteorLoader>
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     animation = Tween(begin: 0.0, end: 1.0).animate(controller)
       ..addListener(() {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _move = animation.value;
             if (animation.value <= 0.5) {
@@ -768,6 +764,7 @@ class _MeteorLoaderState extends State<MeteorLoader>
               _fraction = 2 - (animation.value) * 2;
             }
           });
+        }
       });
     controller.forward();
     //  controller.addStatusListener((status) {
@@ -812,9 +809,8 @@ class SleepModeState extends State<SleepMode>
   Animation<double> _animation;
 
   Future _getDefaultTime() async {
-    KeyValueStorage defaultSleepTimerStorage =
-        KeyValueStorage(defaultSleepTimerKey);
-    int defaultTime = await defaultSleepTimerStorage.getInt(defaultValue: 30);
+    var defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
+    var defaultTime = await defaultSleepTimerStorage.getInt(defaultValue: 30);
     setState(() => _minSelected = defaultTime);
   }
 
@@ -869,15 +865,15 @@ class SleepModeState extends State<SleepMode>
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    final ColorTween _colorTween =
+    final _colorTween =
         ColorTween(begin: context.primaryColor, end: Colors.black);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Selector<AudioPlayerNotifier, Tuple3<int, double, SleepTimerMode>>(
       selector: (_, audio) =>
           Tuple3(audio.timeLeft, audio.switchValue, audio.sleepTimerMode),
       builder: (_, data, __) {
-        double fraction = data.item2 < 0.5 ? data.item2 * 2 : 1;
-        double move = data.item2 > 0.5 ? data.item2 * 2 - 1 : 0;
+        var fraction = data.item2 < 0.5 ? data.item2 * 2 : 1;
+        var move = data.item2 > 0.5 ? data.item2 * 2 - 1 : 0;
         return Container(
           height: 300,
           color: _colorTween.transform(move),
@@ -1173,7 +1169,7 @@ class _ControlPanelState extends State<ControlPanel>
               children: <Widget>[
                 Consumer<AudioPlayerNotifier>(
                   builder: (_, data, __) {
-                    Color _c = (context.brightness == Brightness.light)
+                    var _c = (context.brightness == Brightness.light)
                         ? data.episode.primaryColor.colorizedark()
                         : data.episode.primaryColor.colorizeLight();
                     return Column(
@@ -1204,7 +1200,7 @@ class _ControlPanelState extends State<ControlPanel>
                             ),
                             child: Slider(
                                 value: data.seekSliderValue,
-                                onChanged: (double val) {
+                                onChanged: (val) {
                                   audio.sliderSeek(val);
                                 }),
                           ),
@@ -1226,7 +1222,7 @@ class _ControlPanelState extends State<ControlPanel>
                                   child: data.remoteErrorMessage != null
                                       ? Text(data.remoteErrorMessage,
                                           style: const TextStyle(
-                                              color: const Color(0xFFFF0000)))
+                                              color: Color(0xFFFF0000)))
                                       : Text(
                                           data.audioState ==
                                                       AudioProcessingState
@@ -1472,10 +1468,11 @@ class _ControlPanelState extends State<ControlPanel>
                           IconButton(
                             padding: EdgeInsets.zero,
                             onPressed: () {
-                              if (_setSpeed == 0)
+                              if (_setSpeed == 0) {
                                 _controller.forward();
-                              else
+                              } else {
                                 _controller.reverse();
+                              }
                             },
                             icon: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

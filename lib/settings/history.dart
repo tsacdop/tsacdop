@@ -1,20 +1,19 @@
+import 'package:dio/dio.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:dio/dio.dart';
-import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:tsacdop/state/podcast_group.dart';
+import 'package:provider/provider.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
-import '../webfeed/webfeed.dart';
-import '../type/searchpodcast.dart';
-import '../util/extension_helper.dart';
-import '../type/play_histroy.dart';
 import '../state/podcast_group.dart';
+import '../type/play_histroy.dart';
+import '../type/searchpodcast.dart';
 import '../type/sub_history.dart';
+import '../util/extension_helper.dart';
+import '../webfeed/webfeed.dart';
 
 class PlayedHistory extends StatefulWidget {
   @override
@@ -24,31 +23,29 @@ class PlayedHistory extends StatefulWidget {
 class _PlayedHistoryState extends State<PlayedHistory>
     with SingleTickerProviderStateMixin {
   Future<List<PlayHistory>> getPlayHistory(int top) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     List<PlayHistory> playHistory;
     playHistory = await dbHelper.getPlayHistory(top);
-    for (var record in playHistory) await record.getEpisode();
+    for (var record in playHistory) {
+      await record.getEpisode();
+    }
     return playHistory;
   }
 
   _loadMoreData() async {
     // await Future.delayed(Duration(seconds: 3));
-    if (mounted)
+    if (mounted) {
       setState(() {
         _top = _top + 100;
       });
+    }
   }
 
   int _top = 100;
 
   Future<List<SubHistory>> getSubHistory() async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.getSubHistory();
-  }
-
-  static String _stringForSeconds(double seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
   TabController _controller;
@@ -56,10 +53,10 @@ class _PlayedHistoryState extends State<PlayedHistory>
 
   Future<List<FlSpot>> getData() async {
     var dbHelper = DBHelper();
-    List<FlSpot> stats = [];
+    var stats = <FlSpot>[];
 
     for (var day in list) {
-      double mins = await dbHelper.listenMins(7 - day);
+      var mins = await dbHelper.listenMins(7 - day);
       stats.add(FlSpot(day.toDouble(), mins));
     }
     return stats;
@@ -72,11 +69,11 @@ class _PlayedHistoryState extends State<PlayedHistory>
     );
     var subscribeWorker = context.watch<GroupList>();
     try {
-      BaseOptions options = new BaseOptions(
+      var options = BaseOptions(
         connectTimeout: 10000,
         receiveTimeout: 10000,
       );
-      Response response = await Dio(options).get(url);
+      var response = await Dio(options).get(url);
       var p = RssFeed.parse(response.data);
       var podcast = OnlinePodcast(
           rss: url,
@@ -84,7 +81,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
           publisher: p.author,
           description: p.description,
           image: p.itunes.image.href);
-      SubscribeItem item = SubscribeItem(podcast.rss, podcast.title,
+      var item = SubscribeItem(podcast.rss, podcast.title,
           imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
     } on DioError catch (e) {
@@ -123,7 +120,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
         backgroundColor: Theme.of(context).primaryColor,
         body: SafeArea(
           child: NestedScrollView(
-            headerSliverBuilder: (BuildContext context, bool innerBoxScrolled) {
+            headerSliverBuilder: (context, innerBoxScrolled) {
               return <Widget>[
                 SliverAppBar(
                   backgroundColor: Theme.of(context).primaryColor,
@@ -132,8 +129,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                   floating: false,
                   pinned: true,
                   flexibleSpace: LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
+                    builder: (context, constraints) {
                       top = constraints.biggest.height;
                       return FlexibleSpaceBar(
                         title: top < 70 + MediaQuery.of(context).padding.top
@@ -181,10 +177,10 @@ class _PlayedHistoryState extends State<PlayedHistory>
               FutureBuilder<List<PlayHistory>>(
                 future: getPlayHistory(_top),
                 builder: (context, snapshot) {
-                  double _width = MediaQuery.of(context).size.width;
+                  var _width = MediaQuery.of(context).size.width;
                   return snapshot.hasData
                       ? NotificationListener<ScrollNotification>(
-                          onNotification: (ScrollNotification scrollInfo) {
+                          onNotification: (scrollInfo) {
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
                                 snapshot.data.length == _top) _loadMoreData();
@@ -194,10 +190,9 @@ class _PlayedHistoryState extends State<PlayedHistory>
                               //shrinkWrap: true,
                               scrollDirection: Axis.vertical,
                               itemCount: snapshot.data.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                double seekValue =
-                                    snapshot.data[index].seekValue;
-                                double seconds = snapshot.data[index].seconds;
+                              itemBuilder: (context, index) {
+                                var seekValue = snapshot.data[index].seekValue;
+                                var seconds = snapshot.data[index].seconds;
                                 return Container(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 5),
@@ -263,8 +258,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                               child: Text(
                                                 seconds == 0 && seekValue == 1
                                                     ? s.mark
-                                                    : _stringForSeconds(
-                                                        seconds),
+                                                    : seconds.toInt().toTime,
                                                 style: TextStyle(
                                                     color: Colors.white),
                                               ),
@@ -293,8 +287,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                           // shrinkWrap: true,
                           scrollDirection: Axis.vertical,
                           itemCount: snapshot.data.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            bool _status = snapshot.data[index].status;
+                          itemBuilder: (context, index) {
+                            var _status = snapshot.data[index].status;
                             return Container(
                               color: context.scaffoldBackgroundColor,
                               child: Column(
@@ -381,7 +375,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return new Container(
+    return Container(
       color: _color,
       child: _tabBar,
     );
@@ -481,7 +475,7 @@ class HistoryChart extends StatelessWidget {
           ),
           lineBarsData: [
             LineChartBarData(
-              spots: this.stats,
+              spots: stats,
               isCurved: true,
               colors: [context.accentColor],
               preventCurveOverShooting: true,

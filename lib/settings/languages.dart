@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../util/extension_helper.dart';
 import '../generated/l10n.dart';
+import '../util/extension_helper.dart';
 
 class LanguagesSetting extends StatefulWidget {
   const LanguagesSetting({Key key}) : super(key: key);
@@ -52,7 +52,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     trailing: Radio<Locale>(
                         value: Locale(Intl.systemLocale),
                         groupValue: Locale(Intl.getCurrentLocale()),
-                        onChanged: (Locale locale) async {
+                        onChanged: (locale) async {
                           await S.load(locale);
                           setState(() {});
                         }),
@@ -68,7 +68,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     trailing: Radio<Locale>(
                         value: Locale('en'),
                         groupValue: Locale(Intl.getCurrentLocale()),
-                        onChanged: (Locale locale) async {
+                        onChanged: (locale) async {
                           await S.load(locale);
                           setState(() {});
                         }),
@@ -84,7 +84,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     trailing: Radio<Locale>(
                         value: Locale('zh_Hans'),
                         groupValue: Locale(Intl.getCurrentLocale()),
-                        onChanged: (Locale locale) async {
+                        onChanged: (locale) async {
                           await S.load(locale);
                           setState(() {});
                         }),
@@ -100,7 +100,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     trailing: Radio<Locale>(
                         value: Locale('fr'),
                         groupValue: Locale(Intl.getCurrentLocale()),
-                        onChanged: (Locale locale) async {
+                        onChanged: (locale) async {
                           await S.load(locale);
                           setState(() {});
                         }),

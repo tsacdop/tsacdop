@@ -28,30 +28,28 @@ class EpisodeTask {
 
 void downloadCallback(String id, DownloadTaskStatus status, int progress) {
   print('Homepage callback task in $id  status ($status) $progress');
-  final SendPort send =
-      IsolateNameServer.lookupPortByName('downloader_send_port');
+  final send = IsolateNameServer.lookupPortByName('downloader_send_port');
   send.send([id, status, progress]);
 }
 
 void autoDownloadCallback(String id, DownloadTaskStatus status, int progress) {
   print('Autodownload callback task in $id  status ($status) $progress');
-  final SendPort send =
-      IsolateNameServer.lookupPortByName('auto_downloader_send_port');
+  final send = IsolateNameServer.lookupPortByName('auto_downloader_send_port');
   send.send([id, status, progress]);
 }
 
 //For background auto downlaod
 class AutoDownloader {
   DBHelper dbHelper = DBHelper();
-  List<EpisodeTask> _episodeTasks = [];
-  Completer _completer = Completer();
+  final List<EpisodeTask> _episodeTasks = [];
+  final Completer _completer = Completer();
   AutoDownloader() {
     FlutterDownloader.registerCallback(autoDownloadCallback);
   }
 
   bindBackgroundIsolate() {
-    ReceivePort _port = ReceivePort();
-    bool isSuccess = IsolateNameServer.registerPortWithName(
+    var _port = ReceivePort();
+    var isSuccess = IsolateNameServer.registerPortWithName(
         _port.sendPort, 'auto_downloader_send_port');
     if (!isSuccess) {
       IsolateNameServer.removePortNameMapping('auto_downloader_send_port');
@@ -89,10 +87,9 @@ class AutoDownloader {
   Future _saveMediaId(EpisodeTask episodeTask) async {
     final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
         query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
-    String filePath = 'file://' +
-        path.join(completeTask.first.savedDir,
-            Uri.encodeComponent(completeTask.first.filename));
-    FileStat fileStat = await File(
+    var filePath =
+        'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename))}';
+    var fileStat = await File(
             path.join(completeTask.first.savedDir, completeTask.first.filename))
         .stat();
     await dbHelper.saveMediaId(episodeTask.episode.enclosureUrl, filePath,
@@ -106,22 +103,20 @@ class AutoDownloader {
       {bool showNotification = false}) async {
     for (var episode in episodes) {
       final dir = await getExternalStorageDirectory();
-      String localPath = path.join(dir.path, episode.feedTitle);
+      var localPath = path.join(dir.path, episode.feedTitle);
       final saveDir = Directory(localPath);
-      bool hasExisted = await saveDir.exists();
+      var hasExisted = await saveDir.exists();
       if (!hasExisted) {
         saveDir.create();
       }
-      DateTime now = DateTime.now();
-      String datePlus = now.year.toString() +
+      var now = DateTime.now();
+      var datePlus = now.year.toString() +
           now.month.toString() +
           now.day.toString() +
           now.second.toString();
-      String fileName = episode.title +
-          datePlus +
-          '.' +
-          episode.enclosureUrl.split('/').last.split('.').last;
-      String taskId = await FlutterDownloader.enqueue(
+      var fileName =
+          '${episode.title}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
+      var taskId = await FlutterDownloader.enqueue(
         fileName: fileName,
         url: episode.enclosureUrl,
         savedDir: localPath,
@@ -157,24 +152,26 @@ class DownloadState extends ChangeNotifier {
 
   _loadTasks() async {
     _episodeTasks = [];
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     var tasks = await FlutterDownloader.loadTasks();
-    if (tasks.length != 0)
+    if (tasks.length != 0) {
       for (var task in tasks) {
-        EpisodeBrief episode = await dbHelper.getRssItemWithUrl(task.url);
-        if (episode == null)
+        var episode = await dbHelper.getRssItemWithUrl(task.url);
+        if (episode == null) {
           await FlutterDownloader.remove(
               taskId: task.taskId, shouldDeleteContent: true);
-        else
+        } else {
           _episodeTasks.add(EpisodeTask(episode, task.taskId,
               progress: task.progress, status: task.status));
+        }
       }
+    }
     notifyListeners();
   }
 
   void _bindBackgroundIsolate() {
-    ReceivePort _port = ReceivePort();
-    bool isSuccess = IsolateNameServer.registerPortWithName(
+    var _port = ReceivePort();
+    var isSuccess = IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     if (!isSuccess) {
       _unbindBackgroundIsolate();
@@ -195,8 +192,9 @@ class DownloadState extends ChangeNotifier {
             _saveMediaId(episodeTask).then((value) {
               notifyListeners();
             });
-          } else
+          } else {
             notifyListeners();
+          }
         }
       }
     });
@@ -206,16 +204,15 @@ class DownloadState extends ChangeNotifier {
     episodeTask.status = DownloadTaskStatus.complete;
     final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
         query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
-    String filePath = 'file://' +
-        path.join(completeTask.first.savedDir,
-            Uri.encodeComponent(completeTask.first.filename));
+    var filePath =
+        'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename))}';
     print(filePath);
-    FileStat fileStat = await File(
+    var fileStat = await File(
             path.join(completeTask.first.savedDir, completeTask.first.filename))
         .stat();
     dbHelper.saveMediaId(episodeTask.episode.enclosureUrl, filePath,
         episodeTask.taskId, fileStat.size);
-    EpisodeBrief episode =
+    var episode =
         await dbHelper.getRssItemWithUrl(episodeTask.episode.enclosureUrl);
     _removeTask(episodeTask.episode);
     _episodeTasks.add(EpisodeTask(episode, episodeTask.taskId,
@@ -245,25 +242,23 @@ class DownloadState extends ChangeNotifier {
 
   Future startTask(EpisodeBrief episode, {bool showNotification = true}) async {
     var dbHelper = DBHelper();
-    bool isDownloaded = await dbHelper.isDownloaded(episode.enclosureUrl);
+    var isDownloaded = await dbHelper.isDownloaded(episode.enclosureUrl);
     if (!isDownloaded) {
       final dir = await getExternalStorageDirectory();
-      String localPath = path.join(dir.path, episode.feedTitle);
+      var localPath = path.join(dir.path, episode.feedTitle);
       final saveDir = Directory(localPath);
-      bool hasExisted = await saveDir.exists();
+      var hasExisted = await saveDir.exists();
       if (!hasExisted) {
         saveDir.create();
       }
-      DateTime now = DateTime.now();
-      String datePlus = now.year.toString() +
+      var now = DateTime.now();
+      var datePlus = now.year.toString() +
           now.month.toString() +
           now.day.toString() +
           now.second.toString();
-      String fileName = episode.title +
-          datePlus +
-          '.' +
-          episode.enclosureUrl.split('/').last.split('.').last;
-      String taskId = await FlutterDownloader.enqueue(
+      var fileName =
+          '${episode.title}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
+      var taskId = await FlutterDownloader.enqueue(
         fileName: fileName,
         url: episode.enclosureUrl,
         savedDir: localPath,
@@ -277,14 +272,14 @@ class DownloadState extends ChangeNotifier {
   }
 
   Future pauseTask(EpisodeBrief episode) async {
-    EpisodeTask task = episodeToTask(episode);
+    var task = episodeToTask(episode);
     await FlutterDownloader.pause(taskId: task.taskId);
   }
 
   Future resumeTask(EpisodeBrief episode) async {
-    EpisodeTask task = episodeToTask(episode);
-    String newTaskId = await FlutterDownloader.resume(taskId: task.taskId);
-    int index = _episodeTasks.indexOf(task);
+    var task = episodeToTask(episode);
+    var newTaskId = await FlutterDownloader.resume(taskId: task.taskId);
+    var index = _episodeTasks.indexOf(task);
     _removeTask(episode);
     FlutterDownloader.remove(taskId: task.taskId);
     var dbHelper = DBHelper();
@@ -293,10 +288,10 @@ class DownloadState extends ChangeNotifier {
   }
 
   Future retryTask(EpisodeBrief episode) async {
-    EpisodeTask task = episodeToTask(episode);
-    String newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
+    var task = episodeToTask(episode);
+    var newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
     await FlutterDownloader.remove(taskId: task.taskId);
-    int index = _episodeTasks.indexOf(task);
+    var index = _episodeTasks.indexOf(task);
     _removeTask(episode);
     var dbHelper = DBHelper();
     _episodeTasks.insert(index, EpisodeTask(episode, newTaskId));
@@ -304,20 +299,21 @@ class DownloadState extends ChangeNotifier {
   }
 
   Future removeTask(EpisodeBrief episode) async {
-    EpisodeTask task = episodeToTask(episode);
+    var task = episodeToTask(episode);
     await FlutterDownloader.remove(
         taskId: task.taskId, shouldDeleteContent: false);
   }
 
   Future delTask(EpisodeBrief episode) async {
-    EpisodeTask task = episodeToTask(episode);
+    var task = episodeToTask(episode);
     await FlutterDownloader.remove(
         taskId: task.taskId, shouldDeleteContent: true);
     await dbHelper.delDownloaded(episode.enclosureUrl);
 
     for (var episodeTask in _episodeTasks) {
-      if (episodeTask.taskId == task.taskId)
+      if (episodeTask.taskId == task.taskId) {
         episodeTask.status = DownloadTaskStatus.undefined;
+      }
       notifyListeners();
     }
     _removeTask(episode);
@@ -330,24 +326,27 @@ class DownloadState extends ChangeNotifier {
 
   _autoDelete() async {
     print('Start auto delete outdated episodes');
-    KeyValueStorage autoDeleteStorage = KeyValueStorage(autoDeleteKey);
-    int autoDelete = await autoDeleteStorage.getInt();
-    if (autoDelete == 0)
+    var autoDeleteStorage = KeyValueStorage(autoDeleteKey);
+    var autoDelete = await autoDeleteStorage.getInt();
+    if (autoDelete == 0) {
       await autoDeleteStorage.saveInt(30);
-    else if (autoDelete > 0) {
-      int deadline = DateTime.now()
+    } else if (autoDelete > 0) {
+      var deadline = DateTime.now()
           .subtract(Duration(days: autoDelete))
           .millisecondsSinceEpoch;
-      List<EpisodeBrief> episodes = await dbHelper.getOutdatedEpisode(deadline);
+      var episodes = await dbHelper.getOutdatedEpisode(deadline);
       if (episodes.isNotEmpty) {
-        for (var episode in episodes) await delTask(episode);
+        for (var episode in episodes) {
+          await delTask(episode);
+        }
       }
       final tasks = await FlutterDownloader.loadTasksWithRawQuery(
           query:
               'SELECT * FROM task WHERE time_created < $deadline AND status = 3');
-      for (var task in tasks)
+      for (var task in tasks) {
         FlutterDownloader.remove(
             taskId: task.taskId, shouldDeleteContent: true);
+      }
     }
   }
 }

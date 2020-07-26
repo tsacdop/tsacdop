@@ -1,5 +1,5 @@
-import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 import 'episodebrief.dart';
 
 class Playlist {
@@ -12,21 +12,21 @@ class Playlist {
   KeyValueStorage storage = KeyValueStorage('playlist');
 
   getPlaylist() async {
-    List<String> urls = await storage.getStringList();
+    var urls = await storage.getStringList();
     if (urls.length == 0) {
       _playlist = [];
     } else {
       _playlist = [];
 
-      for (String url in urls) {
-        EpisodeBrief episode = await dbHelper.getRssItemWithUrl(url);
+      for (var url in urls) {
+        var episode = await dbHelper.getRssItemWithUrl(url);
         if (episode != null) _playlist.add(episode);
       }
     }
   }
 
   savePlaylist() async {
-    List<String> urls = [];
+    var urls = <String>[];
     urls.addAll(_playlist.map((e) => e.enclosureUrl));
     await storage.saveStringList(urls.toSet().toList());
   }
@@ -48,10 +48,10 @@ class Playlist {
   }
 
   Future<int> delFromPlaylist(EpisodeBrief episodeBrief) async {
-    int index = _playlist.indexOf(episodeBrief);
+    var index = _playlist.indexOf(episodeBrief);
     _playlist.removeWhere(
         (episode) => episode.enclosureUrl == episodeBrief.enclosureUrl);
-    print('delete' + episodeBrief.title);
+    print('delete${episodeBrief.title}');
     await savePlaylist();
     return index;
   }

@@ -11,8 +11,7 @@ generalDialog(BuildContext context,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (BuildContext context, Animation animaiton,
-              Animation secondaryAnimation) =>
+      pageBuilder: (context, animaiton, secondaryAnimation) =>
           AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
           statusBarIconBrightness: Brightness.light,

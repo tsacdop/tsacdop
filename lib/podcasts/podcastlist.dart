@@ -1,19 +1,19 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 
+import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
-import '../local_storage/sqflite_localpodcast.dart';
-import 'podcast_detail.dart';
-import '../util/pageroute.dart';
 import '../util/extension_helper.dart';
+import '../util/pageroute.dart';
+import 'podcast_detail.dart';
 
 class AboutPodcast extends StatefulWidget {
   final PodcastLocal podcastLocal;
@@ -29,7 +29,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
 
   void getDescription(String id) async {
     var dbHelper = DBHelper();
-    String description = await dbHelper.getFeedDescription(id);
+    var description = await dbHelper.getFeedDescription(id);
     _description = description;
     setState(() {
       _load = true;
@@ -100,7 +100,7 @@ class _PodcastListState extends State<PodcastList> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
+    var _width = MediaQuery.of(context).size.width;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -132,7 +132,7 @@ class _PodcastListState extends State<PodcastList> {
                             crossAxisCount: 3,
                           ),
                           delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
+                            (context, index) {
                               return InkWell(
                                 onTap: () {
                                   Navigator.push(
@@ -153,9 +153,8 @@ class _PodcastListState extends State<PodcastList> {
                                       barrierColor: Colors.black54,
                                       transitionDuration:
                                           const Duration(milliseconds: 200),
-                                      pageBuilder: (BuildContext context,
-                                              Animation animaiton,
-                                              Animation secondaryAnimation) =>
+                                      pageBuilder: (context, animaiton,
+                                              secondaryAnimation) =>
                                           AnnotatedRegion<SystemUiOverlayStyle>(
                                             value: SystemUiOverlayStyle(
                                               statusBarIconBrightness:

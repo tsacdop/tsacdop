@@ -1,19 +1,18 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'package:tsacdop/local_storage/key_value_storage.dart';
-import 'package:tsacdop/service/ompl_build.dart';
-import 'package:tsacdop/state/podcast_group.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:line_icons/line_icons.dart';
+import 'package:provider/provider.dart';
 
+import '../local_storage/key_value_storage.dart';
+import '../service/ompl_build.dart';
 import '../settings/settting.dart';
+import '../state/podcast_group.dart';
 import '../state/refresh_podcast.dart';
 import '../util/extension_helper.dart';
 import 'about.dart';
@@ -27,16 +26,16 @@ class _PopupMenuState extends State<PopupMenu> {
   Future<String> _getRefreshDate(BuildContext context) async {
     int refreshDate;
     final s = context.s;
-    KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
-    int i = await refreshstorage.getInt();
+    var refreshstorage = KeyValueStorage('refreshdate');
+    var i = await refreshstorage.getInt();
     if (i == 0) {
-      KeyValueStorage refreshstorage = KeyValueStorage('refreshdate');
+      var refreshstorage = KeyValueStorage('refreshdate');
       await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
       refreshDate = DateTime.now().millisecondsSinceEpoch;
     } else {
       refreshDate = i;
     }
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
+    var date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
     var difference = DateTime.now().difference(date);
     if (difference.inSeconds < 60) {
       return s.secondsAgo(difference.inSeconds);
@@ -54,19 +53,19 @@ class _PopupMenuState extends State<PopupMenu> {
 
   void _saveOmpl(String path) async {
     var subscribeWorker = Provider.of<GroupList>(context, listen: false);
-    RegExp rssExp = RegExp(r'^(https?):\/\/(.*)');
+    var rssExp = RegExp(r'^(https?):\/\/(.*)');
     final s = context.s;
-    File file = File(path);
+    var file = File(path);
     try {
       Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(file);
       for (var entry in data.entries) {
-        String title = entry.key;
+        var title = entry.key;
         print(title);
         var list = entry.value.reversed;
         for (var rss in list) {
-          String rssLink = rssExp.stringMatch(rss.xmlUrl);
+          var rssLink = rssExp.stringMatch(rss.xmlUrl);
           if (rssLink != null) {
-            SubscribeItem item = SubscribeItem(rssLink, rss.text, group: title);
+            var item = SubscribeItem(rssLink, rss.text, group: title);
             await subscribeWorker.setSubscribeItem(item);
             await Future.delayed(Duration(milliseconds: 200));
             print(rss.text);
@@ -85,11 +84,11 @@ class _PopupMenuState extends State<PopupMenu> {
   void _getFilePath() async {
     final s = context.s;
     try {
-      String filePath = await FilePicker.getFilePath(type: FileType.any);
+      var filePath = await FilePicker.getFilePath(type: FileType.any);
       if (filePath == '') {
         return;
       }
-      print('File Path' + filePath);
+      print('File Path$filePath');
       //importOmpl.importState = ImportState.start;
       Fluttertoast.showToast(
         msg: s.toastReadFile,
@@ -131,13 +130,14 @@ class _PopupMenuState extends State<PopupMenu> {
                     FutureBuilder<String>(
                         future: _getRefreshDate(context),
                         builder: (_, snapshot) {
-                          if (snapshot.hasData)
+                          if (snapshot.hasData) {
                             return Text(
                               snapshot.data,
                               style: TextStyle(color: Colors.red, fontSize: 12),
                             );
-                          else
+                          } else {
                             return Center();
+                          }
                         })
                   ],
                 ),

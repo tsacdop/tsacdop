@@ -1,30 +1,30 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tuple/tuple.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
-import '../type/episodebrief.dart';
-import '../type/play_histroy.dart';
-import '../state/podcast_group.dart';
-import '../state/download_state.dart';
-import '../type/podcastlocal.dart';
-import '../state/audio_state.dart';
-import '../util/custom_widget.dart';
-import '../util/pageroute.dart';
-import '../util/extension_helper.dart';
-import '../local_storage/sqflite_localpodcast.dart';
-import '../local_storage/key_value_storage.dart';
 import '../episodes/episode_detail.dart';
+import '../local_storage/key_value_storage.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 import '../podcasts/podcast_detail.dart';
 import '../podcasts/podcast_manage.dart';
+import '../state/audio_state.dart';
+import '../state/download_state.dart';
+import '../state/podcast_group.dart';
+import '../type/episodebrief.dart';
+import '../type/play_histroy.dart';
+import '../type/podcastlocal.dart';
+import '../util/custom_widget.dart';
+import '../util/extension_helper.dart';
+import '../util/pageroute.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -55,15 +55,15 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
+    var _width = MediaQuery.of(context).size.width;
     final s = context.s;
     return Selector<GroupList, Tuple3<List<PodcastGroup>, bool, bool>>(
       selector: (_, groupList) =>
           Tuple3(groupList.groups, groupList.created, groupList.isLoading),
       builder: (_, data, __) {
         var groups = data.item1;
-        bool import = data.item2;
-        bool isLoading = data.item3;
+        var import = data.item2;
+        var isLoading = data.item3;
         return isLoading
             ? Container(
                 height: (_width - 20) / 3 + 140,
@@ -84,12 +84,13 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     gravity: ToastGravity.BOTTOM,
                                   );
                                 } else {
-                                  if (mounted)
+                                  if (mounted) {
                                     setState(() {
                                       (_groupIndex != 0)
                                           ? _groupIndex--
                                           : _groupIndex = groups.length - 1;
                                     });
+                                  }
                                 }
                               } else if (event.primaryVelocity < -200) {
                                 if (groups.length == 1) {
@@ -131,12 +132,13 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                         alignment: Alignment.bottomRight,
                                         child: InkWell(
                                           onTap: () {
-                                            if (!import)
+                                            if (!import) {
                                               Navigator.push(
                                                 context,
                                                 SlideLeftRoute(
                                                     page: PodcastManage()),
                                               );
+                                            }
                                           },
                                           child: Container(
                                             height: 30,
@@ -196,7 +198,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                         WidgetSpan(
                                             child:
                                                 Icon(Icons.add_circle_outline)),
-                                        TextSpan(text: ' to subscribe podcasts')
+                                        TextSpan(text: ' to search podcasts')
                                       ],
                                     ))
                                   : Text(s.noPodcastGroup,
@@ -223,12 +225,13 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               } else {
-                                if (mounted)
+                                if (mounted) {
                                   setState(() {
                                     (_groupIndex != 0)
                                         ? _groupIndex--
                                         : _groupIndex = groups.length - 1;
                                   });
+                                }
                               }
                             } else if (event.primaryVelocity < -200) {
                               if (groups.length == 1) {
@@ -268,12 +271,13 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                       alignment: Alignment.bottomRight,
                                       child: InkWell(
                                         onTap: () {
-                                          if (!import)
+                                          if (!import) {
                                             Navigator.push(
                                               context,
                                               SlideLeftRoute(
                                                   page: PodcastManage()),
                                             );
+                                          }
                                         },
                                         child: Container(
                                           height: 30,
@@ -309,14 +313,13 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                   isScrollable: true,
                                   tabs: groups[_groupIndex]
                                       .podcasts
-                                      .map<Widget>((PodcastLocal podcastLocal) {
-                                    Color color =
-                                        (Theme.of(context).brightness ==
-                                                Brightness.light)
-                                            ? podcastLocal.primaryColor
-                                                .colorizedark()
-                                            : podcastLocal.primaryColor
-                                                .colorizeLight();
+                                      .map<Widget>((podcastLocal) {
+                                    var color = (Theme.of(context).brightness ==
+                                            Brightness.light)
+                                        ? podcastLocal.primaryColor
+                                            .colorizedark()
+                                        : podcastLocal.primaryColor
+                                            .colorizeLight();
                                     return Tab(
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.all(
@@ -378,7 +381,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                           child: TabBarView(
                             children: groups[_groupIndex]
                                 .podcasts
-                                .map<Widget>((PodcastLocal podcastLocal) {
+                                .map<Widget>((podcastLocal) {
                               return Container(
                                 decoration: BoxDecoration(
                                     color: Theme.of(context).brightness ==
@@ -408,13 +411,13 @@ class PodcastPreview extends StatelessWidget {
 
   Future<List<EpisodeBrief>> _getRssItemTop(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes = await dbHelper.getRssItemTop(podcastLocal.id);
+    var episodes = await dbHelper.getRssItemTop(podcastLocal.id);
     return episodes;
   }
 
   @override
   Widget build(BuildContext context) {
-    Color _c = (Theme.of(context).brightness == Brightness.light)
+    var _c = (Theme.of(context).brightness == Brightness.light)
         ? podcastLocal.primaryColor.colorizedark()
         : podcastLocal.primaryColor.colorizeLight();
     return Column(
@@ -504,7 +507,7 @@ class ShowEpisode extends StatelessWidget {
 
   String _dateToString(BuildContext context, {int pubDate}) {
     final s = context.s;
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
+    var date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
     var difference = DateTime.now().toUtc().difference(date);
     if (difference.inHours < 24) {
       return s.hoursAgo(difference.inHours);
@@ -518,50 +521,48 @@ class ShowEpisode extends StatelessWidget {
 
   Future<Tuple5<int, bool, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
-    List<int> menuList = await _getEpisodeMenu();
-    bool tapToOpen = await _getTapToOpenPopupMenu();
-    int listened = await _isListened(episode);
+    var menuList = await _getEpisodeMenu();
+    var tapToOpen = await _getTapToOpenPopupMenu();
+    var listened = await _isListened(episode);
 
-    bool liked = await _isLiked(episode);
-    bool downloaded = await _isDownloaded(episode);
+    var liked = await _isLiked(episode);
+    var downloaded = await _isDownloaded(episode);
 
     return Tuple5(listened, liked, downloaded, tapToOpen, menuList);
   }
 
   Future<int> _isListened(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.isListened(episode.enclosureUrl);
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.isLiked(episode.enclosureUrl);
   }
 
   Future<List<int>> _getEpisodeMenu() async {
-    KeyValueStorage popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
-    List<int> list = await popupMenuStorage.getMenu();
+    var popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
+    var list = await popupMenuStorage.getMenu();
     return list;
   }
 
   Future<bool> _isDownloaded(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
+    var dbHelper = DBHelper();
     return await dbHelper.isDownloaded(episode.enclosureUrl);
   }
 
   Future<bool> _getTapToOpenPopupMenu() async {
-    KeyValueStorage tapToOpenPopupMenuStorage =
-        KeyValueStorage(tapToOpenPopupMenuKey);
-    int boo = await tapToOpenPopupMenuStorage.getInt(defaultValue: 0);
+    var tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
+    var boo = await tapToOpenPopupMenuStorage.getInt(defaultValue: 0);
     return boo == 1;
   }
 
   _markListened(EpisodeBrief episode) async {
-    DBHelper dbHelper = DBHelper();
-    bool marked = await dbHelper.checkMarked(episode);
+    var dbHelper = DBHelper();
+    var marked = await dbHelper.checkMarked(episode);
     if (!marked) {
-      final PlayHistory history =
-          PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+      final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
       await dbHelper.saveHistory(history);
     }
   }
@@ -578,7 +579,7 @@ class ShowEpisode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double _width = context.width;
+    var _width = context.width;
     final s = context.s;
     var downloader = Provider.of<DownloadState>(context, listen: false);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
@@ -596,8 +597,8 @@ class ShowEpisode extends StatelessWidget {
               crossAxisSpacing: 6.0,
             ),
             delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                Color _c = (Theme.of(context).brightness == Brightness.light)
+              (context, index) {
+                var _c = (Theme.of(context).brightness == Brightness.light)
                     ? podcastLocal.primaryColor.colorizedark()
                     : podcastLocal.primaryColor.colorizeLight();
                 return Selector<AudioPlayerNotifier,
@@ -612,13 +613,12 @@ class ShowEpisode extends StatelessWidget {
                             Tuple5<int, bool, bool, bool, List<int>>>(
                         future: _initData(episodes[index]),
                         initialData: Tuple5(0, false, false, false, []),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          int isListened = snapshot.data.item1;
-                          bool isLiked = snapshot.data.item2;
-                          bool isDownloaded = snapshot.data.item3;
-                          bool tapToOpen = snapshot.data.item4;
-                          List<int> menuList = snapshot.data.item5;
+                        builder: (context, snapshot) {
+                          var isListened = snapshot.data.item1;
+                          var isLiked = snapshot.data.item2;
+                          var isDownloaded = snapshot.data.item3;
+                          var tapToOpen = snapshot.data.item4;
+                          var menuList = snapshot.data.item5;
                           return Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -658,8 +658,9 @@ class ShowEpisode extends StatelessWidget {
                                       color: context.accentColor,
                                     ),
                                     onPressed: () {
-                                      if (data.item1 != episodes[index])
+                                      if (data.item1 != episodes[index]) {
                                         audio.episodeLoad(episodes[index]);
+                                      }
                                     }),
                                 menuList.contains(1)
                                     ? FocusedMenuItem(
@@ -777,9 +778,10 @@ class ShowEpisode extends StatelessWidget {
                                             LineIcons.download_solid,
                                             color: Colors.green),
                                         onPressed: () {
-                                          if (!isDownloaded)
+                                          if (!isDownloaded) {
                                             downloader
                                                 .startTask(episodes[index]);
+                                          }
                                         })
                                     : null
                               ],
@@ -804,8 +806,8 @@ class ShowEpisode extends StatelessWidget {
                                             MainAxisAlignment.start,
                                         children: <Widget>[
                                           Hero(
-                                            tag: episodes[index].enclosureUrl +
-                                                'scroll',
+                                            tag:
+                                                '${episodes[index].enclosureUrl}scroll',
                                             child: Container(
                                               height: _width / 18,
                                               width: _width / 18,
@@ -929,11 +931,7 @@ class ShowEpisode extends StatelessWidget {
                                                 ? Container(
                                                     alignment: Alignment.center,
                                                     child: Text(
-                                                      ((episodes[index]
-                                                                      .enclosureLength) ~/
-                                                                  1000000)
-                                                              .toString() +
-                                                          'MB',
+                                                      '${(episodes[index].enclosureLength) ~/ 1000000}MB',
                                                       style: TextStyle(
                                                           fontSize:
                                                               _width / 35),
@@ -978,7 +976,7 @@ class _CirclePainter extends BoxPainter {
 
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration cfg) {
-    final Offset circleOffset =
+    final circleOffset =
         offset + Offset(cfg.size.width / 2, cfg.size.height - radius);
     canvas.drawCircle(circleOffset, radius, _paint);
   }

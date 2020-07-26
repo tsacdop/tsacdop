@@ -1,10 +1,11 @@
 import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
 
-import '../state/download_state.dart';
 import '../episodes/episode_detail.dart';
+import '../state/download_state.dart';
 import '../util/pageroute.dart';
 
 class DownloadList extends StatefulWidget {
@@ -63,7 +64,7 @@ class _DownloadListState extends State<DownloadList> {
                 padding: EdgeInsets.all(5.0),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
+                    (context, index) {
                       return ListTile(
                         onTap: () => Navigator.push(
                           context,
@@ -101,7 +102,7 @@ class _DownloadListState extends State<DownloadList> {
                                               Radius.circular(6)),
                                           color: Colors.red),
                                       child: Text(
-                                        tasks[index].progress.toString() + '%',
+                                        '${tasks[index].progress}%',
                                         textAlign: TextAlign.center,
                                         maxLines: 1,
                                         style: TextStyle(color: Colors.white),

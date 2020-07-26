@@ -2,17 +2,17 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 
-import '../state/setting_state.dart';
 import '../home/audioplayer.dart';
-import '../util/general_dialog.dart';
-import '../util/extension_helper.dart';
+import '../state/setting_state.dart';
 import '../util/custom_dropdown.dart';
+import '../util/extension_helper.dart';
+import '../util/general_dialog.dart';
 
 const List secondsToSelect = [10, 15, 20, 25, 30, 45, 60];
 
@@ -95,7 +95,7 @@ class PlaySetting extends StatelessWidget {
           children: [
             InkWell(
               onTap: () {
-                int startTime = data.item1;
+                var startTime = data.item1;
                 generalDialog(
                   context,
                   content: TimePickerSpinner(
@@ -111,7 +111,7 @@ class PlaySetting extends StatelessWidget {
                     normalTextStyle: GoogleFonts.teko(
                         textStyle:
                             TextStyle(fontSize: 40, color: Colors.black38)),
-                    onTimeChange: (DateTime time) {
+                    onTimeChange: (time) {
                       startTime = time.hour * 60 + time.minute;
                     },
                   ),
@@ -177,7 +177,7 @@ class PlaySetting extends StatelessWidget {
                         textStyle:
                             TextStyle(fontSize: 40, color: Colors.black38)),
                     is24HourMode: false,
-                    onTimeChange: (DateTime time) {
+                    onTimeChange: (time) {
                       endTime = time.hour * 60 + time.minute;
                     },
                   ),
@@ -329,7 +329,7 @@ class PlaySetting extends StatelessWidget {
                                 displayItemCount: 5,
                                 isDense: true,
                                 value: data,
-                                onChanged: (int value) =>
+                                onChanged: (value) =>
                                     settings.setFastForwardSeconds = value,
                                 items: secondsToSelect
                                     .map<DropdownMenuItem<int>>((e) {
@@ -352,7 +352,7 @@ class PlaySetting extends StatelessWidget {
                                 displayItemCount: 5,
                                 isDense: true,
                                 value: data,
-                                onChanged: (int value) =>
+                                onChanged: (value) =>
                                     settings.setRewindSeconds = value,
                                 items: secondsToSelect
                                     .map<DropdownMenuItem<int>>((e) {
@@ -392,7 +392,7 @@ class PlaySetting extends StatelessWidget {
                               displayItemCount: 5,
                               isDense: true,
                               value: data,
-                              onChanged: (int value) =>
+                              onChanged: (value) =>
                                   settings.setDefaultSleepTimer = value,
                               items:
                                   minsToSelect.map<DropdownMenuItem<int>>((e) {

@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../state/setting_state.dart';
-import '../util/extension_helper.dart';
 import '../util/custom_dropdown.dart';
+import '../util/extension_helper.dart';
 
 class SyncingSetting extends StatelessWidget {
   @override
@@ -79,10 +79,11 @@ class SyncingSetting extends StatelessWidget {
                                 value: data.item1,
                                 onChanged: (boo) async {
                                   settings.autoUpdate = boo;
-                                  if (boo)
+                                  if (boo) {
                                     settings.setWorkManager(data.item2);
-                                  else
+                                  } else {
                                     settings.cancelWork();
+                                  }
                                 }),
                           ),
                         ),

@@ -1,47 +1,45 @@
 import 'dart:io';
 import 'dart:ui';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:workmanager/workmanager.dart';
 
-import '../local_storage/sqflite_localpodcast.dart';
 import '../local_storage/key_value_storage.dart';
-import '../type/podcastlocal.dart';
-import '../type/episodebrief.dart';
+import '../local_storage/sqflite_localpodcast.dart';
 import '../type/settings_backup.dart';
 import 'download_state.dart';
 
 void callbackDispatcher() {
-  if (Platform.isAndroid)
+  if (Platform.isAndroid) {
     Workmanager.executeTask((task, inputData) async {
       var dbHelper = DBHelper();
-      List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
+      var podcastList = await dbHelper.getPodcastLocalAll();
       //lastWork is a indicator for if the app was opened since last backgroundwork
       //if the app wes opend,then the old marked new episode would be marked not new.
-      KeyValueStorage lastWorkStorage = KeyValueStorage(lastWorkKey);
-      int lastWork = await lastWorkStorage.getInt();
-      for (PodcastLocal podcastLocal in podcastList) {
+      var lastWorkStorage = KeyValueStorage(lastWorkKey);
+      var lastWork = await lastWorkStorage.getInt();
+      for (var podcastLocal in podcastList) {
         await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
-        print('Refresh ' + podcastLocal.title);
+        print('Refresh ${podcastLocal.title}');
       }
       await FlutterDownloader.initialize();
-      AutoDownloader downloader = AutoDownloader();
+      var downloader = AutoDownloader();
 
-      KeyValueStorage autoDownloadStorage =
-          KeyValueStorage(autoDownloadNetworkKey);
-      int autoDownloadNetwork = await autoDownloadStorage.getInt();
+      var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+      var autoDownloadNetwork = await autoDownloadStorage.getInt();
       var result = await Connectivity().checkConnectivity();
       if (autoDownloadNetwork == 1) {
-        List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
+        var episodes = await dbHelper.getNewEpisodes('all');
         // For safety
         if (episodes.length < 100 && episodes.length > 0) {
           downloader.bindBackgroundIsolate();
           await downloader.startTask(episodes);
         }
       } else if (result == ConnectivityResult.wifi) {
-        List<EpisodeBrief> episodes = await dbHelper.getNewEpisodes('all');
+        var episodes = await dbHelper.getNewEpisodes('all');
         //For safety
         if (episodes.length < 100 && episodes.length > 0) {
           downloader.bindBackgroundIsolate();
@@ -49,10 +47,11 @@ void callbackDispatcher() {
         }
       }
       await lastWorkStorage.saveInt(1);
-      KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
+      var refreshstorage = KeyValueStorage(refreshdateKey);
       await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
       return Future.value(true);
     });
+  }
 }
 
 ThemeData lightTheme = ThemeData(
@@ -259,12 +258,9 @@ class SettingState extends ChangeNotifier {
     _getSleepTimerData();
     _getPlayerSeconds();
     _getUpdateInterval().then((value) async {
-      if (_initUpdateTag == 0)
+      if (_initUpdateTag == 0) {
         setWorkManager(24);
-
-      /// Restart worker if anythin changed in worker callback.
-      /// varsion 2 add auto download new episodes
-      else if (_autoUpdate && _initialShowIntor == 1) {
+      } else if (_autoUpdate && _initialShowIntor == 1) {
         await cancelWork();
         setWorkManager(_initUpdateTag);
         await saveShowIntro(2);
@@ -273,14 +269,14 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _getTheme() async {
-    int mode = await themeStorage.getInt();
+    var mode = await themeStorage.getInt();
     _theme = ThemeMode.values[mode];
   }
 
   Future _getAccentSetColor() async {
-    String colorString = await accentStorage.getString();
+    var colorString = await accentStorage.getString();
     if (colorString.isNotEmpty) {
-      int color = int.parse('FF' + colorString.toUpperCase(), radix: 16);
+      var color = int.parse('FF${colorString.toUpperCase()}', radix: 16);
       _accentSetColor = Color(color).withOpacity(1.0);
     } else {
       _accentSetColor = Colors.teal[500];
@@ -393,37 +389,37 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<SettingsBackup> backup() async {
-    int theme = await themeStorage.getInt();
-    String accentColor = await accentStorage.getString();
-    bool realDark = await realDarkStorage.getBool(defaultValue: false);
-    bool autoPlay =
+    var theme = await themeStorage.getInt();
+    var accentColor = await accentStorage.getString();
+    var realDark = await realDarkStorage.getBool(defaultValue: false);
+    var autoPlay =
         await autoPlayStorage.getBool(defaultValue: true, reverse: true);
-    bool autoUpdate =
+    var autoUpdate =
         await autoupdateStorage.getBool(defaultValue: true, reverse: true);
-    int updateInterval = await intervalStorage.getInt();
-    bool downloadUsingData = await downloadUsingDataStorage.getBool(
+    var updateInterval = await intervalStorage.getInt();
+    var downloadUsingData = await downloadUsingDataStorage.getBool(
         defaultValue: true, reverse: true);
-    int cacheMax = await cacheStorage.getInt(defaultValue: 500 * 1024 * 1024);
-    int podcastLayout = await podcastLayoutStorage.getInt();
-    int recentLayout = await recentLayoutStorage.getInt();
-    int favLayout = await favLayoutStorage.getInt();
-    int downloadLayout = await downloadLayoutStorage.getInt();
-    bool autoDownloadNetwork =
+    var cacheMax = await cacheStorage.getInt(defaultValue: 500 * 1024 * 1024);
+    var podcastLayout = await podcastLayoutStorage.getInt();
+    var recentLayout = await recentLayoutStorage.getInt();
+    var favLayout = await favLayoutStorage.getInt();
+    var downloadLayout = await downloadLayoutStorage.getInt();
+    var autoDownloadNetwork =
         await autoDownloadStorage.getBool(defaultValue: false);
-    List<String> episodePopupMenu =
+    var episodePopupMenu =
         await KeyValueStorage(episodePopupMenuKey).getStringList();
-    int autoDelete = await autoDeleteStorage.getInt();
-    bool autoSleepTimer =
+    var autoDelete = await autoDeleteStorage.getInt();
+    var autoSleepTimer =
         await autoSleepTimerStorage.getBool(defaultValue: false);
-    int autoSleepTimerStart = await autoSleepTimerStartStorage.getInt();
-    int autoSleepTimerEnd = await autoSleepTimerEndStorage.getInt();
-    int autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
-    int defaultSleepTime = await defaultSleepTimerStorage.getInt();
-    bool tapToOpenPopupMenu = await KeyValueStorage(tapToOpenPopupMenuKey)
+    var autoSleepTimerStart = await autoSleepTimerStartStorage.getInt();
+    var autoSleepTimerEnd = await autoSleepTimerEndStorage.getInt();
+    var autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
+    var defaultSleepTime = await defaultSleepTimerStorage.getInt();
+    var tapToOpenPopupMenu = await KeyValueStorage(tapToOpenPopupMenuKey)
         .getBool(defaultValue: false);
-    int fastForwardSeconds =
+    var fastForwardSeconds =
         await fastForwardSecondsStorage.getInt(defaultValue: 30);
-    int rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
+    var rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
 
     return SettingsBackup(
         theme: theme,

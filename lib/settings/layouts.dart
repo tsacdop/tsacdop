@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../util/extension_helper.dart';
-import '../util/episodegrid.dart';
-import '../util/custom_widget.dart';
 import '../local_storage/key_value_storage.dart';
+import '../util/custom_widget.dart';
+import '../util/episodegrid.dart';
+import '../util/extension_helper.dart';
 import 'popup_menu.dart';
 
 class LayoutSetting extends StatefulWidget {
@@ -16,8 +16,8 @@ class LayoutSetting extends StatefulWidget {
 
 class _LayoutSettingState extends State<LayoutSetting> {
   Future<Layout> _getLayout(String key) async {
-    KeyValueStorage keyValueStorage = KeyValueStorage(key);
-    int layout = await keyValueStorage.getInt();
+    var keyValueStorage = KeyValueStorage(key);
+    var layout = await keyValueStorage.getInt();
     return Layout.values[layout];
   }
 
@@ -31,7 +31,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
         padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
         child: InkWell(
           onTap: () async {
-            KeyValueStorage storage = KeyValueStorage(key);
+            var storage = KeyValueStorage(key);
             await storage.saveInt(option.index);
             setState(() {});
           },

@@ -5,7 +5,6 @@ import 'package:flutter_isolate/flutter_isolate.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
-import '../type/podcastlocal.dart';
 
 enum RefreshState { none, fetch, error, artwork }
 
@@ -68,14 +67,14 @@ class RefreshWorker extends ChangeNotifier {
 }
 
 Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
-  KeyValueStorage refreshstorage = KeyValueStorage(refreshdateKey);
+  var refreshstorage = KeyValueStorage(refreshdateKey);
   await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
   var dbHelper = DBHelper();
-  List<PodcastLocal> podcastList = await dbHelper.getPodcastLocalAll();
+  var podcastList = await dbHelper.getPodcastLocalAll();
   for (var podcastLocal in podcastList) {
     sendPort.send([podcastLocal.title, 1]);
-    int updateCount = await dbHelper.updatePodcastRss(podcastLocal);
-    print('Refresh ' + podcastLocal.title + updateCount.toString());
+    var updateCount = await dbHelper.updatePodcastRss(podcastLocal);
+    print('Refresh ${podcastLocal.title}$updateCount');
   }
   sendPort.send("done");
 }

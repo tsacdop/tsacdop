@@ -25,7 +25,7 @@ extension IntExtension on int {
   String toDate(BuildContext context) {
     if (this == null) return '';
     final s = context.s;
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(this, isUtc: true);
+    var date = DateTime.fromMillisecondsSinceEpoch(this, isUtc: true);
     var difference = DateTime.now().toUtc().difference(date);
     if (difference.inHours < 24) {
       return s.hoursAgo(difference.inHours);
@@ -38,20 +38,21 @@ extension IntExtension on int {
   }
 
   String get toTime =>
-      '${(this ~/ 60)}:${(this.truncate() % 60).toString().padLeft(2, '0')}';
+      '${(this ~/ 60)}:${(truncate() % 60).toString().padLeft(2, '0')}';
 
   String toInterval(BuildContext context) {
-    if (this == null || this.isNegative) return '';
+    if (this == null || isNegative) return '';
     final s = context.s;
     var interval = Duration(milliseconds: this);
-    if (interval.inHours <= 48)
+    if (interval.inHours <= 48) {
       return s.publishedDaily;
-    else if (interval.inDays > 2 && interval.inDays <= 14)
+    } else if (interval.inDays > 2 && interval.inDays <= 14) {
       return s.publishedWeekly;
-    else if (interval.inDays > 14 && interval.inDays < 60)
+    } else if (interval.inDays > 14 && interval.inDays < 60) {
       return s.publishedMonthly;
-    else
+    } else {
       return s.publishedYearly;
+    }
   }
 }
 

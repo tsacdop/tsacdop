@@ -44,7 +44,7 @@ class AtomFeed {
     try {
       feedElement = document.findElements("feed").first;
     } on StateError {
-      throw new ArgumentError("feed not found");
+      throw ArgumentError("feed not found");
     }
 
     return AtomFeed(

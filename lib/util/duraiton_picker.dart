@@ -10,7 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-const Duration _kDialAnimateDuration = const Duration(milliseconds: 200);
+const Duration _kDialAnimateDuration = Duration(milliseconds: 200);
 
 const double _kDurationPickerWidthPortrait = 328.0;
 const double _kDurationPickerWidthLandscape = 512.0;
@@ -51,50 +51,49 @@ class _DialPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const double _epsilon = .001;
-    const double _sweep = _kTwoPi - _epsilon;
-    const double _startAngle = -math.pi / 2.0;
+    const _epsilon = .001;
+    const _sweep = _kTwoPi - _epsilon;
+    const _startAngle = -math.pi / 2.0;
 
-    final double radius = size.shortestSide / 2.0;
-    final Offset center = new Offset(size.width / 2.0, size.height / 2.0);
-    final Offset centerPoint = center;
+    final radius = size.shortestSide / 2.0;
+    final center = Offset(size.width / 2.0, size.height / 2.0);
+    final centerPoint = center;
 
-    double pctTheta = (0.25 - (theta % _kTwoPi) / _kTwoPi) % 1.0;
+    var pctTheta = (0.25 - (theta % _kTwoPi) / _kTwoPi) % 1.0;
 
     // Draw the background outer ring
-    canvas.drawCircle(
-        centerPoint, radius, new Paint()..color = backgroundColor);
+    canvas.drawCircle(centerPoint, radius, Paint()..color = backgroundColor);
 
     // Draw a translucent circle for every hour
-    for (int i = 0; i < multiplier; i = i + 1) {
+    for (var i = 0; i < multiplier; i = i + 1) {
       canvas.drawCircle(centerPoint, radius,
-          new Paint()..color = accentColor.withOpacity((i == 0) ? 0.3 : 0.1));
+          Paint()..color = accentColor.withOpacity((i == 0) ? 0.3 : 0.1));
     }
 
     // Draw the inner background circle
     canvas.drawCircle(centerPoint, radius * 0.88,
-        new Paint()..color = Theme.of(context).canvasColor);
+        Paint()..color = Theme.of(context).canvasColor);
 
     // Get the offset point for an angle value of theta, and a distance of _radius
     Offset getOffsetForTheta(double theta, double _radius) {
       return center +
-          new Offset(_radius * math.cos(theta), -_radius * math.sin(theta));
+          Offset(_radius * math.cos(theta), -_radius * math.sin(theta));
     }
 
     // Draw the handle that is used to drag and to indicate the position around the circle
-    final Paint handlePaint = new Paint()..color = accentColor;
-    final Offset handlePoint = getOffsetForTheta(theta, radius - 10.0);
+    final handlePaint = Paint()..color = accentColor;
+    final handlePoint = getOffsetForTheta(theta, radius - 10.0);
     canvas.drawCircle(handlePoint, 20.0, handlePaint);
 
     // Draw the Text in the center of the circle which displays hours and mins
-    String minutes = (multiplier == 0) ? '' : "${multiplier}min ";
+    var minutes = (multiplier == 0) ? '' : "${multiplier}min ";
 //    int minutes = (pctTheta * 60).round();
 //    minutes = minutes == 60 ? 0 : minutes;
-    String seconds = "$secondHand";
+    var seconds = "$secondHand";
 
-    TextPainter textDurationValuePainter = new TextPainter(
+    var textDurationValuePainter = TextPainter(
         textAlign: TextAlign.center,
-        text: new TextSpan(
+        text: TextSpan(
             text: '$minutes$seconds',
             style: Theme.of(context)
                 .textTheme
@@ -102,28 +101,28 @@ class _DialPainter extends CustomPainter {
                 .copyWith(fontSize: size.shortestSide * 0.15)),
         textDirection: TextDirection.ltr)
       ..layout();
-    Offset middleForValueText = new Offset(
+    var middleForValueText = Offset(
         centerPoint.dx - (textDurationValuePainter.width / 2),
         centerPoint.dy - textDurationValuePainter.height / 2);
     textDurationValuePainter.paint(canvas, middleForValueText);
 
-    TextPainter textMinPainter = new TextPainter(
+    var textMinPainter = TextPainter(
         textAlign: TextAlign.center,
-        text: new TextSpan(
+        text: TextSpan(
             text: 'sec', //th: ${theta}',
             style: Theme.of(context).textTheme.bodyText1),
         textDirection: TextDirection.ltr)
       ..layout();
     textMinPainter.paint(
         canvas,
-        new Offset(
+        Offset(
             centerPoint.dx - (textMinPainter.width / 2),
             centerPoint.dy +
                 (textDurationValuePainter.height / 2) -
                 textMinPainter.height / 2));
 
     // Draw an arc around the circle for the amount of the circle that has elapsed.
-    var elapsedPainter = new Paint()
+    var elapsedPainter = Paint()
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..color = accentColor.withOpacity(0.3)
@@ -131,7 +130,7 @@ class _DialPainter extends CustomPainter {
       ..strokeWidth = radius * 0.12;
 
     canvas.drawArc(
-      new Rect.fromCircle(
+      Rect.fromCircle(
         center: centerPoint,
         radius: radius - radius * 0.12 / 2,
       ),
@@ -144,12 +143,11 @@ class _DialPainter extends CustomPainter {
     // Paint the labels (the minute strings)
     void paintLabels(List<TextPainter> labels) {
       if (labels == null) return;
-      final double labelThetaIncrement = -_kTwoPi / labels.length;
-      double labelTheta = _kPiByTwo;
+      final labelThetaIncrement = -_kTwoPi / labels.length;
+      var labelTheta = _kPiByTwo;
 
-      for (TextPainter label in labels) {
-        final Offset labelOffset =
-            new Offset(-label.width / 2.0, -label.height / 2.0);
+      for (var label in labels) {
+        final labelOffset = Offset(-label.width / 2.0, -label.height / 2.0);
 
         label.paint(
             canvas, getOffsetForTheta(labelTheta, radius - 40.0) + labelOffset);
@@ -183,21 +181,20 @@ class _Dial extends StatefulWidget {
   /// The resolution of mins of the dial, i.e. if snapToMins = 5.0, only durations of 5min intervals will be selectable.
   final double snapToMins;
   @override
-  _DialState createState() => new _DialState();
+  _DialState createState() => _DialState();
 }
 
 class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _thetaController = new AnimationController(
+    _thetaController = AnimationController(
       duration: _kDialAnimateDuration,
       vsync: this,
     );
-    _thetaTween =
-        new Tween<double>(begin: _getThetaForDuration(widget.duration));
-    _theta = _thetaTween.animate(new CurvedAnimation(
-        parent: _thetaController, curve: Curves.fastOutSlowIn))
+    _thetaTween = Tween<double>(begin: _getThetaForDuration(widget.duration));
+    _theta = _thetaTween.animate(
+        CurvedAnimation(parent: _thetaController, curve: Curves.fastOutSlowIn))
       ..addListener(() => setState(() {}));
     _thetaController.addStatusListener((status) {
 //      if (status == AnimationStatus.completed && _hours != _snappedHours) {
@@ -238,7 +235,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   Animation<double> _theta;
   AnimationController _thetaController;
 
-  double _pct = 0.0;
+  final double _pct = 0.0;
   int _seconds = 0;
   bool _dragging = false;
   int _minutes = 0;
@@ -249,8 +246,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   void _animateTo(double targetTheta) {
-    final double currentTheta = _theta.value;
-    double beginTheta =
+    final currentTheta = _theta.value;
+    var beginTheta =
         _nearest(targetTheta, currentTheta, currentTheta + _kTwoPi);
     beginTheta = _nearest(targetTheta, beginTheta, currentTheta - _kTwoPi);
     _thetaTween
@@ -284,9 +281,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
 
   void _updateThetaForPan() {
     setState(() {
-      final Offset offset = _position - _center;
-      final double angle =
-          (math.atan2(offset.dx, offset.dy) - _kPiByTwo) % _kTwoPi;
+      final offset = _position - _center;
+      final angle = (math.atan2(offset.dx, offset.dy) - _kPiByTwo) % _kTwoPi;
 
       // Stop accidental abrupt pans from making the dial seem like it starts from 1h.
       // (happens when wanting to pan from 0 clockwise, but when doing so quickly, one actually pans from before 0 (e.g. setting the duration to 59mins, and then crossing 0, which would then mean 1h 1min).
@@ -315,10 +311,10 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   void _handlePanUpdate(DragUpdateDetails details) {
-    double oldTheta = _theta.value;
+    var oldTheta = _theta.value;
     _position += details.delta;
     _updateThetaForPan();
-    double newTheta = _theta.value;
+    var newTheta = _theta.value;
 //    _updateRotations(oldTheta, newTheta);
     _updateTurningAngle(oldTheta, newTheta);
     _notifyOnChangedIfNeeded();
@@ -344,7 +340,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
 
   double _angleToSeconds(double angle) {
     // Coordinate transformation from mathematical COS to dial COS
-    double dialAngle = _kPiByTwo - angle;
+    var dialAngle = _kPiByTwo - angle;
 
     // Turn dial angle into minutes, may go beyond 60 minutes (multiple turns)
     return dialAngle / _kTwoPi * 60.0;
@@ -393,27 +389,27 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   List<TextPainter> _buildSeconds(TextTheme textTheme) {
-    final TextStyle style = textTheme.subtitle1;
+    final style = textTheme.subtitle1;
 
-    const List<Duration> _secondsMarkerValues = const <Duration>[
-      const Duration(seconds: 0),
-      const Duration(seconds: 5),
-      const Duration(seconds: 10),
-      const Duration(seconds: 15),
-      const Duration(seconds: 20),
-      const Duration(seconds: 25),
-      const Duration(seconds: 30),
-      const Duration(seconds: 35),
-      const Duration(seconds: 40),
-      const Duration(seconds: 45),
-      const Duration(seconds: 50),
-      const Duration(seconds: 55),
+    const _secondsMarkerValues = <Duration>[
+      Duration(seconds: 0),
+      Duration(seconds: 5),
+      Duration(seconds: 10),
+      Duration(seconds: 15),
+      Duration(seconds: 20),
+      Duration(seconds: 25),
+      Duration(seconds: 30),
+      Duration(seconds: 35),
+      Duration(seconds: 40),
+      Duration(seconds: 45),
+      Duration(seconds: 50),
+      Duration(seconds: 55),
     ];
 
-    final List<TextPainter> labels = <TextPainter>[];
-    for (Duration duration in _secondsMarkerValues) {
-      var painter = new TextPainter(
-        text: new TextSpan(style: style, text: duration.inSeconds.toString()),
+    final labels = <TextPainter>[];
+    for (var duration in _secondsMarkerValues) {
+      var painter = TextPainter(
+        text: TextSpan(style: style, text: duration.inSeconds.toString()),
         textDirection: TextDirection.ltr,
       )..layout();
       labels.add(painter);
@@ -433,20 +429,20 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         break;
     }
 
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     int selectedDialValue;
     _minutes = _minuteHand(_turningAngle);
     _seconds = _secondHand(_turningAngle);
 
-    return new GestureDetector(
+    return GestureDetector(
         excludeFromSemantics: true,
         onPanStart: _handlePanStart,
         onPanUpdate: _handlePanUpdate,
         onPanEnd: _handlePanEnd,
         onTapUp: _handleTapUp,
-        child: new CustomPaint(
-          painter: new _DialPainter(
+        child: CustomPaint(
+          painter: _DialPainter(
             pct: _pct,
             multiplier: _minutes,
             secondHand: _seconds,
@@ -482,7 +478,7 @@ class _DurationPickerDialog extends StatefulWidget {
   final double snapToMins;
 
   @override
-  _DurationPickerDialogState createState() => new _DurationPickerDialogState();
+  _DurationPickerDialogState createState() => _DurationPickerDialogState();
 }
 
 class _DurationPickerDialogState extends State<_DurationPickerDialog> {
@@ -520,34 +516,34 @@ class _DurationPickerDialogState extends State<_DurationPickerDialog> {
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
-    final Widget picker = new Padding(
+    final Widget picker = Padding(
         padding: const EdgeInsets.all(16.0),
-        child: new AspectRatio(
+        child: AspectRatio(
             aspectRatio: 1.0,
-            child: new _Dial(
+            child: _Dial(
               duration: _selectedDuration,
               onChanged: _handleTimeChanged,
               snapToMins: widget.snapToMins,
             )));
 
     final Widget actions = ButtonBar(children: <Widget>[
-      new FlatButton(
-          child: new Text(localizations.cancelButtonLabel),
+      FlatButton(
+          child: Text(localizations.cancelButtonLabel),
           onPressed: _handleCancel),
-      new FlatButton(
-          child: new Text(localizations.okButtonLabel), onPressed: _handleOk),
+      FlatButton(
+          child: Text(localizations.okButtonLabel), onPressed: _handleOk),
     ]);
 
-    final Dialog dialog = new Dialog(child: new OrientationBuilder(
-        builder: (BuildContext context, Orientation orientation) {
-      final Widget pickerAndActions = new Container(
+    final dialog =
+        Dialog(child: OrientationBuilder(builder: (context, orientation) {
+      final Widget pickerAndActions = Container(
         color: theme.dialogBackgroundColor,
-        child: new Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            new Expanded(
+            Expanded(
                 child:
                     picker), // picker grows and shrinks with the available space
             actions,
@@ -558,26 +554,26 @@ class _DurationPickerDialogState extends State<_DurationPickerDialog> {
       assert(orientation != null);
       switch (orientation) {
         case Orientation.portrait:
-          return new SizedBox(
+          return SizedBox(
               width: _kDurationPickerWidthPortrait,
               height: _kDurationPickerHeightPortrait,
-              child: new Column(
+              child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    new Expanded(
+                    Expanded(
                       child: pickerAndActions,
                     ),
                   ]));
         case Orientation.landscape:
-          return new SizedBox(
+          return SizedBox(
               width: _kDurationPickerWidthLandscape,
               height: _kDurationPickerHeightLandscape,
-              child: new Row(
+              child: Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    new Flexible(
+                    Flexible(
                       child: pickerAndActions,
                     ),
                   ]));
@@ -585,7 +581,7 @@ class _DurationPickerDialogState extends State<_DurationPickerDialog> {
       return null;
     }));
 
-    return new Theme(
+    return Theme(
       data: theme.copyWith(
         dialogBackgroundColor: Colors.transparent,
       ),
@@ -621,8 +617,8 @@ Future<Duration> showDurationPicker(
 
   return await showDialog<Duration>(
     context: context,
-    builder: (BuildContext context) => new _DurationPickerDialog(
-        initialTime: initialTime, snapToMins: snapToMins),
+    builder: (context) =>
+        _DurationPickerDialog(initialTime: initialTime, snapToMins: snapToMins),
   );
 }
 

@@ -38,9 +38,9 @@ class KeyValueStorage {
   final String key;
   KeyValueStorage(this.key);
   Future<List<GroupEntity>> getGroups() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     if (prefs.getString(key) == null) {
-      PodcastGroup home = PodcastGroup('Home');
+      var home = PodcastGroup('Home');
       await prefs.setString(
           key,
           json.encode({
@@ -56,7 +56,7 @@ class KeyValueStorage {
   }
 
   Future<bool> saveGroup(List<GroupEntity> groupList) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     return prefs.setString(
         key,
         json.encode(
@@ -64,23 +64,23 @@ class KeyValueStorage {
   }
 
   Future<bool> saveInt(int setting) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     return prefs.setInt(key, setting);
   }
 
   Future<int> getInt({int defaultValue = 0}) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     if (prefs.getInt(key) == null) await prefs.setInt(key, defaultValue);
     return prefs.getInt(key);
   }
 
   Future<bool> saveStringList(List<String> playList) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     return prefs.setStringList(key, playList);
   }
 
   Future<List<String>> getStringList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     if (prefs.getStringList(key) == null) {
       await prefs.setStringList(key, []);
     }
@@ -88,12 +88,12 @@ class KeyValueStorage {
   }
 
   Future<bool> saveString(String string) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     return prefs.setString(key, string);
   }
 
   Future<String> getString() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     if (prefs.getString(key) == null) {
       await prefs.setString(key, '');
     }
@@ -101,34 +101,35 @@ class KeyValueStorage {
   }
 
   saveMenu(List<int> list) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(key, list.map((e) => e.toString()).toList());
   }
 
   Future<List<int>> getMenu() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     if (prefs.getStringList(key) == null) {
       await prefs.setStringList(key, ['0', '1', '12', '13', '14']);
     }
-    List<String> list = prefs.getStringList(key);
-    return list.map((e) => int.parse(e)).toList();
+    var list = prefs.getStringList(key);
+    return list.map(int.parse).toList();
   }
 
   /// Rreverse is used for compatite bool value save before which set true = 0, false = 1
   Future<bool> getBool(
       {@required bool defaultValue, bool reverse = false}) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getInt(key) == null)
+    var prefs = await SharedPreferences.getInstance();
+    if (prefs.getInt(key) == null) {
       reverse
           ? await prefs.setInt(key, defaultValue ? 0 : 1)
           : await prefs.setInt(key, defaultValue ? 1 : 0);
-    int i = prefs.getInt(key);
+    }
+    var i = prefs.getInt(key);
     return reverse ? i == 0 : i == 1;
   }
 
   /// Rreverse is used for compatite bool value save before which set true = 0, false = 1
-  saveBool(bool boo, {bool reverse = false}) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  saveBool(boo, {reverse = false}) async {
+    var prefs = await SharedPreferences.getInstance();
     reverse ? prefs.setInt(key, boo ? 0 : 1) : prefs.setInt(key, boo ? 1 : 0);
   }
 }

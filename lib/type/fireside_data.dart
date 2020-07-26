@@ -17,29 +17,29 @@ class FiresideData {
   DBHelper dbHelper = DBHelper();
 
   String parseLink(String link) {
-    if (link == "http://www.shengfm.cn/")
+    if (link == "http://www.shengfm.cn/") {
       return "https://guiguzaozhidao.fireside.fm/";
-    else
+    } else {
       return link;
+    }
   }
 
   Future fatchData() async {
-    Response response = await Dio().get(parseLink(link));
+    var response = await Dio().get(parseLink(link));
     if (response.statusCode == 200) {
       var doc = parse(response.data);
-      RegExp reg = RegExp(r'https(.+)jpg');
-      String backgroundImage = reg.stringMatch(doc.body
+      var reg = RegExp(r'https(.+)jpg');
+      var backgroundImage = reg.stringMatch(doc.body
           .getElementsByClassName('hero-background')
           .first
           .attributes
           .toString());
       var ul = doc.body.getElementsByClassName('episode-hosts').first.children;
-      List<PodcastHost> hosts = [];
+      var hosts = <PodcastHost>[];
       for (var element in ul) {
         PodcastHost host;
-        String name = element.text.trim();
-        String image =
-            element.children.first.children.first.attributes.toString();
+        var name = element.text.trim();
+        var image = element.children.first.children.first.attributes.toString();
         print(reg.stringMatch(image));
 
         host = PodcastHost(
@@ -49,7 +49,7 @@ class FiresideData {
 
         hosts.add(host);
       }
-      List<String> data = [
+      var data = <String>[
         id,
         backgroundImage,
         json.encode({'hosts': hosts.map((host) => host.toJson()).toList()})
@@ -59,7 +59,7 @@ class FiresideData {
   }
 
   Future getData() async {
-    List<String> data = await dbHelper.getFiresideData(id);
+    var data = await dbHelper.getFiresideData(id);
     _background = data[0];
     if (data[1] != '') {
       _hosts = json
@@ -67,8 +67,9 @@ class FiresideData {
           .cast<Map<String, Object>>()
           .map<PodcastHost>(PodcastHost.fromJson)
           .toList();
-    } else
+    } else {
       _hosts = null;
+    }
   }
 }
 

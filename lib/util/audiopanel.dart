@@ -41,7 +41,8 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
           ..addListener(() {
             if (mounted) setState(() {});
           });
-    _animation = Tween<double>(begin: 0, end: initSize).animate(_controller);
+    _animation =
+        Tween<double>(begin: 0, end: initSize).animate(_slowController);
     _controller.forward();
     super.initState();
   }
@@ -60,7 +61,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
         child: (_animation.value > widget.minHeight + 30)
             ? Positioned.fill(
                 child: GestureDetector(
-                  onTap: () => _backToMini(),
+                  onTap: _backToMini,
                   child: Container(
                     color: Theme.of(context)
                         .scaffoldBackgroundColor
@@ -73,8 +74,8 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
       Container(
         alignment: Alignment.bottomCenter,
         child: GestureDetector(
-          onVerticalDragStart: (event) => _start(event),
-          onVerticalDragUpdate: (event) => _update(event),
+          onVerticalDragStart: _start,
+          onVerticalDragUpdate: _update,
           onVerticalDragEnd: (event) => _end(),
           child: Container(
             height: (_animation.value >= widget.maxHeight)
