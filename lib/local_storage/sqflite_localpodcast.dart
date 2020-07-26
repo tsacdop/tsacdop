@@ -5,12 +5,12 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:webfeed/webfeed.dart';
 
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
 import '../type/sub_history.dart';
-import '../webfeed/webfeed.dart';
 
 enum Filter { downloaded, liked, search, all }
 
@@ -441,7 +441,7 @@ class DBHelper {
     String description, url;
     for (var i = 0; i < result; i++) {
       print(feed.items[i].title);
-      description = _getDescription(feed.items[i].content.value ?? '',
+      description = _getDescription(feed.items[i]?.content?.value ?? '',
           feed.items[i].description ?? '', feed.items[i].itunes.summary ?? '');
       if (feed.items[i].enclosure != null) {
         _isXimalaya(feed.items[i].enclosure.url)

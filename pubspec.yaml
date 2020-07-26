@@ -58,6 +58,9 @@ dependencies:
   focused_menu:
     git:
       url: https://github.com/stonega/focused_menu.git
+  webfeed:
+    git:
+      url: https://github.com/stonega/webfeed.git
 
 dev_dependencies:
   flutter_test:

@@ -32,6 +32,7 @@
 /build/
 pubspec.lock
 .vscode
+analysis_options.yaml
 
 # Web related
 lib/generated_plugin_registrant.dart

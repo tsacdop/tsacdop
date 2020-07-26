@@ -244,7 +244,7 @@ class AboutApp extends StatelessWidget {
                                 ),
                                 Expanded(
                                     child: Text(
-                                  'ppp(oza987@protonmail.com)',
+                                  'ppp',
                                   maxLines: 1,
                                   overflow: TextOverflow.fade,
                                 )),

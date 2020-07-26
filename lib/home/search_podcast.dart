@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:webfeed/webfeed.dart';
 import 'package:provider/provider.dart';
 
 import '../service/api_search.dart';
@@ -14,7 +15,6 @@ import '../state/podcast_group.dart';
 import '../type/searchepisodes.dart';
 import '../type/searchpodcast.dart';
 import '../util/extension_helper.dart';
-import '../webfeed/webfeed.dart';
 
 class MyHomePageDelegate extends SearchDelegate<int> {
   final String searchFieldLabel;

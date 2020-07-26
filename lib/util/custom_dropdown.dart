@@ -1100,7 +1100,9 @@ class MyDropdownButton<T> extends StatefulWidget {
 }
 
 class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
-    with WidgetsBindingObserver {
+    // ignore: prefer_mixin
+    with
+        WidgetsBindingObserver {
   int _selectedIndex;
   _DropdownRoute<T> _dropdownRoute;
   Orientation _lastOrientation;

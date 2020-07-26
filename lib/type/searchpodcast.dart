@@ -70,6 +70,7 @@ class OnlinePodcast {
 
   int get interval {
     if (count < 1) {
+      // ignore: avoid_returning_null
       return null;
     }
     return (latestPubDate - earliestPubDate) ~/ count;
