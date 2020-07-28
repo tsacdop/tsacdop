@@ -943,85 +943,31 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                           child: IconButton(
                                                               tooltip: s
                                                                   .addNewEpisodeTooltip,
-                                                              icon:
-                                                                  // Icon(Icons.playlist_add),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          16,
-                                                                      width: 21,
-                                                                      child: CustomPaint(
-                                                                          painter: AddToPlaylistPainter(
-                                                                        context
-                                                                            .textColor,
-                                                                        context
-                                                                            .textColor,
-                                                                      ))),
+                                                              icon: SizedBox(
+                                                                  height: 16,
+                                                                  width: 21,
+                                                                  child:
+                                                                      CustomPaint(
+                                                                          painter:
+                                                                              AddToPlaylistPainter(
+                                                                    context
+                                                                        .textColor,
+                                                                    context
+                                                                        .textColor,
+                                                                  ))),
                                                               onPressed: () {}),
                                                         );
                                                 }),
                                             Material(
-                                                color: Colors.transparent,
-                                                child: IconButton(
-                                                  tooltip: s.changeLayout,
-                                                  padding: EdgeInsets.zero,
-                                                  onPressed: () {
-                                                    if (_layout ==
-                                                        Layout.three) {
-                                                      setState(() {
-                                                        _layout = Layout.one;
-                                                      });
-                                                    } else if (_layout ==
-                                                        Layout.two) {
-                                                      setState(() {
-                                                        _layout = Layout.three;
-                                                      });
-                                                    } else {
-                                                      setState(() {
-                                                        _layout = Layout.two;
-                                                      });
-                                                    }
-                                                  },
-                                                  icon: _layout == Layout.three
-                                                      ? SizedBox(
-                                                          height: 10,
-                                                          width: 30,
-                                                          child: CustomPaint(
-                                                            painter: LayoutPainter(
-                                                                0,
-                                                                context
-                                                                    .textTheme
-                                                                    .bodyText1
-                                                                    .color),
-                                                          ),
-                                                        )
-                                                      : _layout == Layout.two
-                                                          ? SizedBox(
-                                                              height: 10,
-                                                              width: 30,
-                                                              child:
-                                                                  CustomPaint(
-                                                                painter: LayoutPainter(
-                                                                    1,
-                                                                    context
-                                                                        .textTheme
-                                                                        .bodyText1
-                                                                        .color),
-                                                              ),
-                                                            )
-                                                          : SizedBox(
-                                                              height: 10,
-                                                              width: 30,
-                                                              child:
-                                                                  CustomPaint(
-                                                                painter: LayoutPainter(
-                                                                    4,
-                                                                    context
-                                                                        .textTheme
-                                                                        .bodyText1
-                                                                        .color),
-                                                              ),
-                                                            ),
-                                                )),
+                                              color: Colors.transparent,
+                                              child: LayoutButton(
+                                                layout: _layout,
+                                                onPressed: (layout) =>
+                                                    setState(() {
+                                                  _layout = layout;
+                                                }),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       )),
@@ -1204,62 +1150,12 @@ class _MyFavoriteState extends State<_MyFavorite>
                                         Spacer(),
                                         Material(
                                           color: Colors.transparent,
-                                          child: IconButton(
-                                              padding: EdgeInsets.zero,
-                                              onPressed: () {
-                                                if (_layout == Layout.three) {
-                                                  setState(() {
-                                                    _layout = Layout.one;
-                                                  });
-                                                } else if (_layout ==
-                                                    Layout.two) {
-                                                  setState(() {
-                                                    _layout = Layout.three;
-                                                  });
-                                                } else {
-                                                  setState(() {
-                                                    _layout = Layout.two;
-                                                  });
-                                                }
-                                              },
-                                              icon: _layout == Layout.three
-                                                  ? SizedBox(
-                                                      height: 10,
-                                                      width: 30,
-                                                      child: CustomPaint(
-                                                        painter: LayoutPainter(
-                                                            0,
-                                                            context
-                                                                .textTheme
-                                                                .bodyText1
-                                                                .color),
-                                                      ),
-                                                    )
-                                                  : _layout == Layout.two
-                                                      ? SizedBox(
-                                                          height: 10,
-                                                          width: 30,
-                                                          child: CustomPaint(
-                                                            painter: LayoutPainter(
-                                                                1,
-                                                                context
-                                                                    .textTheme
-                                                                    .bodyText1
-                                                                    .color),
-                                                          ),
-                                                        )
-                                                      : SizedBox(
-                                                          height: 10,
-                                                          width: 30,
-                                                          child: CustomPaint(
-                                                            painter: LayoutPainter(
-                                                                4,
-                                                                context
-                                                                    .textTheme
-                                                                    .bodyText1
-                                                                    .color),
-                                                          ),
-                                                        )),
+                                          child: LayoutButton(
+                                            layout: _layout,
+                                            onPressed: (layout) => setState(() {
+                                              _layout = layout;
+                                            }),
+                                          ),
                                         ),
                                       ],
                                     )),

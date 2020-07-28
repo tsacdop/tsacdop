@@ -606,34 +606,11 @@ class _PodcastDetailState extends State<PodcastDetail> {
               color: Colors.transparent,
               clipBehavior: Clip.hardEdge,
               borderRadius: BorderRadius.circular(100),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  if (_layout == Layout.three) {
-                    setState(() {
-                      _layout = Layout.one;
-                    });
-                  } else if (_layout == Layout.two) {
-                    setState(() {
-                      _layout = Layout.three;
-                    });
-                  } else {
-                    setState(() {
-                      _layout = Layout.two;
-                    });
-                  }
-                },
-                icon: _layout == Layout.three
-                    ? IconPainter(
-                        LayoutPainter(0, context.textColor),
-                      )
-                    : _layout == Layout.two
-                        ? IconPainter(
-                            LayoutPainter(1, context.textColor),
-                          )
-                        : IconPainter(
-                            LayoutPainter(4, context.textColor),
-                          ),
+              child: LayoutButton(
+                layout: _layout,
+                onPressed: (layout) => setState(() {
+                  _layout = layout;
+                }),
               ),
             ),
             SizedBox(width: 10)

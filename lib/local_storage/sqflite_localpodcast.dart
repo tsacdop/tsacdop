@@ -270,7 +270,7 @@ class DBHelper {
     var playHistory = <PlayHistory>[];
     for (var record in list) {
       playHistory.add(PlayHistory(record['title'], record['enclosure_url'],
-          record['seconds'], record['seek_value'],
+          (record['seconds']).toInt(), record['seek_value'],
           playdate: DateTime.fromMillisecondsSinceEpoch(record['add_date'])));
     }
     return playHistory;
@@ -337,7 +337,7 @@ class DBHelper {
         [episodeBrief.enclosureUrl]);
     return list.isNotEmpty
         ? PlayHistory(list.first['title'], list.first['enclosure_url'],
-            list.first['seconds'], list.first['seek_value'],
+            (list.first['seconds']).toInt(), list.first['seek_value'],
             playdate:
                 DateTime.fromMillisecondsSinceEpoch(list.first['add_date']))
         : PlayHistory(episodeBrief.title, episodeBrief.enclosureUrl, 0, 0);

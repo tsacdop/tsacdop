@@ -1,15 +1,23 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
+import 'extension_helper.dart';
 
 enum SlideDirection { up, down }
 
 class AudioPanel extends StatefulWidget {
   final Widget miniPanel;
   final Widget expandedPanel;
+  final Widget optionPanel;
+  final Widget cover;
   final double minHeight;
   final double maxHeight;
   AudioPanel(
       {@required this.miniPanel,
       @required this.expandedPanel,
+      this.optionPanel,
+      this.cover,
       this.minHeight = 60,
       this.maxHeight = 300,
       Key key})
@@ -26,11 +34,11 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   AnimationController _slowController;
   Animation _animation;
   SlideDirection _slideDirection;
+  double _expandHeight;
 
   @override
   void initState() {
     initSize = widget.minHeight;
-    _slideDirection = SlideDirection.up;
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 50))
           ..addListener(() {
@@ -44,7 +52,9 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _animation =
         Tween<double>(begin: 0, end: initSize).animate(_slowController);
     _controller.forward();
+    _slideDirection = SlideDirection.up;
     super.initState();
+    _expandHeight = 600;
   }
 
   @override
@@ -52,6 +62,16 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _controller.dispose();
     _slowController.dispose();
     super.dispose();
+  }
+
+  double _getHeight() {
+    if (_animation.value >= _expandHeight) {
+      return _expandHeight;
+    } else if (_animation.value <= widget.minHeight) {
+      return widget.minHeight;
+    } else {
+      return _animation.value;
+    }
   }
 
   @override
@@ -65,7 +85,8 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                   child: Container(
                     color: Theme.of(context)
                         .scaffoldBackgroundColor
-                        .withOpacity(0.8),
+                        .withOpacity(0.9 *
+                            math.min(_animation.value / widget.maxHeight, 1)),
                   ),
                 ),
               )
@@ -78,11 +99,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
           onVerticalDragUpdate: _update,
           onVerticalDragEnd: (event) => _end(),
           child: Container(
-            height: (_animation.value >= widget.maxHeight)
-                ? widget.maxHeight
-                : (_animation.value <= widget.minHeight)
-                    ? widget.minHeight
-                    : _animation.value,
+            height: _getHeight(),
             child: _animation.value < widget.minHeight + 30
                 ? Container(
                     color: Theme.of(context).primaryColor,
@@ -97,7 +114,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                   )
                 : Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
+                      color: context.primaryColor,
                       boxShadow: [
                         BoxShadow(
                           offset: Offset(0, -0.5),
@@ -117,7 +134,8 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                                 (widget.maxHeight - widget.minHeight - 50)
                             : 1,
                         child: Container(
-                          height: widget.maxHeight,
+                          height: math.max(widget.maxHeight,
+                              math.min(_animation.value, _expandHeight)),
                           child: widget.expandedPanel,
                         ),
                       ),
@@ -160,12 +178,21 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   _end() {
     if (_slideDirection == SlideDirection.up) {
       if (_move > 20) {
-        setState(() {
-          _animation =
-              Tween<double>(begin: _animation.value, end: widget.maxHeight)
-                  .animate(_slowController);
-          initSize = widget.maxHeight;
-        });
+        if (_animation.value > widget.maxHeight + 20) {
+          setState(() {
+            _animation =
+                Tween<double>(begin: _animation.value, end: _expandHeight)
+                    .animate(_slowController);
+            initSize = _expandHeight;
+          });
+        } else {
+          setState(() {
+            _animation =
+                Tween<double>(begin: _animation.value, end: widget.maxHeight)
+                    .animate(_slowController);
+            initSize = widget.maxHeight;
+          });
+        }
         _slowController.forward();
       } else {
         setState(() {
@@ -178,26 +205,44 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
       }
     } else if (_slideDirection == SlideDirection.down) {
       if (_move > -50) {
-        setState(() {
-          _animation =
-              Tween<double>(begin: _animation.value, end: widget.maxHeight)
-                  .animate(_slowController);
-          initSize = widget.maxHeight;
-        });
+        if (_animation.value > widget.maxHeight) {
+          setState(() {
+            _animation =
+                Tween<double>(begin: _animation.value, end: _expandHeight)
+                    .animate(_slowController);
+            initSize = _expandHeight;
+          });
+        } else {
+          setState(() {
+            _animation =
+                Tween<double>(begin: _animation.value, end: widget.maxHeight)
+                    .animate(_slowController);
+            initSize = widget.maxHeight;
+          });
+        }
         _slowController.forward();
       } else {
-        setState(() {
-          _animation =
-              Tween<double>(begin: _animation.value, end: widget.minHeight)
-                  .animate(_controller);
-          initSize = widget.minHeight;
-        });
+        if (_animation.value > widget.maxHeight) {
+          setState(() {
+            _animation =
+                Tween<double>(begin: _animation.value, end: widget.maxHeight)
+                    .animate(_slowController);
+            initSize = widget.maxHeight;
+          });
+        } else {
+          setState(() {
+            _animation =
+                Tween<double>(begin: _animation.value, end: widget.minHeight)
+                    .animate(_controller);
+            initSize = widget.minHeight;
+          });
+        }
         _controller.forward();
       }
     }
-    if (_animation.value >= widget.maxHeight) {
+    if (_animation.value >= _expandHeight) {
       setState(() {
-        initSize = widget.maxHeight;
+        initSize = _expandHeight;
       });
     } else if (_animation.value < widget.minHeight) {
       setState(() {
