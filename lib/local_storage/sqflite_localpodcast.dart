@@ -318,9 +318,9 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         "SELECT seconds FROM PlayHistory WHERE add_date > ? AND add_date < ?",
         [start, end]);
-    var sum = 0;
+    var sum = 0.0;
     if (list.isEmpty) {
-      sum = 0;
+      sum = 0.0;
     } else {
       for (var record in list) {
         sum += record['seconds'];
