@@ -1000,3 +1000,84 @@ class LayoutButton extends StatelessWidget {
     );
   }
 }
+
+/// Remove scroll view overlay effect.
+class NoGrowBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
+  }
+}
+
+class Meteor extends CustomPainter {
+  Paint _paint;
+  Meteor() {
+    _paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), _paint);
+  }
+
+  @override
+  bool shouldRepaint(Meteor oldDelegate) {
+    return false;
+  }
+}
+
+/// Used in sleep mode widget.
+class MeteorLoader extends StatefulWidget {
+  @override
+  _MeteorLoaderState createState() => _MeteorLoaderState();
+}
+
+class _MeteorLoaderState extends State<MeteorLoader>
+    with SingleTickerProviderStateMixin {
+  double _fraction = 0.0;
+  double _move = 0.0;
+  Animation animation;
+  AnimationController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    animation = Tween(begin: 0.0, end: 1.0).animate(controller)
+      ..addListener(() {
+        if (mounted) {
+          setState(() {
+            _move = animation.value;
+            if (animation.value <= 0.5) {
+              _fraction = animation.value * 2;
+            } else {
+              _fraction = 2 - (animation.value) * 2;
+            }
+          });
+        }
+      });
+    controller.forward();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 300 * _move + 10,
+      left: 150 * _move + 50,
+      child: SizedBox(
+          width: 50 * _fraction,
+          height: 100 * _fraction,
+          child: CustomPaint(painter: Meteor())),
+    );
+  }
+}

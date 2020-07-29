@@ -18,6 +18,7 @@ import '../state/podcast_group.dart';
 import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../type/playlist.dart';
+import '../util/audiopanel.dart';
 import '../util/custom_widget.dart';
 import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
@@ -44,6 +45,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<AudioPanelState> _playerKey = GlobalKey<AudioPanelState>();
   TabController _controller;
   Decoration _getIndicator(BuildContext context) {
     return UnderlineTabIndicator(
@@ -102,10 +104,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           systemNavigationBarColor: Theme.of(context).primaryColor,
         ),
         child: Scaffold(
-          key: _scaffoldKey,
+          //  key: _scaffoldKey,
           body: WillPopScope(
             onWillPop: () async {
-              if (Platform.isAndroid) {
+              if (_playerKey.currentState != null &&
+                  _playerKey.currentState.initSize > 100) {
+                _playerKey.currentState.backToMini();
+                return false;
+              } else if (Platform.isAndroid) {
                 _androidAppRetain.invokeMethod('sendToBackground');
                 return false;
               } else {
@@ -445,7 +451,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           }),
                     ],
                   ),
-                  Container(child: PlayerWidget()),
+                  Container(child: PlayerWidget(playerKey: _playerKey)),
                 ],
               ),
             ),

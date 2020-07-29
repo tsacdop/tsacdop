@@ -10,23 +10,22 @@ class AudioPanel extends StatefulWidget {
   final Widget miniPanel;
   final Widget expandedPanel;
   final Widget optionPanel;
-  final Widget cover;
   final double minHeight;
   final double maxHeight;
+
   AudioPanel(
       {@required this.miniPanel,
       @required this.expandedPanel,
       this.optionPanel,
-      this.cover,
-      this.minHeight = 60,
+      this.minHeight = 70,
       this.maxHeight = 300,
       Key key})
       : super(key: key);
   @override
-  _AudioPanelState createState() => _AudioPanelState();
+  AudioPanelState createState() => AudioPanelState();
 }
 
-class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
+class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   double initSize;
   double _startdy;
   double _move = 0;
@@ -81,7 +80,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
         child: (_animation.value > widget.minHeight + 30)
             ? Positioned.fill(
                 child: GestureDetector(
-                  onTap: _backToMini,
+                  onTap: backToMini,
                   child: Container(
                     color: Theme.of(context)
                         .scaffoldBackgroundColor
@@ -92,7 +91,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
               )
             : Center(),
       ),
-      Container(
+      Align(
         alignment: Alignment.bottomCenter,
         child: GestureDetector(
           onVerticalDragStart: _start,
@@ -107,9 +106,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                       opacity: _animation.value > widget.minHeight
                           ? (widget.minHeight + 30 - _animation.value) / 40
                           : 1,
-                      child: Container(
-                        child: widget.miniPanel,
-                      ),
+                      child: widget.miniPanel,
                     ),
                   )
                 : Container(
@@ -117,12 +114,11 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                       color: context.primaryColor,
                       boxShadow: [
                         BoxShadow(
-                          offset: Offset(0, -0.5),
+                          offset: Offset(0, -1),
                           blurRadius: 1,
-                          color:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? Colors.grey[400].withOpacity(0.5)
-                                  : Colors.grey[800],
+                          color: context.brightness == Brightness.light
+                              ? Colors.grey[400].withOpacity(0.5)
+                              : Colors.grey[800],
                         ),
                       ],
                     ),
@@ -133,7 +129,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                             ? (_animation.value - widget.minHeight) /
                                 (widget.maxHeight - widget.minHeight - 50)
                             : 1,
-                        child: Container(
+                        child: SizedBox(
                           height: math.max(widget.maxHeight,
                               math.min(_animation.value, _expandHeight)),
                           child: widget.expandedPanel,
@@ -147,11 +143,20 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     ]);
   }
 
-  _backToMini() {
+  backToMini() {
     setState(() {
       _animation = Tween<double>(begin: initSize, end: widget.minHeight)
           .animate(_slowController);
       initSize = widget.minHeight;
+    });
+    _slowController.forward();
+  }
+
+  scrollToTop() {
+    setState(() {
+      _animation = Tween<double>(begin: initSize, end: _expandHeight)
+          .animate(_slowController);
+      initSize = _expandHeight;
     });
     _slowController.forward();
   }
@@ -175,7 +180,7 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _controller.forward();
   }
 
-  _end() {
+  _end() async {
     if (_slideDirection == SlideDirection.up) {
       if (_move > 20) {
         if (_animation.value > widget.maxHeight + 20) {
@@ -185,15 +190,16 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                     .animate(_slowController);
             initSize = _expandHeight;
           });
+          _slowController.forward();
         } else {
           setState(() {
             _animation =
-                Tween<double>(begin: _animation.value, end: widget.maxHeight)
-                    .animate(_slowController);
+                Tween<double>(begin: widget.maxHeight, end: widget.maxHeight)
+                    .animate(_controller);
             initSize = widget.maxHeight;
           });
+          _controller.forward();
         }
-        _slowController.forward();
       } else {
         setState(() {
           _animation =
@@ -249,5 +255,66 @@ class _AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
         initSize = widget.minHeight;
       });
     }
+  }
+}
+
+class _AudioPanelRoute extends StatefulWidget {
+  _AudioPanelRoute({this.expandPanel, this.height, Key key}) : super(key: key);
+  final Widget expandPanel;
+  final double height;
+  @override
+  __AudioPanelRouteState createState() => __AudioPanelRouteState();
+}
+
+class __AudioPanelRouteState extends State<_AudioPanelRoute> {
+  @override
+  Widget build(BuildContext context) {
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: Scaffold(
+        body: Stack(children: <Widget>[
+          Container(
+            child: Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                // child:
+                // Container(
+                //   color: Theme.of(context)
+                //       .scaffoldBackgroundColor
+                //       .withOpacity(0.8),
+                //
+                //),
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: widget.height,
+              decoration: BoxDecoration(
+                color: context.primaryColor,
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(0, -1),
+                    blurRadius: 1,
+                    color: context.brightness == Brightness.light
+                        ? Colors.grey[400].withOpacity(0.5)
+                        : Colors.grey[800],
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: 300,
+                  child: widget.expandPanel,
+                ),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
   }
 }

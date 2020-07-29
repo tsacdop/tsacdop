@@ -41,345 +41,14 @@ final List<BoxShadow> _customShadowNight = [
 const List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
 const List speedToSelect = [0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0];
 
-class PlayerWidget extends StatefulWidget {
-  @override
-  _PlayerWidgetState createState() => _PlayerWidgetState();
-}
-
-class _PlayerWidgetState extends State<PlayerWidget> {
-  final GlobalKey<AnimatedListState> miniPlaylistKey = GlobalKey();
-
-  Widget _playlist(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    return Container(
-      alignment: Alignment.topLeft,
-      height: 300,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-      ),
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20.0),
-            height: 60.0,
-            // color: context.primaryColorDark,
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  height: 20.0,
-                  // color: context.primaryColorDark,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    context.s.homeMenuPlaylist,
-                    style: TextStyle(
-                        color: Theme.of(context).accentColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  ),
-                ),
-                Spacer(),
-                Container(
-                  height: 60,
-                  alignment: Alignment.center,
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 30,
-                    width: 60,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        border: Border.all(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.black12
-                                    : Colors.white10,
-                            width: 1),
-                        boxShadow:
-                            Theme.of(context).brightness == Brightness.dark
-                                ? _customShadowNight
-                                : _customShadow),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        onTap: () {
-                          audio.playNext();
-                          miniPlaylistKey.currentState.removeItem(
-                              0, (context, animation) => Container());
-                          miniPlaylistKey.currentState.insertItem(0);
-                        },
-                        child: SizedBox(
-                          height: 30,
-                          width: 60,
-                          child: Icon(
-                            Icons.skip_next,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 20),
-                  width: 30.0,
-                  height: 30.0,
-                  decoration: BoxDecoration(
-                    boxShadow: (Theme.of(context).brightness == Brightness.dark)
-                        ? _customShadowNight
-                        : _customShadow,
-                    color: Theme.of(context).primaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          SlideLeftRoute(page: PlaylistPage()),
-                        );
-                      },
-                      child: SizedBox(
-                        height: 30.0,
-                        width: 30.0,
-                        child: Transform.rotate(
-                          angle: math.pi,
-                          child: Icon(
-                            LineIcons.database_solid,
-                            size: 20.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child:
-                Selector<AudioPlayerNotifier, Tuple2<List<EpisodeBrief>, bool>>(
-              selector: (_, audio) =>
-                  Tuple2(audio.queue.playlist, audio.queueUpdate),
-              builder: (_, data, __) {
-                return AnimatedList(
-                  key: miniPlaylistKey,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  initialItemCount: data.item1.length,
-                  itemBuilder: (context, index, animation) => ScaleTransition(
-                    alignment: Alignment.center,
-                    scale: animation,
-                    child: index == 0 || index > data.item1.length - 1
-                        ? Center()
-                        : Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          audio.episodeLoad(data.item1[index]);
-                                          miniPlaylistKey.currentState
-                                              .removeItem(
-                                                  index,
-                                                  (context, animation) =>
-                                                      Center());
-                                          miniPlaylistKey.currentState
-                                              .insertItem(0);
-                                        },
-                                        child: Container(
-                                          height: 60,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          alignment: Alignment.centerLeft,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Container(
-                                                padding: EdgeInsets.all(10.0),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              15.0)),
-                                                  child: Container(
-                                                      height: 30.0,
-                                                      width: 30.0,
-                                                      child: Image.file(File(
-                                                          "${data.item1[index].imagePath}"))),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                    data.item1[index].title,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    margin:
-                                        EdgeInsets.symmetric(horizontal: 20),
-                                    width: 30.0,
-                                    height: 30.0,
-                                    decoration: BoxDecoration(
-                                      boxShadow:
-                                          (Theme.of(context).brightness ==
-                                                  Brightness.dark)
-                                              ? _customShadowNight
-                                              : _customShadow,
-                                      color: Theme.of(context).primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0)),
-                                        onTap: () async {
-                                          await audio
-                                              .moveToTop(data.item1[index]);
-                                          miniPlaylistKey.currentState
-                                              .removeItem(
-                                            index,
-                                            (context, animation) => Center(),
-                                            duration:
-                                                Duration(milliseconds: 500),
-                                          );
-                                          miniPlaylistKey.currentState
-                                              .insertItem(1,
-                                                  duration: Duration(
-                                                      milliseconds: 200));
-                                        },
-                                        child: SizedBox(
-                                          height: 30.0,
-                                          width: 30.0,
-                                          child: Transform.rotate(
-                                            angle: math.pi,
-                                            child: Icon(
-                                              LineIcons.download_solid,
-                                              size: 20.0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Divider(height: 2),
-                            ],
-                          ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _expandedPanel(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: 1,
-      length: 3,
-      child: Stack(
-        children: <Widget>[
-          TabBarView(
-            children: <Widget>[
-              SleepMode(),
-              ControlPanel(),
-              _playlist(context),
-              //  ShareClip(),
-            ],
-          ),
-          Positioned(
-            bottom: 10,
-            left: MediaQuery.of(context).size.width / 2 - 25,
-            child: Container(
-              alignment: Alignment.center,
-              width: 50.0,
-              height: 10.0,
-              //color: Colors.blue,
-              child: TabBar(
-                  labelPadding: EdgeInsets.only(top: 0),
-                  indicatorPadding: EdgeInsets.all(0),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicatorWeight: 0,
-                  indicator: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).accentColor,
-                  ),
-                  tabs: <Widget>[
-                    Container(
-                      // child: Text('p'),
-                      height: 8.0,
-                      width: 8.0,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                          border: Border.all(
-                              color: Theme.of(context).accentColor,
-                              width: 2.0)),
-                    ),
-                    Container(
-                      height: 8.0,
-                      width: 8.0,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                          border: Border.all(
-                              color: Theme.of(context).accentColor,
-                              width: 2.0)),
-                    ),
-                    Container(
-                      height: 8.0,
-                      width: 8.0,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                          border: Border.all(
-                              color: Theme.of(context).accentColor,
-                              width: 2.0)),
-                    ),
-                  ]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _miniPanel(double width, BuildContext context) {
+class PlayerWidget extends StatelessWidget {
+  PlayerWidget({this.playerKey});
+  final GlobalKey<AudioPanelState> playerKey;
+  Widget _miniPanel(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
     return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-      ),
+      color: context.primaryColor,
       height: 60,
       child:
           Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
@@ -387,22 +56,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           selector: (_, audio) =>
               Tuple2(audio.episode?.primaryColor, audio.seekSliderValue),
           builder: (_, data, __) {
-            var _c = (Theme.of(context).brightness == Brightness.light)
+            var _c = context.brightness == Brightness.light
                 ? data.item1.colorizedark()
                 : data.item1.colorizeLight();
             return SizedBox(
-                height: 2,
-                child: LinearProgressIndicator(
-                  value: data.item2,
-                  backgroundColor: Theme.of(context).primaryColor,
-                  valueColor: AlwaysStoppedAnimation<Color>(_c),
-                ));
+              height: 2,
+              child: LinearProgressIndicator(
+                value: data.item2,
+                backgroundColor: context.primaryColor,
+                valueColor: AlwaysStoppedAnimation<Color>(_c),
+              ),
+            );
           },
         ),
         Expanded(
-          child: Container(
-            padding: EdgeInsets.only(left: 15, right: 10),
-            alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -432,9 +101,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             1000,
                         audio.remoteErrorMessage),
                     builder: (_, data, __) {
-                      return Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        alignment: Alignment.center,
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: data.item3 != null
                             ? Text(data.item3,
                                 style:
@@ -442,8 +110,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             : data.item1
                                 ? Text(
                                     s.buffering,
-                                    style: TextStyle(
-                                        color: Theme.of(context).accentColor),
+                                    style:
+                                        TextStyle(color: context.accentColor),
                                   )
                                 : Text(
                                     s.timeLeft(
@@ -457,85 +125,84 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 Expanded(
                   flex: 2,
                   child: Selector<AudioPlayerNotifier, Tuple2<bool, bool>>(
-                      selector: (_, audio) =>
-                          Tuple2(audio.buffering, audio.playing),
-                      builder: (_, data, __) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            data.item1
-                                ? Stack(
-                                    alignment: Alignment.center,
-                                    children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10.0),
-                                          child: SizedBox(
-                                              height: 30.0,
-                                              width: 30.0,
-                                              child: CircleAvatar(
-                                                backgroundImage: FileImage(File(
-                                                    "${audio.episode.imagePath}")),
-                                              )),
-                                        ),
-                                        Container(
-                                          height: 40.0,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.black),
-                                        ),
-                                      ])
-                                : data.item2
-                                    ? InkWell(
-                                        onTap: data.item2
-                                            ? () => audio.pauseAduio()
-                                            : null,
-                                        child: ImageRotate(
-                                            title: audio.episode?.title,
-                                            path: audio.episode?.imagePath),
-                                      )
-                                    : InkWell(
-                                        onTap: data.item2
-                                            ? null
-                                            : () => audio.resumeAudio(),
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10.0),
-                                              child: SizedBox(
-                                                  height: 30.0,
-                                                  width: 30.0,
-                                                  child: CircleAvatar(
-                                                    backgroundImage: FileImage(File(
-                                                        "${audio.episode.imagePath}")),
-                                                  )),
-                                            ),
-                                            Container(
-                                              height: 40.0,
-                                              decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Colors.black),
-                                            ),
-                                            if (!data.item1)
-                                              Icon(
-                                                Icons.play_arrow,
-                                                color: Colors.white,
-                                              )
-                                          ],
-                                        ),
+                    selector: (_, audio) =>
+                        Tuple2(audio.buffering, audio.playing),
+                    builder: (_, data, __) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          data.item1
+                              ? Stack(
+                                  alignment: Alignment.center,
+                                  children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10.0),
+                                        child: SizedBox(
+                                            height: 30.0,
+                                            width: 30.0,
+                                            child: CircleAvatar(
+                                              backgroundImage: FileImage(File(
+                                                  "${audio.episode.imagePath}")),
+                                            )),
                                       ),
-                            IconButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () => audio.playNext(),
-                                iconSize: 20.0,
-                                icon: Icon(Icons.skip_next),
-                                color:
-                                    Theme.of(context).tabBarTheme.labelColor),
-                          ],
-                        );
-                      }),
+                                      Container(
+                                        height: 40.0,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.black),
+                                      ),
+                                    ])
+                              : data.item2
+                                  ? InkWell(
+                                      onTap: data.item2
+                                          ? () => audio.pauseAduio()
+                                          : null,
+                                      child: ImageRotate(
+                                          title: audio.episode?.title,
+                                          path: audio.episode?.imagePath),
+                                    )
+                                  : InkWell(
+                                      onTap: data.item2
+                                          ? null
+                                          : () => audio.resumeAudio(),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10.0),
+                                            child: SizedBox(
+                                                height: 30.0,
+                                                width: 30.0,
+                                                child: CircleAvatar(
+                                                  backgroundImage: FileImage(File(
+                                                      "${audio.episode.imagePath}")),
+                                                )),
+                                          ),
+                                          Container(
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.black),
+                                          ),
+                                          if (!data.item1)
+                                            Icon(
+                                              Icons.play_arrow,
+                                              color: Colors.white,
+                                            )
+                                        ],
+                                      ),
+                                    ),
+                          IconButton(
+                              onPressed: () => audio.playNext(),
+                              iconSize: 20.0,
+                              icon: Icon(Icons.skip_next),
+                              color: context.textColor)
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -547,15 +214,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var _width = MediaQuery.of(context).size.width;
     return Selector<AudioPlayerNotifier, bool>(
       selector: (_, audio) => audio.playerRunning,
       builder: (_, playerrunning, __) {
         return !playerrunning
             ? Center()
             : AudioPanel(
-                miniPanel: _miniPanel(_width, context),
-                expandedPanel: ControlPanel());
+                key: playerKey,
+                miniPanel: _miniPanel(context),
+                expandedPanel: ControlPanel(onTap: () {
+                  print('ext');
+                  playerKey.currentState.scrollToTop();
+                }));
       },
     );
   }
@@ -593,40 +263,20 @@ class _LastPositionState extends State<LastPosition> {
                           padding: EdgeInsets.symmetric(horizontal: 5),
                           decoration: BoxDecoration(
                               border: Border.all(
-                                  width: 1,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .color),
+                                  width: 1, color: context.textColor),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0))),
                           child: Text(s.listened))
                       : snapshot.data.seconds < 10
                           ? Center()
-                          : Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
-                                onTap: () => audio.seekTo(
-                                    (snapshot.data.seconds * 1000).toInt()),
-                                child: Container(
-                                  width: 120.0,
-                                  height: 20.0,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 1,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .bodyText1
-                                              .color),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0))),
-                                  child: Text(s.timeLastPlayed(
-                                      snapshot.data.seconds.toTime)),
-                                ),
-                              ),
+                          : OutlineButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100.0),
+                                  side: BorderSide(color: Colors.green[700])),
+                              highlightedBorderColor: Colors.green[700],
+                              onPressed: () => audio.seekTo(
+                                  (snapshot.data.seconds * 1000).toInt()),
+                              child: Text(snapshot.data.seconds.toTime),
                             )
                   : Center();
             });
@@ -700,77 +350,6 @@ class _ImageRotateState extends State<ImageRotate>
   }
 }
 
-class Meteor extends CustomPainter {
-  Paint _paint;
-  Meteor() {
-    _paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), _paint);
-  }
-
-  @override
-  bool shouldRepaint(Meteor oldDelegate) {
-    return false;
-  }
-}
-
-class MeteorLoader extends StatefulWidget {
-  @override
-  _MeteorLoaderState createState() => _MeteorLoaderState();
-}
-
-class _MeteorLoaderState extends State<MeteorLoader>
-    with SingleTickerProviderStateMixin {
-  double _fraction = 0.0;
-  double _move = 0.0;
-  Animation animation;
-  AnimationController controller;
-  @override
-  void initState() {
-    super.initState();
-    controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    animation = Tween(begin: 0.0, end: 1.0).animate(controller)
-      ..addListener(() {
-        if (mounted) {
-          setState(() {
-            _move = animation.value;
-            if (animation.value <= 0.5) {
-              _fraction = animation.value * 2;
-            } else {
-              _fraction = 2 - (animation.value) * 2;
-            }
-          });
-        }
-      });
-    controller.forward();
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: 300 * _move + 10,
-      left: 150 * _move + 50,
-      child: SizedBox(
-          width: 50 * _fraction,
-          height: 100 * _fraction,
-          child: CustomPaint(painter: Meteor())),
-    );
-  }
-}
-
 class PlaylistWidget extends StatefulWidget {
   const PlaylistWidget({Key key}) : super(key: key);
 
@@ -800,213 +379,179 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
               selector: (_, audio) =>
                   Tuple2(audio.queue.playlist, audio.queueUpdate),
               builder: (_, data, __) {
-                return AnimatedList(
-                  key: miniPlaylistKey,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  initialItemCount: data.item1.length,
-                  itemBuilder: (context, index, animation) => ScaleTransition(
-                    alignment: Alignment.center,
-                    scale: animation,
-                    child: index == 0 || index > data.item1.length - 1
-                        ? Center()
-                        : Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          audio.episodeLoad(data.item1[index]);
-                                          miniPlaylistKey.currentState
-                                              .removeItem(
-                                                  index,
-                                                  (context, animation) =>
-                                                      Center());
-                                          miniPlaylistKey.currentState
-                                              .insertItem(0);
-                                        },
-                                        child: Container(
-                                          height: 60,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          alignment: Alignment.centerLeft,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Container(
-                                                padding: EdgeInsets.all(10.0),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              15.0)),
-                                                  child: Container(
-                                                      height: 30.0,
-                                                      width: 30.0,
-                                                      child: Image.file(File(
-                                                          "${data.item1[index].imagePath}"))),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                    data.item1[index].title,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                return ClipRRect(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10)),
+                  child: AnimatedList(
+                    key: miniPlaylistKey,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    initialItemCount: data.item1.length,
+                    itemBuilder: (context, index, animation) => ScaleTransition(
+                      alignment: Alignment.center,
+                      scale: animation,
+                      child: index == 0 || index > data.item1.length - 1
+                          ? Center()
+                          : Column(
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: () {
+                                            audio
+                                                .episodeLoad(data.item1[index]);
+                                            miniPlaylistKey.currentState
+                                                .removeItem(
+                                                    index,
+                                                    (context, animation) =>
+                                                        Center());
+                                            miniPlaylistKey.currentState
+                                                .insertItem(0);
+                                          },
+                                          child: Container(
+                                            height: 60,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            alignment: Alignment.centerLeft,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                Container(
+                                                  padding: EdgeInsets.all(10.0),
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                15.0)),
+                                                    child: Container(
+                                                        height: 30.0,
+                                                        width: 30.0,
+                                                        child: Image.file(File(
+                                                            "${data.item1[index].imagePath}"))),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    margin:
-                                        EdgeInsets.symmetric(horizontal: 20),
-                                    width: 30.0,
-                                    height: 30.0,
-                                    decoration: BoxDecoration(
-                                      boxShadow:
-                                          (Theme.of(context).brightness ==
-                                                  Brightness.dark)
-                                              ? _customShadowNight
-                                              : _customShadow,
-                                      color: Theme.of(context).primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0)),
-                                        onTap: () async {
-                                          await audio
-                                              .moveToTop(data.item1[index]);
-                                          miniPlaylistKey.currentState
-                                              .removeItem(
-                                            index,
-                                            (context, animation) => Center(),
-                                            duration:
-                                                Duration(milliseconds: 500),
-                                          );
-                                          miniPlaylistKey.currentState
-                                              .insertItem(1,
-                                                  duration: Duration(
-                                                      milliseconds: 200));
-                                        },
-                                        child: SizedBox(
-                                          height: 30.0,
-                                          width: 30.0,
-                                          child: Transform.rotate(
-                                            angle: math.pi,
-                                            child: Icon(
-                                              LineIcons.download_solid,
-                                              size: 20.0,
+                                                Expanded(
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Text(
+                                                      data.item1[index].title,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Divider(height: 2),
-                            ],
-                          ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
+                                      child: Material(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        clipBehavior: Clip.hardEdge,
+                                        color: context.primaryColor,
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15.0)),
+                                          onTap: () async {
+                                            await audio
+                                                .moveToTop(data.item1[index]);
+                                            miniPlaylistKey.currentState
+                                                .removeItem(
+                                              index,
+                                              (context, animation) => Center(),
+                                              duration:
+                                                  Duration(milliseconds: 500),
+                                            );
+                                            miniPlaylistKey.currentState
+                                                .insertItem(
+                                                    1,
+                                                    duration: Duration(
+                                                        milliseconds: 200));
+                                          },
+                                          child: SizedBox(
+                                            height: 30.0,
+                                            width: 30.0,
+                                            child: Transform.rotate(
+                                              angle: math.pi,
+                                              child: Icon(
+                                                LineIcons.download_solid,
+                                                size: 20.0,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Divider(height: 2),
+                              ],
+                            ),
+                    ),
                   ),
                 );
               },
             ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20.0),
+          SizedBox(
             height: 60.0,
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  height: 20.0,
-                  // color: context.primaryColorDark,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    context.s.homeMenuPlaylist,
-                    style: TextStyle(
-                        color: Theme.of(context).accentColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  ),
-                ),
-                Spacer(),
-                Container(
-                  height: 60,
-                  alignment: Alignment.center,
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 30,
-                    width: 60,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                      border: Border.all(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.black12
-                              : Colors.white10,
-                          width: 1),
-                      // boxShadow:
-                      //     Theme.of(context).brightness == Brightness.dark
-                      //         ? _customShadowNight
-                      //         : _customShadow,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Text(
+                      context.s.homeMenuPlaylist,
+                      style: TextStyle(
+                          color: Theme.of(context).accentColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        onTap: () {
-                          audio.playNext();
-                          miniPlaylistKey.currentState.removeItem(
-                              0, (context, animation) => Container());
-                          miniPlaylistKey.currentState.insertItem(0);
-                        },
-                        child: SizedBox(
-                          height: 30,
-                          width: 60,
-                          child: Icon(
-                            Icons.skip_next,
-                            size: 30,
-                          ),
+                  ),
+                  Spacer(),
+                  Material(
+                    borderRadius: BorderRadius.circular(100),
+                    color: context.primaryColor,
+                    child: InkWell(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      onTap: () {
+                        audio.playNext();
+                        miniPlaylistKey.currentState
+                            .removeItem(0, (context, animation) => Container());
+                        miniPlaylistKey.currentState.insertItem(0);
+                      },
+                      child: SizedBox(
+                        height: 30,
+                        width: 60,
+                        child: Icon(
+                          Icons.skip_next,
+                          size: 30,
                         ),
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 20),
-                  width: 30.0,
-                  height: 30.0,
-                  decoration: BoxDecoration(
-                    // boxShadow: (Theme.of(context).brightness == Brightness.dark)
-                    //     ? _customShadowNight
-                    //     : _customShadow,
-                    color: Theme.of(context).primaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
+                  SizedBox(width: 20),
+                  Material(
+                    borderRadius: BorderRadius.circular(100),
+                    color: context.primaryColor,
                     child: InkWell(
-                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      borderRadius: BorderRadius.circular(15.0),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -1026,8 +571,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -1048,7 +593,6 @@ class SleepModeState extends State<SleepMode>
   int _minSelected;
   AnimationController _controller;
   Animation<double> _animation;
-
   Future _getDefaultTime() async {
     var defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
     var defaultTime = await defaultSleepTimerStorage.getInt(defaultValue: 30);
@@ -1060,6 +604,7 @@ class SleepModeState extends State<SleepMode>
     super.initState();
     _minSelected = 30;
     _getDefaultTime();
+
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
@@ -1116,6 +661,7 @@ class SleepModeState extends State<SleepMode>
         var fraction = math.min(data.item2 * 2, 1.0);
         var move = math.max(data.item2 * 2 - 1, 0.0);
         return LayoutBuilder(builder: (context, constraints) {
+          var width = constraints.maxWidth;
           return Container(
             height: 300,
             decoration: BoxDecoration(
@@ -1127,77 +673,56 @@ class SleepModeState extends State<SleepMode>
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(5),
+                    SizedBox(
+                      height: 10,
                     ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
+                    Expanded(
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 20),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: minsToSelect
-                              .map((e) => InkWell(
-                                    onTap: () =>
-                                        setState(() => _minSelected = e),
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 10.0),
-                                          decoration: BoxDecoration(
-                                            boxShadow: !(e == _minSelected ||
-                                                    fraction > 0)
-                                                ? (context.brightness ==
-                                                        Brightness.dark)
-                                                    ? customShadowNight(
-                                                        fraction)
-                                                    : customShadow(fraction)
-                                                : null,
-                                            color: (e == _minSelected)
-                                                ? context.accentColor
-                                                : context.primaryColor,
-                                            shape: BoxShape.circle,
+                        child: move == 1
+                            ? Center()
+                            : Wrap(
+                                direction: Axis.horizontal,
+                                children: minsToSelect
+                                    .map((e) => InkWell(
+                                          onTap: () =>
+                                              setState(() => _minSelected = e),
+                                          child: Container(
+                                            margin: EdgeInsets.all(10.0),
+                                            decoration: BoxDecoration(
+                                              color: (e == _minSelected)
+                                                  ? context.accentColor
+                                                  : context.primaryColor,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            alignment: Alignment.center,
+                                            height: 30,
+                                            width: 30,
+                                            child: Text(e.toString(),
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: (e == _minSelected)
+                                                        ? Colors.white
+                                                        : null)),
                                           ),
-                                          alignment: Alignment.center,
-                                          height: 30,
-                                          width: 30,
-                                          child: Text(e.toString(),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: (e == _minSelected)
-                                                      ? Colors.white
-                                                      : null)),
-                                        ),
-                                        Container(
-                                          height: 30 * move,
-                                          width: 30 * move,
-                                          decoration: BoxDecoration(
-                                              color: _colorTween
-                                                  .transform(fraction),
-                                              shape: BoxShape.circle),
-                                        ),
-                                      ],
-                                    ),
-                                  ))
-                              .toList(),
-                        ),
+                                        ))
+                                    .toList(),
+                              ),
                       ),
                     ),
                     Stack(
                       children: <Widget>[
-                        Container(
+                        SizedBox(
                           height: 100,
-                          alignment: Alignment.center,
+                          width: width,
                         ),
                         Positioned(
                           left: data.item3 == SleepTimerMode.timer
-                              ? -context.width * (move) / 4
-                              : context.width * (move) / 4,
-                          child: Container(
+                              ? -width * (move) / 4
+                              : width * (move) / 4,
+                          child: SizedBox(
                             height: 100,
-                            width: context.width,
+                            width: width,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
@@ -1208,10 +733,6 @@ class SleepModeState extends State<SleepMode>
                                   decoration: BoxDecoration(
                                     border:
                                         Border.all(color: context.primaryColor),
-                                    boxShadow:
-                                        context.brightness == Brightness.light
-                                            ? customShadow(fraction)
-                                            : customShadowNight(fraction),
                                     color: _colorTween.transform(move),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(20)),
@@ -1229,27 +750,26 @@ class SleepModeState extends State<SleepMode>
                                           audio.cancelTimer();
                                         }
                                       },
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
+                                      borderRadius: BorderRadius.circular(20),
                                       child: SizedBox(
-                                          height: 40,
-                                          width: 120,
-                                          child: Center(
-                                              child: Text(
+                                        height: 40,
+                                        width: 120,
+                                        child: Center(
+                                          child: Text(
                                             s.endOfEpisode,
                                             style: TextStyle(
-                                                // fontWeight: FontWeight.bold,
-                                                // fontSize: 20,
                                                 color: (move > 0
                                                     ? Colors.white
                                                     : null)),
-                                          ))),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                                 Container(
                                   height: 100 * (1 - fraction),
-                                  width: 2,
+                                  width: 1,
                                   color: context.primaryColorDark,
                                 ),
                                 Container(
@@ -1259,13 +779,8 @@ class SleepModeState extends State<SleepMode>
                                   decoration: BoxDecoration(
                                     border:
                                         Border.all(color: context.primaryColor),
-                                    boxShadow:
-                                        context.brightness == Brightness.light
-                                            ? customShadow(fraction)
-                                            : customShadowNight(fraction),
                                     color: _colorTween.transform(move),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20)),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Material(
                                     color: Colors.transparent,
@@ -1280,8 +795,7 @@ class SleepModeState extends State<SleepMode>
                                           audio.cancelTimer();
                                         }
                                       },
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
+                                      borderRadius: BorderRadius.circular(20),
                                       child: SizedBox(
                                         height: 40,
                                         width: 120,
@@ -1291,8 +805,6 @@ class SleepModeState extends State<SleepMode>
                                                 ? data.item1.toTime
                                                 : (_minSelected * 60).toTime,
                                             style: TextStyle(
-                                                // fontWeight: FontWeight.bold,
-                                                // fontSize: 20,
                                                 color: (move > 0
                                                     ? Colors.white
                                                     : null)),
@@ -1308,14 +820,29 @@ class SleepModeState extends State<SleepMode>
                         ),
                       ],
                     ),
+                    SizedBox(
+                      height: 60.0,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            context.s.sleepTimer,
+                            style: TextStyle(
+                                color: Theme.of(context).accentColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    )
                   ],
                 ),
                 Positioned(
-                  bottom: 50 + 20 * data.item2,
-                  left: context.width / 2 - 100,
+                  bottom: 100 + 70 * data.item2,
+                  left: width / 2 - 100,
                   width: 200,
-                  child: Container(
-                    alignment: Alignment.center,
+                  child: Center(
                     child: Text(s.goodNight,
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -1323,19 +850,8 @@ class SleepModeState extends State<SleepMode>
                             color: Colors.white.withOpacity(fraction))),
                   ),
                 ),
-                Positioned(
-                  bottom: 100 * (1 - data.item2) - 30,
-                  left: context.width / 2 - 100,
-                  width: 200,
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: Text(s.sleepTimer,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20)),
-                  ),
-                ),
-                data.item2 == 1 ? CustomPaint(painter: StarSky()) : Center(),
-                data.item2 == 1 ? MeteorLoader() : Center(),
+                if (data.item2 == 1) CustomPaint(painter: StarSky()),
+                if (data.item2 == 1) MeteorLoader()
               ],
             ),
           );
@@ -1346,17 +862,19 @@ class SleepModeState extends State<SleepMode>
 }
 
 class ControlPanel extends StatefulWidget {
-  ControlPanel({Key key}) : super(key: key);
+  ControlPanel({this.onTap, Key key}) : super(key: key);
+  final VoidCallback onTap;
   @override
   _ControlPanelState createState() => _ControlPanelState();
 }
 
 class _ControlPanelState extends State<ControlPanel>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   double _speedSelected;
   double _setSpeed;
   AnimationController _controller;
   Animation<double> _animation;
+  TabController _tabController;
   List<BoxShadow> customShadow(double scale) => [
         BoxShadow(
             blurRadius: 26 * (1 - scale),
@@ -1382,6 +900,7 @@ class _ControlPanelState extends State<ControlPanel>
   void initState() {
     _speedSelected = 0;
     _setSpeed = 0;
+    _tabController = TabController(vsync: this, length: 2);
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
@@ -1394,313 +913,291 @@ class _ControlPanelState extends State<ControlPanel>
   @override
   void dispose() {
     _controller.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-
     return LayoutBuilder(
       builder: (context, constraints) {
-        print(constraints.maxHeight);
         var maxHeight = constraints.maxHeight;
         return Container(
           color: context.primaryColor,
           height: 300,
-          //padding: EdgeInsets.symmetric(horizontal: 10.0),
-          child: Stack(
-            children: <Widget>[
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Consumer<AudioPlayerNotifier>(
-                      builder: (_, data, __) {
-                        var _c = (context.brightness == Brightness.light)
-                            ? data.episode.primaryColor.colorizedark()
-                            : data.episode.primaryColor.colorizeLight();
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Container(
-                              padding:
-                                  EdgeInsets.only(top: 10, left: 10, right: 10),
-                              child: SliderTheme(
-                                data: SliderTheme.of(context).copyWith(
-                                  activeTrackColor: maxHeight <= 300
-                                      ? Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.grey[900]
-                                          : Colors.grey[400]
-                                      : context.primaryColor,
-                                  inactiveTrackColor: maxHeight > 300
-                                      ? context.primaryColor
-                                      : context.primaryColorDark,
-                                  trackHeight: 20.0,
-                                  trackShape: MyRectangularTrackShape(),
-                                  thumbColor: context.accentColor,
-                                  thumbShape: MyRoundSliderThumpShape(
-                                      enabledThumbRadius: 10.0,
-                                      disabledThumbRadius: 10.0,
-                                      thumbCenterColor: _c),
-                                  overlayColor: Theme.of(context)
-                                      .accentColor
-                                      .withAlpha(32),
-                                  overlayShape: RoundSliderOverlayShape(
-                                      overlayRadius: 4.0),
-                                ),
-                                child: Slider(
-                                    value: data.seekSliderValue,
-                                    onChanged: (val) {
-                                      audio.sliderSeek(val);
-                                    }),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Consumer<AudioPlayerNotifier>(
+                  builder: (_, data, __) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          padding:
+                              EdgeInsets.only(top: 20, left: 10, right: 10),
+                          child: SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: maxHeight <= 300
+                                  ? context.accentColor.withAlpha(70)
+                                  : context.primaryColor,
+                              inactiveTrackColor: maxHeight > 300
+                                  ? context.primaryColor
+                                  : context.primaryColorDark,
+                              trackHeight: 8.0,
+                              trackShape: MyRectangularTrackShape(),
+                              thumbColor: context.accentColor,
+                              thumbShape: RoundSliderThumbShape(
+                                enabledThumbRadius: 6.0,
+                                disabledThumbRadius: 6.0,
                               ),
+                              overlayColor:
+                                  Theme.of(context).accentColor.withAlpha(32),
+                              overlayShape:
+                                  RoundSliderOverlayShape(overlayRadius: 4.0),
                             ),
-                            Container(
-                              height: 20.0,
-                              padding: EdgeInsets.symmetric(horizontal: 30.0),
-                              child: maxHeight > 300
-                                  ? Center()
-                                  : Row(
-                                      children: <Widget>[
-                                        Text(
-                                          (data.backgroundAudioPosition ~/ 1000)
-                                                  .toTime ??
-                                              '',
-                                          style: TextStyle(fontSize: 10),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: data.remoteErrorMessage !=
-                                                    null
-                                                ? Text(data.remoteErrorMessage,
-                                                    style: const TextStyle(
-                                                        color:
-                                                            Color(0xFFFF0000)))
-                                                : Text(
-                                                    data.audioState ==
-                                                                AudioProcessingState
-                                                                    .buffering ||
-                                                            data.audioState ==
-                                                                AudioProcessingState
-                                                                    .connecting ||
-                                                            data.audioState ==
-                                                                AudioProcessingState
-                                                                    .none ||
-                                                            data.audioState ==
-                                                                AudioProcessingState
-                                                                    .skippingToNext
-                                                        ? context.s.buffering
-                                                        : '',
-                                                    style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .accentColor),
-                                                  ),
-                                          ),
-                                        ),
-                                        Text(
-                                          (data.backgroundAudioDuration ~/ 1000)
-                                                  .toTime ??
-                                              '',
-                                          style: TextStyle(fontSize: 10),
-                                        ),
-                                      ],
+                            child: Slider(
+                                value: data.seekSliderValue,
+                                onChanged: (val) {
+                                  audio.sliderSeek(val);
+                                }),
+                          ),
+                        ),
+                        Container(
+                          height: 20.0,
+                          padding: EdgeInsets.symmetric(horizontal: 30.0),
+                          child: maxHeight > 300
+                              ? Center()
+                              : Row(
+                                  children: <Widget>[
+                                    Text(
+                                      (data.backgroundAudioPosition ~/ 1000)
+                                              .toTime ??
+                                          '',
+                                      style: TextStyle(fontSize: 10),
                                     ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    Container(
-                      height: 100,
-                      child: Selector<AudioPlayerNotifier, bool>(
-                        selector: (_, audio) => audio.playing,
-                        builder: (_, playing, __) {
-                          return Material(
-                            color: Colors.transparent,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 0),
-                                    onPressed:
-                                        playing ? () => audio.rewind() : null,
-                                    iconSize: 32.0,
-                                    icon: Icon(Icons.fast_rewind),
-                                    color: Colors.grey[500]),
-                                Selector<AudioPlayerNotifier, int>(
-                                    selector: (_, audio) => audio.rewindSeconds,
-                                    builder: (_, seconds, __) => Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 5.0),
-                                          child: Text('$seconds s',
-                                              style: GoogleFonts.teko(
-                                                textBaseline:
-                                                    TextBaseline.ideographic,
-                                                textStyle: TextStyle(
-                                                    color: Colors.grey[500],
-                                                    fontSize: 20),
-                                              )),
-                                        )),
-                                Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 30),
-                                  height: 60,
-                                  width: 60,
-                                  decoration: BoxDecoration(
-                                      color: context.primaryColor,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: context.brightness ==
-                                                  Brightness.dark
+                                    Expanded(
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        child: data.remoteErrorMessage != null
+                                            ? Text(data.remoteErrorMessage,
+                                                style: const TextStyle(
+                                                    color: Color(0xFFFF0000)))
+                                            : Text(
+                                                data.audioState ==
+                                                            AudioProcessingState
+                                                                .buffering ||
+                                                        data.audioState ==
+                                                            AudioProcessingState
+                                                                .connecting ||
+                                                        data.audioState ==
+                                                            AudioProcessingState
+                                                                .none ||
+                                                        data.audioState ==
+                                                            AudioProcessingState
+                                                                .skippingToNext
+                                                    ? context.s.buffering
+                                                    : '',
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .accentColor),
+                                              ),
+                                      ),
+                                    ),
+                                    Text(
+                                      (data.backgroundAudioDuration ~/ 1000)
+                                              .toTime ??
+                                          '',
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                SizedBox(
+                  height: 100,
+                  child: Selector<AudioPlayerNotifier, bool>(
+                    selector: (_, audio) => audio.playing,
+                    builder: (_, playing, __) {
+                      return Material(
+                        color: Colors.transparent,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                padding: EdgeInsets.only(right: 10, left: 30),
+                                onPressed:
+                                    playing ? () => audio.rewind() : null,
+                                iconSize: 32.0,
+                                icon: Icon(Icons.fast_rewind),
+                                color: Colors.grey[500]),
+                            Selector<AudioPlayerNotifier, int>(
+                                selector: (_, audio) => audio.rewindSeconds,
+                                builder: (_, seconds, __) => Padding(
+                                      padding: const EdgeInsets.only(top: 5.0),
+                                      child: Text('$seconds s',
+                                          style: GoogleFonts.teko(
+                                            textBaseline:
+                                                TextBaseline.ideographic,
+                                            textStyle: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 20),
+                                          )),
+                                    )),
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 30),
+                              height: 60,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                  color: context.primaryColor,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color:
+                                          context.brightness == Brightness.dark
                                               ? Colors.black12
                                               : Colors.white10,
-                                          width: 1),
-                                      boxShadow:
-                                          context.brightness == Brightness.dark
-                                              ? _customShadowNight
-                                              : _customShadow),
-                                  child: playing
-                                      ? Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(30)),
-                                            onTap: playing
-                                                ? () {
-                                                    audio.pauseAduio();
-                                                  }
-                                                : null,
-                                            child: SizedBox(
-                                              height: 60,
-                                              width: 60,
-                                              child: Icon(
-                                                Icons.pause,
-                                                size: 40,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(30)),
-                                            onTap: playing
-                                                ? null
-                                                : () {
-                                                    audio.resumeAudio();
-                                                  },
-                                            child: SizedBox(
-                                              height: 60,
-                                              width: 60,
-                                              child: Icon(
-                                                Icons.play_arrow,
-                                                size: 40,
-                                                color: context.accentColor,
-                                              ),
-                                            ),
+                                      width: 1),
+                                  boxShadow:
+                                      context.brightness == Brightness.dark
+                                          ? _customShadowNight
+                                          : _customShadow),
+                              child: playing
+                                  ? Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30)),
+                                        onTap: playing
+                                            ? () {
+                                                audio.pauseAduio();
+                                              }
+                                            : null,
+                                        child: SizedBox(
+                                          height: 60,
+                                          width: 60,
+                                          child: Icon(
+                                            Icons.pause,
+                                            size: 40,
                                           ),
                                         ),
-                                ),
-                                Selector<AudioPlayerNotifier, int>(
-                                    selector: (_, audio) =>
-                                        audio.fastForwardSeconds,
-                                    builder: (_, seconds, __) => Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 5.0),
-                                          child: Text('$seconds s',
-                                              style: GoogleFonts.teko(
-                                                textStyle: TextStyle(
-                                                    color: Colors.grey[500],
-                                                    fontSize: 20),
-                                              )),
-                                        )),
-                                IconButton(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 10.0),
-                                  onPressed: playing
-                                      ? () => audio.fastForward()
-                                      : null,
-                                  iconSize: 32.0,
-                                  icon: Icon(Icons.fast_forward),
-                                  color: Colors.grey[500],
-                                )
-                              ],
+                                      ),
+                                    )
+                                  : Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30)),
+                                        onTap: playing
+                                            ? null
+                                            : () {
+                                                audio.resumeAudio();
+                                              },
+                                        child: SizedBox(
+                                          height: 60,
+                                          width: 60,
+                                          child: Icon(
+                                            Icons.play_arrow,
+                                            size: 40,
+                                            color: context.accentColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                    Container(
-                      height: 70.0,
-                      padding: EdgeInsets.only(
-                          left: 60, right: 60, bottom: 10, top: 10),
-                      alignment: Alignment.center,
-                      child: Selector<AudioPlayerNotifier, String>(
-                        selector: (_, audio) => audio.episode.title,
-                        builder: (_, title, __) {
-                          return Container(
-                            child: LayoutBuilder(
-                              builder: (context, size) {
-                                var span = TextSpan(
-                                    text: title,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20));
-                                var tp = TextPainter(
-                                    text: span,
-                                    maxLines: 1,
-                                    textDirection: TextDirection.ltr);
-                                tp.layout(maxWidth: size.maxWidth);
-                                if (tp.didExceedMaxLines) {
-                                  return Marquee(
-                                    text: title,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                    scrollAxis: Axis.horizontal,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    blankSpace: 30.0,
-                                    velocity: 50.0,
-                                    pauseAfterRound: Duration.zero,
-                                    startPadding: 30.0,
-                                    accelerationDuration:
-                                        Duration(milliseconds: 100),
-                                    accelerationCurve: Curves.linear,
-                                    decelerationDuration:
-                                        Duration(milliseconds: 100),
-                                    decelerationCurve: Curves.linear,
-                                  );
-                                } else {
-                                  return Text(
-                                    title,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  );
-                                }
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    if (constraints.maxHeight > 300)
-                      SizedBox(
-                        height: constraints.maxHeight - 300,
-                        child: SingleChildScrollView(
-                            physics: NeverScrollableScrollPhysics(),
-                            child: SizedBox(
-                              height: 300,
-                              child: PageView(
-                                scrollDirection: Axis.horizontal,
+                            Selector<AudioPlayerNotifier, int>(
+                                selector: (_, audio) =>
+                                    audio.fastForwardSeconds,
+                                builder: (_, seconds, __) => Padding(
+                                      padding: const EdgeInsets.only(top: 5.0),
+                                      child: Text('$seconds s',
+                                          style: GoogleFonts.teko(
+                                            textStyle: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 20),
+                                          )),
+                                    )),
+                            IconButton(
+                              padding: EdgeInsets.only(left: 10.0, right: 30),
+                              onPressed:
+                                  playing ? () => audio.fastForward() : null,
+                              iconSize: 32.0,
+                              icon: Icon(Icons.fast_forward),
+                              color: Colors.grey[500],
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  height: 70.0,
+                  padding:
+                      EdgeInsets.only(left: 60, right: 60, bottom: 10, top: 10),
+                  alignment: Alignment.center,
+                  child: Selector<AudioPlayerNotifier, String>(
+                    selector: (_, audio) => audio.episode.title,
+                    builder: (_, title, __) {
+                      return Container(
+                        child: LayoutBuilder(
+                          builder: (context, size) {
+                            var span = TextSpan(
+                                text: title,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20));
+                            var tp = TextPainter(
+                                text: span,
+                                maxLines: 1,
+                                textDirection: TextDirection.ltr);
+                            tp.layout(maxWidth: size.maxWidth);
+                            if (tp.didExceedMaxLines) {
+                              return Marquee(
+                                text: title,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                                scrollAxis: Axis.horizontal,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                blankSpace: 30.0,
+                                velocity: 50.0,
+                                pauseAfterRound: Duration.zero,
+                                startPadding: 30.0,
+                                accelerationDuration:
+                                    Duration(milliseconds: 100),
+                                accelerationCurve: Curves.linear,
+                                decelerationDuration:
+                                    Duration(milliseconds: 100),
+                                decelerationCurve: Curves.linear,
+                              );
+                            } else {
+                              return Text(
+                                title,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
+                              );
+                            }
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                if (constraints.maxHeight > 300)
+                  SizedBox(
+                    height: constraints.maxHeight - 300,
+                    child: SingleChildScrollView(
+                        physics: NeverScrollableScrollPhysics(),
+                        child: SizedBox(
+                            height: 300,
+                            child: TabBarView(
+                                controller: _tabController,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -1712,146 +1209,188 @@ class _ControlPanelState extends State<ControlPanel>
                                         horizontal: 20.0),
                                     child: SleepMode(),
                                   )
-                                ],
-                              ),
-                            )),
-                      ),
-                    Expanded(
-                      child: Selector<AudioPlayerNotifier,
-                          Tuple3<EpisodeBrief, bool, bool>>(
-                        selector: (_, audio) => Tuple3(audio.episode,
-                            audio.stopOnComplete, audio.startSleepTimer),
-                        builder: (_, data, __) {
-                          return Container(
-                            padding: EdgeInsets.only(
-                                left: 5.0, right: 5.0, bottom: 5.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                InkWell(
-                                  onTap: () => Navigator.push(
-                                      context,
-                                      SlideUptRoute(
-                                          page: EpisodeDetail(
-                                              episodeItem: data.item1,
-                                              heroTag: 'playpanel'))),
-                                  child: Container(
-                                    height: 30.0,
-                                    width: 30.0,
-                                    child: CircleAvatar(
-                                      backgroundImage: FileImage(
-                                          File("${data.item1.imagePath}")),
+                                ]))),
+                  ),
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      if (maxHeight <= 300)
+                        Selector<AudioPlayerNotifier,
+                            Tuple3<EpisodeBrief, bool, bool>>(
+                          selector: (_, audio) => Tuple3(audio.episode,
+                              audio.stopOnComplete, audio.startSleepTimer),
+                          builder: (_, data, __) {
+                            return Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  if (_setSpeed == 0)
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            SlideUptRoute(
+                                                page: EpisodeDetail(
+                                                    episodeItem: data.item1,
+                                                    heroTag: 'playpanel'))),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              height: 30.0,
+                                              width: 30.0,
+                                              child: CircleAvatar(
+                                                backgroundImage: FileImage(File(
+                                                    "${data.item1.imagePath}")),
+                                              ),
+                                            ),
+                                            SizedBox(width: 5),
+                                            SizedBox(
+                                              width: 100,
+                                              child: Text(
+                                                data.item1.feedTitle,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.fade,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  if (_setSpeed > 0)
+                                    Expanded(
+                                      child: SingleChildScrollView(
+                                        padding: EdgeInsets.all(10.0),
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: speedToSelect
+                                              .map<Widget>((e) => InkWell(
+                                                    onTap: () {
+                                                      if (_setSpeed == 1) {
+                                                        setState(() =>
+                                                            _speedSelected = e);
+                                                        audio.setSpeed(e);
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      height: 30,
+                                                      width: 30,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 5),
+                                                      decoration: e ==
+                                                                  _speedSelected &&
+                                                              _setSpeed > 0
+                                                          ? BoxDecoration(
+                                                              color: context
+                                                                  .accentColor,
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              boxShadow: context
+                                                                          .brightness ==
+                                                                      Brightness
+                                                                          .light
+                                                                  ? customShadow(
+                                                                      1.0)
+                                                                  : customShadowNight(
+                                                                      1.0),
+                                                            )
+                                                          : BoxDecoration(
+                                                              color: context
+                                                                  .primaryColor,
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              boxShadow: context
+                                                                          .brightness ==
+                                                                      Brightness
+                                                                          .light
+                                                                  ? customShadow(1 -
+                                                                      _setSpeed)
+                                                                  : customShadowNight(1 -
+                                                                      _setSpeed)),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: _setSpeed > 0
+                                                          ? Text(e.toString(),
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: e ==
+                                                                          _speedSelected
+                                                                      ? Colors
+                                                                          .white
+                                                                      : null))
+                                                          : Center(),
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      if (_setSpeed == 0) {
+                                        _controller.forward();
+                                      } else {
+                                        _controller.reverse();
+                                      }
+                                    },
+                                    icon: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: <Widget>[
+                                        Transform.rotate(
+                                            angle: math.pi * _setSpeed,
+                                            child: Text('X')),
+                                        Selector<AudioPlayerNotifier, double>(
+                                          selector: (_, audio) =>
+                                              audio.currentSpeed ?? 1.0,
+                                          builder: (context, value, child) =>
+                                              Text(value.toString()),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 5.0),
-                                  width: 150,
-                                  child: Text(
-                                    data.item1.feedTitle,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.fade,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.playlist_play),
-                                  onPressed: () {},
-                                ),
-                                IconButton(
-                                    icon: Icon(Icons.timer), onPressed: null),
-                                Spacer(),
-                                LastPosition(),
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  onPressed: () {
-                                    if (_setSpeed == 0) {
-                                      _controller.forward();
-                                    } else {
-                                      _controller.reverse();
-                                    }
-                                  },
-                                  icon: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: <Widget>[
-                                      Transform.rotate(
-                                          angle: math.pi * _setSpeed,
-                                          child: Text('X')),
-                                      Selector<AudioPlayerNotifier, double>(
-                                        selector: (_, audio) =>
-                                            audio.currentSpeed ?? 1.0,
-                                        builder: (context, value, child) =>
-                                            Text(value.toString()),
-                                      ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      if (_setSpeed == 0 && maxHeight > 300)
+                        TweenAnimationBuilder(
+                            tween: Tween<double>(begin: 0.0, end: 1.0),
+                            duration: Duration(milliseconds: 400),
+                            builder: (context, value, child) {
+                              return Transform.scale(
+                                scale: value,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 100.0),
+                                  child: TabBar(
+                                    controller: _tabController,
+                                    indicatorSize: TabBarIndicatorSize.label,
+                                    indicatorColor: context.primaryColor,
+                                    tabs: [
+                                      Icon(Icons.playlist_play),
+                                      Icon(Icons.brightness_2),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ]),
-              Positioned(
-                right: 0,
-                bottom: 50.0,
-                child: _setSpeed == 0
-                    ? Center()
-                    : SingleChildScrollView(
-                        padding: EdgeInsets.all(10.0),
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: speedToSelect
-                              .map<Widget>((e) => InkWell(
-                                    onTap: () {
-                                      if (_setSpeed == 1) {
-                                        setState(() => _speedSelected = e);
-                                        audio.setSpeed(e);
-                                      }
-                                    },
-                                    child: Container(
-                                      height: 30,
-                                      width: 30,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 5),
-                                      decoration: e == _speedSelected &&
-                                              _setSpeed > 0
-                                          ? BoxDecoration(
-                                              color: context.accentColor,
-                                              shape: BoxShape.circle,
-                                              boxShadow: context.brightness ==
-                                                      Brightness.light
-                                                  ? customShadow(1.0)
-                                                  : customShadowNight(1.0),
-                                            )
-                                          : BoxDecoration(
-                                              color: context.primaryColor,
-                                              shape: BoxShape.circle,
-                                              boxShadow: context.brightness ==
-                                                      Brightness.light
-                                                  ? customShadow(1 - _setSpeed)
-                                                  : customShadowNight(
-                                                      1 - _setSpeed)),
-                                      alignment: Alignment.center,
-                                      child: _setSpeed > 0
-                                          ? Text(e.toString(),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: e == _speedSelected
-                                                      ? Colors.white
-                                                      : null))
-                                          : Center(),
-                                    ),
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-              ),
-            ],
-          ),
+                              );
+                            }),
+                      if (_setSpeed == 0 && maxHeight <= 300)
+                        IconButton(
+                            icon: Icon(Icons.keyboard_arrow_up),
+                            onPressed: widget.onTap),
+                    ],
+                  ),
+                ),
+              ]),
         );
       },
     );

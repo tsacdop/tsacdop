@@ -725,7 +725,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
           _positionTween.end = Offset(
               10,
               playerRunning
-                  ? MediaQuery.of(context).size.height - 100
+                  ? MediaQuery.of(context).size.height - 110
                   : MediaQuery.of(context).size.height - 40);
 
           var _width = MediaQuery.of(context).size.width;
