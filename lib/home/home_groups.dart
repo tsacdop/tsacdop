@@ -378,23 +378,26 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                           decoration: BoxDecoration(
                             color: Theme.of(context).scaffoldBackgroundColor,
                           ),
-                          child: TabBarView(
-                            children: groups[_groupIndex]
-                                .podcasts
-                                .map<Widget>((podcastLocal) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.black12),
-                                margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                key: ObjectKey(podcastLocal.title),
-                                child: PodcastPreview(
-                                  podcastLocal: podcastLocal,
-                                ),
-                              );
-                            }).toList(),
+                          child: ScrollConfiguration(
+                            behavior: NoGrowBehavior(),
+                            child: TabBarView(
+                              children: groups[_groupIndex]
+                                  .podcasts
+                                  .map<Widget>((podcastLocal) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Theme.of(context).primaryColor
+                                          : Colors.black12),
+                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                  key: ObjectKey(podcastLocal.title),
+                                  child: PodcastPreview(
+                                    podcastLocal: podcastLocal,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
                           ),
                         ),
                       ],

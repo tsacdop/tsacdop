@@ -374,71 +374,76 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               ),
                             ];
                           },
-                          body: TabBarView(
-                            controller: _controller,
-                            children: <Widget>[
-                              NestedScrollViewInnerScrollPositionKeyWidget(
-                                  Key('tab0'),
-                                  DescribedFeatureOverlay(
-                                      featureId: podcastFeature,
-                                      tapTarget: Text(s.featureDiscoveryEpisode,
-                                          textAlign: TextAlign.center),
-                                      backgroundColor: Colors.cyan[500],
-                                      enablePulsingAnimation: false,
-                                      onDismiss: () => Future.value(true),
-                                      title:
-                                          Text(s.featureDiscoveryEpisodeTitle),
-                                      description: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(s.featureDiscoveryEpisodeDes),
-                                          Row(
-                                            children: [
-                                              FlatButton(
-                                                color: Colors.cyan[600],
-                                                padding:
-                                                    const EdgeInsets.all(0),
-                                                child: Text(s.understood,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .button
-                                                        .copyWith(
-                                                            color:
-                                                                Colors.white)),
-                                                onPressed: () async =>
-                                                    FeatureDiscovery
-                                                        .completeCurrentStep(
-                                                            context),
-                                              ),
-                                              Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 5)),
-                                              FlatButton(
-                                                color: Colors.cyan[600],
-                                                padding:
-                                                    const EdgeInsets.all(0),
-                                                child: Text(s.dismiss,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .button
-                                                        .copyWith(
-                                                            color:
-                                                                Colors.white)),
-                                                onPressed: () =>
-                                                    FeatureDiscovery.dismissAll(
-                                                        context),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      child: _RecentUpdate())),
-                              NestedScrollViewInnerScrollPositionKeyWidget(
-                                  Key('tab1'), _MyFavorite()),
-                              NestedScrollViewInnerScrollPositionKeyWidget(
-                                  Key('tab2'), _MyDownload()),
-                            ],
+                          body: ScrollConfiguration(
+                            behavior: NoGrowBehavior(),
+                            child: TabBarView(
+                              controller: _controller,
+                              children: <Widget>[
+                                NestedScrollViewInnerScrollPositionKeyWidget(
+                                    Key('tab0'),
+                                    DescribedFeatureOverlay(
+                                        featureId: podcastFeature,
+                                        tapTarget: Text(
+                                            s.featureDiscoveryEpisode,
+                                            textAlign: TextAlign.center),
+                                        backgroundColor: Colors.cyan[500],
+                                        enablePulsingAnimation: false,
+                                        onDismiss: () => Future.value(true),
+                                        title: Text(
+                                            s.featureDiscoveryEpisodeTitle),
+                                        description: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(s.featureDiscoveryEpisodeDes),
+                                            Row(
+                                              children: [
+                                                FlatButton(
+                                                  color: Colors.cyan[600],
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  child: Text(s.understood,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .button
+                                                          .copyWith(
+                                                              color: Colors
+                                                                  .white)),
+                                                  onPressed: () async =>
+                                                      FeatureDiscovery
+                                                          .completeCurrentStep(
+                                                              context),
+                                                ),
+                                                Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 5)),
+                                                FlatButton(
+                                                  color: Colors.cyan[600],
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  child: Text(s.dismiss,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .button
+                                                          .copyWith(
+                                                              color: Colors
+                                                                  .white)),
+                                                  onPressed: () =>
+                                                      FeatureDiscovery
+                                                          .dismissAll(context),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        child: _RecentUpdate())),
+                                NestedScrollViewInnerScrollPositionKeyWidget(
+                                    Key('tab1'), _MyFavorite()),
+                                NestedScrollViewInnerScrollPositionKeyWidget(
+                                    Key('tab2'), _MyDownload()),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -474,7 +479,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     final s = context.s;
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: context.scaffoldBackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
