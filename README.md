@@ -8,32 +8,32 @@
 
 ## About
 
-Enjoy podcast with Tsacdop.
+Enjoy podcasts with Tsacdop.
 
-Tsacdop is a podcast player developed with flutter, a clean, simply beautiful and friendly app, and is free and open source.
+Tsacdop is a podcast player developed with Flutter, a clean, simply beautiful and friendly app, which is also free and open source.
 
-Credit to flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) and [Just_Audio](https://pub.dev/packages/just_audio).
+Credit to Flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) and [Just_Audio](https://pub.dev/packages/just_audio).
 
-The podcasts search engine is powered by [ListenNotes](https://listennotes.com).
+The podcast search engine is powered by [ListenNotes](https://listennotes.com).
 
 ## Features
 
-* Podcasts group management
+* Podcast group management
 * Playlist support
-* Sleep timer / Speed setting
+* Sleep timer / speed setting
 * OMPL file export and import
 * Auto syncing in background
-* Listen and subscribe history record
-* Dark mode / Accent color
+* Listening and subscription history record
+* Dark mode / accent color
 * Download for offline play
-* Auto download new episodes / Auto delete outdated downloads
+* Auto download new episodes / auto delete outdated downloads
 * Settings backup
 
 More to come...
 
 ## Preview
 
-| HomePage | Group | Podcast | Episode| DarkMode |
+| Home Page | Group | Podcast | Episode| Dark Mode |
 | ----- | ----- | ----- | ------ | ----- |
 |![][Homepage ScreenShot]|![][Group Screenshot] | ![][Podcast Screenshot] | ![][Episode Screenshot]| ![][Darkmode Screenshot] |
 
@@ -43,29 +43,29 @@ Support languages
 
 * ![English]
 * ![Chinese Simplified]
-* ![Franch]  
+* ![French]  
 
    Translator: ppp
 
 Please [Email](mailto:<tsacdop.app@gmail.com>) me you'd like to contribute to support more languages!
 
-Credit to [Localizely](https://localizely.com/) for kind support to open source project.
+Credit to [Localizely](https://localizely.com/) for kind support to open source projects.
 
 ## License
 
-Tsacdop is licensed under the [GPL V3.0](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
+Tsacdop is licensed under the [GPL v3.0](https://github.com/stonega/tsacdop/blob/master/LICENSE) license.
 
 ## Build
 
-Tsacdop is using ListenNotes api 1.0 pro to search podcast, which is not free. So I can not expose the api key in the repo.
-If you want to build the app, you need to create a new file named .env.dart in lib folder. Add below code in .env.dart.
+Tsacdop uses ListenNotes API 1.0 pro to search for podcasts, which is not free, so I can not expose the API key in the repo.
+If you want to build the app, you need to create a new file named `.env.dart` in lib folder. Add the following code to `.env.dart`.
 
 ``` dart
 final environment = {"apiKey":"APIKEY"};
 ```
 
-You can get own api key on [ListenNotes](https://www.listennotes.com/api/), basic plan is free to all, and replace "APIKEY" with it.
-If no api key added, the search function in the app won't work. But you can still add podcasts by serach rss link or import ompl file.
+You can get your own API key on [ListenNotes](https://www.listennotes.com/api/), basic plan is free for everyone. Replace `"APIKEY"` with it.
+If no api key is added, the search function in the app won't work. But you can still add podcasts by using an RSS link or importing an OMPL file.
 
 ## Archetecture
 
@@ -111,13 +111,13 @@ src
 
 ## Known Issue
 
-* Playlist unstable
+* Playlist is unstable
 
 ## Getting Started
 
 This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+Here are a few resources to get you started if this is your first Flutter project:
 
 * [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
 * [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
