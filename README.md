@@ -43,7 +43,9 @@ Support languages
 
 * ![English]
 * ![Chinese Simplified]
-* ![Franch]
+* ![Franch]  
+
+   Translator: ppp
 
 Please [Email](mailto:<tsacdop.app@gmail.com>) me you'd like to contribute to support more languages!
 
@@ -97,7 +99,7 @@ src
 ├──settings
    ├──setting.dart [Setting Page]
 
-STATES
+STATE
 src
 ├──state
    ├──audio_state.dart [Audio State]
