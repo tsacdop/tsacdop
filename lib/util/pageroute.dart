@@ -112,3 +112,34 @@ class ScaleRoute extends PageRouteBuilder {
           ),
         );
 }
+
+class FadeRoute extends PageRouteBuilder {
+  final Widget page;
+  FadeRoute({this.page})
+      : super(
+          pageBuilder: (
+            context,
+            animation,
+            secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+          ) =>
+              FadeTransition(
+            opacity: Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInCubic,
+              ),
+            ),
+            child: child,
+          ),
+        );
+}

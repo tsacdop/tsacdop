@@ -222,9 +222,14 @@ class PlayerWidget extends StatelessWidget {
             : AudioPanel(
                 key: playerKey,
                 miniPanel: _miniPanel(context),
-                expandedPanel: ControlPanel(onTap: () {
-                  playerKey.currentState.scrollToTop();
-                }));
+                expandedPanel: ControlPanel(
+                  onExpand: () {
+                    playerKey.currentState.scrollToTop();
+                  },
+                  onClose: () {
+                    playerKey.currentState.backToMini();
+                  },
+                ));
       },
     );
   }
@@ -605,7 +610,9 @@ class SleepModeState extends State<SleepMode>
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       });
 
     _controller.addStatusListener((status) {
@@ -835,19 +842,19 @@ class SleepModeState extends State<SleepMode>
                     )
                   ],
                 ),
-                if (fraction > 0)
+                if (move > 0)
                   Positioned(
                     bottom: 120,
                     left: width / 2 - 100,
                     width: 200,
                     child: Center(
                       child: Transform.translate(
-                        offset: Offset(0, -50 * fraction),
+                        offset: Offset(0, -50 * move),
                         child: Text(s.goodNight,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: Colors.white.withOpacity(fraction))),
+                                color: Colors.white.withOpacity(move))),
                       ),
                     ),
                   ),
@@ -863,8 +870,9 @@ class SleepModeState extends State<SleepMode>
 }
 
 class ControlPanel extends StatefulWidget {
-  ControlPanel({this.onTap, Key key}) : super(key: key);
-  final VoidCallback onTap;
+  ControlPanel({this.onExpand, this.onClose, Key key}) : super(key: key);
+  final VoidCallback onExpand;
+  final VoidCallback onClose;
   @override
   _ControlPanelState createState() => _ControlPanelState();
 }
@@ -1237,12 +1245,24 @@ class _ControlPanelState extends State<ControlPanel>
                                   if (_setSpeed == 0)
                                     Expanded(
                                       child: InkWell(
-                                        onTap: () => Navigator.push(
-                                            context,
-                                            SlideUptRoute(
-                                                page: EpisodeDetail(
-                                                    episodeItem: data.item1,
-                                                    heroTag: 'playpanel'))),
+                                        onTap: () async {
+                                          widget.onClose();
+                                          Navigator.push(
+                                              context,
+                                              FadeRoute(
+                                                  page: EpisodeDetail(
+                                                      episodeItem: data.item1,
+                                                      heroTag: 'playpanel'))
+                                              //  PageRouteBuilder( pageBuilder: (context,
+                                              //            animation,
+                                              //              secondAnimation) =>
+                                              //          EpisodeDetail(
+                                              //              episodeItem:
+                                              //                  data.item1,
+                                              //              heroTag:
+                                              //                  'playpanel'))
+                                              );
+                                        },
                                         child: Row(
                                           children: [
                                             SizedBox(
@@ -1386,7 +1406,7 @@ class _ControlPanelState extends State<ControlPanel>
                                           color: context.textColor)),
                                 ),
                               ),
-                              onTap: widget.onTap),
+                              onTap: widget.onExpand),
                         ),
                       if (_setSpeed == 0 && maxHeight > 300)
                         Transform.translate(
