@@ -22,6 +22,7 @@ class SettingsBackup {
   final bool tapToOpenPopupMenu;
   final int fastForwardSeconds;
   final int rewindSeconds;
+  final int playerHeight;
   SettingsBackup(
       {this.theme,
       this.accentColor,
@@ -45,7 +46,8 @@ class SettingsBackup {
       this.autoSleepTimerMode,
       this.tapToOpenPopupMenu,
       this.fastForwardSeconds,
-      this.rewindSeconds});
+      this.rewindSeconds,
+      this.playerHeight});
 
   Map<String, Object> toJson() {
     return {
@@ -70,7 +72,8 @@ class SettingsBackup {
       'autoSleepTimerMode': autoSleepTimerMode,
       'tapToOpenPopupMenu': tapToOpenPopupMenu,
       'fastForwardSeconds': fastForwardSeconds,
-      'rewindSeconds': rewindSeconds
+      'rewindSeconds': rewindSeconds,
+      'playerHeight': playerHeight
     };
   }
 
@@ -98,6 +101,7 @@ class SettingsBackup {
         autoSleepTimerMode: json['autoSleepTimerMode'] as int,
         tapToOpenPopupMenu: json['tapToOpenPopupMenu'] as bool,
         fastForwardSeconds: json['fastForwardSeconds'] as int,
-        rewindSeconds: json['rewindSeconds'] as int);
+        rewindSeconds: json['rewindSeconds'] as int,
+        playerHeight: json['playerHeight'] as int);
   }
 }

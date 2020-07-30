@@ -420,6 +420,8 @@ class SettingState extends ChangeNotifier {
     var fastForwardSeconds =
         await fastForwardSecondsStorage.getInt(defaultValue: 30);
     var rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
+    var playerHeight =
+        await KeyValueStorage(playerHeightKey).getInt(defaultValue: 0);
 
     return SettingsBackup(
         theme: theme,
@@ -444,7 +446,8 @@ class SettingState extends ChangeNotifier {
         defaultSleepTime: defaultSleepTime,
         tapToOpenPopupMenu: tapToOpenPopupMenu,
         fastForwardSeconds: fastForwardSeconds,
-        rewindSeconds: rewindSeconds);
+        rewindSeconds: rewindSeconds,
+        playerHeight: playerHeight);
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -472,6 +475,7 @@ class SettingState extends ChangeNotifier {
     await defaultSleepTimerStorage.saveInt(backup.defaultSleepTime);
     await fastForwardSecondsStorage.saveInt(backup.fastForwardSeconds);
     await rewindSecondsStorage.saveInt(backup.rewindSeconds);
+    await KeyValueStorage(playerHeightKey).saveInt(backup.playerHeight);
     await KeyValueStorage(tapToOpenPopupMenuKey)
         .saveBool(backup.tapToOpenPopupMenu);
     await initData();
