@@ -223,7 +223,6 @@ class PlayerWidget extends StatelessWidget {
                 key: playerKey,
                 miniPanel: _miniPanel(context),
                 expandedPanel: ControlPanel(onTap: () {
-                  print('ext');
                   playerKey.currentState.scrollToTop();
                 }));
       },
@@ -511,18 +510,15 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           SizedBox(
             height: 60.0,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Text(
-                      context.s.homeMenuPlaylist,
-                      style: TextStyle(
-                          color: Theme.of(context).accentColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
+                  Text(
+                    context.s.homeMenuPlaylist,
+                    style: TextStyle(
+                        color: context.accentColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
                   ),
                   Spacer(),
                   Material(
@@ -609,14 +605,14 @@ class SleepModeState extends State<SleepMode>
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        Provider.of<AudioPlayerNotifier>(context, listen: false)
-            .setSwitchValue = _animation.value;
+        setState(() {});
       });
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         Provider.of<AudioPlayerNotifier>(context, listen: false)
-            .sleepTimer(_minSelected);
+          ..sleepTimer(_minSelected)
+          ..setSwitchValue = 1;
       }
     });
   }
@@ -658,8 +654,10 @@ class SleepModeState extends State<SleepMode>
       selector: (_, audio) =>
           Tuple3(audio?.timeLeft, audio?.switchValue, audio.sleepTimerMode),
       builder: (_, data, __) {
-        var fraction = math.min(data.item2 * 2, 1.0);
-        var move = math.max(data.item2 * 2 - 1, 0.0);
+        var fraction =
+            data.item2 == 1 ? 1.0 : math.min(_animation.value * 2, 1.0);
+        var move =
+            data.item2 == 1 ? 1.0 : math.max(_animation.value * 2 - 1, 0.0);
         return LayoutBuilder(builder: (context, constraints) {
           var width = constraints.maxWidth;
           return Container(
@@ -734,8 +732,7 @@ class SleepModeState extends State<SleepMode>
                                     border:
                                         Border.all(color: context.primaryColor),
                                     color: _colorTween.transform(move),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20)),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Material(
                                     color: Colors.transparent,
@@ -823,7 +820,7 @@ class SleepModeState extends State<SleepMode>
                     SizedBox(
                       height: 60.0,
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40.0),
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
@@ -838,18 +835,22 @@ class SleepModeState extends State<SleepMode>
                     )
                   ],
                 ),
-                Positioned(
-                  bottom: 100 + 70 * data.item2,
-                  left: width / 2 - 100,
-                  width: 200,
-                  child: Center(
-                    child: Text(s.goodNight,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Colors.white.withOpacity(fraction))),
+                if (fraction > 0)
+                  Positioned(
+                    bottom: 120,
+                    left: width / 2 - 100,
+                    width: 200,
+                    child: Center(
+                      child: Transform.translate(
+                        offset: Offset(0, -50 * fraction),
+                        child: Text(s.goodNight,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.white.withOpacity(fraction))),
+                      ),
+                    ),
                   ),
-                ),
                 if (data.item2 == 1) CustomPaint(painter: StarSky()),
                 if (data.item2 == 1) MeteorLoader()
               ],
@@ -875,6 +876,7 @@ class _ControlPanelState extends State<ControlPanel>
   AnimationController _controller;
   Animation<double> _animation;
   TabController _tabController;
+  int _tabIndex = 0;
   List<BoxShadow> customShadow(double scale) => [
         BoxShadow(
             blurRadius: 26 * (1 - scale),
@@ -900,7 +902,10 @@ class _ControlPanelState extends State<ControlPanel>
   void initState() {
     _speedSelected = 0;
     _setSpeed = 0;
-    _tabController = TabController(vsync: this, length: 2);
+    _tabController = TabController(vsync: this, length: 2)
+      ..addListener(() {
+        setState(() => _tabIndex = _tabController.index);
+      });
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
@@ -943,9 +948,9 @@ class _ControlPanelState extends State<ControlPanel>
                             data: SliderTheme.of(context).copyWith(
                               activeTrackColor: maxHeight <= 300
                                   ? context.accentColor.withAlpha(70)
-                                  : context.primaryColor,
+                                  : Colors.transparent,
                               inactiveTrackColor: maxHeight > 300
-                                  ? context.primaryColor
+                                  ? Colors.transparent
                                   : context.primaryColorDark,
                               trackHeight: 8.0,
                               trackShape: MyRectangularTrackShape(),
@@ -954,8 +959,7 @@ class _ControlPanelState extends State<ControlPanel>
                                 enabledThumbRadius: 6.0,
                                 disabledThumbRadius: 6.0,
                               ),
-                              overlayColor:
-                                  Theme.of(context).accentColor.withAlpha(32),
+                              overlayColor: context.accentColor.withAlpha(32),
                               overlayShape:
                                   RoundSliderOverlayShape(overlayRadius: 4.0),
                             ),
@@ -1002,8 +1006,7 @@ class _ControlPanelState extends State<ControlPanel>
                                                     ? context.s.buffering
                                                     : '',
                                                 style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .accentColor),
+                                                    color: context.accentColor),
                                               ),
                                       ),
                                     ),
@@ -1196,20 +1199,23 @@ class _ControlPanelState extends State<ControlPanel>
                         physics: NeverScrollableScrollPhysics(),
                         child: SizedBox(
                             height: 300,
-                            child: TabBarView(
-                                controller: _tabController,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0),
-                                    child: PlaylistWidget(),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0),
-                                    child: SleepMode(),
-                                  )
-                                ]))),
+                            child: ScrollConfiguration(
+                              behavior: NoGrowBehavior(),
+                              child: TabBarView(
+                                  controller: _tabController,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
+                                      child: PlaylistWidget(),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
+                                      child: SleepMode(),
+                                    )
+                                  ]),
+                            ))),
                   ),
                 Expanded(
                   child: Stack(
@@ -1361,32 +1367,55 @@ class _ControlPanelState extends State<ControlPanel>
                             );
                           },
                         ),
-                      if (_setSpeed == 0 && maxHeight > 300)
-                        TweenAnimationBuilder(
-                            tween: Tween<double>(begin: 0.0, end: 1.0),
-                            duration: Duration(milliseconds: 400),
-                            builder: (context, value, child) {
-                              return Transform.scale(
-                                scale: value,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 100.0),
-                                  child: TabBar(
-                                    controller: _tabController,
-                                    indicatorSize: TabBarIndicatorSize.label,
-                                    indicatorColor: context.primaryColor,
-                                    tabs: [
-                                      Icon(Icons.playlist_play),
-                                      Icon(Icons.brightness_2),
-                                    ],
-                                  ),
+                      if (_setSpeed == 0)
+                        Positioned(
+                          bottom: 15,
+                          child: InkWell(
+                              child: SizedBox(
+                                height: 50,
+                                width: 100,
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: CustomPaint(
+                                      size: Size(100, 5),
+                                      painter: TabIndicator(
+                                          index: _tabIndex,
+                                          indicatorSize: 20,
+                                          fraction: (maxHeight - 300) / 300,
+                                          accentColor: context.accentColor,
+                                          color: context.textColor)),
                                 ),
-                              );
-                            }),
-                      if (_setSpeed == 0 && maxHeight <= 300)
-                        IconButton(
-                            icon: Icon(Icons.keyboard_arrow_up),
-                            onPressed: widget.onTap),
+                              ),
+                              onTap: widget.onTap),
+                        ),
+                      if (_setSpeed == 0 && maxHeight > 300)
+                        Transform.translate(
+                          offset: Offset(0, 5) * (maxHeight - 300) / 300,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: context.width / 2 - 80),
+                            child: TabBar(
+                              controller: _tabController,
+                              indicatorSize: TabBarIndicatorSize.label,
+                              labelColor: context.accentColor,
+                              unselectedLabelColor: context.textColor,
+                              indicator: BoxDecoration(),
+                              tabs: [
+                                Container(
+                                    height: 20,
+                                    width: 20,
+                                    child: Icon(Icons.playlist_play)),
+                                Container(
+                                    height: 20,
+                                    width: 20,
+                                    child: Transform.rotate(
+                                        angle: math.pi * 0.7,
+                                        child: Icon(Icons.brightness_2,
+                                            size: 18))),
+                              ],
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),

@@ -104,7 +104,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           systemNavigationBarColor: Theme.of(context).primaryColor,
         ),
         child: Scaffold(
-          //  key: _scaffoldKey,
+          key: _scaffoldKey,
           body: WillPopScope(
             onWillPop: () async {
               if (_playerKey.currentState != null &&

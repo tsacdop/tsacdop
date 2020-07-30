@@ -449,12 +449,11 @@ class _MenuBarState extends State<MenuBar> {
     return Container(
       height: 50.0,
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        border: Border.all(
-          color: Theme.of(context).brightness == Brightness.light
-              ? Colors.grey[200]
-              : Theme.of(context).primaryColor,
-        ),
+        color: context.scaffoldBackgroundColor,
+        //border: Border.all(
+        //  color: Theme.of(context).brightness == Brightness.light
+        //      ? Colors.grey[200]
+        //      : context.primaryColor,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -474,10 +473,11 @@ class _MenuBarState extends State<MenuBar> {
                       child: Container(
                         height: 30.0,
                         width: 30.0,
-                        color: Theme.of(context).scaffoldBackgroundColor,
+                        color: context.scaffoldBackgroundColor,
                         child: widget.hide
                             ? Center()
                             : CircleAvatar(
+                                radius: 15,
                                 backgroundImage: FileImage(
                                     File("${widget.episodeItem.imagePath}"))),
                       ),

@@ -29,8 +29,8 @@ class SlideLeftRoute extends PageRouteBuilder {
 
 class SlideLeftHideRoute extends PageRouteBuilder {
   final Widget page;
-  final Widget transitionPage;
-  SlideLeftHideRoute({this.page, this.transitionPage})
+  // final Widget transitionPage;
+  SlideLeftHideRoute({this.page})
       : super(
           pageBuilder: (
             context,
@@ -38,7 +38,7 @@ class SlideLeftHideRoute extends PageRouteBuilder {
             secondaryAnimation,
           ) =>
               page,
-          transitionDuration: Duration(milliseconds: 300),
+          // transitionDuration: Duration(milliseconds: 300),
           transitionsBuilder: (
             context,
             animation,

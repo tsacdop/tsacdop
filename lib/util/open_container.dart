@@ -742,7 +742,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
                       child: SizedBox(
                         width: rect.width,
                         height: rect.height *
-                            (playerRunning ? (1 - 60 / context.width) : 1),
+                            (playerRunning ? (1 - 70 / context.height) : 1),
                         child: Material(
                           clipBehavior: Clip.antiAlias,
                           animationDuration: Duration.zero,

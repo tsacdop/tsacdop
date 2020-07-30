@@ -476,14 +476,14 @@ class PodcastPreview extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            SlideLeftHideRoute(
-                                transitionPage: PodcastDetail(
-                                  podcastLocal: podcastLocal,
-                                  hide: playerRunning,
-                                ),
+                            SlideLeftRoute(
+                                // transitionPage: PodcastDetail(
+                                //   podcastLocal: podcastLocal,
+                                //   hide: playerRunning,
+                                // ),
                                 page: PodcastDetail(
-                                  podcastLocal: podcastLocal,
-                                )),
+                              podcastLocal: podcastLocal,
+                            )),
                           );
                         },
                       ),

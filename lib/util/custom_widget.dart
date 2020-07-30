@@ -7,6 +7,10 @@ import 'package:flutter/material.dart';
 import 'episodegrid.dart';
 import 'extension_helper.dart';
 
+const kTwoPi = math.pi * 2;
+const kPi = math.pi;
+const kHalfPi = math.pi / 2;
+
 //Layout change indicator
 class LayoutPainter extends CustomPainter {
   double scale;
@@ -30,8 +34,8 @@ class LayoutPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(LayoutPainter oldDelegate) {
+    return oldDelegate.scale != scale || oldDelegate.color != color;
   }
 }
 
@@ -82,14 +86,47 @@ class StarSky extends CustomPainter {
       ..color = Colors.white
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
-    canvas.drawPoints(ui.PointMode.points, pisces, paint);
-    canvas.drawPoints(ui.PointMode.points, points, paint);
-    canvas.drawPoints(ui.PointMode.points, orion, paint);
+    var _fullPaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.butt
+      ..style = PaintingStyle.stroke;
+    _darwStar(Offset center, double radius) {
+      canvas.drawCircle(center, radius, paint);
+      var path = Path()
+        ..addOval(Rect.fromCircle(center: center, radius: radius * 2));
+      canvas.drawShadow(path.shift(Offset(0, -6)), Colors.white, 6, true);
+    }
+
+    _darwBigStar(Offset center, double radius) {
+      var path = Path();
+      path.moveTo(center.dx - radius * 1.5, center.dy);
+      path.lineTo(center.dx + radius * 1.5, center.dy);
+      path.moveTo(center.dx, center.dy - radius * 2);
+      path.lineTo(center.dx, center.dy + radius * 2);
+      //canvas.drawPath(path, _fullPaint);
+      canvas.drawShadow(path.shift(Offset(0, 0)), Colors.white, 4, true);
+    }
+
+    for (var center in pisces) {
+      _darwStar(center, 2);
+    }
+    for (var center in orion) {
+      _darwStar(center, 2);
+    }
+    for (var center in points) {
+      _darwBigStar(center, 3);
+      _darwStar(center, 3);
+    }
+
+    //canvas.drawPoints(ui.PointMode.points, pisces, paint);
+    //canvas.drawPoints(ui.PointMode.points, points, paint);
+    //canvas.drawPoints(ui.PointMode.points, orion, paint);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(StarSky oldDelegate) {
+    return false;
   }
 }
 
@@ -121,8 +158,8 @@ class ListenedPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(ListenedPainter oldDelegate) {
+    return false;
   }
 }
 
@@ -155,8 +192,8 @@ class ListenedAllPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(ListenedAllPainter oldDelegate) {
+    return false;
   }
 }
 
@@ -190,8 +227,8 @@ class MarkListenedPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(MarkListenedPainter oldDelegate) {
+    return false;
   }
 }
 
@@ -239,8 +276,8 @@ class HideListenedPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(HideListenedPainter oldDelegate) {
+    return oldDelegate.fraction != fraction;
   }
 }
 
@@ -1079,5 +1116,52 @@ class _MeteorLoaderState extends State<MeteorLoader>
           height: 100 * _fraction,
           child: CustomPaint(painter: Meteor())),
     );
+  }
+}
+
+/// Custom paint in player widget. Tab indicator.
+class TabIndicator extends CustomPainter {
+  double fraction;
+  double indicatorSize;
+  Color color;
+  Color accentColor;
+  int index;
+  TabIndicator(
+      {this.fraction,
+      this.color,
+      this.accentColor,
+      this.indicatorSize,
+      this.index});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var _paint = Paint()
+      ..color = color
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round;
+    var _accentPaint = Paint()
+      ..color = accentColor
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round;
+    var leftStartE = Offset(indicatorSize, size.height);
+    var rightStartE = Offset(size.width - indicatorSize, size.height);
+    var startPoint = Offset(size.width / 2, 0);
+    var leftStart = startPoint + (leftStartE - startPoint) * fraction;
+    var rightStart = startPoint + (rightStartE - startPoint) * fraction;
+    var leftEnd = startPoint +
+        Offset(-size.height, size.height) +
+        Offset(-(size.width / 2 - size.height) * fraction, 0);
+    var rightEnd = startPoint +
+        Offset(size.height, size.height) +
+        Offset((size.width / 2 - size.height) * fraction, 0);
+    canvas.drawLine(leftStart, leftEnd,
+        index == 0 || fraction == 0 ? _accentPaint : _paint);
+    canvas.drawLine(rightStart, rightEnd,
+        index == 1 || fraction == 0 ? _accentPaint : _paint);
+  }
+
+  @override
+  bool shouldRepaint(TabIndicator oldDelegate) {
+    return oldDelegate.fraction != fraction || oldDelegate.index != index;
   }
 }
