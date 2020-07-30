@@ -480,7 +480,7 @@ class _SearchListState extends State<SearchList> {
             child: GestureDetector(
               onTap: () => setState(() => _selectedPodcast = null),
               child: Container(
-                color: context.scaffoldBackgroundColor.withOpacity(0.8),
+                color: context.scaffoldBackgroundColor.withOpacity(0.9),
               ),
             ),
           ),
@@ -774,241 +774,253 @@ class _SearchResultDetailState extends State<SearchResultDetail>
       onVerticalDragStart: _start,
       onVerticalDragUpdate: _update,
       onVerticalDragEnd: (event) => _end(),
-      child: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            boxShadow: [
-              BoxShadow(
-                offset: Offset(0, -0.5),
-                blurRadius: 1,
-                color: Theme.of(context).brightness == Brightness.light
-                    ? Colors.grey[400].withOpacity(0.5)
-                    : Colors.grey[800],
-              ),
-            ],
-          ),
-          height: _animation.value,
-          child: DefaultTabController(
-            length: 2,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 120,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: Text(widget.onlinePodcast.title,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: context.textTheme.headline5),
-                              ),
-                              Text(
-                                '${widget.onlinePodcast.interval.toInterval(context)} | '
-                                '${widget.onlinePodcast.latestPubDate.toDate(context)}',
-                                maxLines: 1,
-                                overflow: TextOverflow.fade,
-                                style: TextStyle(color: context.accentColor),
-                              ),
-                              !_isSubscribed
-                                  ? OutlineButton(
-                                      highlightedBorderColor:
-                                          context.accentColor,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(100.0),
-                                          side: BorderSide(
-                                              color: context.accentColor)),
-                                      splashColor:
-                                          context.accentColor.withOpacity(0.5),
-                                      child: Text(s.subscribe,
-                                          style: TextStyle(
-                                              color: context.accentColor)),
-                                      onPressed: () {
-                                        subscribePodcast(widget.onlinePodcast);
-                                        setState(() {
-                                          _isSubscribed = true;
-                                        });
-                                        Fluttertoast.showToast(
-                                          msg: s.podcastSubscribed,
-                                          gravity: ToastGravity.BOTTOM,
-                                        );
-                                      })
-                                  : OutlineButton(
-                                      color:
-                                          context.accentColor.withOpacity(0.5),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(100.0),
-                                          side: BorderSide(
-                                              color: Colors.grey[500])),
-                                      highlightedBorderColor: Colors.grey[500],
-                                      disabledTextColor: Colors.grey[500],
-                                      child: Text(s.subscribe),
-                                      disabledBorderColor: Colors.grey[500],
-                                      onPressed: () {})
-                            ],
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0, -0.5),
+              blurRadius: 1,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Colors.grey[400].withOpacity(0.5)
+                  : Colors.grey[800],
+            ),
+          ],
+        ),
+        height: _animation.value,
+        child: DefaultTabController(
+          length: 2,
+          child: Column(
+            children: [
+              SizedBox(
+                height: math.min(_animation.value, 120),
+                child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: SizedBox(
+                    height: 120,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  child: Text(widget.onlinePodcast.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: context.textTheme.headline5),
+                                ),
+                                Text(
+                                  '${widget.onlinePodcast.interval.toInterval(context)} | '
+                                  '${widget.onlinePodcast.latestPubDate.toDate(context)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.fade,
+                                  style: TextStyle(color: context.accentColor),
+                                ),
+                                !_isSubscribed
+                                    ? OutlineButton(
+                                        highlightedBorderColor:
+                                            context.accentColor,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(100.0),
+                                            side: BorderSide(
+                                                color: context.accentColor)),
+                                        splashColor: context.accentColor
+                                            .withOpacity(0.5),
+                                        child: Text(s.subscribe,
+                                            style: TextStyle(
+                                                color: context.accentColor)),
+                                        onPressed: () {
+                                          subscribePodcast(
+                                              widget.onlinePodcast);
+                                          setState(() {
+                                            _isSubscribed = true;
+                                          });
+                                          Fluttertoast.showToast(
+                                            msg: s.podcastSubscribed,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        })
+                                    : OutlineButton(
+                                        color: context.accentColor
+                                            .withOpacity(0.5),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(100.0),
+                                            side: BorderSide(
+                                                color: Colors.grey[500])),
+                                        highlightedBorderColor:
+                                            Colors.grey[500],
+                                        disabledTextColor: Colors.grey[500],
+                                        child: Text(s.subscribe),
+                                        disabledBorderColor: Colors.grey[500],
+                                        onPressed: () {})
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      CachedNetworkImage(
-                        height: 120.0,
-                        width: 120.0,
-                        fit: BoxFit.fitWidth,
-                        alignment: Alignment.center,
-                        imageUrl: widget.onlinePodcast.image,
-                        progressIndicatorBuilder:
-                            (context, url, downloadProgress) => Container(
-                          height: 120,
-                          width: 120,
+                        CachedNetworkImage(
+                          height: 120.0,
+                          width: 120.0,
+                          fit: BoxFit.fitWidth,
                           alignment: Alignment.center,
-                          color: context.primaryColorDark,
-                          child: SizedBox(
-                            width: 40,
-                            height: 2,
-                            child: LinearProgressIndicator(
-                                value: downloadProgress.progress),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                            width: 120,
+                          imageUrl: widget.onlinePodcast.image,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) => Container(
                             height: 120,
+                            width: 120,
                             alignment: Alignment.center,
                             color: context.primaryColorDark,
-                            child: Icon(Icons.error)),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 50,
-                  child: TabBar(
-                      indicatorColor: context.accentColor,
-                      labelColor: context.textColor,
-                      indicatorWeight: 3,
-                      indicatorSize: TabBarIndicatorSize.label,
-                      tabs: [
-                        Text(s.homeToprightMenuAbout),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(s.episode(2)),
-                            SizedBox(width: 2),
-                            Container(
-                                padding: const EdgeInsets.only(
-                                    left: 5, right: 5, top: 2, bottom: 2),
-                                decoration: BoxDecoration(
-                                    color: context.accentColor,
-                                    borderRadius: BorderRadius.circular(100)),
-                                child: Text(
-                                    widget.onlinePodcast.count.toString(),
-                                    style: TextStyle(color: Colors.white)))
-                          ],
-                        )
-                      ]),
-                ),
-                Expanded(
-                  child: TabBarView(children: [
-                    ListView(
-                      physics: _animation.value != widget.maxHeight
-                          ? NeverScrollableScrollPhysics()
-                          : null,
-                      children: [
-                        Html(
-                          onLinkTap: (url) {
-                            url.launchUrl;
-                          },
-                          linkStyle: TextStyle(
-                              color: context.accentColor,
-                              textBaseline: TextBaseline.ideographic),
-                          shrinkToFit: true,
-                          data: widget.onlinePodcast.description,
-                          padding: const EdgeInsets.only(
-                              left: 20.0, right: 20, bottom: 20),
-                          defaultTextStyle: TextStyle(
-                            height: 1.8,
+                            child: SizedBox(
+                              width: 40,
+                              height: 2,
+                              child: LinearProgressIndicator(
+                                  value: downloadProgress.progress),
+                            ),
                           ),
+                          errorWidget: (context, url, error) => Container(
+                              width: 120,
+                              height: 120,
+                              alignment: Alignment.center,
+                              color: context.primaryColorDark,
+                              child: Icon(Icons.error)),
                         ),
                       ],
                     ),
-                    FutureBuilder<List<OnlineEpisode>>(
-                        future: _searchFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            var content = snapshot.data;
-                            return ListView.builder(
-                              physics: _animation.value != widget.maxHeight
-                                  ? NeverScrollableScrollPhysics()
-                                  : null,
-                              itemCount: content.length + 1,
-                              itemBuilder: (context, index) {
-                                if (index == content.length) {
-                                  return Container(
+                  ),
+                ),
+              ),
+              if (_animation.value > 120)
+                SizedBox(
+                  height: math.min(_animation.value - 120, 50),
+                  child: SingleChildScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: SizedBox(
+                      height: 50,
+                      child: TabBar(
+                          indicatorColor: context.accentColor,
+                          labelColor: context.textColor,
+                          indicatorWeight: 3,
+                          indicatorSize: TabBarIndicatorSize.label,
+                          tabs: [
+                            Text(s.homeToprightMenuAbout),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(s.episode(2)),
+                                SizedBox(width: 2),
+                                Container(
                                     padding: const EdgeInsets.only(
-                                        top: 10.0, bottom: 20.0),
-                                    alignment: Alignment.center,
-                                    child: SizedBox(
-                                      width: 100,
-                                      child: OutlineButton(
-                                        highlightedBorderColor:
-                                            context.accentColor,
-                                        splashColor: context.accentColor
-                                            .withOpacity(0.5),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(100))),
-                                        child: _loading
-                                            ? SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                ))
-                                            : Text(context.s.loadMore),
-                                        onPressed: () => _loading
-                                            ? null
-                                            : setState(
-                                                () {
-                                                  _loading = true;
-                                                  _searchFuture = _getEpisodes(
-                                                      id: widget
-                                                          .onlinePodcast.id,
-                                                      nextEpisodeDate:
-                                                          _nextEpisdoeDate);
-                                                },
-                                              ),
-                                      ),
+                                        left: 5, right: 5, top: 2, bottom: 2),
+                                    decoration: BoxDecoration(
+                                        color: context.accentColor,
+                                        borderRadius:
+                                            BorderRadius.circular(100)),
+                                    child: Text(
+                                        widget.onlinePodcast.count.toString(),
+                                        style: TextStyle(color: Colors.white)))
+                              ],
+                            )
+                          ]),
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: TabBarView(children: [
+                  ListView(
+                    physics: _animation.value != widget.maxHeight
+                        ? NeverScrollableScrollPhysics()
+                        : null,
+                    children: [
+                      Html(
+                        onLinkTap: (url) {
+                          url.launchUrl;
+                        },
+                        linkStyle: TextStyle(
+                            color: context.accentColor,
+                            textBaseline: TextBaseline.ideographic),
+                        shrinkToFit: true,
+                        data: widget.onlinePodcast.description,
+                        padding: const EdgeInsets.only(
+                            left: 20.0, right: 20, bottom: 20),
+                        defaultTextStyle: TextStyle(
+                          height: 1.8,
+                        ),
+                      ),
+                    ],
+                  ),
+                  FutureBuilder<List<OnlineEpisode>>(
+                      future: _searchFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          var content = snapshot.data;
+                          return ListView.builder(
+                            physics: _animation.value != widget.maxHeight
+                                ? NeverScrollableScrollPhysics()
+                                : null,
+                            itemCount: content.length + 1,
+                            itemBuilder: (context, index) {
+                              if (index == content.length) {
+                                return Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 10.0, bottom: 20.0),
+                                  alignment: Alignment.center,
+                                  child: SizedBox(
+                                    width: 100,
+                                    child: OutlineButton(
+                                      highlightedBorderColor:
+                                          context.accentColor,
+                                      splashColor:
+                                          context.accentColor.withOpacity(0.5),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(100))),
+                                      child: _loading
+                                          ? SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ))
+                                          : Text(context.s.loadMore),
+                                      onPressed: () => _loading
+                                          ? null
+                                          : setState(
+                                              () {
+                                                _loading = true;
+                                                _searchFuture = _getEpisodes(
+                                                    id: widget.onlinePodcast.id,
+                                                    nextEpisodeDate:
+                                                        _nextEpisdoeDate);
+                                              },
+                                            ),
                                     ),
-                                  );
-                                }
-                                return ListTile(
-                                  title: Text(content[index].title),
-                                  subtitle: Text(
-                                      '${content[index].length.toTime} | '
-                                      '${content[index].pubDate.toDate(context)}',
-                                      style: TextStyle(
-                                          color: context.accentColor)),
+                                  ),
                                 );
-                              },
-                            );
-                          }
-                          return Center(
-                            child: CircularProgressIndicator(),
+                              }
+                              return ListTile(
+                                title: Text(content[index].title),
+                                subtitle: Text(
+                                    '${content[index].length.toTime} | '
+                                    '${content[index].pubDate.toDate(context)}',
+                                    style:
+                                        TextStyle(color: context.accentColor)),
+                              );
+                            },
                           );
-                        })
-                  ]),
-                )
-              ],
-            ),
+                        }
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      })
+                ]),
+              )
+            ],
           ),
         ),
       ),
