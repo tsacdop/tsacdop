@@ -34,6 +34,42 @@ class AboutApp extends StatelessWidget {
           ),
         ),
       );
+  Widget _translatorInfo(BuildContext context, {String name, String flag}) =>
+      Container(
+        height: 50.0,
+        padding: EdgeInsets.symmetric(horizontal: 20.0),
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: Divider.createBorderSide(context),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(LineIcons.user, color: Theme.of(context).accentColor),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+            ),
+            Expanded(
+                child: Text(
+              name,
+              maxLines: 1,
+              overflow: TextOverflow.fade,
+            )),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image(
+                image: AssetImage('assets/$flag.png'),
+                height: 20,
+                width: 30,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -224,41 +260,9 @@ class AboutApp extends StatelessWidget {
                               ],
                             ),
                           ),
-                          Container(
-                            height: 50.0,
-                            padding: EdgeInsets.symmetric(horizontal: 20.0),
-                            alignment: Alignment.centerLeft,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: Divider.createBorderSide(context),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Icon(LineIcons.user,
-                                    color: Theme.of(context).accentColor),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                ),
-                                Expanded(
-                                    child: Text(
-                                  'ppp',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
-                                )),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: Image(
-                                    image: AssetImage('assets/fr.png'),
-                                    height: 20,
-                                    fit: BoxFit.fitHeight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          _translatorInfo(context, name: 'ppp', flag: 'fr'),
+                          _translatorInfo(context,
+                              name: 'Joel Israel', flag: 'mx')
                         ],
                       ),
                     ),
