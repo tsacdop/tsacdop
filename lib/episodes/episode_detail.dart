@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -61,17 +62,17 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 
   ScrollController _controller;
   _scrollListener() {
-    if (_controller.offset > _controller.position.maxScrollExtent * 0.8) {
-      if (!_showMenu) {
-        setState(() {
-          _showMenu = true;
-        });
-      }
-    } else if (_controller.offset <
-        _controller.position.maxScrollExtent * 0.8) {
-      if (_showMenu) {
+    if (_controller.position.userScrollDirection == ScrollDirection.reverse) {
+      if (_showMenu && mounted) {
         setState(() {
           _showMenu = false;
+        });
+      }
+    }
+    if (_controller.position.userScrollDirection == ScrollDirection.forward) {
+      if (!_showMenu && mounted) {
+        setState(() {
+          _showMenu = true;
         });
       }
     }
@@ -101,7 +102,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   void initState() {
     super.initState();
     _loaddes = false;
-    _showMenu = false;
+    _showMenu = true;
     _showTitle = false;
     getSDescription(widget.episodeItem.enclosureUrl);
     _controller = ScrollController();
@@ -343,26 +344,30 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                       ),
                                     )
                           : Center(),
-                      Selector<AudioPlayerNotifier, bool>(
-                          selector: (_, audio) => audio.playerRunning,
+                      Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
+                          selector: (_, audio) =>
+                              Tuple2(audio.playerRunning, audio.playerHeight),
                           builder: (_, data, __) {
+                            var height = kMinPlayerHeight[data.item2.index];
                             return SizedBox(
-                              height: data ? 70.0 : 0,
+                              height: data.item1 ? height : 0,
                             );
                           }),
                     ],
                   ),
                 ),
               ),
-              Selector<AudioPlayerNotifier, bool>(
-                  selector: (_, audio) => audio.playerRunning,
+              Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
+                  selector: (_, audio) =>
+                      Tuple2(audio.playerRunning, audio.playerHeight),
                   builder: (_, data, __) {
+                    var height = kMinPlayerHeight[data.item2.index];
                     return Container(
                       alignment: Alignment.bottomCenter,
-                      padding: EdgeInsets.only(bottom: data ? 70.0 : 0),
+                      padding: EdgeInsets.only(bottom: data.item1 ? height : 0),
                       child: AnimatedContainer(
                         duration: Duration(milliseconds: 400),
-                        height: !_showMenu ? 50 : 0,
+                        height: _showMenu ? 50 : 0,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: MenuBar(
@@ -539,7 +544,7 @@ class _MenuBarState extends State<MenuBar> {
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         return snapshot.hasData
-                            ? snapshot.data.seekValue > 0.95
+                            ? snapshot.data.seekValue > 0.90
                                 ? Container(
                                     height: 25,
                                     padding:
