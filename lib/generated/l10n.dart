@@ -1193,6 +1193,36 @@ class S {
     );
   }
 
+  /// `Medium`
+  String get playerHeightMed {
+    return Intl.message(
+      'Medium',
+      name: 'playerHeightMed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Short`
+  String get playerHeightShort {
+    return Intl.message(
+      'Short',
+      name: 'playerHeightShort',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tall`
+  String get playerHeightTall {
+    return Intl.message(
+      'Tall',
+      name: 'playerHeightTall',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Playing`
   String get playing {
     return Intl.message(
@@ -1932,6 +1962,26 @@ class S {
     );
   }
 
+  /// `Player height`
+  String get settingsPlayerHeight {
+    return Intl.message(
+      'Player height',
+      name: 'settingsPlayerHeight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change player widget height as you like`
+  String get settingsPlayerHeightDes {
+    return Intl.message(
+      'Change player widget height as you like',
+      name: 'settingsPlayerHeightDes',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Episodes popup menu`
   String get settingsPopupMenu {
     return Intl.message(
@@ -1952,10 +2002,10 @@ class S {
     );
   }
 
-  /// `Prefrence`
+  /// `Preference`
   String get settingsPrefrence {
     return Intl.message(
-      'Prefrence',
+      'Preference',
       name: 'settingsPrefrence',
       desc: '',
       args: [],
