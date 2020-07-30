@@ -184,7 +184,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future _getPlayerHeight() async {
-    var index = await playerHeightStorage.getInt(defaultValue: 1);
+    var index = await playerHeightStorage.getInt(defaultValue: 0);
     _playerHeight = PlayerHeight.values[index];
   }
 
