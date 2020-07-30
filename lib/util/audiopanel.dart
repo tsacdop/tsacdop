@@ -53,7 +53,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _controller.forward();
     _slideDirection = SlideDirection.up;
     super.initState();
-    _expandHeight = 600;
+    _expandHeight = widget.maxHeight + 300;
   }
 
   @override
@@ -61,6 +61,16 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _controller.dispose();
     _slowController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(AudioPanel oldWidget) {
+    if (oldWidget.maxHeight != widget.maxHeight) {
+      setState(() {
+        _expandHeight = widget.maxHeight + 300;
+      });
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   double _getHeight() {

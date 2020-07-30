@@ -832,11 +832,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           ],
                         ),
                       ),
-                      Selector<AudioPlayerNotifier, bool>(
-                          selector: (_, audio) => audio.playerRunning,
+                      Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
+                          selector: (_, audio) =>
+                              Tuple2(audio.playerRunning, audio.playerHeight),
                           builder: (_, data, __) {
+                            var height = kMinPlayerHeight[data.item2.index];
                             return SizedBox(
-                              height: data ? 70.0 : 0,
+                              height: data.item1 ? height : 0,
                             );
                           }),
                     ],

@@ -49,7 +49,7 @@ void _audioPlayerTaskEntrypoint() async {
 
 /// Sleep timer mode.
 enum SleepTimerMode { endOfEpisode, timer, undefined }
-
+enum PlayerHeight { short, mid, tall }
 //enum ShareStatus { generate, download, complete, undefined, error }
 
 class AudioPlayerNotifier extends ChangeNotifier {
@@ -63,6 +63,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   var autoSleepTimerEndStorage = KeyValueStorage(autoSleepTimerEndKey);
   var fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
   var rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
+  var playerHeightStorage = KeyValueStorage(playerHeightKey);
 
   /// Current playing episdoe.
   EpisodeBrief _episode;
@@ -139,6 +140,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
   //Update episode card when setting changed
   bool _episodeState = false;
 
+  /// Player height.
+  PlayerHeight _playerHeight;
+
   AudioProcessingState get audioState => _audioState;
   int get backgroundAudioDuration => _backgroundAudioDuration;
   int get backgroundAudioPosition => _backgroundAudioPosition;
@@ -161,6 +165,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool get autoSleepTimer => _autoSleepTimer;
   int get fastForwardSeconds => _fastForwardSeconds;
   int get rewindSeconds => _rewindSeconds;
+  PlayerHeight get playerHeight => _playerHeight;
 
   set setSwitchValue(double value) {
     _switchValue = value;
@@ -170,6 +175,21 @@ class AudioPlayerNotifier extends ChangeNotifier {
   set setEpisodeState(bool boo) {
     _episodeState = !_episodeState;
     notifyListeners();
+  }
+
+  set setPlayerHeight(PlayerHeight mode) {
+    _playerHeight = mode;
+    notifyListeners();
+    _savePlayerHeight();
+  }
+
+  Future _getPlayerHeight() async {
+    var index = await playerHeightStorage.getInt(defaultValue: 1);
+    _playerHeight = PlayerHeight.values[index];
+  }
+
+  Future _savePlayerHeight() async {
+    await playerHeightStorage.saveInt(_playerHeight.index);
   }
 
   Future _getAutoPlay() async {
@@ -189,6 +209,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   @override
   void addListener(VoidCallback listener) async {
+    await _getPlayerHeight();
     super.addListener(listener);
     _queueUpdate = false;
     await _getAutoSleepTimer();

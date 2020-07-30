@@ -395,7 +395,7 @@ class PlaySetting extends StatelessWidget {
                               onChanged: (value) =>
                                   settings.setDefaultSleepTimer = value,
                               items:
-                                  minsToSelect.map<DropdownMenuItem<int>>((e) {
+                                  kMinsToSelect.map<DropdownMenuItem<int>>((e) {
                                 return DropdownMenuItem<int>(
                                     value: e, child: Text(s.minsCount(e)));
                               }).toList()),

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
+import '../class/settingstate.dart';
 import '../local_storage/key_value_storage.dart';
+import '../state/audio_state.dart';
+import '../util/custom_dropdown.dart';
 import '../util/custom_widget.dart';
 import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
@@ -19,6 +23,23 @@ class _LayoutSettingState extends State<LayoutSetting> {
     var keyValueStorage = KeyValueStorage(key);
     var layout = await keyValueStorage.getInt();
     return Layout.values[layout];
+  }
+
+  String _getHeightString(PlayerHeight mode) {
+    final s = context.s;
+    switch (mode) {
+      case PlayerHeight.short:
+        return s.playerHeightShort;
+        break;
+      case PlayerHeight.mid:
+        return s.playerHeightMed;
+        break;
+      case PlayerHeight.tall:
+        return s.playerHeightTall;
+        break;
+      default:
+        return '';
+    }
   }
 
   Widget _gridOptions(BuildContext context,
@@ -130,6 +151,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -160,55 +182,84 @@ class _LayoutSettingState extends State<LayoutSetting> {
                           .bodyText1
                           .copyWith(color: Theme.of(context).accentColor)),
                 ),
+                ListTile(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PopupMenuSetting())),
+                  contentPadding: EdgeInsets.only(left: 80.0, right: 20),
+                  title: Text(s.settingsPopupMenu),
+                  subtitle: Text(s.settingsPopupMenuDes),
+                ),
+                Divider(height: 2),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                ),
+                Container(
+                  height: 30.0,
+                  padding: EdgeInsets.symmetric(horizontal: 70),
+                  alignment: Alignment.centerLeft,
+                  child: Text(s.play,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(color: Theme.of(context).accentColor)),
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.only(
+                      left: 80.0, right: 20, bottom: 10, top: 10),
+                  title: Text(s.settingsPlayerHeight),
+                  subtitle: Text(s.settingsPlayerHeightDes),
+                  trailing: Selector<AudioPlayerNotifier, PlayerHeight>(
+                    selector: (_, audio) => audio.playerHeight,
+                    builder: (_, data, __) => MyDropdownButton(
+                        hint: Text(_getHeightString(data)),
+                        underline: Center(),
+                        elevation: 1,
+                        value: data.index,
+                        items: <int>[0, 1, 2].map<DropdownMenuItem<int>>((e) {
+                          return DropdownMenuItem<int>(
+                              value: e,
+                              child: Text(
+                                  _getHeightString(PlayerHeight.values[e])));
+                        }).toList(),
+                        onChanged: (index) =>
+                            audio.setPlayerHeight = PlayerHeight.values[index]),
+                  ),
+                ),
+                Divider(height: 2),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                ),
+                Container(
+                  height: 30.0,
+                  padding: EdgeInsets.symmetric(horizontal: 70),
+                  alignment: Alignment.centerLeft,
+                  child: Text(s.settingsDefaultGrid,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(color: Theme.of(context).accentColor)),
+                ),
                 ListView(
-                    physics: const BouncingScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
                     children: <Widget>[
-                      ListTile(
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PopupMenuSetting())),
-                        contentPadding: EdgeInsets.only(left: 80.0, right: 20),
-                        title: Text(s.settingsPopupMenu),
-                        subtitle: Text(s.settingsPopupMenuDes),
-                      ),
-                      Divider(height: 2),
-                      Padding(
-                        padding: EdgeInsets.all(10.0),
-                      ),
-                      Container(
-                        height: 30.0,
-                        padding: EdgeInsets.symmetric(horizontal: 70),
-                        alignment: Alignment.centerLeft,
-                        child: Text(s.settingsDefaultGrid,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                .copyWith(
-                                    color: Theme.of(context).accentColor)),
-                      ),
-                      ListView(
-                          physics: const BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          children: <Widget>[
-                            _setDefaultGridView(context,
-                                text: s.settingsDefaultGridPodcast,
-                                key: podcastLayoutKey),
-                            _setDefaultGridView(context,
-                                text: s.settingsDefaultGridRecent,
-                                key: recentLayoutKey),
-                            _setDefaultGridView(context,
-                                text: s.settingsDefaultGridFavorite,
-                                key: favLayoutKey),
-                            _setDefaultGridView(context,
-                                text: s.settingsDefaultGridDownload,
-                                key: downloadLayoutKey),
-                          ]),
-                      Divider(height: 2)
+                      _setDefaultGridView(context,
+                          text: s.settingsDefaultGridPodcast,
+                          key: podcastLayoutKey),
+                      _setDefaultGridView(context,
+                          text: s.settingsDefaultGridRecent,
+                          key: recentLayoutKey),
+                      _setDefaultGridView(context,
+                          text: s.settingsDefaultGridFavorite,
+                          key: favLayoutKey),
+                      _setDefaultGridView(context,
+                          text: s.settingsDefaultGridDownload,
+                          key: downloadLayoutKey),
                     ]),
+                Divider(height: 2),
               ],
             ),
           )),

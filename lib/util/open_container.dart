@@ -73,6 +73,7 @@ class OpenContainer extends StatefulWidget {
     @required this.openBuilder,
     this.flightWidget,
     this.playerRunning,
+    this.playerHeight,
     this.tappable = true,
     this.transitionDuration = const Duration(milliseconds: 300),
     this.transitionType = ContainerTransitionType.fade,
@@ -106,6 +107,7 @@ class OpenContainer extends StatefulWidget {
   final Color closedColor;
   final Widget flightWidget;
   final bool playerRunning;
+  final double playerHeight;
 
   /// Background color of the container while it is open.
   ///
@@ -248,6 +250,7 @@ class _OpenContainerState extends State<OpenContainer> {
       transitionType: widget.transitionType,
       flightWidget: widget.flightWidget,
       playerRunning: widget.playerRunning,
+      playerHeight: widget.playerHeight,
     ));
   }
 
@@ -362,6 +365,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
     @required this.transitionType,
     this.flightWidget,
     this.playerRunning,
+    this.playerHeight,
   })  : assert(closedColor != null),
         assert(openColor != null),
         assert(closedElevation != null),
@@ -391,6 +395,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
 
   final Widget flightWidget;
   final bool playerRunning;
+  final double playerHeight;
   static _FlippableTweenSequence<Color> _getColorTween({
     @required ContainerTransitionType transitionType,
     @required Color closedColor,
@@ -725,7 +730,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
           _positionTween.end = Offset(
               10,
               playerRunning
-                  ? MediaQuery.of(context).size.height - 110
+                  ? MediaQuery.of(context).size.height - 40 - playerHeight
                   : MediaQuery.of(context).size.height - 40);
 
           var _width = MediaQuery.of(context).size.width;
@@ -742,7 +747,9 @@ class _OpenContainerRoute extends ModalRoute<void> {
                       child: SizedBox(
                         width: rect.width,
                         height: rect.height *
-                            (playerRunning ? (1 - 70 / context.height) : 1),
+                            (playerRunning
+                                ? (1 - playerHeight / context.height)
+                                : 1),
                         child: Material(
                           clipBehavior: Clip.antiAlias,
                           animationDuration: Duration.zero,

@@ -9,6 +9,7 @@ import 'package:focused_menu/modals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/home/audioplayer.dart';
 import 'package:tuple/tuple.dart';
 
 import '../episodes/episode_detail.dart';
@@ -592,10 +593,11 @@ class OpenContainerWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<AudioPlayerNotifier, bool>(
-      selector: (_, audio) => audio.playerRunning,
+    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
+      selector: (_, audio) => Tuple2(audio.playerRunning, audio.playerHeight),
       builder: (_, data, __) => OpenContainer(
-        playerRunning: data,
+        playerRunning: data.item1,
+        playerHeight: kMinPlayerHeight[data.item2.index],
         flightWidget: CircleAvatar(
           backgroundImage: FileImage(File("${episode.imagePath}")),
         ),

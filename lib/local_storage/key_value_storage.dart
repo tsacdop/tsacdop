@@ -33,6 +33,7 @@ const String autoSleepTimerModeKey = 'autoSleepTimerModeKey';
 const String tapToOpenPopupMenuKey = 'tapToOpenPopupMenuKey';
 const String fastForwardSecondsKey = 'fastForwardSecondsKey';
 const String rewindSecondsKey = 'rewindSecondsKey';
+const String playerHeightKey = 'playerHeightKey';
 
 class KeyValueStorage {
   final String key;

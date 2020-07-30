@@ -38,8 +38,10 @@ final List<BoxShadow> _customShadowNight = [
   BoxShadow(blurRadius: 8, offset: Offset(2, 2), color: Colors.black)
 ];
 
-const List minsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
-const List speedToSelect = [0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0];
+const List kMinsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
+const List kSpeedToSelect = [0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0];
+const List kMinPlayerHeight = <double>[70.0, 75.0, 80.0];
+const List kMaxPlayerHeight = <double>[300.0, 325.0, 350.0];
 
 class PlayerWidget extends StatelessWidget {
   PlayerWidget({this.playerKey});
@@ -56,7 +58,7 @@ class PlayerWidget extends StatelessWidget {
           selector: (_, audio) =>
               Tuple2(audio.episode?.primaryColor, audio.seekSliderValue),
           builder: (_, data, __) {
-            var _c = context.brightness == Brightness.light
+            var c = context.brightness == Brightness.light
                 ? data.item1.colorizedark()
                 : data.item1.colorizeLight();
             return SizedBox(
@@ -64,7 +66,7 @@ class PlayerWidget extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: data.item2,
                 backgroundColor: context.primaryColor,
-                valueColor: AlwaysStoppedAnimation<Color>(_c),
+                valueColor: AlwaysStoppedAnimation<Color>(c),
               ),
             );
           },
@@ -214,15 +216,20 @@ class PlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<AudioPlayerNotifier, bool>(
-      selector: (_, audio) => audio.playerRunning,
-      builder: (_, playerrunning, __) {
-        return !playerrunning
+    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
+      selector: (_, audio) => Tuple2(audio.playerRunning, audio?.playerHeight),
+      builder: (_, data, __) {
+        var minHeight = kMinPlayerHeight[data.item2.index];
+        var maxHeight = kMaxPlayerHeight[data.item2.index];
+        return !data.item1
             ? Center()
             : AudioPanel(
+                minHeight: minHeight,
+                maxHeight: maxHeight,
                 key: playerKey,
                 miniPanel: _miniPanel(context),
                 expandedPanel: ControlPanel(
+                  maxHeight: maxHeight,
                   onExpand: () {
                     playerKey.currentState.scrollToTop();
                   },
@@ -235,14 +242,9 @@ class PlayerWidget extends StatelessWidget {
   }
 }
 
-class LastPosition extends StatefulWidget {
+class LastPosition extends StatelessWidget {
   LastPosition({Key key}) : super(key: key);
 
-  @override
-  _LastPositionState createState() => _LastPositionState();
-}
-
-class _LastPositionState extends State<LastPosition> {
   Future<PlayHistory> getPosition(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
     return await dbHelper.getPosition(episode);
@@ -255,35 +257,61 @@ class _LastPositionState extends State<LastPosition> {
     return Selector<AudioPlayerNotifier, EpisodeBrief>(
       selector: (_, audio) => audio.episode,
       builder: (context, episode, child) {
-        return FutureBuilder<PlayHistory>(
-            future: getPosition(episode),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
-              return snapshot.hasData
-                  ? snapshot.data.seekValue > 0.90
-                      ? Container(
-                          height: 20.0,
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 1, color: context.textColor),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                          child: Text(s.listened))
-                      : snapshot.data.seconds < 10
-                          ? Center()
-                          : OutlineButton(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100.0),
-                                  side: BorderSide(color: Colors.green[700])),
-                              highlightedBorderColor: Colors.green[700],
-                              onPressed: () => audio.seekTo(
-                                  (snapshot.data.seconds * 1000).toInt()),
-                              child: Text(snapshot.data.seconds.toTime),
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FutureBuilder<PlayHistory>(
+                future: getPosition(episode),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  return snapshot.hasData
+                      ? snapshot.data.seekValue > 0.90
+                          ? Container(
+                              height: 20,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CustomPaint(
+                                  painter: ListenedAllPainter(
+                                      context.accentColor,
+                                      stroke: 2.0),
+                                ),
+                              ),
                             )
-                  : Center();
-            });
+                          : snapshot.data.seconds < 10
+                              ? Center()
+                              : OutlineButton(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(100.0),
+                                      side:
+                                          BorderSide(color: Colors.green[700])),
+                                  highlightedBorderColor: Colors.green[700],
+                                  onPressed: () => audio.seekTo(
+                                      (snapshot.data.seconds * 1000).toInt()),
+                                  child: Row(
+                                    children: [
+                                      Text(s.timeLastPlayed(
+                                          snapshot.data.seconds.toTime)),
+                                    ],
+                                  ),
+                                )
+                      : Center();
+                }),
+            Selector<AudioPlayerNotifier, double>(
+              selector: (_, audio) => audio.switchValue,
+              builder: (_, data, __) => data == 1
+                  ? Container(
+                      height: 20,
+                      width: 40,
+                      child: Transform.rotate(
+                          angle: math.pi * 0.7,
+                          child: Icon(Icons.brightness_2, size: 18)))
+                  : Center(),
+            )
+          ],
+        );
       },
     );
   }
@@ -688,7 +716,7 @@ class SleepModeState extends State<SleepMode>
                             ? Center()
                             : Wrap(
                                 direction: Axis.horizontal,
-                                children: minsToSelect
+                                children: kMinsToSelect
                                     .map((e) => InkWell(
                                           onTap: () =>
                                               setState(() => _minSelected = e),
@@ -870,9 +898,11 @@ class SleepModeState extends State<SleepMode>
 }
 
 class ControlPanel extends StatefulWidget {
-  ControlPanel({this.onExpand, this.onClose, Key key}) : super(key: key);
+  ControlPanel({this.onExpand, this.onClose, this.maxHeight, Key key})
+      : super(key: key);
   final VoidCallback onExpand;
   final VoidCallback onClose;
+  final double maxHeight;
   @override
   _ControlPanelState createState() => _ControlPanelState();
 }
@@ -935,7 +965,7 @@ class _ControlPanelState extends State<ControlPanel>
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return LayoutBuilder(
       builder: (context, constraints) {
-        var maxHeight = constraints.maxHeight;
+        var height = constraints.maxHeight;
         return Container(
           color: context.primaryColor,
           height: 300,
@@ -954,10 +984,10 @@ class _ControlPanelState extends State<ControlPanel>
                               EdgeInsets.only(top: 20, left: 10, right: 10),
                           child: SliderTheme(
                             data: SliderTheme.of(context).copyWith(
-                              activeTrackColor: maxHeight <= 300
+                              activeTrackColor: height <= widget.maxHeight
                                   ? context.accentColor.withAlpha(70)
                                   : Colors.transparent,
-                              inactiveTrackColor: maxHeight > 300
+                              inactiveTrackColor: height > widget.maxHeight
                                   ? Colors.transparent
                                   : context.primaryColorDark,
                               trackHeight: 8.0,
@@ -981,7 +1011,7 @@ class _ControlPanelState extends State<ControlPanel>
                         Container(
                           height: 20.0,
                           padding: EdgeInsets.symmetric(horizontal: 30.0),
-                          child: maxHeight > 300
+                          child: height > widget.maxHeight
                               ? Center()
                               : Row(
                                   children: <Widget>[
@@ -1150,59 +1180,70 @@ class _ControlPanelState extends State<ControlPanel>
                   ),
                 ),
                 Container(
-                  height: 70.0,
-                  padding:
-                      EdgeInsets.only(left: 60, right: 60, bottom: 10, top: 10),
+                  height: 80.0,
+                  padding: EdgeInsets.only(left: 60, right: 60),
                   alignment: Alignment.center,
-                  child: Selector<AudioPlayerNotifier, String>(
-                    selector: (_, audio) => audio.episode.title,
-                    builder: (_, title, __) {
-                      return Container(
-                        child: LayoutBuilder(
-                          builder: (context, size) {
-                            var span = TextSpan(
-                                text: title,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20));
-                            var tp = TextPainter(
-                                text: span,
-                                maxLines: 1,
-                                textDirection: TextDirection.ltr);
-                            tp.layout(maxWidth: size.maxWidth);
-                            if (tp.didExceedMaxLines) {
-                              return Marquee(
-                                text: title,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18),
-                                scrollAxis: Axis.horizontal,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                blankSpace: 30.0,
-                                velocity: 50.0,
-                                pauseAfterRound: Duration.zero,
-                                startPadding: 30.0,
-                                accelerationDuration:
-                                    Duration(milliseconds: 100),
-                                accelerationCurve: Curves.linear,
-                                decelerationDuration:
-                                    Duration(milliseconds: 100),
-                                decelerationCurve: Curves.linear,
-                              );
-                            } else {
-                              return Text(
-                                title,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              );
-                            }
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: Selector<AudioPlayerNotifier, String>(
+                          selector: (_, audio) => audio.episode.title,
+                          builder: (_, title, __) {
+                            return Container(
+                              child: LayoutBuilder(
+                                builder: (context, size) {
+                                  var span = TextSpan(
+                                      text: title,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20));
+                                  var tp = TextPainter(
+                                      text: span,
+                                      maxLines: 1,
+                                      textDirection: TextDirection.ltr);
+                                  tp.layout(maxWidth: size.maxWidth);
+                                  if (tp.didExceedMaxLines) {
+                                    return Marquee(
+                                      text: title,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                      scrollAxis: Axis.horizontal,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      blankSpace: 30.0,
+                                      velocity: 50.0,
+                                      pauseAfterRound: Duration.zero,
+                                      startPadding: 30.0,
+                                      accelerationDuration:
+                                          Duration(milliseconds: 100),
+                                      accelerationCurve: Curves.linear,
+                                      decelerationDuration:
+                                          Duration(milliseconds: 100),
+                                      decelerationCurve: Curves.linear,
+                                    );
+                                  } else {
+                                    return Text(
+                                      title,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    );
+                                  }
+                                },
+                              ),
+                            );
                           },
                         ),
-                      );
-                    },
+                      ),
+                      if (height <= widget.maxHeight) LastPosition()
+                    ],
                   ),
                 ),
-                if (constraints.maxHeight > 300)
+                if (height > widget.maxHeight)
                   SizedBox(
-                    height: constraints.maxHeight - 300,
+                    height: height - widget.maxHeight,
                     child: SingleChildScrollView(
                         physics: NeverScrollableScrollPhysics(),
                         child: SizedBox(
@@ -1229,7 +1270,7 @@ class _ControlPanelState extends State<ControlPanel>
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      if (maxHeight <= 300)
+                      if (height <= widget.maxHeight)
                         Selector<AudioPlayerNotifier,
                             Tuple3<EpisodeBrief, bool, bool>>(
                           selector: (_, audio) => Tuple3(audio.episode,
@@ -1252,16 +1293,7 @@ class _ControlPanelState extends State<ControlPanel>
                                               FadeRoute(
                                                   page: EpisodeDetail(
                                                       episodeItem: data.item1,
-                                                      heroTag: 'playpanel'))
-                                              //  PageRouteBuilder( pageBuilder: (context,
-                                              //            animation,
-                                              //              secondAnimation) =>
-                                              //          EpisodeDetail(
-                                              //              episodeItem:
-                                              //                  data.item1,
-                                              //              heroTag:
-                                              //                  'playpanel'))
-                                              );
+                                                      heroTag: 'playpanel')));
                                         },
                                         child: Row(
                                           children: [
@@ -1292,7 +1324,7 @@ class _ControlPanelState extends State<ControlPanel>
                                         padding: EdgeInsets.all(10.0),
                                         scrollDirection: Axis.horizontal,
                                         child: Row(
-                                          children: speedToSelect
+                                          children: kSpeedToSelect
                                               .map<Widget>((e) => InkWell(
                                                     onTap: () {
                                                       if (_setSpeed == 1) {
@@ -1389,7 +1421,11 @@ class _ControlPanelState extends State<ControlPanel>
                         ),
                       if (_setSpeed == 0)
                         Positioned(
-                          bottom: 15,
+                          bottom: widget.maxHeight == kMaxPlayerHeight[2]
+                              ? 35.0
+                              : widget.maxHeight == kMaxPlayerHeight[1]
+                                  ? 25.0
+                                  : 15.0,
                           child: InkWell(
                               child: SizedBox(
                                 height: 50,
@@ -1401,16 +1437,18 @@ class _ControlPanelState extends State<ControlPanel>
                                       painter: TabIndicator(
                                           index: _tabIndex,
                                           indicatorSize: 20,
-                                          fraction: (maxHeight - 300) / 300,
+                                          fraction:
+                                              (height - widget.maxHeight) / 300,
                                           accentColor: context.accentColor,
                                           color: context.textColor)),
                                 ),
                               ),
                               onTap: widget.onExpand),
                         ),
-                      if (_setSpeed == 0 && maxHeight > 300)
+                      if (_setSpeed == 0 && height > widget.maxHeight)
                         Transform.translate(
-                          offset: Offset(0, 5) * (maxHeight - 300) / 300,
+                          offset:
+                              Offset(0, 5) * (height - widget.maxHeight) / 300,
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                                 horizontal: context.width / 2 - 80),
