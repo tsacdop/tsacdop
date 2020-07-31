@@ -219,24 +219,26 @@ class PlayerWidget extends StatelessWidget {
     return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
       selector: (_, audio) => Tuple2(audio.playerRunning, audio?.playerHeight),
       builder: (_, data, __) {
-        var minHeight = kMinPlayerHeight[data.item2.index];
-        var maxHeight = kMaxPlayerHeight[data.item2.index];
-        return !data.item1
-            ? Center()
-            : AudioPanel(
-                minHeight: minHeight,
+        if (!data.item1) {
+          return Center();
+        } else {
+          var minHeight = kMinPlayerHeight[data.item2.index];
+          var maxHeight = kMaxPlayerHeight[data.item2.index];
+          return AudioPanel(
+              minHeight: minHeight,
+              maxHeight: maxHeight,
+              key: playerKey,
+              miniPanel: _miniPanel(context),
+              expandedPanel: ControlPanel(
                 maxHeight: maxHeight,
-                key: playerKey,
-                miniPanel: _miniPanel(context),
-                expandedPanel: ControlPanel(
-                  maxHeight: maxHeight,
-                  onExpand: () {
-                    playerKey.currentState.scrollToTop();
-                  },
-                  onClose: () {
-                    playerKey.currentState.backToMini();
-                  },
-                ));
+                onExpand: () {
+                  playerKey.currentState.scrollToTop();
+                },
+                onClose: () {
+                  playerKey.currentState.backToMini();
+                },
+              ));
+        }
       },
     );
   }

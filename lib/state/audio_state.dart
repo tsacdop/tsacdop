@@ -208,12 +208,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   @override
-  void addListener(VoidCallback listener) async {
-    await _getPlayerHeight();
+  void addListener(VoidCallback listener) {
     super.addListener(listener);
+    _getPlayerHeight();
     _queueUpdate = false;
-    await _getAutoSleepTimer();
-    await AudioService.connect();
+    _getAutoSleepTimer();
+    AudioService.connect();
     var running = AudioService.running;
     if (running) {}
   }
