@@ -775,7 +775,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   title: _topHeight < 70 + context.paddingTop
                                       ? Text(widget.podcastLocal.title,
                                           maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                          overflow: TextOverflow.clip,
                                           style: TextStyle(color: Colors.white))
                                       : Center(),
                                 );
@@ -807,14 +807,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                           initNum: _scroll ? 0 : 12,
                                         )
                                       : SliverToBoxAdapter(
-                                          child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 200),
-                                              child: SizedBox(
-                                                  height: 20,
-                                                  width: 20,
-                                                  child:
-                                                      CircularProgressIndicator())),
+                                          child: Center(),
                                         );
                                 }),
                             SliverList(
