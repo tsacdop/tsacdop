@@ -187,6 +187,7 @@ class EpisodeGrid extends StatelessWidget {
   Widget _pubDate(BuildContext context, {EpisodeBrief episode, Color color}) =>
       Text(
         episode.pubDate.toDate(context),
+        overflow: TextOverflow.visible,
         style: TextStyle(
             fontSize: context.width / 35,
             color: color,
@@ -443,6 +444,8 @@ class EpisodeGrid extends StatelessWidget {
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: <Widget>[
                                         layout != Layout.one
                                             ? _circleImage(context,
@@ -490,77 +493,63 @@ class EpisodeGrid extends StatelessWidget {
                                     flex: 1,
                                     child: Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: <Widget>[
                                         if (layout != Layout.one)
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: _pubDate(context,
-                                                episode: episodes[index],
-                                                color: _c),
-                                          ),
+                                          _pubDate(context,
+                                              episode: episodes[index],
+                                              color: _c),
                                         Spacer(),
-                                        layout != Layout.three &&
-                                                episodes[index].duration != 0
-                                            ? Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  episodes[index]
-                                                      .duration
-                                                      .toTime,
-                                                  style: TextStyle(
-                                                      fontSize: _width / 35),
-                                                ),
-                                              )
-                                            : Center(),
-                                        episodes[index].duration == 0 ||
-                                                episodes[index]
-                                                        .enclosureLength ==
-                                                    null ||
-                                                episodes[index]
-                                                        .enclosureLength ==
-                                                    0 ||
-                                                layout == Layout.three
-                                            ? Center()
-                                            : Text(
-                                                '|',
-                                                style: TextStyle(
-                                                  fontSize: _width / 35,
-                                                  // color: _c,
-                                                  // fontStyle: FontStyle.italic,
-                                                ),
-                                              ),
-                                        layout != Layout.three &&
-                                                episodes[index]
-                                                        .enclosureLength !=
-                                                    null &&
-                                                episodes[index]
-                                                        .enclosureLength !=
-                                                    0
-                                            ? Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  '${(episodes[index].enclosureLength) ~/ 1000000}MB',
-                                                  style: TextStyle(
-                                                      fontSize: _width / 35),
-                                                ),
-                                              )
-                                            : Center(),
+                                        if (layout != Layout.three &&
+                                            episodes[index].duration != 0)
+                                          Container(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              episodes[index].duration.toTime,
+                                              style: TextStyle(
+                                                  fontSize: _width / 35),
+                                            ),
+                                          ),
+                                        if (episodes[index].duration != 0 &&
+                                            episodes[index].enclosureLength !=
+                                                null &&
+                                            episodes[index].enclosureLength !=
+                                                0 &&
+                                            layout != Layout.three)
+                                          Text(
+                                            '|',
+                                            style: TextStyle(
+                                              fontSize: _width / 35,
+                                              // color: _c,
+                                              // fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        if (layout != Layout.three &&
+                                            episodes[index].enclosureLength !=
+                                                null &&
+                                            episodes[index].enclosureLength !=
+                                                0)
+                                          Container(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              '${(episodes[index].enclosureLength) ~/ 1000000}MB',
+                                              style: TextStyle(
+                                                  fontSize: _width / 35),
+                                            ),
+                                          ),
                                         Padding(
                                           padding: EdgeInsets.all(1),
                                         ),
-                                        showFavorite || layout != Layout.three
-                                            ? isLiked
-                                                ? IconTheme(
-                                                    data: IconThemeData(
-                                                        size: _width / 35),
-                                                    child: Icon(
-                                                      Icons.favorite,
-                                                      color: Colors.red,
-                                                    ),
-                                                  )
-                                                : Center()
-                                            : Center()
+                                        if ((showFavorite ||
+                                                layout != Layout.three) &&
+                                            isLiked)
+                                          Icon(
+                                            Icons.favorite,
+                                            color: Colors.red,
+                                            size: _width / 35,
+                                          )
                                       ],
                                     ),
                                   ),

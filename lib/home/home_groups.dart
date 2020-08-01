@@ -878,18 +878,18 @@ class ShowEpisode extends StatelessWidget {
                                     Expanded(
                                         flex: 1,
                                         child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: <Widget>[
-                                            Container(
-                                              alignment: Alignment.bottomLeft,
-                                              child: Text(
-                                                _dateToString(context,
-                                                    pubDate: episodes[index]
-                                                        .pubDate),
-                                                style: TextStyle(
-                                                  fontSize: _width / 35,
-                                                  color: _c,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
+                                            Text(
+                                              _dateToString(context,
+                                                  pubDate:
+                                                      episodes[index].pubDate),
+                                              overflow: TextOverflow.visible,
+                                              style: TextStyle(
+                                                fontSize: _width / 35,
+                                                color: _c,
+                                                fontStyle: FontStyle.italic,
                                               ),
                                             ),
                                             Spacer(),
