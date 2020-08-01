@@ -1058,8 +1058,9 @@ class DBHelper {
   Future<bool> isDownloaded(String url) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
-        "SELECT downloaded FROM Episodes WHERE enclosure_url = ?", [url]);
-    return list.first['downloaded'] == 'ND' ? false : true;
+        "SELECT id FROM Episodes WHERE enclosure_url = ? AND enclosure_url != media_id",
+        [url]);
+    return list.isNotEmpty;
   }
 
   Future<int> saveDownloaded(String url, String id) async {

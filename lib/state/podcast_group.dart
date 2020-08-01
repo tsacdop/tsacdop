@@ -150,8 +150,9 @@ class GroupList extends ChangeNotifier {
   SubscribeItem _currentSubscribeItem = SubscribeItem('', '');
   SubscribeItem get currentSubscribeItem => _currentSubscribeItem;
 
-  /// Default false, true if subscribe isolate is created.
   bool _created = false;
+
+  /// Default false, true if subscribe isolate is created.
   bool get created => _created;
 
   /// Add subsribe item
@@ -452,7 +453,6 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       try {
         p = RssFeed.parse(response.data);
       } catch (e) {
-        print(e);
         sendPort.send([item.title, item.url, 6]);
         await Future.delayed(Duration(seconds: 2));
         sendPort.send([item.title, item.url, 4]);
@@ -567,7 +567,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         }
       }
     } catch (e) {
-      print(e);
+      print('$e confirm');
       sendPort.send([item.title, item.url, 6]);
       await Future.delayed(Duration(seconds: 2));
       sendPort.send([item.title, item.url, 4]);
