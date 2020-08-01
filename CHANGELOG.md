@@ -1,5 +1,27 @@
 # Tsacdop Changelog
 
+## v0.4.9
+
+Release date 2020/8/1
+
+### New features
+
+* Player ui redesign.
+* Added player height setting.
+* Added skip slience feature.
+
+### Bugs fixed
+
+* Language fixs. (Thanks to Atrate)
+* Make app movable to SD card. (Thanks to Atrate)
+
+### Minor change
+
+* Episode page open animation improved.
+* POdcast page load faster than before.
+* Removed unnecessary scroll overlay effect.
+* Episode page bottom menu hide when scroll down. 
+
 ## v0.4.8
 
 Release date 2020/7/25
