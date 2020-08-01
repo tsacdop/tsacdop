@@ -59,6 +59,7 @@ class MyApp extends StatelessWidget {
             theme: lightTheme.copyWith(
                 accentColor: setting.accentSetColor,
                 cursorColor: setting.accentSetColor,
+                textSelectionHandleColor: setting.accentSetColor,
                 toggleableActiveColor: setting.accentSetColor),
             darkTheme: ThemeData.dark().copyWith(
                 accentColor: setting.accentSetColor,
