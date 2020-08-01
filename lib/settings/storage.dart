@@ -131,7 +131,7 @@ class _StorageSettingState extends State<StorageSetting>
                             return ListTile(
                               onTap: () => settings.downloadUsingData = !data,
                               contentPadding: EdgeInsets.only(
-                                  left: 80.0, right: 25, bottom: 10, top: 10),
+                                  left: 70.0, right: 25, bottom: 10, top: 10),
                               title: Text(s.settingsNetworkCellular),
                               subtitle: Text(s.settingsNetworkCellularDes),
                               trailing: Transform.scale(
@@ -156,7 +156,7 @@ class _StorageSettingState extends State<StorageSetting>
                                   setState(() {});
                                 },
                                 contentPadding: EdgeInsets.only(
-                                    left: 80.0, right: 25, bottom: 10, top: 10),
+                                    left: 70.0, right: 25, bottom: 10, top: 10),
                                 title: Text(s.settingsNetworkCellularAuto),
                                 subtitle:
                                     Text(s.settingsNetworkCellularAutoDes),
@@ -203,7 +203,7 @@ class _StorageSettingState extends State<StorageSetting>
                             context,
                             MaterialPageRoute(
                                 builder: (context) => DownloadsManage())),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 80.0),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 70.0),
                         title: Text(s.download),
                         subtitle: Text(s.settingsManageDownloadDes),
                       ),
@@ -214,7 +214,7 @@ class _StorageSettingState extends State<StorageSetting>
                         builder: (context, snapshot) {
                           return ListTile(
                             contentPadding:
-                                EdgeInsets.only(left: 80.0, right: 20),
+                                EdgeInsets.only(left: 70.0, right: 20),
                             title: Text(s.settingsAutoDelete),
                             subtitle: Text(s.settingsAutoDeleteDes),
                             trailing: MyDropdownButton(
@@ -240,7 +240,7 @@ class _StorageSettingState extends State<StorageSetting>
                       ),
                       Divider(height: 2),
                       ListTile(
-                        contentPadding: EdgeInsets.only(left: 80.0, right: 25),
+                        contentPadding: EdgeInsets.only(left: 70.0, right: 25),
                         //  leading: Icon(Icons.colorize),
                         title: Text(s.settingsAudioCache),
                         subtitle: Text(s.settingsAudioCacheDes),
@@ -257,7 +257,7 @@ class _StorageSettingState extends State<StorageSetting>
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            left: 60.0, right: 20.0, bottom: 10.0),
+                            left: 50.0, right: 20.0, bottom: 10.0),
                         child: SliderTheme(
                           data: Theme.of(context).sliderTheme.copyWith(
                               showValueIndicator: ShowValueIndicator.always,

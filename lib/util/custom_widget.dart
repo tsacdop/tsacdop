@@ -949,7 +949,7 @@ class DownloadPainter extends CustomPainter {
     var center = Offset(size.width / 2, size.height / 2);
     if (pauseProgress == 0) {
       canvas.drawLine(
-          Offset(width / 2, 0), Offset(width / 2, height * 4 / 5), _paint);
+          Offset(width / 2, 2), Offset(width / 2, height * 4 / 5), _paint);
       canvas.drawLine(Offset(width / 5, height / 2),
           Offset(width / 2, height * 4 / 5), _paint);
       canvas.drawLine(Offset(width * 4 / 5, height / 2),

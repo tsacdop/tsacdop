@@ -31,6 +31,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
         receiveTimeout: 10000,
       );
       var response = await Dio(options).get(url);
+      print(response);
       return RssFeed.parse(response.data);
     } catch (e) {
       rethrow;
@@ -330,18 +331,15 @@ class _RssResultState extends State<RssResult> {
                       return Container(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                         alignment: Alignment.center,
-                        child: SizedBox(
-                          width: 100,
-                          child: OutlineButton(
-                            highlightedBorderColor: context.accentColor,
-                            splashColor: context.accentColor.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(100))),
-                            child: Text(context.s.loadMore),
-                            onPressed: () => setState(
-                              () => _loadItems += 10,
-                            ),
+                        child: OutlineButton(
+                          highlightedBorderColor: context.accentColor,
+                          splashColor: context.accentColor.withOpacity(0.5),
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(100))),
+                          child: Text(context.s.loadMore),
+                          onPressed: () => setState(
+                            () => _loadItems += 10,
                           ),
                         ),
                       );
@@ -439,33 +437,30 @@ class _SearchListState extends State<SearchList> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
-                        child: SizedBox(
-                          height: 30,
-                          child: OutlineButton(
-                            highlightedBorderColor: context.accentColor,
-                            splashColor: context.accentColor.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(100))),
-                            child: _loading
-                                ? SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ))
-                                : Text(context.s.loadMore),
-                            onPressed: () => _loading
-                                ? null
-                                : setState(
-                                    () {
-                                      _loading = true;
-                                      _nextOffset = _offset;
-                                      _searchFuture =
-                                          _getList(widget.query, _nextOffset);
-                                    },
-                                  ),
-                          ),
+                        child: OutlineButton(
+                          highlightedBorderColor: context.accentColor,
+                          splashColor: context.accentColor.withOpacity(0.5),
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(100))),
+                          child: _loading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ))
+                              : Text(context.s.loadMore),
+                          onPressed: () => _loading
+                              ? null
+                              : setState(
+                                  () {
+                                    _loading = true;
+                                    _nextOffset = _offset;
+                                    _searchFuture =
+                                        _getList(widget.query, _nextOffset);
+                                  },
+                                ),
                         ),
                       )
                     ],
@@ -489,6 +484,7 @@ class _SearchListState extends State<SearchList> {
             builder: (context, constrants) => SearchResultDetail(
               _selectedPodcast,
               maxHeight: constrants.maxHeight,
+              isSubscribed: _subscribed.contains(_selectedPodcast),
               onClose: (option) {
                 setState(() => _selectedPodcast = null);
               },
@@ -613,6 +609,7 @@ class SearchResultDetail extends StatefulWidget {
       this.maxHeight,
       this.onSubscribe,
       this.episodeList,
+      this.isSubscribed,
       Key key})
       : super(key: key);
   final OnlinePodcast onlinePodcast;
@@ -620,6 +617,7 @@ class SearchResultDetail extends StatefulWidget {
   final ValueChanged<OnlinePodcast> onSubscribe;
   final double maxHeight;
   final List<OnlineEpisode> episodeList;
+  final bool isSubscribed;
   @override
   _SearchResultDetailState createState() => _SearchResultDetailState();
 }
@@ -653,9 +651,6 @@ class _SearchResultDetailState extends State<SearchResultDetail>
   final List<OnlineEpisode> _episodeList = [];
 
   Future _searchFuture;
-
-  /// Subscribe indicator.
-  bool _isSubscribed = false;
 
   /// Episodes list load more.
   bool _loading = false;
@@ -821,7 +816,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                   overflow: TextOverflow.fade,
                                   style: TextStyle(color: context.accentColor),
                                 ),
-                                !_isSubscribed
+                                !widget.isSubscribed
                                     ? OutlineButton(
                                         highlightedBorderColor:
                                             context.accentColor,
@@ -838,9 +833,6 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                         onPressed: () {
                                           subscribePodcast(
                                               widget.onlinePodcast);
-                                          setState(() {
-                                            _isSubscribed = true;
-                                          });
                                           Fluttertoast.showToast(
                                             msg: s.podcastSubscribed,
                                             gravity: ToastGravity.BOTTOM,
@@ -971,7 +963,6 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                       top: 10.0, bottom: 20.0),
                                   alignment: Alignment.center,
                                   child: SizedBox(
-                                    width: 100,
                                     child: OutlineButton(
                                       highlightedBorderColor:
                                           context.accentColor,

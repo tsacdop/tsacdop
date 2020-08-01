@@ -70,7 +70,7 @@ class SyncingSetting extends StatelessWidget {
                             }
                           },
                           contentPadding: const EdgeInsets.only(
-                              left: 80.0, right: 20, bottom: 10),
+                              left: 70.0, right: 20, bottom: 10),
                           title: Text(s.settingsEnableSyncing),
                           subtitle: Text(s.settingsEnableSyncingDes),
                           trailing: Transform.scale(
@@ -87,10 +87,9 @@ class SyncingSetting extends StatelessWidget {
                                 }),
                           ),
                         ),
-                        Divider(height: 2),
                         ListTile(
                           contentPadding:
-                              const EdgeInsets.only(left: 80.0, right: 20),
+                              const EdgeInsets.only(left: 70.0, right: 20),
                           title: Text(s.settingsUpdateInterval),
                           subtitle: Text(s.settingsUpdateIntervalDes),
                           trailing: MyDropdownButton(

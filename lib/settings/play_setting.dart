@@ -281,8 +281,8 @@ class PlaySetting extends StatelessWidget {
                         selector: (_, settings) => settings.autoPlay,
                         builder: (_, data, __) => ListTile(
                           onTap: () => settings.setAutoPlay = !data,
-                          contentPadding:
-                              EdgeInsets.only(left: 80.0, right: 20),
+                          contentPadding: EdgeInsets.only(
+                              left: 70.0, right: 20, bottom: 10),
                           title: Text(s.settingsMenuAutoPlay),
                           subtitle: Text(s.settingsAutoPlayDes),
                           trailing: Transform.scale(
@@ -316,7 +316,7 @@ class PlaySetting extends StatelessWidget {
                       children: <Widget>[
                         ListTile(
                           contentPadding: EdgeInsets.only(
-                              left: 80.0, right: 20, bottom: 10, top: 10),
+                              left: 70.0, right: 20, bottom: 10, top: 10),
                           title: Text(s.settingsFastForwardSec),
                           subtitle: Text(s.settingsFastForwardSecDes),
                           trailing: Selector<SettingState, int>(
@@ -340,7 +340,7 @@ class PlaySetting extends StatelessWidget {
                         ),
                         ListTile(
                           contentPadding: EdgeInsets.only(
-                              left: 80.0, right: 20, bottom: 10, top: 10),
+                              left: 70.0, right: 20, bottom: 10, top: 10),
                           title: Text(s.settingsRewindSec),
                           subtitle: Text(s.settingsRewindSecDes),
                           trailing: Selector<SettingState, int>(
@@ -380,7 +380,7 @@ class PlaySetting extends StatelessWidget {
                     scrollDirection: Axis.vertical,
                     children: <Widget>[
                       ListTile(
-                        contentPadding: EdgeInsets.only(left: 80.0, right: 20),
+                        contentPadding: EdgeInsets.only(left: 70.0, right: 20),
                         title: Text(s.settingsSTDefaultTime),
                         subtitle: Text(s.settingsSTDefautTimeDes),
                         trailing: Selector<SettingState, int>(
@@ -401,13 +401,12 @@ class PlaySetting extends StatelessWidget {
                               }).toList()),
                         ),
                       ),
-                      Divider(),
                       Selector<SettingState, bool>(
                         selector: (_, settings) => settings.autoSleepTimer,
                         builder: (_, data, __) => ListTile(
                           onTap: () => settings.setAutoSleepTimer = !data,
                           contentPadding: const EdgeInsets.only(
-                              left: 80.0, right: 20.0, bottom: 10.0, top: 10.0),
+                              left: 70.0, right: 20.0, bottom: 10.0, top: 10.0),
                           title: Text(s.settingsSTAuto),
                           subtitle: Text(s.settingsSTAutoDes),
                           trailing: Transform.scale(
@@ -421,7 +420,7 @@ class PlaySetting extends StatelessWidget {
                       ),
                       ListTile(
                           contentPadding: const EdgeInsets.only(
-                              left: 80.0, right: 20.0, bottom: 10.0, top: 10.0),
+                              left: 70.0, right: 20.0, bottom: 10.0, top: 10.0),
                           title: Text(s.settingsSTMode),
                           subtitle:
                               context.width > 360 ? null : _modeWidget(context),
@@ -430,7 +429,7 @@ class PlaySetting extends StatelessWidget {
                               : null),
                       ListTile(
                           contentPadding:
-                              EdgeInsets.only(left: 80.0, right: 20),
+                              EdgeInsets.only(left: 70.0, right: 20),
                           title: Text(s.schedule),
                           subtitle: context.width > 360
                               ? null

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../state/setting_state.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 import '../util/general_dialog.dart';
 
@@ -131,7 +132,7 @@ class ThemeSetting extends StatelessWidget {
                               ),
                             ),
                           )),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 80.0),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 70.0),
                   //  leading: Icon(Icons.colorize),
                   title: Text(s.settingsTheme),
                   subtitle: Text(s.systemDefault),
@@ -141,7 +142,7 @@ class ThemeSetting extends StatelessWidget {
                   builder: (_, data, __) => ListTile(
                     onTap: () => settings.setRealDark = !data,
                     contentPadding: const EdgeInsets.only(
-                        left: 80.0, right: 20, bottom: 10, top: 10),
+                        left: 70.0, right: 20, bottom: 10, top: 10),
                     //  leading: Icon(Icons.colorize),
                     title: Text(
                       s.settingsRealDark,
@@ -172,7 +173,7 @@ class ThemeSetting extends StatelessWidget {
                           settings.setAccentColor = value,
                     ),
                   ),
-                  contentPadding: EdgeInsets.only(left: 80.0, right: 25),
+                  contentPadding: EdgeInsets.only(left: 70.0, right: 35),
                   title: Text(s.settingsAccentColor),
                   subtitle: Text(s.settingsAccentColorDes),
                   trailing: Container(
@@ -279,66 +280,70 @@ class _ColorPickerState extends State<ColorPicker>
               key: UniqueKey(),
               controller: _controller,
               children: Colors.primaries
-                  .map<Widget>((color) => GridView.count(
-                        primary: false,
-                        padding: const EdgeInsets.all(10),
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        crossAxisCount: 3,
-                        children: <Widget>[
-                          _colorCircle(color.shade100),
-                          _colorCircle(color.shade200),
-                          _colorCircle(color.shade300),
-                          _colorCircle(color.shade400),
-                          _colorCircle(color.shade500),
-                          _colorCircle(color.shade600),
-                          _colorCircle(color.shade700),
-                          _colorCircle(color.shade800),
-                          _colorCircle(color.shade900),
-                          ...color == Colors.red
-                              ? _accentList(Colors.redAccent)
-                              : color == Colors.pink
-                                  ? _accentList(Colors.pinkAccent)
-                                  : color == Colors.deepOrange
-                                      ? _accentList(Colors.deepOrangeAccent)
-                                      : color == Colors.orange
-                                          ? _accentList(Colors.orangeAccent)
-                                          : color == Colors.amber
-                                              ? _accentList(Colors.amberAccent)
-                                              : color == Colors.yellow
-                                                  ? _accentList(
-                                                      Colors.yellowAccent)
-                                                  : color == Colors.lime
-                                                      ? _accentList(
-                                                          Colors.limeAccent)
-                                                      : color ==
-                                                              Colors.lightGreen
-                                                          ? _accentList(Colors
-                                                              .lightGreenAccent)
-                                                          : color == Colors.green
-                                                              ? _accentList(Colors
-                                                                  .greenAccent)
-                                                              : color ==
-                                                                      Colors
-                                                                          .teal
-                                                                  ? _accentList(
-                                                                      Colors
-                                                                          .tealAccent)
-                                                                  : color ==
-                                                                          Colors
-                                                                              .cyan
-                                                                      ? _accentList(
-                                                                          Colors
-                                                                              .cyanAccent)
-                                                                      : color ==
-                                                                              Colors
-                                                                                  .lightBlue
-                                                                          ? _accentList(Colors
-                                                                              .lightBlueAccent)
-                                                                          : color == Colors.blue
-                                                                              ? _accentList(Colors.blueAccent)
-                                                                              : color == Colors.indigo ? _accentList(Colors.indigoAccent) : color == Colors.purple ? _accentList(Colors.purpleAccent) : color == Colors.deepPurple ? _accentList(Colors.deepPurpleAccent) : []
-                        ],
+                  .map<Widget>((color) => ScrollConfiguration(
+                        behavior: NoGrowBehavior(),
+                        child: GridView.count(
+                          primary: false,
+                          padding: const EdgeInsets.all(10),
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          crossAxisCount: 3,
+                          children: <Widget>[
+                            _colorCircle(color.shade100),
+                            _colorCircle(color.shade200),
+                            _colorCircle(color.shade300),
+                            _colorCircle(color.shade400),
+                            _colorCircle(color.shade500),
+                            _colorCircle(color.shade600),
+                            _colorCircle(color.shade700),
+                            _colorCircle(color.shade800),
+                            _colorCircle(color.shade900),
+                            ...color == Colors.red
+                                ? _accentList(Colors.redAccent)
+                                : color == Colors.pink
+                                    ? _accentList(Colors.pinkAccent)
+                                    : color == Colors.deepOrange
+                                        ? _accentList(Colors.deepOrangeAccent)
+                                        : color == Colors.orange
+                                            ? _accentList(Colors.orangeAccent)
+                                            : color == Colors.amber
+                                                ? _accentList(
+                                                    Colors.amberAccent)
+                                                : color == Colors.yellow
+                                                    ? _accentList(
+                                                        Colors.yellowAccent)
+                                                    : color == Colors.lime
+                                                        ? _accentList(
+                                                            Colors.limeAccent)
+                                                        : color ==
+                                                                Colors
+                                                                    .lightGreen
+                                                            ? _accentList(Colors
+                                                                .lightGreenAccent)
+                                                            : color ==
+                                                                    Colors.green
+                                                                ? _accentList(Colors
+                                                                    .greenAccent)
+                                                                : color ==
+                                                                        Colors
+                                                                            .teal
+                                                                    ? _accentList(
+                                                                        Colors
+                                                                            .tealAccent)
+                                                                    : color ==
+                                                                            Colors
+                                                                                .cyan
+                                                                        ? _accentList(
+                                                                            Colors
+                                                                                .cyanAccent)
+                                                                        : color == Colors.lightBlue
+                                                                            ? _accentList(Colors
+                                                                                .lightBlueAccent)
+                                                                            : color == Colors.blue
+                                                                                ? _accentList(Colors.blueAccent)
+                                                                                : color == Colors.indigo ? _accentList(Colors.indigoAccent) : color == Colors.purple ? _accentList(Colors.purpleAccent) : color == Colors.deepPurple ? _accentList(Colors.deepPurpleAccent) : []
+                          ],
+                        ),
                       ))
                   .toList(),
             ),

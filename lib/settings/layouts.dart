@@ -123,7 +123,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
 
   Widget _setDefaultGridView(BuildContext context, {String text, String key}) {
     return Padding(
-      padding: EdgeInsets.only(left: 80.0, right: 20, bottom: 10),
+      padding: EdgeInsets.only(left: 70.0, right: 20, bottom: 10),
       child: context.width > 360
           ? Row(
               children: [
@@ -186,7 +186,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => PopupMenuSetting())),
-                  contentPadding: EdgeInsets.only(left: 80.0, right: 20),
+                  contentPadding: EdgeInsets.only(left: 70.0, right: 20),
                   title: Text(s.settingsPopupMenu),
                   subtitle: Text(s.settingsPopupMenuDes),
                 ),
@@ -206,7 +206,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.only(
-                      left: 80.0, right: 20, bottom: 10, top: 10),
+                      left: 70.0, right: 20, bottom: 10, top: 10),
                   title: Text(s.settingsPlayerHeight),
                   subtitle: Text(s.settingsPlayerHeightDes),
                   trailing: Selector<AudioPlayerNotifier, PlayerHeight>(
