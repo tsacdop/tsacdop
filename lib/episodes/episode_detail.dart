@@ -378,7 +378,12 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       ),
                     );
                   }),
-              Container(child: PlayerWidget(playerKey: _playerKey)),
+              Selector<AudioPlayerNotifier, EpisodeBrief>(
+                  selector: (_, audio) => audio.episode,
+                  builder: (_, data, __) => Container(
+                      child: PlayerWidget(
+                          playerKey: _playerKey,
+                          isPlayingPage: data == widget.episodeItem))),
             ],
           ),
         ),
@@ -623,8 +628,7 @@ class _MenuBarState extends State<MenuBar> {
           Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
             selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
             builder: (_, data, __) {
-              return (widget.episodeItem.title == data.item1?.title &&
-                      data.item2)
+              return (widget.episodeItem == data.item1 && data.item2)
                   ? Container(
                       padding: EdgeInsets.only(right: 30),
                       child: SizedBox(

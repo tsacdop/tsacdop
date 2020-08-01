@@ -44,8 +44,9 @@ const List kMinPlayerHeight = <double>[70.0, 75.0, 80.0];
 const List kMaxPlayerHeight = <double>[300.0, 325.0, 350.0];
 
 class PlayerWidget extends StatelessWidget {
-  PlayerWidget({this.playerKey});
+  PlayerWidget({this.playerKey, this.isPlayingPage = false});
   final GlobalKey<AudioPanelState> playerKey;
+  final bool isPlayingPage;
   Widget _miniPanel(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
@@ -231,6 +232,7 @@ class PlayerWidget extends StatelessWidget {
               miniPanel: _miniPanel(context),
               expandedPanel: ControlPanel(
                 maxHeight: maxHeight,
+                isPlayingPage: isPlayingPage,
                 onExpand: () {
                   playerKey.currentState.scrollToTop();
                 },
@@ -934,11 +936,17 @@ class SleepModeState extends State<SleepMode>
 }
 
 class ControlPanel extends StatefulWidget {
-  ControlPanel({this.onExpand, this.onClose, this.maxHeight, Key key})
+  ControlPanel(
+      {this.onExpand,
+      this.onClose,
+      this.maxHeight,
+      this.isPlayingPage = false,
+      Key key})
       : super(key: key);
   final VoidCallback onExpand;
   final VoidCallback onClose;
   final double maxHeight;
+  final bool isPlayingPage;
   @override
   _ControlPanelState createState() => _ControlPanelState();
 }
@@ -1324,12 +1332,14 @@ class _ControlPanelState extends State<ControlPanel>
                                       child: InkWell(
                                         onTap: () async {
                                           widget.onClose();
-                                          Navigator.push(
-                                              context,
-                                              FadeRoute(
-                                                  page: EpisodeDetail(
-                                                      episodeItem: data.item1,
-                                                      heroTag: 'playpanel')));
+                                          if (!widget.isPlayingPage) {
+                                            Navigator.push(
+                                                context,
+                                                FadeRoute(
+                                                    page: EpisodeDetail(
+                                                        episodeItem: data.item1,
+                                                        heroTag: 'playpanel')));
+                                          }
                                         },
                                         child: Row(
                                           children: [
