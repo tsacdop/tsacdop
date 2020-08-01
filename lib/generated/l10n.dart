@@ -139,10 +139,10 @@ class S {
     );
   }
 
-  /// `Cellular data warn`
+  /// `Cellular data warning`
   String get cellularConfirm {
     return Intl.message(
-      'Cellular data warn',
+      'Cellular data warning',
       name: 'cellularConfirm',
       desc: '',
       args: [],
@@ -358,10 +358,10 @@ class S {
     );
   }
 
-  /// `You can change group name or delete group here, but home group can not be edited or deleted`
+  /// `You can change group name or delete it here, but the home group can not be edited or deleted`
   String get featureDiscoveryEditGroupDes {
     return Intl.message(
-      'You can change group name or delete group here, but home group can not be edited or deleted',
+      'You can change group name or delete it here, but the home group can not be edited or deleted',
       name: 'featureDiscoveryEditGroupDes',
       desc: '',
       args: [],
@@ -378,20 +378,20 @@ class S {
     );
   }
 
-  /// `You can long tap to play episode or add episode to playlist.`
+  /// `You can long press to play episode or add it to a playlist.`
   String get featureDiscoveryEpisodeDes {
     return Intl.message(
-      'You can long tap to play episode or add episode to playlist.',
+      'You can long press to play episode or add it to a playlist.',
       name: 'featureDiscoveryEpisodeDes',
       desc: '',
       args: [],
     );
   }
 
-  /// `Long tap to play episode instantly`
+  /// `Long press to play episode instantly`
   String get featureDiscoveryEpisodeTitle {
     return Intl.message(
-      'Long tap to play episode instantly',
+      'Long press to play episode instantly',
       name: 'featureDiscoveryEpisodeTitle',
       desc: '',
       args: [],
@@ -408,30 +408,30 @@ class S {
     );
   }
 
-  /// `Default group is home for new podcast, you can create new group and move podcast to new group, podcast can be added to multi-groups.`
+  /// `The Home group is the default group for new podcasts. You can create new groups and move podcasts to them as well as add podcasts to multiple groups.`
   String get featureDiscoveryGroupDes {
     return Intl.message(
-      'Default group is home for new podcast, you can create new group and move podcast to new group, podcast can be added to multi-groups.',
+      'The Home group is the default group for new podcasts. You can create new groups and move podcasts to them as well as add podcasts to multiple groups.',
       name: 'featureDiscoveryGroupDes',
       desc: '',
       args: [],
     );
   }
 
-  /// `Long tap to reorder podcast`
+  /// `Long press to reorder podcasts`
   String get featureDiscoveryGroupPodcast {
     return Intl.message(
-      'Long tap to reorder podcast',
+      'Long press to reorder podcasts',
       name: 'featureDiscoveryGroupPodcast',
       desc: '',
       args: [],
     );
   }
 
-  /// `You can tap to see more options, or long tap to reorder podcast in group.`
+  /// `You can tap to see more options, or long press to reorder podcasts in group.`
   String get featureDiscoveryGroupPodcastDes {
     return Intl.message(
-      'You can tap to see more options, or long tap to reorder podcast in group.',
+      'You can tap to see more options, or long press to reorder podcasts in group.',
       name: 'featureDiscoveryGroupPodcastDes',
       desc: '',
       args: [],
@@ -448,10 +448,10 @@ class S {
     );
   }
 
-  /// `You can import OMPL file, open setting or refresh all podcast at once here.`
+  /// `You can import OMPL files, open settings or refresh all podcasts at once here.`
   String get featureDiscoveryOMPLDes {
     return Intl.message(
-      'You can import OMPL file, open setting or refresh all podcast at once here.',
+      'You can import OMPL files, open settings or refresh all podcasts at once here.',
       name: 'featureDiscoveryOMPLDes',
       desc: '',
       args: [],
@@ -468,10 +468,10 @@ class S {
     );
   }
 
-  /// `You can add episode to playlist by yourself. Episode will be auto removed from playlist when played.`
+  /// `You can add episodes to playlists by yourself. Episodes will be automatically removed from playlists when played.`
   String get featureDiscoveryPlaylistDes {
     return Intl.message(
-      'You can add episode to playlist by yourself. Episode will be auto removed from playlist when played.',
+      'You can add episodes to playlists by yourself. Episodes will be automatically removed from playlists when played.',
       name: 'featureDiscoveryPlaylistDes',
       desc: '',
       args: [],
@@ -508,20 +508,20 @@ class S {
     );
   }
 
-  /// `Tap to search podcast`
+  /// `Tap to search for podcasts`
   String get featureDiscoverySearch {
     return Intl.message(
-      'Tap to search podcast',
+      'Tap to search for podcasts',
       name: 'featureDiscoverySearch',
       desc: '',
       args: [],
     );
   }
 
-  /// `You can search podcast title , key word or RSS link to subscribe new podcast.`
+  /// `You can search by podcast title, key word or RSS link to subscribe to new podcasts.`
   String get featureDiscoverySearchDes {
     return Intl.message(
-      'You can search podcast title , key word or RSS link to subscribe new podcast.',
+      'You can search by podcast title, key word or RSS link to subscribe to new podcasts.',
       name: 'featureDiscoverySearchDes',
       desc: '',
       args: [],
@@ -548,10 +548,10 @@ class S {
     );
   }
 
-  /// `Rate on Play`
+  /// `Rate on Play Store`
   String get feedbackPlay {
     return Intl.message(
-      'Rate on Play',
+      'Rate on Play Store',
       name: 'feedbackPlay',
       desc: 'Rate on Google Play Store.\nUser can tap to open play link.',
       args: [],
@@ -608,10 +608,10 @@ class S {
     );
   }
 
-  /// `Group existed`
+  /// `Group already exists`
   String get groupExisted {
     return Intl.message(
-      'Group existed',
+      'Group already exists',
       name: 'groupExisted',
       desc: 'Group name validate in add group dialog. User can\'t add group with same name.',
       args: [],
@@ -628,10 +628,10 @@ class S {
     );
   }
 
-  /// `Are you sure you want to delete this group? Podcasts will be moved to Home group.`
+  /// `Are you sure you want to delete this group? Podcasts will be moved to the Home group.`
   String get groupRemoveConfirm {
     return Intl.message(
-      'Are you sure you want to delete this group? Podcasts will be moved to Home group.',
+      'Are you sure you want to delete this group? Podcasts will be moved to the Home group.',
       name: 'groupRemoveConfirm',
       desc: '',
       args: [],
@@ -897,30 +897,30 @@ class S {
     );
   }
 
-  /// `Mark confirm`
+  /// `Confirm marking`
   String get markConfirm {
     return Intl.message(
-      'Mark confirm',
+      'Confirm marking',
       name: 'markConfirm',
       desc: '',
       args: [],
     );
   }
 
-  /// `Confirm mark all episodes listened?`
+  /// `Confirm to mark all episodes as listened?`
   String get markConfirmContent {
     return Intl.message(
-      'Confirm mark all episodes listened?',
+      'Confirm to mark all episodes as listened?',
       name: 'markConfirmContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `Mark listened`
+  /// `Mark as listened`
   String get markListened {
     return Intl.message(
-      'Mark listened',
+      'Mark as listened',
       name: 'markListened',
       desc: '',
       args: [],
@@ -947,10 +947,10 @@ class S {
     );
   }
 
-  /// `Mark All Listened`
+  /// `Mark All As Listened`
   String get menuMarkAllListened {
     return Intl.message(
-      'Mark All Listened',
+      'Mark All As Listened',
       name: 'menuMarkAllListened',
       desc: '',
       args: [],
@@ -1043,50 +1043,50 @@ class S {
     );
   }
 
-  /// `No episode downloaded yet`
+  /// `No episodes downloaded yet`
   String get noEpisodeDownload {
     return Intl.message(
-      'No episode downloaded yet',
+      'No episodes downloaded yet',
       name: 'noEpisodeDownload',
       desc: '',
       args: [],
     );
   }
 
-  /// `No episode collected yet`
+  /// `No episodes collected yet`
   String get noEpisodeFavorite {
     return Intl.message(
-      'No episode collected yet',
+      'No episodes collected yet',
       name: 'noEpisodeFavorite',
       desc: '',
       args: [],
     );
   }
 
-  /// `No episode received yet`
+  /// `No episodes received yet`
   String get noEpisodeRecent {
     return Intl.message(
-      'No episode received yet',
+      'No episodes received yet',
       name: 'noEpisodeRecent',
       desc: '',
       args: [],
     );
   }
 
-  /// `No podcast in this group`
+  /// `No podcasts in this group`
   String get noPodcastGroup {
     return Intl.message(
-      'No podcast in this group',
+      'No podcasts in this group',
       name: 'noPodcastGroup',
       desc: '',
       args: [],
     );
   }
 
-  /// `Still no show notes received for this episode.`
+  /// `No show notes available for this episode.`
   String get noShownote {
     return Intl.message(
-      'Still no show notes received for this episode.',
+      'No show notes available for this episode.',
       name: 'noShownote',
       desc: 'Means this episode have no show notes.',
       args: [],
@@ -1103,10 +1103,10 @@ class S {
     );
   }
 
-  /// `Subscribe failed, network error {title}`
+  /// `Subscribing failed, network error {title}`
   String notificationNetworkError(Object title) {
     return Intl.message(
-      'Subscribe failed, network error $title',
+      'Subscribing failed, network error $title',
       name: 'notificationNetworkError',
       desc: '',
       args: [title],
@@ -1123,20 +1123,20 @@ class S {
     );
   }
 
-  /// `Subscribe failed, podcast existed {title}`
+  /// `Subscribing failed, podcast already exists {title}`
   String notificationSubscribeExisted(Object title) {
     return Intl.message(
-      'Subscribe failed, podcast existed $title',
+      'Subscribing failed, podcast already exists $title',
       name: 'notificationSubscribeExisted',
       desc: '',
       args: [title],
     );
   }
 
-  /// `Subscribe success {title}`
+  /// `Subscribed successfully {title}`
   String notificationSuccess(Object title) {
     return Intl.message(
-      'Subscribe success $title',
+      'Subscribed successfully $title',
       name: 'notificationSuccess',
       desc: '',
       args: [title],
@@ -1193,6 +1193,16 @@ class S {
     );
   }
 
+  /// `Player`
+  String get player {
+    return Intl.message(
+      'Player',
+      name: 'player',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Medium`
   String get playerHeightMed {
     return Intl.message(
@@ -1203,20 +1213,20 @@ class S {
     );
   }
 
-  /// `Short`
+  /// `Low`
   String get playerHeightShort {
     return Intl.message(
-      'Short',
+      'Low',
       name: 'playerHeightShort',
       desc: '',
       args: [],
     );
   }
 
-  /// `Tall`
+  /// `High`
   String get playerHeightTall {
     return Intl.message(
-      'Tall',
+      'High',
       name: 'playerHeightTall',
       desc: '',
       args: [],
@@ -1296,10 +1306,10 @@ class S {
     );
   }
 
-  /// `Mark episode as listened`
+  /// `Mark episode as listened to`
   String get popupMenuMarkDes {
     return Intl.message(
-      'Mark episode as listened',
+      'Mark episode as listened to',
       name: 'popupMenuMarkDes',
       desc: '',
       args: [],
@@ -1406,10 +1416,10 @@ class S {
     );
   }
 
-  /// `Remove confirm`
+  /// `Removal confirmation`
   String get removeConfirm {
     return Intl.message(
-      'Remove confirm',
+      'Removal confirmation',
       name: 'removeConfirm',
       desc: 'unsubscribe podcast dialog',
       args: [],
@@ -1486,10 +1496,10 @@ class S {
     );
   }
 
-  /// `Search podcast`
+  /// `Search for podcasts`
   String get searchPodcast {
     return Intl.message(
-      'Search podcast',
+      'Search for podcasts',
       name: 'searchPodcast',
       desc: '',
       args: [],
@@ -1672,10 +1682,10 @@ class S {
     );
   }
 
-  /// `Favorite tab`
+  /// `Favorites tab`
   String get settingsDefaultGridFavorite {
     return Intl.message(
-      'Favorite tab',
+      'Favorites tab',
       name: 'settingsDefaultGridFavorite',
       desc: '',
       args: [],
@@ -1702,30 +1712,30 @@ class S {
     );
   }
 
-  /// `Discovery Features Again`
+  /// `Reenable "Discover Features"`
   String get settingsDiscovery {
     return Intl.message(
-      'Discovery Features Again',
+      'Reenable "Discover Features"',
       name: 'settingsDiscovery',
       desc: 'Reset feature discovery state. User tap it and restart app, will see features tutorial again.',
       args: [],
     );
   }
 
-  /// `Enable syncing`
+  /// `Enable synchronisation`
   String get settingsEnableSyncing {
     return Intl.message(
-      'Enable syncing',
+      'Enable synchronisation',
       name: 'settingsEnableSyncing',
       desc: '',
       args: [],
     );
   }
 
-  /// `Refresh all podcasts in the background to get leatest episodes`
+  /// `Refresh all podcasts in the background to get latest episodes`
   String get settingsEnableSyncingDes {
     return Intl.message(
-      'Refresh all podcasts in the background to get leatest episodes',
+      'Refresh all podcasts in the background to get latest episodes',
       name: 'settingsEnableSyncingDes',
       desc: '',
       args: [],
@@ -1772,10 +1782,10 @@ class S {
     );
   }
 
-  /// `Bugs and features request`
+  /// `Bugs and feature requests`
   String get settingsFeedbackDes {
     return Intl.message(
-      'Bugs and features request',
+      'Bugs and feature requests',
       name: 'settingsFeedbackDes',
       desc: '',
       args: [],
@@ -1872,20 +1882,20 @@ class S {
     );
   }
 
-  /// `Open source libraries used in app`
+  /// `Open source libraries used in this app`
   String get settingsLibrariesDes {
     return Intl.message(
-      'Open source libraries used in app',
+      'Open source libraries used in this app',
       name: 'settingsLibrariesDes',
       desc: '',
       args: [],
     );
   }
 
-  /// `Manage download`
+  /// `Manage downloads`
   String get settingsManageDownload {
     return Intl.message(
-      'Manage download',
+      'Manage downloads',
       name: 'settingsManageDownload',
       desc: '',
       args: [],
@@ -1932,10 +1942,10 @@ class S {
     );
   }
 
-  /// `You can set podcast auto download in group manage page`
+  /// `You can configure podcast auto download in the group management page`
   String get settingsNetworkCellularAutoDes {
     return Intl.message(
-      'You can set podcast auto download in group manage page',
+      'You can configure podcast auto download in the group management page',
       name: 'settingsNetworkCellularAutoDes',
       desc: '',
       args: [],
@@ -1992,10 +2002,10 @@ class S {
     );
   }
 
-  /// `Change the popup menu of episode`
+  /// `Change the popup menu of episodes`
   String get settingsPopupMenuDes {
     return Intl.message(
-      'Change the popup menu of episode',
+      'Change the popup menu of episodes',
       name: 'settingsPopupMenuDes',
       desc: '',
       args: [],
@@ -2222,6 +2232,16 @@ class S {
     );
   }
 
+  /// `Skip silence`
+  String get skipSilence {
+    return Intl.message(
+      'Skip silence',
+      name: 'skipSilence',
+      desc: 'Feature skip silence',
+      args: [],
+    );
+  }
+
   /// `Sleep timer`
   String get sleepTimer {
     return Intl.message(
@@ -2302,20 +2322,20 @@ class S {
     );
   }
 
-  /// `Discovery feature reopened, pleast restart the app`
+  /// `Discovery feature reenabled, please reopen the app`
   String get toastDiscovery {
     return Intl.message(
-      'Discovery feature reopened, pleast restart the app',
+      'Discovery feature reenabled, please reopen the app',
       name: 'toastDiscovery',
       desc: 'Toast displayed when user tap Discovery Features Again in settings page.',
       args: [],
     );
   }
 
-  /// `File error, subscribe failed`
+  /// `File error, subscribing failed`
   String get toastFileError {
     return Intl.message(
-      'File error, subscribe failed',
+      'File error, subscribing failed',
       name: 'toastFileError',
       desc: '',
       args: [],
@@ -2342,20 +2362,20 @@ class S {
     );
   }
 
-  /// `Import settings successfully`
+  /// `Settings imported successfully`
   String get toastImportSettingsSuccess {
     return Intl.message(
-      'Import settings successfully',
+      'Settings imported successfully',
       name: 'toastImportSettingsSuccess',
       desc: '',
       args: [],
     );
   }
 
-  /// `At least select one group`
+  /// `Select at least one group`
   String get toastOneGroup {
     return Intl.message(
-      'At least select one group',
+      'Select at least one group',
       name: 'toastOneGroup',
       desc: '',
       args: [],
@@ -2372,10 +2392,10 @@ class S {
     );
   }
 
-  /// `Read file successfully`
+  /// `File read successfully`
   String get toastReadFile {
     return Intl.message(
-      'Read file successfully',
+      'File read successfully',
       name: 'toastReadFile',
       desc: '',
       args: [],
@@ -2402,10 +2422,10 @@ class S {
     );
   }
 
-  /// `Setting saved`
+  /// `Settings saved`
   String get toastSettingSaved {
     return Intl.message(
-      'Setting saved',
+      'Settings saved',
       name: 'toastSettingSaved',
       desc: '',
       args: [],
@@ -2472,10 +2492,10 @@ class S {
     );
   }
 
-  /// `Episode removed from favorite`
+  /// `Episode removed from favorites`
   String get unliked {
     return Intl.message(
-      'Episode removed from favorite',
+      'Episode removed from favorites',
       name: 'unliked',
       desc: '',
       args: [],
@@ -2515,10 +2535,10 @@ class S {
     );
   }
 
-  /// `Version : {version}`
+  /// `Version: {version}`
   String version(Object version) {
     return Intl.message(
-      'Version : $version',
+      'Version: $version',
       name: 'version',
       desc: '',
       args: [version],

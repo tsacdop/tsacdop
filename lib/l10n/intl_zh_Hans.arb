@@ -278,6 +278,8 @@
   "@play": {},
   "playback": "播放控制",
   "@playback": {},
+  "player": "播放器",
+  "@player": {},
   "playerHeightMed": "中",
   "@playerHeightMed": {},
   "playerHeightShort": "低",
@@ -501,6 +503,10 @@
   "@size": {},
   "skipSecondsAtStart": "开头跳过秒数",
   "@skipSecondsAtStart": {},
+  "skipSilence": "跳过无声",
+  "@skipSilence": {
+    "description": "Feature skip silence"
+  },
   "sleepTimer": "睡眠模式",
   "@sleepTimer": {},
   "subscribe": "订阅",

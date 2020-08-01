@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../class/settingstate.dart';
 import '../local_storage/key_value_storage.dart';
 import '../state/audio_state.dart';
 import '../util/custom_dropdown.dart';
@@ -199,7 +198,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
-                  child: Text(s.play,
+                  child: Text(s.player,
                       style: Theme.of(context)
                           .textTheme
                           .bodyText1
