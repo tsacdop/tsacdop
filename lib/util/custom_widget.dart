@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -90,7 +89,7 @@ class StarSky extends CustomPainter {
       ..color = Colors.white
       ..strokeWidth = 1.0
       ..strokeCap = StrokeCap.butt
-      ..style = PaintingStyle.stroke;
+      ..style = PaintingStyle.fill;
     _darwStar(Offset center, double radius) {
       canvas.drawCircle(center, radius, paint);
       var path = Path()
@@ -101,11 +100,18 @@ class StarSky extends CustomPainter {
     _darwBigStar(Offset center, double radius) {
       var path = Path();
       path.moveTo(center.dx - radius * 1.5, center.dy);
-      path.lineTo(center.dx + radius * 1.5, center.dy);
-      path.moveTo(center.dx, center.dy - radius * 2);
-      path.lineTo(center.dx, center.dy + radius * 2);
-      //canvas.drawPath(path, _fullPaint);
-      canvas.drawShadow(path.shift(Offset(0, 0)), Colors.white, 4, true);
+      path.quadraticBezierTo(center.dx - radius * 0.2, center.dy - radius * 0.2,
+          center.dx, center.dy - radius * 2);
+      path.quadraticBezierTo(center.dx + radius * 0.2, center.dy - radius * 0.2,
+          center.dx + radius * 1.5, center.dy);
+      path.quadraticBezierTo(center.dx + radius * 0.2, center.dy + radius * 0.2,
+          center.dx, center.dy + radius * 2);
+      path.quadraticBezierTo(center.dx - radius * 0.2, center.dy + radius * 0.2,
+          center.dx - radius * 1.5, center.dy);
+      path.close();
+
+      canvas.drawPath(path, _fullPaint);
+      canvas.drawShadow(path.shift(Offset(0, -6)), Colors.white, 10, true);
     }
 
     for (var center in pisces) {
@@ -115,13 +121,9 @@ class StarSky extends CustomPainter {
       _darwStar(center, 2);
     }
     for (var center in points) {
-      _darwBigStar(center, 3);
-      _darwStar(center, 3);
+      _darwBigStar(center, 4);
+      _darwStar(center, 2);
     }
-
-    //canvas.drawPoints(ui.PointMode.points, pisces, paint);
-    //canvas.drawPoints(ui.PointMode.points, points, paint);
-    //canvas.drawPoints(ui.PointMode.points, orion, paint);
   }
 
   @override
