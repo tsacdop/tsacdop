@@ -5,6 +5,7 @@
 [![Github Downloads][]][github release - recent]
 [![Localizely][]][localizely - website]
 [![style: effective dart][]][effective dart pub]
+[![License badge][]][license]
 
 ## About
 
@@ -58,7 +59,7 @@ Tsacdop is licensed under the [GPL v3.0](https://github.com/stonega/tsacdop/blob
 ## Build
 
 Tsacdop uses ListenNotes API 1.0 pro to search for podcasts, which is not free, so I can not expose the API key in the repo.
-If you want to build the app, you need to create a new file named `.env.dart` in lib folder. Add the following code to `.env.dart`.
+If you want to build the app, you need to create a new file named `.env.dart` in lib folder. Add the following code to `.env.dart` .
 
 ``` dart
 final environment = {"apiKey":"APIKEY"};
@@ -145,3 +146,5 @@ For help getting started with Flutter, view our
 [Darkmode Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png
 [style: effective dart]: https://img.shields.io/badge/style-effective_dart-40c4ff.svg
 [effective dart pub]: https://pub.dev/packages/effective_dart
+[license]: https://github.com/stonega/tsacdop/blob/master/LICENSE
+[License badge]: https://img.shields.io/badge/license-GPLv3-yellow.svg
