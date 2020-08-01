@@ -34,6 +34,8 @@ const String tapToOpenPopupMenuKey = 'tapToOpenPopupMenuKey';
 const String fastForwardSecondsKey = 'fastForwardSecondsKey';
 const String rewindSecondsKey = 'rewindSecondsKey';
 const String playerHeightKey = 'playerHeightKey';
+const String speedKey = 'speedKey';
+const String skipSilenceKey = 'skipSilenceKey';
 
 class KeyValueStorage {
   final String key;
@@ -101,9 +103,10 @@ class KeyValueStorage {
     return prefs.getString(key);
   }
 
-  saveMenu(List<int> list) async {
+  Future<bool> saveMenu(List<int> list) async {
     var prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(key, list.map((e) => e.toString()).toList());
+    return await prefs.setStringList(
+        key, list.map((e) => e.toString()).toList());
   }
 
   Future<List<int>> getMenu() async {
@@ -129,8 +132,23 @@ class KeyValueStorage {
   }
 
   /// Rreverse is used for compatite bool value save before which set true = 0, false = 1
-  saveBool(boo, {reverse = false}) async {
+  Future<bool> saveBool(boo, {reverse = false}) async {
     var prefs = await SharedPreferences.getInstance();
-    reverse ? prefs.setInt(key, boo ? 0 : 1) : prefs.setInt(key, boo ? 1 : 0);
+    return reverse
+        ? prefs.setInt(key, boo ? 0 : 1)
+        : prefs.setInt(key, boo ? 1 : 0);
+  }
+
+  Future<bool> saveDouble(double data) async {
+    var prefs = await SharedPreferences.getInstance();
+    return prefs.setDouble(key, data);
+  }
+
+  Future<double> getDoubel({double defaultValue = 0.0}) async {
+    var prefs = await SharedPreferences.getInstance();
+    if (prefs.getDouble(key) == null) {
+      await prefs.setDouble(key, defaultValue);
+    }
+    return prefs.getDouble(key);
   }
 }

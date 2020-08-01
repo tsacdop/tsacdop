@@ -64,6 +64,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   var fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
   var rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
   var playerHeightStorage = KeyValueStorage(playerHeightKey);
+  var speedStorage = KeyValueStorage(speedKey);
+  var skipSilenceStorage = KeyValueStorage(skipSilenceKey);
 
   /// Current playing episdoe.
   EpisodeBrief _episode;
@@ -137,18 +139,24 @@ class AudioPlayerNotifier extends ChangeNotifier {
   /// Current speed.
   double _currentSpeed = 1;
 
-  //Update episode card when setting changed
+  ///Update episode card when setting changed
   bool _episodeState = false;
 
   /// Player height.
   PlayerHeight _playerHeight;
+
+  /// Player skip silence.
+  bool _skipSilence;
+
+  // ignore: prefer_final_fields
+  bool _playerRunning = false;
 
   AudioProcessingState get audioState => _audioState;
   int get backgroundAudioDuration => _backgroundAudioDuration;
   int get backgroundAudioPosition => _backgroundAudioPosition;
   double get seekSliderValue => _seekSliderValue;
   String get remoteErrorMessage => _remoteErrorMessage;
-  bool get playerRunning => _audioState != AudioProcessingState.none;
+  bool get playerRunning => _playerRunning;
   bool get buffering => _audioState != AudioProcessingState.ready;
   int get lastPositin => _lastPostion;
   Playlist get queue => _queue;
@@ -166,6 +174,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   int get fastForwardSeconds => _fastForwardSeconds;
   int get rewindSeconds => _rewindSeconds;
   PlayerHeight get playerHeight => _playerHeight;
+  bool get skipSilence => _skipSilence;
 
   set setSwitchValue(double value) {
     _switchValue = value;
@@ -183,9 +192,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _savePlayerHeight();
   }
 
-  Future _getPlayerHeight() async {
+  Future _initAudioData() async {
     var index = await playerHeightStorage.getInt(defaultValue: 0);
     _playerHeight = PlayerHeight.values[index];
+    _currentSpeed = await speedStorage.getDoubel(defaultValue: 1.0);
+    _skipSilence = await skipSilenceStorage.getBool(defaultValue: false);
   }
 
   Future _savePlayerHeight() async {
@@ -210,9 +221,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
-    _getPlayerHeight();
-    _queueUpdate = false;
-    _getAutoSleepTimer();
+    _initAudioData();
+    //  _queueUpdate = false;
+    // _getAutoSleepTimer();
     AudioService.connect();
     var running = AudioService.running;
     if (running) {}
@@ -257,7 +268,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _backgroundAudioPosition = 0;
       _seekSliderValue = 0;
       _episode = episodeNew;
-      _audioState = AudioProcessingState.connecting;
+      _playerRunning = true;
       notifyListeners();
       //await _queue.savePlaylist();
       _startAudioService(startPosition, episodeNew.enclosureUrl);
@@ -270,6 +281,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   _startAudioService(int position, String url) async {
     _stopOnComplete = false;
     _sleepTimerMode = SleepTimerMode.undefined;
+    _switchValue = 0;
 
     /// Connect to audio service.
     if (!AudioService.connected) {
@@ -319,7 +331,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
         sleepTimer(defaultTimer);
       }
     }
-
+    if (_currentSpeed != 1.0) {
+      await AudioService.customAction('setSpeed', _currentSpeed);
+    }
+    if (_skipSilence) {
+      await AudioService.customAction('setSkipSilence', skipSilence);
+    }
     await AudioService.play();
 
     AudioService.currentMediaItemStream
@@ -343,24 +360,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
         AudioService.skipToNext();
       }
     });
-
-    //   queueSubject = BehaviorSubject<List<MediaItem>>();
-    //   queueSubject.addStream(
-    //      AudioService.queueStream.distinct().where((event) => event != null));
-//queueSubject.stream.
-    AudioService.customEventStream.distinct().listen((event) async {
-      if (event is String && _episode.title == event) {
-        print(event);
-        _queue.delFromPlaylist(_episode);
-        _lastPostion = 0;
-        notifyListeners();
-        await positionStorage.saveInt(_lastPostion);
-        final history = PlayHistory(_episode.title, _episode.enclosureUrl,
-            backgroundAudioPosition ~/ 1000, seekSliderValue);
-        dbHelper.saveHistory(history);
-      }
-    });
-
     AudioService.playbackStateStream
         .distinct()
         .where((event) => event != null)
@@ -385,6 +384,23 @@ class AudioPlayerNotifier extends ChangeNotifier {
         _remoteErrorMessage = null;
       }
       notifyListeners();
+    });
+
+    AudioService.customEventStream.distinct().listen((event) async {
+      if (event is String && _episode.title == event) {
+        print(event);
+        _queue.delFromPlaylist(_episode);
+        _lastPostion = 0;
+        notifyListeners();
+        await positionStorage.saveInt(_lastPostion);
+        final history = PlayHistory(_episode.title, _episode.enclosureUrl,
+            backgroundAudioPosition ~/ 1000, seekSliderValue);
+        dbHelper.saveHistory(history);
+      }
+      if (event is Map && event['playerRunning'] == false) {
+        _playerRunning = false;
+        notifyListeners();
+      }
     });
 
     //double s = _currentSpeed ?? 1.0;
@@ -431,7 +447,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _seekSliderValue = 0;
     _episode = _queue.playlist.first;
     _queueUpdate = !_queueUpdate;
-    _audioState = AudioProcessingState.connecting;
+    _audioState = AudioProcessingState.none;
+    _playerRunning = true;
     notifyListeners();
     _startAudioService(_lastPostion ?? 0, _queue.playlist.first.enclosureUrl);
   }
@@ -554,9 +571,18 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
   }
 
+  /// Set player speed.
   setSpeed(double speed) async {
     await AudioService.customAction('setSpeed', speed);
     _currentSpeed = speed;
+    await speedStorage.saveDouble(_currentSpeed);
+    notifyListeners();
+  }
+
+  setSkipSilence({@required bool skipSilence}) async {
+    await AudioService.customAction('setSkipSilence', skipSilence);
+    _skipSilence = skipSilence;
+    await skipSilenceStorage.saveBool(_skipSilence);
     notifyListeners();
   }
 
@@ -819,6 +845,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _playerStateSubscription.cancel();
     _eventSubscription.cancel();
     await _setState(processingState: AudioProcessingState.none);
+    AudioServiceBackground.sendCustomEvent({'playerRunning': false});
     await super.onStop();
   }
 
@@ -857,7 +884,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   void onFastForward() async {
     await _seekRelative(fastForwardInterval);
-    print('test');
   }
 
   @override
@@ -919,7 +945,16 @@ class AudioPlayerTask extends BackgroundAudioTask {
       case 'setSpeed':
         await _audioPlayer.setSpeed(argument);
         break;
+      case 'setSkipSilence':
+        await _setSkipSilence(argument);
+        break;
     }
+  }
+
+  Future _setSkipSilence(bool boo) async {
+    await _audioPlayer.setSkipSilence(boo);
+    var duration = await _audioPlayer.durationFuture ?? Duration.zero;
+    AudioServiceBackground.setMediaItem(mediaItem.copyWith(duration: duration));
   }
 
   Future<void> _setState({
