@@ -36,6 +36,7 @@ const String rewindSecondsKey = 'rewindSecondsKey';
 const String playerHeightKey = 'playerHeightKey';
 const String speedKey = 'speedKey';
 const String skipSilenceKey = 'skipSilenceKey';
+const String localeKey = 'localeKey';
 
 class KeyValueStorage {
   final String key;

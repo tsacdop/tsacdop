@@ -5,6 +5,8 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:intl/intl.dart';
+import 'package:tsacdop/generated/l10n.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -100,6 +102,7 @@ class SettingState extends ChangeNotifier {
   var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
   var fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
   var rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
+  var localeStorage = KeyValueStorage(localeKey);
 
   Future initData() async {
     await _getTheme();
@@ -107,6 +110,11 @@ class SettingState extends ChangeNotifier {
     await _getShowIntro();
     await _getRealDark();
   }
+
+  Locale _locale;
+
+  /// Load locale.
+  Locale get locale => _locale;
 
   /// Spp thememode. default auto.
   ThemeMode _theme;
@@ -253,6 +261,7 @@ class SettingState extends ChangeNotifier {
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
+    _getLocale();
     _getAutoUpdate();
     _getDownloadUsingData();
     _getSleepTimerData();
@@ -329,6 +338,17 @@ class SettingState extends ChangeNotifier {
     _rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
     _fastForwardSeconds =
         await fastForwardSecondsStorage.getInt(defaultValue: 30);
+  }
+
+  Future _getLocale() async {
+    var localeString = await localeStorage.getStringList();
+    if (localeString.isEmpty) {
+      _locale = Locale(Intl.systemLocale);
+    } else {
+      _locale = Locale(localeString.first, localeString[1]);
+    }
+    await S.load(_locale);
+    print(_locale.toString());
   }
 
   Future _saveAccentSetColor() async {

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../generated/l10n.dart';
+import '../local_storage/key_value_storage.dart';
 import '../util/extension_helper.dart';
 
 class LanguagesSetting extends StatefulWidget {
@@ -19,6 +20,20 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
       await launch(url);
     } else {
       throw 'Could not launch $url';
+    }
+  }
+
+  _setLocale(Locale locale, {bool systemDefault = false}) async {
+    var localeStorage = KeyValueStorage(localeKey);
+    if (systemDefault) {
+      await localeStorage.saveStringList([]);
+    } else {
+      await localeStorage
+          .saveStringList([locale.languageCode, locale.countryCode]);
+    }
+    await S.load(locale);
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -44,66 +59,43 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
             children: [
               ListTile(
                 title: Text(s.systemDefault),
-                onTap: () async {
-                  await S.load(Locale(Intl.systemLocale));
-                  setState(() {});
-                },
+                onTap: () =>
+                    _setLocale(Locale(Intl.systemLocale), systemDefault: true),
                 contentPadding: const EdgeInsets.only(left: 75, right: 20),
                 trailing: Radio<Locale>(
                     value: Locale(Intl.systemLocale),
                     groupValue: Locale(Intl.getCurrentLocale()),
-                    onChanged: (locale) async {
-                      await S.load(locale);
-                      setState(() {});
-                    }),
+                    onChanged: (locale) =>
+                        _setLocale(locale, systemDefault: true)),
               ),
               Divider(height: 2),
               ListTile(
-                title: Text('English'),
-                onTap: () async {
-                  await S.load(Locale('en'));
-                  setState(() {});
-                },
-                contentPadding: const EdgeInsets.only(left: 75, right: 20),
-                trailing: Radio<Locale>(
-                    value: Locale('en'),
-                    groupValue: Locale(Intl.getCurrentLocale()),
-                    onChanged: (locale) async {
-                      await S.load(locale);
-                      setState(() {});
-                    }),
-              ),
+                  title: Text('English'),
+                  onTap: () => _setLocale(Locale('en')),
+                  contentPadding: const EdgeInsets.only(left: 75, right: 20),
+                  trailing: Radio<Locale>(
+                      value: Locale('en'),
+                      groupValue: Locale(Intl.getCurrentLocale()),
+                      onChanged: _setLocale)),
               Divider(height: 2),
               ListTile(
-                title: Text('简体中文'),
-                onTap: () async {
-                  await S.load(Locale('zh_Hans'));
-                  setState(() {});
-                },
-                contentPadding: const EdgeInsets.only(left: 75, right: 20),
-                trailing: Radio<Locale>(
+                  title: Text('简体中文'),
+                  onTap: () => _setLocale(Locale('zh_Hans')),
+                  contentPadding: const EdgeInsets.only(left: 75, right: 20),
+                  trailing: Radio<Locale>(
                     value: Locale('zh_Hans'),
                     groupValue: Locale(Intl.getCurrentLocale()),
-                    onChanged: (locale) async {
-                      await S.load(locale);
-                      setState(() {});
-                    }),
-              ),
+                    onChanged: _setLocale,
+                  )),
               Divider(height: 2),
               ListTile(
-                title: Text('LE françAIS'),
-                onTap: () async {
-                  await S.load(Locale('fr'));
-                  setState(() {});
-                },
+                title: Text('Français'),
+                onTap: () => _setLocale(Locale('fr')),
                 contentPadding: const EdgeInsets.only(left: 75, right: 20),
                 trailing: Radio<Locale>(
                     value: Locale('fr'),
                     groupValue: Locale(Intl.getCurrentLocale()),
-                    onChanged: (locale) async {
-                      await S.load(locale);
-                      setState(() {});
-                    }),
+                    onChanged: _setLocale),
               ),
               Divider(height: 2),
               //ListTile(
