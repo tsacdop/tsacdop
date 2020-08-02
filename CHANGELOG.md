@@ -6,9 +6,9 @@ Release date 2020/8/1
 
 ### New features
 
-* Player ui redesign.
+* Player UI redesign.
 * Added player height setting.
-* Added skip slience feature.
+* Added skip silence feature.
 
 ### Bugs fixed
 
@@ -18,7 +18,7 @@ Release date 2020/8/1
 ### Minor change
 
 * Episode page open animation improved.
-* POdcast page load faster than before.
+* Podcast page load faster than before.
 * Removed unnecessary scroll overlay effect.
 * Episode page bottom menu hide when scroll down. 
 
