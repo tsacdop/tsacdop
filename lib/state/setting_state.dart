@@ -442,6 +442,9 @@ class SettingState extends ChangeNotifier {
     var rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
     var playerHeight =
         await KeyValueStorage(playerHeightKey).getInt(defaultValue: 0);
+    var localeList = await localeStorage.getStringList();
+    var backupLocale =
+        localeList.isEmpty ? '' : '${'${localeList.first}-'}${localeList[1]}';
 
     return SettingsBackup(
         theme: theme,
@@ -467,7 +470,8 @@ class SettingState extends ChangeNotifier {
         tapToOpenPopupMenu: tapToOpenPopupMenu,
         fastForwardSeconds: fastForwardSeconds,
         rewindSeconds: rewindSeconds,
-        playerHeight: playerHeight);
+        playerHeight: playerHeight,
+        locale: backupLocale);
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -498,6 +502,21 @@ class SettingState extends ChangeNotifier {
     await KeyValueStorage(playerHeightKey).saveInt(backup.playerHeight);
     await KeyValueStorage(tapToOpenPopupMenuKey)
         .saveBool(backup.tapToOpenPopupMenu);
+    if (backup.locale == '') {
+      await localeStorage.saveStringList([]);
+      await S.load(Locale(Intl.systemLocale));
+    } else {
+      var localeList = backup.locale.split('-');
+      var backupLocale;
+      if (localeList[1] == 'null') {
+        backupLocale = Locale(localeList.first);
+      } else {
+        backupLocale = Locale(localeList.first, localeList[1]);
+      }
+      await localeStorage.saveStringList(
+          [backupLocale.languageCode, backupLocale.countryCode]);
+      await S.load(backupLocale);
+    }
     await initData();
     await _getAutoUpdate();
     await _getDownloadUsingData();

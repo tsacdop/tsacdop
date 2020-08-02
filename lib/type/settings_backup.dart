@@ -23,6 +23,7 @@ class SettingsBackup {
   final int fastForwardSeconds;
   final int rewindSeconds;
   final int playerHeight;
+  final String locale;
   SettingsBackup(
       {this.theme,
       this.accentColor,
@@ -47,7 +48,8 @@ class SettingsBackup {
       this.tapToOpenPopupMenu,
       this.fastForwardSeconds,
       this.rewindSeconds,
-      this.playerHeight});
+      this.playerHeight,
+      this.locale});
 
   Map<String, Object> toJson() {
     return {
@@ -73,7 +75,8 @@ class SettingsBackup {
       'tapToOpenPopupMenu': tapToOpenPopupMenu,
       'fastForwardSeconds': fastForwardSeconds,
       'rewindSeconds': rewindSeconds,
-      'playerHeight': playerHeight
+      'playerHeight': playerHeight,
+      'locale': locale
     };
   }
 
@@ -102,6 +105,7 @@ class SettingsBackup {
         tapToOpenPopupMenu: json['tapToOpenPopupMenu'] as bool,
         fastForwardSeconds: json['fastForwardSeconds'] as int,
         rewindSeconds: json['rewindSeconds'] as int,
-        playerHeight: json['playerHeight'] as int);
+        playerHeight: json['playerHeight'] as int,
+        locale: json['locale'] as String);
   }
 }
