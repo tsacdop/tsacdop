@@ -463,10 +463,17 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
     var offset = kMaterialListPadding.top;
     if (items.isNotEmpty && index > 0) {
       assert(items.length == itemHeights?.length);
-      offset += itemHeights
-          .sublist(0, index)
-          .reduce((total, height) => total + height);
+      if (displayItemCount == null) {
+        offset += itemHeights
+            .sublist(0, index)
+            .reduce((total, height) => total + height);
+      } else {
+        offset += itemHeights
+            .sublist(math.max(0, index + 1 - displayItemCount), index)
+            .reduce((total, height) => total + height);
+      }
     }
+
     return offset;
   }
 
@@ -476,7 +483,10 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
   // that's possible given availableHeight.
   _MenuLimits getMenuLimits(
       Rect buttonRect, double availableHeight, int index) {
-    final maxMenuHeight = availableHeight - 2.0 * _kMenuItemHeight;
+    final maxMenuHeight = displayItemCount == null
+        ? availableHeight - 2.0 * _kMenuItemHeight
+        : math.min(_kMenuItemHeight * displayItemCount,
+            availableHeight - 2 * _kMenuItemHeight);
     final buttonTop = buttonRect.top;
     final buttonBottom = math.min(buttonRect.bottom, availableHeight);
     final selectedItemOffset = getItemOffset(index);
@@ -522,8 +532,9 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
     // (the default).
     final scrollOffset = preferredMenuHeight <= maxMenuHeight
         ? 0.0
-        : math.max(0.0, selectedItemOffset - (buttonTop - menuTop));
-
+        : displayItemCount == null || displayItemCount > index
+            ? math.max(0.0, selectedItemOffset - (buttonTop - menuTop))
+            : math.max(0.0, (index - displayItemCount + 1) * _kMenuItemHeight);
     return _MenuLimits(menuTop, menuBottom, menuHeight, scrollOffset);
   }
 }
