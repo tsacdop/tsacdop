@@ -245,6 +245,19 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await lastWorkStorage.saveInt(0);
   }
 
+  playlistLoad() async {
+    await _queue.getPlaylist();
+    _backgroundAudioDuration = 0;
+    _backgroundAudioPosition = 0;
+    _seekSliderValue = 0;
+    _episode = _queue.playlist.first;
+    _queueUpdate = !_queueUpdate;
+    _audioState = AudioProcessingState.none;
+    _playerRunning = true;
+    notifyListeners();
+    _startAudioService(_lastPostion ?? 0, _queue.playlist.first.enclosureUrl);
+  }
+
   Future<void> episodeLoad(EpisodeBrief episode,
       {int startPosition = 0}) async {
     print(episode.enclosureUrl);
@@ -395,7 +408,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         await positionStorage.saveInt(_lastPostion);
         final history = PlayHistory(_episode.title, _episode.enclosureUrl,
             backgroundAudioPosition ~/ 1000, seekSliderValue);
-        dbHelper.saveHistory(history);
+        await dbHelper.saveHistory(history);
       }
       if (event is Map && event['playerRunning'] == false) {
         _playerRunning = false;
@@ -438,19 +451,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
         timer.cancel();
       }
     });
-  }
-
-  playlistLoad() async {
-    await _queue.getPlaylist();
-    _backgroundAudioDuration = 0;
-    _backgroundAudioPosition = 0;
-    _seekSliderValue = 0;
-    _episode = _queue.playlist.first;
-    _queueUpdate = !_queueUpdate;
-    _audioState = AudioProcessingState.none;
-    _playerRunning = true;
-    notifyListeners();
-    _startAudioService(_lastPostion ?? 0, _queue.playlist.first.enclosureUrl);
   }
 
   playNext() async {
@@ -651,7 +651,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   final List<MediaItem> _queue = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
   AudioProcessingState _skipState;
-  bool _playing;
+  bool _playing = false;
   bool _interrupted = false;
   bool _stopAtEnd;
   int _cacheMax;
