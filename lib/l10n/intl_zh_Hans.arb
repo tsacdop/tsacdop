@@ -24,7 +24,7 @@
   "@autoDownload": {},
   "back": "返回",
   "@back": {},
-  "buffering": "缓冲",
+  "buffering": "缓冲中",
   "@buffering": {},
   "cancel": "取消",
   "@cancel": {},
@@ -242,7 +242,7 @@
       "title": {}
     }
   },
-  "notificationSubscribe": "订阅{title}",
+  "notificationSubscribe": "订阅 {title}",
   "@notificationSubscribe": {
     "placeholders": {
       "title": {}

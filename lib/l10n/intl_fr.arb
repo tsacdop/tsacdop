@@ -304,7 +304,7 @@
   "@popupMenuMarkDes": {},
   "popupMenuPlayDes": "Jouer l'épisode",
   "@popupMenuPlayDes": {},
-  "privacyPolicy": "Politique relative aux données personnelles",
+  "privacyPolicy": "Gestion des données personnelles",
   "@privacyPolicy": {},
   "published": "Publié le {date}",
   "@published": {
@@ -578,7 +578,7 @@
   "@understood": {},
   "undo": "ANNULER",
   "@undo": {},
-  "unlike": "Dislike",
+  "unlike": "Unlike",
   "@unlike": {},
   "unliked": "L'épisode a été supprimé des favoris.",
   "@unliked": {},
@@ -586,7 +586,7 @@
   "@updateDate": {},
   "updateEpisodesCount": "{count, plural, zero{Aucune mise à jour.} one{Mise à jour d'{count} épisode.} other{Mise à jour de {count} épisodes.}}",
   "@updateEpisodesCount": {},
-  "updateFailed": "Échec de la mise à jour, erreur de réseau",
+  "updateFailed": "Échec de la mise à jour, erreur réseau",
   "@updateFailed": {},
   "version": "Version : {version}",
   "@version": {

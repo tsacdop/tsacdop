@@ -205,7 +205,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "popupMenuLikeDes" : MessageLookupByLibrary.simpleMessage("Ajouter l\'épisode aux favoris"),
     "popupMenuMarkDes" : MessageLookupByLibrary.simpleMessage("Marquer l\'épisode comme lu"),
     "popupMenuPlayDes" : MessageLookupByLibrary.simpleMessage("Jouer l\'épisode"),
-    "privacyPolicy" : MessageLookupByLibrary.simpleMessage("Politique relative aux données personnelles"),
+    "privacyPolicy" : MessageLookupByLibrary.simpleMessage("Gestion des données personnelles"),
     "published" : m20,
     "publishedDaily" : MessageLookupByLibrary.simpleMessage("Quotidien"),
     "publishedMonthly" : MessageLookupByLibrary.simpleMessage("Mensuel"),
@@ -320,11 +320,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "translators" : MessageLookupByLibrary.simpleMessage("Traducteurs"),
     "understood" : MessageLookupByLibrary.simpleMessage("Compris"),
     "undo" : MessageLookupByLibrary.simpleMessage("ANNULER"),
-    "unlike" : MessageLookupByLibrary.simpleMessage("Dislike"),
+    "unlike" : MessageLookupByLibrary.simpleMessage("Unlike"),
     "unliked" : MessageLookupByLibrary.simpleMessage("L\'épisode a été supprimé des favoris."),
     "updateDate" : MessageLookupByLibrary.simpleMessage("Date de mise à jour"),
     "updateEpisodesCount" : m27,
-    "updateFailed" : MessageLookupByLibrary.simpleMessage("Échec de la mise à jour, erreur de réseau"),
+    "updateFailed" : MessageLookupByLibrary.simpleMessage("Échec de la mise à jour, erreur réseau"),
     "version" : m28
   };
 }

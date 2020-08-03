@@ -98,22 +98,16 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     onChanged: _setLocale),
               ),
               Divider(height: 2),
-              //ListTile(
-              //  title: Text('Español'),
-              //  onTap: () async {
-              //    await S.load(Locale('es'));
-              //    setState(() {});
-              //  },
-              //  contentPadding: const EdgeInsets.only(left: 75, right: 20),
-              //  trailing: Radio<Locale>(
-              //      value: Locale('es'),
-              //      groupValue: Locale(Intl.getCurrentLocale()),
-              //      onChanged: (locale) async {
-              //        await S.load(locale);
-              //        setState(() {});
-              //      }),
-              //),
-              //Divider(height: 2),
+              ListTile(
+                title: Text('Español'),
+                onTap: () => _setLocale(Locale('es')),
+                contentPadding: const EdgeInsets.only(left: 75, right: 20),
+                trailing: Radio<Locale>(
+                    value: Locale('es'),
+                    groupValue: Locale(Intl.getCurrentLocale()),
+                    onChanged: _setLocale),
+              ),
+              Divider(height: 2),
               ListTile(
                 onTap: () => _launchUrl(
                     'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project'),

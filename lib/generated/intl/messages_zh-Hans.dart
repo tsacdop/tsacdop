@@ -47,7 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m13(title) => "订阅失败，网络错误 ${title}";
 
-  static m14(title) => "订阅${title}";
+  static m14(title) => "订阅 ${title}";
 
   static m15(title) => "订阅失败，播客已存在 ${title}";
 
@@ -87,7 +87,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "all" : MessageLookupByLibrary.simpleMessage("全部"),
     "autoDownload" : MessageLookupByLibrary.simpleMessage("自动下载"),
     "back" : MessageLookupByLibrary.simpleMessage("返回"),
-    "buffering" : MessageLookupByLibrary.simpleMessage("缓冲"),
+    "buffering" : MessageLookupByLibrary.simpleMessage("缓冲中"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
     "cellularConfirm" : MessageLookupByLibrary.simpleMessage("流量确认"),
     "cellularConfirmDes" : MessageLookupByLibrary.simpleMessage("您确定使用流量下载吗"),
