@@ -27,7 +27,9 @@ extension IntExtension on int {
     final s = context.s;
     var date = DateTime.fromMillisecondsSinceEpoch(this, isUtc: true);
     var difference = DateTime.now().toUtc().difference(date);
-    if (difference.inHours < 24) {
+    if (difference.inMinutes < 30) {
+      return s.hoursAgo(0);
+    } else if (difference.inHours < 24) {
       return s.hoursAgo(difference.inHours);
     } else if (difference.inDays < 7) {
       return s.daysAgo(difference.inDays);

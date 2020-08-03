@@ -464,6 +464,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         await AudioService.addQueueItem(episodeNew.toMediaItem());
       }
       await _queue.addToPlayList(episodeNew);
+      _queueUpdate = !_queueUpdate;
       notifyListeners();
     }
   }

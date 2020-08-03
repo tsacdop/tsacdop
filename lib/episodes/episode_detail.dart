@@ -425,14 +425,14 @@ class _MenuBarState extends State<MenuBar> {
     return await dbHelper.isLiked(episode.enclosureUrl);
   }
 
-  Widget _buttonOnMenu(Widget widget, VoidCallback onTap) => Material(
+  Widget _buttonOnMenu({Widget child, VoidCallback onTap}) => Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           child: Container(
               height: 50.0,
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: widget),
+              child: child),
         ),
       );
 
@@ -499,49 +499,55 @@ class _MenuBarState extends State<MenuBar> {
                     builder: (context, snapshot) {
                       return (!snapshot.data)
                           ? _buttonOnMenu(
-                              Icon(
+                              child: Icon(
                                 Icons.favorite_border,
                                 color: Colors.grey[700],
-                              ), () async {
-                              await saveLiked(widget.episodeItem.enclosureUrl);
-                              OverlayEntry _overlayEntry;
-                              _overlayEntry = _createOverlayEntry();
-                              Overlay.of(context).insert(_overlayEntry);
-                              await Future.delayed(Duration(seconds: 2));
-                              _overlayEntry?.remove();
-                            })
+                              ),
+                              onTap: () async {
+                                await saveLiked(
+                                    widget.episodeItem.enclosureUrl);
+                                OverlayEntry _overlayEntry;
+                                _overlayEntry = _createOverlayEntry();
+                                Overlay.of(context).insert(_overlayEntry);
+                                await Future.delayed(Duration(seconds: 2));
+                                _overlayEntry?.remove();
+                              })
                           : _buttonOnMenu(
-                              Icon(
+                              child: Icon(
                                 Icons.favorite,
                                 color: Colors.red,
                               ),
-                              () =>
+                              onTap: () =>
                                   setUnliked(widget.episodeItem.enclosureUrl));
                     },
                   ),
                   DownloadButton(episode: widget.episodeItem),
-                  Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
-                    selector: (_, audio) => audio.queue.playlist,
+                  Selector<AudioPlayerNotifier,
+                      Tuple2<List<EpisodeBrief>, bool>>(
+                    selector: (_, audio) =>
+                        Tuple2(audio.queue.playlist, audio.queueUpdate),
                     builder: (_, data, __) {
-                      return data.contains(widget.episodeItem)
+                      return data.item1.contains(widget.episodeItem)
                           ? _buttonOnMenu(
-                              Icon(Icons.playlist_add_check,
-                                  color: context.accentColor), () {
-                              audio.delFromPlaylist(widget.episodeItem);
-                              Fluttertoast.showToast(
-                                msg: s.toastRemovePlaylist,
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            })
+                              child: Icon(Icons.playlist_add_check,
+                                  color: context.accentColor),
+                              onTap: () {
+                                audio.delFromPlaylist(widget.episodeItem);
+                                Fluttertoast.showToast(
+                                  msg: s.toastRemovePlaylist,
+                                  gravity: ToastGravity.BOTTOM,
+                                );
+                              })
                           : _buttonOnMenu(
-                              Icon(Icons.playlist_add, color: Colors.grey[700]),
-                              () {
-                              Fluttertoast.showToast(
-                                msg: s.toastAddPlaylist,
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                              audio.addToPlaylist(widget.episodeItem);
-                            });
+                              child: Icon(Icons.playlist_add,
+                                  color: Colors.grey[700]),
+                              onTap: () {
+                                audio.addToPlaylist(widget.episodeItem);
+                                Fluttertoast.showToast(
+                                  msg: s.toastAddPlaylist,
+                                  gravity: ToastGravity.BOTTOM,
+                                );
+                              });
                     },
                   ),
                   FutureBuilder<PlayHistory>(

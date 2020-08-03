@@ -5,9 +5,7 @@ import 'episodebrief.dart';
 class Playlist {
   String name;
   DBHelper dbHelper = DBHelper();
-
   List<EpisodeBrief> _playlist;
-
   List<EpisodeBrief> get playlist => _playlist;
   KeyValueStorage storage = KeyValueStorage('playlist');
 
@@ -17,7 +15,6 @@ class Playlist {
       _playlist = [];
     } else {
       _playlist = [];
-
       for (var url in urls) {
         var episode = await dbHelper.getRssItemWithUrl(url);
         if (episode != null) _playlist.add(episode);
@@ -35,7 +32,9 @@ class Playlist {
     if (!_playlist.contains(episodeBrief)) {
       _playlist.add(episodeBrief);
       await savePlaylist();
-      dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+      if (episodeBrief.isNew == 1) {
+        await dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+      }
     }
   }
 
@@ -43,7 +42,9 @@ class Playlist {
     if (!_playlist.contains(episodeBrief)) {
       _playlist.insert(index, episodeBrief);
       await savePlaylist();
-      dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+      if (episodeBrief.isNew == 1) {
+        await dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+      }
     }
   }
 
