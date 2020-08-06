@@ -192,7 +192,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
 
   _end() async {
     if (_slideDirection == SlideDirection.up) {
-      if (_move > 20) {
+      if (_move > 50) {
         if (_animation.value > widget.maxHeight + 20) {
           setState(() {
             _animation =
