@@ -40,16 +40,17 @@ More to come...
 
 ## Localization
 
-Support languages
-
-* ![English]
-* ![Chinese Simplified]
-* ![French] 
-* ![Spanish]
-
 Please [Email](mailto:<tsacdop.app@gmail.com>) me you'd like to contribute to support more languages!
 
 Credit to [Localizely](https://localizely.com/) for kind support to open source projects.
+
+### ![English]
+
+### ![Chinese Simplified]
+
+### ![French] 
+
+### ![Spanish]
 
 ## License
 
@@ -59,8 +60,6 @@ Tsacdop is licensed under the [GPL v3.0](https://github.com/stonega/tsacdop/blob
 
 1. If you don't have Flutter SDK installed, please visit offcial [Flutter][Flutter Install] site.
 2. Fetch latest sorce code from master branch.
-
-   
 
 ``` 
 git clone https://github.com/stonega/tsacdop.git
