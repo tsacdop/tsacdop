@@ -38,14 +38,17 @@ class Playlist {
     }
   }
 
-  addToPlayListAt(EpisodeBrief episodeBrief, int index) async {
-    if (!_playlist.contains(episodeBrief)) {
-      _playlist.insert(index, episodeBrief);
-      await savePlaylist();
+  addToPlayListAt(EpisodeBrief episodeBrief, int index,
+      {bool existed = true}) async {
+    if (existed) {
+      _playlist.removeWhere(
+          (episode) => episode.enclosureUrl == episodeBrief.enclosureUrl);
       if (episodeBrief.isNew == 1) {
         await dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
       }
     }
+    _playlist.insert(index, episodeBrief);
+    await savePlaylist();
   }
 
   Future<int> delFromPlaylist(EpisodeBrief episodeBrief) async {

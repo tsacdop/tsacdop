@@ -71,7 +71,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   EpisodeBrief _episode;
 
   /// Current playlist.
-  final Playlist _queue = Playlist();
+  Playlist _queue;
 
   /// Notifier for playlist change.
   bool _queueUpdate = false;
@@ -230,6 +230,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> loadPlaylist() async {
+    _queue = Playlist();
     await _queue.getPlaylist();
     await _getAutoPlay();
     _lastPostion = await positionStorage.getInt();
@@ -519,16 +520,20 @@ class AudioPlayerNotifier extends ChangeNotifier {
     return index;
   }
 
-  moveToTop(EpisodeBrief episode) async {
+  Future<bool> moveToTop(EpisodeBrief episode) async {
     await delFromPlaylist(episode);
     if (playerRunning) {
-      await addToPlaylistAt(episode, 1);
+      await AudioService.addQueueItemAt(episode.toMediaItem(), 1);
+      await _queue.addToPlayListAt(episode, 1, existed: false);
     } else {
-      await addToPlaylistAt(episode, 0);
+      await _queue.addToPlayListAt(episode, 0, existed: false);
       _lastPostion = 0;
       positionStorage.saveInt(_lastPostion);
     }
+    _queueUpdate = !_queueUpdate;
     notifyListeners();
+    print('moved to top');
+    return true;
   }
 
   pauseAduio() async {
@@ -652,7 +657,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   final List<MediaItem> _queue = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
   AudioProcessingState _skipState;
-  bool _playing = false;
+  bool _playing;
   bool _interrupted = false;
   bool _stopAtEnd;
   int _cacheMax;
@@ -971,7 +976,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       systemActions: [MediaAction.seekTo],
       processingState:
           processingState ?? AudioServiceBackground.state.processingState,
-      playing: _playing,
+      playing: _playing ?? false,
       position: position,
       bufferedPosition: bufferedPosition ?? position,
       speed: _audioPlayer.speed,

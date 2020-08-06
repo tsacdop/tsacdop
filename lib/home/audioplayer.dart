@@ -449,129 +449,112 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
               selector: (_, audio) =>
                   Tuple2(audio.queue.playlist, audio.queueUpdate),
               builder: (_, data, __) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10)),
-                  child: AnimatedList(
-                    key: miniPlaylistKey,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    initialItemCount: data.item1.length,
-                    itemBuilder: (context, index, animation) => ScaleTransition(
-                      alignment: Alignment.center,
-                      scale: animation,
-                      child: index == 0 || index > data.item1.length - 1
-                          ? Center()
-                          : Column(
-                              children: <Widget>[
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: () {
-                                            audio
-                                                .episodeLoad(data.item1[index]);
-                                            miniPlaylistKey.currentState
-                                                .removeItem(
-                                                    index,
-                                                    (context, animation) =>
-                                                        Center());
-                                            miniPlaylistKey.currentState
-                                                .insertItem(0);
-                                          },
-                                          child: Container(
-                                            height: 60,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 20),
+                var episodesToPlay = data.item1.sublist(1);
+                return AnimatedList(
+                  key: miniPlaylistKey,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  initialItemCount: episodesToPlay.length,
+                  itemBuilder: (context, index, animation) => ScaleTransition(
+                    alignment: Alignment.center,
+                    scale: animation,
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    audio.episodeLoad(data.item1[index]);
+                                    miniPlaylistKey.currentState.removeItem(
+                                        index,
+                                        (context, animation) => Center());
+                                    miniPlaylistKey.currentState.insertItem(0);
+                                  },
+                                  child: Container(
+                                    height: 60,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Container(
+                                          padding: EdgeInsets.all(10.0),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15.0)),
+                                            child: Container(
+                                                height: 30.0,
+                                                width: 30.0,
+                                                child: Image.file(File(
+                                                    "${episodesToPlay[index].imagePath}"))),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Align(
                                             alignment: Alignment.centerLeft,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                Container(
-                                                  padding: EdgeInsets.all(10.0),
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                15.0)),
-                                                    child: Container(
-                                                        height: 30.0,
-                                                        width: 30.0,
-                                                        child: Image.file(File(
-                                                            "${data.item1[index].imagePath}"))),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Align(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    child: Text(
-                                                      data.item1[index].title,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                            child: Text(
+                                              episodesToPlay[index].title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20.0),
-                                      child: Material(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                        clipBehavior: Clip.hardEdge,
-                                        color: context.primaryColor,
-                                        child: InkWell(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(15.0)),
-                                          onTap: () async {
-                                            await audio
-                                                .moveToTop(data.item1[index]);
-                                            miniPlaylistKey.currentState
-                                                .removeItem(
-                                              index,
-                                              (context, animation) => Center(),
-                                              duration:
-                                                  Duration(milliseconds: 500),
-                                            );
-                                            miniPlaylistKey.currentState
-                                                .insertItem(
-                                                    1,
-                                                    duration: Duration(
-                                                        milliseconds: 200));
-                                          },
-                                          child: SizedBox(
-                                            height: 30.0,
-                                            width: 30.0,
-                                            child: Transform.rotate(
-                                              angle: math.pi,
-                                              child: Icon(
-                                                LineIcons.download_solid,
-                                                size: 20.0,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                                Divider(height: 2),
-                              ],
+                              ),
                             ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: Material(
+                                borderRadius: BorderRadius.circular(100),
+                                clipBehavior: Clip.hardEdge,
+                                color: context.primaryColor,
+                                child: InkWell(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.0)),
+                                  onTap: () async {
+                                    miniPlaylistKey.currentState.removeItem(
+                                      index,
+                                      (context, animation) => Center(),
+                                      duration: Duration(milliseconds: 50),
+                                    );
+                                    var episdoe =
+                                        episodesToPlay.removeAt(index);
+                                    episodesToPlay.insert(0, episdoe);
+                                    miniPlaylistKey.currentState.insertItem(0,
+                                        duration: Duration(milliseconds: 200));
+                                    await audio
+                                        .moveToTop(data.item1[index + 1]);
+                                  },
+                                  child: SizedBox(
+                                    height: 30.0,
+                                    width: 30.0,
+                                    child: Transform.rotate(
+                                      angle: math.pi,
+                                      child: Icon(
+                                        LineIcons.download_solid,
+                                        size: 20.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Divider(height: 2),
+                      ],
                     ),
                   ),
                 );
