@@ -524,16 +524,18 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(15.0)),
                                   onTap: () async {
+                                    var episdoe =
+                                        episodesToPlay.removeAt(index);
+                                    episodesToPlay.insert(0, episdoe);
                                     miniPlaylistKey.currentState.removeItem(
                                       index,
                                       (context, animation) => Center(),
                                       duration: Duration(milliseconds: 50),
                                     );
-                                    var episdoe =
-                                        episodesToPlay.removeAt(index);
-                                    episodesToPlay.insert(0, episdoe);
                                     miniPlaylistKey.currentState.insertItem(0,
-                                        duration: Duration(milliseconds: 200));
+                                        duration: Duration(milliseconds: 100));
+                                    await Future.delayed(
+                                        Duration(milliseconds: 150));
                                     await audio
                                         .moveToTop(data.item1[index + 1]);
                                   },
@@ -1008,7 +1010,7 @@ class _ControlPanelState extends State<ControlPanel>
                       children: <Widget>[
                         Container(
                           padding:
-                              EdgeInsets.only(top: 20, left: 10, right: 10),
+                              EdgeInsets.only(top: 20, left: 30, right: 30),
                           child: SliderTheme(
                             data: SliderTheme.of(context).copyWith(
                               activeTrackColor: height <= widget.maxHeight
@@ -1100,26 +1102,36 @@ class _ControlPanelState extends State<ControlPanel>
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            IconButton(
-                                padding: EdgeInsets.only(right: 10, left: 30),
-                                onPressed:
-                                    playing ? () => audio.rewind() : null,
-                                iconSize: 32.0,
-                                icon: Icon(Icons.fast_rewind),
-                                color: Colors.grey[500]),
-                            Selector<AudioPlayerNotifier, int>(
-                                selector: (_, audio) => audio.rewindSeconds,
-                                builder: (_, seconds, __) => Padding(
-                                      padding: const EdgeInsets.only(top: 5.0),
-                                      child: Text('$seconds s',
-                                          style: GoogleFonts.teko(
-                                            textBaseline:
-                                                TextBaseline.ideographic,
-                                            textStyle: TextStyle(
-                                                color: Colors.grey[500],
-                                                fontSize: 20),
+                            FlatButton(
+                              color: Colors.transparent,
+                              padding: EdgeInsets.only(right: 10, left: 10),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100.0),
+                                  side: BorderSide(color: Colors.transparent)),
+                              onPressed: playing ? () => audio.rewind() : null,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.fast_rewind,
+                                      size: 32, color: Colors.grey[500]),
+                                  SizedBox(width: 5),
+                                  Selector<AudioPlayerNotifier, int>(
+                                      selector: (_, audio) =>
+                                          audio.rewindSeconds,
+                                      builder: (_, seconds, __) => Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5.0),
+                                            child: Text('$seconds s',
+                                                style: GoogleFonts.teko(
+                                                  textBaseline:
+                                                      TextBaseline.ideographic,
+                                                  textStyle: TextStyle(
+                                                      color: Colors.grey[500],
+                                                      fontSize: 25),
+                                                )),
                                           )),
-                                    )),
+                                ],
+                              ),
+                            ),
                             Container(
                               margin: EdgeInsets.symmetric(horizontal: 30),
                               height: 60,
@@ -1180,25 +1192,34 @@ class _ControlPanelState extends State<ControlPanel>
                                       ),
                                     ),
                             ),
-                            Selector<AudioPlayerNotifier, int>(
-                                selector: (_, audio) =>
-                                    audio.fastForwardSeconds,
-                                builder: (_, seconds, __) => Padding(
-                                      padding: const EdgeInsets.only(top: 5.0),
-                                      child: Text('$seconds s',
-                                          style: GoogleFonts.teko(
-                                            textStyle: TextStyle(
-                                                color: Colors.grey[500],
-                                                fontSize: 20),
-                                          )),
-                                    )),
-                            IconButton(
-                              padding: EdgeInsets.only(left: 10.0, right: 30),
+                            FlatButton(
+                              padding: EdgeInsets.only(left: 10.0, right: 10),
                               onPressed:
                                   playing ? () => audio.fastForward() : null,
-                              iconSize: 32.0,
-                              icon: Icon(Icons.fast_forward),
-                              color: Colors.grey[500],
+                              color: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100.0),
+                                  side: BorderSide(color: Colors.transparent)),
+                              child: Row(
+                                children: [
+                                  Selector<AudioPlayerNotifier, int>(
+                                      selector: (_, audio) =>
+                                          audio.fastForwardSeconds,
+                                      builder: (_, seconds, __) => Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5.0),
+                                            child: Text('$seconds s',
+                                                style: GoogleFonts.teko(
+                                                  textStyle: TextStyle(
+                                                      color: Colors.grey[500],
+                                                      fontSize: 25),
+                                                )),
+                                          )),
+                                  SizedBox(width: 10),
+                                  Icon(Icons.fast_forward,
+                                      size: 32.0, color: Colors.grey[500]),
+                                ],
+                              ),
                             )
                           ],
                         ),
