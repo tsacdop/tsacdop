@@ -391,17 +391,15 @@ class DBHelper {
             var month = mmDd.stringMatch(pubDate);
             date =
                 DateFormat('yyyy-MM-dd HH:mm', 'en_US').parse('$month $time');
-            print(date.toString());
           } else {
             date = DateTime.now();
           }
         }
       }
     }
-    var result = date
-        .add(Duration(hours: timezoneInt))
-        .add(DateTime.now().timeZoneOffset);
-    return result;
+    date.add(Duration(hours: timezoneInt)).add(DateTime.now().timeZoneOffset);
+    print(date.toString());
+    return date;
   }
 
   int _getExplicit(bool b) {
@@ -461,7 +459,7 @@ class DBHelper {
       if (url != null) {
         await dbClient.transaction((txn) {
           return txn.rawInsert(
-              """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
+              """INSERT OR REPLACE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
                 description, feed_id, milliseconds, duration, explicit, media_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
               [
                 title,
@@ -524,6 +522,7 @@ class DBHelper {
           final length = item?.enclosure?.length ?? 0;
           final pubDate = item.pubDate;
           final date = _parsePubDate(pubDate);
+          print(date.toString());
           final milliseconds = date.millisecondsSinceEpoch;
           final duration = item.itunes.duration?.inSeconds ?? 0;
           final explicit = _getExplicit(item.itunes.explicit);
@@ -1050,9 +1049,13 @@ class DBHelper {
 
   Future<bool> isLiked(String url) async {
     var dbClient = await database;
-    List<Map> list = await dbClient
+    var list = <Map>[];
+    list = await dbClient
         .rawQuery("SELECT liked FROM Episodes WHERE enclosure_url = ?", [url]);
-    return list.first['liked'] == 0 ? false : true;
+    if (list.isNotEmpty) {
+      return list.first['liked'] == 0 ? false : true;
+    }
+    return false;
   }
 
   Future<bool> isDownloaded(String url) async {
