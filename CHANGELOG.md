@@ -1,5 +1,20 @@
 # Tsacdop Changelog
 
+## 0.4.10
+
+Release date 2020/8/6
+
+### Bugs fixed
+
+* Episdoe date parse error.
+* Play from start after interrupt.
+* Playlist in player unstable.
+* Language setting not saved after restart app.
+
+### Minor change
+
+* Fast forward and rewind buttons UI changed.
+
 ## v0.4.9
 
 Release date 2020/8/1
