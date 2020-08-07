@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
-import 'package:tsacdop/local_storage/sqflite_localpodcast.dart';
+
+import '../local_storage/sqflite_localpodcast.dart';
 
 class FiresideData {
   final String id;
@@ -45,7 +46,8 @@ class FiresideData {
         host = PodcastHost(
             name,
             reg.stringMatch(image) ??
-                'http://xuanmei.us/assets/default/avatar_small-170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg');
+                'https://fireside.fm/assets/default/avatar_small'
+                    '-170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg');
 
         hosts.add(host);
       }

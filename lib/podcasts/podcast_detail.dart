@@ -93,17 +93,11 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Future _updateRssItem(BuildContext context, PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final result = await dbHelper.updatePodcastRss(podcastLocal);
-    if (result == 0) {
-      Fluttertoast.showToast(
-        msg: 'No Update',
-        gravity: ToastGravity.TOP,
-      );
-    } else if (result > 0) {
-      Fluttertoast.showToast(
-        msg: context.s.updateEpisodesCount(result),
-        gravity: ToastGravity.TOP,
-      );
-
+    Fluttertoast.showToast(
+      msg: context.s.updateEpisodesCount(result),
+      gravity: ToastGravity.TOP,
+    );
+    if (result > 0) {
       var autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
       if (autoDownload) {
         var downloader = Provider.of<DownloadState>(context, listen: false);
@@ -128,13 +122,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
           }
         }
       }
-    } else {
+    } else if (result != 0) {
       Fluttertoast.showToast(
         msg: context.s.updateFailed,
         gravity: ToastGravity.TOP,
       );
     }
-    if (mounted) setState(() {});
+    if (mounted && result > 0) setState(() {});
   }
 
   Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal,
@@ -214,59 +208,86 @@ class _PodcastDetailState extends State<PodcastDetail> {
                 if (snapshot.hasData) {
                   var hosts = snapshot.data.item2;
                   var backgroundImage = snapshot.data.item1;
-                  return Container(
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: CachedNetworkImageProvider(
-                                backgroundImage,
+                  return CachedNetworkImage(
+                    imageUrl: backgroundImage,
+                    errorWidget: (context, url, error) => Center(),
+                    imageBuilder: (context, backgroundImageProvider) =>
+                        Container(
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: backgroundImageProvider,
+                                    fit: BoxFit.cover)),
+                            alignment: Alignment.centerRight,
+                            child: Container(
+                              color: Colors.black26,
+                              padding: EdgeInsets.symmetric(vertical: 5.0),
+                              width: MediaQuery.of(context).size.width,
+                              alignment: Alignment.centerRight,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: hosts
+                                      .map((host) => Container(
+                                          padding: EdgeInsets.all(5.0),
+                                          width: 80.0,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              CachedNetworkImage(
+                                                imageUrl: host.image,
+                                                progressIndicatorBuilder:
+                                                    (context, url,
+                                                            downloadProgress) =>
+                                                        SizedBox(
+                                                  width: 40,
+                                                  height: 2,
+                                                  child:
+                                                      LinearProgressIndicator(
+                                                          value:
+                                                              downloadProgress
+                                                                  .progress),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        CircleAvatar(
+                                                  backgroundColor:
+                                                      Colors.grey[400],
+                                                  backgroundImage: AssetImage(
+                                                      'assets/fireside.jpg'),
+                                                ),
+                                                imageBuilder: (context,
+                                                        hostImage) =>
+                                                    CircleAvatar(
+                                                        backgroundColor:
+                                                            Colors.grey[400],
+                                                        backgroundImage:
+                                                            hostImage),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.all(2),
+                                              ),
+                                              Text(
+                                                host.name,
+                                                style: TextStyle(
+                                                  backgroundColor: Colors.black
+                                                      .withOpacity(0.5),
+                                                  color: Colors.white,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.fade,
+                                              ),
+                                            ],
+                                          )))
+                                      .toList()
+                                      .cast<Widget>(),
+                                ),
                               ),
-                              fit: BoxFit.cover)),
-                      alignment: Alignment.centerRight,
-                      child: Container(
-                        color: Colors.black26,
-                        padding: EdgeInsets.symmetric(vertical: 5.0),
-                        width: MediaQuery.of(context).size.width,
-                        alignment: Alignment.centerRight,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: hosts
-                                .map((host) => Container(
-                                    padding: EdgeInsets.all(5.0),
-                                    width: 80.0,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        CircleAvatar(
-                                            backgroundColor: Colors.grey[400],
-                                            backgroundImage:
-                                                CachedNetworkImageProvider(
-                                              host.image,
-                                            )),
-                                        Padding(
-                                          padding: EdgeInsets.all(2),
-                                        ),
-                                        Text(
-                                          host.name,
-                                          style: TextStyle(
-                                            backgroundColor:
-                                                Colors.black.withOpacity(0.5),
-                                            color: Colors.white,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.fade,
-                                        ),
-                                      ],
-                                    )))
-                                .toList()
-                                .cast<Widget>(),
-                          ),
-                        ),
-                      ));
+                            )),
+                  );
                 } else {
                   return Center();
                 }
