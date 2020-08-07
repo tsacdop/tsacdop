@@ -9,10 +9,10 @@ import 'package:focused_menu/modals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/home/audioplayer.dart';
 import 'package:tuple/tuple.dart';
 
 import '../episodes/episode_detail.dart';
+import '../home/audioplayer.dart';
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';

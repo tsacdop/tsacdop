@@ -532,7 +532,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
     _queueUpdate = !_queueUpdate;
     notifyListeners();
-    print('moved to top');
     return true;
   }
 
