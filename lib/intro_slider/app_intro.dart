@@ -197,7 +197,7 @@ class _SlideIntroState extends State<SlideIntro> {
                                   onTap: () => _controller.animateToPage(
                                       _position.toInt() + 1,
                                       duration: Duration(milliseconds: 200),
-                                      curve: Curves.bounceIn),
+                                      curve: Curves.linear),
                                   child: SizedBox(
                                       height: 40,
                                       width: 80,

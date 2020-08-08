@@ -81,14 +81,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     } else if (_showTitle) setState(() => _showTitle = false);
   }
 
-  _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
   _markListened(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
     var marked = await dbHelper.checkMarked(episode);
@@ -281,9 +273,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                               ? Html(
                                   padding: EdgeInsets.only(
                                       left: 20.0, right: 20, bottom: 50),
-                                  defaultTextStyle:
-                                      // GoogleFonts.libreBaskerville(
-                                      GoogleFonts.martel(
+                                  defaultTextStyle: GoogleFonts.martel(
                                     textStyle: TextStyle(
                                       height: 1.8,
                                     ),
@@ -291,10 +281,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                   data: _description,
                                   linkStyle: TextStyle(
                                       color: context.accentColor,
-                                      // decoration: TextDecoration.underline,
                                       textBaseline: TextBaseline.ideographic),
                                   onLinkTap: (url) {
-                                    _launchUrl(url);
+                                    url.launchUrl;
                                   },
                                   useRichText: true,
                                 )
@@ -307,7 +296,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                       alignment: Alignment.topLeft,
                                       child: SelectableLinkify(
                                         onOpen: (link) {
-                                          _launchUrl(link.url);
+                                          link.url.launchUrl;
                                         },
                                         text: _description,
                                         style: GoogleFonts.martel(
