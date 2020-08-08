@@ -288,6 +288,30 @@ class LastPosition extends StatelessWidget {
                     textColor: data ? Colors.white : null,
                     onPressed: () => audio.setSkipSilence(skipSilence: !data))),
             SizedBox(width: 10),
+            Selector<AudioPlayerNotifier, bool>(
+                selector: (_, audio) => audio.boostVolume,
+                builder: (_, data, __) => FlatButton(
+                    child: Row(
+                      children: [
+                        Icon(Icons.flash_on, size: 18),
+                        SizedBox(width: 5),
+                        Text('Boost Volume'),
+                      ],
+                    ),
+                    color: data ? context.accentColor : Colors.transparent,
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100.0),
+                        side: BorderSide(
+                            color: data
+                                ? context.accentColor
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withOpacity(0.12))),
+                    textColor: data ? Colors.white : null,
+                    onPressed: () => audio.setBoostVolume(boostVolume: !data))),
+            SizedBox(width: 10),
             FutureBuilder<PlayHistory>(
                 future: getPosition(episode),
                 builder: (context, snapshot) {

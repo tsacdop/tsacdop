@@ -41,6 +41,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
   }
 
   double _topHeight;
+  List<EpisodeBrief> episodes = [];
 
   @override
   void initState() {
@@ -72,14 +73,14 @@ class _PlaylistPageState extends State<PlaylistPage> {
         appBar: AppBar(
           title: _topHeight == 60 ? Text(s.homeMenuPlaylist) : Center(),
           elevation: 0,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: context.primaryColor,
         ),
         body: SafeArea(
           child: Selector<AudioPlayerNotifier, Tuple3<Playlist, bool, bool>>(
             selector: (_, audio) =>
                 Tuple3(audio.queue, audio.playerRunning, audio.queueUpdate),
             builder: (_, data, __) {
-              final episodes = data.item1.playlist;
+              episodes = data.item1.playlist;
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,10 +104,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                     ? '${s.homeMenuPlaylist}\n'
                                     : '',
                                 style: TextStyle(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .color,
+                                  color: context.textColor,
                                   fontSize: 30,
                                 ),
                                 children: <TextSpan>[
@@ -124,7 +122,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                           ? 'episode'
                                           : 'episodes',
                                       style: TextStyle(
-                                        color: Theme.of(context).accentColor,
+                                        color: context.accentColor,
                                         fontSize: 15,
                                       )),
                                   TextSpan(
@@ -132,14 +130,14 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                         _sumPlaylistLength(episodes).toString(),
                                     style: GoogleFonts.cairo(
                                         textStyle: TextStyle(
-                                      color: Theme.of(context).accentColor,
+                                      color: context.accentColor,
                                       fontSize: 25,
                                     )),
                                   ),
                                   TextSpan(
                                       text: 'mins',
                                       style: TextStyle(
-                                        color: Theme.of(context).accentColor,
+                                        color: context.accentColor,
                                         fontSize: 15,
                                       )),
                                 ],
@@ -226,8 +224,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                     padding: EdgeInsets.all(0),
                                     alignment: Alignment.center,
                                     icon: Icon(Icons.play_circle_filled,
-                                        size: 40,
-                                        color: Theme.of(context).accentColor),
+                                        size: 40, color: (context).accentColor),
                                     onPressed: () {
                                       audio.playlistLoad();
                                       // setState(() {});
@@ -247,10 +244,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
                           if (newIndex > oldIndex) {
                             newIndex -= 1;
                           }
-                          final episodeRemove = episodes[oldIndex];
-                          audio.delFromPlaylist(episodeRemove);
-                          audio.addToPlaylistAt(episodeRemove, newIndex);
-                          setState(() {});
+                          audio.reorderPlaylist(newIndex, oldIndex);
+                          final episodeRemove = episodes.removeAt(oldIndex);
+                          setState(() {
+                            episodes.insert(newIndex, episodeRemove);
+                          });
                         },
                         scrollDirection: Axis.vertical,
                         children: data.item2
