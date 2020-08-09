@@ -119,6 +119,16 @@ class S {
     );
   }
 
+  /// `Boost volume`
+  String get boostVolume {
+    return Intl.message(
+      'Boost volume',
+      name: 'boostVolume',
+      desc: 'Boost volume in player widget.',
+      args: [],
+    );
+  }
+
   /// `Buffering`
   String get buffering {
     return Intl.message(

@@ -24,6 +24,10 @@
   "@autoDownload": {},
   "back": "返回",
   "@back": {},
+  "boostVolume": "增强声音",
+  "@boostVolume": {
+    "description": "Boost volume in player widget."
+  },
   "buffering": "缓冲中",
   "@buffering": {},
   "cancel": "取消",

@@ -87,6 +87,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "all" : MessageLookupByLibrary.simpleMessage("全部"),
     "autoDownload" : MessageLookupByLibrary.simpleMessage("自动下载"),
     "back" : MessageLookupByLibrary.simpleMessage("返回"),
+    "boostVolume" : MessageLookupByLibrary.simpleMessage("增强声音"),
     "buffering" : MessageLookupByLibrary.simpleMessage("缓冲中"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
     "cellularConfirm" : MessageLookupByLibrary.simpleMessage("流量确认"),

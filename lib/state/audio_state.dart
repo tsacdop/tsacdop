@@ -66,6 +66,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   var playerHeightStorage = KeyValueStorage(playerHeightKey);
   var speedStorage = KeyValueStorage(speedKey);
   var skipSilenceStorage = KeyValueStorage(skipSilenceKey);
+  var boostVolumeStorage = KeyValueStorage(boostVolumeKey);
+  var volumeGainStorage = KeyValueStorage(volumeGainKey);
 
   /// Current playing episdoe.
   EpisodeBrief _episode;
@@ -148,6 +150,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
   /// Player skip silence.
   bool _skipSilence;
 
+  /// Boost volumn
+  bool _boostVolume;
+
+  /// Boost volume gain.
+  int _volumeGain;
+
   // ignore: prefer_final_fields
   bool _playerRunning = false;
 
@@ -175,6 +183,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   int get rewindSeconds => _rewindSeconds;
   PlayerHeight get playerHeight => _playerHeight;
   bool get skipSilence => _skipSilence;
+  bool get boostVolume => _boostVolume;
+  int get volumeGain => _volumeGain;
 
   set setSwitchValue(double value) {
     _switchValue = value;
@@ -197,6 +207,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _playerHeight = PlayerHeight.values[index];
     _currentSpeed = await speedStorage.getDoubel(defaultValue: 1.0);
     _skipSilence = await skipSilenceStorage.getBool(defaultValue: false);
+    _boostVolume = await boostVolumeStorage.getBool(defaultValue: false);
+    _volumeGain = await volumeGainStorage.getInt(defaultValue: 3000);
   }
 
   Future _savePlayerHeight() async {
@@ -345,12 +357,23 @@ class AudioPlayerNotifier extends ChangeNotifier {
         sleepTimer(defaultTimer);
       }
     }
+
+    /// Set player speed.
     if (_currentSpeed != 1.0) {
       await AudioService.customAction('setSpeed', _currentSpeed);
     }
+
+    /// Set slipsilence.
     if (_skipSilence) {
       await AudioService.customAction('setSkipSilence', skipSilence);
     }
+
+    /// Set boostValome.
+    if (_boostVolume) {
+      await AudioService.customAction(
+          'setBoostVolume', [_boostVolume, _volumeGain]);
+    }
+
     await AudioService.play();
 
     AudioService.currentMediaItemStream
@@ -456,6 +479,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   playNext() async {
     await AudioService.skipToNext();
+    _queueUpdate = !_queueUpdate;
+    notifyListeners();
   }
 
   addToPlaylist(EpisodeBrief episode) async {
@@ -520,6 +545,19 @@ class AudioPlayerNotifier extends ChangeNotifier {
     return index;
   }
 
+  Future reorderPlaylist(int oldIndex, int newIndex) async {
+    var episode = _queue.playlist[oldIndex];
+    if (playerRunning) {
+      await AudioService.removeQueueItem(episode.toMediaItem());
+      await AudioService.addQueueItemAt(episode.toMediaItem(), newIndex);
+    }
+    await _queue.addToPlayListAt(episode, newIndex);
+    if (newIndex == 0) {
+      _lastPostion = 0;
+      await positionStorage.saveInt(0);
+    }
+  }
+
   Future<bool> moveToTop(EpisodeBrief episode) async {
     await delFromPlaylist(episode);
     if (playerRunning) {
@@ -535,11 +573,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
     return true;
   }
 
-  pauseAduio() async {
-    AudioService.pause();
+  Future<void> pauseAduio() async {
+    await AudioService.pause();
   }
 
-  resumeAudio() async {
+  Future<void> resumeAudio() async {
     if (_audioState != AudioProcessingState.connecting &&
         _audioState != AudioProcessingState.none) AudioService.play();
   }
@@ -589,6 +627,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _skipSilence = skipSilence;
     await skipSilenceStorage.saveBool(_skipSilence);
     notifyListeners();
+  }
+
+  setBoostVolume({@required bool boostVolume, int gain}) async {
+    await AudioService.customAction(
+        'setBoostVolume', [boostVolume, _volumeGain]);
+    _boostVolume = boostVolume;
+    notifyListeners();
+    await boostVolumeStorage.saveBool(boostVolume);
   }
 
   //Set sleep timer
@@ -953,6 +999,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
       case 'setSkipSilence':
         await _setSkipSilence(argument);
         break;
+      case 'setBoostVolume':
+        await _setBoostVolume(argument[0], argument[1]);
+        break;
     }
   }
 
@@ -960,6 +1009,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await _audioPlayer.setSkipSilence(boo);
     var duration = await _audioPlayer.durationFuture ?? Duration.zero;
     AudioServiceBackground.setMediaItem(mediaItem.copyWith(duration: duration));
+  }
+
+  Future _setBoostVolume(bool boo, int gain) async {
+    await _audioPlayer.setBoostVolume(boo, gain: gain);
   }
 
   Future<void> _setState({

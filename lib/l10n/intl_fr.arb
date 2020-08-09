@@ -24,6 +24,10 @@
   "@autoDownload": {},
   "back": "Retour",
   "@back": {},
+  "boostVolume": "Boost volume",
+  "@boostVolume": {
+    "description": "Boost volume in player widget."
+  },
   "buffering": "Buffering",
   "@buffering": {},
   "cancel": "ANNULER",

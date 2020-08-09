@@ -261,118 +261,124 @@ class LastPosition extends StatelessWidget {
     return Selector<AudioPlayerNotifier, EpisodeBrief>(
       selector: (_, audio) => audio.episode,
       builder: (context, episode, child) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Selector<AudioPlayerNotifier, bool>(
-                selector: (_, audio) => audio.skipSilence,
-                builder: (_, data, __) => FlatButton(
-                    child: Row(
-                      children: [
-                        Icon(Icons.flash_on, size: 18),
-                        SizedBox(width: 5),
-                        Text(s.skipSilence),
-                      ],
-                    ),
-                    color: data ? context.accentColor : Colors.transparent,
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(
-                            color: data
-                                ? context.accentColor
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withOpacity(0.12))),
-                    textColor: data ? Colors.white : null,
-                    onPressed: () => audio.setSkipSilence(skipSilence: !data))),
-            SizedBox(width: 10),
-            Selector<AudioPlayerNotifier, bool>(
-                selector: (_, audio) => audio.boostVolume,
-                builder: (_, data, __) => FlatButton(
-                    child: Row(
-                      children: [
-                        Icon(Icons.flash_on, size: 18),
-                        SizedBox(width: 5),
-                        Text('Boost Volume'),
-                      ],
-                    ),
-                    color: data ? context.accentColor : Colors.transparent,
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(
-                            color: data
-                                ? context.accentColor
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withOpacity(0.12))),
-                    textColor: data ? Colors.white : null,
-                    onPressed: () => audio.setBoostVolume(boostVolume: !data))),
-            SizedBox(width: 10),
-            FutureBuilder<PlayHistory>(
-                future: getPosition(episode),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  return snapshot.hasData
-                      ? snapshot.data.seekValue > 0.90
-                          ? Container(
-                              height: 20,
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              child: SizedBox(
-                                width: 20,
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Selector<AudioPlayerNotifier, bool>(
+                  selector: (_, audio) => audio.skipSilence,
+                  builder: (_, data, __) => FlatButton(
+                      child: Row(
+                        children: [
+                          Icon(Icons.flash_on, size: 18),
+                          SizedBox(width: 5),
+                          Text(s.skipSilence),
+                        ],
+                      ),
+                      color: data ? context.accentColor : Colors.transparent,
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(
+                              color: data
+                                  ? context.accentColor
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.12))),
+                      textColor: data ? Colors.white : null,
+                      onPressed: () =>
+                          audio.setSkipSilence(skipSilence: !data))),
+              SizedBox(width: 10),
+              Selector<AudioPlayerNotifier, bool>(
+                  selector: (_, audio) => audio.boostVolume,
+                  builder: (_, data, __) => FlatButton(
+                      child: Row(
+                        children: [
+                          Icon(Icons.volume_up, size: 18),
+                          SizedBox(width: 5),
+                          Text(s.boostVolume),
+                        ],
+                      ),
+                      color: data ? context.accentColor : Colors.transparent,
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(
+                              color: data
+                                  ? context.accentColor
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.12))),
+                      textColor: data ? Colors.white : null,
+                      onPressed: () =>
+                          audio.setBoostVolume(boostVolume: !data))),
+              SizedBox(width: 10),
+              FutureBuilder<PlayHistory>(
+                  future: getPosition(episode),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) print(snapshot.error);
+                    return snapshot.hasData
+                        ? snapshot.data.seekValue > 0.90
+                            ? Container(
                                 height: 20,
-                                child: CustomPaint(
-                                  painter: ListenedAllPainter(
-                                      context.accentColor,
-                                      stroke: 2.0),
-                                ),
-                              ),
-                            )
-                          : snapshot.data.seconds < 10
-                              ? Center()
-                              : OutlineButton(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                      side: BorderSide(
-                                          color: context.accentColor)),
-                                  highlightedBorderColor: Colors.green[700],
-                                  onPressed: () => audio.seekTo(
-                                      (snapshot.data.seconds * 1000).toInt()),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CustomPaint(
-                                          painter: ListenedPainter(
-                                              context.textColor,
-                                              stroke: 2.0),
-                                        ),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(snapshot.data.seconds.toTime),
-                                    ],
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CustomPaint(
+                                    painter: ListenedAllPainter(
+                                        context.accentColor,
+                                        stroke: 2.0),
                                   ),
-                                )
-                      : Center();
-                }),
-            Selector<AudioPlayerNotifier, double>(
-              selector: (_, audio) => audio.switchValue,
-              builder: (_, data, __) => data == 1
-                  ? Container(
-                      height: 20,
-                      width: 40,
-                      child: Transform.rotate(
-                          angle: math.pi * 0.7,
-                          child: Icon(Icons.brightness_2,
-                              size: 18, color: context.accentColor)))
-                  : Center(),
-            )
-          ],
+                                ),
+                              )
+                            : snapshot.data.seconds < 10
+                                ? Center()
+                                : OutlineButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(100.0),
+                                        side: BorderSide(
+                                            color: context.accentColor)),
+                                    highlightedBorderColor: Colors.green[700],
+                                    onPressed: () => audio.seekTo(
+                                        (snapshot.data.seconds * 1000).toInt()),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CustomPaint(
+                                            painter: ListenedPainter(
+                                                context.textColor,
+                                                stroke: 2.0),
+                                          ),
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(snapshot.data.seconds.toTime),
+                                      ],
+                                    ),
+                                  )
+                        : Center();
+                  }),
+              Selector<AudioPlayerNotifier, double>(
+                selector: (_, audio) => audio.switchValue,
+                builder: (_, data, __) => data == 1
+                    ? Container(
+                        height: 20,
+                        width: 40,
+                        child: Transform.rotate(
+                            angle: math.pi * 0.7,
+                            child: Icon(Icons.brightness_2,
+                                size: 18, color: context.accentColor)))
+                    : Center(),
+              )
+            ],
+          ),
         );
       },
     );

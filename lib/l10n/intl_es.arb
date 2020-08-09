@@ -24,6 +24,10 @@
   "@autoDownload": {},
   "back": "Atras",
   "@back": {},
+  "boostVolume": "Boost volume",
+  "@boostVolume": {
+    "description": "Boost volume in player widget."
+  },
   "buffering": "Cargando ",
   "@buffering": {},
   "cancel": "CANCELAR",

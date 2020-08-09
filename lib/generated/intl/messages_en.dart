@@ -87,6 +87,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "all" : MessageLookupByLibrary.simpleMessage("All"),
     "autoDownload" : MessageLookupByLibrary.simpleMessage("Auto download"),
     "back" : MessageLookupByLibrary.simpleMessage("Back"),
+    "boostVolume" : MessageLookupByLibrary.simpleMessage("Boost volume"),
     "buffering" : MessageLookupByLibrary.simpleMessage("Buffering"),
     "cancel" : MessageLookupByLibrary.simpleMessage("CANCEL"),
     "cellularConfirm" : MessageLookupByLibrary.simpleMessage("Cellular data warning"),
