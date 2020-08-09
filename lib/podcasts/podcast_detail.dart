@@ -226,65 +226,73 @@ class _PodcastDetailState extends State<PodcastDetail> {
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: hosts
-                                      .map((host) => Container(
-                                          padding: EdgeInsets.all(5.0),
-                                          width: 80.0,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              CachedNetworkImage(
-                                                imageUrl: host.image,
-                                                progressIndicatorBuilder:
-                                                    (context, url,
-                                                            downloadProgress) =>
-                                                        SizedBox(
-                                                  width: 40,
-                                                  height: 2,
-                                                  child:
-                                                      LinearProgressIndicator(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: hosts
+                                        .map<Widget>((host) {
+                                          final image = host.image ==
+                                                  "http://xuanmei.us/assets/default/avatar_small-"
+                                                      "170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg"
+                                              ? "https://fireside.fm/assets/default/avatar_small"
+                                                  "-170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg"
+                                              : host.image;
+                                          return Container(
+                                              padding: EdgeInsets.all(5.0),
+                                              width: 80.0,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: <Widget>[
+                                                  CachedNetworkImage(
+                                                    imageUrl: image,
+                                                    progressIndicatorBuilder:
+                                                        (context, url,
+                                                                downloadProgress) =>
+                                                            SizedBox(
+                                                      width: 40,
+                                                      height: 2,
+                                                      child: LinearProgressIndicator(
                                                           value:
                                                               downloadProgress
                                                                   .progress),
-                                                ),
-                                                errorWidget:
-                                                    (context, url, error) =>
+                                                    ),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            CircleAvatar(
+                                                      backgroundColor:
+                                                          Colors.grey[400],
+                                                      backgroundImage: AssetImage(
+                                                          'assets/fireside.jpg'),
+                                                    ),
+                                                    imageBuilder: (context,
+                                                            hostImage) =>
                                                         CircleAvatar(
-                                                  backgroundColor:
-                                                      Colors.grey[400],
-                                                  backgroundImage: AssetImage(
-                                                      'assets/fireside.jpg'),
-                                                ),
-                                                imageBuilder: (context,
-                                                        hostImage) =>
-                                                    CircleAvatar(
-                                                        backgroundColor:
-                                                            Colors.grey[400],
-                                                        backgroundImage:
-                                                            hostImage),
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.all(2),
-                                              ),
-                                              Text(
-                                                host.name,
-                                                style: TextStyle(
-                                                  backgroundColor: Colors.black
-                                                      .withOpacity(0.5),
-                                                  color: Colors.white,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.fade,
-                                              ),
-                                            ],
-                                          )))
-                                      .toList()
-                                      .cast<Widget>(),
-                                ),
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .grey[400],
+                                                            backgroundImage:
+                                                                hostImage),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.all(2),
+                                                  ),
+                                                  Text(
+                                                    host.name,
+                                                    style: TextStyle(
+                                                      backgroundColor: Colors
+                                                          .black
+                                                          .withOpacity(0.5),
+                                                      color: Colors.white,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                    maxLines: 2,
+                                                    overflow: TextOverflow.fade,
+                                                  ),
+                                                ],
+                                              ));
+                                        })
+                                        .toList()
+                                        .cast<Widget>()),
                               ),
                             )),
                   );
