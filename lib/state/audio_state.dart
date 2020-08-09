@@ -202,6 +202,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _savePlayerHeight();
   }
 
+  set setVolumeGain(int volumeGain) {
+    _volumeGain = volumeGain;
+    notifyListeners();
+    volumeGainStorage.saveInt(volumeGain);
+  }
+
   Future _initAudioData() async {
     var index = await playerHeightStorage.getInt(defaultValue: 0);
     _playerHeight = PlayerHeight.values[index];

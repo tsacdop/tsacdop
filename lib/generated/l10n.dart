@@ -1672,6 +1672,26 @@ class S {
     );
   }
 
+  /// `Volume boost level`
+  String get settingsBoostVolume {
+    return Intl.message(
+      'Volume boost level',
+      name: 'settingsBoostVolume',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change volume boost level`
+  String get settingsBoostVolumeDes {
+    return Intl.message(
+      'Change volume boost level',
+      name: 'settingsBoostVolumeDes',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Default grid view`
   String get settingsDefaultGrid {
     return Intl.message(

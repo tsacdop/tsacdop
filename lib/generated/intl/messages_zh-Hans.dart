@@ -240,6 +240,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsAutoPlayDes" : MessageLookupByLibrary.simpleMessage("自动播放下一节目"),
     "settingsBackup" : MessageLookupByLibrary.simpleMessage("备份"),
     "settingsBackupDes" : MessageLookupByLibrary.simpleMessage("备份应用数据"),
+    "settingsBoostVolume" : MessageLookupByLibrary.simpleMessage("声音增强水平"),
+    "settingsBoostVolumeDes" : MessageLookupByLibrary.simpleMessage("修改声音增强水平"),
     "settingsDefaultGrid" : MessageLookupByLibrary.simpleMessage("默认布局"),
     "settingsDefaultGridDownload" : MessageLookupByLibrary.simpleMessage("下载页"),
     "settingsDefaultGridFavorite" : MessageLookupByLibrary.simpleMessage("收藏页"),

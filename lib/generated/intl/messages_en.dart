@@ -240,6 +240,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsAutoPlayDes" : MessageLookupByLibrary.simpleMessage("Auto play next episode in playlist"),
     "settingsBackup" : MessageLookupByLibrary.simpleMessage("Backup"),
     "settingsBackupDes" : MessageLookupByLibrary.simpleMessage("Backup app data"),
+    "settingsBoostVolume" : MessageLookupByLibrary.simpleMessage("Volume boost level"),
+    "settingsBoostVolumeDes" : MessageLookupByLibrary.simpleMessage("Change volume boost level"),
     "settingsDefaultGrid" : MessageLookupByLibrary.simpleMessage("Default grid view"),
     "settingsDefaultGridDownload" : MessageLookupByLibrary.simpleMessage("Download tab"),
     "settingsDefaultGridFavorite" : MessageLookupByLibrary.simpleMessage("Favorites tab"),

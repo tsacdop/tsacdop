@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../home/audioplayer.dart';
+import '../state/audio_state.dart';
 import '../state/setting_state.dart';
 import '../util/custom_dropdown.dart';
 import '../util/extension_helper.dart';
@@ -17,6 +18,16 @@ import '../util/general_dialog.dart';
 const List secondsToSelect = [10, 15, 20, 25, 30, 45, 60];
 
 class PlaySetting extends StatelessWidget {
+  String _volumeEffect(BuildContext context, int i) {
+    final s = context.s;
+    if (i == 2000) {
+      return s.playerHeightShort;
+    } else if (i == 3000) {
+      return s.playerHeightMed;
+    }
+    return s.playerHeightTall;
+  }
+
   Widget _modeWidget(BuildContext context) {
     var settings = Provider.of<SettingState>(context, listen: false);
     return Selector<SettingState, Tuple2<int, int>>(
@@ -234,7 +245,8 @@ class PlaySetting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var settings = Provider.of<SettingState>(context, listen: false);
+    var settings = context.watch<SettingState>();
+    var audio = context.watch<AudioPlayerNotifier>();
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -358,6 +370,30 @@ class PlaySetting extends StatelessWidget {
                                     .map<DropdownMenuItem<int>>((e) {
                                   return DropdownMenuItem<int>(
                                       value: e, child: Text(s.secCount(e)));
+                                }).toList()),
+                          ),
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.only(
+                              left: 70.0, right: 20, bottom: 10, top: 10),
+                          title: Text(s.settingsBoostVolume),
+                          subtitle: Text(s.settingsBoostVolumeDes),
+                          trailing: Selector<AudioPlayerNotifier, int>(
+                            selector: (_, audio) => audio.volumeGain,
+                            builder: (_, volumeGain, __) => MyDropdownButton(
+                                hint: Text(_volumeEffect(context, volumeGain)),
+                                underline: Center(),
+                                elevation: 1,
+                                displayItemCount: 5,
+                                isDense: true,
+                                value: volumeGain,
+                                onChanged: (value) =>
+                                    audio.setVolumeGain = value,
+                                items: [2000, 3000, 4000]
+                                    .map<DropdownMenuItem<int>>((e) {
+                                  return DropdownMenuItem<int>(
+                                      value: e,
+                                      child: Text(_volumeEffect(context, e)));
                                 }).toList()),
                           ),
                         ),
