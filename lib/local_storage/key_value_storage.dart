@@ -37,6 +37,8 @@ const String playerHeightKey = 'playerHeightKey';
 const String speedKey = 'speedKey';
 const String skipSilenceKey = 'skipSilenceKey';
 const String localeKey = 'localeKey';
+const String boostVolumeKey = 'boostVolumeKey';
+const String volumeGainKey = 'volumeGainKey';
 
 class KeyValueStorage {
   final String key;
