@@ -200,7 +200,6 @@ class DBHelper {
     var result = await dbClient.rawUpdate(
         'UPDATE PodcastLocal SET background_image = ? , hosts = ? WHERE id = ?',
         [list[1], list[2], list[0]]);
-    print('Fireside data save in sqllite');
     return result;
   }
 
@@ -226,7 +225,6 @@ class DBHelper {
         await FlutterDownloader.remove(
             taskId: i['downloaded'], shouldDeleteContent: true);
       }
-      print('Removed all download tasks');
     }
     await dbClient.rawDelete('DELETE FROM Episodes WHERE feed_id=?', [id]);
     var _milliseconds = DateTime.now().millisecondsSinceEpoch;
@@ -421,14 +419,14 @@ class DBHelper {
   String _getDescription(String content, String description, String summary) {
     if (content.length >= description.length) {
       if (content.length >= summary.length) {
-        return content;
+        return content == '<![CDATA[ ]]>' ? '' : content;
       } else {
-        return summary;
+        return summary == '<![CDATA[ ]]>' ? '' : summary;
       }
     } else if (description.length >= summary.length) {
-      return description;
+      return description == '<![CDATA[ ]]>' ? '' : description;
     } else {
-      return summary;
+      return summary == '<![CDATA[ ]]>' ? '' : summary;
     }
   }
 

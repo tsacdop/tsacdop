@@ -28,7 +28,7 @@ class Playlist {
     await storage.saveStringList(urls.toSet().toList());
   }
 
-  addToPlayList(EpisodeBrief episodeBrief) async {
+  Future<void> addToPlayList(EpisodeBrief episodeBrief) async {
     if (!_playlist.contains(episodeBrief)) {
       _playlist.add(episodeBrief);
       await savePlaylist();
@@ -38,7 +38,7 @@ class Playlist {
     }
   }
 
-  addToPlayListAt(EpisodeBrief episodeBrief, int index,
+  Future<void> addToPlayListAt(EpisodeBrief episodeBrief, int index,
       {bool existed = true}) async {
     if (existed) {
       _playlist.removeWhere(

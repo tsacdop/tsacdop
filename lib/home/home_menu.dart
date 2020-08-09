@@ -60,7 +60,6 @@ class _PopupMenuState extends State<PopupMenu> {
       Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(file);
       for (var entry in data.entries) {
         var title = entry.key;
-        print(title);
         var list = entry.value.reversed;
         for (var rss in list) {
           var rssLink = rssExp.stringMatch(rss.xmlUrl);
@@ -68,7 +67,6 @@ class _PopupMenuState extends State<PopupMenu> {
             var item = SubscribeItem(rssLink, rss.text, group: title);
             await subscribeWorker.setSubscribeItem(item);
             await Future.delayed(Duration(milliseconds: 200));
-            print(rss.text);
           }
         }
       }

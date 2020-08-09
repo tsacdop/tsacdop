@@ -31,7 +31,6 @@ class MyHomePageDelegate extends SearchDelegate<int> {
         receiveTimeout: 10000,
       );
       var response = await Dio(options).get(url);
-      print(response);
       return RssFeed.parse(response.data);
     } catch (e) {
       rethrow;
