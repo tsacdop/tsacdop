@@ -274,6 +274,22 @@ class DBHelper {
     return playHistory;
   }
 
+  /// History list in playlist page, not include marked episdoes.
+  Future<List<PlayHistory>> getPlayRecords(int top) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory 
+        WHERE seconds != 0 ORDER BY add_date DESC LIMIT ?
+     """, [top]);
+    var playHistory = <PlayHistory>[];
+    for (var record in list) {
+      playHistory.add(PlayHistory(record['title'], record['enclosure_url'],
+          (record['seconds']).toInt(), record['seek_value'],
+          playdate: DateTime.fromMillisecondsSinceEpoch(record['add_date'])));
+    }
+    return playHistory;
+  }
+
   Future<int> isListened(String url) async {
     var dbClient = await database;
     var i = 0;

@@ -8,8 +8,10 @@ import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
+import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
+import '../type/play_histroy.dart';
 import '../type/playlist.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
@@ -34,28 +36,15 @@ class _PlaylistPageState extends State<PlaylistPage> {
     }
   }
 
-  ScrollController _controller;
-  _scrollListener() {
-    var value = _controller.offset;
-    setState(() => _topHeight = (100 - value) > 60 ? 100 - value : 60);
+  Future<double> _getListenTime() async {
+    var dbHelper = DBHelper();
+    var listenTime = await dbHelper.listenMins(0);
+    return listenTime;
   }
 
-  double _topHeight;
+  bool _loadHistory = false;
+
   List<EpisodeBrief> episodes = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _topHeight = 100;
-    _controller = ScrollController()..addListener(_scrollListener);
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(_scrollListener);
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +60,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-          title: _topHeight == 60 ? Text(s.homeMenuPlaylist) : Center(),
           elevation: 0,
           backgroundColor: context.primaryColor,
         ),
@@ -86,192 +74,241 @@ class _PlaylistPageState extends State<PlaylistPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Container(
-                    height: _topHeight,
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            height: _topHeight,
-                            padding: EdgeInsets.only(
-                              left: 60,
-                            ),
-                            alignment: Alignment.centerLeft,
-                            child: RichText(
-                              text: TextSpan(
-                                text: _topHeight > 90
-                                    ? '${s.homeMenuPlaylist}\n'
-                                    : '',
-                                style: TextStyle(
-                                  color: context.textColor,
-                                  fontSize: 30,
-                                ),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                    text: episodes.length.toString(),
-                                    style: GoogleFonts.cairo(
-                                      textStyle: TextStyle(
-                                        color: Theme.of(context).accentColor,
-                                        fontSize: 25,
-                                      ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          height: 100,
+                          padding: EdgeInsets.only(
+                            left: 60,
+                          ),
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    _loadHistory
+                                        ? s.settingsHistory
+                                        : s.homeMenuPlaylist,
+                                    style: TextStyle(
+                                      color: context.textColor,
+                                      fontSize: 30,
                                     ),
                                   ),
-                                  TextSpan(
-                                      text: episodes.length < 2
-                                          ? 'episode'
-                                          : 'episodes',
-                                      style: TextStyle(
-                                        color: context.accentColor,
-                                        fontSize: 15,
-                                      )),
-                                  TextSpan(
-                                    text:
-                                        _sumPlaylistLength(episodes).toString(),
-                                    style: GoogleFonts.cairo(
-                                        textStyle: TextStyle(
-                                      color: context.accentColor,
-                                      fontSize: 25,
-                                    )),
-                                  ),
-                                  TextSpan(
-                                      text: 'mins',
-                                      style: TextStyle(
-                                        color: context.accentColor,
-                                        fontSize: 15,
-                                      )),
+                                  SizedBox(width: 5),
+                                  IconButton(
+                                      icon: _loadHistory
+                                          ? Icon(Icons.playlist_play)
+                                          : Icon(Icons.history),
+                                      onPressed: () => setState(() {
+                                            _loadHistory = !_loadHistory;
+                                          }))
                                 ],
                               ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            padding: EdgeInsets.all(5.0),
-                            margin: EdgeInsets.only(right: 20.0, bottom: 5.0),
-                            decoration: data.item2
-                                ? BoxDecoration(
-                                    color: context.brightness == Brightness.dark
-                                        ? Colors.grey[800]
-                                        : Colors.grey[200],
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10.0)),
-                                  )
-                                : BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.transparent),
-                            child: data.item2
-                                ? _topHeight < 90
-                                    ? Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          CircleAvatar(
-                                            radius: 12,
-                                            backgroundImage: FileImage(File(
-                                                "${episodes.first.imagePath}")),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: SizedBox(
-                                                width: 20,
-                                                height: 15,
-                                                child: WaveLoader(
-                                                  color: context.accentColor,
-                                                )),
-                                          ),
-                                        ],
-                                      )
-                                    : Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          CircleAvatar(
-                                            radius: 15,
-                                            //backgroundColor: _c.withOpacity(0.5),
-                                            backgroundImage: FileImage(File(
-                                                "${episodes.first.imagePath}")),
-                                          ),
-                                          Container(
-                                            width: 150,
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              episodes.first.title,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.fade,
-                                              textAlign: TextAlign.center,
+                              _loadHistory
+                                  ? FutureBuilder<double>(
+                                      future: _getListenTime(),
+                                      initialData: 0.0,
+                                      builder: (context, snapshot) => RichText(
+                                        text: TextSpan(
+                                          text: 'Today ',
+                                          style: GoogleFonts.cairo(
+                                            textStyle: TextStyle(
+                                              color:
+                                                  Theme.of(context).accentColor,
+                                              fontSize: 20,
                                             ),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: SizedBox(
-                                                width: 20,
-                                                height: 15,
-                                                child: WaveLoader(
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text:
+                                                  '${snapshot.data.toStringAsFixed(0)} ',
+                                              style: GoogleFonts.cairo(
+                                                  textStyle: TextStyle(
+                                                color: context.accentColor,
+                                                fontSize: 25,
+                                              )),
+                                            ),
+                                            TextSpan(
+                                                text: 'mins',
+                                                style: TextStyle(
                                                   color: context.accentColor,
+                                                  fontSize: 15,
                                                 )),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  : RichText(
+                                      text: TextSpan(
+                                        text: episodes.length.toString(),
+                                        style: GoogleFonts.cairo(
+                                          textStyle: TextStyle(
+                                            color:
+                                                Theme.of(context).accentColor,
+                                            fontSize: 25,
                                           ),
+                                        ),
+                                        children: <TextSpan>[
+                                          TextSpan(
+                                              text: episodes.length < 2
+                                                  ? 'episode'
+                                                  : 'episodes',
+                                              style: TextStyle(
+                                                color: context.accentColor,
+                                                fontSize: 15,
+                                              )),
+                                          TextSpan(
+                                            text: _sumPlaylistLength(episodes)
+                                                .toString(),
+                                            style: GoogleFonts.cairo(
+                                                textStyle: TextStyle(
+                                              color: context.accentColor,
+                                              fontSize: 25,
+                                            )),
+                                          ),
+                                          TextSpan(
+                                              text: 'mins',
+                                              style: TextStyle(
+                                                color: context.accentColor,
+                                                fontSize: 15,
+                                              )),
                                         ],
-                                      )
-                                : IconButton(
-                                    padding: EdgeInsets.all(0),
-                                    alignment: Alignment.center,
-                                    icon: Icon(Icons.play_circle_filled,
-                                        size: 40, color: (context).accentColor),
-                                    onPressed: () {
-                                      audio.playlistLoad();
-                                      // setState(() {});
-                                    }),
+                                      ),
+                                    ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          padding: EdgeInsets.all(5.0),
+                          margin: EdgeInsets.only(right: 20.0, bottom: 5.0),
+                          decoration: data.item2
+                              ? BoxDecoration(
+                                  color: context.brightness == Brightness.dark
+                                      ? Colors.grey[800]
+                                      : Colors.grey[200],
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                )
+                              : BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.transparent),
+                          child: data.item2
+                              // ? _topHeight < 90
+                              //     ? Row(
+                              //         mainAxisAlignment:
+                              //             MainAxisAlignment.center,
+                              //         crossAxisAlignment:
+                              //             CrossAxisAlignment.center,
+                              //         children: <Widget>[
+                              //           CircleAvatar(
+                              //             radius: 12,
+                              //             backgroundImage: FileImage(File(
+                              //                 "${episodes.first.imagePath}")),
+                              //           ),
+                              //           Padding(
+                              //             padding: EdgeInsets.symmetric(
+                              //                 horizontal: 15),
+                              //             child: SizedBox(
+                              //                 width: 20,
+                              //                 height: 15,
+                              //                 child: WaveLoader(
+                              //                   color: context.accentColor,
+                              //                 )),
+                              //           ),
+                              //         ],
+                              //       )
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    CircleAvatar(
+                                      radius: 15,
+                                      //backgroundColor: _c.withOpacity(0.5),
+                                      backgroundImage: FileImage(
+                                          File("${episodes.first.imagePath}")),
+                                    ),
+                                    Container(
+                                      width: 150,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        episodes.first.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.fade,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 15),
+                                      child: SizedBox(
+                                          width: 20,
+                                          height: 15,
+                                          child: WaveLoader(
+                                            color: context.accentColor,
+                                          )),
+                                    ),
+                                  ],
+                                )
+                              : IconButton(
+                                  alignment: Alignment.center,
+                                  icon: Icon(Icons.play_circle_filled,
+                                      size: 40, color: (context).accentColor),
+                                  onPressed: () {
+                                    audio.playlistLoad();
+                                    // setState(() {});
+                                  }),
+                        ),
+                      ),
+                    ],
                   ),
                   Divider(
                     height: 3,
                   ),
                   Expanded(
-                    child: ReorderableListView(
-                        scrollController: _controller,
-                        onReorder: (oldIndex, newIndex) {
-                          if (newIndex > oldIndex) {
-                            newIndex -= 1;
-                          }
-                          audio.reorderPlaylist(oldIndex, newIndex);
-                          // final episodeRemove = episodes.removeAt(oldIndex);
-                          // print(episodeRemove.title);
-                          setState(() {
-                            // episodes.insert(newIndex, episodeRemove);
-                          });
-                        },
-                        scrollDirection: Axis.vertical,
-                        children: data.item2
-                            ? episodes.map<Widget>((episode) {
-                                if (episode.enclosureUrl !=
-                                    episodes.first.enclosureUrl) {
-                                  return DismissibleContainer(
-                                    episode: episode,
-                                    key: ValueKey(episode.enclosureUrl),
-                                  );
-                                } else {
-                                  return Container(
-                                    key: ValueKey('sd'),
-                                  );
-                                }
-                              }).toList()
-                            : episodes
-                                .map<Widget>((episode) => DismissibleContainer(
-                                      episode: episode,
-                                      key: ValueKey(episode.enclosureUrl),
-                                    ))
-                                .toList()),
+                    child: _loadHistory
+                        ? HistoryList()
+                        : ReorderableListView(
+                            // scrollController: _playlistController,
+                            onReorder: (oldIndex, newIndex) {
+                              if (newIndex > oldIndex) {
+                                newIndex -= 1;
+                              }
+                              audio.reorderPlaylist(oldIndex, newIndex);
+                              // final episodeRemove = episodes.removeAt(oldIndex);
+                              // print(episodeRemove.title);
+                              setState(() {
+                                // episodes.insert(newIndex, episodeRemove);
+                              });
+                            },
+                            scrollDirection: Axis.vertical,
+                            children: data.item2
+                                ? episodes.map<Widget>((episode) {
+                                    if (episode.enclosureUrl !=
+                                        episodes.first.enclosureUrl) {
+                                      return DismissibleContainer(
+                                        episode: episode,
+                                        key: ValueKey(episode.enclosureUrl),
+                                      );
+                                    } else {
+                                      return Container(
+                                        key: ValueKey('sd'),
+                                      );
+                                    }
+                                  }).toList()
+                                : episodes
+                                    .map<Widget>((episode) =>
+                                        DismissibleContainer(
+                                          episode: episode,
+                                          key: ValueKey(episode.enclosureUrl),
+                                        ))
+                                    .toList()),
                   ),
                 ],
               );
@@ -315,7 +352,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
-    var _c = (Theme.of(context).brightness == Brightness.light)
+    var c = (Theme.of(context).brightness == Brightness.light)
         ? widget.episode.primaryColor.colorizedark()
         : widget.episode.primaryColor.colorizeLight();
     return AnimatedContainer(
@@ -399,11 +436,11 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.unfold_more, color: _c),
+                        Icon(Icons.unfold_more, color: c),
                         CircleAvatar(
                           //backgroundColor: _c.withOpacity(0.5),
                           backgroundImage:
-                              FileImage(File("${widget.episode.imagePath}")),
+                              FileImage(File(widget.episode.imagePath)),
                         ),
                       ],
                     ),
@@ -445,5 +482,153 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
               ),
             ),
     );
+  }
+}
+
+class HistoryList extends StatefulWidget {
+  HistoryList({Key key}) : super(key: key);
+
+  @override
+  _HistoryListState createState() => _HistoryListState();
+}
+
+class _HistoryListState extends State<HistoryList> {
+  var dbHelper = DBHelper();
+  Future<List<PlayHistory>> getPlayRecords(int top) async {
+    List<PlayHistory> playHistory;
+    playHistory = await dbHelper.getPlayRecords(top);
+    for (var record in playHistory) {
+      await record.getEpisode();
+    }
+    return playHistory;
+  }
+
+  _loadMoreData() async {
+    if (mounted) {
+      setState(() {
+        _top = _top + 100;
+      });
+    }
+  }
+
+  int _top = 100;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.s;
+    final audio = context.watch<AudioPlayerNotifier>();
+    return FutureBuilder<List<PlayHistory>>(
+        future: getPlayRecords(_top),
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? NotificationListener<ScrollNotification>(
+                  onNotification: (scrollInfo) {
+                    if (scrollInfo.metrics.pixels ==
+                            scrollInfo.metrics.maxScrollExtent &&
+                        snapshot.data.length == _top) _loadMoreData();
+                    return true;
+                  },
+                  child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        final seekValue = snapshot.data[index].seekValue;
+                        final seconds = snapshot.data[index].seconds;
+                        final date = snapshot
+                            .data[index].playdate.millisecondsSinceEpoch;
+                        final episode = snapshot.data[index].episode;
+                        var c =
+                            (Theme.of(context).brightness == Brightness.light)
+                                ? episode.primaryColor.colorizedark()
+                                : episode.primaryColor.colorizeLight();
+                        return ListTile(
+                          contentPadding:
+                              EdgeInsets.only(left: 40, right: 20, top: 10),
+                          onTap: () => audio.episodeLoad(episode),
+                          leading: CircleAvatar(
+                            backgroundColor: c.withOpacity(0.5),
+                            backgroundImage: FileImage(File(episode.imagePath)),
+                          ),
+                          title: Text(
+                            snapshot.data[index].title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Row(
+                            children: <Widget>[
+                              Text(
+                                date.toDate(context),
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                              SizedBox(width: 5),
+                              if (seekValue < 0.9)
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () async {
+                                      audio.episodeLoad(episode,
+                                          startPosition:
+                                              (seconds * 1000).toInt());
+                                    },
+                                    child: Container(
+                                      height: 20,
+                                      alignment: Alignment.center,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 5),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0)),
+                                        color: context.accentColor,
+                                      ),
+                                      child: Text(
+                                        seconds.toTime,
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              SizedBox(width: 5),
+                              Selector<AudioPlayerNotifier,
+                                  Tuple2<List<EpisodeBrief>, bool>>(
+                                selector: (_, audio) => Tuple2(
+                                    audio.queue.playlist, audio.queueUpdate),
+                                builder: (_, data, __) {
+                                  return data.item1.contains(episode)
+                                      ? IconButton(
+                                          icon: Icon(Icons.playlist_add_check,
+                                              color: context.accentColor),
+                                          onPressed: () async {
+                                            audio.delFromPlaylist(episode);
+                                            Fluttertoast.showToast(
+                                              msg: s.toastRemovePlaylist,
+                                              gravity: ToastGravity.BOTTOM,
+                                            );
+                                          })
+                                      : IconButton(
+                                          icon: Icon(Icons.playlist_add,
+                                              color: Colors.grey[700]),
+                                          onPressed: () async {
+                                            audio.addToPlaylist(episode);
+                                            Fluttertoast.showToast(
+                                              msg: s.toastAddPlaylist,
+                                              gravity: ToastGravity.BOTTOM,
+                                            );
+                                          });
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                )
+              : Center(
+                  child: SizedBox(
+                      height: 25,
+                      width: 25,
+                      child: CircularProgressIndicator()),
+                );
+        });
   }
 }
