@@ -437,6 +437,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
       if (event is Map && event['playerRunning'] == false) {
         _playerRunning = false;
         notifyListeners();
+        final history = PlayHistory(_episode.title, _episode.enclosureUrl,
+            _lastPostion ~/ 1000, _seekSliderValue);
+        await dbHelper.saveHistory(history);
       }
     });
 
@@ -790,7 +793,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
       await AudioServiceBackground.setQueue(_queue);
       await AudioServiceBackground.setMediaItem(mediaItem);
       await _audioPlayer.setUrl(mediaItem.id, cacheMax: _cacheMax);
-      print(mediaItem.title);
       var duration = await _audioPlayer.durationFuture;
       if (duration != null) {
         await AudioServiceBackground.setMediaItem(
@@ -880,11 +882,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   Future<void> _seekRelative(Duration offset) async {
     var newPosition = _audioPlayer.playbackEvent.position + offset;
-    print(newPosition.inSeconds);
     //  if (newPosition < Duration.zero) newPosition = Duration.zero;
     //  if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
-
-    print(newPosition.inSeconds);
     onSeekTo(newPosition);
   }
 
