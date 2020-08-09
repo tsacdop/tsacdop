@@ -244,10 +244,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
                           if (newIndex > oldIndex) {
                             newIndex -= 1;
                           }
-                          audio.reorderPlaylist(newIndex, oldIndex);
-                          final episodeRemove = episodes.removeAt(oldIndex);
+                          audio.reorderPlaylist(oldIndex, newIndex);
+                          // final episodeRemove = episodes.removeAt(oldIndex);
+                          // print(episodeRemove.title);
                           setState(() {
-                            episodes.insert(newIndex, episodeRemove);
+                            // episodes.insert(newIndex, episodeRemove);
                           });
                         },
                         scrollDirection: Axis.vertical,
