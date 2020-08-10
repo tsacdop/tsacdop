@@ -1,13 +1,14 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:linkify/linkify.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
@@ -53,6 +54,23 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
         .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '')
         .replaceAll('\r', '')
         .trim();
+    if (!_description.contains('<')) {
+      final linkList = linkify(_description,
+          options: LinkifyOptions(humanize: false),
+          linkifiers: [UrlLinkifier(), EmailLinkifier()]);
+      for (var element in linkList) {
+        if (element is UrlElement) {
+          _description = _description.replaceAll(element.url,
+              '<a rel="nofollow" href = ${element.url}>${element.text}</a>');
+        }
+        if (element is EmailElement) {
+          final address = element.emailAddress;
+          _description = _description.replaceAll(address,
+              '<a rel="nofollow" href = "mailto:$address">$address</a>');
+        }
+      }
+    }
+
     if (mounted) {
       setState(() {
         _loaddes = true;
@@ -93,6 +111,20 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
       final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
       await dbHelper.saveHistory(history);
     }
+  }
+
+  int _getTimeStamp(String url) {
+    final time = url.substring(7);
+    final data = time.split(':');
+    var seconds;
+    if (data.length == 3) {
+      seconds = int.tryParse(data[0]) * 3600 +
+          int.tryParse(data[1]) * 60 +
+          int.tryParse(data[2]);
+    } else if (data.length == 2) {
+      seconds = int.tryParse(data[0]) * 60 + int.tryParse(data[1]);
+    }
+    return seconds;
   }
 
   @override
@@ -218,29 +250,28 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                         alignment: Alignment.centerLeft,
                         padding: EdgeInsets.only(
                             left: 20.0, right: 20, top: 10, bottom: 10),
-                        child: Text(
-                            s.published(DateFormat.yMMMd().format(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                    widget.episodeItem.pubDate))),
-                            style: TextStyle(
-                                color: Theme.of(context).accentColor)),
+                        child: Row(
+                          children: [
+                            Text(
+                                s.published(DateFormat.yMMMd().format(
+                                    DateTime.fromMillisecondsSinceEpoch(
+                                        widget.episodeItem.pubDate))),
+                                style: TextStyle(
+                                    color: Theme.of(context).accentColor)),
+                            SizedBox(width: 10),
+                            if (widget.episodeItem.explicit == 1)
+                              Text('E',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red))
+                          ],
+                        ),
                       ),
                       Padding(
                         padding: EdgeInsets.only(
                             left: 20.0, right: 20, top: 5, bottom: 5),
                         child: Row(
                           children: <Widget>[
-                            if (widget.episodeItem.explicit == 1)
-                              Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.red[800],
-                                      shape: BoxShape.circle),
-                                  height: 32.0,
-                                  width: 32.0,
-                                  margin: EdgeInsets.only(right: 10.0),
-                                  alignment: Alignment.center,
-                                  child: Text('E',
-                                      style: TextStyle(color: Colors.white))),
                             if (widget.episodeItem.duration != 0)
                               Container(
                                   decoration: BoxDecoration(
@@ -274,7 +305,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                             FutureBuilder<PlayHistory>(
                                 future: _getPosition(widget.episodeItem),
                                 builder: (context, snapshot) {
-                                  if (snapshot.hasError) print(snapshot.error);
+                                  if (snapshot.hasError) {
+                                    developer.log(snapshot.error);
+                                  }
                                   if (snapshot.hasData &&
                                       snapshot.data.seekValue < 0.9 &&
                                       snapshot.data.seconds > 10) {
@@ -314,69 +347,69 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                         ),
                       ),
                       _loaddes
-                          ? (_description.contains('<'))
-                              ? Html(
-                                  padding: EdgeInsets.only(
-                                      left: 20.0, right: 20, bottom: 50),
-                                  defaultTextStyle: GoogleFonts.martel(
-                                    textStyle: TextStyle(
-                                      height: 1.8,
-                                    ),
-                                  ),
-                                  data: _description,
-                                  linkStyle: TextStyle(
-                                      color: context.accentColor,
-                                      textBaseline: TextBaseline.ideographic),
-                                  onLinkTap: (url) {
-                                    url.launchUrl;
-                                  },
-                                  useRichText: true,
-                                )
-                              : _description.length > 0
-                                  ? Container(
+                          ? _description.length > 0
+                              ? Selector<AudioPlayerNotifier, EpisodeBrief>(
+                                  selector: (_, audio) => audio.episode,
+                                  builder: (_, data, __) {
+                                    var description = _description;
+                                    if (data == widget.episodeItem) {
+                                      final linkList = linkify(_description,
+                                          options:
+                                              LinkifyOptions(humanize: false),
+                                          linkifiers: [TimeStampLinkifier()]);
+                                      for (var element in linkList) {
+                                        if (element is TimeStampElement) {
+                                          final time = element.timeStamp;
+                                          description = description.replaceFirst(
+                                              time,
+                                              '<a rel="nofollow" href = "skipto:$time">$time</a>');
+                                        }
+                                      }
+                                    }
+                                    return Html(
                                       padding: EdgeInsets.only(
-                                          left: 20.0,
-                                          right: 20.0,
-                                          bottom: 50.0),
-                                      alignment: Alignment.topLeft,
-                                      child: SelectableLinkify(
-                                        onOpen: (link) {
-                                          link.url.launchUrl;
-                                        },
-                                        text: _description,
-                                        style: GoogleFonts.martel(
-                                          textStyle: TextStyle(
-                                            height: 1.8,
-                                          ),
-                                        ),
-                                        linkStyle: TextStyle(
-                                          color: Theme.of(context).accentColor,
-                                          //  decoration:
-                                          //      TextDecoration.underline,
+                                          left: 20.0, right: 20, bottom: 50),
+                                      defaultTextStyle: GoogleFonts.martel(
+                                        textStyle: TextStyle(
+                                          height: 1.8,
                                         ),
                                       ),
-                                    )
-                                  : Container(
-                                      height: context.width,
-                                      alignment: Alignment.center,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Image(
-                                            image: AssetImage(
-                                                'assets/shownote.png'),
-                                            height: 100.0,
-                                          ),
-                                          Padding(padding: EdgeInsets.all(5.0)),
-                                          Text(s.noShownote,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  color: context.textColor
-                                                      .withOpacity(0.5))),
-                                        ],
+                                      data: description,
+                                      linkStyle: TextStyle(
+                                          color: context.accentColor,
+                                          textBaseline:
+                                              TextBaseline.ideographic),
+                                      onLinkTap: (url) {
+                                        if (url.substring(0, 6) == 'skipto') {
+                                          final seconds = _getTimeStamp(url);
+                                          audio.seekTo(seconds * 1000);
+                                        } else {
+                                          url.launchUrl;
+                                        }
+                                      },
+                                      useRichText: true,
+                                    );
+                                  })
+                              : Container(
+                                  height: context.width,
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Image(
+                                        image:
+                                            AssetImage('assets/shownote.png'),
+                                        height: 100.0,
                                       ),
-                                    )
+                                      Padding(padding: EdgeInsets.all(5.0)),
+                                      Text(s.noShownote,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              color: context.textColor
+                                                  .withOpacity(0.5))),
+                                    ],
+                                  ),
+                                )
                           : Center(),
                       Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
                           selector: (_, audio) =>
