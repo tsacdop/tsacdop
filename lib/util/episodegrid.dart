@@ -89,11 +89,16 @@ class EpisodeGrid extends StatelessWidget {
 
   _markListened(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
-    var marked = await dbHelper.checkMarked(episode);
-    if (!marked) {
-      final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-      await dbHelper.saveHistory(history);
-    }
+    // var marked = await dbHelper.checkMarked(episode);
+    // if (!marked) {
+    final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+    await dbHelper.saveHistory(history);
+    // }
+  }
+
+  _markNotListened(String url) async {
+    var dbHelper = DBHelper();
+    await dbHelper.markNotListened(url);
   }
 
   _saveLiked(String url) async {
@@ -383,7 +388,7 @@ class EpisodeGrid extends StatelessWidget {
                                               ? context.primaryColor
                                               : context.dialogBackgroundColor,
                                       title: isListened > 0
-                                          ? Text(s.listened,
+                                          ? Text(s.markNotListened,
                                               style: TextStyle(
                                                   color: context.textColor
                                                       .withOpacity(0.5)))
@@ -406,6 +411,14 @@ class EpisodeGrid extends StatelessWidget {
                                           audio.setEpisodeState = true;
                                           Fluttertoast.showToast(
                                             msg: s.markListened,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        } else {
+                                          await _markNotListened(
+                                              episodes[index].enclosureUrl);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: s.markNotListened,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         }

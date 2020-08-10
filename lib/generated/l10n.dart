@@ -937,6 +937,16 @@ class S {
     );
   }
 
+  /// `Mark not listened`
+  String get markNotListened {
+    return Intl.message(
+      'Mark not listened',
+      name: 'markNotListened',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Menu`
   String get menu {
     return Intl.message(

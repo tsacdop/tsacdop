@@ -336,8 +336,6 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                                 backgroundImage: FileImage(File(
                                                     "${podcastLocal.imagePath}")),
                                               ),
-                                              // child: Image.file(File(
-                                              //      "${podcastLocal.imagePath}")),
                                             ),
                                             FutureBuilder<int>(
                                                 future: getPodcastUpdateCounts(

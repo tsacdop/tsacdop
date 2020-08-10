@@ -167,6 +167,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "markConfirm" : MessageLookupByLibrary.simpleMessage("Marquage effectué"),
     "markConfirmContent" : MessageLookupByLibrary.simpleMessage("Marquer tous les épisodes comme lus ?"),
     "markListened" : MessageLookupByLibrary.simpleMessage("Marquer comme lu"),
+    "markNotListened" : MessageLookupByLibrary.simpleMessage("Mark not listened"),
     "menu" : MessageLookupByLibrary.simpleMessage("Menu"),
     "menuAllPodcasts" : MessageLookupByLibrary.simpleMessage("Tous les podcasts"),
     "menuMarkAllListened" : MessageLookupByLibrary.simpleMessage("Marquer comme tous lu"),

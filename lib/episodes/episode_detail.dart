@@ -10,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../home/audioplayer.dart';
 import '../local_storage/sqflite_localpodcast.dart';
@@ -48,16 +47,22 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   String path;
   String _description;
 
-  Future getSDescription(String url) async {
+  Future _getSDescription(String url) async {
     var dbHelper = DBHelper();
     _description = (await dbHelper.getDescription(url))
         .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '')
-        .replaceAll('\r', '');
+        .replaceAll('\r', '')
+        .trim();
     if (mounted) {
       setState(() {
         _loaddes = true;
       });
     }
+  }
+
+  Future<PlayHistory> _getPosition(EpisodeBrief episode) async {
+    var dbHelper = DBHelper();
+    return await dbHelper.getPosition(episode);
   }
 
   ScrollController _controller;
@@ -96,7 +101,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     _loaddes = false;
     _showMenu = true;
     _showTitle = false;
-    getSDescription(widget.episodeItem.enclosureUrl);
+    _getSDescription(widget.episodeItem.enclosureUrl);
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
   }
@@ -110,6 +115,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
+    final audio = context.watch<AudioPlayerNotifier>();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -138,55 +144,55 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                   )
                 : Center(),
             elevation: _showTitle ? 1 : 0,
-            actions: [
-              PopupMenuButton(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                elevation: 1,
-                tooltip: s.menu,
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 0,
-                    child: Container(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(
-                            width: 25,
-                            height: 25,
-                            child: CustomPaint(
-                                painter: ListenedAllPainter(
-                                    context.textTheme.bodyText1.color,
-                                    stroke: 2)),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5.0),
-                          ),
-                          Text(
-                            s.markListened,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-                onSelected: (value) async {
-                  switch (value) {
-                    case 0:
-                      await _markListened(widget.episodeItem);
-                      if (mounted) setState(() {});
-                      Fluttertoast.showToast(
-                        msg: s.markListened,
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                      break;
-                    default:
-                      break;
-                  }
-                },
-              ),
-            ],
+            //actions: [
+            //  PopupMenuButton(
+            //    shape: RoundedRectangleBorder(
+            //        borderRadius: BorderRadius.all(Radius.circular(10))),
+            //    elevation: 1,
+            //    tooltip: s.menu,
+            //    itemBuilder: (context) => [
+            //      PopupMenuItem(
+            //        value: 0,
+            //        child: Container(
+            //          padding: EdgeInsets.only(left: 10),
+            //          child: Row(
+            //            crossAxisAlignment: CrossAxisAlignment.center,
+            //            children: <Widget>[
+            //              SizedBox(
+            //                width: 25,
+            //                height: 25,
+            //                child: CustomPaint(
+            //                    painter: ListenedAllPainter(
+            //                        context.textTheme.bodyText1.color,
+            //                        stroke: 2)),
+            //              ),
+            //              Padding(
+            //                padding: EdgeInsets.symmetric(horizontal: 5.0),
+            //              ),
+            //              Text(
+            //                s.markListened,
+            //              ),
+            //            ],
+            //          ),
+            //        ),
+            //      ),
+            //    ],
+            //    onSelected: (value) async {
+            //      switch (value) {
+            //        case 0:
+            //          await _markListened(widget.episodeItem);
+            //          if (mounted) setState(() {});
+            //          Fluttertoast.showToast(
+            //            msg: s.markListened,
+            //            gravity: ToastGravity.BOTTOM,
+            //          );
+            //          break;
+            //        default:
+            //          break;
+            //      }
+            //    },
+            //  ),
+            //],
           ),
           body: Stack(
             children: <Widget>[
@@ -221,7 +227,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            left: 20.0, right: 20, top: 10, bottom: 10),
+                            left: 20.0, right: 20, top: 5, bottom: 5),
                         child: Row(
                           children: <Widget>[
                             if (widget.episodeItem.explicit == 1)
@@ -229,42 +235,81 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                   decoration: BoxDecoration(
                                       color: Colors.red[800],
                                       shape: BoxShape.circle),
-                                  height: 25.0,
-                                  width: 25.0,
+                                  height: 32.0,
+                                  width: 32.0,
                                   margin: EdgeInsets.only(right: 10.0),
                                   alignment: Alignment.center,
                                   child: Text('E',
                                       style: TextStyle(color: Colors.white))),
                             if (widget.episodeItem.duration != 0)
                               Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.cyan[300],
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(15.0))),
-                                height: 25.0,
-                                margin: EdgeInsets.only(right: 10.0),
-                                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                                alignment: Alignment.center,
-                                child: Text(
-                                    s.minsCount(
-                                        widget.episodeItem.duration ~/ 60),
-                                    style: textstyle),
-                              ),
+                                  decoration: BoxDecoration(
+                                      color: Colors.cyan[300],
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(16.0))),
+                                  height: 32.0,
+                                  margin: EdgeInsets.only(right: 10.0),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.0),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      s.minsCount(
+                                          widget.episodeItem.duration ~/ 60),
+                                      style: context.textTheme.button)),
                             if (widget.episodeItem.enclosureLength != null &&
                                 widget.episodeItem.enclosureLength != 0)
                               Container(
                                 decoration: BoxDecoration(
                                     color: Colors.lightBlue[300],
                                     borderRadius: BorderRadius.all(
-                                        Radius.circular(15.0))),
-                                height: 25.0,
+                                        Radius.circular(16.0))),
+                                height: 32.0,
                                 margin: EdgeInsets.only(right: 10.0),
                                 padding: EdgeInsets.symmetric(horizontal: 10.0),
                                 alignment: Alignment.center,
                                 child: Text(
                                     '${(widget.episodeItem.enclosureLength) ~/ 1000000}MB',
-                                    style: textstyle),
+                                    style: context.textTheme.button),
                               ),
+                            FutureBuilder<PlayHistory>(
+                                future: _getPosition(widget.episodeItem),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) print(snapshot.error);
+                                  if (snapshot.hasData &&
+                                      snapshot.data.seekValue < 0.9 &&
+                                      snapshot.data.seconds > 10) {
+                                    return OutlineButton(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(100.0),
+                                          side: BorderSide(
+                                              color: context.accentColor)),
+                                      highlightedBorderColor: Colors.green[700],
+                                      onPressed: () => audio.episodeLoad(
+                                          widget.episodeItem,
+                                          startPosition:
+                                              (snapshot.data.seconds * 1000)
+                                                  .toInt()),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CustomPaint(
+                                              painter: ListenedPainter(
+                                                  context.textColor,
+                                                  stroke: 2.0),
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(snapshot.data.seconds.toTime),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    return Center();
+                                  }
+                                }),
                           ],
                         ),
                       ),
@@ -392,20 +437,36 @@ class MenuBar extends StatefulWidget {
 }
 
 class _MenuBarState extends State<MenuBar> {
-  Future<PlayHistory> getPosition(EpisodeBrief episode) async {
+  Future<int> _isListened(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
-    return await dbHelper.getPosition(episode);
+    return await dbHelper.isListened(episode.enclosureUrl);
   }
 
-  saveLiked(String url) async {
+  _saveLiked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setLiked(url);
     if (mounted) setState(() {});
   }
 
-  setUnliked(String url) async {
+  _setUnliked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setUniked(url);
+    if (mounted) setState(() {});
+  }
+
+  _markListened(EpisodeBrief episode) async {
+    var dbHelper = DBHelper();
+    //var marked = await dbHelper.checkMarked(episode);
+    //if (!marked) {
+    final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+    await dbHelper.saveHistory(history);
+    //}
+    if (mounted) setState(() {});
+  }
+
+  _markNotListened(String url) async {
+    var dbHelper = DBHelper();
+    await dbHelper.markNotListened(url);
     if (mounted) setState(() {});
   }
 
@@ -418,10 +479,11 @@ class _MenuBarState extends State<MenuBar> {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          child: Container(
-              height: 50.0,
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: child),
+          child: SizedBox(
+            height: 50,
+            child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0), child: child),
+          ),
         ),
       );
 
@@ -449,10 +511,6 @@ class _MenuBarState extends State<MenuBar> {
       height: 50.0,
       decoration: BoxDecoration(
         color: context.scaffoldBackgroundColor,
-        //border: Border.all(
-        //  color: Theme.of(context).brightness == Brightness.light
-        //      ? Colors.grey[200]
-        //      : context.primaryColor,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -493,7 +551,7 @@ class _MenuBarState extends State<MenuBar> {
                                 color: Colors.grey[700],
                               ),
                               onTap: () async {
-                                await saveLiked(
+                                await _saveLiked(
                                     widget.episodeItem.enclosureUrl);
                                 OverlayEntry _overlayEntry;
                                 _overlayEntry = _createOverlayEntry();
@@ -507,7 +565,7 @@ class _MenuBarState extends State<MenuBar> {
                                 color: Colors.red,
                               ),
                               onTap: () =>
-                                  setUnliked(widget.episodeItem.enclosureUrl));
+                                  _setUnliked(widget.episodeItem.enclosureUrl));
                     },
                   ),
                   DownloadButton(episode: widget.episodeItem),
@@ -539,83 +597,47 @@ class _MenuBarState extends State<MenuBar> {
                               });
                     },
                   ),
-                  FutureBuilder<PlayHistory>(
-                      future: getPosition(widget.episodeItem),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) print(snapshot.error);
-                        return snapshot.hasData
-                            ? snapshot.data.seekValue > 0.90
-                                ? Container(
-                                    height: 25,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 15),
-                                    child: SizedBox(
-                                      width: 25,
-                                      height: 25,
-                                      child: CustomPaint(
-                                        painter: ListenedAllPainter(
-                                            context.accentColor,
-                                            stroke: 2.0),
-                                      ),
-                                    ),
-                                  )
-                                : snapshot.data.seconds < 0.1
-                                    ? SizedBox(
-                                        width: 1,
-                                      )
-                                    : Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: () => audio.episodeLoad(
-                                              widget.episodeItem,
-                                              startPosition:
-                                                  (snapshot.data.seconds * 1000)
-                                                      .toInt()),
-                                          child: Container(
-                                            height: 50,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Row(
-                                              children: <Widget>[
-                                                SizedBox(
-                                                  width: 20,
-                                                  height: 20,
-                                                  child: CustomPaint(
-                                                    painter: ListenedPainter(
-                                                        context.accentColor,
-                                                        stroke: 2.0),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 2)),
-                                                Container(
-                                                  height: 20,
-                                                  alignment: Alignment.center,
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 5),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10.0)),
-                                                    color: context.accentColor,
-                                                  ),
-                                                  child: Text(
-                                                    snapshot
-                                                        .data.seconds.toTime,
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                            : Center();
-                      }),
+                  FutureBuilder<int>(
+                    future: _isListened(widget.episodeItem),
+                    initialData: 0,
+                    builder: (context, snapshot) {
+                      return snapshot.data == 0
+                          ? _buttonOnMenu(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: CustomPaint(
+                                  size: Size(25, 20),
+                                  painter: ListenedAllPainter(Colors.grey[700],
+                                      stroke: 2.0),
+                                ),
+                              ),
+                              onTap: () {
+                                _markListened(widget.episodeItem);
+                                Fluttertoast.showToast(
+                                  msg: s.markListened,
+                                  gravity: ToastGravity.BOTTOM,
+                                );
+                              })
+                          : _buttonOnMenu(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: CustomPaint(
+                                  size: Size(25, 20),
+                                  painter: ListenedAllPainter(
+                                      context.accentColor,
+                                      stroke: 2.0),
+                                ),
+                              ),
+                              onTap: () {
+                                _markNotListened(
+                                    widget.episodeItem.enclosureUrl);
+                                Fluttertoast.showToast(
+                                  msg: s.markNotListened,
+                                  gravity: ToastGravity.BOTTOM,
+                                );
+                              });
+                    },
+                  ),
                 ],
               ),
             ),

@@ -204,6 +204,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   set setVolumeGain(int volumeGain) {
     _volumeGain = volumeGain;
+    if (_playerRunning && _boostVolume) {
+      setBoostVolume(boostVolume: _boostVolume, gain: _volumeGain);
+    }
     notifyListeners();
     volumeGainStorage.saveInt(volumeGain);
   }

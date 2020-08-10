@@ -204,6 +204,8 @@
   "@markConfirmContent": {},
   "markListened": "Marcar escuchados",
   "@markListened": {},
+  "markNotListened": "Mark not listened",
+  "@markNotListened": {},
   "menu": "Menú",
   "@menu": {},
   "menuAllPodcasts": "Todos los podcasts",

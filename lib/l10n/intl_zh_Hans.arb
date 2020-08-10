@@ -204,6 +204,8 @@
   "@markConfirmContent": {},
   "markListened": "标记已收听",
   "@markListened": {},
+  "markNotListened": "标记为未收听",
+  "@markNotListened": {},
   "menu": "菜单",
   "@menu": {},
   "menuAllPodcasts": "所有订阅",

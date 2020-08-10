@@ -167,6 +167,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "markConfirm" : MessageLookupByLibrary.simpleMessage("确认标记"),
     "markConfirmContent" : MessageLookupByLibrary.simpleMessage("是否确认标记全部节目为已收听？"),
     "markListened" : MessageLookupByLibrary.simpleMessage("标记已收听"),
+    "markNotListened" : MessageLookupByLibrary.simpleMessage("标记为未收听"),
     "menu" : MessageLookupByLibrary.simpleMessage("菜单"),
     "menuAllPodcasts" : MessageLookupByLibrary.simpleMessage("所有订阅"),
     "menuMarkAllListened" : MessageLookupByLibrary.simpleMessage("标记所有已收听"),

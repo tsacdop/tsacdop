@@ -305,6 +305,21 @@ class DBHelper {
     }
   }
 
+  Future<int> markNotListened(String url) async {
+    var dbClient = await database;
+    int count;
+    await dbClient.transaction((txn) async {
+      count = await txn.rawUpdate(
+          "UPDATE OR IGNORE PlayHistory SET listen_time = 0 WHERE enclosure_url = ?",
+          [url]);
+    });
+    await dbClient.rawDelete(
+        'DELETE FROM PlayHistory WHERE enclosure_url=? '
+        'AND listen_time = 0 AND seconds = 0',
+        [url]);
+    return count;
+  }
+
   Future<List<SubHistory>> getSubHistory() async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
@@ -435,14 +450,14 @@ class DBHelper {
   String _getDescription(String content, String description, String summary) {
     if (content.length >= description.length) {
       if (content.length >= summary.length) {
-        return content == '<![CDATA[ ]]>' ? '' : content;
+        return content;
       } else {
-        return summary == '<![CDATA[ ]]>' ? '' : summary;
+        return summary;
       }
     } else if (description.length >= summary.length) {
-      return description == '<![CDATA[ ]]>' ? '' : description;
+      return description;
     } else {
-      return summary == '<![CDATA[ ]]>' ? '' : summary;
+      return summary;
     }
   }
 
