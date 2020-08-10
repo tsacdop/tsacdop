@@ -186,6 +186,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                       Expanded(
                         flex: 1,
                         child: Container(
+                          alignment: Alignment.center,
                           padding: EdgeInsets.all(5.0),
                           margin: EdgeInsets.only(right: 20.0, bottom: 5.0),
                           decoration: data.item2
@@ -196,9 +197,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10.0)),
                                 )
-                              : BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.transparent),
+                              : BoxDecoration(color: Colors.transparent),
                           child: data.item2
                               // ? _topHeight < 90
                               //     ? Row(
@@ -257,7 +256,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   ],
                                 )
                               : IconButton(
-                                  alignment: Alignment.center,
                                   icon: Icon(Icons.play_circle_filled,
                                       size: 40, color: (context).accentColor),
                                   onPressed: () {
@@ -438,7 +436,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                       children: [
                         Icon(Icons.unfold_more, color: c),
                         CircleAvatar(
-                          //backgroundColor: _c.withOpacity(0.5),
+                          backgroundColor: c.withOpacity(0.5),
                           backgroundImage:
                               FileImage(File(widget.episode.imagePath)),
                         ),
