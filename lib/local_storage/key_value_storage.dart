@@ -53,7 +53,6 @@ class KeyValueStorage {
             'groups': [home.toEntity().toJson()]
           }));
     }
-    print(prefs.getString(key));
     return json
         .decode(prefs.getString(key))['groups']
         .cast<Map<String, Object>>()

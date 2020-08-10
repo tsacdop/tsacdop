@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:ui';
 
@@ -25,7 +26,7 @@ void callbackDispatcher() {
       var lastWork = await lastWorkStorage.getInt();
       for (var podcastLocal in podcastList) {
         await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
-        print('Refresh ${podcastLocal.title}');
+        developer.log('Refresh ${podcastLocal.title}');
       }
       await FlutterDownloader.initialize();
       var downloader = AutoDownloader();
@@ -140,12 +141,12 @@ class SettingState extends ChangeNotifier {
         constraints: Constraints(
           networkType: NetworkType.connected,
         ));
-    print('work manager init done + ');
+    developer.log('work manager init done + ');
   }
 
   Future cancelWork() async {
     await Workmanager.cancelAll();
-    print('work job cancelled');
+    developer.log('work job cancelled');
   }
 
   Color _accentSetColor;
@@ -348,7 +349,6 @@ class SettingState extends ChangeNotifier {
       _locale = Locale(localeString.first, localeString[1]);
     }
     await S.load(_locale);
-    print(_locale.toString());
   }
 
   Future _saveAccentSetColor() async {

@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:xml/xml.dart' as xml;
@@ -60,7 +61,7 @@ class PodcastsBackup {
     var content = xml.XmlDocument.parse(opml);
     var title =
         content.findAllElements('head').first.findElements('title').first.text;
-    print(title);
+    developer.log(title, name: 'Import OMPL');
     var groups = content.findAllElements('body').first.findElements('outline');
     if (title != 'Tsacdop Feed Groups') {
       var total = content
@@ -68,7 +69,6 @@ class PodcastsBackup {
           .map((ele) => OmplOutline.parse(ele))
           .toList();
       data['Home'] = total;
-      print(data.toString());
       return data;
     }
 
@@ -80,7 +80,6 @@ class PodcastsBackup {
           .toList();
       data[title] = total;
     }
-    print(data.toString());
     return data;
   }
 }

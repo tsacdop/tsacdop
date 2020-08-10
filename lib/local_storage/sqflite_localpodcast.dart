@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:dio/dio.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -427,7 +428,7 @@ class DBHelper {
       }
     }
     date.add(Duration(hours: timezoneInt)).add(DateTime.now().timeZoneOffset);
-    print(date.toString());
+    developer.log(date.toString());
     return date;
   }
 
@@ -467,7 +468,7 @@ class DBHelper {
     var dbClient = await database;
     String description, url;
     for (var i = 0; i < result; i++) {
-      print(feed.items[i].title);
+      developer.log(feed.items[i].title);
       description = _getDescription(feed.items[i]?.content?.value ?? '',
           feed.items[i].description ?? '', feed.items[i].itunes.summary ?? '');
       if (feed.items[i].enclosure != null) {
@@ -536,7 +537,7 @@ class DBHelper {
               [podcastLocal.id]);
         }
         for (var item in feed.items) {
-          print(item.title);
+          developer.log(item.title);
           description = _getDescription(item.content.value ?? '',
               item.description ?? '', item.itunes.summary ?? '');
 
@@ -550,7 +551,6 @@ class DBHelper {
           final length = item?.enclosure?.length ?? 0;
           final pubDate = item.pubDate;
           final date = _parsePubDate(pubDate);
-          print(date.toString());
           final milliseconds = date.millisecondsSinceEpoch;
           final duration = item.itunes.duration?.inSeconds ?? 0;
           final explicit = _getExplicit(item.itunes.explicit);
@@ -586,7 +586,7 @@ class DBHelper {
       }
       return 0;
     } catch (e) {
-      print(e);
+      developer.log(e, name: 'Update podcast error');
       return -1;
     }
   }
@@ -1009,7 +1009,7 @@ class DBHelper {
       await txn.rawUpdate(
           "UPDATE Episodes SET is_new = 0 WHERE enclosure_url = ?", [url]);
     });
-    print('remove new episode $url');
+    developer.log('remove new episode $url');
   }
 
   Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy) async {
@@ -1126,7 +1126,7 @@ class DBHelper {
           "UPDATE Episodes SET downloaded = 'ND', media_id = ? WHERE enclosure_url = ?",
           [url, url]);
     });
-    print('Deleted $url');
+    developer.log('Deleted $url');
     return count;
   }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -71,7 +72,7 @@ class _PopupMenuState extends State<PopupMenu> {
         }
       }
     } catch (e) {
-      print(e);
+      developer.log(e, name: 'OMPL parse error');
       Fluttertoast.showToast(
         msg: s.toastFileError,
         gravity: ToastGravity.TOP,
@@ -86,15 +87,13 @@ class _PopupMenuState extends State<PopupMenu> {
       if (filePath == '') {
         return;
       }
-      print('File Path$filePath');
-      //importOmpl.importState = ImportState.start;
       Fluttertoast.showToast(
         msg: s.toastReadFile,
         gravity: ToastGravity.TOP,
       );
       _saveOmpl(filePath);
     } on PlatformException catch (e) {
-      print(e.toString());
+      developer.log(e.toString(), name: 'Get OMPL file');
     }
   }
 

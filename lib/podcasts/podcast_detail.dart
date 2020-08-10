@@ -187,10 +187,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
           widget.podcastLocal.title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: Theme.of(context)
-              .textTheme
-              .headline5
-              .copyWith(color: Colors.white),
+          style: context.textTheme.headline5.copyWith(color: Colors.white),
         ),
       ),
     );
@@ -821,7 +818,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     filter: _filter,
                                     query: _query),
                                 builder: (context, snapshot) {
-                                  if (snapshot.hasError) print(snapshot.error);
                                   return (snapshot.hasData)
                                       ? EpisodeGrid(
                                           episodes: snapshot.data,

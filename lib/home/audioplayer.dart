@@ -320,7 +320,6 @@ class LastPosition extends StatelessWidget {
               FutureBuilder<PlayHistory>(
                   future: getPosition(episode),
                   builder: (context, snapshot) {
-                    if (snapshot.hasError) print(snapshot.error);
                     return snapshot.hasData
                         ? snapshot.data.seekValue > 0.90
                             ? Container(

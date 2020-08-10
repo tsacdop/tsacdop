@@ -430,10 +430,6 @@ class PodcastPreview extends StatelessWidget {
                 return FutureBuilder<List<EpisodeBrief>>(
                   future: _getRssItemTop(podcastLocal),
                   builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      print(snapshot.error);
-                      Center();
-                    }
                     return (snapshot.hasData)
                         ? ShowEpisode(
                             episodes: snapshot.data,

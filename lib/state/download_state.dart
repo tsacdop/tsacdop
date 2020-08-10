@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
@@ -27,13 +28,14 @@ class EpisodeTask {
 }
 
 void downloadCallback(String id, DownloadTaskStatus status, int progress) {
-  print('Homepage callback task in $id  status ($status) $progress');
+  developer.log('Homepage callback task in $id  status ($status) $progress');
   final send = IsolateNameServer.lookupPortByName('downloader_send_port');
   send.send([id, status, progress]);
 }
 
 void autoDownloadCallback(String id, DownloadTaskStatus status, int progress) {
-  print('Autodownload callback task in $id  status ($status) $progress');
+  developer
+      .log('Autodownload callback task in $id  status ($status) $progress');
   final send = IsolateNameServer.lookupPortByName('auto_downloader_send_port');
   send.send([id, status, progress]);
 }
@@ -56,7 +58,6 @@ class AutoDownloader {
       bindBackgroundIsolate();
       return;
     }
-    print('start listen');
     _port.listen((dynamic data) {
       String id = data[0];
       DownloadTaskStatus status = data[1];
@@ -206,7 +207,6 @@ class DownloadState extends ChangeNotifier {
         query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
     var filePath =
         'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename))}';
-    print(filePath);
     var fileStat = await File(
             path.join(completeTask.first.savedDir, completeTask.first.filename))
         .stat();
@@ -325,7 +325,7 @@ class DownloadState extends ChangeNotifier {
   }
 
   _autoDelete() async {
-    print('Start auto delete outdated episodes');
+    developer.log('Start auto delete outdated episodes');
     var autoDeleteStorage = KeyValueStorage(autoDeleteKey);
     var autoDelete = await autoDeleteStorage.getInt();
     if (autoDelete == 0) {

@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:isolate';
 
 import 'package:flutter/material.dart';
@@ -74,7 +75,7 @@ Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
   for (var podcastLocal in podcastList) {
     sendPort.send([podcastLocal.title, 1]);
     var updateCount = await dbHelper.updatePodcastRss(podcastLocal);
-    print('Refresh ${podcastLocal.title}$updateCount');
+    developer.log('Refresh ${podcastLocal.title}$updateCount');
   }
   sendPort.send("done");
 }

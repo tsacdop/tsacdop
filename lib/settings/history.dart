@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:dio/dio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -84,8 +86,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
       var item = SubscribeItem(podcast.rss, podcast.title,
           imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
-    } on DioError catch (e) {
-      print(e);
+    } catch (e) {
+      developer.log(e.toString(), name: 'Recover podcast error');
       Fluttertoast.showToast(
         msg: context.s.toastRecoverFailed,
         gravity: ToastGravity.BOTTOM,

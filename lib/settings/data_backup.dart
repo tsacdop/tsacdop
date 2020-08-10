@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -80,7 +81,7 @@ class _DataBackupState extends State<DataBackup> {
         gravity: ToastGravity.BOTTOM,
       );
     } catch (e) {
-      print(e);
+      developer.log(e, name: 'Import settings');
       Fluttertoast.showToast(
         msg: s.toastFileError,
         gravity: ToastGravity.BOTTOM,
@@ -95,14 +96,13 @@ class _DataBackupState extends State<DataBackup> {
       if (filePath == '') {
         return;
       }
-      print('File Path$filePath');
       Fluttertoast.showToast(
         msg: s.toastReadFile,
         gravity: ToastGravity.BOTTOM,
       );
       _importSetting(filePath, context);
     } on PlatformException catch (e) {
-      print(e.toString());
+      developer.log(e.toString(), name: 'Get file path');
     }
   }
 

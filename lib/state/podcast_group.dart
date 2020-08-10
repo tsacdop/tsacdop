@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
@@ -445,7 +446,6 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       connectTimeout: 20000,
       receiveTimeout: 20000,
     );
-    print(rss);
 
     try {
       var response = await Dio(options).get(rss);
@@ -495,7 +495,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
             var image = img.decodeImage(imageResponse.data);
             thumbnail = img.copyResize(image, width: 300);
           } catch (e) {
-            print(e);
+            developer.log(e.toString(), name: 'Download image error');
             try {
               var index = math.Random().nextInt(3);
               var imageResponse = await Dio().get<List<int>>(
@@ -506,7 +506,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
                   "${listColor[index]}&color=fff&name=${item.title}&length=2&bold=true";
               thumbnail = img.decodeImage(imageResponse.data);
             } catch (e) {
-              print(e);
+              developer.log(e.toString(), name: 'Donwload image error');
               sendPort.send([item.title, item.url, 6]);
               await Future.delayed(Duration(seconds: 2));
               sendPort.send([item.title, item.url, 4]);
@@ -539,7 +539,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
           try {
             await data.fatchData();
           } catch (e) {
-            print(e);
+            developer.log(e.toString(), name: 'Fatch fireside data error');
           }
         }
         await dbHelper.savePodcastRss(p, uuid);
@@ -567,7 +567,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         }
       }
     } catch (e) {
-      print('$e confirm');
+      developer.log('$e confirm');
       sendPort.send([item.title, item.url, 6]);
       await Future.delayed(Duration(seconds: 2));
       sendPort.send([item.title, item.url, 4]);

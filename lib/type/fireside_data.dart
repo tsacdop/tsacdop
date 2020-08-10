@@ -41,8 +41,6 @@ class FiresideData {
         PodcastHost host;
         var name = element.text.trim();
         var image = element.children.first.children.first.attributes.toString();
-        print(reg.stringMatch(image));
-
         host = PodcastHost(
             name,
             reg.stringMatch(image) ??

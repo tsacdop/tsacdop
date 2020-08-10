@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -63,7 +64,7 @@ extension StringExtension on String {
     if (await canLaunch(this)) {
       await launch(this);
     } else {
-      print('Could not launch $this');
+      developer.log('Could not launch $this');
       Fluttertoast.showToast(
         msg: '$this Invalid Link',
         gravity: ToastGravity.TOP,

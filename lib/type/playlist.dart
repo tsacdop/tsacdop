@@ -55,7 +55,6 @@ class Playlist {
     var index = _playlist.indexOf(episodeBrief);
     _playlist.removeWhere(
         (episode) => episode.enclosureUrl == episodeBrief.enclosureUrl);
-    print('delete${episodeBrief.title}');
     await savePlaylist();
     return index;
   }

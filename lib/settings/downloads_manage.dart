@@ -44,7 +44,6 @@ class _DownloadsManageState extends State<DownloadsManage> {
     _size = 0;
     _fileNum = 0;
     var dir = await getExternalStorageDirectory();
-    print(dir.path);
     dir.list().forEach((d) {
       var fileDir = Directory(d.path);
       fileDir.list().forEach((file) async {

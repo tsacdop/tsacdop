@@ -765,7 +765,6 @@ class _RecentUpdateState extends State<_RecentUpdate>
           return FutureBuilder<List<EpisodeBrief>>(
             future: _getRssItem(_top, _group),
             builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
               return (snapshot.hasData)
                   ? snapshot.data.length == 0
                       ? Padding(
@@ -1059,7 +1058,6 @@ class _MyFavoriteState extends State<_MyFavorite>
           return FutureBuilder<List<EpisodeBrief>>(
             future: _getLikedRssItem(_top, _sortBy),
             builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
               return (snapshot.hasData)
                   ? snapshot.data.length == 0
                       ? Padding(

@@ -282,7 +282,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   Future<void> episodeLoad(EpisodeBrief episode,
       {int startPosition = 0}) async {
-    print(episode.enclosureUrl);
     final episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     //TODO  load episode from last position when player running
     if (playerRunning) {
@@ -434,7 +433,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
     AudioService.customEventStream.distinct().listen((event) async {
       if (event is String && _episode.title == event) {
-        print(event);
         _queue.delFromPlaylist(_episode);
         _lastPostion = 0;
         notifyListeners();

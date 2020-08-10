@@ -289,7 +289,6 @@ class _PodcastCardState extends State<PodcastCard>
                                           setState(() {
                                             if (!value) {
                                               _selectedGroups.remove(group);
-                                              print(group.name);
                                             } else {
                                               _selectedGroups.add(group);
                                             }
@@ -313,7 +312,6 @@ class _PodcastCardState extends State<PodcastCard>
                                     ),
                                     IconButton(
                                       onPressed: () async {
-                                        print(_selectedGroups);
                                         if (_selectedGroups.length > 0) {
                                           setState(() {
                                             _addGroup = false;
