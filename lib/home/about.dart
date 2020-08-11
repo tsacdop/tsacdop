@@ -5,7 +5,7 @@ import 'package:line_icons/line_icons.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
-const String version = '0.4.10';
+const String version = '0.4.11';
 
 class AboutApp extends StatelessWidget {
   Widget _listItem(
@@ -58,15 +58,16 @@ class AboutApp extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.fade,
             )),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image(
-                image: AssetImage('assets/$flag.png'),
-                height: 20,
-                width: 30,
-                fit: BoxFit.cover,
+            if (flag != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Image(
+                  image: AssetImage('assets/$flag.png'),
+                  height: 20,
+                  width: 30,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
           ],
         ),
       );
@@ -260,6 +261,7 @@ class AboutApp extends StatelessWidget {
                               ],
                             ),
                           ),
+                          _translatorInfo(context, name: 'Atrate'),
                           _translatorInfo(context, name: 'ppp', flag: 'fr'),
                           _translatorInfo(context,
                               name: 'Joel Israel', flag: 'mx')

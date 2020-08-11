@@ -1,5 +1,27 @@
 # Tsacdop Changelog
 
+## 0.4.11
+
+Release date 2020/8/12
+
+### New features
+
+* Boost volume. You can change boost level in settings.
+* You can tap time stamp to skip instantly in shownote when the episode is playing.
+* Add history list in playlist page.
+* You can also mark not listened now.
+
+### Minor change
+
+* Improved time picker UI.
+* Add episode setting page.
+
+### Bugs fix
+
+* Play record didn't saved after stop playing.
+* Network error message didn't disapear after skip to next.
+* Fireside avatar load error.
+
 ## 0.4.10
 
 Release date 2020/8/6
