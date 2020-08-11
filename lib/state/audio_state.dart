@@ -292,6 +292,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _queue.playlist.removeAt(0);
       _queue.playlist.removeWhere((item) => item == episode);
       _queue.playlist.insert(0, episodeNew);
+      _remoteErrorMessage = null;
       notifyListeners();
       await _queue.savePlaylist();
       if (episodeNew.isNew == 1) {
@@ -486,6 +487,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   playNext() async {
+    _remoteErrorMessage = null;
     await AudioService.skipToNext();
     _queueUpdate = !_queueUpdate;
     notifyListeners();
@@ -586,6 +588,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> resumeAudio() async {
+    _remoteErrorMessage = null;
+    notifyListeners();
     if (_audioState != AudioProcessingState.connecting &&
         _audioState != AudioProcessingState.none) AudioService.play();
   }
