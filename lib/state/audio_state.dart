@@ -289,14 +289,16 @@ class AudioPlayerNotifier extends ChangeNotifier {
           backgroundAudioPosition ~/ 1000, seekSliderValue);
       await dbHelper.saveHistory(history);
       AudioService.addQueueItemAt(episodeNew.toMediaItem(), 0);
-      _queue.playlist
-          .removeWhere((item) => item.enclosureUrl == episode.enclosureUrl);
+      _queue.playlist.removeAt(0);
+      _queue.playlist.removeWhere((item) => item == episode);
       _queue.playlist.insert(0, episodeNew);
       notifyListeners();
       await _queue.savePlaylist();
+      if (episodeNew.isNew == 1) {
+        await dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
+      }
     } else {
       await _queue.getPlaylist();
-      await _queue.delFromPlaylist(episode);
       await _queue.addToPlayListAt(episodeNew, 0);
       _backgroundAudioDuration = 0;
       _backgroundAudioPosition = 0;
@@ -304,11 +306,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _episode = episodeNew;
       _playerRunning = true;
       notifyListeners();
-      //await _queue.savePlaylist();
       _startAudioService(startPosition, episodeNew.enclosureUrl);
-      if (episodeNew.isNew == 1) {
-        await dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
-      }
     }
   }
 
@@ -922,6 +920,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   void onAddQueueItemAt(MediaItem mediaItem, int index) async {
     if (index == 0) {
       await _audioPlayer.stop();
+      _queue.removeAt(0);
       _queue.removeWhere((item) => item.id == mediaItem.id);
       _queue.insert(0, mediaItem);
       await AudioServiceBackground.setQueue(_queue);
