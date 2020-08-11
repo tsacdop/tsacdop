@@ -2,9 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
@@ -12,8 +10,8 @@ import '../home/audioplayer.dart';
 import '../state/audio_state.dart';
 import '../state/setting_state.dart';
 import '../util/custom_dropdown.dart';
+import '../util/custom_time_picker.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
 
 const List secondsToSelect = [10, 15, 20, 25, 30, 45, 60];
 
@@ -105,54 +103,26 @@ class PlaySetting extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
-              onTap: () {
+              onTap: () async {
                 var startTime = data.item1;
-                generalDialog(
-                  context,
-                  content: TimePickerSpinner(
-                    minutesInterval: 15,
-                    time: DateTime.fromMillisecondsSinceEpoch(
-                        data.item1 * 60 * 1000,
-                        isUtc: true),
-                    isForce2Digits: true,
-                    is24HourMode: false,
-                    highlightedTextStyle: GoogleFonts.teko(
-                        textStyle: TextStyle(
-                            fontSize: 40, color: context.accentColor)),
-                    normalTextStyle: GoogleFonts.teko(
-                        textStyle:
-                            TextStyle(fontSize: 40, color: Colors.black38)),
-                    onTimeChange: (time) {
-                      startTime = time.hour * 60 + time.minute;
-                    },
-                  ),
-                  actions: <Widget>[
-                    FlatButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
-                        s.cancel,
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        if (startTime != data.item2) {
-                          settings.setAutoSleepTimerStart = startTime;
-                          Navigator.of(context).pop();
-                        } else {
-                          Fluttertoast.showToast(
-                            msg: s.toastTimeEqualEnd,
-                            gravity: ToastGravity.BOTTOM,
-                          );
-                        }
-                      },
-                      child: Text(
-                        s.confirm,
-                        style: TextStyle(color: context.accentColor),
-                      ),
-                    )
-                  ],
-                );
+                final timeOfDay = await showCustomTimePicker(
+                    context: context,
+                    cancelText: s.cancel,
+                    confirmText: s.confirm,
+                    helpText: '',
+                    initialTime: TimeOfDay(
+                        hour: startTime ~/ 60, minute: startTime % 60));
+                if (timeOfDay != null) {
+                  startTime = timeOfDay.hour * 60 + timeOfDay.minute;
+                  if (startTime != data.item2) {
+                    settings.setAutoSleepTimerStart = startTime;
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: s.toastTimeEqualEnd,
+                      gravity: ToastGravity.BOTTOM,
+                    );
+                  }
+                }
               },
               borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(5), topLeft: Radius.circular(5)),
@@ -171,54 +141,26 @@ class PlaySetting extends StatelessWidget {
               ),
             ),
             InkWell(
-              onTap: () {
-                int endTime;
-                generalDialog(
-                  context,
-                  content: TimePickerSpinner(
-                    minutesInterval: 15,
-                    time: DateTime.fromMillisecondsSinceEpoch(
-                        data.item2 * 60 * 1000,
-                        isUtc: true),
-                    isForce2Digits: true,
-                    highlightedTextStyle: GoogleFonts.teko(
-                        textStyle: TextStyle(
-                            fontSize: 40, color: context.accentColor)),
-                    normalTextStyle: GoogleFonts.teko(
-                        textStyle:
-                            TextStyle(fontSize: 40, color: Colors.black38)),
-                    is24HourMode: false,
-                    onTimeChange: (time) {
-                      endTime = time.hour * 60 + time.minute;
-                    },
-                  ),
-                  actions: <Widget>[
-                    FlatButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
-                        s.cancel,
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        if (endTime != data.item1) {
-                          settings.setAutoSleepTimerEnd = endTime;
-                          Navigator.of(context).pop();
-                        } else {
-                          Fluttertoast.showToast(
-                            msg: s.toastTimeEqualStart,
-                            gravity: ToastGravity.BOTTOM,
-                          );
-                        }
-                      },
-                      child: Text(
-                        s.confirm,
-                        style: TextStyle(color: context.accentColor),
-                      ),
-                    )
-                  ],
-                );
+              onTap: () async {
+                var endTime = data.item2;
+                final timeOfDay = await showCustomTimePicker(
+                    context: context,
+                    cancelText: s.cancel,
+                    confirmText: s.confirm,
+                    helpText: '',
+                    initialTime:
+                        TimeOfDay(hour: endTime ~/ 60, minute: endTime % 60));
+                if (timeOfDay != null) {
+                  endTime = timeOfDay.hour * 60 + timeOfDay.minute;
+                  if (endTime != data.item1) {
+                    settings.setAutoSleepTimerEnd = endTime;
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: s.toastTimeEqualStart,
+                      gravity: ToastGravity.BOTTOM,
+                    );
+                  }
+                }
               },
               borderRadius: BorderRadius.only(
                   bottomRight: Radius.circular(5),

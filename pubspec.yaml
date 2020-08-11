@@ -26,7 +26,6 @@ dependencies:
   flutter_downloader: ^1.4.4
   fluttertoast: ^4.0.0
   flutter_isolate: ^1.0.0+14
-  flutter_time_picker_spinner: ^1.0.6+1
   flutter_linkify: ^3.1.3
   flutter_file_dialog: ^0.0.5
   flare_flutter: ^2.0.6
