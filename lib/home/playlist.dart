@@ -568,6 +568,8 @@ class _HistoryListState extends State<HistoryList> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     subtitle: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: <Widget>[
                                         Selector<AudioPlayerNotifier,
                                             Tuple2<List<EpisodeBrief>, bool>>(
@@ -618,25 +620,46 @@ class _HistoryListState extends State<HistoryList> {
                                                         (seconds * 1000)
                                                             .toInt());
                                               },
-                                              child: Container(
-                                                height: 25,
-                                                alignment: Alignment.center,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 10),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              20.0)),
-                                                  color: context.accentColor,
+                                              child: Stack(children: [
+                                                ShaderMask(
+                                                  shaderCallback: (bounds) {
+                                                    return LinearGradient(
+                                                      begin:
+                                                          Alignment.centerLeft,
+                                                      colors: <Color>[
+                                                        context.accentColor
+                                                            .withOpacity(0.8),
+                                                        Colors.white70
+                                                      ],
+                                                      stops: [
+                                                        seekValue,
+                                                        seekValue
+                                                      ],
+                                                      tileMode: TileMode.mirror,
+                                                    ).createShader(bounds);
+                                                  },
+                                                  child: Container(
+                                                    height: 25,
+                                                    alignment: Alignment.center,
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 20),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  20.0)),
+                                                      color:
+                                                          context.accentColor,
+                                                    ),
+                                                    child: Text(
+                                                      seconds.toTime,
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
                                                 ),
-                                                child: Text(
-                                                  s.timeLastPlayed(
-                                                      seconds.toTime),
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
+                                              ]),
                                             ),
                                           ),
                                         Spacer(),
