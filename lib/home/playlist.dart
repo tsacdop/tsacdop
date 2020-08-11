@@ -280,7 +280,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
                               }
                               audio.reorderPlaylist(oldIndex, newIndex);
                               // final episodeRemove = episodes.removeAt(oldIndex);
-                              // print(episodeRemove.title);
                               setState(() {
                                 // episodes.insert(newIndex, episodeRemove);
                               });

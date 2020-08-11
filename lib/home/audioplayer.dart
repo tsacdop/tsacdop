@@ -559,12 +559,12 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                     miniPlaylistKey.currentState.removeItem(
                                       index,
                                       (context, animation) => Center(),
-                                      duration: Duration(milliseconds: 50),
+                                      duration: Duration(milliseconds: 200),
                                     );
                                     miniPlaylistKey.currentState.insertItem(0,
                                         duration: Duration(milliseconds: 100));
                                     await Future.delayed(
-                                        Duration(milliseconds: 150));
+                                        Duration(milliseconds: 300));
                                     await audio
                                         .moveToTop(data.item1[index + 1]);
                                   },

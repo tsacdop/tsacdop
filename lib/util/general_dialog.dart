@@ -21,14 +21,14 @@ generalDialog(BuildContext context,
                   : Color.fromRGBO(15, 15, 15, 1),
         ),
         child: AlertDialog(
-            elevation: 1,
+            elevation: 2,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             titlePadding: EdgeInsets.all(20),
             title: SizedBox(width: context.width - 160, child: title),
             content: content,
             contentPadding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-            actionsPadding: EdgeInsets.all(10),
+            actionsPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
             actions: actions),
       ),
     );

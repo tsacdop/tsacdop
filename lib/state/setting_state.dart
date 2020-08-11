@@ -60,7 +60,6 @@ void callbackDispatcher() {
 ThemeData lightTheme = ThemeData(
   accentColorBrightness: Brightness.dark,
   primaryColor: Colors.grey[100],
-  //  accentColor: _accentSetColor,
   primaryColorLight: Colors.white,
   primaryColorDark: Colors.grey[300],
   dialogBackgroundColor: Colors.white,
