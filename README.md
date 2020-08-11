@@ -142,7 +142,9 @@ src
 
 ## Contact
 
-You can also reach out to me directly at [tsacdop.app@gmail.com](mailto:<tsacdop.app@gmail.com>).
+You can reach out to me directly at [tsacdop.app@gmail.com](mailto:<tsacdop.app@gmail.com>).
+
+Or you can join our [Telegram Group](https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg).
 
 ## Getting Started with Flutter
 
