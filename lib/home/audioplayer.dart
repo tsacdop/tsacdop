@@ -558,13 +558,15 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                     episodesToPlay.insert(0, episdoe);
                                     miniPlaylistKey.currentState.removeItem(
                                       index,
-                                      (context, animation) => Center(),
-                                      duration: Duration(milliseconds: 200),
+                                      (context, animation) {
+                                        return Center();
+                                      },
+                                      duration: Duration.zero,
                                     );
                                     miniPlaylistKey.currentState.insertItem(0,
                                         duration: Duration(milliseconds: 100));
                                     await Future.delayed(
-                                        Duration(milliseconds: 300));
+                                        Duration(milliseconds: 100));
                                     await audio
                                         .moveToTop(data.item1[index + 1]);
                                   },
@@ -1389,7 +1391,7 @@ class _ControlPanelState extends State<ControlPanel>
                                               width: 100,
                                               child: Text(
                                                 data.item1.feedTitle,
-                                                maxLines: 2,
+                                                maxLines: 1,
                                                 overflow: TextOverflow.fade,
                                               ),
                                             ),
