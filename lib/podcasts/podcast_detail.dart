@@ -20,13 +20,12 @@ import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../type/fireside_data.dart';
-import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
 import '../util/audiopanel.dart';
 import '../util/custom_widget.dart';
 import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
+import 'podcast_settings.dart';
 
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, @required this.podcastLocal, this.hide = false})
@@ -93,10 +92,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Future _updateRssItem(BuildContext context, PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
     final result = await dbHelper.updatePodcastRss(podcastLocal);
-    Fluttertoast.showToast(
-      msg: context.s.updateEpisodesCount(result),
-      gravity: ToastGravity.TOP,
-    );
+    if (result >= 0) {
+      Fluttertoast.showToast(
+        msg: context.s.updateEpisodesCount(result),
+        gravity: ToastGravity.TOP,
+      );
+    }
     if (result > 0) {
       var autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
       if (autoDownload) {
@@ -161,19 +162,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
     var storage = KeyValueStorage(podcastLayoutKey);
     var index = await storage.getInt(defaultValue: 1);
     return index;
-  }
-
-  _markListened(String podcastId) async {
-    var dbHelper = DBHelper();
-    var episodes = await dbHelper.getRssItem(podcastId, -1, reverse: true);
-    for (var episode in episodes) {
-      var marked = await dbHelper.checkMarked(episode);
-      if (!marked) {
-        final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-        await dbHelper.saveHistory(history);
-        if (mounted) setState(() {});
-      }
-    }
   }
 
   Widget podcastInfo(BuildContext context) {
@@ -308,33 +296,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
-  _confirmMarkListened(BuildContext context) => generalDialog(
-        context,
-        title: Text(context.s.markConfirm),
-        content: Text(context.s.markConfirmContent),
-        actions: <Widget>[
-          FlatButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              context.s.cancel,
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-          ),
-          FlatButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await _markListened(widget.podcastLocal.id);
-            },
-            child: Text(
-              context.s.confirm,
-              style: TextStyle(color: context.accentColor),
-            ),
-          )
-        ],
-      );
-
   _customPopupMenu(
           {Widget child,
           String tooltip,
@@ -370,7 +331,14 @@ class _PodcastDetailState extends State<PodcastDetail> {
               widget.podcastLocal.rssUrl.launchUrl;
               break;
             case 2:
-              _confirmMarkListened(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  fullscreenDialog: true,
+                  builder: (context) =>
+                      PodcastSetting(podcastLocal: widget.podcastLocal),
+                ),
+              );
               break;
           }
         },
@@ -398,7 +366,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
               child: Row(
                 children: <Widget>[
                   Icon(
-                    Icons.rss_feed,
+                    LineIcons.rss_square_solid,
                     color: context.textColor,
                   ),
                   Padding(
@@ -412,23 +380,15 @@ class _PodcastDetailState extends State<PodcastDetail> {
           PopupMenuItem(
             value: 2,
             child: Container(
-              padding: EdgeInsets.only(left: 10),
+              padding: const EdgeInsets.only(left: 10),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(
-                    width: 25,
-                    height: 25,
-                    child: CustomPaint(
-                        painter:
-                            ListenedAllPainter(context.textColor, stroke: 2)),
-                  ),
+                  Icon(LineIcons.cog_solid, color: context.textColor),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 5.0),
                   ),
-                  Text(
-                    s.menuMarkAllListened,
-                  ),
+                  Text(s.settings),
                 ],
               ),
             ),

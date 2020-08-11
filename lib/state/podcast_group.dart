@@ -58,7 +58,16 @@ class PodcastGroup {
   Future getPodcasts() async {
     var dbHelper = DBHelper();
     if (podcastList != []) {
-      _podcasts = await dbHelper.getPodcastLocal(podcastList);
+      try {
+        _podcasts = await dbHelper.getPodcastLocal(podcastList);
+      } catch (e) {
+        await Future.delayed(Duration(milliseconds: 200));
+        try {
+          _podcasts = await dbHelper.getPodcastLocal(podcastList);
+        } catch (e) {
+          developer.log(e.toString());
+        }
+      }
     }
   }
 

@@ -586,7 +586,7 @@ class DBHelper {
       }
       return 0;
     } catch (e) {
-      developer.log(e, name: 'Update podcast error');
+      developer.log(e.toString(), name: 'Update podcast error');
       return -1;
     }
   }

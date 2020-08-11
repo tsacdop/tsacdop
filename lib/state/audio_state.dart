@@ -423,7 +423,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       }
 
       /// Reset error state.
-      if (_audioState != AudioProcessingState.error && _playing) {
+      if (_audioState != AudioProcessingState.error) {
         _remoteErrorMessage = null;
       }
       notifyListeners();

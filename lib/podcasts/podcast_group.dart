@@ -80,14 +80,14 @@ class _PodcastCardState extends State<PodcastCard>
   int _seconds;
   int _skipSeconds;
 
-  Future<int> getSkipSecond(String id) async {
+  Future<int> _getSkipSecond(String id) async {
     var dbHelper = DBHelper();
     var seconds = await dbHelper.getSkipSeconds(id);
     _skipSeconds = seconds;
     return seconds;
   }
 
-  saveSkipSeconds(String id, int seconds) async {
+  _saveSkipSeconds(String id, int seconds) async {
     var dbHelper = DBHelper();
     await dbHelper.saveSkipSeconds(id, seconds);
   }
@@ -117,11 +117,6 @@ class _PodcastCardState extends State<PodcastCard>
     } else {
       return true;
     }
-  }
-
-  String _stringForSeconds(double seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
 
   @override
@@ -389,7 +384,8 @@ class _PodcastCardState extends State<PodcastCard>
                                 },
                               ),
                               FutureBuilder<int>(
-                                  future: getSkipSecond(widget.podcastLocal.id),
+                                  future:
+                                      _getSkipSecond(widget.podcastLocal.id),
                                   initialData: 0,
                                   builder: (context, snapshot) {
                                     return _buttonOnMenu(
@@ -398,7 +394,7 @@ class _PodcastCardState extends State<PodcastCard>
                                           size: _value == 0 ? 1 : 20 * (_value),
                                         ),
                                         tooltip:
-                                            'Skip${snapshot.data == 0 ? '' : _stringForSeconds(snapshot.data.toDouble())}',
+                                            'Skip${snapshot.data == 0 ? '' : snapshot.data.toTime}',
                                         onTap: () {
                                           generalDialog(
                                             context,
@@ -425,7 +421,7 @@ class _PodcastCardState extends State<PodcastCard>
                                               FlatButton(
                                                 onPressed: () {
                                                   Navigator.of(context).pop();
-                                                  saveSkipSeconds(
+                                                  _saveSkipSeconds(
                                                       widget.podcastLocal.id,
                                                       _seconds);
                                                 },
