@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/intl_standalone.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../generated/l10n.dart';
@@ -343,7 +344,17 @@ class SettingState extends ChangeNotifier {
   Future _getLocale() async {
     var localeString = await localeStorage.getStringList();
     if (localeString.isEmpty) {
-      _locale = Locale(Intl.systemLocale);
+      await findSystemLocale();
+      var systemLanCode;
+      final list = Intl.systemLocale.split('_');
+      if (list.length == 2) {
+        systemLanCode = list.first;
+      } else if (list.length == 3) {
+        systemLanCode = '${list[0]}_${list[1]}';
+      } else {
+        systemLanCode = 'en';
+      }
+      _locale = Locale(systemLanCode);
     } else {
       _locale = Locale(localeString.first, localeString[1]);
     }

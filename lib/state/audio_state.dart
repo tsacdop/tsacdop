@@ -292,6 +292,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _queue.playlist.removeAt(0);
       _queue.playlist.removeWhere((item) => item == episode);
       _queue.playlist.insert(0, episodeNew);
+      _queueUpdate != _queueUpdate;
       _remoteErrorMessage = null;
       notifyListeners();
       await _queue.savePlaylist();
