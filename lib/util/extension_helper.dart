@@ -41,7 +41,7 @@ extension IntExtension on int {
   }
 
   String get toTime =>
-      '${(this ~/ 60)}:${(truncate() % 60).toString().padLeft(2, '0')}';
+      '${(this ~/ 60).toString().padLeft(2, '0')}:${(truncate() % 60).toString().padLeft(2, '0')}';
 
   String toInterval(BuildContext context) {
     if (this == null || isNegative) return '';

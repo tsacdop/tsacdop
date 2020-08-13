@@ -23,7 +23,7 @@ class PlaylistPage extends StatefulWidget {
 
 class _PlaylistPageState extends State<PlaylistPage> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
-
+  var _loadList;
   int _sumPlaylistLength(List<EpisodeBrief> episodes) {
     var sum = 0;
     if (episodes.length == 0) {
@@ -44,7 +44,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
   bool _loadHistory = false;
 
-  List<EpisodeBrief> episodes = [];
+  @override
+  void initState() {
+    super.initState();
+    _loadList = _ReorderablePlaylist();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,11 +68,12 @@ class _PlaylistPageState extends State<PlaylistPage> {
           backgroundColor: context.accentColor.withAlpha(70),
         ),
         body: SafeArea(
-          child: Selector<AudioPlayerNotifier, Tuple3<Playlist, bool, bool>>(
-            selector: (_, audio) =>
-                Tuple3(audio.queue, audio.playerRunning, audio.queueUpdate),
+          child: Selector<AudioPlayerNotifier,
+              Tuple4<Playlist, bool, bool, EpisodeBrief>>(
+            selector: (_, audio) => Tuple4(audio.queue, audio.playerRunning,
+                audio.queueUpdate, audio.episode),
             builder: (_, data, __) {
-              episodes = data.item1.playlist;
+              var episodes = data.item1.playlist;
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,6 +112,12 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             : Icon(Icons.history),
                                         onPressed: () => setState(() {
                                               _loadHistory = !_loadHistory;
+                                              if (_loadHistory) {
+                                                _loadList = _HistoryList();
+                                              } else {
+                                                _loadList =
+                                                    _ReorderablePlaylist();
+                                              }
                                             }))
                                   ],
                                 ),
@@ -234,14 +245,14 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                       CircleAvatar(
                                         radius: 15,
                                         //backgroundColor: _c.withOpacity(0.5),
-                                        backgroundImage: FileImage(File(
-                                            "${episodes.first.imagePath}")),
+                                        backgroundImage: FileImage(
+                                            File("${data.item4.imagePath}")),
                                       ),
                                       Container(
                                         width: 150,
                                         alignment: Alignment.center,
                                         child: Text(
-                                          episodes.first.title,
+                                          data.item4.title,
                                           maxLines: 1,
                                           overflow: TextOverflow.fade,
                                           textAlign: TextAlign.center,
@@ -261,7 +272,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   )
                                 : IconButton(
                                     icon: Icon(Icons.play_circle_filled,
-                                        size: 40, color: (context).accentColor),
+                                        size: 40, color: context.accentColor),
                                     onPressed: () {
                                       audio.playlistLoad();
                                       // setState(() {});
@@ -272,42 +283,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                     ),
                   ),
                   Expanded(
-                    child: _loadHistory
-                        ? HistoryList()
-                        : ReorderableListView(
-                            onReorder: (oldIndex, newIndex) {
-                              if (newIndex > oldIndex) {
-                                newIndex -= 1;
-                              }
-                              audio.reorderPlaylist(oldIndex, newIndex);
-                              // final episodeRemove = episodes.removeAt(oldIndex);
-                              setState(() {
-                                // episodes.insert(newIndex, episodeRemove);
-                              });
-                            },
-                            scrollDirection: Axis.vertical,
-                            children: data.item2
-                                ? episodes.map<Widget>((episode) {
-                                    if (episode.enclosureUrl !=
-                                        episodes.first.enclosureUrl) {
-                                      return DismissibleContainer(
-                                        episode: episode,
-                                        key: ValueKey(episode.enclosureUrl),
-                                      );
-                                    } else {
-                                      return Container(
-                                        key: ValueKey('sd'),
-                                      );
-                                    }
-                                  }).toList()
-                                : episodes
-                                    .map<Widget>((episode) =>
-                                        DismissibleContainer(
-                                          episode: episode,
-                                          key: ValueKey(episode.enclosureUrl),
-                                        ))
-                                    .toList()),
-                  ),
+                      child: AnimatedSwitcher(
+                          duration: Duration(milliseconds: 300),
+                          child: _loadList)),
                 ],
               );
             },
@@ -318,17 +296,71 @@ class _PlaylistPageState extends State<PlaylistPage> {
   }
 }
 
-class DismissibleContainer extends StatefulWidget {
-  final EpisodeBrief episode;
-  DismissibleContainer({this.episode, Key key}) : super(key: key);
+class _ReorderablePlaylist extends StatefulWidget {
+  _ReorderablePlaylist({Key key}) : super(key: key);
 
   @override
-  _DismissibleContainerState createState() => _DismissibleContainerState();
+  __ReorderablePlaylistState createState() => __ReorderablePlaylistState();
 }
 
-class _DismissibleContainerState extends State<DismissibleContainer> {
+class __ReorderablePlaylistState extends State<_ReorderablePlaylist> {
+  @override
+  Widget build(BuildContext context) {
+    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    return Selector<AudioPlayerNotifier, Tuple2<Playlist, bool>>(
+        selector: (_, audio) => Tuple2(audio.queue, audio.playerRunning),
+        builder: (_, data, __) {
+          var episodes = data.item1.playlist;
+          return ReorderableListView(
+              onReorder: (oldIndex, newIndex) {
+                if (newIndex > oldIndex) {
+                  newIndex -= 1;
+                }
+                audio.reorderPlaylist(oldIndex, newIndex);
+                setState(() {});
+              },
+              scrollDirection: Axis.vertical,
+              children: data.item2
+                  ? episodes.map<Widget>((episode) {
+                      if (episode.enclosureUrl != episodes.first.enclosureUrl) {
+                        return _DismissibleContainer(
+                          episode: episode,
+                          onRemove: (value) => setState(() {}),
+                          key: ValueKey(episode.enclosureUrl),
+                        );
+                      } else {
+                        return Container(
+                          key: ValueKey('sd'),
+                        );
+                      }
+                    }).toList()
+                  : episodes
+                      .map<Widget>((episode) => _DismissibleContainer(
+                            episode: episode,
+                            onRemove: (value) => setState(() {}),
+                            key: ValueKey(episode.enclosureUrl),
+                          ))
+                      .toList());
+        });
+  }
+}
+
+class _DismissibleContainer extends StatefulWidget {
+  final EpisodeBrief episode;
+  final ValueChanged<bool> onRemove;
+  _DismissibleContainer({this.episode, this.onRemove, Key key})
+      : super(key: key);
+
+  @override
+  __DismissibleContainerState createState() => __DismissibleContainerState();
+}
+
+class __DismissibleContainerState extends State<_DismissibleContainer> {
   bool _delete;
   Widget _episodeTag(String text, Color color) {
+    if (text == '') {
+      return Center();
+    }
     return Container(
       decoration: BoxDecoration(
           color: color, borderRadius: BorderRadius.circular(15.0)),
@@ -400,11 +432,8 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                   _delete = true;
                 });
                 var index = await audio.delFromPlaylist(widget.episode);
+                widget.onRemove(true);
                 final episodeRemove = widget.episode;
-                Fluttertoast.showToast(
-                  msg: s.toastRemovePlaylist,
-                  gravity: ToastGravity.BOTTOM,
-                );
                 Scaffold.of(context).showSnackBar(SnackBar(
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Colors.grey[800],
@@ -413,8 +442,9 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                   action: SnackBarAction(
                       textColor: context.accentColor,
                       label: s.undo,
-                      onPressed: () {
-                        audio.addToPlaylistAt(episodeRemove, index);
+                      onPressed: () async {
+                        await audio.addToPlaylistAt(episodeRemove, index);
+                        widget.onRemove(false);
                       }),
                 ));
               },
@@ -424,60 +454,66 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Expanded(
-                      child: Center(
-                        child: ListTile(
-                          title: Container(
-                            padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                            child: Text(
-                              widget.episode.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(vertical: 8),
+                        onTap: () async {
+                          await audio.episodeLoad(widget.episode);
+                          widget.onRemove(true);
+                        },
+                        title: Container(
+                          padding: EdgeInsets.fromLTRB(0, 5.0, 20.0, 5.0),
+                          child: Text(
+                            widget.episode.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          leading: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.unfold_more, color: c),
-                              CircleAvatar(
-                                backgroundColor: c.withOpacity(0.5),
-                                backgroundImage:
-                                    FileImage(File(widget.episode.imagePath)),
-                              ),
+                        ),
+                        leading: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.unfold_more, color: c),
+                            CircleAvatar(
+                              backgroundColor: c.withOpacity(0.5),
+                              backgroundImage:
+                                  FileImage(File(widget.episode.imagePath)),
+                            ),
+                          ],
+                        ),
+                        subtitle: Container(
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+                          height: 35,
+                          child: Row(
+                            children: <Widget>[
+                              if (widget.episode.explicit == 1)
+                                Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.red[800],
+                                        shape: BoxShape.circle),
+                                    height: 25.0,
+                                    width: 25.0,
+                                    margin: EdgeInsets.only(right: 10.0),
+                                    alignment: Alignment.center,
+                                    child: Text('E',
+                                        style: TextStyle(color: Colors.white))),
+                              if (widget.episode.duration != 0)
+                                _episodeTag(
+                                    widget.episode.duration == 0
+                                        ? ''
+                                        : s.minsCount(
+                                            widget.episode.duration ~/ 60),
+                                    Colors.cyan[300]),
+                              if (widget.episode.enclosureLength != null)
+                                _episodeTag(
+                                    widget.episode.enclosureLength == 0
+                                        ? ''
+                                        : '${(widget.episode.enclosureLength) ~/ 1000000}MB',
+                                    Colors.lightBlue[300]),
                             ],
                           ),
-                          subtitle: Container(
-                            padding: EdgeInsets.only(top: 5, bottom: 5),
-                            height: 35,
-                            child: Row(
-                              children: <Widget>[
-                                if (widget.episode.explicit == 1)
-                                  Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.red[800],
-                                          shape: BoxShape.circle),
-                                      height: 25.0,
-                                      width: 25.0,
-                                      margin: EdgeInsets.only(right: 10.0),
-                                      alignment: Alignment.center,
-                                      child: Text('E',
-                                          style:
-                                              TextStyle(color: Colors.white))),
-                                if (widget.episode.duration != 0)
-                                  _episodeTag(
-                                      s.minsCount(
-                                          widget.episode.duration ~/ 60),
-                                      Colors.cyan[300]),
-                                if (widget.episode.enclosureLength != null)
-                                  _episodeTag(
-                                      '${(widget.episode.enclosureLength) ~/ 1000000}MB',
-                                      Colors.lightBlue[300]),
-                              ],
-                            ),
-                          ),
-                          //trailing: Icon(Icons.menu),
                         ),
+                        //trailing: Icon(Icons.menu),
                       ),
                     ),
                     Divider(
@@ -491,14 +527,14 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
   }
 }
 
-class HistoryList extends StatefulWidget {
-  HistoryList({Key key}) : super(key: key);
+class _HistoryList extends StatefulWidget {
+  _HistoryList({Key key}) : super(key: key);
 
   @override
-  _HistoryListState createState() => _HistoryListState();
+  __HistoryListState createState() => __HistoryListState();
 }
 
-class _HistoryListState extends State<HistoryList> {
+class __HistoryListState extends State<_HistoryList> {
   var dbHelper = DBHelper();
   Future<List<PlayHistory>> getPlayRecords(int top) async {
     List<PlayHistory> playHistory;
@@ -550,126 +586,157 @@ class _HistoryListState extends State<HistoryList> {
                         return SizedBox(
                           height: 90.0,
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Expanded(
                                 child: Center(
                                   child: ListTile(
                                     contentPadding:
-                                        EdgeInsets.only(left: 40, right: 20),
+                                        EdgeInsets.fromLTRB(24, 8, 20, 8),
                                     onTap: () => audio.episodeLoad(episode),
                                     leading: CircleAvatar(
                                       backgroundColor: c.withOpacity(0.5),
                                       backgroundImage:
                                           FileImage(File(episode.imagePath)),
                                     ),
-                                    title: Text(
-                                      snapshot.data[index].title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                    title: Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 5.0),
+                                      child: Text(
+                                        snapshot.data[index].title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                                    subtitle: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        Selector<AudioPlayerNotifier,
-                                            Tuple2<List<EpisodeBrief>, bool>>(
-                                          selector: (_, audio) => Tuple2(
-                                              audio.queue.playlist,
-                                              audio.queueUpdate),
-                                          builder: (_, data, __) {
-                                            return data.item1.contains(episode)
-                                                ? IconButton(
-                                                    icon: Icon(
-                                                        Icons
-                                                            .playlist_add_check,
-                                                        color: context
-                                                            .accentColor),
-                                                    onPressed: () async {
-                                                      audio.delFromPlaylist(
-                                                          episode);
-                                                      Fluttertoast.showToast(
-                                                        msg: s
-                                                            .toastRemovePlaylist,
-                                                        gravity:
-                                                            ToastGravity.BOTTOM,
-                                                      );
-                                                    })
-                                                : IconButton(
-                                                    icon: Icon(
-                                                        Icons.playlist_add,
-                                                        color:
-                                                            Colors.grey[700]),
-                                                    onPressed: () async {
-                                                      audio.addToPlaylist(
-                                                          episode);
-                                                      Fluttertoast.showToast(
-                                                        msg: s.toastAddPlaylist,
-                                                        gravity:
-                                                            ToastGravity.BOTTOM,
-                                                      );
-                                                    });
-                                          },
-                                        ),
-                                        if (seekValue < 0.9)
-                                          Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              onTap: () async {
-                                                audio.episodeLoad(episode,
-                                                    startPosition:
-                                                        (seconds * 1000)
-                                                            .toInt());
-                                              },
-                                              child: Stack(children: [
-                                                ShaderMask(
-                                                  shaderCallback: (bounds) {
-                                                    return LinearGradient(
-                                                      begin:
-                                                          Alignment.centerLeft,
-                                                      colors: <Color>[
-                                                        context.accentColor
-                                                            .withOpacity(0.8),
-                                                        Colors.white70
-                                                      ],
-                                                      stops: [
-                                                        seekValue,
-                                                        seekValue
-                                                      ],
-                                                      tileMode: TileMode.mirror,
-                                                    ).createShader(bounds);
+                                    subtitle: Container(
+                                      height: 35,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          if (seekValue < 0.9)
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 5.0),
+                                              child: Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: () async {
+                                                    audio.episodeLoad(episode,
+                                                        startPosition:
+                                                            (seconds * 1000)
+                                                                .toInt());
                                                   },
-                                                  child: Container(
-                                                    height: 25,
-                                                    alignment: Alignment.center,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 20),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  20.0)),
-                                                      color:
-                                                          context.accentColor,
+                                                  child: Stack(children: [
+                                                    ShaderMask(
+                                                      shaderCallback: (bounds) {
+                                                        return LinearGradient(
+                                                          begin: Alignment
+                                                              .centerLeft,
+                                                          colors: <Color>[
+                                                            Colors.cyan[600]
+                                                                .withOpacity(
+                                                                    0.8),
+                                                            Colors.white70
+                                                          ],
+                                                          stops: [
+                                                            seekValue,
+                                                            seekValue
+                                                          ],
+                                                          tileMode:
+                                                              TileMode.mirror,
+                                                        ).createShader(bounds);
+                                                      },
+                                                      child: Container(
+                                                        height: 25,
+                                                        alignment:
+                                                            Alignment.center,
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 20),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          20.0)),
+                                                          color: context
+                                                              .accentColor,
+                                                        ),
+                                                        child: Text(
+                                                          seconds.toTime,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ),
                                                     ),
-                                                    child: Text(
-                                                      seconds.toTime,
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                  ),
+                                                  ]),
                                                 ),
-                                              ]),
+                                              ),
+                                            ),
+                                          SizedBox(
+                                            child: Selector<
+                                                AudioPlayerNotifier,
+                                                Tuple2<List<EpisodeBrief>,
+                                                    bool>>(
+                                              selector: (_, audio) => Tuple2(
+                                                  audio.queue.playlist,
+                                                  audio.queueUpdate),
+                                              builder: (_, data, __) {
+                                                return data.item1
+                                                        .contains(episode)
+                                                    ? IconButton(
+                                                        icon: Icon(
+                                                            Icons
+                                                                .playlist_add_check,
+                                                            color: context
+                                                                .accentColor),
+                                                        onPressed: () async {
+                                                          audio.delFromPlaylist(
+                                                              episode);
+                                                          Fluttertoast
+                                                              .showToast(
+                                                            msg: s
+                                                                .toastRemovePlaylist,
+                                                            gravity:
+                                                                ToastGravity
+                                                                    .BOTTOM,
+                                                          );
+                                                        })
+                                                    : IconButton(
+                                                        icon: Icon(
+                                                            Icons.playlist_add,
+                                                            color: Colors
+                                                                .grey[700]),
+                                                        onPressed: () async {
+                                                          audio.addToPlaylist(
+                                                              episode);
+                                                          Fluttertoast
+                                                              .showToast(
+                                                            msg: s
+                                                                .toastAddPlaylist,
+                                                            gravity:
+                                                                ToastGravity
+                                                                    .BOTTOM,
+                                                          );
+                                                        });
+                                              },
                                             ),
                                           ),
-                                        Spacer(),
-                                        Text(
-                                          date.toDate(context),
-                                          style: TextStyle(
-                                            fontSize: 15,
+                                          Spacer(),
+                                          Text(
+                                            date.toDate(context),
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
