@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../state/podcast_group.dart';
 
+const String groupsKey = 'groups';
+const String playlistKey = 'playlist';
 const String autoPlayKey = 'autoPlay';
 const String audioPositionKey = 'audioposition';
 const String lastWorkKey = 'lastWork';

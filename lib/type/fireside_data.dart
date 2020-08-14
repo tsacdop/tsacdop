@@ -15,7 +15,7 @@ class FiresideData {
   List<PodcastHost> get hosts => _hosts;
   FiresideData(this.id, this.link);
 
-  DBHelper dbHelper = DBHelper();
+  final DBHelper _dbHelper = DBHelper();
 
   String parseLink(String link) {
     if (link == "http://www.shengfm.cn/") {
@@ -26,7 +26,12 @@ class FiresideData {
   }
 
   Future fatchData() async {
-    var response = await Dio().get(parseLink(link));
+    var options = BaseOptions(
+      connectTimeout: 20000,
+      receiveTimeout: 20000,
+    );
+
+    var response = await Dio(options).get(parseLink(link));
     if (response.statusCode == 200) {
       var doc = parse(response.data);
       var reg = RegExp(r'https(.+)jpg');
@@ -54,12 +59,12 @@ class FiresideData {
         backgroundImage,
         json.encode({'hosts': hosts.map((host) => host.toJson()).toList()})
       ];
-      await dbHelper.saveFiresideData(data);
+      await _dbHelper.saveFiresideData(data);
     }
   }
 
   Future getData() async {
-    var data = await dbHelper.getFiresideData(id);
+    var data = await _dbHelper.getFiresideData(id);
     _background = data[0];
     if (data[1] != '') {
       _hosts = json

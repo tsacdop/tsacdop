@@ -1,8 +1,8 @@
-import 'dart:ui';
+import 'package:equatable/equatable.dart';
 
 import 'package:audio_service/audio_service.dart';
 
-class EpisodeBrief {
+class EpisodeBrief extends Equatable {
   final String title;
   final String description;
   final int pubDate;
@@ -50,11 +50,5 @@ class EpisodeBrief {
   }
 
   @override
-  bool operator ==(Object episode) =>
-      episode is EpisodeBrief &&
-      episode.title == title &&
-      episode.enclosureUrl == enclosureUrl;
-
-  @override
-  int get hashCode => hashValues(enclosureUrl, title);
+  List<Object> get props => [enclosureUrl, title];
 }

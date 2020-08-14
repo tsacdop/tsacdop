@@ -41,7 +41,7 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
                   final podcast = widget.group.podcasts.removeAt(oldIndex);
                   widget.group.podcasts.insert(newIndex, podcast);
                 });
-                widget.group.setOrderedPodcasts = widget.group.podcasts;
+                widget.group.orderedPodcasts = widget.group.podcasts;
                 groupList.addToOrderChanged(widget.group);
               },
               children: widget.group.podcasts.map<Widget>((podcastLocal) {
@@ -49,7 +49,7 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
                   decoration:
                       BoxDecoration(color: Theme.of(context).primaryColor),
                   key: ObjectKey(podcastLocal.title),
-                  child: PodcastCard(
+                  child: _PodcastCard(
                     podcastLocal: podcastLocal,
                     group: widget.group,
                   ),
@@ -60,15 +60,15 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
   }
 }
 
-class PodcastCard extends StatefulWidget {
+class _PodcastCard extends StatefulWidget {
   final PodcastLocal podcastLocal;
   final PodcastGroup group;
-  PodcastCard({this.podcastLocal, this.group, Key key}) : super(key: key);
+  _PodcastCard({this.podcastLocal, this.group, Key key}) : super(key: key);
   @override
-  _PodcastCardState createState() => _PodcastCardState();
+  __PodcastCardState createState() => __PodcastCardState();
 }
 
-class _PodcastCardState extends State<PodcastCard>
+class __PodcastCardState extends State<_PodcastCard>
     with SingleTickerProviderStateMixin {
   bool _loadMenu;
   bool _addGroup;
@@ -161,11 +161,11 @@ class _PodcastCardState extends State<PodcastCard>
 
   @override
   Widget build(BuildContext context) {
-    var _c = (Theme.of(context).brightness == Brightness.light)
+    final c = (Theme.of(context).brightness == Brightness.light)
         ? widget.podcastLocal.primaryColor.colorizedark()
         : widget.podcastLocal.primaryColor.colorizeLight();
     final s = context.s;
-    var _width = MediaQuery.of(context).size.width;
+    var width = context.width;
     var groupList = context.watch<GroupList>();
     _belongGroups = groupList.getPodcastGroup(widget.podcastLocal.id);
 
@@ -199,7 +199,7 @@ class _PodcastCardState extends State<PodcastCard>
                     Container(
                       child: Icon(
                         Icons.unfold_more,
-                        color: _c,
+                        color: c,
                       ),
                     ),
                     Container(
@@ -214,7 +214,7 @@ class _PodcastCardState extends State<PodcastCard>
                       ),
                     ),
                     Container(
-                        width: _width / 2,
+                        width: width / 2,
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         alignment: Alignment.centerLeft,
                         child: Column(

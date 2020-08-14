@@ -4,28 +4,28 @@ import 'episodebrief.dart';
 
 class Playlist {
   String name;
-  DBHelper dbHelper = DBHelper();
+  final DBHelper _dbHelper = DBHelper();
   List<EpisodeBrief> _playlist;
   List<EpisodeBrief> get playlist => _playlist;
-  KeyValueStorage storage = KeyValueStorage('playlist');
+  final KeyValueStorage _playlistStorage = KeyValueStorage(playlistKey);
 
-  getPlaylist() async {
-    var urls = await storage.getStringList();
+  Future<void> getPlaylist() async {
+    var urls = await _playlistStorage.getStringList();
     if (urls.length == 0) {
       _playlist = [];
     } else {
       _playlist = [];
       for (var url in urls) {
-        var episode = await dbHelper.getRssItemWithUrl(url);
+        var episode = await _dbHelper.getRssItemWithUrl(url);
         if (episode != null) _playlist.add(episode);
       }
     }
   }
 
-  savePlaylist() async {
+  Future<void> savePlaylist() async {
     var urls = <String>[];
     urls.addAll(_playlist.map((e) => e.enclosureUrl));
-    await storage.saveStringList(urls.toSet().toList());
+    await _playlistStorage.saveStringList(urls.toSet().toList());
   }
 
   Future<void> addToPlayList(EpisodeBrief episodeBrief) async {
@@ -33,7 +33,7 @@ class Playlist {
       _playlist.add(episodeBrief);
       await savePlaylist();
       if (episodeBrief.isNew == 1) {
-        await dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+        await _dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
       }
     }
   }
@@ -44,7 +44,7 @@ class Playlist {
       _playlist.removeWhere(
           (episode) => episode.enclosureUrl == episodeBrief.enclosureUrl);
       if (episodeBrief.isNew == 1) {
-        await dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
+        await _dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
       }
     }
     _playlist.insert(index, episodeBrief);

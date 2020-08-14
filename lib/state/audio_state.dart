@@ -551,6 +551,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
       await AudioService.removeQueueItem(episodeNew.toMediaItem());
     }
     var index = await _queue.delFromPlaylist(episodeNew);
+    if (index == 0) {
+      _lastPostion = 0;
+      await positionStorage.saveInt(0);
+    }
     _queueUpdate = !_queueUpdate;
     notifyListeners();
     return index;

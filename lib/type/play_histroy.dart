@@ -2,7 +2,7 @@ import '../local_storage/sqflite_localpodcast.dart';
 import 'episodebrief.dart';
 
 class PlayHistory {
-  DBHelper dbHelper = DBHelper();
+  final DBHelper _dbHelper = DBHelper();
 
   /// Episdoe title.
   String title;
@@ -26,6 +26,6 @@ class PlayHistory {
   EpisodeBrief get episode => _episode;
 
   getEpisode() async {
-    _episode = await dbHelper.getRssItemWithUrl(url);
+    _episode = await _dbHelper.getRssItemWithUrl(url);
   }
 }
