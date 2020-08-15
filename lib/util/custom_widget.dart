@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:tsacdop/type/episodebrief.dart';
 
 import 'episodegrid.dart';
 import 'extension_helper.dart';
@@ -587,9 +588,8 @@ class _LineLoaderState extends State<LineLoader>
 }
 
 class ImageRotate extends StatefulWidget {
-  final String title;
-  final String path;
-  ImageRotate({this.title, this.path, Key key}) : super(key: key);
+  final EpisodeBrief episodeItem;
+  ImageRotate({this.episodeItem, Key key}) : super(key: key);
   @override
   _ImageRotateState createState() => _ImageRotateState();
 }
@@ -599,6 +599,7 @@ class _ImageRotateState extends State<ImageRotate>
   Animation _animation;
   AnimationController _controller;
   double _value;
+
   @override
   void initState() {
     super.initState();
@@ -635,16 +636,14 @@ class _ImageRotateState extends State<ImageRotate>
   Widget build(BuildContext context) {
     return Transform.rotate(
       angle: 2 * math.pi * _value,
-      child: Container(
-        padding: EdgeInsets.all(10.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
-          child: Container(
-            height: 30.0,
-            width: 30.0,
-            color: Colors.white,
-            child: Image.file(File("${widget.path}")),
-          ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 10.0),
+        child: SizedBox(
+          width: 30,
+          height: 30,
+          child: CircleAvatar(
+              backgroundColor: widget.episodeItem.backgroudColor(context),
+              backgroundImage: widget.episodeItem.avatarImage),
         ),
       ),
     );

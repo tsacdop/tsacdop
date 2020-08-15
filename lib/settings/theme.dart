@@ -168,7 +168,7 @@ class ThemeSetting extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: context.accentColor))
                     ])),
-                    content: ColorPicker(
+                    content: _ColorPicker(
                       onColorChanged: (value) =>
                           settings.setAccentColor = value,
                     ),
@@ -183,7 +183,7 @@ class ThemeSetting extends StatelessWidget {
                         shape: BoxShape.circle, color: context.accentColor),
                   ),
                 ),
-                Divider(height: 2),
+                Divider(height: 1),
               ],
             ),
           ],
@@ -193,14 +193,14 @@ class ThemeSetting extends StatelessWidget {
   }
 }
 
-class ColorPicker extends StatefulWidget {
+class _ColorPicker extends StatefulWidget {
   final ValueChanged<Color> onColorChanged;
-  ColorPicker({Key key, this.onColorChanged}) : super(key: key);
+  _ColorPicker({Key key, this.onColorChanged}) : super(key: key);
   @override
-  _ColorPickerState createState() => _ColorPickerState();
+  __ColorPickerState createState() => __ColorPickerState();
 }
 
-class _ColorPickerState extends State<ColorPicker>
+class __ColorPickerState extends State<_ColorPicker>
     with SingleTickerProviderStateMixin {
   TabController _controller;
   int _index;
@@ -284,9 +284,9 @@ class _ColorPickerState extends State<ColorPicker>
                         behavior: NoGrowBehavior(),
                         child: GridView.count(
                           primary: false,
-                          padding: const EdgeInsets.all(10),
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
+                          padding: const EdgeInsets.fromLTRB(2, 10, 2, 10),
+                          crossAxisSpacing: 4,
+                          mainAxisSpacing: 4,
                           crossAxisCount: 3,
                           children: <Widget>[
                             _colorCircle(color.shade100),

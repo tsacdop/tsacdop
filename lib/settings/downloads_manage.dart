@@ -320,9 +320,9 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                                   }
                                                 },
                                                 leading: CircleAvatar(
-                                                  backgroundImage: FileImage(File(
-                                                      "${_episodes[index].imagePath}")),
-                                                ),
+                                                    backgroundImage:
+                                                        _episodes[index]
+                                                            .avatarImage),
                                                 title: Text(
                                                   _episodes[index].title,
                                                   maxLines: 1,

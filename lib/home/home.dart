@@ -614,10 +614,9 @@ class PlaylistButtonState extends State<PlaylistButton> {
                                 alignment: Alignment.center,
                                 children: <Widget>[
                                   CircleAvatar(
-                                    radius: 20,
-                                    backgroundImage: FileImage(File(
-                                        "${data.item2.playlist.first.imagePath}")),
-                                  ),
+                                      radius: 20,
+                                      backgroundImage: data
+                                          .item2.playlist.first.avatarImage),
                                   Container(
                                     height: 40.0,
                                     width: 40.0,
@@ -678,12 +677,42 @@ class PlaylistButtonState extends State<PlaylistButton> {
             ),
           ),
         ),
+        PopupMenuItem(
+          value: 2,
+          child: Container(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.history),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                ),
+                Text(s.settingsHistory),
+              ],
+            ),
+          ),
+        ),
       ],
       onSelected: (value) {
         if (value == 0) {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => PlaylistPage()));
-        } else if (value == 1) {}
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlaylistPage(
+                initPage: InitPage.playlist,
+              ),
+            ),
+          );
+        } else if (value == 2) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlaylistPage(
+                initPage: InitPage.history,
+              ),
+            ),
+          );
+        }
       },
     );
   }

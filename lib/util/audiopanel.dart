@@ -122,6 +122,10 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                 : Container(
                     decoration: BoxDecoration(
                       color: context.primaryColor,
+                      //  borderRadius: BorderRadius.only(
+                      //      topLeft: Radius.circular(20.0),
+                      //      topRight: Radius.circular(20.0)),
+
                       boxShadow: [
                         BoxShadow(
                           offset: Offset(0, -1),

@@ -190,7 +190,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   title: Text(s.settingsPopupMenu),
                   subtitle: Text(s.settingsPopupMenuDes),
                 ),
-                Divider(height: 2),
+                Divider(height: 1),
                 Padding(
                   padding: EdgeInsets.all(10.0),
                 ),
@@ -226,7 +226,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                             audio.setPlayerHeight = PlayerHeight.values[index]),
                   ),
                 ),
-                Divider(height: 2),
+                Divider(height: 1),
                 Padding(
                   padding: EdgeInsets.all(10.0),
                 ),
@@ -258,7 +258,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                           text: s.settingsDefaultGridDownload,
                           key: downloadLayoutKey),
                     ]),
-                Divider(height: 2),
+                Divider(height: 1),
               ],
             ),
           )),

@@ -118,9 +118,7 @@ class _DownloadListState extends State<DownloadList> {
                           ),
                         ),
                         leading: CircleAvatar(
-                          backgroundImage: FileImage(
-                              File("${tasks[index].episode.imagePath}")),
-                        ),
+                            backgroundImage: tasks[index].episode.avatarImage),
                         trailing: _downloadButton(tasks[index], context),
                       );
                     },

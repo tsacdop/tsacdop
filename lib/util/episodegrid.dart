@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:auto_animated/auto_animated.dart';
@@ -134,8 +133,7 @@ class EpisodeGrid extends StatelessWidget {
             ? Center()
             : CircleAvatar(
                 backgroundColor: color.withOpacity(0.5),
-                backgroundImage: FileImage(File("${episode.imagePath}")),
-              ),
+                backgroundImage: episode.avatarImage),
       );
 
   Widget _downloadIndicater(BuildContext context,
@@ -227,9 +225,7 @@ class EpisodeGrid extends StatelessWidget {
           crossAxisSpacing: 6.0,
         ),
         itemBuilder: (context, index, animation) {
-          var _c = (Theme.of(context).brightness == Brightness.light)
-              ? episodes[index].primaryColor.colorizedark()
-              : episodes[index].primaryColor.colorizeLight();
+          final c = episodes[index].backgroudColor(context);
           scrollController.addListener(() {});
 
           return FadeTransition(
@@ -463,11 +459,11 @@ class EpisodeGrid extends StatelessWidget {
                                         layout != Layout.one
                                             ? _circleImage(context,
                                                 episode: episodes[index],
-                                                color: _c,
+                                                color: c,
                                                 boo: boo)
                                             : _pubDate(context,
                                                 episode: episodes[index],
-                                                color: _c),
+                                                color: c),
                                         Spacer(),
                                         //   _listenIndicater(context,
                                         //       episode: episodes[index],
@@ -477,7 +473,7 @@ class EpisodeGrid extends StatelessWidget {
                                             episode: episodes[index],
                                             isDownloaded: isDownloaded),
                                         _numberIndicater(context,
-                                            index: index, color: _c)
+                                            index: index, color: c)
                                       ],
                                     ),
                                   ),
@@ -491,7 +487,7 @@ class EpisodeGrid extends StatelessWidget {
                                             children: [
                                               _circleImage(context,
                                                   episode: episodes[index],
-                                                  color: _c,
+                                                  color: c,
                                                   boo: boo),
                                               SizedBox(
                                                 width: 5,
@@ -513,7 +509,7 @@ class EpisodeGrid extends StatelessWidget {
                                         if (layout != Layout.one)
                                           _pubDate(context,
                                               episode: episodes[index],
-                                              color: _c),
+                                              color: c),
                                         Spacer(),
                                         if (layout != Layout.three &&
                                             episodes[index].duration != 0)
@@ -600,9 +596,7 @@ class OpenContainerWrapper extends StatelessWidget {
       builder: (_, data, __) => OpenContainer(
         playerRunning: data.item1,
         playerHeight: kMinPlayerHeight[data.item2.index],
-        flightWidget: CircleAvatar(
-          backgroundImage: FileImage(File("${episode.imagePath}")),
-        ),
+        flightWidget: CircleAvatar(backgroundImage: episode.avatarImage),
         transitionDuration: Duration(milliseconds: 400),
         beginColor: Theme.of(context).primaryColor,
         endColor: Theme.of(context).primaryColor,

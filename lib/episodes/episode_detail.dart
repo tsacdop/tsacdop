@@ -41,42 +41,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 
   /// Show page title.
   bool _showTitle;
-
-  /// Load shownote.
-  bool _loaddes;
   bool _showMenu;
   String path;
-  String _description;
-
-  Future _getSDescription(String url) async {
-    var dbHelper = DBHelper();
-    _description = (await dbHelper.getDescription(url))
-        .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '')
-        .replaceAll('\r', '')
-        .trim();
-    if (!_description.contains('<')) {
-      final linkList = linkify(_description,
-          options: LinkifyOptions(humanize: false),
-          linkifiers: [UrlLinkifier(), EmailLinkifier()]);
-      for (var element in linkList) {
-        if (element is UrlElement) {
-          _description = _description.replaceAll(element.url,
-              '<a rel="nofollow" href = ${element.url}>${element.text}</a>');
-        }
-        if (element is EmailElement) {
-          final address = element.emailAddress;
-          _description = _description.replaceAll(address,
-              '<a rel="nofollow" href = "mailto:$address">$address</a>');
-        }
-      }
-    }
-
-    if (mounted) {
-      setState(() {
-        _loaddes = true;
-      });
-    }
-  }
 
   Future<PlayHistory> _getPosition(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
@@ -104,33 +70,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     } else if (_showTitle) setState(() => _showTitle = false);
   }
 
-  _markListened(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
-    var marked = await dbHelper.checkMarked(episode);
-    if (!marked) {
-      final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-      await dbHelper.saveHistory(history);
-    }
-  }
-
-  int _getTimeStamp(String url) {
-    final time = url.substring(7);
-    final data = time.split(':');
-    var seconds;
-    if (data.length == 3) {
-      seconds = int.tryParse(data[0]) * 3600 +
-          int.tryParse(data[1]) * 60 +
-          int.tryParse(data[2]);
-    } else if (data.length == 2) {
-      seconds = int.tryParse(data[0]) * 60 + int.tryParse(data[1]);
-    }
-    return seconds;
-  }
-
   @override
   void initState() {
     super.initState();
-    _loaddes = false;
     _showMenu = true;
     _showTitle = false;
     //_getSDescription(widget.episodeItem.enclosureUrl);
@@ -569,8 +511,8 @@ class __MenuBarState extends State<_MenuBar> {
                             ? Center()
                             : CircleAvatar(
                                 radius: 15,
-                                backgroundImage: FileImage(
-                                    File("${widget.episodeItem.imagePath}"))),
+                                backgroundImage:
+                                    widget.episodeItem.avatarImage),
                       ),
                     ),
                   ),

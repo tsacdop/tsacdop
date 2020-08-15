@@ -16,7 +16,11 @@ import '../type/playlist.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
+enum InitPage { playlist, history }
+
 class PlaylistPage extends StatefulWidget {
+  final InitPage initPage;
+  PlaylistPage({this.initPage, Key key}) : super(key: key);
   @override
   _PlaylistPageState createState() => _PlaylistPageState();
 }
@@ -47,7 +51,12 @@ class _PlaylistPageState extends State<PlaylistPage> {
   @override
   void initState() {
     super.initState();
-    _loadList = _ReorderablePlaylist();
+    if (widget.initPage == InitPage.playlist) {
+      _loadList = _ReorderablePlaylist();
+    } else {
+      _loadHistory = true;
+      _loadList = _HistoryList();
+    }
   }
 
   @override
@@ -213,41 +222,15 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   )
                                 : BoxDecoration(color: Colors.transparent),
                             child: data.item2
-                                // ? _topHeight < 90
-                                //     ? Row(
-                                //         mainAxisAlignment:
-                                //             MainAxisAlignment.center,
-                                //         crossAxisAlignment:
-                                //             CrossAxisAlignment.center,
-                                //         children: <Widget>[
-                                //           CircleAvatar(
-                                //             radius: 12,
-                                //             backgroundImage: FileImage(File(
-                                //                 "${episodes.first.imagePath}")),
-                                //           ),
-                                //           Padding(
-                                //             padding: EdgeInsets.symmetric(
-                                //                 horizontal: 15),
-                                //             child: SizedBox(
-                                //                 width: 20,
-                                //                 height: 15,
-                                //                 child: WaveLoader(
-                                //                   color: context.accentColor,
-                                //                 )),
-                                //           ),
-                                //         ],
-                                //       )
                                 ? Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: <Widget>[
                                       CircleAvatar(
-                                        radius: 15,
-                                        //backgroundColor: _c.withOpacity(0.5),
-                                        backgroundImage: FileImage(
-                                            File("${data.item4.imagePath}")),
-                                      ),
+                                          radius: 15,
+                                          backgroundImage:
+                                              data.item4.avatarImage),
                                       Container(
                                         width: 150,
                                         alignment: Alignment.center,
@@ -380,11 +363,9 @@ class __DismissibleContainerState extends State<_DismissibleContainer> {
 
   @override
   Widget build(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    final audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
-    var c = (Theme.of(context).brightness == Brightness.light)
-        ? widget.episode.primaryColor.colorizedark()
-        : widget.episode.primaryColor.colorizeLight();
+    final c = widget.episode.backgroudColor(context);
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       alignment: Alignment.center,
@@ -475,10 +456,8 @@ class __DismissibleContainerState extends State<_DismissibleContainer> {
                           children: [
                             Icon(Icons.unfold_more, color: c),
                             CircleAvatar(
-                              backgroundColor: c.withOpacity(0.5),
-                              backgroundImage:
-                                  FileImage(File(widget.episode.imagePath)),
-                            ),
+                                backgroundColor: c.withOpacity(0.5),
+                                backgroundImage: widget.episode.avatarImage),
                           ],
                         ),
                         subtitle: Container(
@@ -595,10 +574,8 @@ class __HistoryListState extends State<_HistoryList> {
                                         EdgeInsets.fromLTRB(24, 8, 20, 8),
                                     onTap: () => audio.episodeLoad(episode),
                                     leading: CircleAvatar(
-                                      backgroundColor: c.withOpacity(0.5),
-                                      backgroundImage:
-                                          FileImage(File(episode.imagePath)),
-                                    ),
+                                        backgroundColor: c.withOpacity(0.5),
+                                        backgroundImage: episode.avatarImage),
                                     title: Padding(
                                       padding:
                                           EdgeInsets.symmetric(vertical: 5.0),
@@ -741,7 +718,7 @@ class __HistoryListState extends State<_HistoryList> {
                                   ),
                                 ),
                               ),
-                              Divider(height: 2)
+                              Divider(height: 1)
                             ],
                           ),
                         );

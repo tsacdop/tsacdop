@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+
+import '../util/extension_helper.dart';
 
 class PodcastLocal extends Equatable {
   final String title;
@@ -28,6 +33,18 @@ class PodcastLocal extends Equatable {
       : assert(rssUrl != null),
         _episodeCount = episodeCount ?? 0,
         _upateCount = upateCount ?? 0;
+
+  ImageProvider get avatarImage {
+    return File(imagePath).existsSync()
+        ? FileImage(File(imagePath))
+        : const AssetImage('assets/avatar_backup.png');
+  }
+
+  Color backgroudColor(BuildContext context) {
+    return context.brightness == Brightness.light
+        ? primaryColor.colorizedark()
+        : primaryColor.colorizeLight();
+  }
 
   @override
   List<Object> get props => [id, rssUrl];

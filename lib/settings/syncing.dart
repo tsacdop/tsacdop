@@ -110,7 +110,7 @@ class SyncingSetting extends StatelessWidget {
                                     value: e, child: Text(s.hoursCount(e)));
                               }).toList()),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                       ],
                     ),
                   ],

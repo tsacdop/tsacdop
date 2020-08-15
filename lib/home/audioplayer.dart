@@ -59,7 +59,7 @@ class PlayerWidget extends StatelessWidget {
           selector: (_, audio) =>
               Tuple2(audio.episode?.primaryColor, audio.seekSliderValue),
           builder: (_, data, __) {
-            var c = context.brightness == Brightness.light
+            final c = context.brightness == Brightness.light
                 ? data.item1.colorizedark()
                 : data.item1.colorizeLight();
             return SizedBox(
@@ -127,9 +127,10 @@ class PlayerWidget extends StatelessWidget {
                 ),
                 Expanded(
                   flex: 2,
-                  child: Selector<AudioPlayerNotifier, Tuple2<bool, bool>>(
+                  child: Selector<AudioPlayerNotifier,
+                      Tuple3<bool, bool, EpisodeBrief>>(
                     selector: (_, audio) =>
-                        Tuple2(audio.buffering, audio.playing),
+                        Tuple3(audio.buffering, audio.playing, audio.episode),
                     builder: (_, data, __) {
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -142,12 +143,15 @@ class PlayerWidget extends StatelessWidget {
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10.0),
                                         child: SizedBox(
-                                            height: 30.0,
-                                            width: 30.0,
-                                            child: CircleAvatar(
-                                              backgroundImage: FileImage(File(
-                                                  "${audio.episode.imagePath}")),
-                                            )),
+                                          height: 30.0,
+                                          width: 30.0,
+                                          child: CircleAvatar(
+                                            backgroundColor: data.item3
+                                                .backgroudColor(context),
+                                            backgroundImage:
+                                                data.item3.avatarImage,
+                                          ),
+                                        ),
                                       ),
                                       Container(
                                         height: 40.0,
@@ -161,9 +165,8 @@ class PlayerWidget extends StatelessWidget {
                                       onTap: data.item2
                                           ? () => audio.pauseAduio()
                                           : null,
-                                      child: ImageRotate(
-                                          title: audio.episode?.title,
-                                          path: audio.episode?.imagePath),
+                                      child:
+                                          ImageRotate(episodeItem: data.item3),
                                     )
                                   : InkWell(
                                       onTap: data.item2
@@ -176,12 +179,15 @@ class PlayerWidget extends StatelessWidget {
                                             padding: EdgeInsets.symmetric(
                                                 vertical: 10.0),
                                             child: SizedBox(
-                                                height: 30.0,
-                                                width: 30.0,
-                                                child: CircleAvatar(
-                                                  backgroundImage: FileImage(File(
-                                                      "${audio.episode.imagePath}")),
-                                                )),
+                                              height: 30.0,
+                                              width: 30.0,
+                                              child: CircleAvatar(
+                                                backgroundColor: data.item3
+                                                    .backgroudColor(context),
+                                                backgroundImage:
+                                                    data.item3.avatarImage,
+                                              ),
+                                            ),
                                           ),
                                           Container(
                                             height: 40.0,
@@ -384,71 +390,6 @@ class LastPosition extends StatelessWidget {
   }
 }
 
-class ImageRotate extends StatefulWidget {
-  final String title;
-  final String path;
-  ImageRotate({this.title, this.path, Key key}) : super(key: key);
-  @override
-  _ImageRotateState createState() => _ImageRotateState();
-}
-
-class _ImageRotateState extends State<ImageRotate>
-    with SingleTickerProviderStateMixin {
-  Animation _animation;
-  AnimationController _controller;
-  double _value;
-  @override
-  void initState() {
-    super.initState();
-    _value = 0;
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 2000),
-    );
-    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
-      ..addListener(() {
-        if (mounted) {
-          setState(() {
-            _value = _animation.value;
-          });
-        }
-      });
-    _controller.forward();
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.reset();
-      } else if (status == AnimationStatus.dismissed) {
-        _controller.forward();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: 2 * math.pi * _value,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
-          child: Container(
-            height: 30.0,
-            width: 30.0,
-            color: Colors.white,
-            child: Image.file(File("${widget.path}")),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class PlaylistWidget extends StatefulWidget {
   const PlaylistWidget({Key key}) : super(key: key);
 
@@ -500,7 +441,6 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                     miniPlaylistKey.currentState.removeItem(
                                         index,
                                         (context, animation) => Center());
-                                    miniPlaylistKey.currentState.insertItem(0);
                                   },
                                   child: Container(
                                     height: 60,
@@ -586,7 +526,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                             ),
                           ],
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                       ],
                     ),
                   ),
@@ -638,7 +578,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          SlideLeftRoute(page: PlaylistPage()),
+                          SlideLeftRoute(
+                              page: PlaylistPage(
+                            initPage: InitPage.playlist,
+                          )),
                         );
                       },
                       child: SizedBox(
@@ -1382,8 +1325,8 @@ class _ControlPanelState extends State<ControlPanel>
                                               height: 30.0,
                                               width: 30.0,
                                               child: CircleAvatar(
-                                                backgroundImage: FileImage(File(
-                                                    "${data.item1.imagePath}")),
+                                                backgroundImage:
+                                                    data.item1.avatarImage,
                                               ),
                                             ),
                                             SizedBox(width: 5),

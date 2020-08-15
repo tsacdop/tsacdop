@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/material.dart';
+import '../util/extension_helper.dart';
 
 class EpisodeBrief extends Equatable {
   final String title;
@@ -48,6 +52,29 @@ class EpisodeBrief extends Equatable {
         artUri: 'file://$imagePath',
         extras: {'skip': skipSeconds});
   }
+
+  ImageProvider get avatarImage {
+    return File(imagePath).existsSync()
+        ? FileImage(File(imagePath))
+        : const AssetImage('assets/avatar_backup.png');
+  }
+
+  Color backgroudColor(BuildContext context) {
+    return context.brightness == Brightness.light
+        ? primaryColor.colorizedark()
+        : primaryColor.colorizeLight();
+  }
+
+  EpisodeBrief copyWith({
+    String mediaId,
+  }) =>
+      EpisodeBrief(title, enclosureUrl, enclosureLength, pubDate, feedTitle,
+          primaryColor, duration, explicit, imagePath, isNew,
+          mediaId: mediaId ?? this.mediaId,
+          downloaded: downloaded,
+          skipSeconds: skipSeconds,
+          description: description,
+          downloadDate: downloadDate);
 
   @override
   List<Object> get props => [enclosureUrl, title];

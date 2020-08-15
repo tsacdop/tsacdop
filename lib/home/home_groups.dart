@@ -314,12 +314,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                   tabs: groups[_groupIndex]
                                       .podcasts
                                       .map<Widget>((podcastLocal) {
-                                    var color = (Theme.of(context).brightness ==
-                                            Brightness.light)
-                                        ? podcastLocal.primaryColor
-                                            .colorizedark()
-                                        : podcastLocal.primaryColor
-                                            .colorizeLight();
+                                    final color =
+                                        podcastLocal.backgroudColor(context);
                                     return Tab(
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.all(
@@ -331,11 +327,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                               maxHeight: 50,
                                               maxWidth: 50,
                                               child: CircleAvatar(
-                                                backgroundColor:
-                                                    color.withOpacity(0.5),
-                                                backgroundImage: FileImage(File(
-                                                    "${podcastLocal.imagePath}")),
-                                              ),
+                                                  backgroundColor:
+                                                      color.withOpacity(0.5),
+                                                  backgroundImage:
+                                                      podcastLocal.avatarImage),
                                             ),
                                             FutureBuilder<int>(
                                                 future: getPodcastUpdateCounts(
@@ -418,9 +413,7 @@ class PodcastPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _c = (Theme.of(context).brightness == Brightness.light)
-        ? podcastLocal.primaryColor.colorizedark()
-        : podcastLocal.primaryColor.colorizeLight();
+    final c = podcastLocal.backgroudColor(context);
     return Column(
       children: <Widget>[
         Expanded(
@@ -454,7 +447,7 @@ class PodcastPreview extends StatelessWidget {
                 child: Text(podcastLocal.title,
                     maxLines: 1,
                     overflow: TextOverflow.visible,
-                    style: TextStyle(fontWeight: FontWeight.bold, color: _c)),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: c)),
               ),
               Expanded(
                 flex: 1,
@@ -595,9 +588,7 @@ class ShowEpisode extends StatelessWidget {
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                var _c = (Theme.of(context).brightness == Brightness.light)
-                    ? podcastLocal.primaryColor.colorizedark()
-                    : podcastLocal.primaryColor.colorizeLight();
+                final c = podcastLocal.backgroudColor(context);
                 return Selector<AudioPlayerNotifier,
                         Tuple2<EpisodeBrief, List<String>>>(
                     selector: (_, audio) => Tuple2(
@@ -809,8 +800,8 @@ class ShowEpisode extends StatelessWidget {
                                               height: _width / 18,
                                               width: _width / 18,
                                               child: CircleAvatar(
-                                                backgroundImage: FileImage(File(
-                                                    "${podcastLocal.imagePath}")),
+                                                backgroundImage:
+                                                    podcastLocal.avatarImage,
                                               ),
                                             ),
                                           ),
@@ -882,7 +873,7 @@ class ShowEpisode extends StatelessWidget {
                                               overflow: TextOverflow.visible,
                                               style: TextStyle(
                                                 fontSize: _width / 35,
-                                                color: _c,
+                                                color: c,
                                                 fontStyle: FontStyle.italic,
                                               ),
                                             ),

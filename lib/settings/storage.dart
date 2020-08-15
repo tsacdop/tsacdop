@@ -145,7 +145,7 @@ class _StorageSettingState extends State<StorageSetting>
                             );
                           },
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         FutureBuilder<bool>(
                             future: _getAutoDownloadNetwork(),
                             initialData: false,
@@ -172,7 +172,7 @@ class _StorageSettingState extends State<StorageSetting>
                                 ),
                               );
                             }),
-                        Divider(height: 2),
+                        Divider(height: 1),
                       ],
                     ),
                   ]),
@@ -207,7 +207,7 @@ class _StorageSettingState extends State<StorageSetting>
                         title: Text(s.download),
                         subtitle: Text(s.settingsManageDownloadDes),
                       ),
-                      Divider(height: 2),
+                      Divider(height: 1),
                       FutureBuilder<int>(
                         future: _getAutoDeleteDays(),
                         initialData: 30,
@@ -238,7 +238,7 @@ class _StorageSettingState extends State<StorageSetting>
                           );
                         },
                       ),
-                      Divider(height: 2),
+                      Divider(height: 1),
                       ListTile(
                         contentPadding: EdgeInsets.only(left: 70.0, right: 25),
                         //  leading: Icon(Icons.colorize),
@@ -281,7 +281,7 @@ class _StorageSettingState extends State<StorageSetting>
                               }),
                         ),
                       ),
-                      Divider(height: 2),
+                      Divider(height: 1),
                     ],
                   ),
                 ],

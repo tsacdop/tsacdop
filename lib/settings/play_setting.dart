@@ -247,7 +247,7 @@ class PlaySetting extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Divider(height: 2),
+                      Divider(height: 1),
                     ],
                   ),
                   Padding(
@@ -415,7 +415,7 @@ class PlaySetting extends StatelessWidget {
                           trailing: context.width > 360
                               ? _scheduleWidget(context)
                               : null),
-                      Divider(height: 2)
+                      Divider(height: 1)
                     ],
                   ),
                   SizedBox(height: 20)

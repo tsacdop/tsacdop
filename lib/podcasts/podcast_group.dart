@@ -161,9 +161,7 @@ class __PodcastCardState extends State<_PodcastCard>
 
   @override
   Widget build(BuildContext context) {
-    final c = (Theme.of(context).brightness == Brightness.light)
-        ? widget.podcastLocal.primaryColor.colorizedark()
-        : widget.podcastLocal.primaryColor.colorizeLight();
+    final c = widget.podcastLocal.backgroudColor(context);
     final s = context.s;
     var width = context.width;
     var groupList = context.watch<GroupList>();
