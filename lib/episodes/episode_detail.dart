@@ -704,6 +704,7 @@ class _ShowNote extends StatelessWidget {
               '<a rel="nofollow" href = "mailto:$address">$address</a>');
         }
       }
+      await dbHelper.saveEpisodeDes(url, description: description);
     }
     return description;
   }

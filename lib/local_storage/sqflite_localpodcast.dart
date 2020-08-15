@@ -1058,7 +1058,7 @@ class DBHelper {
     return episodes;
   }
 
-  setLiked(String url) async {
+  Future setLiked(String url) async {
     var dbClient = await database;
     var milliseconds = DateTime.now().millisecondsSinceEpoch;
     await dbClient.transaction((txn) async {
@@ -1068,7 +1068,7 @@ class DBHelper {
     });
   }
 
-  setUniked(String url) async {
+  Future setUniked(String url) async {
     var dbClient = await database;
     await dbClient.transaction((txn) async {
       await txn.rawUpdate(
@@ -1137,6 +1137,15 @@ class DBHelper {
         'SELECT description FROM Episodes WHERE enclosure_url = ?', [url]);
     String description = list[0]['description'];
     return description;
+  }
+
+  Future saveEpisodeDes(String url, {String description}) async {
+    var dbClient = await database;
+    await dbClient.transaction((txn) async {
+      await txn.rawUpdate(
+          "UPDATE Episodes SET description = ? WHERE enclosure_url = ?",
+          [description, url]);
+    });
   }
 
   Future<String> getFeedDescription(String id) async {
