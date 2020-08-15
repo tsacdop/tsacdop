@@ -10,6 +10,12 @@ Release date 2020/8/15
 * Popup menu setting import bug.
 * Default language failed to load.
 
+### Minor changes
+
+* Change language|feedback|podcast settings to button sheet.
+* Add history in home playlist button.
+* History page UI improved.
+
 ## 0.4.11
 
 Release date 2020/8/12
