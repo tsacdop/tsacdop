@@ -1,5 +1,15 @@
 # Tsacdop Changelog
 
+## 0.4.12
+
+Release date 2020/8/15
+
+### Bugs fixed
+
+* Crash when reorder episodes or podcasts.
+* Popup menu setting import bug.
+* Default language failed to load.
+
 ## 0.4.11
 
 Release date 2020/8/12

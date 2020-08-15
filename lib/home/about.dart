@@ -5,7 +5,7 @@ import 'package:line_icons/line_icons.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
-const String version = '0.4.11';
+const String version = '0.4.12';
 
 class AboutApp extends StatelessWidget {
   Widget _listItem(
