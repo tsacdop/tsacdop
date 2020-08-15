@@ -25,6 +25,7 @@ import '../util/audiopanel.dart';
 import '../util/custom_widget.dart';
 import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
+import '../util/general_dialog.dart';
 import 'podcast_settings.dart';
 
 class PodcastDetail extends StatefulWidget {
@@ -331,13 +332,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
               widget.podcastLocal.rssUrl.launchUrl;
               break;
             case 2:
-              Navigator.push(
+              generalSheet(
                 context,
-                MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder: (context) =>
-                      PodcastSetting(podcastLocal: widget.podcastLocal),
-                ),
+                title: s.settings,
+                child: PodcastSetting(podcastLocal: widget.podcastLocal),
               );
               break;
           }

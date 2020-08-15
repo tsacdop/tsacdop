@@ -1,16 +1,14 @@
-import 'dart:math' as math;
-
 import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../home/home.dart';
 import '../intro_slider/app_intro.dart';
 import '../podcasts/podcast_manage.dart';
 import '../util/extension_helper.dart';
+import '../util/general_dialog.dart';
 import 'data_backup.dart';
 import 'history.dart';
 import 'languages.dart';
@@ -26,58 +24,19 @@ class Settings extends StatefulWidget {
   _SettingsState createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings>
-    with SingleTickerProviderStateMixin {
-  _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
-  bool _showFeedback;
-  Animation _animation;
-  AnimationController _controller;
-  double _value;
-  @override
-  void initState() {
-    super.initState();
-    _showFeedback = false;
-    _value = 0;
-    _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
-      ..addListener(() {
-        setState(() {
-          _value = _animation.value;
-        });
-      });
-  }
-
-  Widget _feedbackItem(IconData icon, String name, String url) => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _launchUrl(url),
-          child: Container(
-            padding: EdgeInsets.all(5),
-            alignment: Alignment.center,
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  icon,
-                  size: 20 * _value,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                ),
-                Text(
-                  name,
-                  maxLines: 2,
-                )
-              ],
-            ),
-          ),
+class _SettingsState extends State<Settings> {
+  Widget _feedbackItem(IconData icon, String name, String url) => ListTile(
+        onTap: () {
+          url.launchUrl;
+          Navigator.pop(context);
+        },
+        leading: Icon(
+          icon,
+          size: 20,
+        ),
+        title: Text(
+          name,
+          maxLines: 2,
         ),
       );
 
@@ -139,7 +98,7 @@ class _SettingsState extends State<Settings>
                           title: Text(s.settingsAppearance),
                           subtitle: Text(s.settingsAppearanceDes),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
                           onTap: () => Navigator.push(
                               context,
@@ -152,7 +111,7 @@ class _SettingsState extends State<Settings>
                           title: Text(s.settingsLayout),
                           subtitle: Text(s.settingsLayoutDes),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
                           onTap: () => Navigator.push(
                               context,
@@ -165,7 +124,7 @@ class _SettingsState extends State<Settings>
                           title: Text(s.play),
                           subtitle: Text(s.settingsPlayDes),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
                             onTap: () => Navigator.push(
                                 context,
@@ -177,7 +136,7 @@ class _SettingsState extends State<Settings>
                                 color: Colors.yellow[700]),
                             title: Text(s.settingsSyncing),
                             subtitle: Text(s.settingsSyncingDes)),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
                           onTap: () => Navigator.push(
                               context,
@@ -190,7 +149,7 @@ class _SettingsState extends State<Settings>
                           title: Text(s.settingStorage),
                           subtitle: Text(s.settingsStorageDes),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
                           onTap: () => Navigator.push(
                               context,
@@ -203,12 +162,12 @@ class _SettingsState extends State<Settings>
                           title: Text(s.settingsHistory),
                           subtitle: Text(s.settingsHistoryDes),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LanguagesSetting())),
+                          onTap: () => generalSheet(context,
+                                  title: s.settingsLanguages,
+                                  child: LanguagesSetting())
+                              .then((value) => setState(() {})),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.language_solid,
@@ -216,7 +175,7 @@ class _SettingsState extends State<Settings>
                           title: Text(s.settingsLanguages),
                           subtitle: Text(s.settingsLanguagesDes),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
                           onTap: () {
                             //_exportOmpl(context);
@@ -232,7 +191,7 @@ class _SettingsState extends State<Settings>
                           title: Text(s.settingsBackup),
                           subtitle: Text(s.settingsBackupDes),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                       ],
                     ),
                   ],
@@ -271,57 +230,45 @@ class _SettingsState extends State<Settings>
                           title: Text(s.settingsLibraries),
                           subtitle: Text(s.settingsLibrariesDes),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
-                          onTap: () async {
-                            if (_value == 0) {
-                              _showFeedback = !_showFeedback;
-                              _controller.forward();
-                            } else {
-                              await _controller.reverse();
-                              _showFeedback = !_showFeedback;
-                            }
-                          },
+                          onTap: () => generalSheet(
+                            context,
+                            title: s.settingsFeedback,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                _feedbackItem(
+                                    LineIcons.github,
+                                    s.feedbackGithub,
+                                    'https://github.com/stonega/tsacdop/issues'),
+                                Divider(height: 1),
+                                _feedbackItem(
+                                    LineIcons.telegram,
+                                    s.feedbackTelegram,
+                                    'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
+                                Divider(height: 1),
+                                _feedbackItem(
+                                    LineIcons.envelope_open_text_solid,
+                                    s.feedbackEmail,
+                                    'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
+                                Divider(height: 1),
+                                _feedbackItem(
+                                    LineIcons.google_play,
+                                    s.feedbackPlay,
+                                    'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop'),
+                                Divider(height: 1),
+                              ],
+                            ),
+                          ),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 25.0),
                           leading: Icon(LineIcons.bug_solid,
                               color: Colors.pink[700]),
                           title: Text(s.settingsFeedback),
                           subtitle: Text(s.settingsFeedbackDes),
-                          trailing: Transform.rotate(
-                            angle: math.pi * _value,
-                            child: Icon(Icons.keyboard_arrow_down),
-                          ),
                         ),
-                        _showFeedback
-                            ? SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    SizedBox(width: 45),
-                                    _feedbackItem(
-                                        LineIcons.github,
-                                        s.feedbackGithub,
-                                        'https://github.com/stonega/tsacdop/issues'),
-                                    _feedbackItem(
-                                        LineIcons.telegram,
-                                        s.feedbackTelegram,
-                                        'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
-                                    _feedbackItem(
-                                        LineIcons.envelope_open_text_solid,
-                                        s.feedbackEmail,
-                                        'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
-                                    _feedbackItem(
-                                        LineIcons.google_play,
-                                        s.feedbackPlay,
-                                        'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop')
-                                  ],
-                                ),
-                              )
-                            : Center(),
                         Divider(
                           height: 2,
                         ),
@@ -349,7 +296,7 @@ class _SettingsState extends State<Settings>
                               color: Colors.pinkAccent),
                           title: Text(s.settingsDiscovery),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                         ListTile(
                           onTap: () => Navigator.push(
                               context,
@@ -362,7 +309,7 @@ class _SettingsState extends State<Settings>
                               color: Colors.blueGrey),
                           title: Text(s.settingsAppIntro),
                         ),
-                        Divider(height: 2),
+                        Divider(height: 1),
                       ],
                     ),
                     Padding(

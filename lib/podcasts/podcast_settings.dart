@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image/image.dart' as img;
@@ -118,7 +117,8 @@ class _PodcastSettingState extends State<PodcastSetting> {
     }
     if (imageUrl != null &&
         imageUrl.contains('http') &&
-        imageUrl != widget.podcastLocal.imageUrl) {
+        (imageUrl != widget.podcastLocal.imageUrl ||
+            !File(widget.podcastLocal.imageUrl).existsSync())) {
       try {
         img.Image thumbnail;
         var imageResponse = await Dio().get<List<int>>(imageUrl,
@@ -173,13 +173,13 @@ class _PodcastSettingState extends State<PodcastSetting> {
   Widget _getRefreshStatusIcon(RefreshCoverStatus status) {
     switch (status) {
       case RefreshCoverStatus.none:
-        return Icon(Icons.refresh);
+        return Center();
         break;
       case RefreshCoverStatus.start:
         return CircularProgressIndicator(strokeWidth: 2);
         break;
       case RefreshCoverStatus.complete:
-        return Icon(Icons.refresh);
+        return Icon(Icons.done);
         break;
       case RefreshCoverStatus.complete:
         return Icon(Icons.refresh, color: Colors.red);
@@ -192,121 +192,128 @@ class _PodcastSettingState extends State<PodcastSetting> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(s.settings),
-          elevation: 0,
-          backgroundColor: Theme.of(context).primaryColor,
-        ),
-        body: Container(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  FutureBuilder<bool>(
-                      future: _getAutoDownload(widget.podcastLocal.id),
-                      initialData: false,
-                      builder: (context, snapshot) {
-                        return ListTile(
-                          onTap: () => _setAutoDownload(!snapshot.data),
-                          contentPadding: EdgeInsets.fromLTRB(70.0, 10, 20, 10),
-                          title: Text(s.autoDownload),
-                          trailing: Transform.scale(
-                            scale: 0.9,
-                            child: Switch(
-                                value: snapshot.data,
-                                onChanged: _setAutoDownload),
-                          ),
-                        );
-                      }),
-                  Divider(height: 2),
-                  FutureBuilder<int>(
-                    future: _getSkipSecond(widget.podcastLocal.id),
-                    initialData: 0,
-                    builder: (context, snapshot) => ListTile(
-                      onTap: () => generalDialog(
-                        context,
-                        title: Text(s.skipSecondsAtStart, maxLines: 2),
-                        content: DurationPicker(
-                          duration: Duration(seconds: snapshot.data),
-                          onChange: (value) => _seconds = value.inSeconds,
-                        ),
-                        actions: <Widget>[
-                          FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              _seconds = 0;
-                            },
-                            child: Text(
-                              s.cancel,
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
-                          ),
-                          FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              _saveSkipSeconds(_seconds);
-                            },
-                            child: Text(
-                              s.confirm,
-                              style: TextStyle(color: context.accentColor),
-                            ),
-                          )
-                        ],
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          FutureBuilder<bool>(
+              future: _getAutoDownload(widget.podcastLocal.id),
+              initialData: false,
+              builder: (context, snapshot) {
+                return ListTile(
+                  onTap: () => _setAutoDownload(!snapshot.data),
+                  leading: SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CustomPaint(
+                      painter: DownloadPainter(
+                        color: context.brightness == Brightness.light
+                            ? Colors.grey[600]
+                            : Colors.white,
+                        fraction: 0,
+                        progressColor: context.accentColor,
                       ),
-                      contentPadding: EdgeInsets.fromLTRB(70.0, 10, 40, 10),
-                      title: Text(s.skipSecondsAtStart),
-                      trailing: Text(snapshot.data.toTime),
                     ),
                   ),
-                  Divider(height: 2),
-                  ListTile(
-                      onTap: () {
-                        if (_markStatus != MarkStatus.start) {
-                          _confirmMarkListened(context);
-                        }
+                  title: Text(s.autoDownload),
+                  trailing: Transform.scale(
+                    scale: 0.9,
+                    child: Switch(
+                        value: snapshot.data, onChanged: _setAutoDownload),
+                  ),
+                );
+              }),
+          Divider(height: 1),
+          FutureBuilder<int>(
+            future: _getSkipSecond(widget.podcastLocal.id),
+            initialData: 0,
+            builder: (context, snapshot) => ListTile(
+              onTap: () {
+                generalDialog(
+                  context,
+                  title: Text(s.skipSecondsAtStart, maxLines: 2),
+                  content: DurationPicker(
+                    duration: Duration(seconds: snapshot.data),
+                    onChange: (value) => _seconds = value.inSeconds,
+                  ),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _seconds = 0;
                       },
-                      contentPadding: EdgeInsets.fromLTRB(70.0, 10, 40, 10),
-                      title: Text(s.menuMarkAllListened),
-                      // subtitle: Text(s.settingsAutoPlayDes),
-                      trailing: SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: _markStatus == MarkStatus.none
-                              ? CustomPaint(
-                                  painter: ListenedAllPainter(context.textColor,
-                                      stroke: 2),
-                                )
-                              : _markStatus == MarkStatus.start
-                                  ? CircularProgressIndicator(strokeWidth: 2)
-                                  : Icon(Icons.done))),
-                  Divider(height: 2),
-                  ListTile(
-                      onTap: () {
-                        if (_coverStatus != RefreshCoverStatus.start) {
-                          _refreshArtWork();
-                        }
+                      child: Text(
+                        s.cancel,
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _saveSkipSeconds(_seconds);
                       },
-                      contentPadding: EdgeInsets.fromLTRB(70.0, 10, 40, 10),
-                      title: Text(s.refreshArtwork),
-                      trailing: SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: _getRefreshStatusIcon(_coverStatus))),
-                  Divider(height: 2),
-                ]),
+                      child: Text(
+                        s.confirm,
+                        style: TextStyle(color: context.accentColor),
+                      ),
+                    )
+                  ],
+                ).then((value) => setState(() {}));
+              },
+              leading: Icon(Icons.fast_forward),
+              title: Text(s.skipSecondsAtStart),
+              trailing: Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: Text(snapshot.data.toTime),
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+          Divider(height: 1),
+          ListTile(
+              onTap: () {
+                if (_markStatus != MarkStatus.start) {
+                  _confirmMarkListened(context);
+                }
+              },
+              title: Text(s.menuMarkAllListened),
+              leading: SizedBox(
+                height: 20,
+                width: 20,
+                child: CustomPaint(
+                  painter: ListenedAllPainter(
+                      context.brightness == Brightness.light
+                          ? Colors.grey[600]
+                          : Colors.white,
+                      stroke: 2),
+                ),
+              ),
+              trailing: Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: _markStatus == MarkStatus.none
+                        ? Center()
+                        : _markStatus == MarkStatus.start
+                            ? CircularProgressIndicator(strokeWidth: 2)
+                            : Icon(Icons.done)),
+              )),
+          Divider(height: 1),
+          ListTile(
+              onTap: () {
+                if (_coverStatus != RefreshCoverStatus.start) {
+                  _refreshArtWork();
+                }
+              },
+              title: Text(s.refreshArtwork),
+              leading: Icon(Icons.refresh),
+              trailing: SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: _getRefreshStatusIcon(_coverStatus)))),
+          Divider(height: 1),
+        ]);
   }
 }

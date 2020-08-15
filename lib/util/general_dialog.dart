@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 
 import 'extension_helper.dart';
 
-generalDialog(BuildContext context,
-        {Widget title, Widget content, List<Widget> actions}) =>
-    showGeneralDialog(
+Future generalDialog(BuildContext context,
+        {Widget title, Widget content, List<Widget> actions}) async =>
+    await showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
@@ -15,20 +15,51 @@ generalDialog(BuildContext context,
           AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
           statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor:
-              Theme.of(context).brightness == Brightness.light
-                  ? Color.fromRGBO(113, 113, 113, 1)
-                  : Color.fromRGBO(15, 15, 15, 1),
+          systemNavigationBarColor: context.brightness == Brightness.light
+              ? Color.fromRGBO(113, 113, 113, 1)
+              : Color.fromRGBO(15, 15, 15, 1),
         ),
         child: AlertDialog(
             elevation: 2,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                borderRadius: BorderRadius.circular(10.0)),
             titlePadding: EdgeInsets.all(20),
-            title: SizedBox(width: context.width - 160, child: title),
+            title: SizedBox(width: context.width - 120, child: title),
             content: content,
             contentPadding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-            actionsPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
             actions: actions),
       ),
     );
+
+Future generalSheet(BuildContext context, {Widget child, String title}) async =>
+    await showModalBottomSheet(
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
+        ),
+        elevation: 2,
+        context: context,
+        builder: (context) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 10.0, bottom: 2.0),
+                child: Container(
+                  height: 4,
+                  width: 25,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2.0),
+                      color: context.primaryColorDark),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 6.0),
+                child: Text(title, style: context.textTheme.headline6),
+              ),
+              Divider(height: 1),
+              child,
+            ],
+          );
+        });
