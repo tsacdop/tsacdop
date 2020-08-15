@@ -114,37 +114,6 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                     animation: 'longtap',
                     fit: BoxFit.cover,
                   )),
-              Divider(height: 2),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-              ),
-              Container(
-                height: 30.0,
-                padding: EdgeInsets.symmetric(horizontal: 80),
-                alignment: Alignment.centerLeft,
-                child: Text(s.settingsPopupMenu,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        .copyWith(color: Theme.of(context).accentColor)),
-              ),
-              FutureBuilder<bool>(
-                future: _getTapToOpenPopupMenu(),
-                initialData: false,
-                builder: (context, snapshot) => ListTile(
-                  contentPadding:
-                      EdgeInsets.only(left: 80, top: 10, bottom: 10, right: 30),
-                  onTap: () => _saveTapToOpenPopupMenu(!snapshot.data),
-                  title: Text(s.settingsTapToOpenPopupMenu),
-                  subtitle: Text(s.settingsTapToOpenPopupMenuDes),
-                  trailing: Transform.scale(
-                    scale: 0.9,
-                    child: Switch(
-                        value: snapshot.data,
-                        onChanged: _saveTapToOpenPopupMenu),
-                  ),
-                ),
-              ),
               FutureBuilder<List<int>>(
                   future: _getEpisodeMenu(),
                   initialData: [0, 1, 12, 13, 14],
@@ -152,62 +121,96 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                     var menu = snapshot.data;
                     return Expanded(
                       child: ListView(
-                        physics: const BouncingScrollPhysics(),
                         shrinkWrap: true,
-                        children: menu.map<Widget>((e) {
-                          var i = e % 10;
-                          switch (i) {
-                            case 0:
-                              return _popupMenuItem(menu, e,
-                                  icon: Icon(
-                                    LineIcons.play_circle_solid,
-                                    color: context.accentColor,
-                                  ),
-                                  text: s.play,
-                                  description: s.popupMenuPlayDes);
-                              break;
-                            case 1:
-                              return _popupMenuItem(menu, e,
-                                  icon: Icon(
-                                    LineIcons.clock_solid,
-                                    color: Colors.cyan,
-                                  ),
-                                  text: s.later,
-                                  description: s.popupMenuLaterDes);
-                              break;
-                            case 2:
-                              return _popupMenuItem(menu, e,
-                                  icon: Icon(LineIcons.heart,
-                                      color: Colors.red, size: 21),
-                                  text: s.like,
-                                  description: s.popupMenuLikeDes);
-                              break;
-                            case 3:
-                              return _popupMenuItem(menu, e,
-                                  icon: SizedBox(
-                                    width: 23,
-                                    height: 23,
-                                    child: CustomPaint(
-                                        painter: ListenedAllPainter(Colors.blue,
-                                            stroke: 1.5)),
-                                  ),
-                                  text: s.markListened,
-                                  description: s.popupMenuMarkDes);
-                              break;
-                            case 4:
-                              return _popupMenuItem(menu, e,
-                                  icon: Icon(
-                                    LineIcons.download_solid,
-                                    color: Colors.green,
-                                  ),
-                                  text: s.download,
-                                  description: s.popupMenuDownloadDes);
-                              break;
-                            default:
-                              return Text('Text');
-                              break;
-                          }
-                        }).toList(),
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          Container(
+                            height: 30.0,
+                            padding: EdgeInsets.symmetric(horizontal: 80),
+                            alignment: Alignment.centerLeft,
+                            child: Text(s.settingsPopupMenu,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1
+                                    .copyWith(
+                                        color: Theme.of(context).accentColor)),
+                          ),
+                          FutureBuilder<bool>(
+                            future: _getTapToOpenPopupMenu(),
+                            initialData: false,
+                            builder: (context, snapshot) => ListTile(
+                              contentPadding: EdgeInsets.only(
+                                  left: 80, top: 10, bottom: 10, right: 30),
+                              onTap: () =>
+                                  _saveTapToOpenPopupMenu(!snapshot.data),
+                              title: Text(s.settingsTapToOpenPopupMenu),
+                              subtitle: Text(s.settingsTapToOpenPopupMenuDes),
+                              trailing: Transform.scale(
+                                scale: 0.9,
+                                child: Switch(
+                                    value: snapshot.data,
+                                    onChanged: _saveTapToOpenPopupMenu),
+                              ),
+                            ),
+                          ),
+                          ...menu.map<Widget>((e) {
+                            var i = e % 10;
+                            switch (i) {
+                              case 0:
+                                return _popupMenuItem(menu, e,
+                                    icon: Icon(
+                                      LineIcons.play_circle_solid,
+                                      color: context.accentColor,
+                                    ),
+                                    text: s.play,
+                                    description: s.popupMenuPlayDes);
+                                break;
+                              case 1:
+                                return _popupMenuItem(menu, e,
+                                    icon: Icon(
+                                      LineIcons.clock_solid,
+                                      color: Colors.cyan,
+                                    ),
+                                    text: s.later,
+                                    description: s.popupMenuLaterDes);
+                                break;
+                              case 2:
+                                return _popupMenuItem(menu, e,
+                                    icon: Icon(LineIcons.heart,
+                                        color: Colors.red, size: 21),
+                                    text: s.like,
+                                    description: s.popupMenuLikeDes);
+                                break;
+                              case 3:
+                                return _popupMenuItem(menu, e,
+                                    icon: SizedBox(
+                                      width: 23,
+                                      height: 23,
+                                      child: CustomPaint(
+                                          painter: ListenedAllPainter(
+                                              Colors.blue,
+                                              stroke: 1.5)),
+                                    ),
+                                    text: s.markListened,
+                                    description: s.popupMenuMarkDes);
+                                break;
+                              case 4:
+                                return _popupMenuItem(menu, e,
+                                    icon: Icon(
+                                      LineIcons.download_solid,
+                                      color: Colors.green,
+                                    ),
+                                    text: s.download,
+                                    description: s.popupMenuDownloadDes);
+                                break;
+                              default:
+                                return Text('Text');
+                                break;
+                            }
+                          }).toList(),
+                        ],
                       ),
                     );
                   }),

@@ -436,8 +436,7 @@ class SettingState extends ChangeNotifier {
     var downloadLayout = await downloadLayoutStorage.getInt();
     var autoDownloadNetwork =
         await autoDownloadStorage.getBool(defaultValue: false);
-    var episodePopupMenu =
-        await KeyValueStorage(episodePopupMenuKey).getStringList();
+    var episodePopupMenu = await KeyValueStorage(episodePopupMenuKey).getMenu();
     var autoDelete = await autoDeleteStorage.getInt();
     var autoSleepTimer =
         await autoSleepTimerStorage.getBool(defaultValue: false);
@@ -470,7 +469,7 @@ class SettingState extends ChangeNotifier {
         favLayout: favLayout,
         downloadLayout: downloadLayout,
         autoDownloadNetwork: autoDownloadNetwork,
-        episodePopupMenu: episodePopupMenu,
+        episodePopupMenu: episodePopupMenu.map((e) => e.toString()).toList(),
         autoDelete: autoDelete,
         autoSleepTimer: autoSleepTimer,
         autoSleepTimerStart: autoSleepTimerStart,

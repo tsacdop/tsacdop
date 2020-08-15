@@ -133,7 +133,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     _loaddes = false;
     _showMenu = true;
     _showTitle = false;
-    _getSDescription(widget.episodeItem.enclosureUrl);
+    //_getSDescription(widget.episodeItem.enclosureUrl);
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
   }
@@ -229,7 +229,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
           body: Stack(
             children: <Widget>[
               Container(
-                color: Theme.of(context).primaryColor,
+                color: context.primaryColor,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   controller: _controller,
@@ -346,71 +346,72 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                           ],
                         ),
                       ),
-                      _loaddes
-                          ? _description.length > 0
-                              ? Selector<AudioPlayerNotifier, EpisodeBrief>(
-                                  selector: (_, audio) => audio.episode,
-                                  builder: (_, data, __) {
-                                    var description = _description;
-                                    if (data == widget.episodeItem) {
-                                      final linkList = linkify(_description,
-                                          options:
-                                              LinkifyOptions(humanize: false),
-                                          linkifiers: [TimeStampLinkifier()]);
-                                      for (var element in linkList) {
-                                        if (element is TimeStampElement) {
-                                          final time = element.timeStamp;
-                                          description = description.replaceFirst(
-                                              time,
-                                              '<a rel="nofollow" href = "skipto:$time">$time</a>');
-                                        }
-                                      }
-                                    }
-                                    return Html(
-                                      padding: EdgeInsets.only(
-                                          left: 20.0, right: 20, bottom: 50),
-                                      defaultTextStyle: GoogleFonts.martel(
-                                        textStyle: TextStyle(
-                                          height: 1.8,
-                                        ),
-                                      ),
-                                      data: description,
-                                      linkStyle: TextStyle(
-                                          color: context.accentColor,
-                                          textBaseline:
-                                              TextBaseline.ideographic),
-                                      onLinkTap: (url) {
-                                        if (url.substring(0, 6) == 'skipto') {
-                                          final seconds = _getTimeStamp(url);
-                                          audio.seekTo(seconds * 1000);
-                                        } else {
-                                          url.launchUrl;
-                                        }
-                                      },
-                                      useRichText: true,
-                                    );
-                                  })
-                              : Container(
-                                  height: context.width,
-                                  alignment: Alignment.center,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Image(
-                                        image:
-                                            AssetImage('assets/shownote.png'),
-                                        height: 100.0,
-                                      ),
-                                      Padding(padding: EdgeInsets.all(5.0)),
-                                      Text(s.noShownote,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: context.textColor
-                                                  .withOpacity(0.5))),
-                                    ],
-                                  ),
-                                )
-                          : Center(),
+                      _ShowNote(episode: widget.episodeItem),
+                      // _loaddes
+                      //     ? _description.length > 0
+                      //         ? Selector<AudioPlayerNotifier, EpisodeBrief>(
+                      //             selector: (_, audio) => audio.episode,
+                      //             builder: (_, data, __) {
+                      //               var description = _description;
+                      //               if (data == widget.episodeItem) {
+                      //                 final linkList = linkify(_description,
+                      //                     options:
+                      //                         LinkifyOptions(humanize: false),
+                      //                     linkifiers: [TimeStampLinkifier()]);
+                      //                 for (var element in linkList) {
+                      //                   if (element is TimeStampElement) {
+                      //                     final time = element.timeStamp;
+                      //                     description = description.replaceFirst(
+                      //                         time,
+                      //                         '<a rel="nofollow" href = "skipto:$time">$time</a>');
+                      //                   }
+                      //                 }
+                      //               }
+                      //               return Html(
+                      //                 padding: EdgeInsets.only(
+                      //                     left: 20.0, right: 20, bottom: 50),
+                      //                 defaultTextStyle: GoogleFonts.martel(
+                      //                   textStyle: TextStyle(
+                      //                     height: 1.8,
+                      //                   ),
+                      //                 ),
+                      //                 data: description,
+                      //                 linkStyle: TextStyle(
+                      //                     color: context.accentColor,
+                      //                     textBaseline:
+                      //                         TextBaseline.ideographic),
+                      //                 onLinkTap: (url) {
+                      //                   if (url.substring(0, 6) == 'skipto') {
+                      //                     final seconds = _getTimeStamp(url);
+                      //                     audio.seekTo(seconds * 1000);
+                      //                   } else {
+                      //                     url.launchUrl;
+                      //                   }
+                      //                 },
+                      //                 useRichText: true,
+                      //               );
+                      //             })
+                      //         : Container(
+                      //             height: context.width,
+                      //             alignment: Alignment.center,
+                      //             child: Column(
+                      //               mainAxisAlignment: MainAxisAlignment.center,
+                      //               children: <Widget>[
+                      //                 Image(
+                      //                   image:
+                      //                       AssetImage('assets/shownote.png'),
+                      //                   height: 100.0,
+                      //                 ),
+                      //                 Padding(padding: EdgeInsets.all(5.0)),
+                      //                 Text(s.noShownote,
+                      //                     textAlign: TextAlign.center,
+                      //                     style: TextStyle(
+                      //                         color: context.textColor
+                      //                             .withOpacity(0.5))),
+                      //               ],
+                      //             ),
+                      //           )
+                      //     : Center(),
                       Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
                           selector: (_, audio) =>
                               Tuple2(audio.playerRunning, audio.playerHeight),
@@ -437,7 +438,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                         height: _showMenu ? 50 : 0,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
-                          child: MenuBar(
+                          child: _MenuBar(
                               episodeItem: widget.episodeItem,
                               heroTag: widget.heroTag,
                               hide: widget.hide),
@@ -459,17 +460,17 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   }
 }
 
-class MenuBar extends StatefulWidget {
+class _MenuBar extends StatefulWidget {
   final EpisodeBrief episodeItem;
   final String heroTag;
   final bool hide;
-  MenuBar({this.episodeItem, this.heroTag, this.hide, Key key})
+  _MenuBar({this.episodeItem, this.heroTag, this.hide, Key key})
       : super(key: key);
   @override
-  _MenuBarState createState() => _MenuBarState();
+  __MenuBarState createState() => __MenuBarState();
 }
 
-class _MenuBarState extends State<MenuBar> {
+class __MenuBarState extends State<_MenuBar> {
   Future<int> _isListened(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
     return await dbHelper.isListened(episode.enclosureUrl);
@@ -607,7 +608,8 @@ class _MenuBarState extends State<MenuBar> {
                     selector: (_, audio) =>
                         Tuple2(audio.queue.playlist, audio.queueUpdate),
                     builder: (_, data, __) {
-                      return data.item1.contains(widget.episodeItem)
+                      return (data.item1.contains(widget.episodeItem) &&
+                              !widget.hide)
                           ? _buttonOnMenu(
                               child: Icon(Icons.playlist_add_check,
                                   color: context.accentColor),
@@ -716,6 +718,124 @@ class _MenuBarState extends State<MenuBar> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ShowNote extends StatelessWidget {
+  final EpisodeBrief episode;
+  const _ShowNote({this.episode, Key key}) : super(key: key);
+
+  int _getTimeStamp(String url) {
+    final time = url.substring(7);
+    final data = time.split(':');
+    var seconds;
+    if (data.length == 3) {
+      seconds = int.tryParse(data[0]) * 3600 +
+          int.tryParse(data[1]) * 60 +
+          int.tryParse(data[2]);
+    } else if (data.length == 2) {
+      seconds = int.tryParse(data[0]) * 60 + int.tryParse(data[1]);
+    }
+    return seconds;
+  }
+
+  Future<String> _getSDescription(String url) async {
+    var description;
+    var dbHelper = DBHelper();
+    description = (await dbHelper.getDescription(url))
+        .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '')
+        .replaceAll('\r', '')
+        .trim();
+    if (!description.contains('<')) {
+      final linkList = linkify(description,
+          options: LinkifyOptions(humanize: false),
+          linkifiers: [UrlLinkifier(), EmailLinkifier()]);
+      for (var element in linkList) {
+        if (element is UrlElement) {
+          description = description.replaceAll(element.url,
+              '<a rel="nofollow" href = ${element.url}>${element.text}</a>');
+        }
+        if (element is EmailElement) {
+          final address = element.emailAddress;
+          description = description.replaceAll(address,
+              '<a rel="nofollow" href = "mailto:$address">$address</a>');
+        }
+      }
+    }
+    return description;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var audio = context.watch<AudioPlayerNotifier>();
+    final s = context.s;
+    return FutureBuilder(
+      future: _getSDescription(episode.enclosureUrl),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          var description = snapshot.data;
+          return description.length > 0
+              ? Selector<AudioPlayerNotifier, EpisodeBrief>(
+                  selector: (_, audio) => audio.episode,
+                  builder: (_, data, __) {
+                    if (data == episode) {
+                      final linkList = linkify(description,
+                          options: LinkifyOptions(humanize: false),
+                          linkifiers: [TimeStampLinkifier()]);
+                      for (var element in linkList) {
+                        if (element is TimeStampElement) {
+                          final time = element.timeStamp;
+                          description = description.replaceFirst(time,
+                              '<a rel="nofollow" href = "skipto:$time">$time</a>');
+                        }
+                      }
+                    }
+                    return Html(
+                      padding:
+                          EdgeInsets.only(left: 20.0, right: 20, bottom: 50),
+                      defaultTextStyle: GoogleFonts.martel(
+                        textStyle: TextStyle(
+                          height: 1.8,
+                        ),
+                      ),
+                      data: description,
+                      linkStyle: TextStyle(
+                          color: context.accentColor,
+                          textBaseline: TextBaseline.ideographic),
+                      onLinkTap: (url) {
+                        if (url.substring(0, 6) == 'skipto') {
+                          final seconds = _getTimeStamp(url);
+                          audio.seekTo(seconds * 1000);
+                        } else {
+                          url.launchUrl;
+                        }
+                      },
+                      useRichText: true,
+                    );
+                  })
+              : Container(
+                  height: context.width,
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Image(
+                        image: AssetImage('assets/shownote.png'),
+                        height: 100.0,
+                      ),
+                      Padding(padding: EdgeInsets.all(5.0)),
+                      Text(s.noShownote,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: context.textColor.withOpacity(0.5))),
+                    ],
+                  ),
+                );
+        } else {
+          return Center();
+        }
+      },
     );
   }
 }
