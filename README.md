@@ -29,6 +29,8 @@ The podcast search engine is powered by [ListenNotes](https://listennotes.com).
 * Download for offline play
 * Auto download new episodes / auto delete outdated downloads
 * Settings backup
+* Skip silence
+* Boost volume
 
 More to come...
 
