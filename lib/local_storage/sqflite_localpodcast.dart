@@ -235,30 +235,27 @@ class DBHelper {
         [_milliseconds, 1, id]);
   }
 
-  Future<int> saveHistory(PlayHistory history) async {
+  Future<void> saveHistory(PlayHistory history) async {
     var dbClient = await database;
-    var _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    final milliseconds = DateTime.now().millisecondsSinceEpoch;
     var recent = await getPlayHistory(1);
-    if (recent.length == 1) {
-      if (recent.first.url == history.url) {
-        await dbClient.rawDelete("DELETE FROM PlayHistory WHERE add_date = ?",
-            [recent.first.playdate.millisecondsSinceEpoch]);
-      }
+    if (recent.isNotEmpty && recent.first.url == history.url) {
+      await dbClient.rawDelete("DELETE FROM PlayHistory WHERE add_date = ?",
+          [recent.first.playdate.millisecondsSinceEpoch]);
     }
-    var result = await dbClient.transaction((txn) async {
+    await dbClient.transaction((txn) async {
       return await txn.rawInsert(
-          """REPLACE INTO PlayHistory (title, enclosure_url, seconds, seek_value, add_date, listen_time)
+          """INSERT INTO PlayHistory (title, enclosure_url, seconds, seek_value, add_date, listen_time)
        VALUES (?, ?, ?, ?, ?, ?) """,
           [
             history.title,
             history.url,
             history.seconds,
             history.seekValue,
-            _milliseconds,
+            milliseconds,
             history.seekValue > 0.95 ? 1 : 0
           ]);
     });
-    return result;
   }
 
   Future<List<PlayHistory>> getPlayHistory(int top) async {

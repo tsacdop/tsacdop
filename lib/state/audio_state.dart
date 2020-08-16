@@ -267,7 +267,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await lastWorkStorage.saveInt(0);
   }
 
-  playlistLoad() async {
+  Future<void> playlistLoad() async {
     await _queue.getPlaylist();
     _backgroundAudioDuration = 0;
     _backgroundAudioPosition = 0;
@@ -442,11 +442,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
         await dbHelper.saveHistory(history);
       }
       if (event is Map && event['playerRunning'] == false) {
-        _playerRunning = false;
-        notifyListeners();
-        final history = PlayHistory(_episode.title, _episode.enclosureUrl,
-            _lastPostion ~/ 1000, _seekSliderValue);
-        await dbHelper.saveHistory(history);
+        if (_playerRunning) {
+          _playerRunning = false;
+          notifyListeners();
+          final history = PlayHistory(_episode.title, _episode.enclosureUrl,
+              _lastPostion ~/ 1000, _seekSliderValue);
+          await dbHelper.saveHistory(history);
+        }
       }
     });
 

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -515,6 +513,9 @@ class _HistoryList extends StatefulWidget {
 
 class __HistoryListState extends State<_HistoryList> {
   var dbHelper = DBHelper();
+  bool _loadMore = false;
+  Future _getData;
+
   Future<List<PlayHistory>> getPlayRecords(int top) async {
     List<PlayHistory> playHistory;
     playHistory = await dbHelper.getPlayRecords(top);
@@ -527,208 +528,237 @@ class __HistoryListState extends State<_HistoryList> {
   _loadMoreData() async {
     if (mounted) {
       setState(() {
-        _top = _top + 20;
+        _loadMore = true;
+      });
+    }
+    await Future.delayed(Duration(milliseconds: 500));
+    _top = _top + 20;
+    if (mounted) {
+      setState(() {
+        _getData = getPlayRecords(_top);
+        _loadMore = false;
       });
     }
   }
 
-  int _top = 20;
+  int _top;
+  @override
+  void initState() {
+    super.initState();
+    _top = 20;
+    _getData = getPlayRecords(_top);
+  }
 
   @override
   Widget build(BuildContext context) {
     final s = context.s;
     final audio = context.watch<AudioPlayerNotifier>();
     return FutureBuilder<List<PlayHistory>>(
-        future: getPlayRecords(_top),
+        future: _getData,
         builder: (context, snapshot) {
           return snapshot.hasData
               ? NotificationListener<ScrollNotification>(
                   onNotification: (scrollInfo) {
                     if (scrollInfo.metrics.pixels ==
                             scrollInfo.metrics.maxScrollExtent &&
-                        snapshot.data.length == _top) _loadMoreData();
+                        snapshot.data.length == _top) {
+                      if (!_loadMore) {
+                        _loadMoreData();
+                      }
+                    }
                     return true;
                   },
                   child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data.length,
+                      itemCount: snapshot.data.length + 1,
                       itemBuilder: (context, index) {
-                        final seekValue = snapshot.data[index].seekValue;
-                        final seconds = snapshot.data[index].seconds;
-                        final date = snapshot
-                            .data[index].playdate.millisecondsSinceEpoch;
-                        final episode = snapshot.data[index].episode;
-                        var c =
-                            (Theme.of(context).brightness == Brightness.light)
-                                ? episode.primaryColor.colorizedark()
-                                : episode.primaryColor.colorizeLight();
-                        return SizedBox(
-                          height: 90.0,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Expanded(
-                                child: Center(
-                                  child: ListTile(
-                                    contentPadding:
-                                        EdgeInsets.fromLTRB(24, 8, 20, 8),
-                                    onTap: () => audio.episodeLoad(episode),
-                                    leading: CircleAvatar(
-                                        backgroundColor: c.withOpacity(0.5),
-                                        backgroundImage: episode.avatarImage),
-                                    title: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 5.0),
-                                      child: Text(
-                                        snapshot.data[index].title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                        if (index == snapshot.data.length) {
+                          return SizedBox(
+                              height: 2,
+                              child: _loadMore
+                                  ? LinearProgressIndicator()
+                                  : Center());
+                        } else {
+                          final seekValue = snapshot.data[index].seekValue;
+                          final seconds = snapshot.data[index].seconds;
+                          final date = snapshot
+                              .data[index].playdate.millisecondsSinceEpoch;
+                          final episode = snapshot.data[index].episode;
+                          final c = episode.backgroudColor(context);
+                          return SizedBox(
+                            height: 90.0,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                  child: Center(
+                                    child: ListTile(
+                                      contentPadding:
+                                          EdgeInsets.fromLTRB(24, 8, 20, 8),
+                                      onTap: () => audio.episodeLoad(episode),
+                                      leading: CircleAvatar(
+                                          backgroundColor: c.withOpacity(0.5),
+                                          backgroundImage: episode.avatarImage),
+                                      title: Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 5.0),
+                                        child: Text(
+                                          snapshot.data[index].title,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                    ),
-                                    subtitle: Container(
-                                      height: 35,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          if (seekValue < 0.9)
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 5.0),
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                child: InkWell(
-                                                  onTap: () async {
-                                                    audio.episodeLoad(episode,
-                                                        startPosition:
-                                                            (seconds * 1000)
-                                                                .toInt());
-                                                  },
-                                                  child: Stack(children: [
-                                                    ShaderMask(
-                                                      shaderCallback: (bounds) {
-                                                        return LinearGradient(
-                                                          begin: Alignment
-                                                              .centerLeft,
-                                                          colors: <Color>[
-                                                            Colors.cyan[600]
-                                                                .withOpacity(
-                                                                    0.8),
-                                                            Colors.white70
-                                                          ],
-                                                          stops: [
-                                                            seekValue,
-                                                            seekValue
-                                                          ],
-                                                          tileMode:
-                                                              TileMode.mirror,
-                                                        ).createShader(bounds);
-                                                      },
-                                                      child: Container(
-                                                        height: 25,
-                                                        alignment:
-                                                            Alignment.center,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 20),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          20.0)),
-                                                          color: context
-                                                              .accentColor,
-                                                        ),
-                                                        child: Text(
-                                                          seconds.toTime,
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
+                                      subtitle: Container(
+                                        height: 35,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            if (seekValue < 0.9)
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 5.0),
+                                                child: Material(
+                                                  color: Colors.transparent,
+                                                  child: InkWell(
+                                                    onTap: () async {
+                                                      audio.episodeLoad(episode,
+                                                          startPosition:
+                                                              (seconds * 1000)
+                                                                  .toInt());
+                                                    },
+                                                    child: Stack(children: [
+                                                      ShaderMask(
+                                                        shaderCallback:
+                                                            (bounds) {
+                                                          return LinearGradient(
+                                                            begin: Alignment
+                                                                .centerLeft,
+                                                            colors: <Color>[
+                                                              Colors.cyan[600]
+                                                                  .withOpacity(
+                                                                      0.8),
+                                                              Colors.white70
+                                                            ],
+                                                            stops: [
+                                                              seekValue,
+                                                              seekValue
+                                                            ],
+                                                            tileMode:
+                                                                TileMode.mirror,
+                                                          ).createShader(
+                                                              bounds);
+                                                        },
+                                                        child: Container(
+                                                          height: 25,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      20),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                    Radius.circular(
+                                                                        20.0)),
+                                                            color: context
+                                                                .accentColor,
+                                                          ),
+                                                          child: Text(
+                                                            seconds.toTime,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ]),
+                                                    ]),
+                                                  ),
                                                 ),
                                               ),
+                                            SizedBox(
+                                              child: Selector<
+                                                  AudioPlayerNotifier,
+                                                  Tuple2<List<EpisodeBrief>,
+                                                      bool>>(
+                                                selector: (_, audio) => Tuple2(
+                                                    audio.queue.playlist,
+                                                    audio.queueUpdate),
+                                                builder: (_, data, __) {
+                                                  return data.item1
+                                                          .contains(episode)
+                                                      ? IconButton(
+                                                          icon: Icon(
+                                                              Icons
+                                                                  .playlist_add_check,
+                                                              color: context
+                                                                  .accentColor),
+                                                          onPressed: () async {
+                                                            audio
+                                                                .delFromPlaylist(
+                                                                    episode);
+                                                            Fluttertoast
+                                                                .showToast(
+                                                              msg: s
+                                                                  .toastRemovePlaylist,
+                                                              gravity:
+                                                                  ToastGravity
+                                                                      .BOTTOM,
+                                                            );
+                                                          })
+                                                      : IconButton(
+                                                          icon: Icon(
+                                                              Icons
+                                                                  .playlist_add,
+                                                              color: Colors
+                                                                  .grey[700]),
+                                                          onPressed: () async {
+                                                            audio.addToPlaylist(
+                                                                episode);
+                                                            Fluttertoast
+                                                                .showToast(
+                                                              msg: s
+                                                                  .toastAddPlaylist,
+                                                              gravity:
+                                                                  ToastGravity
+                                                                      .BOTTOM,
+                                                            );
+                                                          });
+                                                },
+                                              ),
                                             ),
-                                          SizedBox(
-                                            child: Selector<
-                                                AudioPlayerNotifier,
-                                                Tuple2<List<EpisodeBrief>,
-                                                    bool>>(
-                                              selector: (_, audio) => Tuple2(
-                                                  audio.queue.playlist,
-                                                  audio.queueUpdate),
-                                              builder: (_, data, __) {
-                                                return data.item1
-                                                        .contains(episode)
-                                                    ? IconButton(
-                                                        icon: Icon(
-                                                            Icons
-                                                                .playlist_add_check,
-                                                            color: context
-                                                                .accentColor),
-                                                        onPressed: () async {
-                                                          audio.delFromPlaylist(
-                                                              episode);
-                                                          Fluttertoast
-                                                              .showToast(
-                                                            msg: s
-                                                                .toastRemovePlaylist,
-                                                            gravity:
-                                                                ToastGravity
-                                                                    .BOTTOM,
-                                                          );
-                                                        })
-                                                    : IconButton(
-                                                        icon: Icon(
-                                                            Icons.playlist_add,
-                                                            color: Colors
-                                                                .grey[700]),
-                                                        onPressed: () async {
-                                                          audio.addToPlaylist(
-                                                              episode);
-                                                          Fluttertoast
-                                                              .showToast(
-                                                            msg: s
-                                                                .toastAddPlaylist,
-                                                            gravity:
-                                                                ToastGravity
-                                                                    .BOTTOM,
-                                                          );
-                                                        });
-                                              },
+                                            Spacer(),
+                                            Text(
+                                              date.toDate(context),
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                              ),
                                             ),
-                                          ),
-                                          Spacer(),
-                                          Text(
-                                            date.toDate(context),
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Divider(height: 1)
-                            ],
-                          ),
-                        );
+                                Divider(height: 1)
+                              ],
+                            ),
+                          );
+                        }
                       }),
                 )
               : Center(
                   child: SizedBox(
                       height: 25,
                       width: 25,
-                      child: CircularProgressIndicator()),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      )),
                 );
         });
   }

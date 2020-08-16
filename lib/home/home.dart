@@ -521,7 +521,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                       ),
                     ],
                   ),
-                  child: PlaylistButton()),
+                  child: _PlaylistButton()),
             ],
           ),
           Container(height: 2, color: context.primaryColor),
@@ -536,19 +536,15 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-class PlaylistButton extends StatefulWidget {
-  PlaylistButton({Key key}) : super(key: key);
+class _PlaylistButton extends StatefulWidget {
+  _PlaylistButton({Key key}) : super(key: key);
 
   @override
-  PlaylistButtonState createState() => PlaylistButtonState();
+  __PlaylistButtonState createState() => __PlaylistButtonState();
 }
 
-class PlaylistButtonState extends State<PlaylistButton> {
+class __PlaylistButtonState extends State<_PlaylistButton> {
   bool _loadPlay;
-  static String _stringForSeconds(int seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
-  }
 
   _getPlaylist() async {
     await Provider.of<AudioPlayerNotifier>(context, listen: false)
@@ -567,7 +563,7 @@ class PlaylistButtonState extends State<PlaylistButton> {
 
   @override
   Widget build(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    var audio = context.watch<AudioPlayerNotifier>();
     final s = context.s;
     return MyPopupMenuButton<int>(
       shape: RoundedRectangleBorder(
@@ -639,7 +635,7 @@ class PlaylistButtonState extends State<PlaylistButton> {
                                 child: Column(
                                   children: <Widget>[
                                     Text(
-                                      _stringForSeconds(data.item3 ~/ 1000),
+                                      (data.item3 ~/ 1000).toTime,
                                       // style:
                                       // TextStyle(color: Colors.white)
                                     ),
@@ -654,7 +650,7 @@ class PlaylistButtonState extends State<PlaylistButton> {
                                 ),
                               ),
                               Divider(
-                                height: 2,
+                                height: 1,
                               ),
                             ],
                           ),
@@ -677,6 +673,9 @@ class PlaylistButtonState extends State<PlaylistButton> {
             ),
           ),
         ),
+        PopupMenuDivider(
+          height: 1,
+        ),
         PopupMenuItem(
           value: 2,
           child: Container(
@@ -691,6 +690,9 @@ class PlaylistButtonState extends State<PlaylistButton> {
               ],
             ),
           ),
+        ),
+        PopupMenuDivider(
+          height: 1,
         ),
       ],
       onSelected: (value) {
@@ -757,14 +759,14 @@ class _RecentUpdateState extends State<_RecentUpdate>
     await Future.delayed(Duration(seconds: 3));
     if (mounted) {
       setState(() {
-        _top = _top + 33;
+        _top = _top + 30;
         _loadMore = false;
       });
     }
   }
 
   /// Episodes loaded first time.
-  int _top = 99;
+  int _top = 90;
 
   /// Load more episodes when scroll to bottom.
   bool _loadMore;
@@ -822,7 +824,9 @@ class _RecentUpdateState extends State<_RecentUpdate>
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
                                 snapshot.data.length == _top) {
-                              _loadMoreEpisode();
+                              if (!_loadMore) {
+                                _loadMoreEpisode();
+                              }
                             }
                             return true;
                           },
@@ -1060,13 +1064,13 @@ class _MyFavoriteState extends State<_MyFavorite>
     await Future.delayed(Duration(seconds: 3));
     if (mounted) {
       setState(() {
-        _top = _top + 33;
+        _top = _top + 30;
         _loadMore = false;
       });
     }
   }
 
-  int _top = 99;
+  int _top = 90;
   bool _loadMore;
   Layout _layout;
   int _sortBy;
@@ -1110,7 +1114,9 @@ class _MyFavoriteState extends State<_MyFavorite>
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
                                 snapshot.data.length == _top) {
-                              _loadMoreEpisode();
+                              if (!_loadMore) {
+                                _loadMoreEpisode();
+                              }
                             }
                             return true;
                           },
