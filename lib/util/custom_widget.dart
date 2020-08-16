@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:tsacdop/type/episodebrief.dart';
 
+import '../type/episodebrief.dart';
 import 'episodegrid.dart';
 import 'extension_helper.dart';
 

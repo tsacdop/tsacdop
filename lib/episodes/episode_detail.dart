@@ -1,5 +1,4 @@
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -75,7 +74,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     super.initState();
     _showMenu = true;
     _showTitle = false;
-    //_getSDescription(widget.episodeItem.enclosureUrl);
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
   }
@@ -220,7 +218,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                       color: Colors.cyan[300],
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(16.0))),
-                                  height: 32.0,
+                                  height: 28.0,
                                   margin: EdgeInsets.only(right: 10.0),
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 10.0),
@@ -236,7 +234,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                     color: Colors.lightBlue[300],
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(16.0))),
-                                height: 32.0,
+                                height: 28.0,
                                 margin: EdgeInsets.only(right: 10.0),
                                 padding: EdgeInsets.symmetric(horizontal: 10.0),
                                 alignment: Alignment.center,
@@ -253,32 +251,38 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                   if (snapshot.hasData &&
                                       snapshot.data.seekValue < 0.9 &&
                                       snapshot.data.seconds > 10) {
-                                    return OutlineButton(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(100.0),
-                                          side: BorderSide(
-                                              color: context.accentColor)),
-                                      highlightedBorderColor: Colors.green[700],
-                                      onPressed: () => audio.episodeLoad(
-                                          widget.episodeItem,
-                                          startPosition:
-                                              (snapshot.data.seconds * 1000)
-                                                  .toInt()),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 20,
-                                            height: 20,
-                                            child: CustomPaint(
-                                              painter: ListenedPainter(
-                                                  context.textColor,
-                                                  stroke: 2.0),
+                                    return ButtonTheme(
+                                      height: 28,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 0),
+                                      child: OutlineButton(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(100.0),
+                                            side: BorderSide(
+                                                color: context.accentColor)),
+                                        highlightedBorderColor:
+                                            Colors.green[700],
+                                        onPressed: () => audio.episodeLoad(
+                                            widget.episodeItem,
+                                            startPosition:
+                                                (snapshot.data.seconds * 1000)
+                                                    .toInt()),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CustomPaint(
+                                                painter: ListenedPainter(
+                                                    context.textColor,
+                                                    stroke: 2.0),
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(width: 5),
-                                          Text(snapshot.data.seconds.toTime),
-                                        ],
+                                            SizedBox(width: 5),
+                                            Text(snapshot.data.seconds.toTime),
+                                          ],
+                                        ),
                                       ),
                                     );
                                   } else {

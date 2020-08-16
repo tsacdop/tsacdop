@@ -24,7 +24,8 @@ class PlayedHistory extends StatefulWidget {
 
 class _PlayedHistoryState extends State<PlayedHistory>
     with SingleTickerProviderStateMixin {
-  Future<List<PlayHistory>> getPlayHistory(int top) async {
+  /// Get play history.
+  Future<List<PlayHistory>> _getPlayHistory(int top) async {
     var dbHelper = DBHelper();
     List<PlayHistory> playHistory;
     playHistory = await dbHelper.getPlayHistory(top);
@@ -34,16 +35,24 @@ class _PlayedHistoryState extends State<PlayedHistory>
     return playHistory;
   }
 
+  bool _loadMore = false;
+
   _loadMoreData() async {
-    // await Future.delayed(Duration(seconds: 3));
     if (mounted) {
       setState(() {
-        _top = _top + 100;
+        _loadMore = true;
+      });
+    }
+    await Future.delayed(Duration(milliseconds: 500));
+    if (mounted) {
+      setState(() {
+        _top = _top + 10;
+        _loadMore = false;
       });
     }
   }
 
-  int _top = 100;
+  int _top = 10;
 
   Future<List<SubHistory>> getSubHistory() async {
     var dbHelper = DBHelper();
@@ -177,100 +186,115 @@ class _PlayedHistoryState extends State<PlayedHistory>
             },
             body: TabBarView(controller: _controller, children: <Widget>[
               FutureBuilder<List<PlayHistory>>(
-                future: getPlayHistory(_top),
+                future: _getPlayHistory(_top),
                 builder: (context, snapshot) {
-                  var _width = MediaQuery.of(context).size.width;
+                  var width = MediaQuery.of(context).size.width;
                   return snapshot.hasData
                       ? NotificationListener<ScrollNotification>(
                           onNotification: (scrollInfo) {
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data.length == _top) _loadMoreData();
+                                snapshot.data.length == _top) {
+                              if (!_loadMore) {
+                                _loadMoreData();
+                              }
+                            }
                             return true;
                           },
                           child: ListView.builder(
-                              //shrinkWrap: true,
                               scrollDirection: Axis.vertical,
-                              itemCount: snapshot.data.length,
+                              itemCount: snapshot.data.length + 1,
                               itemBuilder: (context, index) {
-                                var seekValue = snapshot.data[index].seekValue;
-                                var seconds = snapshot.data[index].seconds;
-                                return Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 5),
-                                  color: context.scaffoldBackgroundColor,
-                                  child: Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        title: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              DateFormat.yMd().add_jm().format(
-                                                  snapshot
-                                                      .data[index].playdate),
-                                              style: TextStyle(
-                                                  color: context.textColor
-                                                      .withOpacity(0.8),
-                                                  fontSize: 15,
-                                                  fontStyle: FontStyle.italic),
-                                            ),
-                                            Text(
-                                              snapshot.data[index].title,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
-                                        subtitle: Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              Icons.timelapse,
-                                              color: Colors.grey[400],
-                                            ),
-                                            Container(
-                                              height: 2,
-                                              decoration: BoxDecoration(
-                                                  border: Border(
-                                                      bottom: BorderSide(
-                                                          color:
-                                                              Colors.grey[400],
-                                                          width: 2.0))),
-                                              width: _width * seekValue <
-                                                      (_width - 120)
-                                                  ? _width * seekValue
-                                                  : _width - 120,
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 2),
-                                            ),
-                                            Container(
-                                              width: 50,
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                  color: context.accentColor,
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(10))),
-                                              padding: EdgeInsets.all(2),
-                                              child: Text(
-                                                seconds == 0 && seekValue == 1
-                                                    ? s.mark
-                                                    : seconds.toInt().toTime,
+                                if (index == snapshot.data.length) {
+                                  return SizedBox(
+                                      height: 2,
+                                      child: _loadMore
+                                          ? LinearProgressIndicator()
+                                          : Center());
+                                } else {
+                                  var seekValue =
+                                      snapshot.data[index].seekValue;
+                                  var seconds = snapshot.data[index].seconds;
+                                  return Container(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 5),
+                                    color: context.scaffoldBackgroundColor,
+                                    child: Column(
+                                      children: <Widget>[
+                                        ListTile(
+                                          title: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text(
+                                                DateFormat.yMd()
+                                                    .add_jm()
+                                                    .format(snapshot
+                                                        .data[index].playdate),
                                                 style: TextStyle(
-                                                    color: Colors.white),
+                                                    color: context.textColor
+                                                        .withOpacity(0.8),
+                                                    fontSize: 15,
+                                                    fontStyle:
+                                                        FontStyle.italic),
                                               ),
-                                            ),
-                                          ],
+                                              Text(
+                                                snapshot.data[index].title,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                          subtitle: Row(
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.timelapse,
+                                                color: Colors.grey[400],
+                                              ),
+                                              Container(
+                                                height: 2,
+                                                decoration: BoxDecoration(
+                                                    border: Border(
+                                                        bottom: BorderSide(
+                                                            color: Colors
+                                                                .grey[400],
+                                                            width: 2.0))),
+                                                width: width * seekValue <
+                                                        (width - 120)
+                                                    ? width * seekValue
+                                                    : width - 120,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 2),
+                                              ),
+                                              Container(
+                                                width: 50,
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                    color: context.accentColor,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10))),
+                                                padding: EdgeInsets.all(2),
+                                                child: Text(
+                                                  seconds == 0 && seekValue == 1
+                                                      ? s.mark
+                                                      : seconds.toInt().toTime,
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                      ],
+                                    ),
+                                  );
+                                }
                               }),
                         )
                       : Center(

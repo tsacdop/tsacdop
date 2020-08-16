@@ -25,7 +25,7 @@ class PlayHistory {
   EpisodeBrief _episode;
   EpisodeBrief get episode => _episode;
 
-  getEpisode() async {
+  Future<void> getEpisode() async {
     _episode = await _dbHelper.getRssItemWithUrl(url);
   }
 }
