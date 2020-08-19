@@ -151,7 +151,7 @@ class DownloadState extends ChangeNotifier {
     super.addListener(listener);
   }
 
-  _loadTasks() async {
+  Future<void> _loadTasks() async {
     _episodeTasks = [];
     var dbHelper = DBHelper();
     var tasks = await FlutterDownloader.loadTasks();
@@ -162,8 +162,21 @@ class DownloadState extends ChangeNotifier {
           await FlutterDownloader.remove(
               taskId: task.taskId, shouldDeleteContent: true);
         } else {
-          _episodeTasks.add(EpisodeTask(episode, task.taskId,
-              progress: task.progress, status: task.status));
+          if (task.status == DownloadTaskStatus.complete) {
+            var exist =
+                await File(path.join(task.savedDir, task.filename)).exists();
+            if (!exist) {
+              await FlutterDownloader.remove(
+                  taskId: task.taskId, shouldDeleteContent: true);
+              await dbHelper.delDownloaded(episode.enclosureUrl);
+            } else {
+              _episodeTasks.add(EpisodeTask(episode, task.taskId,
+                  progress: task.progress, status: task.status));
+            }
+          } else {
+            _episodeTasks.add(EpisodeTask(episode, task.taskId,
+                progress: task.progress, status: task.status));
+          }
         }
       }
     }

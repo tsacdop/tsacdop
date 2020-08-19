@@ -1177,12 +1177,6 @@ class DBHelper {
           list.first['is_new'],
           mediaId: list.first['media_id'],
           skipSeconds: list.first['skip_seconds']);
-      if (episode.enclosureUrl != episode.mediaId &&
-          !File(episode.mediaId.substring(7)).existsSync()) {
-        final url = episode.enclosureUrl;
-        await delDownloaded(url);
-        episode = episode.copyWith(mediaId: url);
-      }
       return episode;
     }
   }
@@ -1211,12 +1205,6 @@ class DBHelper {
           list.first['is_new'],
           mediaId: list.first['media_id'],
           skipSeconds: list.first['skip_seconds']);
-      if (episode.enclosureUrl != episode.mediaId &&
-          !File(episode.mediaId.substring(7)).existsSync()) {
-        final url = episode.enclosureUrl;
-        await delDownloaded(url);
-        episode = episode.copyWith(mediaId: url);
-      }
       return episode;
     }
   }
