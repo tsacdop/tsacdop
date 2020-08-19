@@ -1,5 +1,13 @@
 # Tsacdop Changelog
 
+## 0.4.13
+
+Release date 2020/8/19
+
+### BUgs fixed
+
+* Downloaded episode play error, you might need to redownload the episode.
+
 ## 0.4.12
 
 Release date 2020/8/15
