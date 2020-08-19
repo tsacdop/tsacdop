@@ -38,7 +38,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   _getSlideTween(double value) => TweenSequence<double>([
         TweenSequenceItem(
             tween: Tween<double>(begin: 0.0, end: value), weight: 4 / 5),
-        TweenSequenceItem(tween: ConstantTween<double>(0.0), weight: 1 / 5)
+        TweenSequenceItem(
+            tween: Tween<double>(begin: -value, end: 0), weight: 1 / 5)
       ]);
 
   @override
