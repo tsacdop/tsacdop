@@ -30,18 +30,41 @@ class ScrollPodcasts extends StatefulWidget {
   _ScrollPodcastsState createState() => _ScrollPodcastsState();
 }
 
-class _ScrollPodcastsState extends State<ScrollPodcasts> {
-  int _groupIndex;
-
-  Future<int> getPodcastUpdateCounts(String id) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.getPodcastUpdateCounts(id);
-  }
+class _ScrollPodcastsState extends State<ScrollPodcasts>
+    with SingleTickerProviderStateMixin {
+  int _groupIndex = 0;
+  AnimationController _controller;
+  TweenSequence _slideTween;
+  _getSlideTween(double value) => TweenSequence<double>([
+        TweenSequenceItem(
+            tween: Tween<double>(begin: 0.0, end: value), weight: 4 / 5),
+        TweenSequenceItem(tween: ConstantTween<double>(0.0), weight: 1 / 5)
+      ]);
 
   @override
   void initState() {
     super.initState();
     _groupIndex = 0;
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 125))
+          ..addListener(() {
+            if (mounted) setState(() {});
+          })
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) _controller.reset();
+          });
+    _slideTween = _getSlideTween(0.0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<int> getPodcastUpdateCounts(String id) async {
+    var dbHelper = DBHelper();
+    return await dbHelper.getPodcastUpdateCounts(id);
   }
 
   Widget _circleContainer(BuildContext context) => Container(
@@ -98,11 +121,13 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     gravity: ToastGravity.BOTTOM,
                                   );
                                 } else {
-                                  setState(() {
-                                    (_groupIndex < groups.length - 1)
-                                        ? _groupIndex++
-                                        : _groupIndex = 0;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      (_groupIndex < groups.length - 1)
+                                          ? _groupIndex++
+                                          : _groupIndex = 0;
+                                    });
+                                  }
                                 }
                               }
                             },
@@ -116,12 +141,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                               horizontal: 15.0),
                                           child: Text(
                                             groups[_groupIndex].name,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyText1
+                                            style: context.textTheme.bodyText1
                                                 .copyWith(
-                                                    color: Theme.of(context)
-                                                        .accentColor),
+                                                    color: context.accentColor),
                                           )),
                                       Spacer(),
                                       Container(
@@ -160,8 +182,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                 ),
                                 Container(
                                     height: 70,
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
+                                    color: context.scaffoldBackgroundColor,
                                     child: Row(
                                       children: <Widget>[
                                         _circleContainer(context),
@@ -216,7 +237,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         GestureDetector(
-                          onVerticalDragEnd: (event) {
+                          onVerticalDragEnd: (event) async {
                             if (event.primaryVelocity > 200) {
                               if (groups.length == 1) {
                                 Fluttertoast.showToast(
@@ -225,11 +246,18 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                 );
                               } else {
                                 if (mounted) {
-                                  setState(() {
-                                    (_groupIndex != 0)
-                                        ? _groupIndex--
-                                        : _groupIndex = groups.length - 1;
-                                  });
+                                  setState(
+                                      () => _slideTween = _getSlideTween(20));
+                                  _controller.forward();
+                                  await Future.delayed(
+                                      Duration(milliseconds: 100));
+                                  if (mounted) {
+                                    setState(() {
+                                      (_groupIndex != 0)
+                                          ? _groupIndex--
+                                          : _groupIndex = groups.length - 1;
+                                    });
+                                  }
                                 }
                               }
                             } else if (event.primaryVelocity < -200) {
@@ -239,11 +267,18 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               } else {
-                                setState(() {
-                                  (_groupIndex < groups.length - 1)
-                                      ? _groupIndex++
-                                      : _groupIndex = 0;
-                                });
+                                setState(
+                                    () => _slideTween = _getSlideTween(-20));
+                                await Future.delayed(
+                                    Duration(milliseconds: 100));
+                                _controller.forward();
+                                if (mounted) {
+                                  setState(() {
+                                    (_groupIndex < groups.length - 1)
+                                        ? _groupIndex++
+                                        : _groupIndex = 0;
+                                  });
+                                }
                               }
                             }
                           },
@@ -316,45 +351,56 @@ class _ScrollPodcastsState extends State<ScrollPodcasts> {
                                     final color =
                                         podcastLocal.backgroudColor(context);
                                     return Tab(
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(25.0)),
-                                        child: Stack(
-                                          alignment: Alignment.bottomCenter,
-                                          children: <Widget>[
-                                            LimitedBox(
-                                              maxHeight: 50,
-                                              maxWidth: 50,
-                                              child: CircleAvatar(
-                                                  backgroundColor:
-                                                      color.withOpacity(0.5),
-                                                  backgroundImage:
-                                                      podcastLocal.avatarImage),
+                                      child: Transform.translate(
+                                        offset: Offset(
+                                            0,
+                                            _slideTween
+                                                .animate(_controller)
+                                                .value),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(25.0)),
+                                          child: LimitedBox(
+                                            maxHeight: 50,
+                                            maxWidth: 50,
+                                            child: CircleAvatar(
+                                              backgroundColor:
+                                                  color.withOpacity(0.5),
+                                              backgroundImage:
+                                                  podcastLocal.avatarImage,
+                                              child: FutureBuilder<int>(
+                                                  future:
+                                                      getPodcastUpdateCounts(
+                                                          podcastLocal.id),
+                                                  initialData: 0,
+                                                  builder: (context, snapshot) {
+                                                    return snapshot.data > 0
+                                                        ? Align(
+                                                            alignment: Alignment
+                                                                .bottomCenter,
+                                                            child: Container(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              height: 10,
+                                                              width: 40,
+                                                              color: Colors
+                                                                  .black54,
+                                                              child: Text('New',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .red,
+                                                                      fontSize:
+                                                                          8,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic)),
+                                                            ),
+                                                          )
+                                                        : Center();
+                                                  }),
                                             ),
-                                            FutureBuilder<int>(
-                                                future: getPodcastUpdateCounts(
-                                                    podcastLocal.id),
-                                                initialData: 0,
-                                                builder: (context, snapshot) {
-                                                  return snapshot.data > 0
-                                                      ? Container(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          height: 10,
-                                                          width: 40,
-                                                          color: Colors.black54,
-                                                          child: Text('New',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontSize: 8,
-                                                                  fontStyle:
-                                                                      FontStyle
-                                                                          .italic)),
-                                                        )
-                                                      : Center();
-                                                }),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     );
