@@ -336,7 +336,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                 context,
                 title: s.settings,
                 child: PodcastSetting(podcastLocal: widget.podcastLocal),
-              );
+              ).then((value) => setState(() {}));
               break;
           }
         },

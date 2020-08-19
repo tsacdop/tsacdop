@@ -462,8 +462,8 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
     var rss = item.url;
     sendPort.send([item.title, item.url, 1]);
     var options = BaseOptions(
-      connectTimeout: 20000,
-      receiveTimeout: 20000,
+      connectTimeout: 30000,
+      receiveTimeout: 90000,
     );
 
     try {

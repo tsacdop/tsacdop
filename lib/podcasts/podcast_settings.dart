@@ -96,17 +96,18 @@ class _PodcastSettingState extends State<PodcastSetting> {
   Future<void> _refreshArtWork() async {
     setState(() => _coverStatus = RefreshCoverStatus.start);
     var options = BaseOptions(
-      connectTimeout: 20000,
-      receiveTimeout: 20000,
+      connectTimeout: 30000,
+      receiveTimeout: 90000,
     );
+
+    var dio = Dio(options);
     String imageUrl;
 
     try {
-      var response = await Dio(options).get(widget.podcastLocal.rssUrl);
+      var response = await dio.get(widget.podcastLocal.rssUrl);
       try {
-        RssFeed p;
-        p = RssFeed.parse(response.data);
-        imageUrl == p.itunes.image.href;
+        var p = RssFeed.parse(response.data);
+        imageUrl = p.itunes.image.href ?? p.image.url;
       } catch (e) {
         developer.log(e.toString());
         if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
@@ -121,10 +122,9 @@ class _PodcastSettingState extends State<PodcastSetting> {
             !File(widget.podcastLocal.imageUrl).existsSync())) {
       try {
         img.Image thumbnail;
-        var imageResponse = await Dio().get<List<int>>(imageUrl,
+        var imageResponse = await dio.get<List<int>>(imageUrl,
             options: Options(
               responseType: ResponseType.bytes,
-              receiveTimeout: 90000,
             ));
         var image = img.decodeImage(imageResponse.data);
         thumbnail = img.copyResize(image, width: 300);
@@ -137,10 +137,10 @@ class _PodcastSettingState extends State<PodcastSetting> {
           }
         }
       } catch (e) {
+        developer.log(e.toString());
         if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
       }
-    }
-    if (mounted) {
+    } else if (_coverStatus == RefreshCoverStatus.start && mounted) {
       setState(() => _coverStatus = RefreshCoverStatus.complete);
     }
   }
@@ -181,7 +181,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
       case RefreshCoverStatus.complete:
         return Icon(Icons.done);
         break;
-      case RefreshCoverStatus.complete:
+      case RefreshCoverStatus.error:
         return Icon(Icons.refresh, color: Colors.red);
         break;
       default:
@@ -307,11 +307,11 @@ class _PodcastSettingState extends State<PodcastSetting> {
               },
               title: Text(s.refreshArtwork),
               leading: Icon(Icons.refresh),
-              trailing: SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: Padding(
-                      padding: const EdgeInsets.only(right: 10.0),
+              trailing: Padding(
+                  padding: const EdgeInsets.only(right: 15.0),
+                  child: SizedBox(
+                      height: 20,
+                      width: 20,
                       child: _getRefreshStatusIcon(_coverStatus)))),
           Divider(height: 1),
         ]);

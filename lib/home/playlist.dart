@@ -366,6 +366,7 @@ class __DismissibleContainerState extends State<_DismissibleContainer> {
     final c = widget.episode.backgroudColor(context);
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
+      curve: Curves.easeInSine,
       alignment: Alignment.center,
       height: _delete ? 0 : 90.0,
       child: _delete
@@ -413,6 +414,7 @@ class __DismissibleContainerState extends State<_DismissibleContainer> {
                 var index = await audio.delFromPlaylist(widget.episode);
                 widget.onRemove(true);
                 final episodeRemove = widget.episode;
+                Scaffold.of(context).removeCurrentSnackBar();
                 Scaffold.of(context).showSnackBar(SnackBar(
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Colors.grey[800],
