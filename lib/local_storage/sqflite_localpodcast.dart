@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';

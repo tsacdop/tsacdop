@@ -37,7 +37,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   TweenSequence _slideTween;
   _getSlideTween(double value) => TweenSequence<double>([
         TweenSequenceItem(
-            tween: Tween<double>(begin: 0.0, end: value), weight: 4 / 5),
+            tween: Tween<double>(begin: 0.0, end: value), weight: 3 / 5),
+        TweenSequenceItem(tween: ConstantTween<double>(value), weight: 1 / 5),
         TweenSequenceItem(
             tween: Tween<double>(begin: -value, end: 0), weight: 1 / 5)
       ]);
@@ -134,10 +135,11 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                             },
                             child: Column(
                               children: <Widget>[
-                                Container(
+                                SizedBox(
+                                  height: 30,
                                   child: Row(
                                     children: <Widget>[
-                                      Container(
+                                      Padding(
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 15.0),
                                           child: Text(
@@ -147,11 +149,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                                     color: context.accentColor),
                                           )),
                                       Spacer(),
-                                      Container(
-                                        height: 30,
+                                      Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 15),
-                                        alignment: Alignment.bottomRight,
                                         child: InkWell(
                                           onTap: () {
                                             if (!import) {
@@ -162,9 +162,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                               );
                                             }
                                           },
-                                          child: Container(
-                                            height: 30,
-                                            padding: EdgeInsets.all(5.0),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(5.0),
                                             child: Text(
                                               s.homeGroupsSeeAll,
                                               style: context.textTheme.bodyText1
@@ -251,7 +252,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                       () => _slideTween = _getSlideTween(20));
                                   _controller.forward();
                                   await Future.delayed(
-                                      Duration(milliseconds: 100));
+                                      Duration(milliseconds: 50));
                                   if (mounted) {
                                     setState(() {
                                       (_groupIndex != 0)
@@ -271,7 +272,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                 setState(
                                     () => _slideTween = _getSlideTween(-20));
                                 await Future.delayed(
-                                    Duration(milliseconds: 100));
+                                    Duration(milliseconds: 50));
                                 _controller.forward();
                                 if (mounted) {
                                   setState(() {
@@ -285,50 +286,49 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                           },
                           child: Column(
                             children: <Widget>[
-                              Container(
+                              SizedBox(
+                                height: 30,
                                 child: Row(
                                   children: <Widget>[
-                                    Container(
-                                        padding: EdgeInsets.symmetric(
+                                    Padding(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 15.0),
                                         child: Text(
                                           groups[_groupIndex].name,
                                           style: context.textTheme.bodyText1
                                               .copyWith(
-                                                  color: Theme.of(context)
-                                                      .accentColor),
+                                                  color: context.accentColor),
                                         )),
                                     Spacer(),
-                                    Container(
-                                      height: 30.0,
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 15),
-                                      alignment: Alignment.bottomRight,
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
                                       child: InkWell(
-                                        onTap: () {
-                                          if (!import) {
-                                            Navigator.push(
-                                              context,
-                                              SlideLeftRoute(
-                                                  page: PodcastManage()),
-                                            );
-                                          }
-                                        },
-                                        child: Container(
-                                          height: 30,
-                                          padding: EdgeInsets.all(5.0),
-                                          child: Text(
-                                            s.homeGroupsSeeAll,
-                                            style: context.textTheme.bodyText1
-                                                .copyWith(
-                                                    color: import
-                                                        ? context
-                                                            .primaryColorDark
-                                                        : context.accentColor),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                          onTap: () {
+                                            if (!import) {
+                                              Navigator.push(
+                                                context,
+                                                SlideLeftRoute(
+                                                    page: PodcastManage()),
+                                              );
+                                            }
+                                          },
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: Text(
+                                              s.homeGroupsSeeAll,
+                                              style: context.textTheme.bodyText1
+                                                  .copyWith(
+                                                      color: import
+                                                          ? context
+                                                              .primaryColorDark
+                                                          : context
+                                                              .accentColor),
+                                            ),
+                                          )),
+                                    )
                                   ],
                                 ),
                               ),
