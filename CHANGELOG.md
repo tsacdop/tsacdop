@@ -1,10 +1,15 @@
 # Tsacdop Changelog
 
+## 0.4.14
+
+Release date 2020/8/20
+Only for izzyonandroid.
+
 ## 0.4.13
 
 Release date 2020/8/19
 
-### BUgs fixed
+### Bugs fixed
 
 * Downloaded episode play error, you might need to redownload the episode.
 

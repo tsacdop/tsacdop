@@ -5,7 +5,7 @@ import 'package:line_icons/line_icons.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
-const String version = '0.4.13';
+const String version = '0.4.14';
 
 class AboutApp extends StatelessWidget {
   Widget _listItem(
@@ -143,6 +143,8 @@ class AboutApp extends StatelessWidget {
                           onPressed: () =>
                               'https://tsacdop.stonegate.me/#/privacy'
                                   .launchUrl,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5)),
                           child: Text(s.privacyPolicy,
                               style: TextStyle(color: context.accentColor)),
                         ),
@@ -158,6 +160,8 @@ class AboutApp extends StatelessWidget {
                           onPressed: () =>
                               'https://tsacdop.stonegate.me/#/changelog'
                                   .launchUrl,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5)),
                           child: Text(s.changelog,
                               style: TextStyle(color: context.accentColor)),
                         ),
