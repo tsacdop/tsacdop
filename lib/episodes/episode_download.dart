@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../state/setting_state.dart';
+import '../type/episode_task.dart';
 import '../type/episodebrief.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
@@ -167,8 +168,8 @@ class _DownloadButtonState extends State<DownloadButton> {
           builder: (_, data, __) => _buttonOnMenu(
               Center(
                 child: SizedBox(
-                  height: 18,
-                  width: 18,
+                  height: 20,
+                  width: 20,
                   child: CustomPaint(
                     painter: DownloadPainter(
                       color: Colors.grey[700],
@@ -196,11 +197,11 @@ class _DownloadButtonState extends State<DownloadButton> {
                 duration: Duration(milliseconds: 1000),
                 tween: Tween(begin: 0.0, end: 1.0),
                 builder: (context, fraction, child) => SizedBox(
-                  height: 18,
-                  width: 18,
+                  height: 20,
+                  width: 20,
                   child: CustomPaint(
                     painter: DownloadPainter(
-                        color: Colors.grey[700],
+                        color: context.accentColor,
                         fraction: fraction,
                         progressColor: context.accentColor,
                         progress: task.progress / 100),
@@ -226,11 +227,11 @@ class _DownloadButtonState extends State<DownloadButton> {
                 duration: Duration(milliseconds: 500),
                 tween: Tween(begin: 0.0, end: 1.0),
                 builder: (context, fraction, child) => SizedBox(
-                  height: 18,
-                  width: 18,
+                  height: 20,
+                  width: 20,
                   child: CustomPaint(
                     painter: DownloadPainter(
-                        color: Colors.grey[700],
+                        color: context.accentColor,
                         fraction: 1,
                         progressColor: context.accentColor,
                         progress: task.progress / 100,
@@ -245,13 +246,31 @@ class _DownloadButtonState extends State<DownloadButton> {
       case 3:
         Provider.of<AudioPlayerNotifier>(context, listen: false)
             .updateMediaItem(task.episode);
-        return _buttonOnMenu(
-            Icon(
-              Icons.done_all,
-              color: Theme.of(context).accentColor,
-            ), () {
-          _deleteDownload(task.episode);
-        });
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              _deleteDownload(task.episode);
+            },
+            child: Container(
+              height: 50.0,
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(horizontal: 18),
+              child: SizedBox(
+                height: 20,
+                width: 20,
+                child: CustomPaint(
+                  painter: DownloadPainter(
+                    color: context.accentColor,
+                    fraction: 1,
+                    progressColor: context.accentColor,
+                    progress: 1,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
         break;
       case 4:
         return _buttonOnMenu(Icon(Icons.refresh, color: Colors.red),

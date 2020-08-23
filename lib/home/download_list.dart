@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../episodes/episode_detail.dart';
 import '../state/download_state.dart';
+import '../type/episode_task.dart';
 import '../util/pageroute.dart';
 
 class DownloadList extends StatefulWidget {
@@ -17,11 +18,20 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
   var downloader = Provider.of<DownloadState>(context, listen: false);
   switch (task.status.value) {
     case 2:
-      return IconButton(
-        icon: Icon(
-          Icons.pause_circle_filled,
-        ),
-        onPressed: () => downloader.pauseTask(task.episode),
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(
+              Icons.pause_circle_filled,
+            ),
+            onPressed: () => downloader.pauseTask(task.episode),
+          ),
+          IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () => downloader.delTask(task.episode),
+          ),
+        ],
       );
     case 4:
       return Row(
@@ -38,10 +48,16 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
         ],
       );
     case 6:
-      return IconButton(
-        icon: Icon(Icons.play_circle_filled),
-        onPressed: () => downloader.resumeTask(task.episode),
-      );
+      return Row(mainAxisSize: MainAxisSize.min, children: [
+        IconButton(
+          icon: Icon(Icons.play_circle_filled),
+          onPressed: () => downloader.resumeTask(task.episode),
+        ),
+        IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () => downloader.delTask(task.episode),
+        ),
+      ]);
       break;
     default:
       return Center();
@@ -54,12 +70,12 @@ class _DownloadListState extends State<DownloadList> {
     return SliverPadding(
       padding: EdgeInsets.zero,
       sliver: Consumer<DownloadState>(builder: (_, downloader, __) {
-        var tasks = downloader.episodeTasks
+        final tasks = downloader.episodeTasks
             .where((task) => task.status.value != 3)
             .toList();
         return tasks.length > 0
             ? SliverPadding(
-                padding: EdgeInsets.all(5.0),
+                padding: EdgeInsets.symmetric(vertical: 5.0),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
