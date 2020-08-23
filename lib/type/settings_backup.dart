@@ -24,6 +24,7 @@ class SettingsBackup {
   final int rewindSeconds;
   final int playerHeight;
   final String locale;
+  final bool hideListened;
   SettingsBackup(
       {this.theme,
       this.accentColor,
@@ -49,7 +50,8 @@ class SettingsBackup {
       this.fastForwardSeconds,
       this.rewindSeconds,
       this.playerHeight,
-      this.locale});
+      this.locale,
+      this.hideListened});
 
   Map<String, Object> toJson() {
     return {
@@ -76,7 +78,8 @@ class SettingsBackup {
       'fastForwardSeconds': fastForwardSeconds,
       'rewindSeconds': rewindSeconds,
       'playerHeight': playerHeight,
-      'locale': locale
+      'locale': locale,
+      'hideListened': hideListened
     };
   }
 
@@ -106,6 +109,7 @@ class SettingsBackup {
         fastForwardSeconds: json['fastForwardSeconds'] as int,
         rewindSeconds: json['rewindSeconds'] as int,
         playerHeight: json['playerHeight'] as int,
-        locale: json['locale'] as String);
+        locale: json['locale'] as String,
+        hideListened: json['hideListened'] as bool);
   }
 }

@@ -799,32 +799,55 @@ class DBHelper {
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> getRecentRssItem(int top) async {
+  Future<List<EpisodeBrief>> getRecentRssItem(int top,
+      {bool hideListened = false}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
-    List<Map> list = await dbClient.rawQuery(
+    var list = <Map>[];
+    list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         ORDER BY E.milliseconds DESC LIMIT ? """, [top]);
-    for (var i in list) {
-      episodes.add(EpisodeBrief(
-          i['title'],
-          i['enclosure_url'],
-          i['enclosure_length'],
-          i['milliseconds'],
-          i['feed_title'],
-          i['primaryColor'],
-          i['duration'],
-          i['explicit'],
-          i['imagePath'],
-          i['is_new']));
+    if (list.isNotEmpty) {
+      if (!hideListened) {
+        for (var i in list) {
+          episodes.add(EpisodeBrief(
+              i['title'],
+              i['enclosure_url'],
+              i['enclosure_length'],
+              i['milliseconds'],
+              i['feedTitle'],
+              i['primaryColor'],
+              i['duration'],
+              i['explicit'],
+              i['imagePath'],
+              i['is_new']));
+        }
+      } else {
+        for (var i in list) {
+          var listened = await isListened(i['enclosure_url']);
+          if (listened == 0) {
+            episodes.add(EpisodeBrief(
+                i['title'],
+                i['enclosure_url'],
+                i['enclosure_length'],
+                i['milliseconds'],
+                i['feedTitle'],
+                i['primaryColor'],
+                i['duration'],
+                i['explicit'],
+                i['imagePath'],
+                i['is_new']));
+          }
+        }
+      }
     }
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> getGroupRssItem(
-      int top, List<String> group) async {
+  Future<List<EpisodeBrief>> getGroupRssItem(int top, List<String> group,
+      {bool hideListened = false}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     if (group.length > 0) {
@@ -835,18 +858,39 @@ class DBHelper {
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE P.id in (${s.join(',')})
         ORDER BY E.milliseconds DESC LIMIT ? """, [top]);
-      for (var i in list) {
-        episodes.add(EpisodeBrief(
-            i['title'],
-            i['enclosure_url'],
-            i['enclosure_length'],
-            i['milliseconds'],
-            i['feed_title'],
-            i['primaryColor'],
-            i['duration'],
-            i['explicit'],
-            i['imagePath'],
-            i['is_new']));
+      if (list.isNotEmpty) {
+        if (!hideListened) {
+          for (var i in list) {
+            episodes.add(EpisodeBrief(
+                i['title'],
+                i['enclosure_url'],
+                i['enclosure_length'],
+                i['milliseconds'],
+                i['feedTitle'],
+                i['primaryColor'],
+                i['duration'],
+                i['explicit'],
+                i['imagePath'],
+                i['is_new']));
+          }
+        } else {
+          for (var i in list) {
+            var listened = await isListened(i['enclosure_url']);
+            if (listened == 0) {
+              episodes.add(EpisodeBrief(
+                  i['title'],
+                  i['enclosure_url'],
+                  i['enclosure_length'],
+                  i['milliseconds'],
+                  i['feedTitle'],
+                  i['primaryColor'],
+                  i['duration'],
+                  i['explicit'],
+                  i['imagePath'],
+                  i['is_new']));
+            }
+          }
+        }
       }
     }
     return episodes;
@@ -903,7 +947,8 @@ class DBHelper {
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> getDownloadedEpisode(int mode) async {
+  Future<List<EpisodeBrief>> getDownloadedEpisode(int mode,
+      {bool hideListened = false}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     List<Map> list;
@@ -933,26 +978,46 @@ class DBHelper {
         ORDER BY E.enclosure_length DESC""",
       );
     }
-    for (var i in list) {
-      episodes.add(
-        EpisodeBrief(
-            i['title'],
-            i['enclosure_url'],
-            i['enclosure_length'],
-            i['milliseconds'],
-            i['feed_title'],
-            i['primaryColor'],
-            i['duration'],
-            i['explicit'],
-            i['imagePath'],
-            i['is_new'],
-            downloadDate: i['download_date']),
-      );
+    if (list.isNotEmpty) {
+      if (!hideListened) {
+        for (var i in list) {
+          episodes.add(EpisodeBrief(
+              i['title'],
+              i['enclosure_url'],
+              i['enclosure_length'],
+              i['milliseconds'],
+              i['feedTitle'],
+              i['primaryColor'],
+              i['duration'],
+              i['explicit'],
+              i['imagePath'],
+              i['is_new'],
+              downloadDate: i['download_date']));
+        }
+      } else {
+        for (var i in list) {
+          var listened = await isListened(i['enclosure_url']);
+          if (listened == 0) {
+            episodes.add(EpisodeBrief(
+                i['title'],
+                i['enclosure_url'],
+                i['enclosure_length'],
+                i['milliseconds'],
+                i['feedTitle'],
+                i['primaryColor'],
+                i['duration'],
+                i['explicit'],
+                i['imagePath'],
+                i['is_new'],
+                downloadDate: i['download_date']));
+          }
+        }
+      }
     }
     return episodes;
   }
 
-  removeAllNewMark() async {
+  Future<void> removeAllNewMark() async {
     var dbClient = await database;
     await dbClient.transaction((txn) async {
       await txn.rawUpdate("UPDATE Episodes SET is_new = 0 ");
@@ -1009,48 +1074,59 @@ class DBHelper {
     developer.log('remove new episode $url');
   }
 
-  Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy) async {
+  Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy,
+      {bool hideListened = false}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
+    var list = <Map>[];
     if (sortBy == 0) {
-      List<Map> list = await dbClient.rawQuery(
+      list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, P.primaryColor, E.is_new
          FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE E.liked = 1 ORDER BY E.milliseconds DESC LIMIT ?""", [i]);
-      for (var i in list) {
-        episodes.add(EpisodeBrief(
-            i['title'],
-            i['enclosure_url'],
-            i['enclosure_length'],
-            i['milliseconds'],
-            i['feed_title'],
-            i['primaryColor'],
-            i['duration'],
-            i['explicit'],
-            i['imagePath'],
-            i['is_new']));
-      }
     } else {
-      List<Map> list = await dbClient.rawQuery(
+      list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, P.primaryColor, E.is_new
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE E.liked = 1 ORDER BY E.liked_date DESC LIMIT ?""", [i]);
-      for (var i in list) {
-        episodes.add(EpisodeBrief(
-            i['title'],
-            i['enclosure_url'],
-            i['enclosure_length'],
-            i['milliseconds'],
-            i['feed_title'],
-            i['primaryColor'],
-            i['duration'],
-            i['explicit'],
-            i['imagePath'],
-            i['is_new']));
+    }
+    if (list.isNotEmpty) {
+      if (!hideListened) {
+        for (var i in list) {
+          episodes.add(EpisodeBrief(
+              i['title'],
+              i['enclosure_url'],
+              i['enclosure_length'],
+              i['milliseconds'],
+              i['feedTitle'],
+              i['primaryColor'],
+              i['duration'],
+              i['explicit'],
+              i['imagePath'],
+              i['is_new']));
+        }
+      } else {
+        for (var i in list) {
+          var listened = await isListened(i['enclosure_url']);
+          if (listened == 0) {
+            episodes.add(EpisodeBrief(
+                i['title'],
+                i['enclosure_url'],
+                i['enclosure_length'],
+                i['milliseconds'],
+                i['feedTitle'],
+                i['primaryColor'],
+                i['duration'],
+                i['explicit'],
+                i['imagePath'],
+                i['is_new']));
+          }
+        }
       }
     }
+
     return episodes;
   }
 

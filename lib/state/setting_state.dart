@@ -454,33 +454,37 @@ class SettingState extends ChangeNotifier {
     var localeList = await localeStorage.getStringList();
     var backupLocale =
         localeList.isEmpty ? '' : '${'${localeList.first}-'}${localeList[1]}';
+    var hideListened =
+        await KeyValueStorage(hideListenedKey).getBool(defaultValue: false);
 
     return SettingsBackup(
-        theme: theme,
-        accentColor: accentColor,
-        realDark: realDark,
-        autoPlay: autoPlay,
-        autoUpdate: autoUpdate,
-        updateInterval: updateInterval,
-        downloadUsingData: downloadUsingData,
-        cacheMax: cacheMax,
-        podcastLayout: podcastLayout,
-        recentLayout: recentLayout,
-        favLayout: favLayout,
-        downloadLayout: downloadLayout,
-        autoDownloadNetwork: autoDownloadNetwork,
-        episodePopupMenu: episodePopupMenu.map((e) => e.toString()).toList(),
-        autoDelete: autoDelete,
-        autoSleepTimer: autoSleepTimer,
-        autoSleepTimerStart: autoSleepTimerStart,
-        autoSleepTimerEnd: autoSleepTimerEnd,
-        autoSleepTimerMode: autoSleepTimerMode,
-        defaultSleepTime: defaultSleepTime,
-        tapToOpenPopupMenu: tapToOpenPopupMenu,
-        fastForwardSeconds: fastForwardSeconds,
-        rewindSeconds: rewindSeconds,
-        playerHeight: playerHeight,
-        locale: backupLocale);
+      theme: theme,
+      accentColor: accentColor,
+      realDark: realDark,
+      autoPlay: autoPlay,
+      autoUpdate: autoUpdate,
+      updateInterval: updateInterval,
+      downloadUsingData: downloadUsingData,
+      cacheMax: cacheMax,
+      podcastLayout: podcastLayout,
+      recentLayout: recentLayout,
+      favLayout: favLayout,
+      downloadLayout: downloadLayout,
+      autoDownloadNetwork: autoDownloadNetwork,
+      episodePopupMenu: episodePopupMenu.map((e) => e.toString()).toList(),
+      autoDelete: autoDelete,
+      autoSleepTimer: autoSleepTimer,
+      autoSleepTimerStart: autoSleepTimerStart,
+      autoSleepTimerEnd: autoSleepTimerEnd,
+      autoSleepTimerMode: autoSleepTimerMode,
+      defaultSleepTime: defaultSleepTime,
+      tapToOpenPopupMenu: tapToOpenPopupMenu,
+      fastForwardSeconds: fastForwardSeconds,
+      rewindSeconds: rewindSeconds,
+      playerHeight: playerHeight,
+      locale: backupLocale,
+      hideListened: hideListened,
+    );
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -511,6 +515,7 @@ class SettingState extends ChangeNotifier {
     await KeyValueStorage(playerHeightKey).saveInt(backup.playerHeight);
     await KeyValueStorage(tapToOpenPopupMenuKey)
         .saveBool(backup.tapToOpenPopupMenu);
+    await KeyValueStorage(hideListenedKey).saveBool(backup.hideListened);
     if (backup.locale == '') {
       await localeStorage.saveStringList([]);
       await S.load(Locale(Intl.systemLocale));

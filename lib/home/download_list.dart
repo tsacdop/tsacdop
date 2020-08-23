@@ -60,45 +60,46 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
       ]);
       break;
     default:
-      return Center();
+      return SizedBox(
+        width: 10,
+        height: 10,
+      );
   }
 }
 
 class _DownloadListState extends State<DownloadList> {
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: EdgeInsets.zero,
-      sliver: Consumer<DownloadState>(builder: (_, downloader, __) {
-        final tasks = downloader.episodeTasks
-            .where((task) => task.status.value != 3)
-            .toList();
-        return tasks.length > 0
-            ? SliverPadding(
-                padding: EdgeInsets.symmetric(vertical: 5.0),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return ListTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          ScaleRoute(
-                              page: EpisodeDetail(
-                            episodeItem: tasks[index].episode,
-                          )),
-                        ),
-                        title: Row(
+    return Consumer<DownloadState>(builder: (_, downloader, __) {
+      final tasks = downloader.episodeTasks
+          .where((task) => task.status.value != 3)
+          .toList();
+      return tasks.length > 0
+          ? SliverPadding(
+              padding: EdgeInsets.symmetric(vertical: 5.0),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return ListTile(
+                      onTap: () => Navigator.push(
+                        context,
+                        ScaleRoute(
+                            page: EpisodeDetail(
+                          episodeItem: tasks[index].episode,
+                        )),
+                      ),
+                      title: SizedBox(
+                        height: 40,
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
                             Expanded(
                               flex: 5,
-                              child: Container(
-                                child: Text(
-                                  tasks[index].episode.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                              child: Text(
+                                tasks[index].episode.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             Expanded(
@@ -108,6 +109,7 @@ class _DownloadListState extends State<DownloadList> {
                                           DownloadTaskStatus.failed
                                   ? Container(
                                       width: 40.0,
+                                      height: 20.0,
                                       padding:
                                           EdgeInsets.symmetric(horizontal: 2),
                                       alignment: Alignment.center,
@@ -121,29 +123,32 @@ class _DownloadListState extends State<DownloadList> {
                                         maxLines: 1,
                                         style: TextStyle(color: Colors.white),
                                       ))
-                                  : Container(),
+                                  : Container(
+                                      height: 40,
+                                    ),
                             ),
                           ],
                         ),
-                        subtitle: SizedBox(
-                          height: 2,
-                          child: LinearProgressIndicator(
-                            value: tasks[index].progress / 100,
-                          ),
+                      ),
+                      subtitle: SizedBox(
+                        height: 2,
+                        child: LinearProgressIndicator(
+                          value: tasks[index].progress / 100,
                         ),
-                        leading: CircleAvatar(
-                            backgroundImage: tasks[index].episode.avatarImage),
-                        trailing: _downloadButton(tasks[index], context),
-                      );
-                    },
-                    childCount: tasks.length,
-                  ),
+                      ),
+                      leading: CircleAvatar(
+                          radius: 20,
+                          backgroundImage: tasks[index].episode.avatarImage),
+                      trailing: _downloadButton(tasks[index], context),
+                    );
+                  },
+                  childCount: tasks.length,
                 ),
-              )
-            : SliverToBoxAdapter(
-                child: Center(),
-              );
-      }),
-    );
+              ),
+            )
+          : SliverToBoxAdapter(
+              child: Center(),
+            );
+    });
   }
 }

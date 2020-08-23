@@ -73,7 +73,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   String _query = '';
 
   ///Hide listened.
-  bool _hideListened = false;
+  bool _hideListened;
 
   @override
   void initState() {
@@ -139,8 +139,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
     var episodes = <EpisodeBrief>[];
     _episodeCount = await dbHelper.getPodcastCounts(podcastLocal.id);
     var storage = KeyValueStorage(podcastLayoutKey);
+    var hideListenedStorage = KeyValueStorage(hideListenedKey);
     var index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
+    if (_hideListened == null) {
+      _hideListened = await hideListenedStorage.getBool(defaultValue: false);
+    }
     episodes = await dbHelper.getRssItem(podcastLocal.id, count,
         reverse: reverse,
         filter: filter,
@@ -165,7 +169,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
     return index;
   }
 
-  Widget podcastInfo(BuildContext context) {
+  Future<bool> _getHideListened() async {
+    var hideListenedStorage = KeyValueStorage(hideListenedKey);
+    var hideListened = await hideListenedStorage.getBool(defaultValue: false);
+    return hideListened;
+  }
+
+  Widget _podcastInfo(BuildContext context) {
     return Container(
       height: 170,
       padding: EdgeInsets.only(top: 40, left: 80, right: 130),
@@ -182,7 +192,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
-  Widget hostsList(BuildContext context, PodcastLocal podcastLocal) {
+  Widget _hostsList(BuildContext context, PodcastLocal podcastLocal) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -297,7 +307,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
-  _customPopupMenu(
+  Widget _customPopupMenu(
           {Widget child,
           String tooltip,
           List<PopupMenuEntry<int>> itemBuilder,
@@ -318,6 +328,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
           onSelected: (value) => onSelected(value),
         ),
       );
+
   Widget _rightTopMenu(BuildContext context) {
     final s = context.s;
     return _customPopupMenu(
@@ -587,22 +598,29 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   }
                 }),
             Spacer(),
-            Material(
-                color: Colors.transparent,
-                clipBehavior: Clip.hardEdge,
-                borderRadius: BorderRadius.circular(100),
-                child: IconButton(
-                  icon: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: HideListened(
-                      hideListened: _hideListened,
-                    ),
-                  ),
-                  onPressed: () {
-                    setState(() => _hideListened = !_hideListened);
-                  },
-                )),
+            FutureBuilder<bool>(
+                future: _getHideListened(),
+                builder: (context, snapshot) {
+                  if (_hideListened == null) {
+                    _hideListened = snapshot.data;
+                  }
+                  return Material(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.hardEdge,
+                      borderRadius: BorderRadius.circular(100),
+                      child: IconButton(
+                        icon: SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: HideListened(
+                            hideListened: _hideListened ?? false,
+                          ),
+                        ),
+                        onPressed: () {
+                          setState(() => _hideListened = !_hideListened);
+                        },
+                      ));
+                }),
             FutureBuilder<int>(
                 future: _getLayout(),
                 initialData: 1,
@@ -656,7 +674,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
               color: context.accentColor,
               onRefresh: () async {
                 await _updateRssItem(context, widget.podcastLocal);
-                //  audio.addNewEpisode(widget.podcastLocal.id);
               },
               child: Stack(
                 children: <Widget>[
@@ -666,146 +683,151 @@ class _PodcastDetailState extends State<PodcastDetail> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Expanded(
-                        child: CustomScrollView(
-                          controller: _controller
-                            ..addListener(() async {
-                              if (_controller.offset ==
-                                      _controller.position.maxScrollExtent &&
-                                  _dataCount == _top) {
-                                if (mounted) {
-                                  setState(() => _loadMore = true);
+                        child: ScrollConfiguration(
+                          behavior: NoGrowBehavior(),
+                          child: CustomScrollView(
+                            controller: _controller
+                              ..addListener(() async {
+                                if (_controller.offset ==
+                                        _controller.position.maxScrollExtent &&
+                                    _dataCount == _top) {
+                                  if (mounted) {
+                                    setState(() => _loadMore = true);
+                                  }
+                                  await Future.delayed(Duration(seconds: 3));
+                                  if (mounted) {
+                                    setState(() {
+                                      _top = _top + 36;
+                                      _loadMore = false;
+                                    });
+                                  }
                                 }
-                                await Future.delayed(Duration(seconds: 3));
-                                if (mounted) {
-                                  setState(() {
-                                    _top = _top + 36;
-                                    _loadMore = false;
-                                  });
+                                if (_controller.offset > 0 &&
+                                    mounted &&
+                                    !_scroll) {
+                                  setState(() => _scroll = true);
                                 }
-                              }
-                              if (_controller.offset > 0 &&
-                                  mounted &&
-                                  !_scroll) {
-                                setState(() => _scroll = true);
-                              }
-                            }),
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          slivers: <Widget>[
-                            SliverAppBar(
-                              brightness: Brightness.dark,
-                              actions: <Widget>[_rightTopMenu(context)],
-                              elevation: 0,
-                              iconTheme: IconThemeData(
-                                color: Colors.white,
-                              ),
-                              expandedHeight: 150 + context.paddingTop,
-                              backgroundColor: _color,
-                              floating: true,
-                              pinned: true,
-                              flexibleSpace: LayoutBuilder(
-                                  builder: (context, constraints) {
-                                _topHeight = constraints.biggest.height;
-                                return FlexibleSpaceBar(
-                                  background: Stack(
-                                    children: <Widget>[
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            top: 120 + context.paddingTop),
-                                        padding: EdgeInsets.only(
-                                            left: 80, right: 120),
-                                        color: Colors.white10,
-                                        alignment: Alignment.centerLeft,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                                widget.podcastLocal.author ??
-                                                    '',
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    color: Colors.white)),
-                                            if (widget.podcastLocal.provider
-                                                .isNotEmpty)
-                                              Text(
-                                                s.hostedOn(widget
-                                                    .podcastLocal.provider),
-                                                maxLines: 1,
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        alignment: Alignment.centerRight,
-                                        padding: EdgeInsets.only(right: 10),
-                                        child: SizedBox(
-                                          height: 120,
-                                          child: Image.file(File(
-                                              "${widget.podcastLocal.imagePath}")),
-                                        ),
-                                      ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        child: podcastInfo(context),
-                                      ),
-                                    ],
-                                  ),
-                                  title: _topHeight < 70 + context.paddingTop
-                                      ? Text(widget.podcastLocal.title,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.clip,
-                                          style: TextStyle(color: Colors.white))
-                                      : Center(),
-                                );
                               }),
-                            ),
-                            SliverToBoxAdapter(
-                              child: hostsList(context, widget.podcastLocal),
-                            ),
-                            SliverToBoxAdapter(child: _actionBar(context)),
-                            FutureBuilder<List<EpisodeBrief>>(
-                                future: _getRssItem(widget.podcastLocal,
-                                    count: _top,
-                                    reverse: _reverse,
-                                    filter: _filter,
-                                    query: _query),
-                                builder: (context, snapshot) {
-                                  return (snapshot.hasData)
-                                      ? EpisodeGrid(
-                                          episodes: snapshot.data,
-                                          showFavorite: true,
-                                          showNumber: _filter == Filter.all &&
-                                                  !_hideListened
-                                              ? true
-                                              : false,
-                                          layout: _layout,
-                                          reverse: _reverse,
-                                          episodeCount: _episodeCount,
-                                          initNum: _scroll ? 0 : 12,
-                                        )
-                                      : SliverToBoxAdapter(
-                                          child: Center(),
-                                        );
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            slivers: <Widget>[
+                              SliverAppBar(
+                                brightness: Brightness.dark,
+                                actions: <Widget>[_rightTopMenu(context)],
+                                elevation: 0,
+                                iconTheme: IconThemeData(
+                                  color: Colors.white,
+                                ),
+                                expandedHeight: 150 + context.paddingTop,
+                                backgroundColor: _color,
+                                floating: true,
+                                pinned: true,
+                                flexibleSpace: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                  _topHeight = constraints.biggest.height;
+                                  return FlexibleSpaceBar(
+                                    background: Stack(
+                                      children: <Widget>[
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              top: 120 + context.paddingTop),
+                                          padding: EdgeInsets.only(
+                                              left: 80, right: 120),
+                                          color: Colors.white10,
+                                          alignment: Alignment.centerLeft,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text(
+                                                  widget.podcastLocal.author ??
+                                                      '',
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
+                                              if (widget.podcastLocal.provider
+                                                  .isNotEmpty)
+                                                Text(
+                                                  s.hostedOn(widget
+                                                      .podcastLocal.provider),
+                                                  maxLines: 1,
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          alignment: Alignment.centerRight,
+                                          padding: EdgeInsets.only(right: 10),
+                                          child: SizedBox(
+                                            height: 120,
+                                            child: Image.file(File(
+                                                "${widget.podcastLocal.imagePath}")),
+                                          ),
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          child: _podcastInfo(context),
+                                        ),
+                                      ],
+                                    ),
+                                    title: _topHeight < 70 + context.paddingTop
+                                        ? Text(widget.podcastLocal.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.clip,
+                                            style:
+                                                TextStyle(color: Colors.white))
+                                        : Center(),
+                                  );
                                 }),
-                            SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  return _loadMore
-                                      ? Container(
-                                          height: 2,
-                                          child: LinearProgressIndicator())
-                                      : Center();
-                                },
-                                childCount: 1,
                               ),
-                            ),
-                          ],
+                              SliverToBoxAdapter(
+                                child: _hostsList(context, widget.podcastLocal),
+                              ),
+                              SliverToBoxAdapter(child: _actionBar(context)),
+                              FutureBuilder<List<EpisodeBrief>>(
+                                  future: _getRssItem(widget.podcastLocal,
+                                      count: _top,
+                                      reverse: _reverse,
+                                      filter: _filter,
+                                      query: _query),
+                                  builder: (context, snapshot) {
+                                    return (snapshot.hasData)
+                                        ? EpisodeGrid(
+                                            episodes: snapshot.data,
+                                            showFavorite: true,
+                                            showNumber: _filter == Filter.all &&
+                                                    !_hideListened
+                                                ? true
+                                                : false,
+                                            layout: _layout,
+                                            reverse: _reverse,
+                                            episodeCount: _episodeCount,
+                                            initNum: _scroll ? 0 : 12,
+                                          )
+                                        : SliverToBoxAdapter(
+                                            child: Center(),
+                                          );
+                                  }),
+                              SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    return _loadMore
+                                        ? Container(
+                                            height: 2,
+                                            child: LinearProgressIndicator())
+                                        : Center();
+                                  },
+                                  childCount: 1,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(

@@ -24,6 +24,18 @@ class _LayoutSettingState extends State<LayoutSetting> {
     return Layout.values[layout];
   }
 
+  Future<bool> _hideListened() async {
+    var hideListenedStorage = KeyValueStorage(hideListenedKey);
+    var hideListened = await hideListenedStorage.getBool(defaultValue: false);
+    return hideListened;
+  }
+
+  Future<void> _saveHideListened(bool boo) async {
+    var hideListenedStorage = KeyValueStorage(hideListenedKey);
+    await hideListenedStorage.saveBool(boo);
+    if (mounted) setState(() {});
+  }
+
   String _getHeightString(PlayerHeight mode) {
     final s = context.s;
     switch (mode) {
@@ -245,6 +257,22 @@ class _LayoutSettingState extends State<LayoutSetting> {
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
                     children: <Widget>[
+                      FutureBuilder<bool>(
+                        future: _hideListened(),
+                        initialData: false,
+                        builder: (context, snapshot) => ListTile(
+                          contentPadding: EdgeInsets.only(left: 70, right: 10),
+                          onTap: () => _saveHideListened(!snapshot.data),
+                          title: Text('Hide listened'),
+                          subtitle: Text('Hide listened episodes by default'),
+                          trailing: Transform.scale(
+                            scale: 0.9,
+                            child: Switch(
+                                value: snapshot.data,
+                                onChanged: _saveHideListened),
+                          ),
+                        ),
+                      ),
                       _setDefaultGridView(context,
                           text: s.settingsDefaultGridPodcast,
                           key: podcastLayoutKey),

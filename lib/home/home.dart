@@ -98,213 +98,66 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     var settings = Provider.of<SettingState>(context, listen: false);
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          systemNavigationBarIconBrightness:
-              Theme.of(context).accentColorBrightness,
-          statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-          systemNavigationBarColor: Theme.of(context).primaryColor,
-        ),
-        child: Scaffold(
-          key: _scaffoldKey,
-          body: WillPopScope(
-            onWillPop: () async {
-              if (_playerKey.currentState != null &&
-                  _playerKey.currentState.initSize > 100) {
-                _playerKey.currentState.backToMini();
-                return false;
-              } else if (Platform.isAndroid) {
-                _androidAppRetain.invokeMethod('sendToBackground');
-                return false;
-              } else {
-                return true;
-              }
-            },
-            child: SafeArea(
-              child: Stack(
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Expanded(
-                        child: NestedScrollView(
-                          innerScrollPositionKeyBuilder: () {
-                            return Key('tab${_controller.index}');
-                          },
-                          pinnedHeaderSliverHeightBuilder: () => 50,
-                          headerSliverBuilder: (context, innerBoxScrolled) {
-                            return <Widget>[
-                              SliverToBoxAdapter(
-                                child: Column(
-                                  children: <Widget>[
-                                    SizedBox(
-                                      height: 50.0,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          DescribedFeatureOverlay(
-                                            featureId: addFeature,
-                                            tapTarget:
-                                                Icon(Icons.add_circle_outline),
-                                            title:
-                                                Text(s.featureDiscoverySearch),
-                                            backgroundColor: Colors.cyan[600],
-                                            overflowMode: feature1OverflowMode,
-                                            onDismiss: () {
-                                              return Future.value(true);
-                                            },
-                                            description: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(s
-                                                    .featureDiscoverySearchDes),
-                                                FlatButton(
-                                                  color: Colors.cyan[500],
-                                                  padding:
-                                                      const EdgeInsets.all(0),
-                                                  child: Text(s.understood,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .button
-                                                          .copyWith(
-                                                              color: Colors
-                                                                  .white)),
-                                                  onPressed: () async =>
-                                                      FeatureDiscovery
-                                                          .completeCurrentStep(
-                                                              context),
-                                                ),
-                                                FlatButton(
-                                                  color: Colors.cyan[500],
-                                                  padding:
-                                                      const EdgeInsets.all(0),
-                                                  child: Text(s.dismiss,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .button
-                                                          .copyWith(
-                                                              color: Colors
-                                                                  .white)),
-                                                  onPressed: () =>
-                                                      FeatureDiscovery
-                                                          .dismissAll(context),
-                                                ),
-                                              ],
-                                            ),
-                                            child: IconButton(
-                                              tooltip: s.add,
-                                              icon: const Icon(
-                                                  Icons.add_circle_outline),
-                                              onPressed: () async {
-                                                await showSearch<int>(
-                                                  context: context,
-                                                  delegate: MyHomePageDelegate(
-                                                      searchFieldLabel:
-                                                          s.searchPodcast),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () => {
-                                              Theme.of(context).brightness ==
-                                                      Brightness.light
-                                                  ? settings.setTheme =
-                                                      ThemeMode.dark
-                                                  : settings.setTheme =
-                                                      ThemeMode.light
-                                            },
-                                            child: Image(
-                                              image: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.light
-                                                  ? AssetImage(
-                                                      'assets/text.png')
-                                                  : AssetImage(
-                                                      'assets/text_light.png'),
-                                              height: 30,
-                                            ),
-                                          ),
-                                          DescribedFeatureOverlay(
-                                              featureId: menuFeature,
-                                              tapTarget: Icon(Icons.more_vert),
-                                              backgroundColor: Colors.cyan[500],
-                                              onDismiss: () =>
-                                                  Future.value(true),
-                                              title:
-                                                  Text(s.featureDiscoveryOMPL),
-                                              description: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                children: <Widget>[
-                                                  Text(s
-                                                      .featureDiscoveryOMPLDes),
-                                                  FlatButton(
-                                                    color: Colors.cyan[600],
-                                                    padding:
-                                                        const EdgeInsets.all(0),
-                                                    child: Text(s.understood,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .button
-                                                            .copyWith(
-                                                                color: Colors
-                                                                    .white)),
-                                                    onPressed: () async =>
-                                                        FeatureDiscovery
-                                                            .completeCurrentStep(
-                                                                context),
-                                                  ),
-                                                  FlatButton(
-                                                    color: Colors.cyan[600],
-                                                    padding:
-                                                        const EdgeInsets.all(0),
-                                                    child: Text(s.dismiss,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .button
-                                                            .copyWith(
-                                                                color: Colors
-                                                                    .white)),
-                                                    onPressed: () =>
-                                                        FeatureDiscovery
-                                                            .dismissAll(
-                                                                context),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: PopupMenu()),
-                                        ],
-                                      ),
-                                    ),
-                                    Import(),
-                                  ],
-                                ),
-                              ),
-                              SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    return DescribedFeatureOverlay(
-                                      featureId: groupsFeature,
-                                      tapTarget: Center(
-                                          child: Text(
-                                        s.featureDiscoveryPodcast,
-                                        textAlign: TextAlign.center,
-                                      )),
-                                      backgroundColor: Colors.cyan[500],
-                                      enablePulsingAnimation: false,
-                                      onDismiss: () => Future.value(true),
-                                      title:
-                                          Text(s.featureDiscoveryPodcastTitle),
-                                      description: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(s.featureDiscoveryPodcastDes),
-                                          Row(
-                                            children: [
+      value: SystemUiOverlayStyle(
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
+        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+      ),
+      child: Scaffold(
+        key: _scaffoldKey,
+        body: WillPopScope(
+          onWillPop: () async {
+            if (_playerKey.currentState != null &&
+                _playerKey.currentState.initSize > 100) {
+              _playerKey.currentState.backToMini();
+              return false;
+            } else if (Platform.isAndroid) {
+              _androidAppRetain.invokeMethod('sendToBackground');
+              return false;
+            } else {
+              return true;
+            }
+          },
+          child: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: NestedScrollView(
+                        innerScrollPositionKeyBuilder: () {
+                          return Key('tab${_controller.index}');
+                        },
+                        pinnedHeaderSliverHeightBuilder: () => 50,
+                        headerSliverBuilder: (context, innerBoxScrolled) {
+                          return <Widget>[
+                            SliverToBoxAdapter(
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 50.0,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        DescribedFeatureOverlay(
+                                          featureId: addFeature,
+                                          tapTarget:
+                                              Icon(Icons.add_circle_outline),
+                                          title: Text(s.featureDiscoverySearch),
+                                          backgroundColor: Colors.cyan[600],
+                                          overflowMode: feature1OverflowMode,
+                                          onDismiss: () {
+                                            return Future.value(true);
+                                          },
+                                          description: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text(s.featureDiscoverySearchDes),
                                               FlatButton(
-                                                color: Colors.cyan[600],
+                                                color: Colors.cyan[500],
                                                 padding:
                                                     const EdgeInsets.all(0),
                                                 child: Text(s.understood,
@@ -319,11 +172,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                         .completeCurrentStep(
                                                             context),
                                               ),
-                                              Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 5)),
                                               FlatButton(
-                                                color: Colors.cyan[600],
+                                                color: Colors.cyan[500],
                                                 padding:
                                                     const EdgeInsets.all(0),
                                                 child: Text(s.dismiss,
@@ -339,66 +189,50 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                               ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                      child: SizedBox(
-                                        height: height,
-                                        width: width,
-                                        child: ScrollPodcasts(),
-                                      ),
-                                    );
-                                  },
-                                  childCount: 1,
-                                ),
-                              ),
-                              SliverPersistentHeader(
-                                delegate: _SliverAppBarDelegate(
-                                  TabBar(
-                                    indicator: _getIndicator(context),
-                                    isScrollable: true,
-                                    indicatorSize: TabBarIndicatorSize.tab,
-                                    controller: _controller,
-                                    tabs: <Widget>[
-                                      Tab(
-                                        child: Text(s.homeTabMenuRecent),
-                                      ),
-                                      Tab(
-                                        child: Text(s.homeTabMenuFavotite),
-                                      ),
-                                      Tab(
-                                        child: Text(s.download),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                pinned: true,
-                              ),
-                            ];
-                          },
-                          body: ScrollConfiguration(
-                            behavior: NoGrowBehavior(),
-                            child: TabBarView(
-                              controller: _controller,
-                              children: <Widget>[
-                                NestedScrollViewInnerScrollPositionKeyWidget(
-                                    Key('tab0'),
-                                    DescribedFeatureOverlay(
-                                        featureId: podcastFeature,
-                                        tapTarget: Text(
-                                            s.featureDiscoveryEpisode,
-                                            textAlign: TextAlign.center),
-                                        backgroundColor: Colors.cyan[500],
-                                        enablePulsingAnimation: false,
-                                        onDismiss: () => Future.value(true),
-                                        title: Text(
-                                            s.featureDiscoveryEpisodeTitle),
-                                        description: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(s.featureDiscoveryEpisodeDes),
-                                            Row(
-                                              children: [
+                                          child: IconButton(
+                                            tooltip: s.add,
+                                            icon: const Icon(
+                                                Icons.add_circle_outline),
+                                            onPressed: () async {
+                                              await showSearch<int>(
+                                                context: context,
+                                                delegate: MyHomePageDelegate(
+                                                    searchFieldLabel:
+                                                        s.searchPodcast),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () => {
+                                            Theme.of(context).brightness ==
+                                                    Brightness.light
+                                                ? settings.setTheme =
+                                                    ThemeMode.dark
+                                                : settings.setTheme =
+                                                    ThemeMode.light
+                                          },
+                                          child: Image(
+                                            image: Theme.of(context)
+                                                        .brightness ==
+                                                    Brightness.light
+                                                ? AssetImage('assets/text.png')
+                                                : AssetImage(
+                                                    'assets/text_light.png'),
+                                            height: 30,
+                                          ),
+                                        ),
+                                        DescribedFeatureOverlay(
+                                            featureId: menuFeature,
+                                            tapTarget: Icon(Icons.more_vert),
+                                            backgroundColor: Colors.cyan[500],
+                                            onDismiss: () => Future.value(true),
+                                            title: Text(s.featureDiscoveryOMPL),
+                                            description: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: <Widget>[
+                                                Text(s.featureDiscoveryOMPLDes),
                                                 FlatButton(
                                                   color: Colors.cyan[600],
                                                   padding:
@@ -415,10 +249,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                           .completeCurrentStep(
                                                               context),
                                                 ),
-                                                Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 5)),
                                                 FlatButton(
                                                   color: Colors.cyan[600],
                                                   padding:
@@ -436,33 +266,182 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                 ),
                                               ],
                                             ),
+                                            child: PopupMenu()),
+                                      ],
+                                    ),
+                                  ),
+                                  Import(),
+                                ],
+                              ),
+                            ),
+                            SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  return DescribedFeatureOverlay(
+                                    featureId: groupsFeature,
+                                    tapTarget: Center(
+                                        child: Text(
+                                      s.featureDiscoveryPodcast,
+                                      textAlign: TextAlign.center,
+                                    )),
+                                    backgroundColor: Colors.cyan[500],
+                                    enablePulsingAnimation: false,
+                                    onDismiss: () => Future.value(true),
+                                    title: Text(s.featureDiscoveryPodcastTitle),
+                                    description: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(s.featureDiscoveryPodcastDes),
+                                        Row(
+                                          children: [
+                                            FlatButton(
+                                              color: Colors.cyan[600],
+                                              padding: const EdgeInsets.all(0),
+                                              child: Text(s.understood,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .button
+                                                      .copyWith(
+                                                          color: Colors.white)),
+                                              onPressed: () async =>
+                                                  FeatureDiscovery
+                                                      .completeCurrentStep(
+                                                          context),
+                                            ),
+                                            Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5)),
+                                            FlatButton(
+                                              color: Colors.cyan[600],
+                                              padding: const EdgeInsets.all(0),
+                                              child: Text(s.dismiss,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .button
+                                                      .copyWith(
+                                                          color: Colors.white)),
+                                              onPressed: () =>
+                                                  FeatureDiscovery.dismissAll(
+                                                      context),
+                                            ),
                                           ],
                                         ),
-                                        child: _RecentUpdate())),
-                                NestedScrollViewInnerScrollPositionKeyWidget(
-                                    Key('tab1'), _MyFavorite()),
-                                NestedScrollViewInnerScrollPositionKeyWidget(
-                                    Key('tab2'), _MyDownload()),
-                              ],
+                                      ],
+                                    ),
+                                    child: SizedBox(
+                                      height: height,
+                                      width: width,
+                                      child: ScrollPodcasts(),
+                                    ),
+                                  );
+                                },
+                                childCount: 1,
+                              ),
                             ),
-                          ),
+                            SliverPersistentHeader(
+                              delegate: _SliverAppBarDelegate(
+                                TabBar(
+                                  indicator: _getIndicator(context),
+                                  isScrollable: true,
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  controller: _controller,
+                                  tabs: <Widget>[
+                                    Tab(
+                                      child: Text(s.homeTabMenuRecent),
+                                    ),
+                                    Tab(
+                                      child: Text(s.homeTabMenuFavotite),
+                                    ),
+                                    Tab(
+                                      child: Text(s.download),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              pinned: true,
+                            ),
+                          ];
+                        },
+                        body: TabBarView(
+                          controller: _controller,
+                          children: <Widget>[
+                            NestedScrollViewInnerScrollPositionKeyWidget(
+                                Key('tab0'),
+                                DescribedFeatureOverlay(
+                                    featureId: podcastFeature,
+                                    tapTarget: Text(s.featureDiscoveryEpisode,
+                                        textAlign: TextAlign.center),
+                                    backgroundColor: Colors.cyan[500],
+                                    enablePulsingAnimation: false,
+                                    onDismiss: () => Future.value(true),
+                                    title: Text(s.featureDiscoveryEpisodeTitle),
+                                    description: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(s.featureDiscoveryEpisodeDes),
+                                        Row(
+                                          children: [
+                                            FlatButton(
+                                              color: Colors.cyan[600],
+                                              padding: const EdgeInsets.all(0),
+                                              child: Text(s.understood,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .button
+                                                      .copyWith(
+                                                          color: Colors.white)),
+                                              onPressed: () async =>
+                                                  FeatureDiscovery
+                                                      .completeCurrentStep(
+                                                          context),
+                                            ),
+                                            Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5)),
+                                            FlatButton(
+                                              color: Colors.cyan[600],
+                                              padding: const EdgeInsets.all(0),
+                                              child: Text(s.dismiss,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .button
+                                                      .copyWith(
+                                                          color: Colors.white)),
+                                              onPressed: () =>
+                                                  FeatureDiscovery.dismissAll(
+                                                      context),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    child: _RecentUpdate())),
+                            NestedScrollViewInnerScrollPositionKeyWidget(
+                                Key('tab1'), _MyFavorite()),
+                            NestedScrollViewInnerScrollPositionKeyWidget(
+                                Key('tab2'), _MyDownload()),
+                          ],
                         ),
                       ),
-                      Selector<AudioPlayerNotifier, bool>(
-                          selector: (_, audio) => audio.playerRunning,
-                          builder: (_, data, __) {
-                            return Padding(
-                              padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
-                            );
-                          }),
-                    ],
-                  ),
-                  Container(child: PlayerWidget(playerKey: _playerKey)),
-                ],
-              ),
+                    ),
+                    Selector<AudioPlayerNotifier, bool>(
+                        selector: (_, audio) => audio.playerRunning,
+                        builder: (_, data, __) {
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
+                          );
+                        }),
+                  ],
+                ),
+                Container(child: PlayerWidget(playerKey: _playerKey)),
+              ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
 
@@ -728,17 +707,23 @@ class _RecentUpdate extends StatefulWidget {
 
 class _RecentUpdateState extends State<_RecentUpdate>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
-  Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group) async {
+  Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group,
+      {bool hideListened}) async {
     var storage = KeyValueStorage(recentLayoutKey);
+    var hideListenedStorage = KeyValueStorage(hideListenedKey);
     var index = await storage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
-
+    if (_hideListened == null) {
+      _hideListened = await hideListenedStorage.getBool(defaultValue: false);
+    }
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes;
     if (group.first == 'All') {
-      episodes = await dbHelper.getRecentRssItem(top);
+      episodes =
+          await dbHelper.getRecentRssItem(top, hideListened: _hideListened);
     } else {
-      episodes = await dbHelper.getGroupRssItem(top, group);
+      episodes = await dbHelper.getGroupRssItem(top, group,
+          hideListened: _hideListened);
     }
     return episodes;
   }
@@ -755,7 +740,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
   }
 
   /// Load more episodes.
-  _loadMoreEpisode() async {
+  Future<void> _loadMoreEpisode() async {
     if (mounted) setState(() => _loadMore = true);
     await Future.delayed(Duration(seconds: 3));
     if (mounted) {
@@ -776,6 +761,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
   String _groupName;
   List<String> _group;
   Layout _layout;
+  bool _hideListened;
   bool _scroll;
   @override
   void initState() {
@@ -797,7 +783,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
           selector: (_, worker) => worker.created,
           builder: (context, created, child) {
             return FutureBuilder<List<EpisodeBrief>>(
-              future: _getRssItem(_top, _group),
+              future: _getRssItem(_top, _group, hideListened: _hideListened),
               builder: (context, snapshot) {
                 return (snapshot.hasData)
                     ? snapshot.data.length == 0
@@ -1008,6 +994,25 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                   }),
                                               Material(
                                                 color: Colors.transparent,
+                                                child: IconButton(
+                                                  icon: SizedBox(
+                                                    width: 30,
+                                                    height: 15,
+                                                    child: HideListened(
+                                                      hideListened:
+                                                          _hideListened ??
+                                                              false,
+                                                    ),
+                                                  ),
+                                                  onPressed: () {
+                                                    setState(() =>
+                                                        _hideListened =
+                                                            !_hideListened);
+                                                  },
+                                                ),
+                                              ),
+                                              Material(
+                                                color: Colors.transparent,
                                                 child: LayoutButton(
                                                   layout: _layout,
                                                   onPressed: (layout) =>
@@ -1057,16 +1062,22 @@ class _MyFavorite extends StatefulWidget {
 
 class _MyFavoriteState extends State<_MyFavorite>
     with AutomaticKeepAliveClientMixin {
-  Future<List<EpisodeBrief>> _getLikedRssItem(int top, int sortBy) async {
+  Future<List<EpisodeBrief>> _getLikedRssItem(int top, int sortBy,
+      {bool hideListened}) async {
     var storage = KeyValueStorage(favLayoutKey);
     var index = await storage.getInt(defaultValue: 1);
+    var hideListenedStorage = KeyValueStorage(hideListenedKey);
     if (_layout == null) _layout = Layout.values[index];
+    if (_hideListened == null) {
+      _hideListened = await hideListenedStorage.getBool(defaultValue: false);
+    }
     var dbHelper = DBHelper();
-    var episodes = await dbHelper.getLikedRssItem(top, sortBy);
+    var episodes = await dbHelper.getLikedRssItem(top, sortBy,
+        hideListened: _hideListened);
     return episodes;
   }
 
-  _loadMoreEpisode() async {
+  Future<void> _loadMoreEpisode() async {
     if (mounted) setState(() => _loadMore = true);
     await Future.delayed(Duration(seconds: 3));
     if (mounted) {
@@ -1081,6 +1092,7 @@ class _MyFavoriteState extends State<_MyFavorite>
   bool _loadMore;
   Layout _layout;
   int _sortBy;
+  bool _hideListened;
   @override
   void initState() {
     super.initState();
@@ -1096,7 +1108,8 @@ class _MyFavoriteState extends State<_MyFavorite>
         selector: (_, audio) => audio.episodeState,
         builder: (context, episodeState, child) {
           return FutureBuilder<List<EpisodeBrief>>(
-            future: _getLikedRssItem(_top, _sortBy),
+            future:
+                _getLikedRssItem(_top, _sortBy, hideListened: _hideListened),
             builder: (context, snapshot) {
               return (snapshot.hasData)
                   ? snapshot.data.length == 0
@@ -1201,6 +1214,23 @@ class _MyFavoriteState extends State<_MyFavorite>
                                         Spacer(),
                                         Material(
                                           color: Colors.transparent,
+                                          child: IconButton(
+                                            icon: SizedBox(
+                                              width: 30,
+                                              height: 15,
+                                              child: HideListened(
+                                                hideListened:
+                                                    _hideListened ?? false,
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              setState(() => _hideListened =
+                                                  !_hideListened);
+                                            },
+                                          ),
+                                        ),
+                                        Material(
+                                          color: Colors.transparent,
                                           child: LayoutButton(
                                             layout: _layout,
                                             onPressed: (layout) => setState(() {
@@ -1249,89 +1279,100 @@ class _MyDownload extends StatefulWidget {
 class _MyDownloadState extends State<_MyDownload>
     with AutomaticKeepAliveClientMixin {
   Layout _layout;
-  _getLayout() async {
-    var keyValueStorage = KeyValueStorage(downloadLayoutKey);
-    var layout = await keyValueStorage.getInt(defaultValue: 1);
-    if (_layout == null) {
-      setState(() {
-        _layout = Layout.values[layout];
-      });
+  int _sortBy = 0;
+  bool _hideListened;
+  Future<List<EpisodeBrief>> _getDownloadedEpisodes(int sortBy,
+      {bool hideListened}) async {
+    var storage = KeyValueStorage(downloadLayoutKey);
+    var index = await storage.getInt(defaultValue: 1);
+    var hideListenedStorage = KeyValueStorage(hideListenedKey);
+    if (_layout == null) _layout = Layout.values[index];
+    if (_hideListened == null) {
+      _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _getLayout();
+    var dbHelper = DBHelper();
+    var episodes = await dbHelper.getDownloadedEpisode(sortBy,
+        hideListened: _hideListened);
+    return episodes;
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final s = context.s;
-    return CustomScrollView(
-      key: PageStorageKey<String>('download_list'),
-      slivers: <Widget>[
-        DownloadList(),
-        SliverToBoxAdapter(
-          child: _layout == null
-              ? Center()
-              : Container(
-                  height: 40,
-                  color: context.primaryColor,
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(s.downloaded)),
-                      Spacer(),
-                      Material(
-                        color: Colors.transparent,
-                        child: LayoutButton(
-                          layout: _layout,
-                          onPressed: (layout) => setState(() {
-                            _layout = layout;
-                          }),
-                        ),
-                      ),
-                    ],
-                  )),
-        ),
-        Consumer<DownloadState>(
-          builder: (_, downloader, __) {
-            var episodes = downloader.episodeTasks
-                .where((task) => task.status.value == 3)
-                .toList()
-                .map((e) => e.episode)
-                .toList()
-                .reversed
-                .toList();
-            return episodes.length == 0
-                ? SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 110),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(LineIcons.download_solid,
-                              size: 80, color: Colors.grey[500]),
-                          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                          Text(
-                            s.noEpisodeDownload,
-                            style: TextStyle(color: Colors.grey[500]),
-                          )
+    return Consumer<DownloadState>(
+      builder: (_, data, __) => FutureBuilder<List<EpisodeBrief>>(
+          future: _getDownloadedEpisodes(_sortBy, hideListened: _hideListened),
+          builder: (context, snapshot) {
+            var episodes = snapshot.data ?? [];
+            return CustomScrollView(
+              key: PageStorageKey<String>('download_list'),
+              slivers: <Widget>[
+                DownloadList(),
+                SliverToBoxAdapter(
+                  child: Container(
+                      height: 40,
+                      color: context.primaryColor,
+                      child: Row(
+                        children: <Widget>[
+                          Container(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(s.downloaded)),
+                          Spacer(),
+                          Material(
+                            color: Colors.transparent,
+                            child: IconButton(
+                              icon: SizedBox(
+                                width: 30,
+                                height: 15,
+                                child: HideListened(
+                                  hideListened: _hideListened ?? false,
+                                ),
+                              ),
+                              onPressed: () {
+                                setState(() => _hideListened = !_hideListened);
+                              },
+                            ),
+                          ),
+                          Material(
+                            color: Colors.transparent,
+                            child: LayoutButton(
+                              layout: _layout ?? Layout.one,
+                              onPressed: (layout) => setState(() {
+                                _layout = layout;
+                              }),
+                            ),
+                          ),
                         ],
+                      )),
+                ),
+                episodes.length == 0
+                    ? SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 110),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(LineIcons.download_solid,
+                                  size: 80, color: Colors.grey[500]),
+                              Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10)),
+                              Text(
+                                s.noEpisodeDownload,
+                                style: TextStyle(color: Colors.grey[500]),
+                              )
+                            ],
+                          ),
+                        ),
+                      )
+                    : EpisodeGrid(
+                        episodes: episodes,
+                        layout: _layout,
+                        initNum: 0,
                       ),
-                    ),
-                  )
-                : EpisodeGrid(
-                    episodes: episodes,
-                    layout: _layout,
-                    initNum: 0,
-                  );
-          },
-        ),
-      ],
+              ],
+            );
+          }),
     );
   }
 
