@@ -150,7 +150,7 @@ class EpisodeGrid extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.done_all,
+                    Icons.arrow_downward,
                     size: 15,
                     color: Colors.white,
                   ),

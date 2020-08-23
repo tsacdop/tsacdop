@@ -947,10 +947,10 @@ class DownloadPainter extends CustomPainter {
     var center = Offset(size.width / 2, size.height / 2);
     if (pauseProgress == 0) {
       canvas.drawLine(
-          Offset(width / 2, 2), Offset(width / 2, height * 4 / 5), _paint);
-      canvas.drawLine(Offset(width / 5, height / 2),
+          Offset(width / 2, 4), Offset(width / 2, height * 4 / 5), _paint);
+      canvas.drawLine(Offset(width / 4, height / 2),
           Offset(width / 2, height * 4 / 5), _paint);
-      canvas.drawLine(Offset(width * 4 / 5, height / 2),
+      canvas.drawLine(Offset(width * 3 / 4, height / 2),
           Offset(width / 2, height * 4 / 5), _paint);
     }
 
@@ -972,13 +972,15 @@ class DownloadPainter extends CustomPainter {
     if (pauseProgress > 0) {
       canvas.drawLine(
           Offset(width / 5 + height * 3 * pauseProgress / 20,
-              height / 2 - height * 3 * pauseProgress / 10),
-          Offset(width / 2 - height * 3 * pauseProgress / 20, height * 4 / 5),
+              height / 2 - height * pauseProgress / 5),
+          Offset(width / 2 - height * 3 * pauseProgress / 20,
+              height * 4 / 5 - height * pauseProgress / 10),
           _paint);
       canvas.drawLine(
           Offset(width * 4 / 5 - height * 3 * pauseProgress / 20,
-              height / 2 - height * 3 * pauseProgress / 10),
-          Offset(width / 2 + height * 3 * pauseProgress / 20, height * 4 / 5),
+              height / 2 - height * pauseProgress / 5),
+          Offset(width / 2 + height * 3 * pauseProgress / 20,
+              height * 4 / 5 - height * pauseProgress / 10),
           _paint);
     }
   }

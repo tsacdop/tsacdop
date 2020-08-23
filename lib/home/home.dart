@@ -15,6 +15,7 @@ import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
+import '../state/refresh_podcast.dart';
 import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../type/playlist.dart';
@@ -790,253 +791,259 @@ class _RecentUpdateState extends State<_RecentUpdate>
     super.build(context);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
-    return Selector<GroupList, bool>(
-        selector: (_, worker) => worker.created,
-        builder: (context, created, child) {
-          return FutureBuilder<List<EpisodeBrief>>(
-            future: _getRssItem(_top, _group),
-            builder: (context, snapshot) {
-              return (snapshot.hasData)
-                  ? snapshot.data.length == 0
-                      ? Padding(
-                          padding: EdgeInsets.only(top: 150),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(LineIcons.cloud_download_alt_solid,
-                                  size: 80, color: Colors.grey[500]),
-                              Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10)),
-                              Text(
-                                s.noEpisodeRecent,
-                                style: TextStyle(color: Colors.grey[500]),
-                              )
-                            ],
-                          ),
-                        )
-                      : NotificationListener<ScrollNotification>(
-                          onNotification: (scrollInfo) {
-                            if (scrollInfo is ScrollStartNotification &&
-                                mounted &&
-                                !_scroll) {
-                              setState(() => _scroll = true);
-                            }
-                            if (scrollInfo.metrics.pixels ==
-                                    scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data.length == _top) {
-                              if (!_loadMore) {
-                                _loadMoreEpisode();
+    return Selector<RefreshWorker, bool>(
+      selector: (_, worker) => worker.complete,
+      builder: (_, complete, __) => Selector<GroupList, bool>(
+          selector: (_, worker) => worker.created,
+          builder: (context, created, child) {
+            return FutureBuilder<List<EpisodeBrief>>(
+              future: _getRssItem(_top, _group),
+              builder: (context, snapshot) {
+                return (snapshot.hasData)
+                    ? snapshot.data.length == 0
+                        ? Padding(
+                            padding: EdgeInsets.only(top: 150),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(LineIcons.cloud_download_alt_solid,
+                                    size: 80, color: Colors.grey[500]),
+                                Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 10)),
+                                Text(
+                                  s.noEpisodeRecent,
+                                  style: TextStyle(color: Colors.grey[500]),
+                                )
+                              ],
+                            ),
+                          )
+                        : NotificationListener<ScrollNotification>(
+                            onNotification: (scrollInfo) {
+                              if (scrollInfo is ScrollStartNotification &&
+                                  mounted &&
+                                  !_scroll) {
+                                setState(() => _scroll = true);
                               }
-                            }
-                            return true;
-                          },
-                          child: CustomScrollView(
-                              key: PageStorageKey<String>('update'),
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              slivers: <Widget>[
-                                SliverToBoxAdapter(
-                                  child: Container(
-                                      height: 40,
-                                      color: context.primaryColor,
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: Row(
-                                          children: <Widget>[
-                                            Consumer<GroupList>(
-                                              builder:
-                                                  (context, groupList, child) =>
-                                                      Material(
-                                                color: Colors.transparent,
-                                                child: PopupMenuButton<String>(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  10))),
-                                                  elevation: 1,
-                                                  tooltip: s.groupFilter,
-                                                  child: Container(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 20),
-                                                      height: 50,
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: <Widget>[
-                                                          Text(_groupName ==
-                                                                  'All'
-                                                              ? s.all
-                                                              : _groupName),
-                                                          Padding(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        5),
-                                                          ),
-                                                          Icon(
-                                                            LineIcons
-                                                                .filter_solid,
-                                                            size: 18,
-                                                          )
-                                                        ],
-                                                      )),
-                                                  itemBuilder: (context) => [
-                                                    PopupMenuItem(
-                                                        child: Row(children: [
-                                                          Text(s.all),
-                                                          Spacer(),
-                                                          if (_groupName ==
-                                                              'All')
-                                                            DotIndicator()
-                                                        ]),
-                                                        value: 'All')
-                                                  ]..addAll(groupList.groups
-                                                      .map<
-                                                              PopupMenuEntry<
-                                                                  String>>(
-                                                          (e) => PopupMenuItem(
-                                                              value: e.name,
-                                                              child: Row(
-                                                                children: [
-                                                                  Text(e.name),
-                                                                  Spacer(),
-                                                                  if (e.name ==
-                                                                      _groupName)
-                                                                    DotIndicator()
-                                                                ],
-                                                              )))
-                                                      .toList()),
-                                                  onSelected: (value) {
-                                                    if (value == 'All') {
-                                                      setState(() {
-                                                        _groupName = 'All';
-                                                        _group = ['All'];
-                                                      });
-                                                    } else {
-                                                      for (var group
-                                                          in groupList.groups) {
-                                                        if (group.name ==
-                                                            value) {
-                                                          setState(() {
-                                                            _groupName = value;
-                                                            _group = group
-                                                                .podcastList;
-                                                          });
+                              if (scrollInfo.metrics.pixels ==
+                                      scrollInfo.metrics.maxScrollExtent &&
+                                  snapshot.data.length == _top) {
+                                if (!_loadMore) {
+                                  _loadMoreEpisode();
+                                }
+                              }
+                              return true;
+                            },
+                            child: CustomScrollView(
+                                key: PageStorageKey<String>('update'),
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                slivers: <Widget>[
+                                  SliverToBoxAdapter(
+                                    child: Container(
+                                        height: 40,
+                                        color: context.primaryColor,
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: Row(
+                                            children: <Widget>[
+                                              Consumer<GroupList>(
+                                                builder: (context, groupList,
+                                                        child) =>
+                                                    Material(
+                                                  color: Colors.transparent,
+                                                  child:
+                                                      PopupMenuButton<String>(
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    10))),
+                                                    elevation: 1,
+                                                    tooltip: s.groupFilter,
+                                                    child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 20),
+                                                        height: 50,
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: <Widget>[
+                                                            Text(_groupName ==
+                                                                    'All'
+                                                                ? s.all
+                                                                : _groupName),
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          5),
+                                                            ),
+                                                            Icon(
+                                                              LineIcons
+                                                                  .filter_solid,
+                                                              size: 18,
+                                                            )
+                                                          ],
+                                                        )),
+                                                    itemBuilder: (context) => [
+                                                      PopupMenuItem(
+                                                          child: Row(children: [
+                                                            Text(s.all),
+                                                            Spacer(),
+                                                            if (_groupName ==
+                                                                'All')
+                                                              DotIndicator()
+                                                          ]),
+                                                          value: 'All')
+                                                    ]..addAll(groupList.groups
+                                                        .map<
+                                                            PopupMenuEntry<
+                                                                String>>((e) =>
+                                                            PopupMenuItem(
+                                                                value: e.name,
+                                                                child: Row(
+                                                                  children: [
+                                                                    Text(
+                                                                        e.name),
+                                                                    Spacer(),
+                                                                    if (e.name ==
+                                                                        _groupName)
+                                                                      DotIndicator()
+                                                                  ],
+                                                                )))
+                                                        .toList()),
+                                                    onSelected: (value) {
+                                                      if (value == 'All') {
+                                                        setState(() {
+                                                          _groupName = 'All';
+                                                          _group = ['All'];
+                                                        });
+                                                      } else {
+                                                        for (var group
+                                                            in groupList
+                                                                .groups) {
+                                                          if (group.name ==
+                                                              value) {
+                                                            setState(() {
+                                                              _groupName =
+                                                                  value;
+                                                              _group = group
+                                                                  .podcastList;
+                                                            });
+                                                          }
                                                         }
                                                       }
-                                                    }
-                                                  },
+                                                    },
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Spacer(),
-                                            FutureBuilder<int>(
-                                                future:
-                                                    _getUpdateCounts(_group),
-                                                initialData: 0,
-                                                builder: (context, snapshot) {
-                                                  return snapshot.data != 0
-                                                      ? Material(
-                                                          color: Colors
-                                                              .transparent,
-                                                          child: IconButton(
-                                                              tooltip: s
-                                                                  .addNewEpisodeTooltip,
-                                                              icon: SizedBox(
-                                                                  height: 16,
-                                                                  width: 21,
-                                                                  child: CustomPaint(
-                                                                      painter: AddToPlaylistPainter(
-                                                                          context
-                                                                              .textTheme
-                                                                              .bodyText1
-                                                                              .color,
-                                                                          Colors
-                                                                              .red))),
-                                                              onPressed:
-                                                                  () async {
-                                                                await audio
-                                                                    .addNewEpisode(
-                                                                        _group);
-                                                                if (mounted) {
-                                                                  setState(
-                                                                      () {});
-                                                                }
-                                                                Fluttertoast
-                                                                    .showToast(
-                                                                  msg: _groupName ==
-                                                                          'All'
-                                                                      ? s.addNewEpisodeAll(
-                                                                          snapshot
-                                                                              .data)
-                                                                      : s.addEpisodeGroup(
-                                                                          _groupName,
-                                                                          snapshot
-                                                                              .data),
-                                                                  gravity:
-                                                                      ToastGravity
-                                                                          .BOTTOM,
-                                                                );
-                                                              }),
-                                                        )
-                                                      : Material(
-                                                          color: Colors
-                                                              .transparent,
-                                                          child: IconButton(
-                                                              tooltip: s
-                                                                  .addNewEpisodeTooltip,
-                                                              icon: SizedBox(
-                                                                  height: 16,
-                                                                  width: 21,
-                                                                  child:
-                                                                      CustomPaint(
-                                                                          painter:
-                                                                              AddToPlaylistPainter(
-                                                                    context
-                                                                        .textColor,
-                                                                    context
-                                                                        .textColor,
-                                                                  ))),
-                                                              onPressed: () {}),
-                                                        );
-                                                }),
-                                            Material(
-                                              color: Colors.transparent,
-                                              child: LayoutButton(
-                                                layout: _layout,
-                                                onPressed: (layout) =>
-                                                    setState(() {
-                                                  _layout = layout;
-                                                }),
+                                              Spacer(),
+                                              FutureBuilder<int>(
+                                                  future:
+                                                      _getUpdateCounts(_group),
+                                                  initialData: 0,
+                                                  builder: (context, snapshot) {
+                                                    return snapshot.data != 0
+                                                        ? Material(
+                                                            color: Colors
+                                                                .transparent,
+                                                            child: IconButton(
+                                                                tooltip: s
+                                                                    .addNewEpisodeTooltip,
+                                                                icon: SizedBox(
+                                                                    height: 16,
+                                                                    width: 21,
+                                                                    child: CustomPaint(
+                                                                        painter: AddToPlaylistPainter(
+                                                                            context
+                                                                                .textTheme.bodyText1.color,
+                                                                            Colors
+                                                                                .red))),
+                                                                onPressed:
+                                                                    () async {
+                                                                  await audio
+                                                                      .addNewEpisode(
+                                                                          _group);
+                                                                  if (mounted) {
+                                                                    setState(
+                                                                        () {});
+                                                                  }
+                                                                  Fluttertoast
+                                                                      .showToast(
+                                                                    msg: _groupName ==
+                                                                            'All'
+                                                                        ? s.addNewEpisodeAll(snapshot
+                                                                            .data)
+                                                                        : s.addEpisodeGroup(
+                                                                            _groupName,
+                                                                            snapshot.data),
+                                                                    gravity:
+                                                                        ToastGravity
+                                                                            .BOTTOM,
+                                                                  );
+                                                                }),
+                                                          )
+                                                        : Material(
+                                                            color: Colors
+                                                                .transparent,
+                                                            child: IconButton(
+                                                                tooltip: s
+                                                                    .addNewEpisodeTooltip,
+                                                                icon: SizedBox(
+                                                                    height: 16,
+                                                                    width: 21,
+                                                                    child:
+                                                                        CustomPaint(
+                                                                            painter:
+                                                                                AddToPlaylistPainter(
+                                                                      context
+                                                                          .textColor,
+                                                                      context
+                                                                          .textColor,
+                                                                    ))),
+                                                                onPressed:
+                                                                    () {}),
+                                                          );
+                                                  }),
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: LayoutButton(
+                                                  layout: _layout,
+                                                  onPressed: (layout) =>
+                                                      setState(() {
+                                                    _layout = layout;
+                                                  }),
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      )),
-                                ),
-                                EpisodeGrid(
-                                  episodes: snapshot.data,
-                                  layout: _layout,
-                                  initNum: _scroll ? 0 : 12,
-                                ),
-                                SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, index) {
-                                      return _loadMore
-                                          ? Container(
-                                              height: 2,
-                                              child: LinearProgressIndicator())
-                                          : Center();
-                                    },
-                                    childCount: 1,
+                                            ],
+                                          ),
+                                        )),
                                   ),
-                                ),
-                              ]))
-                  : Center();
-            },
-          );
-        });
+                                  EpisodeGrid(
+                                    episodes: snapshot.data,
+                                    layout: _layout,
+                                    initNum: _scroll ? 0 : 12,
+                                  ),
+                                  SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        return _loadMore
+                                            ? Container(
+                                                height: 2,
+                                                child:
+                                                    LinearProgressIndicator())
+                                            : Center();
+                                      },
+                                      childCount: 1,
+                                    ),
+                                  ),
+                                ]))
+                    : Center();
+              },
+            );
+          }),
+    );
   }
 
   @override

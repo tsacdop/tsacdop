@@ -538,12 +538,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   updateMediaItem(EpisodeBrief episode) async {
-    var index = _queue.playlist
-        .indexWhere((item) => item.enclosureUrl == episode.enclosureUrl);
-    if (index > 0) {
-      var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
-      await delFromPlaylist(episode);
-      await addToPlaylistAt(episodeNew, index);
+    if (episode.enclosureUrl == episode.mediaId) {
+      var index = _queue.playlist
+          .indexWhere((item) => item.enclosureUrl == episode.enclosureUrl);
+      if (index > 0) {
+        var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+        await delFromPlaylist(episode);
+        await addToPlaylistAt(episodeNew, index);
+      }
     }
   }
 
@@ -818,7 +820,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       // Resume playback if we were playing
       // if (_playing) {
       //onPlay();
-      playFromStart();
+      _playFromStart();
       // } else {
       //   _setState(state: BasicPlaybackState.paused);
       //  }
@@ -842,7 +844,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
           await AudioServiceBackground.setMediaItem(
               mediaItem.copyWith(duration: duration));
         }
-        playFromStart();
+        _playFromStart();
       } else {
         _playing = true;
         if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
@@ -853,7 +855,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
   }
 
-  playFromStart() async {
+  _playFromStart() async {
     _playing = true;
     if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
         _audioPlayer.playbackEvent.state != AudioPlaybackState.none) {
@@ -940,7 +942,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       var duration = await _audioPlayer.durationFuture ?? Duration.zero;
       AudioServiceBackground.setMediaItem(
           mediaItem.copyWith(duration: duration));
-      playFromStart();
+      _playFromStart();
       //onPlay();
     } else {
       _queue.insert(index, mediaItem);

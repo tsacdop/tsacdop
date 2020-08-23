@@ -422,19 +422,19 @@ class __MenuBarState extends State<_MenuBar> {
     return await dbHelper.isListened(episode.enclosureUrl);
   }
 
-  _saveLiked(String url) async {
+  Future<void> _saveLiked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setLiked(url);
     if (mounted) setState(() {});
   }
 
-  _setUnliked(String url) async {
+  Future<void> _setUnliked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setUniked(url);
     if (mounted) setState(() {});
   }
 
-  _markListened(EpisodeBrief episode) async {
+  Future<void> _markListened(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
     //var marked = await dbHelper.checkMarked(episode);
     //if (!marked) {
@@ -444,7 +444,7 @@ class __MenuBarState extends State<_MenuBar> {
     if (mounted) setState(() {});
   }
 
-  _markNotListened(String url) async {
+  Future<void> _markNotListened(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.markNotListened(url);
     if (mounted) setState(() {});
@@ -554,8 +554,9 @@ class __MenuBarState extends State<_MenuBar> {
                     selector: (_, audio) =>
                         Tuple2(audio.queue.playlist, audio.queueUpdate),
                     builder: (_, data, __) {
-                      return (data.item1.contains(widget.episodeItem) &&
-                              !widget.hide)
+                      final inPlaylist =
+                          data.item1.contains(widget.episodeItem);
+                      return inPlaylist
                           ? _buttonOnMenu(
                               child: Icon(Icons.playlist_add_check,
                                   color: context.accentColor),
@@ -673,7 +674,7 @@ class _ShowNote extends StatelessWidget {
   const _ShowNote({this.episode, Key key}) : super(key: key);
 
   int _getTimeStamp(String url) {
-    final time = url.substring(7);
+    final time = url.substring(3).trim();
     final data = time.split(':');
     var seconds;
     if (data.length == 3) {
@@ -726,7 +727,7 @@ class _ShowNote extends StatelessWidget {
               ? Selector<AudioPlayerNotifier, EpisodeBrief>(
                   selector: (_, audio) => audio.episode,
                   builder: (_, data, __) {
-                    if (data == episode) {
+                    if (data == episode && !description.contains('#t=')) {
                       final linkList = linkify(description,
                           options: LinkifyOptions(humanize: false),
                           linkifiers: [TimeStampLinkifier()]);
@@ -734,7 +735,7 @@ class _ShowNote extends StatelessWidget {
                         if (element is TimeStampElement) {
                           final time = element.timeStamp;
                           description = description.replaceFirst(time,
-                              '<a rel="nofollow" href = "skipto:$time">$time</a>');
+                              '<a rel="nofollow" href = "#t=$time">$time</a>');
                         }
                       }
                     }
@@ -751,9 +752,11 @@ class _ShowNote extends StatelessWidget {
                           color: context.accentColor,
                           textBaseline: TextBaseline.ideographic),
                       onLinkTap: (url) {
-                        if (url.substring(0, 6) == 'skipto') {
+                        if (url.substring(0, 3) == '#t=') {
                           final seconds = _getTimeStamp(url);
-                          audio.seekTo(seconds * 1000);
+                          if (data == episode) {
+                            audio.seekTo(seconds * 1000);
+                          }
                         } else {
                           url.launchUrl;
                         }

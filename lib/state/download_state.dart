@@ -7,25 +7,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../type/episode_task.dart';
 import '../type/episodebrief.dart';
-
-class EpisodeTask {
-  final String taskId;
-  int progress;
-  DownloadTaskStatus status;
-  final EpisodeBrief episode;
-  EpisodeTask(
-    this.episode,
-    this.taskId, {
-    this.progress = 0,
-    this.status = DownloadTaskStatus.undefined,
-  });
-}
 
 void downloadCallback(String id, DownloadTaskStatus status, int progress) {
   developer.log('Homepage callback task in $id  status ($status) $progress');
@@ -170,6 +158,14 @@ class DownloadState extends ChangeNotifier {
                   taskId: task.taskId, shouldDeleteContent: true);
               await dbHelper.delDownloaded(episode.enclosureUrl);
             } else {
+              if (episode.enclosureUrl == episode.mediaId) {
+                var filePath =
+                    'file://${path.join(task.savedDir, Uri.encodeComponent(task.filename))}';
+                var fileStat =
+                    await File(path.join(task.savedDir, task.filename)).stat();
+                await dbHelper.saveMediaId(
+                    episode.enclosureUrl, filePath, task.taskId, fileStat.size);
+              }
               _episodeTasks.add(EpisodeTask(episode, task.taskId,
                   progress: task.progress, status: task.status));
             }
@@ -286,17 +282,19 @@ class DownloadState extends ChangeNotifier {
 
   Future pauseTask(EpisodeBrief episode) async {
     var task = episodeToTask(episode);
-    await FlutterDownloader.pause(taskId: task.taskId);
+    if (task.progress > 0) {
+      await FlutterDownloader.pause(taskId: task.taskId);
+    }
+    notifyListeners();
   }
 
   Future resumeTask(EpisodeBrief episode) async {
     var task = episodeToTask(episode);
     var newTaskId = await FlutterDownloader.resume(taskId: task.taskId);
+    await FlutterDownloader.remove(taskId: task.taskId);
     var index = _episodeTasks.indexOf(task);
-    _removeTask(episode);
-    FlutterDownloader.remove(taskId: task.taskId);
-    var dbHelper = DBHelper();
-    _episodeTasks.insert(index, EpisodeTask(episode, newTaskId));
+    _episodeTasks[index] = task.copyWith(taskId: newTaskId);
+    notifyListeners();
     await dbHelper.saveDownloaded(episode.enclosureUrl, newTaskId);
   }
 
@@ -305,9 +303,8 @@ class DownloadState extends ChangeNotifier {
     var newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
     await FlutterDownloader.remove(taskId: task.taskId);
     var index = _episodeTasks.indexOf(task);
-    _removeTask(episode);
-    var dbHelper = DBHelper();
-    _episodeTasks.insert(index, EpisodeTask(episode, newTaskId));
+    _episodeTasks[index] = task.copyWith(taskId: newTaskId);
+    notifyListeners();
     await dbHelper.saveDownloaded(episode.enclosureUrl, newTaskId);
   }
 

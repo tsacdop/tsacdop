@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
     super.initState();
     _groupIndex = 0;
     _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 125))
+        AnimationController(vsync: this, duration: Duration(milliseconds: 150))
           ..addListener(() {
             if (mounted) setState(() {});
           })
@@ -64,7 +65,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
     super.dispose();
   }
 
-  Future<int> getPodcastUpdateCounts(String id) async {
+  Future<int> _getPodcastUpdateCounts(String id) async {
     var dbHelper = DBHelper();
     return await dbHelper.getPodcastUpdateCounts(id);
   }
@@ -79,7 +80,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
 
   @override
   Widget build(BuildContext context) {
-    var _width = MediaQuery.of(context).size.width;
+    var width = MediaQuery.of(context).size.width;
     final s = context.s;
     return Selector<GroupList, Tuple3<List<PodcastGroup>, bool, bool>>(
       selector: (_, groupList) =>
@@ -90,11 +91,11 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
         var isLoading = data.item3;
         return isLoading
             ? Container(
-                height: (_width - 20) / 3 + 140,
+                height: (width - 20) / 3 + 140,
               )
             : groups[_groupIndex].podcastList.length == 0
                 ? Container(
-                    height: (_width - 20) / 3 + 140,
+                    height: (width - 20) / 3 + 140,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -195,7 +196,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                               ],
                             )),
                         Container(
-                          height: (_width - 20) / 3 + 40,
+                          height: (width - 20) / 3 + 40,
                           color: context.primaryColor,
                           margin: EdgeInsets.symmetric(horizontal: 15),
                           child: Center(
@@ -334,7 +335,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                               ),
                               Container(
                                 height: 70,
-                                width: _width,
+                                width: width,
                                 alignment: Alignment.centerLeft,
                                 color: context.scaffoldBackgroundColor,
                                 child: TabBar(
@@ -358,49 +359,41 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                             _slideTween
                                                 .animate(_controller)
                                                 .value),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(25.0)),
-                                          child: LimitedBox(
-                                            maxHeight: 50,
-                                            maxWidth: 50,
-                                            child: CircleAvatar(
-                                              backgroundColor:
-                                                  color.withOpacity(0.5),
-                                              backgroundImage:
-                                                  podcastLocal.avatarImage,
-                                              child: FutureBuilder<int>(
-                                                  future:
-                                                      getPodcastUpdateCounts(
-                                                          podcastLocal.id),
-                                                  initialData: 0,
-                                                  builder: (context, snapshot) {
-                                                    return snapshot.data > 0
-                                                        ? Align(
+                                        child: LimitedBox(
+                                          maxHeight: 50,
+                                          maxWidth: 50,
+                                          child: CircleAvatar(
+                                            backgroundColor:
+                                                color.withOpacity(0.5),
+                                            backgroundImage:
+                                                podcastLocal.avatarImage,
+                                            child: FutureBuilder<int>(
+                                                future: _getPodcastUpdateCounts(
+                                                    podcastLocal.id),
+                                                initialData: 0,
+                                                builder: (context, snapshot) {
+                                                  return snapshot.data > 0
+                                                      ? Align(
+                                                          alignment: Alignment
+                                                              .bottomRight,
+                                                          child: Container(
                                                             alignment: Alignment
-                                                                .bottomCenter,
-                                                            child: Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              height: 10,
-                                                              width: 40,
-                                                              color: Colors
-                                                                  .black54,
-                                                              child: Text('New',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .red,
-                                                                      fontSize:
-                                                                          8,
-                                                                      fontStyle:
-                                                                          FontStyle
-                                                                              .italic)),
-                                                            ),
-                                                          )
-                                                        : Center();
-                                                  }),
-                                            ),
+                                                                .center,
+                                                            height: 10,
+                                                            width: 10,
+                                                            decoration: BoxDecoration(
+                                                                color:
+                                                                    Colors.red,
+                                                                border: Border.all(
+                                                                    color: context
+                                                                        .primaryColor,
+                                                                    width: 2),
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                          ),
+                                                        )
+                                                      : Center();
+                                                }),
                                           ),
                                         ),
                                       ),
@@ -412,10 +405,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                           ),
                         ),
                         Container(
-                          height: (_width - 20) / 3 + 40,
-                          margin: EdgeInsets.only(left: 10, right: 10),
+                          height: (width - 20) / 3 + 40,
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
+                            color: context.scaffoldBackgroundColor,
                           ),
                           child: ScrollConfiguration(
                             behavior: NoGrowBehavior(),
@@ -474,8 +467,8 @@ class PodcastPreview extends StatelessWidget {
                             episodes: snapshot.data,
                             podcastLocal: podcastLocal,
                           )
-                        : Container(
-                            padding: EdgeInsets.all(5.0),
+                        : Padding(
+                            padding: const EdgeInsets.all(5.0),
                           );
                   },
                 );
@@ -492,12 +485,12 @@ class PodcastPreview extends StatelessWidget {
                 flex: 4,
                 child: Text(podcastLocal.title,
                     maxLines: 1,
-                    overflow: TextOverflow.visible,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontWeight: FontWeight.bold, color: c)),
               ),
               Expanded(
                 flex: 1,
-                child: Container(
+                child: Align(
                   alignment: Alignment.centerRight,
                   child: Material(
                     color: Colors.transparent,
@@ -510,10 +503,6 @@ class PodcastPreview extends StatelessWidget {
                           Navigator.push(
                             context,
                             SlideLeftRoute(
-                                // transitionPage: PodcastDetail(
-                                //   podcastLocal: podcastLocal,
-                                //   hide: playerRunning,
-                                // ),
                                 page: PodcastDetail(
                               podcastLocal: podcastLocal,
                             )),
@@ -536,7 +525,7 @@ class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> episodes;
   final PodcastLocal podcastLocal;
   ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
-  String _stringForSeconds(double seconds) {
+  String stringForSeconds(double seconds) {
     if (seconds == null) return null;
     return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
   }
@@ -928,11 +917,9 @@ class ShowEpisode extends StatelessWidget {
                                                 ? Container(
                                                     alignment: Alignment.center,
                                                     child: Text(
-                                                      _stringForSeconds(
-                                                              episodes[index]
-                                                                  .duration
-                                                                  .toDouble())
-                                                          .toString(),
+                                                      episodes[index]
+                                                          .duration
+                                                          .toTime,
                                                       style: TextStyle(
                                                         fontSize: _width / 35,
                                                         // color: _c,
@@ -981,7 +968,7 @@ class ShowEpisode extends StatelessWidget {
                           );
                         }));
               },
-              childCount: (episodes.length > 2) ? 2 : episodes.length,
+              childCount: math.min(episodes.length, 2),
             ),
           ),
         ),
