@@ -13,7 +13,7 @@ import '../util/custom_dropdown.dart';
 import '../util/custom_time_picker.dart';
 import '../util/extension_helper.dart';
 
-const List secondsToSelect = [10, 15, 20, 25, 30, 45, 60];
+const List secondsToSelect = [5, 10, 15, 20, 25, 30, 45, 60];
 
 class PlaySetting extends StatelessWidget {
   String _volumeEffect(BuildContext context, int i) {
