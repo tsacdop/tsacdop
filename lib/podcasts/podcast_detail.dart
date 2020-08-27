@@ -695,7 +695,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     setState(() => _loadMore = true);
                                   }
                                   await Future.delayed(Duration(seconds: 3));
-                                  if (mounted) {
+                                  if (mounted && _loadMore) {
                                     setState(() {
                                       _top = _top + 36;
                                       _loadMore = false;

@@ -197,6 +197,8 @@ class _RssResultState extends State<RssResult> {
                         !_isSubscribed
                             ? OutlineButton(
                                 highlightedBorderColor: context.accentColor,
+                                borderSide: BorderSide(
+                                    color: context.accentColor, width: 2),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(100.0),
                                     side:
@@ -514,30 +516,30 @@ class SearchResult extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          bottom: Divider.createBorderSide(context),
-        ),
+            //   bottom: Divider.createBorderSide(context),
+            ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+            contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
             onTap: () {
               onSelect(onlinePodcast);
             },
             leading: ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              borderRadius: BorderRadius.circular(25.0),
               child: CachedNetworkImage(
-                height: 40.0,
-                width: 40.0,
+                height: 50.0,
+                width: 50.0,
                 fit: BoxFit.fitWidth,
                 alignment: Alignment.center,
                 imageUrl: onlinePodcast.image,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     Container(
-                  height: 40,
-                  width: 40,
+                  height: 50,
+                  width: 50,
                   alignment: Alignment.center,
                   color: context.primaryColorDark,
                   child: SizedBox(
@@ -548,8 +550,8 @@ class SearchResult extends StatelessWidget {
                   ),
                 ),
                 errorWidget: (context, url, error) => Container(
-                    width: 40,
-                    height: 40,
+                    width: 50,
+                    height: 50,
                     alignment: Alignment.center,
                     color: context.primaryColorDark,
                     child: Icon(Icons.error)),
@@ -560,6 +562,7 @@ class SearchResult extends StatelessWidget {
             trailing: !isSubscribed
                 ? OutlineButton(
                     highlightedBorderColor: context.accentColor,
+                    borderSide: BorderSide(color: context.accentColor),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100.0),
                         side: BorderSide(color: context.accentColor)),
@@ -807,6 +810,9 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                     ? OutlineButton(
                                         highlightedBorderColor:
                                             context.accentColor,
+                                        borderSide: BorderSide(
+                                            color: context.accentColor,
+                                            width: 2),
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(100.0),
