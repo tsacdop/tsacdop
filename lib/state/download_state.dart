@@ -105,6 +105,9 @@ class AutoDownloader {
           now.second.toString();
       var fileName =
           '${episode.title}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
+      if (fileName.length > 100) {
+        fileName = fileName.substring(fileName.length - 100);
+      }
       var taskId = await FlutterDownloader.enqueue(
         fileName: fileName,
         url: episode.enclosureUrl,
@@ -267,6 +270,9 @@ class DownloadState extends ChangeNotifier {
           now.second.toString();
       var fileName =
           '${episode.title}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
+      if (fileName.length > 100) {
+        fileName = fileName.substring(fileName.length - 100);
+      }
       var taskId = await FlutterDownloader.enqueue(
         fileName: fileName,
         url: episode.enclosureUrl,
