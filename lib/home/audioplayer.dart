@@ -39,7 +39,7 @@ final List<BoxShadow> _customShadowNight = [
 ];
 
 const List kMinsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
-const List kSpeedToSelect = [0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0];
+const List kSpeedToSelect = [0.5, 0.6, 0.8, 1.0, 1.1, 1.2, 1.5, 2.0];
 const List kMinPlayerHeight = <double>[70.0, 75.0, 80.0];
 const List kMaxPlayerHeight = <double>[300.0, 325.0, 350.0];
 
