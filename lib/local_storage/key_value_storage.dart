@@ -43,6 +43,7 @@ const String boostVolumeKey = 'boostVolumeKey';
 const String volumeGainKey = 'volumeGainKey';
 const String hideListenedKey = 'hideListenedKey';
 const String notificationLayoutKey = 'notificationLayoutKey';
+const String showNotesFontKey = 'showNotesFontKey';
 
 class KeyValueStorage {
   final String key;

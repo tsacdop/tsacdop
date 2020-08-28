@@ -6,6 +6,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:workmanager/workmanager.dart';
@@ -79,6 +80,20 @@ ThemeData lightTheme = ThemeData(
   buttonTheme: ButtonThemeData(height: 32),
 );
 
+final showNotesFontStyles = <TextStyle>[
+  TextStyle(
+    height: 1.8,
+  ),
+  GoogleFonts.martel(
+      textStyle: TextStyle(
+    height: 1.8,
+  )),
+  GoogleFonts.bitter(
+      textStyle: TextStyle(
+    height: 1.8,
+  )),
+];
+
 class SettingState extends ChangeNotifier {
   var themeStorage = KeyValueStorage(themesKey);
   var accentStorage = KeyValueStorage(accentsKey);
@@ -104,6 +119,7 @@ class SettingState extends ChangeNotifier {
   var fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
   var rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
   var localeStorage = KeyValueStorage(localeKey);
+  var showNotesFontStorage = KeyValueStorage(showNotesFontKey);
 
   Future initData() async {
     await _getTheme();
@@ -259,6 +275,15 @@ class SettingState extends ChangeNotifier {
     _saveRewindSeconds();
   }
 
+  int _showNotesFontIndex;
+  int get showNotesFontIndex => _showNotesFontIndex;
+  TextStyle get showNoteFontStyle => showNotesFontStyles[_showNotesFontIndex];
+  set setShowNoteFontStyle(int index) {
+    _showNotesFontIndex = index;
+    notifyListeners();
+    _saveShowNotesFonts();
+  }
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
@@ -267,6 +292,7 @@ class SettingState extends ChangeNotifier {
     _getDownloadUsingData();
     _getSleepTimerData();
     _getPlayerSeconds();
+    _getShowNotesFonts();
     _getUpdateInterval().then((value) async {
       if (_initUpdateTag == 0) {
         setWorkManager(24);
@@ -361,61 +387,69 @@ class SettingState extends ChangeNotifier {
     await S.load(_locale);
   }
 
-  Future _saveAccentSetColor() async {
+  Future<void> _getShowNotesFonts() async {
+    _showNotesFontIndex = await showNotesFontStorage.getInt(defaultValue: 1);
+  }
+
+  Future<void> _saveAccentSetColor() async {
     await accentStorage
         .saveString(_accentSetColor.toString().substring(10, 16));
   }
 
-  Future _setRealDark() async {
+  Future<void> _setRealDark() async {
     await realDarkStorage.saveBool(_realDark);
   }
 
-  Future saveShowIntro(int i) async {
+  Future<void> saveShowIntro(int i) async {
     await introStorage.saveInt(i);
   }
 
-  Future _saveUpdateInterval() async {
+  Future<void> _saveUpdateInterval() async {
     await intervalStorage.saveInt(_updateInterval);
   }
 
-  Future _saveTheme() async {
+  Future<void> _saveTheme() async {
     await themeStorage.saveInt(_theme.index);
   }
 
-  Future _saveAutoUpdate() async {
+  Future<void> _saveAutoUpdate() async {
     await autoupdateStorage.saveBool(_autoUpdate, reverse: true);
   }
 
-  Future _saveAutoPlay() async {
+  Future<void> _saveAutoPlay() async {
     await autoPlayStorage.saveBool(_autoPlay, reverse: true);
   }
 
-  Future _setDefaultSleepTimer() async {
+  Future<void> _setDefaultSleepTimer() async {
     await defaultSleepTimerStorage.saveInt(_defaultSleepTimer);
   }
 
-  Future _saveAutoSleepTimer() async {
+  Future<void> _saveAutoSleepTimer() async {
     await autoSleepTimerStorage.saveBool(_autoSleepTimer);
   }
 
-  Future _saveAutoSleepTimerMode() async {
+  Future<void> _saveAutoSleepTimerMode() async {
     await autoSleepTimerModeStorage.saveInt(_autoSleepTimerMode);
   }
 
-  Future _saveAutoSleepTimerStart() async {
+  Future<void> _saveAutoSleepTimerStart() async {
     await autoSleepTimerStartStorage.saveInt(_autoSleepTimerStart);
   }
 
-  Future _saveAutoSleepTimerEnd() async {
+  Future<void> _saveAutoSleepTimerEnd() async {
     await autoSleepTimerEndStorage.saveInt(_autoSleepTimerEnd);
   }
 
-  Future _saveFastForwardSeconds() async {
+  Future<void> _saveFastForwardSeconds() async {
     await fastForwardSecondsStorage.saveInt(_fastForwardSeconds);
   }
 
-  Future _saveRewindSeconds() async {
+  Future<void> _saveRewindSeconds() async {
     await rewindSecondsStorage.saveInt(_rewindSeconds);
+  }
+
+  Future<void> _saveShowNotesFonts() async {
+    await showNotesFontStorage.saveInt(_showNotesFontIndex);
   }
 
   Future<SettingsBackup> backup() async {
@@ -458,6 +492,7 @@ class SettingState extends ChangeNotifier {
         await KeyValueStorage(hideListenedKey).getBool(defaultValue: false);
     var notificationLayout =
         await KeyValueStorage(notificationLayoutKey).getInt(defaultValue: 0);
+    var showNotesFont = await showNotesFontStorage.getInt(defaultValue: 1);
 
     return SettingsBackup(
         theme: theme,
@@ -486,7 +521,8 @@ class SettingState extends ChangeNotifier {
         playerHeight: playerHeight,
         locale: backupLocale,
         hideListened: hideListened,
-        notificationLayout: notificationLayout);
+        notificationLayout: notificationLayout,
+        showNotesFont: showNotesFont);
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -520,6 +556,7 @@ class SettingState extends ChangeNotifier {
     await KeyValueStorage(hideListenedKey).saveBool(backup.hideListened);
     await KeyValueStorage(notificationLayoutKey)
         .saveInt(backup.notificationLayout);
+    await showNotesFontStorage.saveInt(backup.showNotesFont);
     if (backup.locale == '') {
       await localeStorage.saveStringList([]);
       await S.load(Locale(Intl.systemLocale));
@@ -539,6 +576,7 @@ class SettingState extends ChangeNotifier {
     await _getAutoUpdate();
     await _getDownloadUsingData();
     await _getSleepTimerData();
+    await _getShowNotesFonts();
     await _getUpdateInterval().then((value) async {
       if (_autoUpdate) {
         await cancelWork();

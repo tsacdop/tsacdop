@@ -26,6 +26,7 @@ class SettingsBackup {
   final String locale;
   final bool hideListened;
   final int notificationLayout;
+  final int showNotesFont;
   SettingsBackup(
       {this.theme,
       this.accentColor,
@@ -53,7 +54,8 @@ class SettingsBackup {
       this.playerHeight,
       this.locale,
       this.hideListened,
-      this.notificationLayout});
+      this.notificationLayout,
+      this.showNotesFont});
 
   Map<String, Object> toJson() {
     return {
@@ -82,7 +84,8 @@ class SettingsBackup {
       'playerHeight': playerHeight,
       'locale': locale,
       'hideListened': hideListened,
-      'notificationLayout': notificationLayout
+      'notificationLayout': notificationLayout,
+      'showNotesFont': showNotesFont
     };
   }
 
@@ -114,6 +117,7 @@ class SettingsBackup {
         playerHeight: json['playerHeight'] as int,
         locale: json['locale'] as String,
         hideListened: json['hideListened'] as bool,
-        notificationLayout: json['notificationLayout'] as int);
+        notificationLayout: json['notificationLayout'] as int,
+        showNotesFont: json['showNotesFont'] as int);
   }
 }

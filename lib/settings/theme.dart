@@ -42,150 +42,195 @@ class ThemeSetting extends StatelessWidget {
                       .bodyText1
                       .copyWith(color: Theme.of(context).accentColor)),
             ),
-            ListView(
-              physics: const BouncingScrollPhysics(),
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              children: <Widget>[
-                ListTile(
-                  onTap: () => showGeneralDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      barrierLabel: MaterialLocalizations.of(context)
-                          .modalBarrierDismissLabel,
-                      barrierColor: Colors.black54,
-                      transitionDuration: const Duration(milliseconds: 200),
-                      pageBuilder: (context, animaiton, secondaryAnimation) =>
-                          AnnotatedRegion<SystemUiOverlayStyle>(
-                            value: SystemUiOverlayStyle(
-                              statusBarIconBrightness: Brightness.light,
-                              systemNavigationBarColor:
-                                  Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Color.fromRGBO(113, 113, 113, 1)
-                                      : Color.fromRGBO(15, 15, 15, 1),
-                            ),
-                            child: AlertDialog(
-                              titlePadding: EdgeInsets.only(
-                                top: 20,
-                                left: 40,
-                                right: context.width / 3,
-                              ),
-                              elevation: 1,
-                              shape: RoundedRectangleBorder(
+            ListTile(
+              onTap: () => showGeneralDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierLabel: MaterialLocalizations.of(context)
+                      .modalBarrierDismissLabel,
+                  barrierColor: Colors.black54,
+                  transitionDuration: const Duration(milliseconds: 200),
+                  pageBuilder: (context, animaiton, secondaryAnimation) =>
+                      AnnotatedRegion<SystemUiOverlayStyle>(
+                        value: SystemUiOverlayStyle(
+                          statusBarIconBrightness: Brightness.light,
+                          systemNavigationBarColor:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Color.fromRGBO(113, 113, 113, 1)
+                                  : Color.fromRGBO(15, 15, 15, 1),
+                        ),
+                        child: AlertDialog(
+                          titlePadding: EdgeInsets.only(
+                            top: 20,
+                            left: 40,
+                            right: context.width / 3,
+                          ),
+                          elevation: 1,
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
+                          title: Text(s.settingsTheme),
+                          content: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                ClipRRect(
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(10.0))),
-                              title: Text(s.settingsTheme),
-                              content: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5)),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: RadioListTile(
-                                            title: Text(s.systemDefault),
-                                            value: ThemeMode.system,
-                                            groupValue: settings.theme,
-                                            onChanged: (value) {
-                                              settings.setTheme = value;
-                                              Navigator.of(context).pop();
-                                            }),
-                                      ),
-                                    ),
-                                    ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5)),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: RadioListTile(
-                                            title: Text(s.darkMode),
-                                            value: ThemeMode.dark,
-                                            groupValue: settings.theme,
-                                            onChanged: (value) {
-                                              settings.setTheme = value;
-                                              Navigator.of(context).pop();
-                                            }),
-                                      ),
-                                    ),
-                                    ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5)),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: RadioListTile(
-                                            title: Text(s.lightMode),
-                                            value: ThemeMode.light,
-                                            groupValue: settings.theme,
-                                            onChanged: (value) {
-                                              settings.setTheme = value;
-                                              Navigator.of(context).pop();
-                                            }),
-                                      ),
-                                    ),
-                                  ],
+                                      BorderRadius.all(Radius.circular(5)),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: RadioListTile(
+                                        title: Text(s.systemDefault),
+                                        value: ThemeMode.system,
+                                        groupValue: settings.theme,
+                                        onChanged: (value) {
+                                          settings.setTheme = value;
+                                          Navigator.of(context).pop();
+                                        }),
+                                  ),
                                 ),
-                              ),
+                                ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: RadioListTile(
+                                        title: Text(s.darkMode),
+                                        value: ThemeMode.dark,
+                                        groupValue: settings.theme,
+                                        onChanged: (value) {
+                                          settings.setTheme = value;
+                                          Navigator.of(context).pop();
+                                        }),
+                                  ),
+                                ),
+                                ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: RadioListTile(
+                                        title: Text(s.lightMode),
+                                        value: ThemeMode.light,
+                                        groupValue: settings.theme,
+                                        onChanged: (value) {
+                                          settings.setTheme = value;
+                                          Navigator.of(context).pop();
+                                        }),
+                                  ),
+                                ),
+                              ],
                             ),
-                          )),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 70.0),
-                  //  leading: Icon(Icons.colorize),
-                  title: Text(s.settingsTheme),
-                  subtitle: Text(s.systemDefault),
-                ),
-                Selector<SettingState, bool>(
-                  selector: (_, setting) => setting.realDark,
-                  builder: (_, data, __) => ListTile(
-                    onTap: () => settings.setRealDark = !data,
-                    contentPadding: const EdgeInsets.only(
-                        left: 70.0, right: 20, bottom: 10, top: 10),
-                    //  leading: Icon(Icons.colorize),
-                    title: Text(
-                      s.settingsRealDark,
-                    ),
-                    subtitle: Text(s.settingsRealDarkDes),
-                    trailing: Transform.scale(
-                      scale: 0.9,
-                      child: Switch(
-                          value: data,
-                          onChanged: (boo) async {
-                            settings.setRealDark = boo;
-                          }),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  onTap: () => generalDialog(
-                    context,
-                    title: Text.rich(TextSpan(text: s.chooseA, children: [
-                      TextSpan(
-                          text: ' ${s.color}',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: context.accentColor))
-                    ])),
-                    content: _ColorPicker(
-                      onColorChanged: (value) =>
-                          settings.setAccentColor = value,
-                    ),
-                  ),
-                  contentPadding: EdgeInsets.only(left: 70.0, right: 35),
-                  title: Text(s.settingsAccentColor),
-                  subtitle: Text(s.settingsAccentColorDes),
-                  trailing: Container(
-                    height: 25,
-                    width: 25,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle, color: context.accentColor),
-                  ),
-                ),
-                Divider(height: 1),
-              ],
+                          ),
+                        ),
+                      )),
+              contentPadding: EdgeInsets.symmetric(horizontal: 70.0),
+              //  leading: Icon(Icons.colorize),
+              title: Text(s.settingsTheme),
+              subtitle: Text(s.systemDefault),
             ),
+            Selector<SettingState, bool>(
+              selector: (_, setting) => setting.realDark,
+              builder: (_, data, __) => ListTile(
+                onTap: () => settings.setRealDark = !data,
+                contentPadding: const EdgeInsets.only(
+                    left: 70.0, right: 20, bottom: 10, top: 10),
+                //  leading: Icon(Icons.colorize),
+                title: Text(
+                  s.settingsRealDark,
+                ),
+                subtitle: Text(s.settingsRealDarkDes),
+                trailing: Transform.scale(
+                  scale: 0.9,
+                  child: Switch(
+                      value: data,
+                      onChanged: (boo) async {
+                        settings.setRealDark = boo;
+                      }),
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () => generalDialog(
+                context,
+                title: Text.rich(TextSpan(text: s.chooseA, children: [
+                  TextSpan(
+                      text: ' ${s.color}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: context.accentColor))
+                ])),
+                content: _ColorPicker(
+                  onColorChanged: (value) => settings.setAccentColor = value,
+                ),
+              ),
+              contentPadding: EdgeInsets.only(left: 70.0, right: 35),
+              title: Text(s.settingsAccentColor),
+              subtitle: Text(s.settingsAccentColorDes),
+              trailing: Container(
+                height: 25,
+                width: 25,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: context.accentColor),
+              ),
+            ),
+            Divider(height: 1),
+            Padding(
+              padding: EdgeInsets.all(10.0),
+            ),
+            Container(
+              height: 30.0,
+              padding: EdgeInsets.symmetric(horizontal: 70),
+              alignment: Alignment.centerLeft,
+              child: Text(s.fontStyle,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(color: Theme.of(context).accentColor)),
+            ),
+            Selector<SettingState, int>(
+              selector: (_, setting) => setting.showNotesFontIndex,
+              builder: (_, data, __) => ListTile(
+                contentPadding: const EdgeInsets.only(
+                    left: 70.0, right: 20, bottom: 10, top: 10),
+                title: Text(s.showNotesFonts),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: showNotesFontStyles.map<Widget>((textStyle) {
+                    final index = showNotesFontStyles.indexOf(textStyle);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: InkWell(
+                        onTap: () => settings.setShowNoteFontStyle = index,
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Container(
+                          height: 60,
+                          width: 80,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: data == index
+                                      ? context.accentColor.withAlpha(70)
+                                      : context.primaryColorDark),
+                              color: data == index
+                                  ? context.accentColor.withAlpha(70)
+                                  : Colors.transparent),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Show notes',
+                            textAlign: TextAlign.center,
+                            style: textStyle,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            Divider(height: 1)
           ],
         ),
       ),
