@@ -143,16 +143,22 @@ class EpisodeGrid extends StatelessWidget {
               ? Container(
                   height: 20,
                   width: 20,
+                  alignment: Alignment.center,
                   margin: EdgeInsets.symmetric(horizontal: 5),
-                  padding: EdgeInsets.symmetric(horizontal: 2),
+                  padding: EdgeInsets.fromLTRB(2, 2, 2, 5),
                   decoration: BoxDecoration(
                     color: context.accentColor,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.arrow_downward,
-                    size: 15,
-                    color: Colors.white,
+                  child: CustomPaint(
+                    size: Size(12, 12),
+                    painter: DownloadPainter(
+                      stroke: 1.0,
+                      color: context.accentColor,
+                      fraction: 1,
+                      progressColor: Colors.white,
+                      progress: 1,
+                    ),
                   ),
                 )
               : Center()

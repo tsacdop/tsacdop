@@ -68,6 +68,8 @@
   "@download": {},
   "downloaded": "已下载",
   "@downloaded": {},
+  "downloadRemovedToast": "下载已删除",
+  "@downloadRemovedToast": {},
   "editGroupName": "修改组名",
   "@editGroupName": {},
   "endOfEpisode": "节目结束",
@@ -128,6 +130,8 @@
   "@filter": {},
   "fonts": "字体",
   "@fonts": {},
+  "fontStyle": "字体风格",
+  "@fontStyle": {},
   "from": "自{time}",
   "@from": {
     "placeholders": {
@@ -519,6 +523,8 @@
   "@settingsUpdateIntervalDes": {},
   "share": "分享",
   "@share": {},
+  "showNotesFonts": "节目简介字体",
+  "@showNotesFonts": {},
   "size": "大小",
   "@size": {},
   "skipSecondsAtStart": "开头跳过秒数",

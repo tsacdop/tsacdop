@@ -68,6 +68,8 @@
   "@download": {},
   "downloaded": "Downloaded",
   "@downloaded": {},
+  "downloadRemovedToast": "Download removed",
+  "@downloadRemovedToast": {},
   "editGroupName": "Edit group name",
   "@editGroupName": {},
   "endOfEpisode": "End of Episode",
@@ -128,6 +130,8 @@
   "@filter": {},
   "fonts": "Fonts",
   "@fonts": {},
+  "fontStyle": "Font style",
+  "@fontStyle": {},
   "from": "From {time}",
   "@from": {
     "placeholders": {
@@ -519,6 +523,8 @@
   "@settingsUpdateIntervalDes": {},
   "share": "Share",
   "@share": {},
+  "showNotesFonts": "Show notes font",
+  "@showNotesFonts": {},
   "size": "Size",
   "@size": {},
   "skipSecondsAtStart": "Skip seconds at start",

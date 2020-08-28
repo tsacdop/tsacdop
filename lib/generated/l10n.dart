@@ -325,6 +325,16 @@ class S {
     );
   }
 
+  /// `Download removed`
+  String get downloadRemovedToast {
+    return Intl.message(
+      'Download removed',
+      name: 'downloadRemovedToast',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Edit group name`
   String get editGroupName {
     return Intl.message(
@@ -613,6 +623,16 @@ class S {
     return Intl.message(
       'Fonts',
       name: 'fonts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Font style`
+  String get fontStyle {
+    return Intl.message(
+      'Font style',
+      name: 'fontStyle',
       desc: '',
       args: [],
     );
@@ -2297,6 +2317,16 @@ class S {
     return Intl.message(
       'Share',
       name: 'share',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show notes font`
+  String get showNotesFonts {
+    return Intl.message(
+      'Show notes font',
+      name: 'showNotesFonts',
       desc: '',
       args: [],
     );
