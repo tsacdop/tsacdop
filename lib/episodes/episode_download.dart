@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -152,7 +153,7 @@ class _DownloadButtonState extends State<DownloadButton> {
               alignment: Alignment.center,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Text('${_task.progress}%',
+                child: Text('${math.max(_task.progress, 0)}%',
                     style: TextStyle(color: Colors.white)),
               )),
         ],
@@ -192,7 +193,7 @@ class _DownloadButtonState extends State<DownloadButton> {
             child: Container(
               height: 50.0,
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 18.0),
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TweenAnimationBuilder(
                 duration: Duration(milliseconds: 1000),
                 tween: Tween(begin: 0.0, end: 1.0),
@@ -222,7 +223,7 @@ class _DownloadButtonState extends State<DownloadButton> {
             child: Container(
               height: 50.0,
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 18),
+              padding: EdgeInsets.symmetric(horizontal: 15),
               child: TweenAnimationBuilder(
                 duration: Duration(milliseconds: 500),
                 tween: Tween(begin: 0.0, end: 1.0),
@@ -255,7 +256,7 @@ class _DownloadButtonState extends State<DownloadButton> {
             child: Container(
               height: 50.0,
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 18),
+              padding: EdgeInsets.symmetric(horizontal: 15),
               child: SizedBox(
                 height: 20,
                 width: 20,

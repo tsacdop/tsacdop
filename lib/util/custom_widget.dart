@@ -921,31 +921,34 @@ class DownloadPainter extends CustomPainter {
   Color progressColor;
   double progress;
   double pauseProgress;
+  double stroke;
   DownloadPainter(
       {this.fraction,
       this.color,
       this.progressColor,
       this.progress = 0,
+      this.stroke = 2,
       this.pauseProgress = 0});
 
   @override
   void paint(Canvas canvas, Size size) {
     var _paint = Paint()
       ..color = color
-      ..strokeWidth = 2.0
+      ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round;
     var _circlePaint = Paint()
       ..color = color.withAlpha(70)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+      ..strokeWidth = stroke;
     var _progressPaint = Paint()
       ..color = progressColor
+      ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+      ..strokeWidth = stroke;
     var width = size.width;
     var height = size.height;
     var center = Offset(size.width / 2, size.height / 2);
-    if (pauseProgress == 0) {
+    if (pauseProgress == 0 && progress < 1) {
       canvas.drawLine(
           Offset(width / 2, 4), Offset(width / 2, height * 4 / 5), _paint);
       canvas.drawLine(Offset(width / 4, height / 2),
@@ -957,14 +960,23 @@ class DownloadPainter extends CustomPainter {
     if (fraction == 0) {
       canvas.drawLine(
           Offset(width / 5, height), Offset(width * 4 / 5, height), _paint);
-    } else {
+    } else if (progress < 1) {
       canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
           math.pi / 2, math.pi * fraction, false, _circlePaint);
       canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
           math.pi / 2, -math.pi * fraction, false, _circlePaint);
     }
 
-    if (fraction == 1) {
+    if (progress == 1) {
+      canvas.drawLine(Offset(width / 5, height), Offset(width * 4 / 5, height),
+          _progressPaint);
+      canvas.drawLine(Offset(width / 5, height / 2),
+          Offset(width / 2, height * 4 / 5), _progressPaint);
+      canvas.drawLine(Offset(width, height * 3 / 10),
+          Offset(width / 2, height * 4 / 5), _progressPaint);
+    }
+
+    if (fraction == 1 && progress < 1) {
       canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
           -math.pi / 2, math.pi * 2 * progress, false, _progressPaint);
     }
