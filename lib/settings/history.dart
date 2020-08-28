@@ -37,7 +37,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
 
   bool _loadMore = false;
 
-  _loadMoreData() async {
+  Future<void> _loadMoreData() async {
     if (mounted) {
       setState(() {
         _loadMore = true;

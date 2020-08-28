@@ -22,7 +22,8 @@ List<Libries> fonts = [
   Libries('Libre Baskerville', font,
       "https://fonts.google.com/specimen/Libre+Baskerville"),
   Libries('Teko', font, "https://fonts.google.com/specimen/Teko"),
-  Libries('Martel', font, "https://fonts.google.com/specimen/Martel")
+  Libries('Martel', font, "https://fonts.google.com/specimen/Martel"),
+  Libries('Bitter', font, "https://fonts.google.com/specimen/Bitter")
 ];
 
 List<Libries> plugins = [

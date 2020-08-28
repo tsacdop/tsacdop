@@ -185,13 +185,13 @@ class _LayoutSettingState extends State<LayoutSetting> {
                 ),
                 Container(
                   height: 30.0,
-                  padding: EdgeInsets.symmetric(horizontal: 70),
+                  padding: const EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text(s.settingsPopupMenu,
                       style: Theme.of(context)
                           .textTheme
                           .bodyText1
-                          .copyWith(color: Theme.of(context).accentColor)),
+                          .copyWith(color: context.accentColor)),
                 ),
                 ListTile(
                   onTap: () => Navigator.push(
