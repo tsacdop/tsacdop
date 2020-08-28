@@ -938,8 +938,8 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                                 tooltip: s
                                                                     .addNewEpisodeTooltip,
                                                                 icon: SizedBox(
-                                                                    height: 16,
-                                                                    width: 21,
+                                                                    height: 15,
+                                                                    width: 20,
                                                                     child: CustomPaint(
                                                                         painter: AddToPlaylistPainter(
                                                                             context
@@ -977,8 +977,8 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                                 tooltip: s
                                                                     .addNewEpisodeTooltip,
                                                                 icon: SizedBox(
-                                                                    height: 16,
-                                                                    width: 21,
+                                                                    height: 15,
+                                                                    width: 20,
                                                                     child:
                                                                         CustomPaint(
                                                                             painter:
@@ -995,6 +995,8 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                               Material(
                                                 color: Colors.transparent,
                                                 child: IconButton(
+                                                  tooltip:
+                                                      s.hideListenedSetting,
                                                   icon: SizedBox(
                                                     width: 30,
                                                     height: 15,

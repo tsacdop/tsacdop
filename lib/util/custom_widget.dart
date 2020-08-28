@@ -352,20 +352,13 @@ class AddToPlaylistPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
     var _path = Path();
-    _path.moveTo(0, 0);
-    _path.lineTo(size.width * 4 / 7, 0);
-    _path.moveTo(0, size.height / 3);
-    _path.lineTo(size.width * 4 / 7, size.height / 3);
-    _path.moveTo(0, size.height * 2 / 3);
-    _path.lineTo(size.width * 3 / 7, size.height * 2 / 3);
-    //_path.moveTo(size.width * 3 / 7, size.height * 2 / 3);
-    //_path.lineTo(size.width, size.height * 2 / 3);
-    //_path.moveTo(size.width * 5 / 7, size.height / 3);
-    //_path.lineTo(size.width * 5 / 7, size.height);
-    // _path.moveTo(size.width*5/7, size.height/4);
-    // _path.lineTo(size.width*11/14, 0);
-    // _path.lineTo(size.width*13/14, size.height/4);
-    // _path.lineTo(size.width, 0);
+    _path.moveTo(0, size.height / 5);
+    _path.lineTo(size.width * 4 / 7, size.height / 5);
+    _path.moveTo(0, size.height / 2);
+    _path.lineTo(size.width * 4 / 7, size.height / 2);
+    _path.moveTo(0, size.height * 4 / 5);
+    _path.lineTo(size.width * 3 / 7, size.height * 4 / 5);
+
     var textPainter = TextPainter(
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
@@ -375,7 +368,7 @@ class AddToPlaylistPainter extends CustomPainter {
               fontStyle: FontStyle.italic, color: textColor, fontSize: 10),
         ))
       ..layout();
-    textPainter.paint(canvas, Offset(size.width * 4 / 7, size.height / 3));
+    textPainter.paint(canvas, Offset(size.width * 4 / 7, size.height * 3 / 5));
     canvas.drawPath(_path, _paint);
   }
 
