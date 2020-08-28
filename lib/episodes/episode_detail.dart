@@ -5,7 +5,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:linkify/linkify.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +13,7 @@ import 'package:tuple/tuple.dart';
 import '../home/audioplayer.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';
+import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../util/audiopanel.dart';
@@ -436,11 +436,8 @@ class __MenuBarState extends State<_MenuBar> {
 
   Future<void> _markListened(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
-    //var marked = await dbHelper.checkMarked(episode);
-    //if (!marked) {
     final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
     await dbHelper.saveHistory(history);
-    //}
     if (mounted) setState(() {});
   }
 
@@ -739,29 +736,28 @@ class _ShowNote extends StatelessWidget {
                         }
                       }
                     }
-                    return Html(
-                      padding:
-                          EdgeInsets.only(left: 20.0, right: 20, bottom: 50),
-                      defaultTextStyle: GoogleFonts.martel(
-                        textStyle: TextStyle(
-                          height: 1.8,
-                        ),
-                      ),
-                      data: description,
-                      linkStyle: TextStyle(
-                          color: context.accentColor,
-                          textBaseline: TextBaseline.ideographic),
-                      onLinkTap: (url) {
-                        if (url.substring(0, 3) == '#t=') {
-                          final seconds = _getTimeStamp(url);
-                          if (data == episode) {
-                            audio.seekTo(seconds * 1000);
+                    return Selector<SettingState, TextStyle>(
+                      selector: (_, settings) => settings.showNoteFontStyle,
+                      builder: (_, data, __) => Html(
+                        padding:
+                            EdgeInsets.only(left: 20.0, right: 20, bottom: 50),
+                        defaultTextStyle: data,
+                        data: description,
+                        linkStyle: TextStyle(
+                            color: context.accentColor,
+                            textBaseline: TextBaseline.ideographic),
+                        onLinkTap: (url) {
+                          if (url.substring(0, 3) == '#t=') {
+                            final seconds = _getTimeStamp(url);
+                            if (data == episode) {
+                              audio.seekTo(seconds * 1000);
+                            }
+                          } else {
+                            url.launchUrl;
                           }
-                        } else {
-                          url.launchUrl;
-                        }
-                      },
-                      useRichText: true,
+                        },
+                        useRichText: true,
+                      ),
                     );
                   })
               : Container(
