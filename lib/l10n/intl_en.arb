@@ -74,6 +74,10 @@
   "@endOfEpisode": {},
   "episode": "{count, plural, zero{} one{Episode} other{Episodes}}",
   "@episode": {},
+  "fastForward": "Fast forward",
+  "@fastForward": {},
+  "fastRewind": "Fast rewind",
+  "@fastRewind": {},
   "featureDiscoveryEditGroup": "Tap to edit group",
   "@featureDiscoveryEditGroup": {},
   "featureDiscoveryEditGroupDes": "You can change group name or delete it here, but the home group can not be edited or deleted",
@@ -142,6 +146,8 @@
   "@groupRemoveConfirm": {},
   "groups": "{count, plural, zero{Group} one{Group} other{Groups}}",
   "@groups": {},
+  "hideListenedSetting": "Hide listened",
+  "@hideListenedSetting": {},
   "homeGroupsSeeAll": "See All",
   "@homeGroupsSeeAll": {},
   "homeMenuPlaylist": "Playlist",
@@ -248,6 +254,8 @@
       "title": {}
     }
   },
+  "notificationSetting": "Notification  panel",
+  "@notificationSetting": {},
   "notificationSubscribe": "Subscribe {title}",
   "@notificationSubscribe": {
     "placeholders": {
@@ -280,6 +288,8 @@
   },
   "oldestFirst": "Oldest first",
   "@oldestFirst": {},
+  "pause": "Pause",
+  "@pause": {},
   "play": "Play",
   "@play": {},
   "playback": "Playback control",
@@ -517,8 +527,12 @@
   "@skipSilence": {
     "description": "Feature skip silence"
   },
+  "skipToNext": "Skip to next",
+  "@skipToNext": {},
   "sleepTimer": "Sleep timer",
   "@sleepTimer": {},
+  "stop": "Stop",
+  "@stop": {},
   "subscribe": "Subscribe",
   "@subscribe": {},
   "subscribeExportDes": "Export OMPL file of all podcasts",

@@ -74,6 +74,10 @@
   "@endOfEpisode": {},
   "episode": "{count, plural, zero{} other{节目}}",
   "@episode": {},
+  "fastForward": "快进",
+  "@fastForward": {},
+  "fastRewind": "快退",
+  "@fastRewind": {},
   "featureDiscoveryEditGroup": "点击修改分组",
   "@featureDiscoveryEditGroup": {},
   "featureDiscoveryEditGroupDes": "您可以修改分组名或者删除分组，注意 Home 分组无法修改，也不能被删除。",
@@ -142,6 +146,8 @@
   "@groupRemoveConfirm": {},
   "groups": "{count, plural, zero{分组} other{分组}}",
   "@groups": {},
+  "hideListenedSetting": "隐藏已收听",
+  "@hideListenedSetting": {},
   "homeGroupsSeeAll": "查看全部",
   "@homeGroupsSeeAll": {},
   "homeMenuPlaylist": "播放列表",
@@ -248,6 +254,8 @@
       "title": {}
     }
   },
+  "notificationSetting": "通知栏",
+  "@notificationSetting": {},
   "notificationSubscribe": "订阅 {title}",
   "@notificationSubscribe": {
     "placeholders": {
@@ -280,6 +288,8 @@
   },
   "oldestFirst": "由旧到新",
   "@oldestFirst": {},
+  "pause": "暂停",
+  "@pause": {},
   "play": "播放",
   "@play": {},
   "playback": "播放控制",
@@ -517,8 +527,12 @@
   "@skipSilence": {
     "description": "Feature skip silence"
   },
+  "skipToNext": "下一首",
+  "@skipToNext": {},
   "sleepTimer": "睡眠模式",
   "@sleepTimer": {},
+  "stop": "停止",
+  "@stop": {},
   "subscribe": "订阅",
   "@subscribe": {},
   "subscribeExportDes": "导出 OMPL 文件",

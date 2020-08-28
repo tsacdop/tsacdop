@@ -358,6 +358,26 @@ class S {
     );
   }
 
+  /// `Fast forward`
+  String get fastForward {
+    return Intl.message(
+      'Fast forward',
+      name: 'fastForward',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fast rewind`
+  String get fastRewind {
+    return Intl.message(
+      'Fast rewind',
+      name: 'fastRewind',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Tap to edit group`
   String get featureDiscoveryEditGroup {
     return Intl.message(
@@ -658,6 +678,16 @@ class S {
       name: 'groups',
       desc: '',
       args: [count],
+    );
+  }
+
+  /// `Hide listened`
+  String get hideListenedSetting {
+    return Intl.message(
+      'Hide listened',
+      name: 'hideListenedSetting',
+      desc: '',
+      args: [],
     );
   }
 
@@ -1133,6 +1163,16 @@ class S {
     );
   }
 
+  /// `Notification  panel`
+  String get notificationSetting {
+    return Intl.message(
+      'Notification  panel',
+      name: 'notificationSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Subscribe {title}`
   String notificationSubscribe(Object title) {
     return Intl.message(
@@ -1188,6 +1228,16 @@ class S {
     return Intl.message(
       'Oldest first',
       name: 'oldestFirst',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pause`
+  String get pause {
+    return Intl.message(
+      'Pause',
+      name: 'pause',
       desc: '',
       args: [],
     );
@@ -2282,11 +2332,31 @@ class S {
     );
   }
 
+  /// `Skip to next`
+  String get skipToNext {
+    return Intl.message(
+      'Skip to next',
+      name: 'skipToNext',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Sleep timer`
   String get sleepTimer {
     return Intl.message(
       'Sleep timer',
       name: 'sleepTimer',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Stop`
+  String get stop {
+    return Intl.message(
+      'Stop',
+      name: 'stop',
       desc: '',
       args: [],
     );

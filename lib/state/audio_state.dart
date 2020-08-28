@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
@@ -41,6 +42,12 @@ MediaControl forward = MediaControl(
   androidIcon: 'drawable/baseline_fast_forward_white_24',
   label: 'forward',
   action: MediaAction.fastForward,
+);
+
+MediaControl rewind = MediaControl(
+  androidIcon: 'drawable/baseline_fast_rewind_white_24',
+  label: 'rewind',
+  action: MediaAction.rewind,
 );
 
 void _audioPlayerTaskEntrypoint() async {
@@ -718,10 +725,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
 }
 
 class AudioPlayerTask extends BackgroundAudioTask {
-  KeyValueStorage cacheStorage = KeyValueStorage(cacheMaxKey);
-
+  final cacheStorage = KeyValueStorage(cacheMaxKey);
+  final layoutStorage = KeyValueStorage(notificationLayoutKey);
   final List<MediaItem> _queue = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
+  AudioSession _session;
   AudioProcessingState _skipState;
   bool _playing;
   bool _interrupted = false;
@@ -737,6 +745,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
     _stopAtEnd = false;
+    _session = await AudioSession.instance;
+    await _session.configure(AudioSessionConfiguration.speech());
+    _handleInterruption(_session);
     _playerStateSubscription = _audioPlayer.playbackStateStream
         .where((state) => state == AudioPlaybackState.completed)
         .listen((state) {
@@ -786,6 +797,52 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
   }
 
+  void _handleInterruption(AudioSession session) async {
+    session.interruptionEventStream.listen((event) {
+      if (event.begin) {
+        switch (event.type) {
+          case AudioInterruptionType.pause:
+            if (_playing) {
+              onPause();
+              _interrupted = true;
+            }
+            break;
+          case AudioInterruptionType.duck:
+            if (_playing) {
+              onPause();
+              _interrupted = true;
+            }
+            break;
+          case AudioInterruptionType.unknown:
+            if (_playing) {
+              onPause();
+              _interrupted = true;
+            }
+            break;
+        }
+      } else {
+        switch (event.type) {
+          case AudioInterruptionType.pause:
+            if (!_playing && _interrupted) {
+              onPlay();
+            }
+            break;
+          case AudioInterruptionType.duck:
+            if (!_playing && _interrupted) {
+              onPlay();
+            }
+            break;
+          case AudioInterruptionType.unknown:
+            break;
+        }
+        _interrupted = false;
+      }
+    });
+    session.becomingNoisyEventStream.listen((_) {
+      if (_playing) onPause();
+    });
+  }
+
   void playPause() {
     if (AudioServiceBackground.state.playing) {
       onPause();
@@ -828,7 +885,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  void onPlay() async {
+  Future<void> onPlay() async {
     if (_skipState == null) {
       if (_playing == null) {
         _playing = true;
@@ -847,6 +904,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         _playFromStart();
       } else {
         _playing = true;
+        _session.setActive(true);
         if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
             _audioPlayer.playbackEvent.state != AudioPlaybackState.none) {
           _audioPlayer.play();
@@ -855,8 +913,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
   }
 
-  _playFromStart() async {
+  Future<void> _playFromStart() async {
     _playing = true;
+    _session.setActive(true);
     if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
         _audioPlayer.playbackEvent.state != AudioPlaybackState.none) {
       try {
@@ -871,7 +930,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  void onPause() {
+  Future<void> onPause() async {
     if (_skipState == null) {
       if (_playing == null) {
       } else if (_playing) {
@@ -882,20 +941,22 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  void onSeekTo(Duration position) {
+  Future<void> onSeekTo(Duration position) async {
     if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
         _audioPlayer.playbackEvent.state != AudioPlaybackState.none) {
-      _audioPlayer.seek(position);
+      await _audioPlayer.seek(position);
     }
   }
 
   @override
-  void onClick(MediaButton button) {
+  Future<void> onClick(MediaButton button) async {
     if (button == MediaButton.media) {
-      playPause();
+      await playPause();
     } else if (button == MediaButton.next) {
-      _seekRelative(fastForwardInterval);
-    } else if (button == MediaButton.previous) _seekRelative(-rewindInterval);
+      await _seekRelative(fastForwardInterval);
+    } else if (button == MediaButton.previous) {
+      await _seekRelative(-rewindInterval);
+    }
   }
 
   Future<void> _seekRelative(Duration offset) async {
@@ -918,19 +979,19 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  void onAddQueueItem(MediaItem mediaItem) async {
+  Future<void> onAddQueueItem(MediaItem mediaItem) async {
     _queue.add(mediaItem);
     await AudioServiceBackground.setQueue(_queue);
   }
 
   @override
-  void onRemoveQueueItem(MediaItem mediaItem) async {
+  Future<void> onRemoveQueueItem(MediaItem mediaItem) async {
     _queue.removeWhere((item) => item.id == mediaItem.id);
     await AudioServiceBackground.setQueue(_queue);
   }
 
   @override
-  void onAddQueueItemAt(MediaItem mediaItem, int index) async {
+  Future<void> onAddQueueItemAt(MediaItem mediaItem, int index) async {
     if (index == 0) {
       await _audioPlayer.stop();
       _queue.removeAt(0);
@@ -951,57 +1012,57 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  void onFastForward() async {
+  Future<void> onFastForward() async {
     await _seekRelative(fastForwardInterval);
   }
 
   @override
-  void onRewind() async {
+  Future<void> onRewind() async {
     await _seekRelative(-rewindInterval);
   }
 
-  @override
-  void onAudioFocusLost(AudioInterruption interruption) {
-    if (_playing) _interrupted = true;
-    switch (interruption) {
-      case AudioInterruption.pause:
-      case AudioInterruption.temporaryPause:
-      case AudioInterruption.unknownPause:
-        onPause();
-        break;
-      case AudioInterruption.temporaryDuck:
-        _audioPlayer.setVolume(0.5);
-        break;
-    }
-  }
-
-  @override
-  void onAudioBecomingNoisy() {
-    if (_skipState == null) {
-      if (_playing == null) {
-      } else if (_audioPlayer.playbackEvent.state ==
-          AudioPlaybackState.playing) {
-        _playing = false;
-        _audioPlayer.pause();
-      }
-    }
-  }
-
-  @override
-  void onAudioFocusGained(AudioInterruption interruption) {
-    switch (interruption) {
-      case AudioInterruption.temporaryPause:
-        if (!_playing && _interrupted) onPlay();
-        break;
-      case AudioInterruption.temporaryDuck:
-        _audioPlayer.setVolume(1.0);
-        break;
-      default:
-        break;
-    }
-    _interrupted = false;
-  }
-
+//  @override
+//  Future<void> onAudioFocusLost(AudioInterruption interruption) {
+//    if (_playing) _interrupted = true;
+//    switch (interruption) {
+//      case AudioInterruption.pause:
+//      case AudioInterruption.temporaryPause:
+//      case AudioInterruption.unknownPause:
+//        onPause();
+//        break;
+//      case AudioInterruption.temporaryDuck:
+//        _audioPlayer.setVolume(0.5);
+//        break;
+//    }
+//  }
+//
+//  @override
+//  Future<void> onAudioBecomingNoisy() async{
+//    if (_skipState == null) {
+//      if (_playing == null) {
+//      } else if (_audioPlayer.playbackEvent.state ==
+//          AudioPlaybackState.playing) {
+//        _playing = false;
+//        _audioPlayer.pause();
+//      }
+//    }
+//  }
+//
+//  @override
+//  void onAudioFocusGained(AudioInterruption interruption) {
+//    switch (interruption) {
+//      case AudioInterruption.temporaryPause:
+//        if (!_playing && _interrupted) onPlay();
+//        break;
+//      case AudioInterruption.temporaryDuck:
+//        _audioPlayer.setVolume(1.0);
+//        break;
+//      default:
+//        break;
+//    }
+//    _interrupted = false;
+//  }
+//
   @override
   Future onCustomAction(funtion, argument) async {
     switch (funtion) {
@@ -1041,9 +1102,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
     if (position == null) {
       position = _audioPlayer.playbackEvent.position;
     }
+    final index = await layoutStorage.getInt(defaultValue: 0);
     await AudioServiceBackground.setState(
-      controls: getControls(),
-      systemActions: [MediaAction.seekTo],
+      controls: getControls(index),
+      systemActions: [
+        MediaAction.seekTo,
+        MediaAction.seekForward,
+        MediaAction.seekBackward,
+      ],
       processingState:
           processingState ?? AudioServiceBackground.state.processingState,
       playing: _playing ?? false,
@@ -1053,11 +1119,36 @@ class AudioPlayerTask extends BackgroundAudioTask {
     );
   }
 
-  List<MediaControl> getControls() {
-    if (_playing) {
-      return [pauseControl, forward, skipToNextControl, stopControl];
-    } else {
-      return [playControl, forward, skipToNextControl, stopControl];
+  List<MediaControl> getControls(int index) {
+    switch (index) {
+      case 0:
+        if (_playing) {
+          return [pauseControl, forward, skipToNextControl, stopControl];
+        } else {
+          return [playControl, forward, skipToNextControl, stopControl];
+        }
+        break;
+      case 1:
+        if (_playing) {
+          return [pauseControl, rewind, skipToNextControl, stopControl];
+        } else {
+          return [playControl, rewind, skipToNextControl, stopControl];
+        }
+        break;
+      case 2:
+        if (_playing) {
+          return [rewind, pauseControl, forward, stopControl];
+        } else {
+          return [rewind, playControl, forward, stopControl];
+        }
+        break;
+      default:
+        if (_playing) {
+          return [pauseControl, forward, skipToNextControl, stopControl];
+        } else {
+          return [playControl, forward, skipToNextControl, stopControl];
+        }
+        break;
     }
   }
 }

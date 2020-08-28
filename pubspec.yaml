@@ -12,7 +12,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   auto_animated: ^2.1.0
-  audio_service: ^0.11.2
+  audio_service: ^0.14.0
+  audio_session: ^0.0.3
   cached_network_image: ^2.2.0+1
   color_thief_flutter: ^1.0.2
   cupertino_icons: ^0.1.3

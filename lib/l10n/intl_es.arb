@@ -74,6 +74,10 @@
   "@endOfEpisode": {},
   "episode": "{count, plural, zero{} one{Episodio} other{Episodios}}",
   "@episode": {},
+  "fastForward": "Fast forward",
+  "@fastForward": {},
+  "fastRewind": "Fast rewind",
+  "@fastRewind": {},
   "featureDiscoveryEditGroup": "Toca para editar grupo",
   "@featureDiscoveryEditGroup": {},
   "featureDiscoveryEditGroupDes": "Puedes cambiar el nombre del grupo o eliminar el grupo aquí, el grupo Home no puede ser editado ni borrado",
@@ -142,6 +146,8 @@
   "@groupRemoveConfirm": {},
   "groups": "{count, plural, zero{Grupo} one{Grupo} other{Grupos}}",
   "@groups": {},
+  "hideListenedSetting": "Hide listened",
+  "@hideListenedSetting": {},
   "homeGroupsSeeAll": "Ver todo",
   "@homeGroupsSeeAll": {},
   "homeMenuPlaylist": "Lista de reproducción",
@@ -248,6 +254,8 @@
       "title": {}
     }
   },
+  "notificationSetting": "Notification panel",
+  "@notificationSetting": {},
   "notificationSubscribe": "Suscribir {title}",
   "@notificationSubscribe": {
     "placeholders": {
@@ -280,6 +288,8 @@
   },
   "oldestFirst": "Mas antiguos primero",
   "@oldestFirst": {},
+  "pause": "Pause",
+  "@pause": {},
   "play": "Reproducir",
   "@play": {},
   "playback": "Control de reproducción",
@@ -517,8 +527,12 @@
   "@skipSilence": {
     "description": "Feature skip silence"
   },
+  "skipToNext": "Skip to next",
+  "@skipToNext": {},
   "sleepTimer": "Temporizador de sueño",
   "@sleepTimer": {},
+  "stop": "Stop",
+  "@stop": {},
   "subscribe": "Suscribir",
   "@subscribe": {},
   "subscribeExportDes": "Exportar OPML de todos los podcasts",

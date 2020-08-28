@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../home/audioplayer.dart';
+import '../local_storage/key_value_storage.dart';
 import '../state/audio_state.dart';
 import '../state/setting_state.dart';
 import '../util/custom_dropdown.dart';
@@ -201,7 +202,7 @@ class PlaySetting extends StatelessWidget {
         appBar: AppBar(
           title: Text(s.play),
           elevation: 0,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: context.primaryColor,
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -209,220 +210,320 @@ class PlaySetting extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+              Container(
+                height: 60.0,
+                padding: EdgeInsets.symmetric(horizontal: 40),
+                alignment: Alignment.center,
+                child: Text(s.notificationSetting,
+                    style: context.textTheme.bodyText1
+                        .copyWith(color: context.accentColor)),
+              ),
+              _NotificationLayout(),
+              Divider(
+                height: 1,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+              ),
+              Container(
+                height: 30.0,
+                padding: EdgeInsets.symmetric(horizontal: 70),
+                alignment: Alignment.centerLeft,
+                child: Text(s.homeMenuPlaylist,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        .copyWith(color: Theme.of(context).accentColor)),
+              ),
+              Selector<SettingState, bool>(
+                selector: (_, settings) => settings.autoPlay,
+                builder: (_, data, __) => ListTile(
+                  onTap: () => settings.setAutoPlay = !data,
+                  contentPadding:
+                      EdgeInsets.only(left: 70.0, right: 20, bottom: 10),
+                  title: Text(s.settingsMenuAutoPlay),
+                  subtitle: Text(s.settingsAutoPlayDes),
+                  trailing: Transform.scale(
+                    scale: 0.9,
+                    child: Switch(
+                        value: data,
+                        onChanged: (boo) => settings.setAutoPlay = boo),
+                  ),
+                ),
+              ),
+              Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+              ),
+              Container(
+                height: 30.0,
+                padding: EdgeInsets.symmetric(horizontal: 70),
+                alignment: Alignment.centerLeft,
+                child: Text(s.playback,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        .copyWith(color: Theme.of(context).accentColor)),
+              ),
+              ListTile(
+                contentPadding:
+                    EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
+                title: Text(s.settingsFastForwardSec),
+                subtitle: Text(s.settingsFastForwardSecDes),
+                trailing: Selector<SettingState, int>(
+                  selector: (_, settings) => settings.fastForwardSeconds,
+                  builder: (_, data, __) => MyDropdownButton(
+                      hint: Text(s.secCount(data)),
+                      underline: Center(),
+                      elevation: 1,
+                      displayItemCount: 5,
+                      isDense: true,
+                      value: data,
+                      onChanged: (value) =>
+                          settings.setFastForwardSeconds = value,
+                      items: secondsToSelect.map<DropdownMenuItem<int>>((e) {
+                        return DropdownMenuItem<int>(
+                            value: e, child: Text(s.secCount(e)));
+                      }).toList()),
+                ),
+              ),
+              ListTile(
+                contentPadding:
+                    EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
+                title: Text(s.settingsRewindSec),
+                subtitle: Text(s.settingsRewindSecDes),
+                trailing: Selector<SettingState, int>(
+                  selector: (_, settings) => settings.rewindSeconds,
+                  builder: (_, data, __) => MyDropdownButton(
+                      hint: Text(s.secCount(data)),
+                      underline: Center(),
+                      elevation: 1,
+                      displayItemCount: 5,
+                      isDense: true,
+                      value: data,
+                      onChanged: (value) => settings.setRewindSeconds = value,
+                      items: secondsToSelect.map<DropdownMenuItem<int>>((e) {
+                        return DropdownMenuItem<int>(
+                            value: e, child: Text(s.secCount(e)));
+                      }).toList()),
+                ),
+              ),
+              ListTile(
+                contentPadding:
+                    EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
+                title: Text(s.settingsBoostVolume),
+                subtitle: Text(s.settingsBoostVolumeDes),
+                trailing: Selector<AudioPlayerNotifier, int>(
+                  selector: (_, audio) => audio.volumeGain,
+                  builder: (_, volumeGain, __) => MyDropdownButton(
+                      hint: Text(_volumeEffect(context, volumeGain)),
+                      underline: Center(),
+                      elevation: 1,
+                      displayItemCount: 5,
+                      isDense: true,
+                      value: volumeGain,
+                      onChanged: (value) => audio.setVolumeGain = value,
+                      items: [2000, 3000, 4000].map<DropdownMenuItem<int>>((e) {
+                        return DropdownMenuItem<int>(
+                            value: e, child: Text(_volumeEffect(context, e)));
+                      }).toList()),
+                ),
+              ),
+              Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+              ),
+              Container(
+                height: 30.0,
+                padding: EdgeInsets.symmetric(horizontal: 70),
+                alignment: Alignment.centerLeft,
+                child: Text(s.sleepTimer,
+                    style: context.textTheme.bodyText1
+                        .copyWith(color: Theme.of(context).accentColor)),
+              ),
+              ListView(
+                physics: const BouncingScrollPhysics(),
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
+                  ListTile(
+                    contentPadding: EdgeInsets.only(left: 70.0, right: 20),
+                    title: Text(s.settingsSTDefaultTime),
+                    subtitle: Text(s.settingsSTDefautTimeDes),
+                    trailing: Selector<SettingState, int>(
+                      selector: (_, settings) => settings.defaultSleepTimer,
+                      builder: (_, data, __) => MyDropdownButton(
+                          hint: Text(s.minsCount(data)),
+                          underline: Center(),
+                          elevation: 1,
+                          displayItemCount: 5,
+                          isDense: true,
+                          value: data,
+                          onChanged: (value) =>
+                              settings.setDefaultSleepTimer = value,
+                          items: kMinsToSelect.map<DropdownMenuItem<int>>((e) {
+                            return DropdownMenuItem<int>(
+                                value: e, child: Text(s.minsCount(e)));
+                          }).toList()),
+                    ),
                   ),
-                  Container(
-                    height: 30.0,
-                    padding: EdgeInsets.symmetric(horizontal: 70),
-                    alignment: Alignment.centerLeft,
-                    child: Text(s.homeMenuPlaylist,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Theme.of(context).accentColor)),
-                  ),
-                  ListView(
-                    physics: const BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    children: <Widget>[
-                      Selector<SettingState, bool>(
-                        selector: (_, settings) => settings.autoPlay,
-                        builder: (_, data, __) => ListTile(
-                          onTap: () => settings.setAutoPlay = !data,
-                          contentPadding: EdgeInsets.only(
-                              left: 70.0, right: 20, bottom: 10),
-                          title: Text(s.settingsMenuAutoPlay),
-                          subtitle: Text(s.settingsAutoPlayDes),
-                          trailing: Transform.scale(
-                            scale: 0.9,
-                            child: Switch(
-                                value: data,
-                                onChanged: (boo) => settings.setAutoPlay = boo),
-                          ),
-                        ),
+                  Selector<SettingState, bool>(
+                    selector: (_, settings) => settings.autoSleepTimer,
+                    builder: (_, data, __) => ListTile(
+                      onTap: () => settings.setAutoSleepTimer = !data,
+                      contentPadding: const EdgeInsets.only(
+                          left: 70.0, right: 20.0, bottom: 10.0, top: 10.0),
+                      title: Text(s.settingsSTAuto),
+                      subtitle: Text(s.settingsSTAutoDes),
+                      trailing: Transform.scale(
+                        scale: 0.9,
+                        child: Switch(
+                            value: data,
+                            onChanged: (boo) =>
+                                settings.setAutoSleepTimer = boo),
                       ),
-                      Divider(height: 1),
-                    ],
+                    ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                  ),
-                  Container(
-                    height: 30.0,
-                    padding: EdgeInsets.symmetric(horizontal: 70),
-                    alignment: Alignment.centerLeft,
-                    child: Text(s.playback,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Theme.of(context).accentColor)),
-                  ),
-                  ListView(
-                      physics: const BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      children: <Widget>[
-                        ListTile(
-                          contentPadding: EdgeInsets.only(
-                              left: 70.0, right: 20, bottom: 10, top: 10),
-                          title: Text(s.settingsFastForwardSec),
-                          subtitle: Text(s.settingsFastForwardSecDes),
-                          trailing: Selector<SettingState, int>(
-                            selector: (_, settings) =>
-                                settings.fastForwardSeconds,
-                            builder: (_, data, __) => MyDropdownButton(
-                                hint: Text(s.secCount(data)),
-                                underline: Center(),
-                                elevation: 1,
-                                displayItemCount: 5,
-                                isDense: true,
-                                value: data,
-                                onChanged: (value) =>
-                                    settings.setFastForwardSeconds = value,
-                                items: secondsToSelect
-                                    .map<DropdownMenuItem<int>>((e) {
-                                  return DropdownMenuItem<int>(
-                                      value: e, child: Text(s.secCount(e)));
-                                }).toList()),
-                          ),
-                        ),
-                        ListTile(
-                          contentPadding: EdgeInsets.only(
-                              left: 70.0, right: 20, bottom: 10, top: 10),
-                          title: Text(s.settingsRewindSec),
-                          subtitle: Text(s.settingsRewindSecDes),
-                          trailing: Selector<SettingState, int>(
-                            selector: (_, settings) => settings.rewindSeconds,
-                            builder: (_, data, __) => MyDropdownButton(
-                                hint: Text(s.secCount(data)),
-                                underline: Center(),
-                                elevation: 1,
-                                displayItemCount: 5,
-                                isDense: true,
-                                value: data,
-                                onChanged: (value) =>
-                                    settings.setRewindSeconds = value,
-                                items: secondsToSelect
-                                    .map<DropdownMenuItem<int>>((e) {
-                                  return DropdownMenuItem<int>(
-                                      value: e, child: Text(s.secCount(e)));
-                                }).toList()),
-                          ),
-                        ),
-                        ListTile(
-                          contentPadding: EdgeInsets.only(
-                              left: 70.0, right: 20, bottom: 10, top: 10),
-                          title: Text(s.settingsBoostVolume),
-                          subtitle: Text(s.settingsBoostVolumeDes),
-                          trailing: Selector<AudioPlayerNotifier, int>(
-                            selector: (_, audio) => audio.volumeGain,
-                            builder: (_, volumeGain, __) => MyDropdownButton(
-                                hint: Text(_volumeEffect(context, volumeGain)),
-                                underline: Center(),
-                                elevation: 1,
-                                displayItemCount: 5,
-                                isDense: true,
-                                value: volumeGain,
-                                onChanged: (value) =>
-                                    audio.setVolumeGain = value,
-                                items: [2000, 3000, 4000]
-                                    .map<DropdownMenuItem<int>>((e) {
-                                  return DropdownMenuItem<int>(
-                                      value: e,
-                                      child: Text(_volumeEffect(context, e)));
-                                }).toList()),
-                          ),
-                        ),
-                        Divider(),
-                      ]),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                  ),
-                  Container(
-                    height: 30.0,
-                    padding: EdgeInsets.symmetric(horizontal: 70),
-                    alignment: Alignment.centerLeft,
-                    child: Text(s.sleepTimer,
-                        style: context.textTheme.bodyText1
-                            .copyWith(color: Theme.of(context).accentColor)),
-                  ),
-                  ListView(
-                    physics: const BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    children: <Widget>[
-                      ListTile(
-                        contentPadding: EdgeInsets.only(left: 70.0, right: 20),
-                        title: Text(s.settingsSTDefaultTime),
-                        subtitle: Text(s.settingsSTDefautTimeDes),
-                        trailing: Selector<SettingState, int>(
-                          selector: (_, settings) => settings.defaultSleepTimer,
-                          builder: (_, data, __) => MyDropdownButton(
-                              hint: Text(s.minsCount(data)),
-                              underline: Center(),
-                              elevation: 1,
-                              displayItemCount: 5,
-                              isDense: true,
-                              value: data,
-                              onChanged: (value) =>
-                                  settings.setDefaultSleepTimer = value,
-                              items:
-                                  kMinsToSelect.map<DropdownMenuItem<int>>((e) {
-                                return DropdownMenuItem<int>(
-                                    value: e, child: Text(s.minsCount(e)));
-                              }).toList()),
-                        ),
-                      ),
-                      Selector<SettingState, bool>(
-                        selector: (_, settings) => settings.autoSleepTimer,
-                        builder: (_, data, __) => ListTile(
-                          onTap: () => settings.setAutoSleepTimer = !data,
-                          contentPadding: const EdgeInsets.only(
-                              left: 70.0, right: 20.0, bottom: 10.0, top: 10.0),
-                          title: Text(s.settingsSTAuto),
-                          subtitle: Text(s.settingsSTAutoDes),
-                          trailing: Transform.scale(
-                            scale: 0.9,
-                            child: Switch(
-                                value: data,
-                                onChanged: (boo) =>
-                                    settings.setAutoSleepTimer = boo),
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                          contentPadding: const EdgeInsets.only(
-                              left: 70.0, right: 20.0, bottom: 10.0, top: 10.0),
-                          title: Text(s.settingsSTMode),
-                          subtitle:
-                              context.width > 360 ? null : _modeWidget(context),
-                          trailing: context.width > 360
-                              ? _modeWidget(context)
-                              : null),
-                      ListTile(
-                          contentPadding:
-                              EdgeInsets.only(left: 70.0, right: 20),
-                          title: Text(s.schedule),
-                          subtitle: context.width > 360
-                              ? null
-                              : _scheduleWidget(context),
-                          trailing: context.width > 360
-                              ? _scheduleWidget(context)
-                              : null),
-                      Divider(height: 1)
-                    ],
-                  ),
-                  SizedBox(height: 20)
+                  ListTile(
+                      contentPadding: const EdgeInsets.only(
+                          left: 70.0, right: 20.0, bottom: 10.0, top: 10.0),
+                      title: Text(s.settingsSTMode),
+                      subtitle:
+                          context.width > 360 ? null : _modeWidget(context),
+                      trailing:
+                          context.width > 360 ? _modeWidget(context) : null),
+                  ListTile(
+                      contentPadding: EdgeInsets.only(left: 70.0, right: 20),
+                      title: Text(s.schedule),
+                      subtitle:
+                          context.width > 360 ? null : _scheduleWidget(context),
+                      trailing: context.width > 360
+                          ? _scheduleWidget(context)
+                          : null),
+                  Divider(height: 1)
                 ],
               ),
+              SizedBox(height: 20)
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NotificationLayout extends StatefulWidget {
+  _NotificationLayout({Key key}) : super(key: key);
+
+  @override
+  __NotificationLayoutState createState() => __NotificationLayoutState();
+}
+
+class __NotificationLayoutState extends State<_NotificationLayout> {
+  Future<int> _getNotificationLayout() async {
+    final storage = KeyValueStorage(notificationLayoutKey);
+    var index = await storage.getInt(defaultValue: 0);
+    return index;
+  }
+
+  Future<void> _setNotificationLayout(int index) async {
+    final storage = KeyValueStorage(notificationLayoutKey);
+    await storage.saveInt(index);
+    if (mounted) setState(() {});
+  }
+
+  Widget _notificationIcon(Widget icon, String des) {
+    return LimitedBox(
+      maxWidth: 60,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          icon,
+          SizedBox(height: 8),
+          Text(des,
+              style: TextStyle(
+                  fontSize: 12, color: context.textColor.withOpacity(0.5)),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.clip),
+        ],
+      ),
+    );
+  }
+
+  Widget _notificationOptions(int index, {int selected}) {
+    final s = context.s;
+    return InkWell(
+      borderRadius: BorderRadius.circular(10.0),
+      onTap: () => _setNotificationLayout(index),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: index == selected
+                ? context.accentColor.withAlpha(70)
+                : context.primaryColorDark,
+          ),
+          borderRadius: BorderRadius.circular(10),
+          color: index == selected
+              ? context.accentColor.withAlpha(70)
+              : Colors.transparent,
+        ),
+        child: index == 0
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _notificationIcon(
+                      Icon(Icons.pause_circle_filled), '${s.play}| ${s.pause}'),
+                  _notificationIcon(Icon(Icons.fast_forward), s.fastForward),
+                  _notificationIcon(Icon(Icons.skip_next), s.skipToNext),
+                  _notificationIcon(Icon(Icons.close), s.stop),
+                ],
+              )
+            : index == 1
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                        _notificationIcon(Icon(Icons.pause_circle_filled),
+                            '${s.play}| ${s.pause}'),
+                        _notificationIcon(
+                            Icon(Icons.fast_rewind), s.fastRewind),
+                        _notificationIcon(Icon(Icons.skip_next), s.skipToNext),
+                        _notificationIcon(Icon(Icons.close), s.stop),
+                      ])
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _notificationIcon(Icon(Icons.fast_rewind), s.fastRewind),
+                      _notificationIcon(Icon(Icons.pause_circle_filled),
+                          '${s.play}| ${s.pause}'),
+                      _notificationIcon(
+                          Icon(Icons.fast_forward), s.fastForward),
+                      _notificationIcon(Icon(Icons.close), s.stop),
+                    ],
+                  ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(40, 0, 40, 30),
+      child: FutureBuilder<int>(
+        future: _getNotificationLayout(),
+        initialData: 0,
+        builder: (context, snapshot) => Column(
+          children: [
+            _notificationOptions(0, selected: snapshot.data),
+            SizedBox(height: 20),
+            _notificationOptions(1, selected: snapshot.data),
+            SizedBox(height: 20),
+            _notificationOptions(2, selected: snapshot.data),
+          ],
         ),
       ),
     );
