@@ -444,17 +444,21 @@ class AudioPlayerNotifier extends ChangeNotifier {
         _lastPostion = 0;
         notifyListeners();
         await positionStorage.saveInt(_lastPostion);
-        final history = PlayHistory(_episode.title, _episode.enclosureUrl,
-            backgroundAudioPosition ~/ 1000, seekSliderValue);
-        await dbHelper.saveHistory(history);
+        if (_lastPostion == 0) {
+          final history = PlayHistory(_episode.title, _episode.enclosureUrl,
+              _backgroundAudioPosition ~/ 1000, _seekSliderValue);
+          await dbHelper.saveHistory(history);
+        }
       }
       if (event is Map && event['playerRunning'] == false) {
         if (_playerRunning) {
           _playerRunning = false;
           notifyListeners();
-          final history = PlayHistory(_episode.title, _episode.enclosureUrl,
-              _lastPostion ~/ 1000, _seekSliderValue);
-          await dbHelper.saveHistory(history);
+          if (_lastPostion > 0) {
+            final history = PlayHistory(_episode.title, _episode.enclosureUrl,
+                _lastPostion ~/ 1000, _seekSliderValue);
+            await dbHelper.saveHistory(history);
+          }
         }
       }
     });
@@ -496,14 +500,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
     });
   }
 
-  playNext() async {
+  Future<void> playNext() async {
     _remoteErrorMessage = null;
     await AudioService.skipToNext();
     _queueUpdate = !_queueUpdate;
     notifyListeners();
   }
 
-  addToPlaylist(EpisodeBrief episode) async {
+  Future<void> addToPlaylist(EpisodeBrief episode) async {
     var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (!_queue.playlist.contains(episodeNew)) {
       if (playerRunning) {
@@ -515,7 +519,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
   }
 
-  addToPlaylistAt(EpisodeBrief episode, int index) async {
+  Future<void> addToPlaylistAt(EpisodeBrief episode, int index) async {
     var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (playerRunning) {
       await AudioService.addQueueItemAt(episodeNew.toMediaItem(), index);
@@ -525,7 +529,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  addNewEpisode(List<String> group) async {
+  Future<void> addNewEpisode(List<String> group) async {
     var newEpisodes = <EpisodeBrief>[];
     if (group.first == 'All') {
       newEpisodes = await dbHelper.getRecentNewRssItem();
@@ -610,27 +614,27 @@ class AudioPlayerNotifier extends ChangeNotifier {
         _audioState != AudioProcessingState.none) AudioService.play();
   }
 
-  forwardAudio(int s) {
+  Future<void> forwardAudio(int s) async {
     var pos = _backgroundAudioPosition + s * 1000;
-    AudioService.seekTo(Duration(milliseconds: pos));
+    await AudioService.seekTo(Duration(milliseconds: pos));
   }
 
-  fastForward() async {
+  Future<void> fastForward() async {
     await AudioService.fastForward();
   }
 
-  rewind() async {
+  Future<void> rewind() async {
     await AudioService.rewind();
   }
 
-  seekTo(int position) async {
+  Future<void> seekTo(int position) async {
     if (_audioState != AudioProcessingState.connecting &&
         _audioState != AudioProcessingState.none) {
       await AudioService.seekTo(Duration(milliseconds: position));
     }
   }
 
-  sliderSeek(double val) async {
+  Future<void> sliderSeek(double val) async {
     if (_audioState != AudioProcessingState.connecting &&
         _audioState != AudioProcessingState.none) {
       _noSlide = false;
@@ -643,21 +647,21 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   /// Set player speed.
-  setSpeed(double speed) async {
+  Future<void> setSpeed(double speed) async {
     await AudioService.customAction('setSpeed', speed);
     _currentSpeed = speed;
     await speedStorage.saveDouble(_currentSpeed);
     notifyListeners();
   }
 
-  setSkipSilence({@required bool skipSilence}) async {
+  Future<void> setSkipSilence({@required bool skipSilence}) async {
     await AudioService.customAction('setSkipSilence', skipSilence);
     _skipSilence = skipSilence;
     await skipSilenceStorage.saveBool(_skipSilence);
     notifyListeners();
   }
 
-  setBoostVolume({@required bool boostVolume, int gain}) async {
+  Future<void> setBoostVolume({@required bool boostVolume, int gain}) async {
     await AudioService.customAction(
         'setBoostVolume', [boostVolume, _volumeGain]);
     _boostVolume = boostVolume;
@@ -685,7 +689,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
         _stopOnComplete = false;
         _startSleepTimer = false;
         _switchValue = 0;
-        AudioService.stop();
+        if (_playerRunning) {
+          AudioService.stop();
+        }
         notifyListeners();
         // AudioService.disconnect();
       });
@@ -717,9 +723,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   @override
   void dispose() async {
-    // await AudioService.stop();
     await AudioService.disconnect();
-    //_playerRunning = false;
     super.dispose();
   }
 }
@@ -950,19 +954,26 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onClick(MediaButton button) async {
-    if (button == MediaButton.media) {
-      await playPause();
-    } else if (button == MediaButton.next) {
-      await _seekRelative(fastForwardInterval);
-    } else if (button == MediaButton.previous) {
-      await _seekRelative(-rewindInterval);
+    switch (button) {
+      case MediaButton.media:
+        if (AudioServiceBackground.state?.playing == true) {
+          await onPause();
+        } else {
+          await onPlay();
+        }
+        break;
+      case MediaButton.next:
+        await onFastForward();
+        break;
+      case MediaButton.previous:
+        await onRewind();
+        break;
     }
   }
 
   Future<void> _seekRelative(Duration offset) async {
     var newPosition = _audioPlayer.playbackEvent.position + offset;
-    //  if (newPosition < Duration.zero) newPosition = Duration.zero;
-    //  if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
+    if (newPosition < Duration.zero) newPosition = Duration.zero;
     onSeekTo(newPosition);
   }
 
@@ -1021,48 +1032,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await _seekRelative(-rewindInterval);
   }
 
-//  @override
-//  Future<void> onAudioFocusLost(AudioInterruption interruption) {
-//    if (_playing) _interrupted = true;
-//    switch (interruption) {
-//      case AudioInterruption.pause:
-//      case AudioInterruption.temporaryPause:
-//      case AudioInterruption.unknownPause:
-//        onPause();
-//        break;
-//      case AudioInterruption.temporaryDuck:
-//        _audioPlayer.setVolume(0.5);
-//        break;
-//    }
-//  }
-//
-//  @override
-//  Future<void> onAudioBecomingNoisy() async{
-//    if (_skipState == null) {
-//      if (_playing == null) {
-//      } else if (_audioPlayer.playbackEvent.state ==
-//          AudioPlaybackState.playing) {
-//        _playing = false;
-//        _audioPlayer.pause();
-//      }
-//    }
-//  }
-//
-//  @override
-//  void onAudioFocusGained(AudioInterruption interruption) {
-//    switch (interruption) {
-//      case AudioInterruption.temporaryPause:
-//        if (!_playing && _interrupted) onPlay();
-//        break;
-//      case AudioInterruption.temporaryDuck:
-//        _audioPlayer.setVolume(1.0);
-//        break;
-//      default:
-//        break;
-//    }
-//    _interrupted = false;
-//  }
-//
   @override
   Future onCustomAction(funtion, argument) async {
     switch (funtion) {
@@ -1104,7 +1073,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
     final index = await layoutStorage.getInt(defaultValue: 0);
     await AudioServiceBackground.setState(
-      controls: getControls(index),
+      controls: _getControls(index),
       systemActions: [
         MediaAction.seekTo,
         MediaAction.seekForward,
@@ -1119,7 +1088,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     );
   }
 
-  List<MediaControl> getControls(int index) {
+  List<MediaControl> _getControls(int index) {
     switch (index) {
       case 0:
         if (_playing) {

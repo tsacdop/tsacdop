@@ -12,7 +12,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   auto_animated: ^2.1.0
-  audio_service: ^0.14.0
   audio_session: ^0.0.3
   cached_network_image: ^2.2.0+1
   color_thief_flutter: ^1.0.2
@@ -50,6 +49,9 @@ dependencies:
   xml: ^4.2.0
   workmanager: ^0.2.3
   wc_flutter_share: ^0.2.2
+  audio_service:
+    git:
+      url: https://github.com/stonega/audio_service.git
   just_audio:
     git:
       url: https://github.com/stonega/just_audio.git
