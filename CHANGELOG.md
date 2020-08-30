@@ -1,5 +1,26 @@
 # Tsacdop Changelog
 
+## 0.4.15
+
+Release date 2020/8/30
+
+### New features
+
+* Option to change notification panel layout.
+* Option to change show notes font style.
+* Option to hide listened default.
+* Change skip next/previous to fastForward/rewind on headset click.
+
+## Bugs fixed
+
+* Download error when filename too long.
+
+## Minor change
+
+* Update download button style and downloaded indicator style.
+* Add 1.1 to speed setting.
+* Add 5s to skip seconds setting.
+
 ## 0.4.14
 
 Release date 2020/8/20
