@@ -86,26 +86,23 @@ class EpisodeGrid extends StatelessWidget {
     return boo;
   }
 
-  _markListened(EpisodeBrief episode) async {
+  Future<void> _markListened(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
-    // var marked = await dbHelper.checkMarked(episode);
-    // if (!marked) {
     final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
     await dbHelper.saveHistory(history);
-    // }
   }
 
-  _markNotListened(String url) async {
+  Future<void> _markNotListened(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.markNotListened(url);
   }
 
-  _saveLiked(String url) async {
+  Future<void> _saveLiked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setLiked(url);
   }
 
-  _setUnliked(String url) async {
+  Future<void> _setUnliked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setUniked(url);
   }
@@ -145,7 +142,7 @@ class EpisodeGrid extends StatelessWidget {
                   width: 20,
                   alignment: Alignment.center,
                   margin: EdgeInsets.symmetric(horizontal: 5),
-                  padding: EdgeInsets.fromLTRB(2, 2, 2, 5),
+                  padding: EdgeInsets.fromLTRB(2, 2, 2, 3),
                   decoration: BoxDecoration(
                     color: context.accentColor,
                     shape: BoxShape.circle,
@@ -471,7 +468,8 @@ class EpisodeGrid extends StatelessWidget {
                                                 episode: episodes[index],
                                                 color: c),
                                         Spacer(),
-                                        //   _listenIndicater(context,
+
+                                        ///   _listenIndicater(context,
                                         //       episode: episodes[index],
                                         //       isListened: snapshot.data),
                                         _isNewIndicator(episodes[index]),

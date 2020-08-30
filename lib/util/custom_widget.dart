@@ -961,12 +961,12 @@ class DownloadPainter extends CustomPainter {
     }
 
     if (progress == 1) {
-      canvas.drawLine(Offset(width / 5, height), Offset(width * 4 / 5, height),
-          _progressPaint);
-      canvas.drawLine(Offset(width / 5, height / 2),
-          Offset(width / 2, height * 4 / 5), _progressPaint);
-      canvas.drawLine(Offset(width, height * 3 / 10),
-          Offset(width / 2, height * 4 / 5), _progressPaint);
+      canvas.drawLine(Offset(width / 5, height * 9 / 10),
+          Offset(width * 4 / 5, height * 9 / 10), _progressPaint);
+      canvas.drawLine(Offset(width / 5, height * 5 / 10),
+          Offset(width * 2 / 5, height * 7 / 10), _progressPaint);
+      canvas.drawLine(Offset(width * 4 / 5, height * 3 / 10),
+          Offset(width * 2 / 5, height * 7 / 10), _progressPaint);
     }
 
     if (fraction == 1 && progress < 1) {
