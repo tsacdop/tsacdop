@@ -27,6 +27,7 @@ class SettingsBackup {
   final bool hideListened;
   final int notificationLayout;
   final int showNotesFont;
+  final List<String> speedList;
   SettingsBackup(
       {this.theme,
       this.accentColor,
@@ -55,7 +56,8 @@ class SettingsBackup {
       this.locale,
       this.hideListened,
       this.notificationLayout,
-      this.showNotesFont});
+      this.showNotesFont,
+      this.speedList});
 
   Map<String, Object> toJson() {
     return {
@@ -85,12 +87,14 @@ class SettingsBackup {
       'locale': locale,
       'hideListened': hideListened,
       'notificationLayout': notificationLayout,
-      'showNotesFont': showNotesFont
+      'showNotesFont': showNotesFont,
+      'speedList': speedList
     };
   }
 
   static SettingsBackup fromJson(Map<String, Object> json) {
-    var list = List<String>.from(json['episodePopupMenu']);
+    final menuList = List<String>.from(json['episodePopupMenu']);
+    final speedList = List<String>.from(json['speedList']);
     return SettingsBackup(
         theme: json['theme'] as int,
         accentColor: json['accentColor'] as String,
@@ -105,7 +109,7 @@ class SettingsBackup {
         favLayout: json['favLayout'] as int,
         downloadLayout: json['downloadLayout'] as int,
         autoDownloadNetwork: json['autoDownloadNetwork'] as bool,
-        episodePopupMenu: list,
+        episodePopupMenu: menuList,
         autoDelete: json['autoDelete'] as int,
         autoSleepTimer: json['autoSleepTimer'] as bool,
         autoSleepTimerStart: json['autoSleepeTimerStart'] as int,
@@ -118,6 +122,7 @@ class SettingsBackup {
         locale: json['locale'] as String,
         hideListened: json['hideListened'] as bool,
         notificationLayout: json['notificationLayout'] as int,
-        showNotesFont: json['showNotesFont'] as int);
+        showNotesFont: json['showNotesFont'] as int,
+        speedList: speedList);
   }
 }

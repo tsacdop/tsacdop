@@ -14,7 +14,24 @@ import '../util/custom_dropdown.dart';
 import '../util/custom_time_picker.dart';
 import '../util/extension_helper.dart';
 
-const List secondsToSelect = [5, 10, 15, 20, 25, 30, 45, 60];
+const List kSecondsToSelect = [5, 10, 15, 20, 25, 30, 45, 60];
+const List<double> kSpeedToSelect = [
+  0.5,
+  0.6,
+  0.8,
+  0.9,
+  1.0,
+  1.1,
+  1.2,
+  1.5,
+  2.0,
+  2.5,
+  3.0,
+  3.5,
+  4.0,
+  4.5,
+  5.0
+];
 
 class PlaySetting extends StatelessWidget {
   String _volumeEffect(BuildContext context, int i) {
@@ -281,7 +298,7 @@ class PlaySetting extends StatelessWidget {
                       value: data,
                       onChanged: (value) =>
                           settings.setFastForwardSeconds = value,
-                      items: secondsToSelect.map<DropdownMenuItem<int>>((e) {
+                      items: kSecondsToSelect.map<DropdownMenuItem<int>>((e) {
                         return DropdownMenuItem<int>(
                             value: e, child: Text(s.secCount(e)));
                       }).toList()),
@@ -302,7 +319,7 @@ class PlaySetting extends StatelessWidget {
                       isDense: true,
                       value: data,
                       onChanged: (value) => settings.setRewindSeconds = value,
-                      items: secondsToSelect.map<DropdownMenuItem<int>>((e) {
+                      items: kSecondsToSelect.map<DropdownMenuItem<int>>((e) {
                         return DropdownMenuItem<int>(
                             value: e, child: Text(s.secCount(e)));
                       }).toList()),
@@ -329,6 +346,7 @@ class PlaySetting extends StatelessWidget {
                       }).toList()),
                 ),
               ),
+              _SpeedList(),
               Divider(height: 1),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -525,6 +543,74 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
             _notificationOptions(2, selected: snapshot.data),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SpeedList extends StatefulWidget {
+  _SpeedList({Key key}) : super(key: key);
+
+  @override
+  __SpeedListState createState() => __SpeedListState();
+}
+
+class __SpeedListState extends State<_SpeedList> {
+  Future<List<double>> _getSpeedList() async {
+    var storage = KeyValueStorage('speedListKey');
+    return await storage.getSpeedList();
+  }
+
+  Future<void> _saveSpeedList(List<double> list) async {
+    var storage = KeyValueStorage('speedListKey');
+    await storage.saveSpeedList(list);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.s;
+    return ListTile(
+      contentPadding:
+          EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
+      title: Text(s.settingsSpeeds),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(s.settingsSpeedsDes),
+          FutureBuilder<List<double>>(
+              future: _getSpeedList(),
+              initialData: [],
+              builder: (context, snapshot) {
+                var speedSelected = snapshot.data;
+                return Wrap(
+                    children: kSpeedToSelect
+                        .map((e) => Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: FilterChip(
+                                key: ValueKey<String>(e.toString()),
+                                label: Text('X ${e.toStringAsFixed(1)}'),
+                                selectedColor: context.accentColor,
+                                labelStyle: TextStyle(
+                                    color: snapshot.data.contains(e)
+                                        ? Colors.white
+                                        : context.textColor),
+                                elevation: 0,
+                                showCheckmark: false,
+                                selected: snapshot.data.contains(e),
+                                onSelected: (value) async {
+                                  if (!value) {
+                                    speedSelected.remove(e);
+                                  } else {
+                                    speedSelected.add(e);
+                                  }
+                                  await _saveSpeedList(speedSelected);
+                                  setState(() {});
+                                },
+                              ),
+                            ))
+                        .toList());
+              }),
+        ],
       ),
     );
   }

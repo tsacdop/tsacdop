@@ -493,6 +493,14 @@
   "@settingsRewindSec": {},
   "settingsRewindSecDes": "Saut arrière",
   "@settingsRewindSecDes": {},
+  "settingsSpeeds": "Speeds",
+  "@settingsSpeeds": {
+    "description": "Playback speeds setting."
+  },
+  "settingsSpeedsDes": "Customize the speeds avaliable",
+  "@settingsSpeedsDes": {
+    "description": "Playback speed setting description"
+  },
   "settingsSTAuto": "Activation automatique de la minuterie",
   "@settingsSTAuto": {},
   "settingsSTAutoDes": "Démarrer la minuterie à l'horaire programmé",

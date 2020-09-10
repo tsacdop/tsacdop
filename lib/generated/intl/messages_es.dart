@@ -295,6 +295,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsSTDefaultTime" : MessageLookupByLibrary.simpleMessage("Tiempo predeterminado"),
     "settingsSTDefautTimeDes" : MessageLookupByLibrary.simpleMessage("Tiempo predeterminado de temporizador de sueño"),
     "settingsSTMode" : MessageLookupByLibrary.simpleMessage("Modo automático de tempo. de sueño"),
+    "settingsSpeeds" : MessageLookupByLibrary.simpleMessage("Speeds"),
+    "settingsSpeedsDes" : MessageLookupByLibrary.simpleMessage("Customize the speeds available"),
     "settingsStorageDes" : MessageLookupByLibrary.simpleMessage("Administrar cache y almacenamiento de descargas"),
     "settingsSyncing" : MessageLookupByLibrary.simpleMessage("Sincronización"),
     "settingsSyncingDes" : MessageLookupByLibrary.simpleMessage("Actualizar podcasts en el fondo"),

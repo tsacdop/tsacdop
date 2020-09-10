@@ -39,7 +39,6 @@ final List<BoxShadow> _customShadowNight = [
 ];
 
 const List kMinsToSelect = [10, 15, 20, 25, 30, 45, 60, 70, 80, 90, 99];
-const List kSpeedToSelect = [0.5, 0.6, 0.8, 1.0, 1.1, 1.2, 1.5, 2.0];
 const List kMinPlayerHeight = <double>[70.0, 75.0, 80.0];
 const List kMaxPlayerHeight = <double>[300.0, 325.0, 350.0];
 
@@ -912,7 +911,6 @@ class ControlPanel extends StatefulWidget {
 
 class _ControlPanelState extends State<ControlPanel>
     with TickerProviderStateMixin {
-  double _speedSelected;
   double _setSpeed;
   AnimationController _controller;
   Animation<double> _animation;
@@ -939,9 +937,13 @@ class _ControlPanelState extends State<ControlPanel>
             color: Colors.black)
       ];
 
+  Future<List<double>> _getSpeedList() async {
+    var storage = KeyValueStorage('speedListKey');
+    return await storage.getSpeedList();
+  }
+
   @override
   void initState() {
-    _speedSelected = 0;
     _setSpeed = 0;
     _tabController = TabController(vsync: this, length: 2)
       ..addListener(() {
@@ -1294,10 +1296,14 @@ class _ControlPanelState extends State<ControlPanel>
                     children: [
                       if (height <= widget.maxHeight)
                         Selector<AudioPlayerNotifier,
-                            Tuple3<EpisodeBrief, bool, bool>>(
-                          selector: (_, audio) => Tuple3(audio.episode,
-                              audio.stopOnComplete, audio.startSleepTimer),
+                            Tuple4<EpisodeBrief, bool, bool, double>>(
+                          selector: (_, audio) => Tuple4(
+                              audio.episode,
+                              audio.stopOnComplete,
+                              audio.startSleepTimer,
+                              audio.currentSpeed),
                           builder: (_, data, __) {
+                            final currentSpeed = data.item4 ?? 1.0;
                             return Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20.0),
@@ -1347,69 +1353,71 @@ class _ControlPanelState extends State<ControlPanel>
                                       child: SingleChildScrollView(
                                         padding: EdgeInsets.all(10.0),
                                         scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          children: kSpeedToSelect
-                                              .map<Widget>((e) => InkWell(
-                                                    onTap: () {
-                                                      if (_setSpeed == 1) {
-                                                        setState(() =>
-                                                            _speedSelected = e);
-                                                        audio.setSpeed(e);
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      height: 30,
-                                                      width: 30,
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 5),
-                                                      decoration: e ==
-                                                                  _speedSelected &&
-                                                              _setSpeed > 0
-                                                          ? BoxDecoration(
-                                                              color: context
-                                                                  .accentColor,
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                              boxShadow: context
-                                                                          .brightness ==
-                                                                      Brightness
-                                                                          .light
-                                                                  ? customShadow(
-                                                                      1.0)
-                                                                  : customShadowNight(
-                                                                      1.0),
-                                                            )
-                                                          : BoxDecoration(
-                                                              color: context
-                                                                  .primaryColor,
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                              boxShadow: context
-                                                                          .brightness ==
-                                                                      Brightness
-                                                                          .light
-                                                                  ? customShadow(1 -
-                                                                      _setSpeed)
-                                                                  : customShadowNight(1 -
-                                                                      _setSpeed)),
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: _setSpeed > 0
-                                                          ? Text(e.toString(),
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: e ==
-                                                                          _speedSelected
-                                                                      ? Colors
-                                                                          .white
-                                                                      : null))
-                                                          : Center(),
-                                                    ),
-                                                  ))
-                                              .toList(),
+                                        child: FutureBuilder<List<double>>(
+                                          future: _getSpeedList(),
+                                          initialData: [],
+                                          builder: (context, snapshot) => Row(
+                                            children: snapshot.data
+                                                .map<Widget>((e) => InkWell(
+                                                      onTap: () {
+                                                        if (_setSpeed == 1) {
+                                                          audio.setSpeed(e);
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        height: 30,
+                                                        width: 30,
+                                                        margin: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 5),
+                                                        decoration: e ==
+                                                                    currentSpeed &&
+                                                                _setSpeed > 0
+                                                            ? BoxDecoration(
+                                                                color: context
+                                                                    .accentColor,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                boxShadow: context
+                                                                            .brightness ==
+                                                                        Brightness
+                                                                            .light
+                                                                    ? customShadow(
+                                                                        1.0)
+                                                                    : customShadowNight(
+                                                                        1.0),
+                                                              )
+                                                            : BoxDecoration(
+                                                                color: context
+                                                                    .primaryColor,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                boxShadow: context
+                                                                            .brightness ==
+                                                                        Brightness
+                                                                            .light
+                                                                    ? customShadow(1 -
+                                                                        _setSpeed)
+                                                                    : customShadowNight(1 -
+                                                                        _setSpeed)),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: _setSpeed > 0
+                                                            ? Text(e.toString(),
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: e ==
+                                                                            currentSpeed
+                                                                        ? Colors
+                                                                            .white
+                                                                        : null))
+                                                            : Center(),
+                                                      ),
+                                                    ))
+                                                .toList(),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -1429,12 +1437,7 @@ class _ControlPanelState extends State<ControlPanel>
                                         Transform.rotate(
                                             angle: math.pi * _setSpeed,
                                             child: Text('X')),
-                                        Selector<AudioPlayerNotifier, double>(
-                                          selector: (_, audio) =>
-                                              audio.currentSpeed ?? 1.0,
-                                          builder: (context, value, child) =>
-                                              Text(value.toString()),
-                                        ),
+                                        Text(currentSpeed.toStringAsFixed(1)),
                                       ],
                                     ),
                                   ),

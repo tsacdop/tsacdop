@@ -493,6 +493,14 @@
   "@settingsRewindSec": {},
   "settingsRewindSecDes": "Change the rewind seconds in player",
   "@settingsRewindSecDes": {},
+  "settingsSpeeds": "Speeds",
+  "@settingsSpeeds": {
+    "description": "Playback speeds setting."
+  },
+  "settingsSpeedsDes": "Customize the speeds available",
+  "@settingsSpeedsDes": {
+    "description": "Playback speed setting description"
+  },
   "settingsSTAuto": "Auto turn on sleep timer",
   "@settingsSTAuto": {},
   "settingsSTAutoDes": "Auto start sleep timer at scheduled time",

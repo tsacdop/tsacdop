@@ -493,6 +493,7 @@ class SettingState extends ChangeNotifier {
     var notificationLayout =
         await KeyValueStorage(notificationLayoutKey).getInt(defaultValue: 0);
     var showNotesFont = await showNotesFontStorage.getInt(defaultValue: 1);
+    var speedList = await KeyValueStorage(speedListKey).getStringList();
 
     return SettingsBackup(
         theme: theme,
@@ -522,7 +523,8 @@ class SettingState extends ChangeNotifier {
         locale: backupLocale,
         hideListened: hideListened,
         notificationLayout: notificationLayout,
-        showNotesFont: showNotesFont);
+        showNotesFont: showNotesFont,
+        speedList: speedList);
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -557,6 +559,8 @@ class SettingState extends ChangeNotifier {
     await KeyValueStorage(notificationLayoutKey)
         .saveInt(backup.notificationLayout);
     await showNotesFontStorage.saveInt(backup.showNotesFont);
+    await KeyValueStorage(speedListKey).saveStringList(backup.speedList);
+
     if (backup.locale == '') {
       await localeStorage.saveStringList([]);
       await S.load(Locale(Intl.systemLocale));

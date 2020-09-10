@@ -44,6 +44,7 @@ const String volumeGainKey = 'volumeGainKey';
 const String hideListenedKey = 'hideListenedKey';
 const String notificationLayoutKey = 'notificationLayoutKey';
 const String showNotesFontKey = 'showNotesFontKey';
+const String speedListKey = 'speedListKey';
 
 class KeyValueStorage {
   final String key;
@@ -123,6 +124,24 @@ class KeyValueStorage {
     }
     var list = prefs.getStringList(key);
     return list.map(int.parse).toList();
+  }
+
+  /// For player speed settings.
+  Future<bool> saveSpeedList(List<double> list) async {
+    var prefs = await SharedPreferences.getInstance();
+    list.sort();
+    return await prefs.setStringList(
+        key, list.map((e) => e.toStringAsFixed(1)).toList());
+  }
+
+  Future<List<double>> getSpeedList() async {
+    var prefs = await SharedPreferences.getInstance();
+    if (prefs.getStringList(key) == null || prefs.getStringList(key).isEmpty) {
+      await prefs.setStringList(
+          key, ['0.5', '0.6', '0.8', '1.0', '1.1', '1.2', '1.5', '2.0']);
+    }
+    var list = prefs.getStringList(key);
+    return list.map(double.parse).toList();
   }
 
   /// Rreverse is used for compatite bool value save before which set true = 0, false = 1

@@ -2172,6 +2172,26 @@ class S {
     );
   }
 
+  /// `Speeds`
+  String get settingsSpeeds {
+    return Intl.message(
+      'Speeds',
+      name: 'settingsSpeeds',
+      desc: 'Playback speeds setting.',
+      args: [],
+    );
+  }
+
+  /// `Customize the speeds available`
+  String get settingsSpeedsDes {
+    return Intl.message(
+      'Customize the speeds available',
+      name: 'settingsSpeedsDes',
+      desc: 'Playback speed setting description',
+      args: [],
+    );
+  }
+
   /// `Auto turn on sleep timer`
   String get settingsSTAuto {
     return Intl.message(

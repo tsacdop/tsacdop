@@ -493,6 +493,14 @@
   "@settingsRewindSec": {},
   "settingsRewindSecDes": "Cambia los segundos de retroceso del reproductor",
   "@settingsRewindSecDes": {},
+  "settingsSpeeds": "Speeds",
+  "@settingsSpeeds": {
+    "description": "Playback speeds setting."
+  },
+  "settingsSpeedsDes": "Customize the speeds available",
+  "@settingsSpeedsDes": {
+    "description": "Playback speed setting description"
+  },
   "settingsSTAuto": "Encender temporizador de sueño automáticamente",
   "@settingsSTAuto": {},
   "settingsSTAutoDes": "Encender temporizador de sueño en un horario determinado",

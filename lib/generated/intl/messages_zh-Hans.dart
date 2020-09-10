@@ -295,6 +295,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsSTDefaultTime" : MessageLookupByLibrary.simpleMessage("默认时长"),
     "settingsSTDefautTimeDes" : MessageLookupByLibrary.simpleMessage("睡眠模式默认时长"),
     "settingsSTMode" : MessageLookupByLibrary.simpleMessage("自动睡眠模式默认时长"),
+    "settingsSpeeds" : MessageLookupByLibrary.simpleMessage("播放速度"),
+    "settingsSpeedsDes" : MessageLookupByLibrary.simpleMessage("设置播放速度选项"),
     "settingsStorageDes" : MessageLookupByLibrary.simpleMessage("管理缓存和下载空间"),
     "settingsSyncing" : MessageLookupByLibrary.simpleMessage("同步"),
     "settingsSyncingDes" : MessageLookupByLibrary.simpleMessage("在后台更新播客"),
