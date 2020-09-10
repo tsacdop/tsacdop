@@ -496,7 +496,7 @@ class _RenameGroupState extends State<RenameGroup> {
   void initState() {
     super.initState();
     _error = 0;
-    _controller = TextEditingController();
+    _controller = TextEditingController(text: widget.group.name);
   }
 
   @override
@@ -558,7 +558,6 @@ class _RenameGroupState extends State<RenameGroup> {
             TextField(
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                hintText: widget.group.name,
                 hintStyle: TextStyle(fontSize: 18),
                 filled: true,
                 focusedBorder: UnderlineInputBorder(
