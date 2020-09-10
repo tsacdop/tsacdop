@@ -11,11 +11,11 @@ Release date 2020/8/30
 * Option to hide listened default.
 * Change skip next/previous to fastForward/rewind on headset click.
 
-## Bugs fixed
+### Bugs fixed
 
 * Download error when filename too long.
 
-## Minor change
+### Minor change
 
 * Update download button style and downloaded indicator style.
 * Add 1.1 to speed setting.
