@@ -723,8 +723,9 @@ class _ShowNote extends StatelessWidget {
           return description.length > 0
               ? Selector<AudioPlayerNotifier, EpisodeBrief>(
                   selector: (_, audio) => audio.episode,
-                  builder: (_, data, __) {
-                    if (data == episode && !description.contains('#t=')) {
+                  builder: (_, playEpisode, __) {
+                    if (playEpisode == episode &&
+                        !description.contains('#t=')) {
                       final linkList = linkify(description,
                           options: LinkifyOptions(humanize: false),
                           linkifiers: [TimeStampLinkifier()]);
@@ -749,7 +750,7 @@ class _ShowNote extends StatelessWidget {
                         onLinkTap: (url) {
                           if (url.substring(0, 3) == '#t=') {
                             final seconds = _getTimeStamp(url);
-                            if (data == episode) {
+                            if (playEpisode == episode) {
                               audio.seekTo(seconds * 1000);
                             }
                           } else {
