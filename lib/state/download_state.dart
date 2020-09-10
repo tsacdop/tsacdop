@@ -257,11 +257,12 @@ class DownloadState extends ChangeNotifier {
     var isDownloaded = await dbHelper.isDownloaded(episode.enclosureUrl);
     if (!isDownloaded) {
       final dir = await getExternalStorageDirectory();
-      var localPath = path.join(dir.path, episode.feedTitle);
+      var localPath =
+          path.join(dir.path, episode.feedTitle.replaceAll('/', ''));
       final saveDir = Directory(localPath);
       var hasExisted = await saveDir.exists();
       if (!hasExisted) {
-        saveDir.create();
+        await saveDir.create();
       }
       var now = DateTime.now();
       var datePlus = now.year.toString() +
