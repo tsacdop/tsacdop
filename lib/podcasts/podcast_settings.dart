@@ -72,6 +72,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
         content: Text(context.s.markConfirmContent),
         actions: <Widget>[
           FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -81,6 +82,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
             ),
           ),
           FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
             onPressed: () async {
               Navigator.of(context).pop();
               await _markListened(widget.podcastLocal.id);
@@ -238,6 +240,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                   ),
                   actions: <Widget>[
                     FlatButton(
+                      splashColor: context.accentColor.withAlpha(70),
                       onPressed: () {
                         Navigator.of(context).pop();
                         _seconds = 0;
@@ -248,6 +251,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                       ),
                     ),
                     FlatButton(
+                      splashColor: context.accentColor.withAlpha(70),
                       onPressed: () {
                         Navigator.of(context).pop();
                         _saveSkipSeconds(_seconds);

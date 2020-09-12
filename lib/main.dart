@@ -62,7 +62,8 @@ class MyApp extends StatelessWidget {
                 textSelectionHandleColor: setting.accentSetColor,
                 toggleableActiveColor: setting.accentSetColor,
                 buttonTheme: ButtonThemeData(
-                    hoverColor: setting.accentSetColor.withAlpha(70))),
+                    hoverColor: setting.accentSetColor.withAlpha(70),
+                    splashColor: setting.accentSetColor.withAlpha(70))),
             darkTheme: ThemeData.dark().copyWith(
                 accentColor: setting.accentSetColor,
                 primaryColorDark: Colors.grey[800],

@@ -585,7 +585,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           transitionDuration: const Duration(milliseconds: 200),
                           pageBuilder:
                               (context, animaiton, secondaryAnimation) =>
-                                  SearchEpisdoe(
+                                  SearchEpisode(
                                     onSearch: (query) {
                                       setState(() {
                                         _query = query;
@@ -951,14 +951,14 @@ class _AboutPodcastState extends State<AboutPodcast> {
   }
 }
 
-class SearchEpisdoe extends StatefulWidget {
-  SearchEpisdoe({this.onSearch, Key key}) : super(key: key);
+class SearchEpisode extends StatefulWidget {
+  SearchEpisode({this.onSearch, Key key}) : super(key: key);
   final ValueChanged<String> onSearch;
   @override
   _SearchEpisodeState createState() => _SearchEpisodeState();
 }
 
-class _SearchEpisodeState extends State<SearchEpisdoe> {
+class _SearchEpisodeState extends State<SearchEpisode> {
   TextEditingController _controller;
   String _query;
 
@@ -990,26 +990,26 @@ class _SearchEpisodeState extends State<SearchEpisdoe> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         elevation: 1,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-        titlePadding:
-            const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
-        actionsPadding: EdgeInsets.all(0),
+        titlePadding: const EdgeInsets.all(20),
+        actionsPadding: EdgeInsets.zero,
         actions: <Widget>[
           FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               s.cancel,
+              textAlign: TextAlign.end,
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
           FlatButton(
-            onPressed: (_query != null && _query != '')
-                ? () {
-                    {
-                      widget.onSearch(_query);
-                      Navigator.of(context).pop();
-                    }
-                  }
-                : null,
+            splashColor: context.accentColor.withAlpha(70),
+            onPressed: () {
+              if ((_query ?? '').isNotEmpty) {
+                widget.onSearch(_query);
+                Navigator.of(context).pop();
+              }
+            },
             child:
                 Text(s.confirm, style: TextStyle(color: context.accentColor)),
           )
@@ -1038,7 +1038,7 @@ class _SearchEpisodeState extends State<SearchEpisdoe> {
               maxLines: 1,
               controller: _controller,
               onChanged: (value) {
-                _query = value;
+                setState(() => _query = value);
               },
             ),
           ],

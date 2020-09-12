@@ -54,6 +54,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
           top: 20, left: 20, right: context.width / 3, bottom: 20),
       actions: <Widget>[
         FlatButton(
+          splashColor: context.accentColor.withAlpha(70),
           padding: EdgeInsets.all(10.0),
           onPressed: () {
             _groupList.removePodcast(widget.podcastLocal.id);

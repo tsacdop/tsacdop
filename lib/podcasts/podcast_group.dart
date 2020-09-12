@@ -406,6 +406,8 @@ class __PodcastCardState extends State<_PodcastCard>
                                             ),
                                             actions: <Widget>[
                                               FlatButton(
+                                                splashColor: context.accentColor
+                                                    .withAlpha(70),
                                                 onPressed: () {
                                                   Navigator.of(context).pop();
                                                   _seconds = 0;
@@ -417,6 +419,8 @@ class __PodcastCardState extends State<_PodcastCard>
                                                 ),
                                               ),
                                               FlatButton(
+                                                splashColor: context.accentColor
+                                                    .withAlpha(70),
                                                 onPressed: () {
                                                   Navigator.of(context).pop();
                                                   _saveSkipSeconds(
@@ -448,6 +452,8 @@ class __PodcastCardState extends State<_PodcastCard>
                                       content: Text(s.removePodcastDes),
                                       actions: <Widget>[
                                         FlatButton(
+                                          splashColor:
+                                              context.accentColor.withAlpha(70),
                                           onPressed: () =>
                                               Navigator.of(context).pop(),
                                           child: Text(
@@ -457,6 +463,8 @@ class __PodcastCardState extends State<_PodcastCard>
                                           ),
                                         ),
                                         FlatButton(
+                                          splashColor:
+                                              context.accentColor.withAlpha(70),
                                           onPressed: () {
                                             groupList.removePodcast(
                                                 widget.podcastLocal.id);
@@ -527,6 +535,7 @@ class _RenameGroupState extends State<RenameGroup> {
         actionsPadding: EdgeInsets.all(0),
         actions: <Widget>[
           FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               s.cancel,
@@ -534,6 +543,7 @@ class _RenameGroupState extends State<RenameGroup> {
             ),
           ),
           FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
             onPressed: () async {
               if (list.contains(_newName)) {
                 setState(() => _error = 1);

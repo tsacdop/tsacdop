@@ -447,6 +447,9 @@ class _PodcastManageState extends State<PodcastManage>
                                                       s.groupRemoveConfirm),
                                                   actions: <Widget>[
                                                     FlatButton(
+                                                      splashColor: context
+                                                          .accentColor
+                                                          .withAlpha(70),
                                                       onPressed: () =>
                                                           Navigator.of(context)
                                                               .pop(),
@@ -458,6 +461,9 @@ class _PodcastManageState extends State<PodcastManage>
                                                       ),
                                                     ),
                                                     FlatButton(
+                                                      splashColor: context
+                                                          .accentColor
+                                                          .withAlpha(70),
                                                       onPressed: () {
                                                         if (_index ==
                                                             groupList.groups
@@ -605,6 +611,7 @@ class _AddGroupState extends State<AddGroup> {
         actionsPadding: EdgeInsets.all(0),
         actions: <Widget>[
           FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               s.cancel,
@@ -612,6 +619,7 @@ class _AddGroupState extends State<AddGroup> {
             ),
           ),
           FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
             onPressed: () async {
               if (list.contains(_newGroup)) {
                 setState(() => _error = 1);
