@@ -36,7 +36,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   int _groupIndex = 0;
   AnimationController _controller;
   TweenSequence _slideTween;
-  _getSlideTween(double value) => TweenSequence<double>([
+  TweenSequence<double> _getSlideTween(double value) => TweenSequence<double>([
         TweenSequenceItem(
             tween: Tween<double>(begin: 0.0, end: value), weight: 3 / 5),
         TweenSequenceItem(tween: ConstantTween<double>(value), weight: 1 / 5),
@@ -80,7 +80,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width;
     final s = context.s;
     return Selector<GroupList, Tuple3<List<PodcastGroup>, bool, bool>>(
       selector: (_, groupList) =>
@@ -907,27 +907,27 @@ class ShowEpisode extends StatelessWidget {
                                                       episodes[index].pubDate),
                                               overflow: TextOverflow.visible,
                                               style: TextStyle(
+                                                height: 1,
                                                 fontSize: _width / 35,
                                                 color: c,
                                                 fontStyle: FontStyle.italic,
                                               ),
                                             ),
                                             Spacer(),
-                                            episodes[index].duration != 0
-                                                ? Container(
-                                                    alignment: Alignment.center,
-                                                    child: Text(
-                                                      episodes[index]
-                                                          .duration
-                                                          .toTime,
-                                                      style: TextStyle(
-                                                        fontSize: _width / 35,
-                                                        // color: _c,
-                                                        // fontStyle: FontStyle.italic,
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Center(),
+                                            if (episodes[index].duration != 0)
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  episodes[index]
+                                                      .duration
+                                                      .toTime,
+                                                  style: TextStyle(
+                                                    fontSize: _width / 35,
+                                                    // color: _c,
+                                                    // fontStyle: FontStyle.italic,
+                                                  ),
+                                                ),
+                                              ),
                                             episodes[index].duration == 0 ||
                                                     episodes[index]
                                                             .enclosureLength ==
@@ -940,25 +940,22 @@ class ShowEpisode extends StatelessWidget {
                                                     '|',
                                                     style: TextStyle(
                                                       fontSize: _width / 35,
-                                                      // color: _c,
-                                                      // fontStyle: FontStyle.italic,
                                                     ),
                                                   ),
-                                            episodes[index].enclosureLength !=
-                                                        null &&
-                                                    episodes[index]
-                                                            .enclosureLength !=
-                                                        0
-                                                ? Container(
-                                                    alignment: Alignment.center,
-                                                    child: Text(
-                                                      '${(episodes[index].enclosureLength) ~/ 1000000}MB',
-                                                      style: TextStyle(
-                                                          fontSize:
-                                                              _width / 35),
-                                                    ),
-                                                  )
-                                                : Center(),
+                                            if (episodes[index]
+                                                        .enclosureLength !=
+                                                    null &&
+                                                episodes[index]
+                                                        .enclosureLength !=
+                                                    0)
+                                              Container(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  '${(episodes[index].enclosureLength) ~/ 1000000}MB',
+                                                  style: TextStyle(
+                                                      fontSize: _width / 35),
+                                                ),
+                                              ),
                                           ],
                                         )),
                                   ],

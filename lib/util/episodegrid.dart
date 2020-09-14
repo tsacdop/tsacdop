@@ -194,7 +194,9 @@ class EpisodeGrid extends StatelessWidget {
       Text(
         episode.pubDate.toDate(context),
         overflow: TextOverflow.visible,
+        textAlign: TextAlign.center,
         style: TextStyle(
+            height: 1,
             fontSize: context.width / 35,
             color: color,
             fontStyle: FontStyle.italic),
@@ -468,10 +470,6 @@ class EpisodeGrid extends StatelessWidget {
                                                 episode: episodes[index],
                                                 color: c),
                                         Spacer(),
-
-                                        ///   _listenIndicater(context,
-                                        //       episode: episodes[index],
-                                        //       isListened: snapshot.data),
                                         _isNewIndicator(episodes[index]),
                                         _downloadIndicater(context,
                                             episode: episodes[index],
@@ -517,7 +515,7 @@ class EpisodeGrid extends StatelessWidget {
                                         Spacer(),
                                         if (layout != Layout.three &&
                                             episodes[index].duration != 0)
-                                          Container(
+                                          Align(
                                             alignment: Alignment.center,
                                             child: Text(
                                               episodes[index].duration.toTime,
@@ -535,8 +533,6 @@ class EpisodeGrid extends StatelessWidget {
                                             '|',
                                             style: TextStyle(
                                               fontSize: _width / 35,
-                                              // color: _c,
-                                              // fontStyle: FontStyle.italic,
                                             ),
                                           ),
                                         if (layout != Layout.three &&
@@ -544,7 +540,7 @@ class EpisodeGrid extends StatelessWidget {
                                                 null &&
                                             episodes[index].enclosureLength !=
                                                 0)
-                                          Container(
+                                          Align(
                                             alignment: Alignment.center,
                                             child: Text(
                                               '${(episodes[index].enclosureLength) ~/ 1000000}MB',
