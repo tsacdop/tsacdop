@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/state/search_state.dart';
 import 'package:tuple/tuple.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -1282,7 +1281,7 @@ class _MyDownload extends StatefulWidget {
 class _MyDownloadState extends State<_MyDownload>
     with AutomaticKeepAliveClientMixin {
   Layout _layout;
-  int _sortBy = 0;
+  int _sortBy;
   bool _hideListened;
   Future<List<EpisodeBrief>> _getDownloadedEpisodes(int sortBy,
       {bool hideListened}) async {
@@ -1297,6 +1296,12 @@ class _MyDownloadState extends State<_MyDownload>
     var episodes = await dbHelper.getDownloadedEpisode(sortBy,
         hideListened: _hideListened);
     return episodes;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _sortBy = 0;
   }
 
   @override

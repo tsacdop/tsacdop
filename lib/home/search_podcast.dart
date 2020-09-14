@@ -108,6 +108,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
           icon: const Icon(Icons.clear),
           onPressed: () {
             query = '';
+            showResults(context);
           },
         ),
     ];
@@ -122,18 +123,6 @@ class MyHomePageDelegate extends SearchDelegate<int> {
             query = history;
             showResults(context);
           });
-      // return Container(
-      //   height: 10,
-      //   width: 10,
-      //   margin: EdgeInsets.only(top: 400),
-      //   child: SizedBox(
-      //     height: 10,
-      //     child: Image.asset(
-      //       'assets/listennotes.png',
-      //       fit: BoxFit.fill,
-      //     ),
-      //   ),
-      // );
     } else if (rssExp.stringMatch(query) != null) {
       return FutureBuilder(
         future: getRss(rssExp.stringMatch(query)),
@@ -222,40 +211,7 @@ class _RssResultState extends State<RssResult> {
                               overflow: TextOverflow.ellipsis,
                               style: context.textTheme.headline5),
                         ),
-                        !_isSubscribed
-                            ? OutlineButton(
-                                highlightedBorderColor: context.accentColor,
-                                borderSide: BorderSide(
-                                    color: context.accentColor, width: 2),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100.0),
-                                    side:
-                                        BorderSide(color: context.accentColor)),
-                                splashColor:
-                                    context.accentColor.withOpacity(0.5),
-                                child: Text(s.subscribe,
-                                    style:
-                                        TextStyle(color: context.accentColor)),
-                                onPressed: () {
-                                  _subscribePodcast(_onlinePodcast);
-                                  setState(() {
-                                    _isSubscribed = true;
-                                  });
-                                  Fluttertoast.showToast(
-                                    msg: s.podcastSubscribed,
-                                    gravity: ToastGravity.BOTTOM,
-                                  );
-                                })
-                            : OutlineButton(
-                                color: context.accentColor.withOpacity(0.5),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100.0),
-                                    side: BorderSide(color: Colors.grey[500])),
-                                highlightedBorderColor: Colors.grey[500],
-                                disabledTextColor: Colors.grey[500],
-                                child: Text(s.subscribe),
-                                disabledBorderColor: Colors.grey[500],
-                                onPressed: () {})
+                        SubscribeButton(_onlinePodcast),
                       ],
                     ),
                   ),
@@ -400,7 +356,7 @@ class _SearchListState extends State<SearchList> {
     final storage = KeyValueStorage(searchHistoryKey);
     final history = await storage.getStringList();
     if (!history.contains(query)) {
-      if (history.length == 10) {
+      if (history.length >= 6) {
         history.removeLast();
       }
       history.insert(0, query);
@@ -623,7 +579,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
     return _episodeList;
   }
 
-  _start(DragStartDetails event) {
+  void _start(DragStartDetails event) {
     setState(() {
       _startdy = event.localPosition.dy;
       _animation =
@@ -632,7 +588,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
     _controller.forward();
   }
 
-  _update(DragUpdateDetails event) {
+  void _update(DragUpdateDetails event) {
     setState(() {
       _move = _startdy - event.localPosition.dy;
       _animation = Tween<double>(begin: _initSize, end: _initSize + _move)
@@ -642,7 +598,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
     _controller.forward();
   }
 
-  _end() {
+  void _end() {
     if (_slideDirection == SlideDirection.up) {
       if (_move > 20) {
         setState(() {
@@ -920,7 +876,7 @@ class SubscribeButton extends StatelessWidget {
     final subscribeWorker = context.watch<GroupList>();
     final searchState = context.watch<SearchState>();
     final s = context.s;
-    subscribePodcast(OnlinePodcast podcast) {
+    void subscribePodcast(OnlinePodcast podcast) {
       var item = SubscribeItem(podcast.rss, podcast.title,
           imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
@@ -940,12 +896,12 @@ class SubscribeButton extends StatelessWidget {
               child: Text(s.subscribe,
                   style: TextStyle(color: context.accentColor)),
               onPressed: () {
-                subscribePodcast(onlinePodcast);
-                searchState.addPodcast(onlinePodcast);
                 Fluttertoast.showToast(
                   msg: s.podcastSubscribed,
                   gravity: ToastGravity.BOTTOM,
                 );
+                subscribePodcast(onlinePodcast);
+                searchState.addPodcast(onlinePodcast);
               })
           : OutlineButton(
               color: context.accentColor.withOpacity(0.5),

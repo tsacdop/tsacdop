@@ -3,7 +3,7 @@ import '../type/searchpodcast.dart';
 
 class SearchState extends ChangeNotifier {
   final List<OnlinePodcast> _subscribedList = [];
-  bool _update;
+  bool _update = false;
   List<OnlinePodcast> get subscribedList => _subscribedList;
   bool get update => _update;
   OnlinePodcast _selectedPodcast;

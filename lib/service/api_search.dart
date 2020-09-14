@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../.env.dart';
+import '../type/search_top_podcast.dart';
 import '../type/searchepisodes.dart';
 import '../type/searchpodcast.dart';
-import '../type/search_top_podcast.dart';
 
 class SearchEngine {
   final apiKey = environment['apiKey'];

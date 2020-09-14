@@ -23,9 +23,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
   Genre _selectedGenre;
   Genre get selectedGenre => _selectedGenre;
   final List<OnlinePodcast> _podcastList = [];
-  bool _loading;
   Future _searchTopPodcast;
-  int _page;
   Future<List<String>> _getSearchHistory() {
     final storage = KeyValueStorage(searchHistoryKey);
     final history = storage.getStringList();
@@ -125,7 +123,6 @@ class DiscoveryPageState extends State<DiscoveryPage> {
     final podcastTopList =
         searchResult.podcasts.map((e) => e?.toOnlinePodcast).toList();
     _podcastList.addAll(podcastTopList.cast());
-    _loading = false;
     return _podcastList;
   }
 
@@ -137,7 +134,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
           ? SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   FutureBuilder<List<String>>(
                       future: _getSearchHistory(),
@@ -147,13 +144,15 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                           final history = snapshot.data;
                           return SizedBox(
                             height: 50,
-                            child: Row(
+                            child: Wrap(
+                              direction: Axis.horizontal,
                               children: history
                                   .map<Widget>((e) => Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            8, 8, 0, 8),
                                         child: FlatButton.icon(
-                                          color: Colors.accents[
-                                                  math.Random().nextInt(10)]
+                                          color: Colors
+                                              .accents[history.indexOf(e)]
                                               .withAlpha(70),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
@@ -175,6 +174,12 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                           height: 1,
                         );
                       }),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
+                    child: Text('Popular',
+                        style: context.textTheme.headline6
+                            .copyWith(color: context.accentColor)),
+                  ),
                   SizedBox(
                     height: 200,
                     child: FutureBuilder<List<OnlinePodcast>>(
@@ -200,8 +205,11 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                                                 BorderRadius.circular(10),
                                             clipBehavior: Clip.hardEdge,
                                             child: InkWell(
-                                              onTap: () => searchState
-                                                  .selectedPodcast = podcast,
+                                              onTap: () {
+                                                searchState.selectedPodcast =
+                                                    podcast;
+                                                widget.onTap('');
+                                              },
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.all(4.0),
@@ -254,12 +262,22 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                           );
                         }),
                   ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
+                    child: Text('Categories',
+                        style: context.textTheme.headline6
+                            .copyWith(color: context.accentColor)),
+                  ),
                   ListView(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     children: genres
                         .map<Widget>((e) => ListTile(
-                              onTap: () => setState(() => _selectedGenre = e),
+                              contentPadding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                              onTap: () {
+                                widget.onTap('');
+                                setState(() => _selectedGenre = e);
+                              },
                               title: Text(e.name),
                             ))
                         .toList(),
@@ -331,6 +349,14 @@ class __TopPodcastListState extends State<_TopPodcastList> {
         final content = snapshot.data;
         return CustomScrollView(
           slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
+                child: Text(widget.genre.name,
+                    style: context.textTheme.headline6
+                        .copyWith(color: context.accentColor)),
+              ),
+            ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
