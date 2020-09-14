@@ -45,6 +45,7 @@ const String hideListenedKey = 'hideListenedKey';
 const String notificationLayoutKey = 'notificationLayoutKey';
 const String showNotesFontKey = 'showNotesFontKey';
 const String speedListKey = 'speedListKey';
+const String searchHistoryKey = 'searchHistoryKey';
 
 class KeyValueStorage {
   final String key;

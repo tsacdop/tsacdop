@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/state/search_state.dart';
 import 'package:tuple/tuple.dart';
 
 import '../local_storage/key_value_storage.dart';

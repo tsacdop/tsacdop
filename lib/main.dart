@@ -13,6 +13,7 @@ import 'state/audio_state.dart';
 import 'state/download_state.dart';
 import 'state/podcast_group.dart';
 import 'state/refresh_podcast.dart';
+import 'state/search_state.dart';
 import 'state/setting_state.dart';
 
 final SettingState themeSetting = SettingState();
@@ -30,6 +31,7 @@ Future main() async {
         ChangeNotifierProvider(create: (_) => AudioPlayerNotifier()),
         ChangeNotifierProvider(create: (_) => GroupList()),
         ChangeNotifierProvider(create: (_) => RefreshWorker()),
+        ChangeNotifierProvider(create: (_) => SearchState()),
         ChangeNotifierProvider(
           lazy: false,
           create: (_) => DownloadState(),

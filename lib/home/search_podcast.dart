@@ -7,18 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:webfeed/webfeed.dart';
 import 'package:provider/provider.dart';
+import 'package:webfeed/webfeed.dart';
 
+import '../local_storage/key_value_storage.dart';
 import '../service/api_search.dart';
 import '../state/podcast_group.dart';
+import '../state/search_state.dart';
 import '../type/searchepisodes.dart';
 import '../type/searchpodcast.dart';
 import '../util/extension_helper.dart';
+import 'pocast_discovery.dart';
 
 class MyHomePageDelegate extends SearchDelegate<int> {
   final String searchFieldLabel;
-
+  final GlobalKey<DiscoveryPageState> _discoveryKey =
+      GlobalKey<DiscoveryPageState>();
   MyHomePageDelegate({this.searchFieldLabel})
       : super(
           searchFieldLabel: searchFieldLabel,
@@ -45,34 +49,52 @@ class MyHomePageDelegate extends SearchDelegate<int> {
       );
 
   @override
+  void close(BuildContext context, int result) {
+    final selectedPodcast = context.read<SearchState>().selectedPodcast;
+    if (selectedPodcast != null) {
+      context.read<SearchState>().clearSelect();
+    } else {
+      if (_discoveryKey.currentState?.selectedGenre != null) {
+        _discoveryKey.currentState.backToHome();
+      } else {
+        context.read<SearchState>().clearList();
+        super.close(context, result);
+      }
+    }
+  }
+
+  @override
   ThemeData appBarTheme(BuildContext context) => Theme.of(context);
 
   @override
   Widget buildLeading(BuildContext context) {
-    return IconButton(
-      tooltip: context.s.back,
-      icon: AnimatedIcon(
-        icon: AnimatedIcons.menu_arrow,
-        progress: transitionAnimation,
-      ),
-      onPressed: () {
-        close(context, 1);
+    return WillPopScope(
+      onWillPop: () async {
+        close(context, null);
+        return false;
       },
+      child: IconButton(
+        tooltip: context.s.back,
+        icon: AnimatedIcon(
+          icon: AnimatedIcons.menu_arrow,
+          progress: transitionAnimation,
+        ),
+        onPressed: () {
+          close(context, 1);
+        },
+      ),
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return Center(
-        child: Container(
-      padding: EdgeInsets.only(top: 100),
-      child: Image(
-        image: context.brightness == Brightness.light
-            ? AssetImage('assets/listennotes.png')
-            : AssetImage('assets/listennotes_light.png'),
-        height: 20,
-      ),
-    ));
+    return DiscoveryPage(
+      key: _discoveryKey,
+      onTap: (history) {
+        query = history;
+        showResults(context);
+      },
+    );
   }
 
   @override
@@ -94,18 +116,24 @@ class MyHomePageDelegate extends SearchDelegate<int> {
   @override
   Widget buildResults(BuildContext context) {
     if (query.isEmpty) {
-      return Container(
-        height: 10,
-        width: 10,
-        margin: EdgeInsets.only(top: 400),
-        child: SizedBox(
-          height: 10,
-          child: Image.asset(
-            'assets/listennote.png',
-            fit: BoxFit.fill,
-          ),
-        ),
-      );
+      return DiscoveryPage(
+          key: _discoveryKey,
+          onTap: (history) {
+            query = history;
+            showResults(context);
+          });
+      // return Container(
+      //   height: 10,
+      //   width: 10,
+      //   margin: EdgeInsets.only(top: 400),
+      //   child: SizedBox(
+      //     height: 10,
+      //     child: Image.asset(
+      //       'assets/listennotes.png',
+      //       fit: BoxFit.fill,
+      //     ),
+      //   ),
+      // );
     } else if (rssExp.stringMatch(query) != null) {
       return FutureBuilder(
         future: getRss(rssExp.stringMatch(query)),
@@ -360,18 +388,30 @@ class _SearchListState extends State<SearchList> {
   final List<OnlinePodcast> _podcastList = [];
   int _offset;
   bool _loading;
-  OnlinePodcast _selectedPodcast;
   Future _searchFuture;
-  final List<OnlinePodcast> _subscribed = [];
+
   @override
   void initState() {
     super.initState();
     _searchFuture = _getList(widget.query, _nextOffset);
   }
 
+  Future<void> _saveHistory(String query) async {
+    final storage = KeyValueStorage(searchHistoryKey);
+    final history = await storage.getStringList();
+    if (!history.contains(query)) {
+      if (history.length == 10) {
+        history.removeLast();
+      }
+      history.insert(0, query);
+      await storage.saveStringList(history);
+    }
+  }
+
   Future<List<OnlinePodcast>> _getList(
       String searchText, int nextOffset) async {
-    var searchEngine = SearchEngine();
+    if (nextOffset == 0) _saveHistory(searchText);
+    final searchEngine = SearchEngine();
     var searchResult = await searchEngine.searchPodcasts(
         searchText: searchText, nextOffset: nextOffset);
     _offset = searchResult.nextOffset;
@@ -382,151 +422,88 @@ class _SearchListState extends State<SearchList> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomCenter,
-      children: [
-        FutureBuilder<List>(
-          future: _searchFuture,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData && widget.query != null) {
-              return Container(
-                padding: EdgeInsets.only(top: 200),
-                alignment: Alignment.topCenter,
-                child: CircularProgressIndicator(),
-              );
-            }
-            var content = snapshot.data;
-            return CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return SearchResult(
-                        onlinePodcast: content[index],
-                        isSubscribed: _subscribed.contains(content[index]),
-                        onSelect: (onlinePodcast) {
-                          setState(() {
-                            _selectedPodcast = onlinePodcast;
-                          });
-                        },
-                        onSubscribe: (onlinePodcast) {
-                          setState(() {
-                            _subscribed.add(onlinePodcast);
-                          });
-                        },
-                      );
-                    },
-                    childCount: content.length,
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
-                        child: OutlineButton(
-                          highlightedBorderColor: context.accentColor,
-                          splashColor: context.accentColor.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(100))),
-                          child: _loading
-                              ? SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ))
-                              : Text(context.s.loadMore),
-                          onPressed: () => _loading
-                              ? null
-                              : setState(
-                                  () {
-                                    _loading = true;
-                                    _nextOffset = _offset;
-                                    _searchFuture =
-                                        _getList(widget.query, _nextOffset);
-                                  },
-                                ),
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
+    return PodcastSlideup(
+      child: FutureBuilder<List>(
+        future: _searchFuture,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData && widget.query != null) {
+            return Container(
+              padding: EdgeInsets.only(top: 200),
+              alignment: Alignment.topCenter,
+              child: CircularProgressIndicator(),
             );
-          },
-        ),
-        if (_selectedPodcast != null)
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () => setState(() => _selectedPodcast = null),
-              child: Container(
-                color: context.scaffoldBackgroundColor.withOpacity(0.9),
+          }
+          var content = snapshot.data;
+          return CustomScrollView(
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return SearchResult(onlinePodcast: content[index]);
+                  },
+                  childCount: content.length,
+                ),
               ),
-            ),
-          ),
-        if (_selectedPodcast != null)
-          LayoutBuilder(
-            builder: (context, constrants) => SearchResultDetail(
-              _selectedPodcast,
-              maxHeight: constrants.maxHeight,
-              isSubscribed: _subscribed.contains(_selectedPodcast),
-              onClose: (option) {
-                setState(() => _selectedPodcast = null);
-              },
-              onSubscribe: (onlinePodcast) {
-                setState(() {
-                  _subscribed.add(onlinePodcast);
-                });
-              },
-            ),
-          ),
-      ],
+              SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
+                      child: OutlineButton(
+                        highlightedBorderColor: context.accentColor,
+                        splashColor: context.accentColor.withOpacity(0.5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(100))),
+                        child: _loading
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ))
+                            : Text(context.s.loadMore),
+                        onPressed: () => _loading
+                            ? null
+                            : setState(
+                                () {
+                                  _loading = true;
+                                  _nextOffset = _offset;
+                                  _searchFuture =
+                                      _getList(widget.query, _nextOffset);
+                                },
+                              ),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          );
+        },
+      ),
     );
   }
 }
 
 class SearchResult extends StatelessWidget {
   final OnlinePodcast onlinePodcast;
-  final ValueChanged<OnlinePodcast> onSelect;
-  final ValueChanged<OnlinePodcast> onSubscribe;
-  final bool isSubscribed;
-  SearchResult(
-      {this.onlinePodcast,
-      this.onSelect,
-      this.onSubscribe,
-      this.isSubscribed,
-      Key key})
-      : super(key: key);
+  SearchResult({this.onlinePodcast, Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var subscribeWorker = Provider.of<GroupList>(context, listen: false);
-    final s = context.s;
-    subscribePodcast(OnlinePodcast podcast) {
-      var item = SubscribeItem(podcast.rss, podcast.title,
-          imgUrl: podcast.image, group: 'Home');
-      subscribeWorker.setSubscribeItem(item);
-      onSubscribe(podcast);
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-            //   bottom: Divider.createBorderSide(context),
-            ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          ListTile(
+    var searchState = context.watch<SearchState>();
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ListTile(
             contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
             onTap: () {
-              onSelect(onlinePodcast);
+              searchState.selectedPodcast = onlinePodcast;
+              // onSelect(onlinePodcast);
             },
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(25.0),
@@ -559,52 +536,18 @@ class SearchResult extends StatelessWidget {
             ),
             title: Text(onlinePodcast.title),
             subtitle: Text(onlinePodcast.publisher ?? ''),
-            trailing: !isSubscribed
-                ? OutlineButton(
-                    highlightedBorderColor: context.accentColor,
-                    borderSide: BorderSide(color: context.accentColor),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(color: context.accentColor)),
-                    splashColor: context.accentColor.withOpacity(0.5),
-                    child: Text(s.subscribe,
-                        style: TextStyle(color: context.accentColor)),
-                    onPressed: () {
-                      subscribePodcast(onlinePodcast);
-                      Fluttertoast.showToast(
-                        msg: s.podcastSubscribed,
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                    })
-                : OutlineButton(
-                    color: context.accentColor.withOpacity(0.5),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(color: Colors.grey[500])),
-                    highlightedBorderColor: Colors.grey[500],
-                    disabledTextColor: Colors.grey[500],
-                    child: Text(s.subscribe),
-                    disabledBorderColor: Colors.grey[500],
-                    onPressed: () {}),
-          ),
-        ],
-      ),
+            trailing: SubscribeButton(onlinePodcast)),
+      ],
     );
   }
 }
 
+/// Search podcast detail widget
 class SearchResultDetail extends StatefulWidget {
   SearchResultDetail(this.onlinePodcast,
-      {this.onClose,
-      this.maxHeight,
-      this.onSubscribe,
-      this.episodeList,
-      this.isSubscribed,
-      Key key})
+      {this.maxHeight, this.episodeList, this.isSubscribed, Key key})
       : super(key: key);
   final OnlinePodcast onlinePodcast;
-  final ValueChanged<bool> onClose;
-  final ValueChanged<OnlinePodcast> onSubscribe;
   final double maxHeight;
   final List<OnlineEpisode> episodeList;
   final bool isSubscribed;
@@ -739,22 +682,16 @@ class _SearchResultDetailState extends State<SearchResultDetail>
           _initSize = _animation.value > _minHeight - 50 ? _minHeight : 100;
         });
         _controller.forward();
-        if (_animation.value < _minHeight - 50) widget.onClose(true);
+        if (_animation.value < _minHeight - 50) {
+          context.read<SearchState>().clearSelect();
+        }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var subscribeWorker = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
-    subscribePodcast(OnlinePodcast podcast) {
-      var item = SubscribeItem(podcast.rss, podcast.title,
-          imgUrl: podcast.image, group: 'Home');
-      subscribeWorker.setSubscribeItem(item);
-      widget.onSubscribe(podcast);
-    }
-
     return GestureDetector(
       onVerticalDragStart: _start,
       onVerticalDragUpdate: _update,
@@ -806,45 +743,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                   overflow: TextOverflow.fade,
                                   style: TextStyle(color: context.accentColor),
                                 ),
-                                !widget.isSubscribed
-                                    ? OutlineButton(
-                                        highlightedBorderColor:
-                                            context.accentColor,
-                                        borderSide: BorderSide(
-                                            color: context.accentColor,
-                                            width: 2),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(100.0),
-                                            side: BorderSide(
-                                                color: context.accentColor)),
-                                        splashColor: context.accentColor
-                                            .withOpacity(0.5),
-                                        child: Text(s.subscribe,
-                                            style: TextStyle(
-                                                color: context.accentColor)),
-                                        onPressed: () {
-                                          subscribePodcast(
-                                              widget.onlinePodcast);
-                                          Fluttertoast.showToast(
-                                            msg: s.podcastSubscribed,
-                                            gravity: ToastGravity.BOTTOM,
-                                          );
-                                        })
-                                    : OutlineButton(
-                                        color: context.accentColor
-                                            .withOpacity(0.5),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(100.0),
-                                            side: BorderSide(
-                                                color: Colors.grey[500])),
-                                        highlightedBorderColor:
-                                            Colors.grey[500],
-                                        disabledTextColor: Colors.grey[500],
-                                        child: Text(s.subscribe),
-                                        disabledBorderColor: Colors.grey[500],
-                                        onPressed: () {})
+                                SubscribeButton(widget.onlinePodcast),
                               ],
                             ),
                           ),
@@ -1006,6 +905,131 @@ class _SearchResultDetailState extends State<SearchResultDetail>
               )
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class SubscribeButton extends StatelessWidget {
+  SubscribeButton(this.onlinePodcast, {Key key}) : super(key: key);
+  final OnlinePodcast onlinePodcast;
+
+  @override
+  Widget build(BuildContext context) {
+    final subscribeWorker = context.watch<GroupList>();
+    final searchState = context.watch<SearchState>();
+    final s = context.s;
+    subscribePodcast(OnlinePodcast podcast) {
+      var item = SubscribeItem(podcast.rss, podcast.title,
+          imgUrl: podcast.image, group: 'Home');
+      subscribeWorker.setSubscribeItem(item);
+      searchState.addPodcast(podcast);
+    }
+
+    return Consumer<SearchState>(builder: (_, searchState, __) {
+      final subscribed = searchState.isSubscribed(onlinePodcast);
+      return !subscribed
+          ? OutlineButton(
+              highlightedBorderColor: context.accentColor,
+              borderSide: BorderSide(color: context.accentColor),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100.0),
+                  side: BorderSide(color: context.accentColor)),
+              splashColor: context.accentColor.withOpacity(0.5),
+              child: Text(s.subscribe,
+                  style: TextStyle(color: context.accentColor)),
+              onPressed: () {
+                subscribePodcast(onlinePodcast);
+                searchState.addPodcast(onlinePodcast);
+                Fluttertoast.showToast(
+                  msg: s.podcastSubscribed,
+                  gravity: ToastGravity.BOTTOM,
+                );
+              })
+          : OutlineButton(
+              color: context.accentColor.withOpacity(0.5),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100.0),
+                  side: BorderSide(color: Colors.grey[500])),
+              highlightedBorderColor: Colors.grey[500],
+              disabledTextColor: Colors.grey[500],
+              child: Text(s.subscribe),
+              disabledBorderColor: Colors.grey[500],
+              onPressed: () {});
+    });
+  }
+}
+
+class PodcastSlideup extends StatelessWidget {
+  const PodcastSlideup({this.child, Key key}) : super(key: key);
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<SearchState>(builder: (_, searchState, __) {
+      final selectedPodcast = searchState.selectedPodcast;
+      final subscribed = searchState.subscribedList;
+      return Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          child,
+          if (selectedPodcast != null)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: searchState.clearSelect,
+                child: Container(
+                  color: context.scaffoldBackgroundColor.withOpacity(0.9),
+                ),
+              ),
+            ),
+          if (selectedPodcast != null)
+            LayoutBuilder(
+              builder: (context, constrants) => SearchResultDetail(
+                selectedPodcast,
+                maxHeight: constrants.maxHeight,
+                isSubscribed: subscribed.contains(selectedPodcast),
+              ),
+            ),
+        ],
+      );
+    });
+  }
+}
+
+class PodcastAvatar extends StatelessWidget {
+  const PodcastAvatar(this.podcast, {Key key}) : super(key: key);
+  final OnlinePodcast podcast;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25.0),
+        child: CachedNetworkImage(
+          height: 50.0,
+          width: 50.0,
+          fit: BoxFit.fitWidth,
+          alignment: Alignment.center,
+          imageUrl: podcast.image,
+          progressIndicatorBuilder: (context, url, downloadProgress) =>
+              Container(
+            height: 50,
+            width: 50,
+            alignment: Alignment.center,
+            color: context.primaryColorDark,
+            child: SizedBox(
+              width: 20,
+              height: 2,
+              child: LinearProgressIndicator(value: downloadProgress.progress),
+            ),
+          ),
+          errorWidget: (context, url, error) => Container(
+              width: 50,
+              height: 50,
+              alignment: Alignment.center,
+              color: context.primaryColorDark,
+              child: Icon(Icons.error)),
         ),
       ),
     );
