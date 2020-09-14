@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -171,7 +169,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                           );
                         }
                         return SizedBox(
-                          height: 1,
+                          height: 0,
                         );
                       }),
                   Padding(

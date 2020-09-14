@@ -20,6 +20,7 @@ import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../type/fireside_data.dart';
+import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
 import '../util/audiopanel.dart';
 import '../util/custom_widget.dart';
@@ -75,6 +76,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
   ///Hide listened.
   bool _hideListened;
 
+  ///Selected episode list.
+  List<EpisodeBrief> _selectedEpisodes;
+
+  ///Toggle for multi-select.
+  bool _multiSelect;
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +89,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     _reverse = false;
     _controller = ScrollController();
     _scroll = false;
+    _multiSelect = false;
   }
 
   @override
@@ -519,34 +527,35 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   PopupMenuItem(
                     value: 3,
                     child: Container(
-                        padding: EdgeInsets.only(
-                            top: 5, bottom: 5, left: 2, right: 2),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                                width: 2,
-                                color: context.textColor.withOpacity(0.2))),
-                        child: _query == ''
-                            ? Row(
-                                children: [
-                                  Text(s.search,
+                      padding:
+                          EdgeInsets.only(top: 5, bottom: 5, left: 2, right: 2),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                              width: 2,
+                              color: context.textColor.withOpacity(0.2))),
+                      child: _query == ''
+                          ? Row(
+                              children: [
+                                Text(s.search,
+                                    style: TextStyle(
+                                        color: context.textColor
+                                            .withOpacity(0.4))),
+                                Spacer()
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Expanded(
+                                  child: Text(_query,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                          color: context.textColor
-                                              .withOpacity(0.4))),
-                                  Spacer()
-                                ],
-                              )
-                            : Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(_query,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            color: context.accentColor)),
-                                  ),
-                                ],
-                              )),
+                                          color: context.accentColor)),
+                                ),
+                              ],
+                            ),
+                    ),
                   ),
                 ],
                 onSelected: (value) {
@@ -638,6 +647,24 @@ class _PodcastDetailState extends State<PodcastDetail> {
                     ),
                   );
                 }),
+            Material(
+                color: Colors.transparent,
+                clipBehavior: Clip.hardEdge,
+                borderRadius: BorderRadius.circular(100),
+                child: IconButton(
+                  icon: SizedBox(
+                    width: 20,
+                    height: 10,
+                    child: CustomPaint(
+                        painter: MultiSelectPainter(color: context.textColor)),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _selectedEpisodes = [];
+                      _multiSelect = true;
+                    });
+                  },
+                )),
             SizedBox(width: 10)
           ],
         ));
@@ -667,8 +694,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
         child: Scaffold(
           body: SafeArea(
             top: false,
-            //minimum:
-            //    widget.hide ? EdgeInsets.only(bottom: 50) : EdgeInsets.zero,
             child: RefreshIndicator(
               key: _refreshIndicatorKey,
               color: context.accentColor,
@@ -789,7 +814,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
                               SliverToBoxAdapter(
                                 child: _hostsList(context, widget.podcastLocal),
                               ),
-                              SliverToBoxAdapter(child: _actionBar(context)),
+                              SliverToBoxAdapter(
+                                  child: _multiSelect
+                                      ? Center()
+                                      : _actionBar(context)),
                               FutureBuilder<List<EpisodeBrief>>(
                                   future: _getRssItem(widget.podcastLocal,
                                       count: _top,
@@ -809,6 +837,11 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                             reverse: _reverse,
                                             episodeCount: _episodeCount,
                                             initNum: _scroll ? 0 : 12,
+                                            multiSelect: _multiSelect,
+                                            selectedList:
+                                                _selectedEpisodes ?? [],
+                                            onSelect: (value) => setState(() =>
+                                                _selectedEpisodes = value),
                                           )
                                         : SliverToBoxAdapter(
                                             child: Center(),
@@ -835,8 +868,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
                               Tuple2(audio.playerRunning, audio.playerHeight),
                           builder: (_, data, __) {
                             var height = kMinPlayerHeight[data.item2.index];
-                            return SizedBox(
-                              height: data.item1 ? height : 0,
+                            return Column(
+                              children: [
+                                if (_multiSelect)
+                                  MultiSelectMenuBar(
+                                    selectedList: _selectedEpisodes,
+                                    onClose: (value) {
+                                      setState(() => _multiSelect = false);
+                                    },
+                                  ),
+                                SizedBox(
+                                  height: data.item1 ? height : 0,
+                                ),
+                              ],
                             );
                           }),
                     ],
@@ -850,6 +894,150 @@ class _PodcastDetailState extends State<PodcastDetail> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class MultiSelectMenuBar extends StatefulWidget {
+  MultiSelectMenuBar({this.selectedList, this.onClose, Key key})
+      : super(key: key);
+  final List<EpisodeBrief> selectedList;
+  final ValueChanged<bool> onClose;
+
+  @override
+  _MultiSelectMenuBarState createState() => _MultiSelectMenuBarState();
+}
+
+///Multi select menu bar.
+class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
+  bool _liked;
+  bool _marked;
+  bool _downloaded;
+  final _dbHelper = DBHelper();
+
+  @override
+  void initState() {
+    super.initState();
+    _liked = false;
+    _marked = false;
+    _downloaded = false;
+  }
+
+  @override
+  void didUpdateWidget(MultiSelectMenuBar oldWidget) {
+    if (oldWidget.selectedList != widget.selectedList) {
+      super.didUpdateWidget(oldWidget);
+    }
+  }
+
+  Future<void> _saveLiked() async {
+    for (var episode in widget.selectedList) {
+      await _dbHelper.setLiked(episode.enclosureUrl);
+    }
+    if (mounted) setState(() => _liked = true);
+  }
+
+  Future<void> _setUnliked() async {
+    for (var episode in widget.selectedList) {
+      await _dbHelper.setUniked(episode.enclosureUrl);
+    }
+    if (mounted) setState(() => _liked = false);
+  }
+
+  Future<void> _markListened() async {
+    for (var episode in widget.selectedList) {
+      final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+      await _dbHelper.saveHistory(history);
+    }
+    if (mounted) setState(() => _marked = true);
+  }
+
+  Future<void> _markNotListened() async {
+    for (var episode in widget.selectedList) {
+      await _dbHelper.markNotListened(episode.enclosureUrl);
+    }
+    if (mounted) setState(() => _marked = false);
+  }
+
+  Widget _buttonOnMenu({Widget child, VoidCallback onTap}) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            height: 50,
+            child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0), child: child),
+          ),
+        ),
+      );
+  OverlayEntry _createOverlayEntry() {
+    RenderBox renderBox = context.findRenderObject();
+    var offset = renderBox.localToGlobal(Offset.zero);
+    return OverlayEntry(
+      builder: (constext) => Positioned(
+        left: offset.dx + 50,
+        top: offset.dy - 60,
+        child: Container(
+            width: 70,
+            height: 100,
+            //color: Colors.grey[200],
+            child: HeartOpen(width: 50, height: 80)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50.0,
+      decoration: BoxDecoration(color: context.primaryColor),
+      child: Row(
+        children: [
+          _buttonOnMenu(
+              child: _liked
+                  ? Icon(Icons.favorite, color: Colors.red)
+                  : Icon(
+                      Icons.favorite_border,
+                      color: Colors.grey[700],
+                    ),
+              onTap: () async {
+                if (!_liked) {
+                  await _saveLiked();
+                } else {
+                  await _setUnliked();
+                }
+                //  OverlayEntry _overlayEntry;
+                //  _overlayEntry = _createOverlayEntry();
+                //  Overlay.of(context).insert(_overlayEntry);
+                //  await Future.delayed(Duration(seconds: 2));
+                //  _overlayEntry?.remove();
+              }),
+          _buttonOnMenu(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: CustomPaint(
+                  size: Size(25, 20),
+                  painter: ListenedAllPainter(
+                      _marked ? context.accentColor : Colors.grey[700],
+                      stroke: 2.0),
+                ),
+              ),
+              onTap: () async {
+                if (!_marked) {
+                  await _markListened();
+                } else {
+                  await _markNotListened();
+                }
+              }),
+          Spacer(),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              child: Text('${widget.selectedList.length} selected',
+                  style: context.textTheme.headline6)),
+          _buttonOnMenu(
+              child: Icon(Icons.close), onTap: () => widget.onClose(true))
+        ],
       ),
     );
   }

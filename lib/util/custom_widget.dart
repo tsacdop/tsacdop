@@ -38,6 +38,36 @@ class LayoutPainter extends CustomPainter {
   }
 }
 
+/// Multi select button.
+class MultiSelectPainter extends CustomPainter {
+  Color color;
+  MultiSelectPainter({@required this.color});
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final x = size.width / 2;
+    final y = size.height / 2;
+    var path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(x, 0);
+    path.lineTo(x, y * 2);
+    path.lineTo(x * 2, y * 2);
+    path.lineTo(x * 2, y);
+    path.lineTo(0, y);
+    path.lineTo(0, 0);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(MultiSelectPainter oldDelegate) {
+    return false;
+  }
+}
+
 //Dark sky used in sleep timer
 class StarSky extends CustomPainter {
   @override
@@ -908,6 +938,7 @@ class DotIndicator extends StatelessWidget {
   }
 }
 
+///Download button.
 class DownloadPainter extends CustomPainter {
   double fraction;
   Color color;
@@ -1021,7 +1052,7 @@ class LayoutButton extends StatelessWidget {
               height: 10,
               width: 30,
               child: CustomPaint(
-                painter: LayoutPainter(0, context.textTheme.bodyText1.color),
+                painter: LayoutPainter(0, context.textColor),
               ),
             )
           : layout == Layout.two
@@ -1029,8 +1060,7 @@ class LayoutButton extends StatelessWidget {
                   height: 10,
                   width: 30,
                   child: CustomPaint(
-                    painter:
-                        LayoutPainter(1, context.textTheme.bodyText1.color),
+                    painter: LayoutPainter(1, context.textColor),
                   ),
                 )
               : SizedBox(

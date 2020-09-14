@@ -161,7 +161,6 @@ class RssResult extends StatefulWidget {
 
 class _RssResultState extends State<RssResult> {
   OnlinePodcast _onlinePodcast;
-  bool _isSubscribed = false;
   int _loadItems;
 
   @override
@@ -180,14 +179,7 @@ class _RssResultState extends State<RssResult> {
 
   @override
   Widget build(BuildContext context) {
-    var subscribeWorker = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
-    _subscribePodcast(OnlinePodcast podcast) {
-      var item = SubscribeItem(podcast.rss, podcast.title,
-          imgUrl: podcast.image, group: 'Home');
-      subscribeWorker.setSubscribeItem(item);
-    }
-
     var items = widget.rssFeed.items;
     return DefaultTabController(
       length: 2,
