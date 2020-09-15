@@ -673,7 +673,6 @@ class ShowEpisode extends StatelessWidget {
   Widget build(BuildContext context) {
     var _width = context.width;
     final s = context.s;
-    var downloader = Provider.of<DownloadState>(context, listen: false);
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return CustomScrollView(
       physics: NeverScrollableScrollPhysics(),

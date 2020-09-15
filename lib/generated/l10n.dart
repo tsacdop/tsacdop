@@ -478,20 +478,20 @@ class S {
     );
   }
 
-  /// `Tap to import OMPL`
+  /// `Tap to import OPML`
   String get featureDiscoveryOMPL {
     return Intl.message(
-      'Tap to import OMPL',
+      'Tap to import OPML',
       name: 'featureDiscoveryOMPL',
       desc: '',
       args: [],
     );
   }
 
-  /// `You can import OMPL files, open settings or refresh all podcasts at once here.`
+  /// `You can import OPML files, open settings or refresh all podcasts at once here.`
   String get featureDiscoveryOMPLDes {
     return Intl.message(
-      'You can import OMPL files, open settings or refresh all podcasts at once here.',
+      'You can import OPML files, open settings or refresh all podcasts at once here.',
       name: 'featureDiscoveryOMPLDes',
       desc: '',
       args: [],
@@ -771,10 +771,10 @@ class S {
     );
   }
 
-  /// `Import OMPL`
+  /// `Import OPML`
   String get homeToprightMenuImportOMPL {
     return Intl.message(
-      'Import OMPL',
+      'Import OPML',
       name: 'homeToprightMenuImportOMPL',
       desc: '',
       args: [],
@@ -847,10 +847,10 @@ class S {
     );
   }
 
-  /// `Subscribe podcast via search or import OMPL file.`
+  /// `Subscribe podcast via search or import OPML file.`
   String get introSecondPage {
     return Intl.message(
-      'Subscribe podcast via search or import OMPL file.',
+      'Subscribe podcast via search or import OPML file.',
       name: 'introSecondPage',
       desc: '',
       args: [],
@@ -2422,10 +2422,10 @@ class S {
     );
   }
 
-  /// `Export OMPL file of all podcasts`
+  /// `Export OPML file of all podcasts`
   String get subscribeExportDes {
     return Intl.message(
-      'Export OMPL file of all podcasts',
+      'Export OPML file of all podcasts',
       name: 'subscribeExportDes',
       desc: '',
       args: [],
