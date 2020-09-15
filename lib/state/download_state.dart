@@ -258,7 +258,7 @@ class DownloadState extends ChangeNotifier {
     if (!isDownloaded) {
       final dir = await getExternalStorageDirectory();
       var localPath =
-          path.join(dir.path, episode.feedTitle.replaceAll('/', ''));
+          path.join(dir.path, episode.feedTitle?.replaceAll('/', ''));
       final saveDir = Directory(localPath);
       var hasExisted = await saveDir.exists();
       if (!hasExisted) {

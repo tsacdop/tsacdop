@@ -10,6 +10,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:html/parser.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
@@ -656,7 +657,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                     width: 20,
                     height: 10,
                     child: CustomPaint(
-                        painter: MultiSelectPainter(color: context.textColor)),
+                        painter:
+                            MultiSelectPainter(color: context.accentColor)),
                   ),
                   onPressed: () {
                     setState(() {
@@ -874,7 +876,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   MultiSelectMenuBar(
                                     selectedList: _selectedEpisodes,
                                     onClose: (value) {
-                                      setState(() => _multiSelect = false);
+                                      setState(() {
+                                        if (value) _multiSelect = false;
+                                      });
                                     },
                                   ),
                                 SizedBox(
@@ -913,6 +917,7 @@ class MultiSelectMenuBar extends StatefulWidget {
 class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
   bool _liked;
   bool _marked;
+  bool _inPlaylist;
   bool _downloaded;
   final _dbHelper = DBHelper();
 
@@ -922,11 +927,18 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
     _liked = false;
     _marked = false;
     _downloaded = false;
+    _inPlaylist = false;
   }
 
   @override
   void didUpdateWidget(MultiSelectMenuBar oldWidget) {
     if (oldWidget.selectedList != widget.selectedList) {
+      setState(() {
+        _liked = false;
+        _marked = false;
+        _downloaded = false;
+        _inPlaylist = false;
+      });
       super.didUpdateWidget(oldWidget);
     }
   }
@@ -935,14 +947,20 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
     for (var episode in widget.selectedList) {
       await _dbHelper.setLiked(episode.enclosureUrl);
     }
-    if (mounted) setState(() => _liked = true);
+    if (mounted) {
+      setState(() => _liked = true);
+      widget.onClose(false);
+    }
   }
 
   Future<void> _setUnliked() async {
     for (var episode in widget.selectedList) {
       await _dbHelper.setUniked(episode.enclosureUrl);
     }
-    if (mounted) setState(() => _liked = false);
+    if (mounted) {
+      setState(() => _liked = false);
+      widget.onClose(false);
+    }
   }
 
   Future<void> _markListened() async {
@@ -950,14 +968,90 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
       final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
       await _dbHelper.saveHistory(history);
     }
-    if (mounted) setState(() => _marked = true);
+    if (mounted) {
+      setState(() => _marked = true);
+      widget.onClose(false);
+    }
   }
 
   Future<void> _markNotListened() async {
     for (var episode in widget.selectedList) {
       await _dbHelper.markNotListened(episode.enclosureUrl);
     }
-    if (mounted) setState(() => _marked = false);
+    if (mounted) {
+      setState(() => _marked = false);
+      widget.onClose(false);
+    }
+  }
+
+  Future<void> _requestDownload() async {
+    final permissionReady = await _checkPermmison();
+    final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
+        .getBool(defaultValue: true, reverse: true);
+    var dataConfirm = true;
+    final result = await Connectivity().checkConnectivity();
+    final usingData = result == ConnectivityResult.mobile;
+    if (permissionReady) {
+      if (downloadUsingData && usingData) {
+        dataConfirm = await _useDataConfirm();
+      }
+      if (dataConfirm) {
+        for (var episode in widget.selectedList) {
+          Provider.of<DownloadState>(context, listen: false).startTask(episode);
+        }
+        if (mounted) {
+          setState(() {
+            _downloaded = true;
+          });
+        }
+      }
+    }
+  }
+
+  Future<bool> _useDataConfirm() async {
+    var ifUseData = false;
+    final s = context.s;
+    await generalDialog(
+      context,
+      title: Text(s.cellularConfirm),
+      content: Text(s.cellularConfirmDes),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            s.cancel,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ),
+        FlatButton(
+          onPressed: () {
+            ifUseData = true;
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            s.confirm,
+            style: TextStyle(color: Colors.red),
+          ),
+        )
+      ],
+    );
+    return ifUseData;
+  }
+
+  Future<bool> _checkPermmison() async {
+    var permission = await Permission.storage.status;
+    if (permission != PermissionStatus.granted) {
+      var permissions = await [Permission.storage].request();
+      if (permissions[Permission.storage] == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
   }
 
   Widget _buttonOnMenu({Widget child, VoidCallback onTap}) => Material(
@@ -989,55 +1083,145 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50.0,
-      decoration: BoxDecoration(color: context.primaryColor),
-      child: Row(
-        children: [
-          _buttonOnMenu(
-              child: _liked
-                  ? Icon(Icons.favorite, color: Colors.red)
-                  : Icon(
-                      Icons.favorite_border,
-                      color: Colors.grey[700],
+    final s = context.s;
+    var audio = context.watch<AudioPlayerNotifier>();
+    return TweenAnimationBuilder(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: Duration(milliseconds: 500),
+      builder: (context, value, child) => Container(
+        height: 50.0 * value,
+        decoration: BoxDecoration(color: context.primaryColor),
+        child: Row(
+          children: [
+            _buttonOnMenu(
+                child: _liked
+                    ? Icon(Icons.favorite, color: Colors.red)
+                    : Icon(
+                        Icons.favorite_border,
+                        color: Colors.grey[700],
+                      ),
+                onTap: () async {
+                  if (widget.selectedList.isNotEmpty) {
+                    if (!_liked) {
+                      await _saveLiked();
+                      Fluttertoast.showToast(
+                        msg: s.liked,
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                    } else {
+                      await _setUnliked();
+                      Fluttertoast.showToast(
+                        msg: s.unliked,
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                    }
+                  }
+                  //  OverlayEntry _overlayEntry;
+                  //  _overlayEntry = _createOverlayEntry();
+                  //  Overlay.of(context).insert(_overlayEntry);
+                  //  await Future.delayed(Duration(seconds: 2));
+                  //  _overlayEntry?.remove();
+                }),
+            _buttonOnMenu(
+              child: _downloaded
+                  ? Center(
+                      child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CustomPaint(
+                          painter: DownloadPainter(
+                              color: context.accentColor,
+                              fraction: 1,
+                              progressColor: context.accentColor,
+                              progress: 1),
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CustomPaint(
+                          painter: DownloadPainter(
+                            color: Colors.grey[700],
+                            fraction: 0,
+                            progressColor: context.accentColor,
+                          ),
+                        ),
+                      ),
                     ),
-              onTap: () async {
-                if (!_liked) {
-                  await _saveLiked();
-                } else {
-                  await _setUnliked();
+              onTap: () {
+                if (widget.selectedList.isNotEmpty) {
+                  if (!_downloaded) _requestDownload();
                 }
-                //  OverlayEntry _overlayEntry;
-                //  _overlayEntry = _createOverlayEntry();
-                //  Overlay.of(context).insert(_overlayEntry);
-                //  await Future.delayed(Duration(seconds: 2));
-                //  _overlayEntry?.remove();
-              }),
-          _buttonOnMenu(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: CustomPaint(
-                  size: Size(25, 20),
-                  painter: ListenedAllPainter(
-                      _marked ? context.accentColor : Colors.grey[700],
-                      stroke: 2.0),
+              },
+            ),
+            _buttonOnMenu(
+                child: _inPlaylist
+                    ? Icon(Icons.playlist_add_check, color: context.accentColor)
+                    : Icon(
+                        Icons.playlist_add,
+                        color: Colors.grey[700],
+                      ),
+                onTap: () async {
+                  if (widget.selectedList.isNotEmpty) {
+                    if (!_inPlaylist) {
+                      for (var episode in widget.selectedList) {
+                        audio.addToPlaylist(episode);
+                        Fluttertoast.showToast(
+                          msg: s.toastAddPlaylist,
+                          gravity: ToastGravity.BOTTOM,
+                        );
+                      }
+                      setState(() => _inPlaylist = true);
+                    } else {
+                      for (var episode in widget.selectedList) {
+                        audio.delFromPlaylist(episode);
+                        Fluttertoast.showToast(
+                          msg: s.toastRemovePlaylist,
+                          gravity: ToastGravity.BOTTOM,
+                        );
+                      }
+                      setState(() => _inPlaylist = false);
+                    }
+                  }
+                }),
+            _buttonOnMenu(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: CustomPaint(
+                    size: Size(25, 20),
+                    painter: ListenedAllPainter(
+                        _marked ? context.accentColor : Colors.grey[700],
+                        stroke: 2.0),
+                  ),
                 ),
-              ),
-              onTap: () async {
-                if (!_marked) {
-                  await _markListened();
-                } else {
-                  await _markNotListened();
-                }
-              }),
-          Spacer(),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: Text('${widget.selectedList.length} selected',
-                  style: context.textTheme.headline6)),
-          _buttonOnMenu(
-              child: Icon(Icons.close), onTap: () => widget.onClose(true))
-        ],
+                onTap: () async {
+                  if (widget.selectedList.isNotEmpty) {
+                    if (!_marked) {
+                      await _markListened();
+                      Fluttertoast.showToast(
+                        msg: s.markListened,
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                    } else {
+                      await _markNotListened();
+                      Fluttertoast.showToast(
+                        msg: s.markNotListened,
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                    }
+                  }
+                }),
+            Spacer(),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text('${widget.selectedList.length} selected',
+                    style: context.textTheme.headline6)),
+            _buttonOnMenu(
+                child: Icon(Icons.close), onTap: () => widget.onClose(true))
+          ],
+        ),
       ),
     );
   }

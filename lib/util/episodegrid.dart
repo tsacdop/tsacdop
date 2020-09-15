@@ -1,12 +1,14 @@
 import 'dart:ui';
 
 import 'package:auto_animated/auto_animated.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
@@ -20,6 +22,7 @@ import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import 'custom_widget.dart';
 import 'extension_helper.dart';
+import 'general_dialog.dart';
 import 'open_container.dart';
 
 enum Layout { three, two, one }
@@ -113,6 +116,70 @@ class EpisodeGrid extends StatelessWidget {
   Future<void> _setUnliked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setUniked(url);
+  }
+
+  Future<void> _requestDownload(BuildContext context,
+      {EpisodeBrief episode}) async {
+    final permissionReady = await _checkPermmison();
+    final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
+        .getBool(defaultValue: true, reverse: true);
+    final result = await Connectivity().checkConnectivity();
+    final usingData = result == ConnectivityResult.mobile;
+    var dataConfirm = true;
+    if (permissionReady) {
+      if (downloadUsingData && usingData) {
+        dataConfirm = await _useDataConfirm(context);
+      }
+      if (dataConfirm) {
+        context.read<DownloadState>().startTask(episode);
+      }
+    }
+  }
+
+  Future<bool> _checkPermmison() async {
+    var permission = await Permission.storage.status;
+    if (permission != PermissionStatus.granted) {
+      var permissions = await [Permission.storage].request();
+      if (permissions[Permission.storage] == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
+
+  Future<bool> _useDataConfirm(BuildContext context) async {
+    var ifUseData = false;
+    final s = context.s;
+    await generalDialog(
+      context,
+      title: Text(s.cellularConfirm),
+      content: Text(s.cellularConfirmDes),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            s.cancel,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ),
+        FlatButton(
+          onPressed: () {
+            ifUseData = true;
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            s.confirm,
+            style: TextStyle(color: Colors.red),
+          ),
+        )
+      ],
+    );
+    return ifUseData;
   }
 
   /// Episode title widget.
@@ -594,10 +661,12 @@ class EpisodeGrid extends StatelessWidget {
                                             trailingIcon: Icon(
                                                 LineIcons.download_solid,
                                                 color: Colors.green),
-                                            onPressed: () {
+                                            onPressed: () async {
                                               if (!isDownloaded) {
-                                                downloader
-                                                    .startTask(episodes[index]);
+                                                await _requestDownload(context,
+                                                    episode: episodes[index]);
+                                                //  downloader
+                                                //      .startTask(episodes[index]);
                                               }
                                             })
                                         : null

@@ -8,6 +8,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/local_storage/key_value_storage.dart';
 
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
@@ -26,33 +27,18 @@ class DownloadButton extends StatefulWidget {
 }
 
 class _DownloadButtonState extends State<DownloadButton> {
-  bool _permissionReady;
-  bool _usingData;
-  StreamSubscription _connectivity;
-
-  @override
-  void initState() {
-    super.initState();
-    _permissionReady = false;
-    _connectivity = Connectivity().onConnectivityChanged.listen((result) {
-      _usingData = result == ConnectivityResult.mobile;
-    });
-  }
-
-  @override
-  void dispose() {
-    _connectivity.cancel();
-    super.dispose();
-  }
-
-  void _requestDownload(EpisodeBrief episode, bool downloadUsingData) async {
-    _permissionReady = await _checkPermmison();
-    var _dataConfirm = true;
-    if (_permissionReady) {
-      if (downloadUsingData && _usingData) {
-        _dataConfirm = await _useDataConfirem();
+  Future<void> _requestDownload(EpisodeBrief episode) async {
+    final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
+        .getBool(defaultValue: true, reverse: true);
+    final permissionReady = await _checkPermmison();
+    final result = await Connectivity().checkConnectivity();
+    final usingData = result == ConnectivityResult.mobile;
+    var dataConfirm = true;
+    if (permissionReady) {
+      if (downloadUsingData && usingData) {
+        dataConfirm = await _useDataConfirm();
       }
-      if (_dataConfirm) {
+      if (dataConfirm) {
         Provider.of<DownloadState>(context, listen: false).startTask(episode);
       }
     }
@@ -61,20 +47,20 @@ class _DownloadButtonState extends State<DownloadButton> {
   void _deleteDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).delTask(episode);
     Fluttertoast.showToast(
-      msg: 'Download removed',
+      msg: context.s.downloadRemovedToast,
       gravity: ToastGravity.BOTTOM,
     );
   }
 
-  _pauseDownload(EpisodeBrief episode) async {
+  Future<void> _pauseDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).pauseTask(episode);
   }
 
-  _resumeDownload(EpisodeBrief episode) async {
+  Future<void> _resumeDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).resumeTask(episode);
   }
 
-  _retryDownload(EpisodeBrief episode) async {
+  Future<void> _retryDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).retryTask(episode);
   }
 
@@ -92,7 +78,7 @@ class _DownloadButtonState extends State<DownloadButton> {
     }
   }
 
-  Future<bool> _useDataConfirem() async {
+  Future<bool> _useDataConfirm() async {
     var ifUseData = false;
     final s = context.s;
     await generalDialog(
@@ -164,24 +150,21 @@ class _DownloadButtonState extends State<DownloadButton> {
   Widget _downloadButton(EpisodeTask task, BuildContext context) {
     switch (task.status.value) {
       case 0:
-        return Selector<SettingState, bool>(
-          selector: (_, settings) => settings.downloadUsingData,
-          builder: (_, data, __) => _buttonOnMenu(
-              Center(
-                child: SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CustomPaint(
-                    painter: DownloadPainter(
-                      color: Colors.grey[700],
-                      fraction: 0,
-                      progressColor: context.accentColor,
-                    ),
+        return _buttonOnMenu(
+            Center(
+              child: SizedBox(
+                height: 20,
+                width: 20,
+                child: CustomPaint(
+                  painter: DownloadPainter(
+                    color: Colors.grey[700],
+                    fraction: 0,
+                    progressColor: context.accentColor,
                   ),
                 ),
               ),
-              () => _requestDownload(task.episode, data)),
-        );
+            ),
+            () => _requestDownload(task.episode));
         break;
       case 2:
         return Material(

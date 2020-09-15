@@ -47,7 +47,7 @@ class MultiSelectPainter extends CustomPainter {
     var paint = Paint()
       ..color = color
       ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke
+      ..style = PaintingStyle.fill
       ..strokeCap = StrokeCap.round;
     final x = size.width / 2;
     final y = size.height / 2;
@@ -59,6 +59,7 @@ class MultiSelectPainter extends CustomPainter {
     path.lineTo(x * 2, y);
     path.lineTo(0, y);
     path.lineTo(0, 0);
+    path.close();
     canvas.drawPath(path, paint);
   }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,7 +9,9 @@ import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/util/general_dialog.dart';
 import 'package:tuple/tuple.dart';
 
 import '../episodes/episode_detail.dart';
@@ -524,6 +527,7 @@ class PodcastPreview extends StatelessWidget {
 class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief> episodes;
   final PodcastLocal podcastLocal;
+  final DBHelper _dbHelper = DBHelper();
   ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
   String stringForSeconds(double seconds) {
     if (seconds == null) return null;
@@ -557,8 +561,7 @@ class ShowEpisode extends StatelessWidget {
   }
 
   Future<int> _isListened(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.isListened(episode.enclosureUrl);
+    return await _dbHelper.isListened(episode.enclosureUrl);
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
@@ -583,7 +586,7 @@ class ShowEpisode extends StatelessWidget {
     return boo == 1;
   }
 
-  _markListened(EpisodeBrief episode) async {
+  Future<void> _markListened(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
     var marked = await dbHelper.checkMarked(episode);
     if (!marked) {
@@ -592,14 +595,78 @@ class ShowEpisode extends StatelessWidget {
     }
   }
 
-  _saveLiked(String url) async {
+  Future<void> _saveLiked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setLiked(url);
   }
 
-  _setUnliked(String url) async {
+  Future<void> _setUnliked(String url) async {
     var dbHelper = DBHelper();
     await dbHelper.setUniked(url);
+  }
+
+  Future<void> _requestDownload(BuildContext context,
+      {EpisodeBrief episode}) async {
+    final permissionReady = await _checkPermmison();
+    final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
+        .getBool(defaultValue: true, reverse: true);
+    final result = await Connectivity().checkConnectivity();
+    final usingData = result == ConnectivityResult.mobile;
+    var dataConfirm = true;
+    if (permissionReady) {
+      if (downloadUsingData && usingData) {
+        dataConfirm = await _useDataConfirm(context);
+      }
+      if (dataConfirm) {
+        Provider.of<DownloadState>(context, listen: false).startTask(episode);
+      }
+    }
+  }
+
+  Future<bool> _checkPermmison() async {
+    var permission = await Permission.storage.status;
+    if (permission != PermissionStatus.granted) {
+      var permissions = await [Permission.storage].request();
+      if (permissions[Permission.storage] == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
+
+  Future<bool> _useDataConfirm(BuildContext context) async {
+    var ifUseData = false;
+    final s = context.s;
+    await generalDialog(
+      context,
+      title: Text(s.cellularConfirm),
+      content: Text(s.cellularConfirmDes),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            s.cancel,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ),
+        FlatButton(
+          onPressed: () {
+            ifUseData = true;
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            s.confirm,
+            style: TextStyle(color: Colors.red),
+          ),
+        )
+      ],
+    );
+    return ifUseData;
   }
 
   @override
@@ -637,11 +704,11 @@ class ShowEpisode extends StatelessWidget {
                         future: _initData(episodes[index]),
                         initialData: Tuple5(0, false, false, false, []),
                         builder: (context, snapshot) {
-                          var isListened = snapshot.data.item1;
-                          var isLiked = snapshot.data.item2;
-                          var isDownloaded = snapshot.data.item3;
-                          var tapToOpen = snapshot.data.item4;
-                          var menuList = snapshot.data.item5;
+                          final isListened = snapshot.data.item1;
+                          final isLiked = snapshot.data.item2;
+                          final isDownloaded = snapshot.data.item3;
+                          final tapToOpen = snapshot.data.item4;
+                          final menuList = snapshot.data.item5;
                           return Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -802,8 +869,10 @@ class ShowEpisode extends StatelessWidget {
                                             color: Colors.green),
                                         onPressed: () {
                                           if (!isDownloaded) {
-                                            downloader
-                                                .startTask(episodes[index]);
+                                            _requestDownload(context,
+                                                episode: episodes[index]);
+                                            //   downloader
+                                            //       .startTask(episodes[index]);
                                           }
                                         })
                                     : null
