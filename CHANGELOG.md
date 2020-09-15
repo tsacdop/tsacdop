@@ -1,5 +1,25 @@
 # Tsacdop Changelog
 
+## 0.4.16
+
+Release date 2020/9/15
+
+## New features
+
+* Discovery feature in search page.
+* Multi select in podcast page.
+* Customize the speeds available.
+
+## Bugs fixed
+
+* Fix download error when podcast name includes /.
+* Make the group name editable directly.
+* Fixed shownote timestamp click error.
+
+## Minor changes
+
+* Update donate button UI.
+
 ## 0.4.15
 
 Release date 2020/8/30
