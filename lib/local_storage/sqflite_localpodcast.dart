@@ -597,7 +597,7 @@ class DBHelper {
           case Filter.all:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? AND H.SUM(listen_time) > 0 ORDER BY E.milliseconds ASC""",
@@ -606,14 +606,14 @@ class DBHelper {
           case Filter.liked:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.liked = 1 ORDER BY E.milliseconds ASC""", [id]);
             break;
           case Filter.downloaded:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.media_id != E.enclosure_url ORDER BY E.milliseconds ASC""",
                 [id]);
@@ -621,7 +621,7 @@ class DBHelper {
           case Filter.search:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.title LIKE ? ORDER BY E.milliseconds ASC""",
                 [id, '%$query%']);
@@ -633,7 +633,7 @@ class DBHelper {
           case Filter.all:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
@@ -643,7 +643,7 @@ class DBHelper {
           case Filter.liked:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? AND E.liked = 1 GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
@@ -653,7 +653,7 @@ class DBHelper {
           case Filter.downloaded:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? AND E.enclosure_url != E.media_id 
@@ -664,7 +664,7 @@ class DBHelper {
           case Filter.search:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? AND E.title LIKE ? GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
@@ -678,7 +678,7 @@ class DBHelper {
           case Filter.all:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor  FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id  
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ?  GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
@@ -688,7 +688,7 @@ class DBHelper {
           case Filter.liked:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? AND E.liked = 1 GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
@@ -698,7 +698,7 @@ class DBHelper {
           case Filter.downloaded:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? AND E.enclosure_url != E.media_id GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
@@ -708,7 +708,7 @@ class DBHelper {
           case Filter.search:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? AND  E.title LIKE ? GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
@@ -724,21 +724,21 @@ class DBHelper {
           case Filter.all:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? ORDER BY E.milliseconds ASC""", [id]);
             break;
           case Filter.liked:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.liked = 1 ORDER BY E.milliseconds ASC""", [id]);
             break;
           case Filter.downloaded:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.media_id != E.enclosure_url ORDER BY E.milliseconds ASC""",
                 [id]);
@@ -746,7 +746,7 @@ class DBHelper {
           case Filter.search:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.title LIKE ? ORDER BY E.milliseconds ASC""",
                 [id, '%$query%']);
@@ -758,14 +758,14 @@ class DBHelper {
           case Filter.all:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? ORDER BY E.milliseconds ASC LIMIT ?""", [id, count]);
             break;
           case Filter.liked:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.liked = 1 ORDER BY E.milliseconds ASC LIMIT ?""",
                 [id, count]);
@@ -773,7 +773,7 @@ class DBHelper {
           case Filter.downloaded:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.enclosure_url != E.media_id ORDER BY E.milliseconds ASC LIMIT ?""",
                 [id, count]);
@@ -781,7 +781,7 @@ class DBHelper {
           case Filter.search:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, 
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.title LIKE ? ORDER BY E.milliseconds ASC LIMIT ?""",
                 [id, '%$query%', count]);
@@ -793,14 +793,14 @@ class DBHelper {
           case Filter.all:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? ORDER BY E.milliseconds DESC LIMIT ?""", [id, count]);
             break;
           case Filter.liked:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.liked = 1 ORDER BY E.milliseconds DESC LIMIT ?""",
                 [id, count]);
@@ -808,7 +808,7 @@ class DBHelper {
           case Filter.downloaded:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.enclosure_url != E.media_id ORDER BY E.milliseconds DESC LIMIT ?""",
                 [id, count]);
@@ -816,7 +816,7 @@ class DBHelper {
           case Filter.search:
             list = await dbClient.rawQuery(
                 """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
-        E.milliseconds, P.imagePath, P.title as feedTitle, E.duration, E.explicit, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND  E.title LIKE ? ORDER BY E.milliseconds DESC LIMIT ?""",
                 [id, '%$query%', count]);
@@ -833,7 +833,7 @@ class DBHelper {
             i['enclosure_url'],
             i['enclosure_length'],
             i['milliseconds'],
-            i['feedTitle'],
+            i['feed_title'],
             i['primaryColor'],
             i['duration'],
             i['explicit'],
@@ -933,7 +933,7 @@ class DBHelper {
             i['enclosure_url'],
             i['enclosure_length'],
             i['milliseconds'],
-            i['feedTitle'],
+            i['feed_title'],
             i['primaryColor'],
             i['duration'],
             i['explicit'],
@@ -975,7 +975,7 @@ class DBHelper {
               i['enclosure_url'],
               i['enclosure_length'],
               i['milliseconds'],
-              i['feedTitle'],
+              i['feed_title'],
               i['primaryColor'],
               i['duration'],
               i['explicit'],
@@ -1107,7 +1107,7 @@ class DBHelper {
             i['enclosure_url'],
             i['enclosure_length'],
             i['milliseconds'],
-            i['feedTitle'],
+            i['feed_title'],
             i['primaryColor'],
             i['duration'],
             i['explicit'],
@@ -1221,7 +1221,7 @@ class DBHelper {
             i['enclosure_url'],
             i['enclosure_length'],
             i['milliseconds'],
-            i['feedTitle'],
+            i['feed_title'],
             i['primaryColor'],
             i['duration'],
             i['explicit'],
