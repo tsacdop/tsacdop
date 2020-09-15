@@ -8,7 +8,7 @@ Release date 2020/9/15
 
 * Discovery feature in search page.
 * Multi select in podcast page.
-* Customize the speeds available.
+* Customize the speed options available.
 
 ## Bugs fixed
 

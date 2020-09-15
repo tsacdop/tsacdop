@@ -375,7 +375,6 @@ class EpisodeGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    var downloader = Provider.of<DownloadState>(context, listen: false);
     final options = LiveOptions(
       delay: Duration.zero,
       showItemInterval: Duration(milliseconds: 50),
