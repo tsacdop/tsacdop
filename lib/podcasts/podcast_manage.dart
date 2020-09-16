@@ -35,32 +35,29 @@ class _PodcastManageState extends State<PodcastManage>
   Animation _menuAnimation;
   double _fraction;
   int _index;
-  double _scroll;
+
   @override
   void initState() {
     super.initState();
     _showSetting = false;
     _fraction = 0;
     _menuValue = 0;
-    _scroll = 0;
     _index = 0;
     _menuController = AnimationController(
-        duration: const Duration(milliseconds: 300), vsync: this);
+        duration: const Duration(milliseconds: 150), vsync: this);
     _controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
         if (mounted) {
-          setState(() {
-            _fraction = _animation.value;
-          });
+          setState(() => _fraction = _animation.value);
         }
       });
-    _menuAnimation = Tween(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(parent: _menuController, curve: Curves.easeIn))
-          ..addListener(() {
-            if (mounted) setState(() => _menuValue = _menuAnimation.value);
-          });
+    _menuAnimation = Tween(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: _menuController, curve: Curves.elasticInOut))
+      ..addListener(() {
+        if (mounted) setState(() => _menuValue = _menuAnimation.value);
+      });
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -89,7 +86,7 @@ class _PodcastManageState extends State<PodcastManage>
     super.dispose();
   }
 
-  Widget _saveButton(BuildContext context) {
+  Widget _saveButton() {
     final s = context.s;
     return Consumer<GroupList>(
       builder: (_, groupList, __) {
@@ -138,52 +135,51 @@ class _PodcastManageState extends State<PodcastManage>
           child: Transform(
             alignment: FractionalOffset(0.5, 0.5),
             transform: Matrix4.rotationY(math.pi * _fraction),
-            child: Container(
-              child: InkWell(
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: _fraction > 0.5
-                          ? Colors.red
-                          : Theme.of(context).accentColor,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey[700].withOpacity(0.5),
-                          blurRadius: 1,
-                          offset: Offset(1, 1),
-                        ),
-                      ]),
-                  alignment: Alignment.center,
-                  child: _fraction > 0.5
-                      ? Icon(LineIcons.save_solid, color: Colors.white)
-                      : AnimatedIcon(
-                          color: Colors.white,
-                          icon: AnimatedIcons.menu_close,
-                          progress: _menuController,
-                        ),
-                  // color: Colors.white,
-                ),
-                onTap: () async {
-                  if (_fraction == 0) {
-                    !_showSetting
-                        ? _menuController.forward()
-                        : await _menuController.reverse();
+            child: InkWell(
+              onTap: () async {
+                if (_fraction == 0) {
+                  !_showSetting
+                      ? _menuController.forward()
+                      : await _menuController.reverse();
+                  if (mounted) {
                     setState(() {
                       _showSetting = !_showSetting;
                     });
-                  } else {
-                    groupList.saveOrder(groupList.groups[_index]);
-                    groupList
-                        .drlFromOrderChanged(groupList.groups[_index].name);
-                    Fluttertoast.showToast(
-                      msg: context.s.toastSettingSaved,
-                      gravity: ToastGravity.BOTTOM,
-                    );
-                    _controller.reverse();
                   }
-                },
+                } else {
+                  groupList.saveOrder(groupList.groups[_index]);
+                  groupList.drlFromOrderChanged(groupList.groups[_index].name);
+                  Fluttertoast.showToast(
+                    msg: context.s.toastSettingSaved,
+                    gravity: ToastGravity.BOTTOM,
+                  );
+                  _controller.reverse();
+                }
+              },
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                    color: _fraction > 0.5
+                        ? Colors.red
+                        : Theme.of(context).accentColor,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey[700].withOpacity(0.5),
+                        blurRadius: 1,
+                        offset: Offset(1, 1),
+                      ),
+                    ]),
+                alignment: Alignment.center,
+                child: _fraction > 0.5
+                    ? Icon(LineIcons.save_solid, color: Colors.white)
+                    : AnimatedIcon(
+                        color: Colors.white,
+                        icon: AnimatedIcons.menu_close,
+                        progress: _menuController,
+                      ),
+                // color: Colors.white,
               ),
             ),
           ),
@@ -192,6 +188,7 @@ class _PodcastManageState extends State<PodcastManage>
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -253,7 +250,7 @@ class _PodcastManageState extends State<PodcastManage>
                           AddGroup()),
                   icon: Icon(Icons.add)),
             ),
-            OrderMenu(),
+            _OrderMenu(),
           ],
         ),
         body: WillPopScope(
@@ -262,278 +259,266 @@ class _PodcastManageState extends State<PodcastManage>
                 .clearOrderChanged();
             return true;
           },
-          child: Consumer<GroupList>(builder: (_, groupList, __) {
-            var _isLoading = groupList.isLoading;
-            var _groups = groupList.groups;
-            return _isLoading
-                ? Center()
-                : Stack(
-                    children: <Widget>[
-                      Container(
-                        color: context.scaffoldBackgroundColor,
-                        child: CustomTabView(
-                          itemCount: _groups.length,
-                          tabBuilder: (context, index) => Tab(
-                            child: Container(
-                                height: 30.0,
-                                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: (_scroll - index).abs() > 1
-                                      ? Colors.grey[300]
-                                      : Colors.grey[300]
-                                          .withOpacity((_scroll - index).abs()),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                ),
-                                child: Text(
-                                  _groups[index].name,
-                                )),
+          child: Consumer<GroupList>(
+            builder: (_, groupList, __) {
+              var _isLoading = groupList.isLoading;
+              var _groups = groupList.groups;
+              return _isLoading
+                  ? Center()
+                  : Stack(
+                      children: <Widget>[
+                        Container(
+                          color: context.scaffoldBackgroundColor,
+                          child: CustomTabView(
+                            itemCount: _groups.length,
+                            tabBuilder: (context, index) => Tab(
+                              child: Container(
+                                  height: 30.0,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.0),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[600].withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Text(
+                                    _groups[index].name,
+                                  )),
+                            ),
+                            pageBuilder: (context, index) =>
+                                DescribedFeatureOverlay(
+                              featureId: configurePodcast,
+                              tapTarget: Text(s.podcast(1)),
+                              title: Text(s.featureDiscoveryGroupPodcast),
+                              overflowMode: OverflowMode.clipContent,
+                              onDismiss: () => Future.value(true),
+                              enablePulsingAnimation: false,
+                              backgroundColor: Colors.cyan[600],
+                              description: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Text(s.featureDiscoveryGroupPodcastDes),
+                                  FlatButton(
+                                    color: Colors.cyan[500],
+                                    padding: const EdgeInsets.all(0),
+                                    child: Text(context.s.understood,
+                                        style: context.textTheme.button
+                                            .copyWith(color: Colors.white)),
+                                    onPressed: () async =>
+                                        FeatureDiscovery.completeCurrentStep(
+                                            context),
+                                  ),
+                                  FlatButton(
+                                    color: Colors.cyan[500],
+                                    padding: const EdgeInsets.all(0),
+                                    child: Text(context.s.dismiss,
+                                        style: context.textTheme.button
+                                            .copyWith(color: Colors.white)),
+                                    onPressed: () =>
+                                        FeatureDiscovery.dismissAll(context),
+                                  ),
+                                ],
+                              ),
+                              child: Container(
+                                  key: ValueKey<String>(_groups[index].name),
+                                  child:
+                                      PodcastGroupList(group: _groups[index])),
+                            ),
+                            onPositionChange: (value) =>
+                                // setState(() =>
+                                _index = value,
                           ),
-                          pageBuilder: (context, index) =>
-                              DescribedFeatureOverlay(
-                            featureId: configurePodcast,
-                            tapTarget: Text(s.podcast(1)),
-                            title: Text(s.featureDiscoveryGroupPodcast),
-                            overflowMode: OverflowMode.clipContent,
-                            onDismiss: () => Future.value(true),
-                            enablePulsingAnimation: false,
-                            backgroundColor: Colors.cyan[600],
-                            description: Column(
+                        ),
+                        if (_showSetting)
+                          Positioned.fill(
+                            top: 50,
+                            child: GestureDetector(
+                              onTap: () async {
+                                await _menuController.reverse();
+                                if (mounted) {
+                                  setState(() => _showSetting = false);
+                                }
+                              },
+                              child: Container(
+                                color: context.scaffoldBackgroundColor
+                                    .withOpacity(0.8 *
+                                        math.min(
+                                            _menuController.value * 2, 1.0)),
+                              ),
+                            ),
+                          ),
+                        Positioned(
+                          right: 30,
+                          bottom: 30,
+                          child: _saveButton(),
+                        ),
+                        if (_showSetting)
+                          Positioned(
+                            right: 100 * _menuValue - 70,
+                            bottom: 100,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
-                                Text(s.featureDiscoveryGroupPodcastDes),
-                                FlatButton(
-                                  color: Colors.cyan[500],
-                                  padding: const EdgeInsets.all(0),
-                                  child: Text(context.s.understood,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .button
-                                          .copyWith(color: Colors.white)),
-                                  onPressed: () async =>
-                                      FeatureDiscovery.completeCurrentStep(
-                                          context),
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      _menuController.reverse();
+                                      setState(() => _showSetting = false);
+                                      _index == 0
+                                          ? Fluttertoast.showToast(
+                                              msg: s.toastHomeGroupNotSupport,
+                                              gravity: ToastGravity.BOTTOM,
+                                            )
+                                          : showGeneralDialog(
+                                              context: context,
+                                              barrierDismissible: true,
+                                              barrierLabel:
+                                                  MaterialLocalizations.of(
+                                                          context)
+                                                      .modalBarrierDismissLabel,
+                                              barrierColor: Colors.black54,
+                                              transitionDuration:
+                                                  const Duration(
+                                                      milliseconds: 300),
+                                              pageBuilder: (context, animaiton,
+                                                      secondaryAnimation) =>
+                                                  RenameGroup(
+                                                    group: _groups[_index],
+                                                  ));
+                                    },
+                                    child: Container(
+                                      height: 30.0,
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey[700],
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.text_fields,
+                                            color: Colors.white,
+                                            size: 15.0,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5.0),
+                                          ),
+                                          Text(context.s.editGroupName,
+                                              style: TextStyle(
+                                                  color: Colors.white)),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                FlatButton(
-                                  color: Colors.cyan[500],
-                                  padding: const EdgeInsets.all(0),
-                                  child: Text(context.s.dismiss,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .button
-                                          .copyWith(color: Colors.white)),
-                                  onPressed: () =>
-                                      FeatureDiscovery.dismissAll(context),
+                                Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 10.0)),
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      _menuController.reverse();
+                                      setState(() => _showSetting = false);
+                                      _index == 0
+                                          ? Fluttertoast.showToast(
+                                              msg: s.toastHomeGroupNotSupport,
+                                              gravity: ToastGravity.BOTTOM,
+                                            )
+                                          : generalDialog(
+                                              context,
+                                              title: Text(s.removeConfirm),
+                                              content:
+                                                  Text(s.groupRemoveConfirm),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  splashColor: context
+                                                      .accentColor
+                                                      .withAlpha(70),
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                  child: Text(
+                                                    context.s.cancel,
+                                                    style: TextStyle(
+                                                        color:
+                                                            Colors.grey[600]),
+                                                  ),
+                                                ),
+                                                FlatButton(
+                                                  splashColor: context
+                                                      .accentColor
+                                                      .withAlpha(70),
+                                                  onPressed: () {
+                                                    if (_index ==
+                                                        groupList
+                                                                .groups.length -
+                                                            1) {
+                                                      setState(() {
+                                                        _index = _index - 1;
+                                                      });
+                                                      groupList.delGroup(
+                                                          _groups[_index + 1]);
+                                                    } else {
+                                                      groupList.delGroup(
+                                                          _groups[_index]);
+                                                    }
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: Text(
+                                                    context.s.confirm,
+                                                    style: TextStyle(
+                                                        color: Colors.red),
+                                                  ),
+                                                )
+                                              ],
+                                            );
+                                    },
+                                    child: Container(
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey[700],
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10.0))),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.delete_outline,
+                                            color: Colors.red,
+                                            size: 15.0,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5.0),
+                                          ),
+                                          Text(s.remove,
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                            child: Container(
-                                key: ValueKey(_groups[index].name),
-                                child: PodcastGroupList(group: _groups[index])),
                           ),
-                          onPositionChange: (value) =>
-                              setState(() => _index = value),
-                          onScroll: (value) => setState(() => _scroll = value),
-                        ),
-                      ),
-                      _showSetting
-                          ? Positioned.fill(
-                              top: 50,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  await _menuController.reverse();
-                                  setState(() => _showSetting = false);
-                                },
-                                child: Container(
-                                  color: Theme.of(context)
-                                      .scaffoldBackgroundColor
-                                      .withOpacity(0.5 * _menuController.value),
-                                ),
-                              ),
-                            )
-                          : Center(),
-                      Positioned(
-                        right: 30,
-                        bottom: 30,
-                        child: _saveButton(context),
-                      ),
-                      _showSetting
-                          ? Positioned(
-                              right: 30 * _menuValue,
-                              bottom: 100,
-                              child: Container(
-                                alignment: Alignment.centerRight,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          _menuController.reverse();
-                                          setState(() => _showSetting = false);
-                                          _index == 0
-                                              ? Fluttertoast.showToast(
-                                                  msg: s
-                                                      .toastHomeGroupNotSupport,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                )
-                                              : showGeneralDialog(
-                                                  context: context,
-                                                  barrierDismissible: true,
-                                                  barrierLabel:
-                                                      MaterialLocalizations.of(
-                                                              context)
-                                                          .modalBarrierDismissLabel,
-                                                  barrierColor: Colors.black54,
-                                                  transitionDuration:
-                                                      const Duration(
-                                                          milliseconds: 300),
-                                                  pageBuilder: (context,
-                                                          animaiton,
-                                                          secondaryAnimation) =>
-                                                      RenameGroup(
-                                                        group: _groups[_index],
-                                                      ));
-                                        },
-                                        child: Container(
-                                          height: 30.0,
-                                          decoration: BoxDecoration(
-                                              color: Colors.grey[700],
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10.0))),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.text_fields,
-                                                color: Colors.white,
-                                                size: 15.0,
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 5.0),
-                                              ),
-                                              Text(context.s.editGroupName,
-                                                  style: TextStyle(
-                                                      color: Colors.white)),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 10.0)),
-                                    Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          _menuController.reverse();
-                                          setState(() => _showSetting = false);
-                                          _index == 0
-                                              ? Fluttertoast.showToast(
-                                                  msg: s
-                                                      .toastHomeGroupNotSupport,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                )
-                                              : generalDialog(
-                                                  context,
-                                                  title: Text(s.removeConfirm),
-                                                  content: Text(
-                                                      s.groupRemoveConfirm),
-                                                  actions: <Widget>[
-                                                    FlatButton(
-                                                      splashColor: context
-                                                          .accentColor
-                                                          .withAlpha(70),
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
-                                                      child: Text(
-                                                        context.s.cancel,
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .grey[600]),
-                                                      ),
-                                                    ),
-                                                    FlatButton(
-                                                      splashColor: context
-                                                          .accentColor
-                                                          .withAlpha(70),
-                                                      onPressed: () {
-                                                        if (_index ==
-                                                            groupList.groups
-                                                                    .length -
-                                                                1) {
-                                                          setState(() {
-                                                            _index = _index - 1;
-                                                            _scroll = 0;
-                                                          });
-                                                          groupList.delGroup(
-                                                              _groups[
-                                                                  _index + 1]);
-                                                        } else {
-                                                          groupList.delGroup(
-                                                              _groups[_index]);
-                                                        }
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      child: Text(
-                                                        context.s.confirm,
-                                                        style: TextStyle(
-                                                            color: Colors.red),
-                                                      ),
-                                                    )
-                                                  ],
-                                                );
-                                        },
-                                        child: Container(
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                              color: Colors.grey[700],
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10.0))),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.delete_outline,
-                                                color: Colors.red,
-                                                size: 15.0,
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 5.0),
-                                              ),
-                                              Text(s.remove,
-                                                  style: TextStyle(
-                                                      color: Colors.red)),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          : Center(),
-                    ],
-                  );
-          }),
+                      ],
+                    );
+            },
+          ),
         ),
       ),
     );
   }
 }
 
-class OrderMenu extends StatelessWidget {
+class _OrderMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
