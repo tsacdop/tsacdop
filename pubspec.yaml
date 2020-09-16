@@ -1,7 +1,7 @@
 name: tsacdop
 description: An open source podacasts player.
 
-version: 0.4.16+33
+version: 0.4.17+34
 
 environment:
   sdk: ">=2.6.0 <3.0.0"
@@ -12,7 +12,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   auto_animated: ^2.1.0
-  audio_session: ^0.0.6
+  audio_session: ^0.0.7
   cached_network_image: ^2.3.1
   color_thief_flutter: ^1.0.2
   cupertino_icons: ^1.0.0

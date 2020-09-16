@@ -4,19 +4,19 @@
 
 Release date 2020/9/15
 
-## New features
+### New features
 
 * Discovery feature in search page.
 * Multi select in podcast page.
 * Customize the speed options available.
 
-## Bugs fixed
+### Bugs fixed
 
 * Fix download error when podcast name includes /.
 * Make the group name editable directly.
 * Fixed shownote timestamp click error.
 
-## Minor changes
+### Minor changes
 
 * Update donate button UI.
 

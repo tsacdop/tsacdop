@@ -990,6 +990,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
+  Future<void> onTaskRemoved() async {
+    onStop();
+  }
+
+  @override
   Future<void> onAddQueueItem(MediaItem mediaItem) async {
     _queue.add(mediaItem);
     await AudioServiceBackground.setQueue(_queue);
