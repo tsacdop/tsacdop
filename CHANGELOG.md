@@ -1,5 +1,13 @@
 # Tsacdop Changelog
 
+## 0.4.17
+
+Release date 2020/9/16
+
+### Bug fixed
+
+* Remove notification after app removed from recent.
+
 ## 0.4.16
 
 Release date 2020/9/15
