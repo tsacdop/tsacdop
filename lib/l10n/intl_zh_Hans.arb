@@ -535,6 +535,8 @@
   "@showNotesFonts": {},
   "size": "大小",
   "@size": {},
+  "skipSecondsAtEnd": "结束跳过秒数",
+  "@skipSecondsAtEnd": {},
   "skipSecondsAtStart": "开头跳过秒数",
   "@skipSecondsAtStart": {},
   "skipSilence": "跳过无声",

@@ -3,12 +3,14 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:image/image.dart' as img;
+import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
+import '../state/podcast_group.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
 import '../util/custom_widget.dart';
@@ -28,72 +30,73 @@ class PodcastSetting extends StatefulWidget {
 }
 
 class _PodcastSettingState extends State<PodcastSetting> {
+  final _dbHelper = DBHelper();
   MarkStatus _markStatus = MarkStatus.none;
   RefreshCoverStatus _coverStatus = RefreshCoverStatus.none;
-  int _seconds = 0;
+  int _secondsStart;
+  int _secondsEnd;
+  bool _markConfirm;
+  bool _removeConfirm;
+  bool _showStartTimePicker;
+  bool _showEndTimePicker;
+
+  @override
+  void initState() {
+    super.initState();
+    _secondsStart = 0;
+    _secondsEnd = 0;
+    _markConfirm = false;
+    _removeConfirm = false;
+    _showStartTimePicker = false;
+    _showEndTimePicker = false;
+  }
 
   Future<void> _setAutoDownload(bool boo) async {
     var permission = await _checkPermmison();
     if (permission) {
-      var dbHelper = DBHelper();
-      await dbHelper.saveAutoDownload(widget.podcastLocal.id, boo: boo);
+      await _dbHelper.saveAutoDownload(widget.podcastLocal.id, boo: boo);
     }
     if (mounted) setState(() {});
   }
 
-  Future<void> _saveSkipSeconds(int seconds) async {
-    var dbHelper = DBHelper();
-    await dbHelper.saveSkipSeconds(widget.podcastLocal.id, seconds);
+  Future<void> _saveSkipSecondsStart(int seconds) async {
+    await _dbHelper.saveSkipSecondsStart(widget.podcastLocal.id, seconds);
+  }
+
+  Future<void> _saveSkipSecondsEnd(int seconds) async {
+    await _dbHelper.saveSkipSecondsEnd(widget.podcastLocal.id, seconds);
+  }
+
+  Future<bool> _getAutoDownload(String id) async {
+    return await _dbHelper.getAutoDownload(id);
+  }
+
+  Future<int> _getSkipSecondStart(String id) async {
+    return await _dbHelper.getSkipSecondsStart(id);
+  }
+
+  Future<int> _getSkipSecondEnd(String id) async {
+    return await _dbHelper.getSkipSecondsEnd(id);
   }
 
   Future<void> _markListened(String podcastId) async {
     setState(() {
       _markStatus = MarkStatus.start;
     });
-    var dbHelper = DBHelper();
-    var episodes = await dbHelper.getRssItem(podcastId, -1, reverse: true);
+    var episodes = await _dbHelper.getRssItem(podcastId, -1, reverse: true);
     for (var episode in episodes) {
-      var marked = await dbHelper.checkMarked(episode);
+      final marked = await _dbHelper.checkMarked(episode);
       if (!marked) {
         final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-        await dbHelper.saveHistory(history);
-        if (mounted) {
-          setState(() {
-            _markStatus = MarkStatus.complete;
-          });
-        }
+        await _dbHelper.saveHistory(history);
       }
     }
+    if (mounted) {
+      setState(() {
+        _markStatus = MarkStatus.complete;
+      });
+    }
   }
-
-  void _confirmMarkListened(BuildContext context) => generalDialog(
-        context,
-        title: Text(context.s.markConfirm),
-        content: Text(context.s.markConfirmContent),
-        actions: <Widget>[
-          FlatButton(
-            splashColor: context.accentColor.withAlpha(70),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              context.s.cancel,
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-          ),
-          FlatButton(
-            splashColor: context.accentColor.withAlpha(70),
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await _markListened(widget.podcastLocal.id);
-            },
-            child: Text(
-              context.s.confirm,
-              style: TextStyle(color: context.accentColor),
-            ),
-          )
-        ],
-      );
 
   Future<void> _refreshArtWork() async {
     setState(() => _coverStatus = RefreshCoverStatus.start);
@@ -161,17 +164,6 @@ class _PodcastSettingState extends State<PodcastSetting> {
     }
   }
 
-  Future<bool> _getAutoDownload(String id) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.getAutoDownload(id);
-  }
-
-  Future<int> _getSkipSecond(String id) async {
-    var dbHelper = DBHelper();
-    var seconds = await dbHelper.getSkipSeconds(id);
-    return seconds;
-  }
-
   Widget _getRefreshStatusIcon(RefreshCoverStatus status) {
     switch (status) {
       case RefreshCoverStatus.none:
@@ -194,130 +186,265 @@ class _PodcastSettingState extends State<PodcastSetting> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
+    final groupList = context.watch<GroupList>();
     return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          FutureBuilder<bool>(
-              future: _getAutoDownload(widget.podcastLocal.id),
-              initialData: false,
-              builder: (context, snapshot) {
-                return ListTile(
-                  onTap: () => _setAutoDownload(!snapshot.data),
-                  leading: SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CustomPaint(
-                      painter: DownloadPainter(
-                        color: context.brightness == Brightness.light
-                            ? Colors.grey[600]
-                            : Colors.white,
-                        fraction: 0,
-                        progressColor: context.accentColor,
-                      ),
-                    ),
-                  ),
-                  title: Text(s.autoDownload),
-                  trailing: Transform.scale(
-                    scale: 0.9,
-                    child: Switch(
-                        value: snapshot.data, onChanged: _setAutoDownload),
-                  ),
-                );
-              }),
-          Divider(height: 1),
-          FutureBuilder<int>(
-            future: _getSkipSecond(widget.podcastLocal.id),
-            initialData: 0,
-            builder: (context, snapshot) => ListTile(
-              onTap: () {
-                generalDialog(
-                  context,
-                  title: Text(s.skipSecondsAtStart, maxLines: 2),
-                  content: DurationPicker(
-                    duration: Duration(seconds: snapshot.data),
-                    onChange: (value) => _seconds = value.inSeconds,
-                  ),
-                  actions: <Widget>[
-                    FlatButton(
-                      splashColor: context.accentColor.withAlpha(70),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        _seconds = 0;
-                      },
-                      child: Text(
-                        s.cancel,
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ),
-                    FlatButton(
-                      splashColor: context.accentColor.withAlpha(70),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        _saveSkipSeconds(_seconds);
-                      },
-                      child: Text(
-                        s.confirm,
-                        style: TextStyle(color: context.accentColor),
-                      ),
-                    )
-                  ],
-                ).then((value) => setState(() {}));
-              },
-              leading: Icon(Icons.fast_forward),
-              title: Text(s.skipSecondsAtStart),
-              trailing: Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Text(snapshot.data.toTime),
-              ),
-            ),
-          ),
-          Divider(height: 1),
-          ListTile(
-              onTap: () {
-                if (_markStatus != MarkStatus.start) {
-                  _confirmMarkListened(context);
-                }
-              },
-              title: Text(s.menuMarkAllListened),
-              leading: SizedBox(
-                height: 20,
-                width: 20,
-                child: CustomPaint(
-                  painter: ListenedAllPainter(
-                      context.brightness == Brightness.light
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        FutureBuilder<bool>(
+            future: _getAutoDownload(widget.podcastLocal.id),
+            initialData: false,
+            builder: (context, snapshot) {
+              return ListTile(
+                onTap: () => _setAutoDownload(!snapshot.data),
+                leading: SizedBox(
+                  height: 22,
+                  width: 24,
+                  child: CustomPaint(
+                    painter: DownloadPainter(
+                      color: context.brightness == Brightness.light
                           ? Colors.grey[600]
                           : Colors.white,
-                      stroke: 2),
+                      fraction: 0,
+                      progressColor: context.accentColor,
+                    ),
+                  ),
                 ),
-              ),
-              trailing: Padding(
-                padding: const EdgeInsets.only(right: 10.0),
+                title: Text(s.autoDownload),
+                trailing: Transform.scale(
+                  scale: 0.9,
+                  child:
+                      Switch(value: snapshot.data, onChanged: _setAutoDownload),
+                ),
+              );
+            }),
+        FutureBuilder<int>(
+          future: _getSkipSecondStart(widget.podcastLocal.id),
+          initialData: 0,
+          builder: (context, snapshot) => ListTile(
+            onTap: () {
+              _secondsStart = 0;
+              setState(() {
+                _removeConfirm = false;
+                _markConfirm = false;
+                _showEndTimePicker = false;
+                _showStartTimePicker = !_showStartTimePicker;
+              });
+            },
+            leading: Icon(Icons.fast_forward),
+            title: Text(s.skipSecondsAtStart),
+            trailing: Padding(
+              padding: const EdgeInsets.only(right: 10.0),
+              child: Text(snapshot.data.toTime),
+            ),
+          ),
+        ),
+        if (_showStartTimePicker)
+          _TimePicker(
+              onCancel: () {
+                _secondsStart = 0;
+                setState(() => _showStartTimePicker = false);
+              },
+              onConfirm: () async {
+                await _saveSkipSecondsStart(_secondsStart);
+                setState(() => _showStartTimePicker = false);
+              },
+              onChange: (value) => _secondsStart = value.inSeconds),
+        FutureBuilder<int>(
+          future: _getSkipSecondEnd(widget.podcastLocal.id),
+          initialData: 0,
+          builder: (context, snapshot) => ListTile(
+            onTap: () {
+              _secondsEnd = 0;
+              setState(() {
+                _removeConfirm = false;
+                _markConfirm = false;
+                _showStartTimePicker = false;
+                _showEndTimePicker = !_showEndTimePicker;
+              });
+            },
+            leading: Icon(Icons.fast_rewind),
+            title: Text(s.skipSecondsAtEnd),
+            trailing: Padding(
+              padding: const EdgeInsets.only(right: 10.0),
+              child: Text(snapshot.data.toTime),
+            ),
+          ),
+        ),
+        if (_showEndTimePicker)
+          _TimePicker(
+            onCancel: () {
+              _secondsEnd = 0;
+              setState(() => _showEndTimePicker = false);
+            },
+            onConfirm: () async {
+              await _saveSkipSecondsEnd(_secondsEnd);
+              setState(() => _showEndTimePicker = false);
+            },
+            onChange: (value) => _secondsEnd = value.inSeconds,
+          ),
+        ListTile(
+            onTap: () {
+              if (_coverStatus != RefreshCoverStatus.start) {
+                _refreshArtWork();
+              }
+            },
+            title: Text(s.refreshArtwork),
+            leading: Icon(Icons.refresh),
+            trailing: Padding(
+                padding: const EdgeInsets.only(right: 15.0),
                 child: SizedBox(
                     height: 20,
                     width: 20,
-                    child: _markStatus == MarkStatus.none
-                        ? Center()
-                        : _markStatus == MarkStatus.start
-                            ? CircularProgressIndicator(strokeWidth: 2)
-                            : Icon(Icons.done)),
-              )),
-          Divider(height: 1),
-          ListTile(
-              onTap: () {
-                if (_coverStatus != RefreshCoverStatus.start) {
-                  _refreshArtWork();
-                }
-              },
-              title: Text(s.refreshArtwork),
-              leading: Icon(Icons.refresh),
-              trailing: Padding(
-                  padding: const EdgeInsets.only(right: 15.0),
-                  child: SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: _getRefreshStatusIcon(_coverStatus)))),
-          Divider(height: 1),
-        ]);
+                    child: _getRefreshStatusIcon(_coverStatus)))),
+        Divider(height: 1),
+        ListTile(
+            onTap: () {
+              setState(() {
+                _removeConfirm = false;
+                _showStartTimePicker = false;
+                _showEndTimePicker = false;
+                _markConfirm = !_markConfirm;
+              });
+            },
+            title: Text(s.menuMarkAllListened,
+                style: TextStyle(
+                    color: context.accentColor, fontWeight: FontWeight.bold)),
+            leading: SizedBox(
+              height: 22,
+              width: 24,
+              child: CustomPaint(
+                painter: ListenedAllPainter(
+                    context.brightness == Brightness.light
+                        ? Colors.grey[600]
+                        : Colors.white,
+                    stroke: 2),
+              ),
+            ),
+            trailing: Padding(
+              padding: const EdgeInsets.only(right: 10.0),
+              child: SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: _markStatus == MarkStatus.none
+                      ? Center()
+                      : _markStatus == MarkStatus.start
+                          ? CircularProgressIndicator(strokeWidth: 2)
+                          : Icon(Icons.done)),
+            )),
+        if (_markConfirm)
+          Container(
+            width: double.infinity,
+            color: context.primaryColorDark,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                FlatButton(
+                    onPressed: () => setState(() {
+                          _markConfirm = false;
+                        }),
+                    child: Text(
+                      s.cancel,
+                      style: TextStyle(color: Colors.grey[600]),
+                    )),
+                FlatButton(
+                    onPressed: () {
+                      if (_markStatus != MarkStatus.start) {
+                        _markListened(widget.podcastLocal.id);
+                      }
+                      setState(() {
+                        _markConfirm = false;
+                      });
+                    },
+                    child: Text(s.confirm,
+                        style: TextStyle(color: context.accentColor))),
+              ],
+            ),
+          ),
+        ListTile(
+          onTap: () {
+            setState(() {
+              _markConfirm = false;
+              _showStartTimePicker = false;
+              _showEndTimePicker = false;
+              _removeConfirm = !_removeConfirm;
+            });
+          },
+          title: Text(s.remove,
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          leading: Icon(Icons.delete, color: Colors.red),
+        ),
+        if (_removeConfirm)
+          Container(
+            width: double.infinity,
+            color: context.primaryColorDark,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                FlatButton(
+                  onPressed: () => setState(() {
+                    _removeConfirm = false;
+                  }),
+                  child:
+                      Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
+                ),
+                FlatButton(
+                    splashColor: Colors.red.withAlpha(70),
+                    onPressed: () {
+                      groupList.removePodcast(widget.podcastLocal.id);
+                      Navigator.of(context).pop();
+                    },
+                    child:
+                        Text(s.confirm, style: TextStyle(color: Colors.red))),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _TimePicker extends StatelessWidget {
+  const _TimePicker({this.onConfirm, this.onCancel, this.onChange, Key key})
+      : super(key: key);
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+  final ValueChanged<Duration> onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.s;
+    return Container(
+      color: context.primaryColorDark,
+      child: Column(
+        children: [
+          SizedBox(height: 10),
+          DurationPicker(
+            key: key,
+            onChange: onChange,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              FlatButton(
+                onPressed: onCancel,
+                child: Text(
+                  s.cancel,
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+              FlatButton(
+                splashColor: context.accentColor.withAlpha(70),
+                onPressed: onConfirm,
+                child: Text(
+                  s.confirm,
+                  style: TextStyle(color: context.accentColor),
+                ),
+              )
+            ],
+          )
+        ],
+      ),
+    );
   }
 }

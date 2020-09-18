@@ -82,14 +82,14 @@ class __PodcastCardState extends State<_PodcastCard>
 
   Future<int> _getSkipSecond(String id) async {
     var dbHelper = DBHelper();
-    var seconds = await dbHelper.getSkipSeconds(id);
+    var seconds = await dbHelper.getSkipSecondsStart(id);
     _skipSeconds = seconds;
     return seconds;
   }
 
   _saveSkipSeconds(String id, int seconds) async {
     var dbHelper = DBHelper();
-    await dbHelper.saveSkipSeconds(id, seconds);
+    await dbHelper.saveSkipSecondsStart(id, seconds);
   }
 
   _setAutoDownload(String id, bool boo) async {
@@ -463,8 +463,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                           ),
                                         ),
                                         FlatButton(
-                                          splashColor:
-                                              context.accentColor.withAlpha(70),
+                                          splashColor: Colors.red.withAlpha(70),
                                           onPressed: () {
                                             groupList.removePodcast(
                                                 widget.podcastLocal.id);

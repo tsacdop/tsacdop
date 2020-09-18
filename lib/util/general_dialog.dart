@@ -41,25 +41,37 @@ Future generalSheet(BuildContext context, {Widget child, String title}) async =>
         elevation: 2,
         context: context,
         builder: (context) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 2.0),
-                child: Container(
-                  height: 4,
-                  width: 25,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2.0),
-                      color: context.primaryColorDark),
-                ),
+          return SafeArea(
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 10.0, bottom: 2.0),
+                    child: Container(
+                      height: 4,
+                      width: 25,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2.0),
+                          color: context.primaryColorDark),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: 50, right: 50, top: 6.0, bottom: 15),
+                    child: Text(
+                      title,
+                      style: context.textTheme.headline6,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                  Divider(height: 1),
+                  child,
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 6.0),
-                child: Text(title, style: context.textTheme.headline6),
-              ),
-              Divider(height: 1),
-              child,
-            ],
+            ),
           );
         });

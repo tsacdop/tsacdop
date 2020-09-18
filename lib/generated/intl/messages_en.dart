@@ -308,6 +308,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
     "showNotesFonts" : MessageLookupByLibrary.simpleMessage("Show notes font"),
     "size" : MessageLookupByLibrary.simpleMessage("Size"),
+    "skipSecondsAtEnd" : MessageLookupByLibrary.simpleMessage("Skip seconds at end"),
     "skipSecondsAtStart" : MessageLookupByLibrary.simpleMessage("Skip seconds at start"),
     "skipSilence" : MessageLookupByLibrary.simpleMessage("Skip silence"),
     "skipToNext" : MessageLookupByLibrary.simpleMessage("Skip to next"),

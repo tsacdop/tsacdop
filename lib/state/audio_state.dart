@@ -920,6 +920,13 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> _playFromStart() async {
     _playing = true;
     _session.setActive(true);
+    if (mediaItem.extras['skipSecondsStart'] > 0 ||
+        mediaItem.extras['skipSecondsEnd'] > 0) {
+      //_audioPlayer.seek(Duration(seconds: mediaItem.extras['skip']));
+      _audioPlayer.setClip(
+          start: Duration(seconds: mediaItem.extras['skipSecondsStart']),
+          end: Duration(seconds: mediaItem.extras['skipSecondsEnd']));
+    }
     if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
         _audioPlayer.playbackEvent.state != AudioPlaybackState.none) {
       try {
@@ -927,9 +934,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
       } catch (e) {
         _setState(processingState: AudioProcessingState.error);
       }
-    }
-    if (mediaItem.extras['skip'] > 0) {
-      _audioPlayer.seek(Duration(seconds: mediaItem.extras['skip']));
     }
   }
 

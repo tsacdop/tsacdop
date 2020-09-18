@@ -635,24 +635,20 @@ class DurationPicker extends StatelessWidget {
       @required this.onChange,
       this.snapToMins,
       this.width,
-      this.height});
+      this.height,
+      Key key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: width ?? _kDurationPickerWidthPortrait / 1.5,
-        height: height ?? _kDurationPickerHeightPortrait / 1.5,
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(
-                child: _Dial(
-                  duration: duration,
-                  onChanged: onChange,
-                  snapToMins: snapToMins,
-                ),
-              ),
-            ]));
+      width: width ?? _kDurationPickerWidthPortrait / 1.5,
+      height: height ?? _kDurationPickerHeightPortrait / 1.5,
+      child: _Dial(
+        duration: duration,
+        onChanged: onChange,
+        snapToMins: snapToMins,
+      ),
+    );
   }
 }

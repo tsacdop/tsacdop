@@ -354,7 +354,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
             case 2:
               generalSheet(
                 context,
-                title: s.settings,
+                title: widget.podcastLocal.title,
                 child: PodcastSetting(podcastLocal: widget.podcastLocal),
               ).then((value) => setState(() {}));
               break;
@@ -674,7 +674,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var _color = widget.podcastLocal.primaryColor.colorizedark();
+    final color = widget.podcastLocal.primaryColor.colorizedark();
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -745,7 +745,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   color: Colors.white,
                                 ),
                                 expandedHeight: 150 + context.paddingTop,
-                                backgroundColor: _color,
+                                backgroundColor: color,
                                 floating: true,
                                 pinned: true,
                                 flexibleSpace: LayoutBuilder(

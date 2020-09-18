@@ -2362,6 +2362,16 @@ class S {
     );
   }
 
+  /// `Skip seconds at end`
+  String get skipSecondsAtEnd {
+    return Intl.message(
+      'Skip seconds at end',
+      name: 'skipSecondsAtEnd',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Skip seconds at start`
   String get skipSecondsAtStart {
     return Intl.message(

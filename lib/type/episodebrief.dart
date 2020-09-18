@@ -21,7 +21,8 @@ class EpisodeBrief extends Equatable {
   final String imagePath;
   final String mediaId;
   final int isNew;
-  final int skipSeconds;
+  final int skipSecondsStart;
+  final int skipSecondsEnd;
   final int downloadDate;
   EpisodeBrief(
       this.title,
@@ -37,7 +38,8 @@ class EpisodeBrief extends Equatable {
       {this.mediaId,
       this.liked,
       this.downloaded,
-      this.skipSeconds,
+      this.skipSecondsStart,
+      this.skipSecondsEnd,
       this.description = '',
       this.downloadDate = 0})
       : assert(enclosureUrl != null);
@@ -50,7 +52,10 @@ class EpisodeBrief extends Equatable {
         album: feedTitle,
         duration: Duration.zero,
         artUri: 'file://$imagePath',
-        extras: {'skip': skipSeconds});
+        extras: {
+          'skipSecondsStart': skipSecondsStart,
+          'skipSecondsEnd': skipSecondsEnd
+        });
   }
 
   ImageProvider get avatarImage {
@@ -72,7 +77,8 @@ class EpisodeBrief extends Equatable {
           primaryColor, duration, explicit, imagePath, isNew,
           mediaId: mediaId ?? this.mediaId,
           downloaded: downloaded,
-          skipSeconds: skipSeconds,
+          skipSecondsStart: skipSecondsStart,
+          skipSecondsEnd: skipSecondsEnd,
           description: description,
           downloadDate: downloadDate);
 

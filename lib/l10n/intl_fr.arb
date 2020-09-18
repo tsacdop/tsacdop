@@ -535,6 +535,8 @@
   "@showNotesFonts": {},
   "size": "Taille",
   "@size": {},
+  "skipSecondsAtEnd": "Skip seconds at end",
+  "@skipSecondsAtEnd": {},
   "skipSecondsAtStart": "Passer les premières secondes du début",
   "@skipSecondsAtStart": {},
   "skipSilence": "Skip silence",

@@ -308,6 +308,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "share" : MessageLookupByLibrary.simpleMessage("分享"),
     "showNotesFonts" : MessageLookupByLibrary.simpleMessage("节目简介字体"),
     "size" : MessageLookupByLibrary.simpleMessage("大小"),
+    "skipSecondsAtEnd" : MessageLookupByLibrary.simpleMessage("结束跳过秒数"),
     "skipSecondsAtStart" : MessageLookupByLibrary.simpleMessage("开头跳过秒数"),
     "skipSilence" : MessageLookupByLibrary.simpleMessage("跳过无声"),
     "skipToNext" : MessageLookupByLibrary.simpleMessage("下一首"),

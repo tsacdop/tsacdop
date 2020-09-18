@@ -27,7 +27,7 @@ class DBHelper {
     var documentsDirectory = await getDatabasesPath();
     var path = join(documentsDirectory, "podcasts.db");
     var theDb = await openDatabase(path,
-        version: 3, onCreate: _onCreate, onUpgrade: _onUpgrade);
+        version: 4, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -37,14 +37,15 @@ class DBHelper {
         imageUrl TEXT,rssUrl TEXT UNIQUE, primaryColor TEXT, author TEXT, 
         description TEXT, add_date INTEGER, imagePath TEXT, provider TEXT, link TEXT, 
         background_image TEXT DEFAULT '', hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0,
-        episode_count INTEGER DEFAULT 0, skip_seconds INTEGER DEFAULT 0, auto_download INTEGER DEFAULT 0)""");
+        episode_count INTEGER DEFAULT 0, skip_seconds INTEGER DEFAULT 0, 
+        auto_download INTEGER DEFAULT 0, skip_seconds_end INTEGER DEFAULT 0)""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
         description TEXT, feed_id TEXT, feed_link TEXT, milliseconds INTEGER, 
         duration INTEGER DEFAULT 0, explicit INTEGER DEFAULT 0, liked INTEGER DEFAULT 0, 
-        liked_date INTEGER DEFAULT 0, downloaded TEXT DEFAULT 'ND', download_date INTEGER DEFAULT 0, media_id TEXT, 
-        is_new INTEGER DEFAULT 0)""");
+        liked_date INTEGER DEFAULT 0, downloaded TEXT DEFAULT 'ND', 
+        download_date INTEGER DEFAULT 0, media_id TEXT, is_new INTEGER DEFAULT 0)""");
     await db.execute(
         """CREATE TABLE PlayHistory(id INTEGER PRIMARY KEY, title TEXT, enclosure_url TEXT,
         seconds REAL, seek_value REAL, add_date INTEGER, listen_time INTEGER DEFAULT 0)""");
@@ -59,9 +60,16 @@ class DBHelper {
           "ALTER TABLE PodcastLocal ADD skip_seconds INTEGER DEFAULT 0 ");
       await db.execute(
           "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
+      await db.execute(
+          "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
     } else if (oldVersion == 2) {
       await db.execute(
           "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
+      await db.execute(
+          "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
+    } else if (oldVersion == 3) {
+      await db.execute(
+          "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
     }
   }
 
@@ -130,17 +138,31 @@ class DBHelper {
     return list.first['count'];
   }
 
-  Future<int> getSkipSeconds(String id) async {
+  Future<int> getSkipSecondsStart(String id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT skip_seconds FROM PodcastLocal WHERE id = ?', [id]);
     return list.first['skip_seconds'];
   }
 
-  Future<int> saveSkipSeconds(String id, int seconds) async {
+  Future<int> saveSkipSecondsStart(String id, int seconds) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET skip_seconds = ? WHERE id = ?", [seconds, id]);
+  }
+
+  Future<int> getSkipSecondsEnd(String id) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT skip_seconds_end FROM PodcastLocal WHERE id = ?', [id]);
+    return list.first['skip_seconds_end'];
+  }
+
+  Future<int> saveSkipSecondsEnd(String id, int seconds) async {
+    var dbClient = await database;
+    return await dbClient.rawUpdate(
+        "UPDATE PodcastLocal SET skip_seconds_end = ? WHERE id = ?",
+        [seconds, id]);
   }
 
   Future<bool> getAutoDownload(String id) async {
@@ -1336,8 +1358,8 @@ class DBHelper {
     EpisodeBrief episode;
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
-        P.title as feed_title, E.duration, E.explicit, P.skip_seconds,E.is_new,
-        P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
+        P.title as feed_title, E.duration, E.explicit, P.skip_seconds, P.skip_seconds_end, 
+        E.is_new, P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.enclosure_url = ?""", [url]);
     if (list.isEmpty) {
       return null;
@@ -1354,7 +1376,8 @@ class DBHelper {
           list.first['imagePath'],
           list.first['is_new'],
           mediaId: list.first['media_id'],
-          skipSeconds: list.first['skip_seconds']);
+          skipSecondsStart: list.first['skip_seconds'],
+          skipSecondsEnd: list.first['skip_seconds_end']);
       return episode;
     }
   }
@@ -1364,9 +1387,9 @@ class DBHelper {
     EpisodeBrief episode;
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
-        P.title as feed_title, E.duration, E.explicit, P.skip_seconds,E.is_new,
-        P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
-        WHERE E.media_id = ?""", [id]);
+        P.title as feed_title, E.duration, E.explicit, P.skip_seconds, P.skip_seconds_end,
+        E.is_new, P.primaryColor, E.media_id FROM Episodes E INNER JOIN 
+        PodcastLocal P ON E.feed_id = P.id WHERE E.media_id = ?""", [id]);
     if (list.isEmpty) {
       return null;
     } else {
@@ -1382,7 +1405,8 @@ class DBHelper {
           list.first['imagePath'],
           list.first['is_new'],
           mediaId: list.first['media_id'],
-          skipSeconds: list.first['skip_seconds']);
+          skipSecondsStart: list.first['skip_seconds'],
+          skipSecondsEnd: list.first['skip_seconds_end']);
       return episode;
     }
   }
