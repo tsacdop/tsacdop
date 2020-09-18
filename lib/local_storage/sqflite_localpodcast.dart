@@ -127,7 +127,8 @@ class DBHelper {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT episode_count FROM PodcastLocal WHERE id = ?', [id]);
-    return list.first['episode_count'];
+    if (list.isNotEmpty) return list.first['episode_count'];
+    return 0;
   }
 
   Future<int> getPodcastUpdateCounts(String id) async {
@@ -135,14 +136,16 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         'SELECt count(*) as count FROM Episodes WHERE feed_id = ? AND is_new = 1',
         [id]);
-    return list.first['count'];
+    if (list.isNotEmpty) return list.first['count'];
+    return 0;
   }
 
   Future<int> getSkipSecondsStart(String id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT skip_seconds FROM PodcastLocal WHERE id = ?', [id]);
-    return list.first['skip_seconds'];
+    if (list.isNotEmpty) return list.first['skip_seconds'];
+    return 0;
   }
 
   Future<int> saveSkipSecondsStart(String id, int seconds) async {
@@ -155,7 +158,8 @@ class DBHelper {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT skip_seconds_end FROM PodcastLocal WHERE id = ?', [id]);
-    return list.first['skip_seconds_end'];
+    if (list.isNotEmpty) return list.first['skip_seconds_end'];
+    return 0;
   }
 
   Future<int> saveSkipSecondsEnd(String id, int seconds) async {
@@ -169,7 +173,8 @@ class DBHelper {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT auto_download FROM PodcastLocal WHERE id = ?', [id]);
-    return list.first['auto_download'] == 1;
+    if (list.isNotEmpty) return list.first['auto_download'] == 1;
+    return false;
   }
 
   Future<int> saveAutoDownload(String id, {bool boo}) async {
@@ -230,7 +235,7 @@ class DBHelper {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT background_image, hosts FROM PodcastLocal WHERE id = ?', [id]);
-    if (list.length > 0) {
+    if (list.isNotEmpty) {
       var data = <String>[list.first['background_image'], list.first['hosts']];
       return data;
     }
@@ -316,8 +321,11 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         "SELECT SUM(listen_time) FROM PlayHistory WHERE enclosure_url = ?",
         [url]);
-    i = list.first['SUM(listen_time)'];
-    return i ?? 0;
+    if (list.isEmpty) {
+      i = list.first['SUM(listen_time)'];
+      return i ?? 0;
+    }
+    return 0;
   }
 
   Future<int> markNotListened(String url) async {

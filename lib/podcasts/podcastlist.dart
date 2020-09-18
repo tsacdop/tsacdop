@@ -12,8 +12,10 @@ import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
 import '../util/extension_helper.dart';
+import '../util/general_dialog.dart';
 import '../util/pageroute.dart';
 import 'podcast_detail.dart';
+import 'podcast_settings.dart';
 
 class AboutPodcast extends StatefulWidget {
   final PodcastLocal podcastLocal;
@@ -76,10 +78,9 @@ class _AboutPodcastState extends State<AboutPodcast> {
             !_load
                 ? Center()
                 : _description != null ? Html(data: _description) : Center(),
-            (widget.podcastLocal.author != null)
-                ? Text(widget.podcastLocal.author,
-                    style: TextStyle(color: Colors.blue))
-                : Center(),
+            if (widget.podcastLocal.author != null)
+              Text(widget.podcastLocal.author,
+                  style: TextStyle(color: Colors.blue))
           ],
         ),
       ),
@@ -93,7 +94,7 @@ class PodcastList extends StatefulWidget {
 }
 
 class _PodcastListState extends State<PodcastList> {
-  Future<List<PodcastLocal>> getPodcastLocal() async {
+  Future<List<PodcastLocal>> _getPodcastLocal() async {
     var dbHelper = DBHelper();
     var podcastList = await dbHelper.getPodcastLocalAll();
     return podcastList;
@@ -101,11 +102,11 @@ class _PodcastListState extends State<PodcastList> {
 
   @override
   Widget build(BuildContext context) {
-    var _width = MediaQuery.of(context).size.width;
+    final width = context.width;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarColor: context.primaryColor,
         systemNavigationBarIconBrightness:
             Theme.of(context).accentColorBrightness,
       ),
@@ -116,13 +117,12 @@ class _PodcastListState extends State<PodcastList> {
         ),
         body: SafeArea(
           child: Container(
-            color: Theme.of(context).primaryColor,
+            color: context.primaryColor,
             child: FutureBuilder<List<PodcastLocal>>(
-              future: getPodcastLocal(),
+              future: _getPodcastLocal(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return CustomScrollView(
-                    primary: false,
                     slivers: <Widget>[
                       SliverPadding(
                         padding: const EdgeInsets.all(10.0),
@@ -144,62 +144,40 @@ class _PodcastListState extends State<PodcastList> {
                                     )),
                                   );
                                 },
-                                onLongPress: () {
-                                  showGeneralDialog(
-                                      context: context,
-                                      barrierDismissible: true,
-                                      barrierLabel:
-                                          MaterialLocalizations.of(context)
-                                              .modalBarrierDismissLabel,
-                                      barrierColor: Colors.black54,
-                                      transitionDuration:
-                                          const Duration(milliseconds: 200),
-                                      pageBuilder: (context, animaiton,
-                                              secondaryAnimation) =>
-                                          AnnotatedRegion<SystemUiOverlayStyle>(
-                                            value: SystemUiOverlayStyle(
-                                              statusBarIconBrightness:
-                                                  Brightness.light,
-                                              systemNavigationBarColor:
-                                                  Theme.of(context)
-                                                              .brightness ==
-                                                          Brightness.light
-                                                      ? Color.fromRGBO(
-                                                          113, 113, 113, 1)
-                                                      : Color.fromRGBO(
-                                                          15, 15, 15, 1),
-                                            ),
-                                            child: AboutPodcast(
-                                                podcastLocal:
-                                                    snapshot.data[index]),
-                                          ));
+                                onLongPress: () async {
+                                  generalSheet(
+                                    context,
+                                    title: snapshot.data[index].title,
+                                    child: PodcastSetting(
+                                        podcastLocal: snapshot.data[index]),
+                                  ).then((value) {
+                                    if (mounted) setState(() {});
+                                  });
                                 },
-                                child: Container(
+                                child: Align(
                                   alignment: Alignment.center,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
-                                      Container(
+                                      SizedBox(
                                         height: 10.0,
                                       ),
                                       ClipRRect(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(_width / 8)),
+                                        borderRadius:
+                                            BorderRadius.circular(width / 8),
                                         child: Container(
-                                          height: _width / 4,
-                                          width: _width / 4,
+                                          height: width / 4,
+                                          width: width / 4,
                                           child: Image.file(File(
                                               "${snapshot.data[index].imagePath}")),
                                         ),
                                       ),
-                                      Container(
-                                        padding: EdgeInsets.all(4.0),
+                                      Padding(
+                                        padding: const EdgeInsets.all(4.0),
                                         child: Text(
                                           snapshot.data[index].title,
                                           textAlign: TextAlign.center,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText1,
+                                          style: context.textTheme.bodyText1,
                                           maxLines: 2,
                                         ),
                                       ),
@@ -215,7 +193,12 @@ class _PodcastListState extends State<PodcastList> {
                     ],
                   );
                 }
-                return Text('NoData');
+                return Center(
+                  child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator()),
+                );
               },
             ),
           ),

@@ -16,7 +16,6 @@ import '../type/podcastlocal.dart';
 import '../util/custom_widget.dart';
 import '../util/duraiton_picker.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
 
 enum MarkStatus { start, complete, none }
 enum RefreshCoverStatus { start, complete, error, none }
@@ -390,8 +389,8 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 ),
                 FlatButton(
                     splashColor: Colors.red.withAlpha(70),
-                    onPressed: () {
-                      groupList.removePodcast(widget.podcastLocal.id);
+                    onPressed: () async {
+                      await groupList.removePodcast(widget.podcastLocal.id);
                       Navigator.of(context).pop();
                     },
                     child:

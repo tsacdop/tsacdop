@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/podcasts/podcastlist.dart';
 import 'package:tsacdop/util/general_dialog.dart';
 import 'package:tuple/tuple.dart';
 
@@ -166,6 +167,15 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                               );
                                             }
                                           },
+                                          onLongPress: () {
+                                            if (!import) {
+                                              Navigator.push(
+                                                context,
+                                                SlideLeftRoute(
+                                                    page: PodcastList()),
+                                              );
+                                            }
+                                          },
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           child: Padding(
@@ -314,6 +324,15 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                                 context,
                                                 SlideLeftRoute(
                                                     page: PodcastManage()),
+                                              );
+                                            }
+                                          },
+                                          onLongPress: () {
+                                            if (!import) {
+                                              Navigator.push(
+                                                context,
+                                                SlideLeftRoute(
+                                                    page: PodcastList()),
                                               );
                                             }
                                           },

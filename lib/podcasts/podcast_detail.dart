@@ -44,6 +44,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       GlobalKey<RefreshIndicatorState>();
 
   final GlobalKey<AudioPanelState> _playerKey = GlobalKey<AudioPanelState>();
+  final _dbHelper = DBHelper();
 
   /// Episodes total count.
   int _episodeCount;
@@ -100,8 +101,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   }
 
   Future _updateRssItem(BuildContext context, PodcastLocal podcastLocal) async {
-    var dbHelper = DBHelper();
-    final result = await dbHelper.updatePodcastRss(podcastLocal);
+    final result = await _dbHelper.updatePodcastRss(podcastLocal);
     if (result >= 0) {
       Fluttertoast.showToast(
         msg: context.s.updateEpisodesCount(result),
@@ -109,14 +109,14 @@ class _PodcastDetailState extends State<PodcastDetail> {
       );
     }
     if (result > 0) {
-      var autoDownload = await dbHelper.getAutoDownload(podcastLocal.id);
+      var autoDownload = await _dbHelper.getAutoDownload(podcastLocal.id);
       if (autoDownload) {
         var downloader = Provider.of<DownloadState>(context, listen: false);
         var result = await Connectivity().checkConnectivity();
         var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
         var autoDownloadNetwork = await autoDownloadStorage.getInt();
         if (autoDownloadNetwork == 1) {
-          var episodes = await dbHelper.getNewEpisodes(podcastLocal.id);
+          var episodes = await _dbHelper.getNewEpisodes(podcastLocal.id);
           // For safety
           if (episodes.length < 100) {
             for (var episode in episodes) {
@@ -124,7 +124,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
             }
           }
         } else if (result == ConnectivityResult.wifi) {
-          var episodes = await dbHelper.getNewEpisodes(podcastLocal.id);
+          var episodes = await _dbHelper.getNewEpisodes(podcastLocal.id);
           //For safety
           if (episodes.length < 100) {
             for (var episode in episodes) {
@@ -144,9 +144,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal,
       {int count, bool reverse, Filter filter, String query}) async {
-    var dbHelper = DBHelper();
     var episodes = <EpisodeBrief>[];
-    _episodeCount = await dbHelper.getPodcastCounts(podcastLocal.id);
+    _episodeCount = await _dbHelper.getPodcastCounts(podcastLocal.id);
     var storage = KeyValueStorage(podcastLayoutKey);
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
     var index = await storage.getInt(defaultValue: 1);
@@ -154,7 +153,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
-    episodes = await dbHelper.getRssItem(podcastLocal.id, count,
+    episodes = await _dbHelper.getRssItem(podcastLocal.id, count,
         reverse: reverse,
         filter: filter,
         query: query,
@@ -182,6 +181,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
     var hideListened = await hideListenedStorage.getBool(defaultValue: false);
     return hideListened;
+  }
+
+  Future<void> _checkPodcast() async {
+    final exist = await _dbHelper.checkPodcast(widget.podcastLocal.rssUrl);
+    if (exist == '') {
+      Navigator.of(context).pop();
+    }
   }
 
   Widget _podcastInfo(BuildContext context) {
@@ -356,7 +362,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
                 context,
                 title: widget.podcastLocal.title,
                 child: PodcastSetting(podcastLocal: widget.podcastLocal),
-              ).then((value) => setState(() {}));
+              ).then((value) {
+                _checkPodcast();
+                setState(() {});
+              });
               break;
           }
         },

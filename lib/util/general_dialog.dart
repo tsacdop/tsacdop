@@ -33,45 +33,46 @@ Future generalDialog(BuildContext context,
 
 Future generalSheet(BuildContext context, {Widget child, String title}) async =>
     await showModalBottomSheet(
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
-        ),
-        elevation: 2,
-        context: context,
-        builder: (context) {
-          return SafeArea(
-            child: SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 2.0),
-                    child: Container(
-                      height: 4,
-                      width: 25,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2.0),
-                          color: context.primaryColorDark),
-                    ),
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
+      ),
+      elevation: 2,
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, bottom: 2.0),
+                  child: Container(
+                    height: 4,
+                    width: 25,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(2.0),
+                        color: context.primaryColorDark),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        left: 50, right: 50, top: 6.0, bottom: 15),
-                    child: Text(
-                      title,
-                      style: context.textTheme.headline6,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.clip,
-                    ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: 50, right: 50, top: 6.0, bottom: 15),
+                  child: Text(
+                    title,
+                    style: context.textTheme.headline6,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.clip,
                   ),
-                  Divider(height: 1),
-                  child,
-                ],
-              ),
+                ),
+                Divider(height: 1),
+                child,
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
