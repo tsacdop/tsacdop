@@ -642,15 +642,16 @@ class _PodcastDetailState extends State<PodcastDetail> {
                 }),
             FutureBuilder<int>(
                 future: _getLayout(),
-                initialData: 1,
                 builder: (context, snapshot) {
-                  if (_layout == null) _layout = Layout.values[snapshot.data];
+                  if (_layout == null && snapshot.data != null) {
+                    _layout = Layout.values[snapshot.data];
+                  }
                   return Material(
                     color: Colors.transparent,
                     clipBehavior: Clip.hardEdge,
                     borderRadius: BorderRadius.circular(100),
                     child: LayoutButton(
-                      layout: _layout,
+                      layout: _layout ?? Layout.two,
                       onPressed: (layout) => setState(() {
                         _layout = layout;
                       }),
