@@ -658,6 +658,16 @@ class S {
     );
   }
 
+  /// `Congratulations! You  have linked gpodder.net account successfully. Tsacdop will automatically sync subscriptions on your device with your gpodder.net account.`
+  String get gpodderLoginDes {
+    return Intl.message(
+      'Congratulations! You  have linked gpodder.net account successfully. Tsacdop will automatically sync subscriptions on your device with your gpodder.net account.',
+      name: 'gpodderLoginDes',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Group already exists`
   String get groupExisted {
     return Intl.message(
@@ -837,6 +847,16 @@ class S {
     );
   }
 
+  /// `Integrate with {service}`
+  String intergateWith(Object service) {
+    return Intl.message(
+      'Integrate with $service',
+      name: 'intergateWith',
+      desc: 'Integrate with',
+      args: [service],
+    );
+  }
+
   /// `You can long press on episode card for quick actions.`
   String get introFourthPage {
     return Intl.message(
@@ -863,6 +883,26 @@ class S {
       'You can create new group for podcasts.',
       name: 'introThirdPage',
       desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid username`
+  String get invalidName {
+    return Intl.message(
+      'Invalid username',
+      name: 'invalidName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last update`
+  String get lastUpdate {
+    return Intl.message(
+      'Last update',
+      name: 'lastUpdate',
+      desc: 'gpodder.net update',
       args: [],
     );
   }
@@ -943,6 +983,46 @@ class S {
       'Load more',
       name: 'loadMore',
       desc: '',
+      args: [],
+    );
+  }
+
+  /// `Logged in as {userName}`
+  String loggedInAs(Object userName) {
+    return Intl.message(
+      'Logged in as $userName',
+      name: 'loggedInAs',
+      desc: 'gpodder.net',
+      args: [userName],
+    );
+  }
+
+  /// `Login`
+  String get login {
+    return Intl.message(
+      'Login',
+      name: 'login',
+      desc: 'gpodder.net login',
+      args: [],
+    );
+  }
+
+  /// `Login failed`
+  String get loginFailed {
+    return Intl.message(
+      'Login failed',
+      name: 'loginFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Logout`
+  String get logout {
+    return Intl.message(
+      'Logout',
+      name: 'logout',
+      desc: 'gpodder.net logout',
       args: [],
     );
   }
@@ -1248,6 +1328,26 @@ class S {
     return Intl.message(
       'Oldest first',
       name: 'oldestFirst',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Password required`
+  String get passwdRequired {
+    return Intl.message(
+      'Password required',
+      name: 'passwdRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Password`
+  String get password {
+    return Intl.message(
+      'Password',
+      name: 'password',
       desc: '',
       args: [],
     );
@@ -2412,6 +2512,16 @@ class S {
     );
   }
 
+  /// `Status`
+  String get status {
+    return Intl.message(
+      'Status',
+      name: 'status',
+      desc: 'gpodder.net status',
+      args: [],
+    );
+  }
+
   /// `Stop`
   String get stop {
     return Intl.message(
@@ -2437,6 +2547,16 @@ class S {
     return Intl.message(
       'Export OPML file of all podcasts',
       name: 'subscribeExportDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sync now`
+  String get syncNow {
+    return Intl.message(
+      'Sync now',
+      name: 'syncNow',
       desc: '',
       args: [],
     );
@@ -2705,6 +2825,26 @@ class S {
     );
   }
 
+  /// `Username`
+  String get username {
+    return Intl.message(
+      'Username',
+      name: 'username',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Username required`
+  String get usernameRequired {
+    return Intl.message(
+      'Username required',
+      name: 'usernameRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Version: {version}`
   String version(Object version) {
     return Intl.message(
@@ -2724,6 +2864,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
       Locale.fromSubtags(languageCode: 'en'),
       Locale.fromSubtags(languageCode: 'es'),
       Locale.fromSubtags(languageCode: 'fr'),
+      Locale.fromSubtags(languageCode: 'pt'),
       Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
     ];
   }

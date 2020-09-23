@@ -101,9 +101,9 @@ class AboutApp extends StatelessWidget {
       ),
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
-        appBar: AppBar(title: Center()
-            // Text(s.homeToprightMenuAbout),
-            ),
+        appBar: AppBar(
+          title: Text(s.homeToprightMenuAbout),
+        ),
         body: SafeArea(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
@@ -268,7 +268,9 @@ class AboutApp extends StatelessWidget {
                         _translatorInfo(context, name: 'Atrate'),
                         _translatorInfo(context, name: 'ppp', flag: 'fr'),
                         _translatorInfo(context,
-                            name: 'Joel Israel', flag: 'mx')
+                            name: 'Joel Israel', flag: 'mx'),
+                        _translatorInfo(context,
+                            name: 'Bruno Pinheiro', flag: 'pt'),
                       ],
                     ),
                   ),
