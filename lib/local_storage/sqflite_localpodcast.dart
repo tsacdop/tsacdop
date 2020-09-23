@@ -242,7 +242,7 @@ class DBHelper {
     return ['', ''];
   }
 
-  Future delPodcastLocal(String id) async {
+  Future<void> delPodcastLocal(String id) async {
     var dbClient = await database;
     await dbClient.rawDelete('DELETE FROM PodcastLocal WHERE id =?', [id]);
     List<Map> list = await dbClient.rawQuery(
@@ -255,10 +255,10 @@ class DBHelper {
       }
     }
     await dbClient.rawDelete('DELETE FROM Episodes WHERE feed_id=?', [id]);
-    var _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var milliseconds = DateTime.now().millisecondsSinceEpoch;
     await dbClient.rawUpdate(
         """UPDATE SubscribeHistory SET remove_date = ? , status = ? WHERE id = ?""",
-        [_milliseconds, 1, id]);
+        [milliseconds, 1, id]);
   }
 
   Future<void> saveHistory(PlayHistory history) async {

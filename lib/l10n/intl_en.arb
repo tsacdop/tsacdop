@@ -140,6 +140,8 @@
   },
   "goodNight": "Good Night",
   "@goodNight": {},
+  "gpodderLoginDes": "Congratulations! You  have linked gpodder.net account successfully. Tsacdop will automatically sync subscriptions on your device with your gpodder.net account.",
+  "@gpodderLoginDes": {},
   "groupExisted": "Group already exists",
   "@groupExisted": {
     "description": "Group name validate in add group dialog. User can't add group with same name."
@@ -180,12 +182,25 @@
   "@hoursCount": {},
   "import": "Import",
   "@import": {},
+  "intergateWith": "Integrate with {service}",
+  "@intergateWith": {
+    "description": "Integrate with",
+    "placeholders": {
+      "service": {}
+    }
+  },
   "introFourthPage": "You can long press on episode card for quick actions.",
   "@introFourthPage": {},
   "introSecondPage": "Subscribe podcast via search or import OPML file.",
   "@introSecondPage": {},
   "introThirdPage": "You can create new group for podcasts.",
   "@introThirdPage": {},
+  "invalidName": "Invalid username",
+  "@invalidName": {},
+  "lastUpdate": "Last update",
+  "@lastUpdate": {
+    "description": "gpodder.net update"
+  },
   "later": "Later",
   "@later": {},
   "lightMode": "Light mode",
@@ -204,6 +219,23 @@
   "@listened": {},
   "loadMore": "Load more",
   "@loadMore": {},
+  "loggedInAs": "Logged in as {userName}",
+  "@loggedInAs": {
+    "description": "gpodder.net",
+    "placeholders": {
+      "userName": {}
+    }
+  },
+  "login": "Login",
+  "@login": {
+    "description": "gpodder.net login"
+  },
+  "loginFailed": "Login failed",
+  "@loginFailed": {},
+  "logout": "Logout",
+  "@logout": {
+    "description": "gpodder.net logout"
+  },
   "mark": "Mark",
   "@mark": {
     "description": "In listen history page, if a episode is marked as listened."
@@ -292,6 +324,10 @@
   },
   "oldestFirst": "Oldest first",
   "@oldestFirst": {},
+  "passwdRequired": "Password required",
+  "@passwdRequired": {},
+  "password": "Password",
+  "@password": {},
   "pause": "Pause",
   "@pause": {},
   "play": "Play",
@@ -547,12 +583,18 @@
   "@skipToNext": {},
   "sleepTimer": "Sleep timer",
   "@sleepTimer": {},
+  "status": "Status",
+  "@status": {
+    "description": "gpodder.net status"
+  },
   "stop": "Stop",
   "@stop": {},
   "subscribe": "Subscribe",
   "@subscribe": {},
   "subscribeExportDes": "Export OPML file of all podcasts",
   "@subscribeExportDes": {},
+  "syncNow": "Sync now",
+  "@syncNow": {},
   "systemDefault": "System default",
   "@systemDefault": {},
   "timeLastPlayed": "Last time {time}",
@@ -628,6 +670,10 @@
   "@updateEpisodesCount": {},
   "updateFailed": "Update failed, network error",
   "@updateFailed": {},
+  "username": "Username",
+  "@username": {},
+  "usernameRequired": "Username required",
+  "@usernameRequired": {},
   "version": "Version: {version}",
   "@version": {
     "placeholders": {

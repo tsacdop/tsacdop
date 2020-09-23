@@ -11,7 +11,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../local_storage/key_value_storage.dart';
-import '../service/ompl_build.dart';
+import '../service/opml_build.dart';
 import '../settings/settting.dart';
 import '../state/podcast_group.dart';
 import '../state/refresh_podcast.dart';
@@ -58,7 +58,8 @@ class _PopupMenuState extends State<PopupMenu> {
     final s = context.s;
     var file = File(path);
     try {
-      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(file);
+      final opml = file.readAsStringSync();
+      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(opml);
       for (var entry in data.entries) {
         var title = entry.key;
         var list = entry.value.reversed;
@@ -83,14 +84,16 @@ class _PopupMenuState extends State<PopupMenu> {
   void _getFilePath() async {
     final s = context.s;
     try {
-      var filePath = await FilePicker.getFilePath(type: FileType.any);
-      if (filePath == '') {
+      var filePickResult =
+          await FilePicker.platform.pickFiles(type: FileType.any);
+      if (filePickResult == null) {
         return;
       }
       Fluttertoast.showToast(
         msg: s.toastReadFile,
         gravity: ToastGravity.TOP,
       );
+      final filePath = filePickResult.files.first.path;
       _saveOmpl(filePath);
     } on PlatformException catch (e) {
       developer.log(e.toString(), name: 'Get OMPL file');

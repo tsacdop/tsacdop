@@ -924,9 +924,10 @@ class IconPainter extends StatelessWidget {
 
 /// A dot just a dot.
 class DotIndicator extends StatelessWidget {
-  DotIndicator({this.radius = 8, Key key})
+  DotIndicator({this.radius = 8, this.color, Key key})
       : assert(radius > 0),
         super(key: key);
+  final Color color;
   final double radius;
 
   @override
@@ -934,8 +935,8 @@ class DotIndicator extends StatelessWidget {
     return Container(
         width: radius,
         height: radius,
-        decoration:
-            BoxDecoration(shape: BoxShape.circle, color: context.accentColor));
+        decoration: BoxDecoration(
+            shape: BoxShape.circle, color: color ?? context.accentColor));
   }
 }
 

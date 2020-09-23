@@ -1,5 +1,4 @@
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:xml/xml.dart' as xml;
 import '../state/podcast_group.dart';
@@ -21,9 +20,9 @@ class OmplOutline {
 class PodcastsBackup {
   ///Group list for backup.
   final List<PodcastGroup> groups;
-  PodcastsBackup(this.groups) : assert(groups.length > 0);
+  PodcastsBackup(this.groups) : assert(groups.isNotEmpty);
 
-  omplBuilder() {
+  xml.XmlNode omplBuilder() {
     var builder = xml.XmlBuilder();
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
     builder.element('ompl', nest: () {
@@ -55,9 +54,9 @@ class PodcastsBackup {
     return builder.build();
   }
 
-  static parseOMPL(File file) {
+  static parseOMPL(String opml) {
     var data = <String, List<OmplOutline>>{};
-    var opml = file.readAsStringSync();
+    // var opml = file.readAsStringSync();
     var content = xml.XmlDocument.parse(opml);
     var title =
         content.findAllElements('head').first.findElements('title').first.text;

@@ -62,6 +62,7 @@ class _SettingsState extends State<Settings> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.all(10.0),
@@ -71,9 +72,7 @@ class _SettingsState extends State<Settings> {
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text(s.settingsPrefrence,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1
+                      style: context.textTheme.bodyText1
                           .copyWith(color: context.accentColor)),
                 ),
                 ListTile(

@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../.env.dart';
-import '../type/search_top_podcast.dart';
-import '../type/searchepisodes.dart';
-import '../type/searchpodcast.dart';
+import '../type/search_api/search_top_podcast.dart';
+import '../type/search_api/searchepisodes.dart';
+import '../type/search_api/searchpodcast.dart';
 
-class SearchEngine {
+class ListenNotesSearch {
   final apiKey = environment['apiKey'];
   Future<SearchPodcast<dynamic>> searchPodcasts(
       {String searchText, int nextOffset}) async {
@@ -48,6 +48,19 @@ class SearchEngine {
         }));
     Map searchResultMap = jsonDecode(response.toString());
     var searchResult = SearchTopPodcast.fromJson(searchResultMap);
+    return searchResult;
+  }
+}
+
+class ItunesSearch {
+  Future<SearchPodcast<dynamic>> searchPodcasts(
+      {String searchText, int limit}) async {
+    var url = "https://itunes.apple.com/search/search?q="
+        "${Uri.encodeComponent(searchText)}${"&media=podcast&entity=podcast&limit=$limit"}";
+    var response = await Dio()
+        .get(url, options: Options(headers: {'Accept': "application/json"}));
+    Map searchResultMap = jsonDecode(response.toString());
+    var searchResult = SearchPodcast.fromJson(searchResultMap);
     return searchResult;
   }
 }

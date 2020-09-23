@@ -59,7 +59,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
           splashColor: context.accentColor.withAlpha(70),
           padding: EdgeInsets.all(10.0),
           onPressed: () {
-            _groupList.removePodcast(widget.podcastLocal.id);
+            _groupList.removePodcast(widget.podcastLocal);
             Navigator.of(context).pop();
           },
           textColor: Colors.red,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../type/searchpodcast.dart';
+import '../type/search_api/searchpodcast.dart';
 
 class SearchState extends ChangeNotifier {
   final List<OnlinePodcast> _subscribedList = [];

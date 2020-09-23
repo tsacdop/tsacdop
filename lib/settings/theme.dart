@@ -185,10 +185,8 @@ class ThemeSetting extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 70),
               alignment: Alignment.centerLeft,
               child: Text(s.fontStyle,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText1
-                      .copyWith(color: Theme.of(context).accentColor)),
+                  style: context.textTheme.bodyText1
+                      .copyWith(color: context.accentColor)),
             ),
             Selector<SettingState, int>(
               selector: (_, setting) => setting.showNotesFontIndex,

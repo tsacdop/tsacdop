@@ -161,7 +161,7 @@ class SettingState extends ChangeNotifier {
   }
 
   Future cancelWork() async {
-    await Workmanager.cancelAll();
+    await Workmanager.cancelByUniqueName('1');
     developer.log('work job cancelled');
   }
 

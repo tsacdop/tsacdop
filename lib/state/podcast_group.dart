@@ -3,22 +3,38 @@ import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:color_thief_flutter/color_thief_flutter.dart';
 import 'package:dio/dio.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
-import 'package:webfeed/webfeed.dart';
 import 'package:uuid/uuid.dart';
-import 'package:equatable/equatable.dart';
+import 'package:webfeed/webfeed.dart';
+import 'package:workmanager/workmanager.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../service/gpodder_api.dart';
 import '../type/fireside_data.dart';
 import '../type/podcastlocal.dart';
+
+void callbackDispatcher() {
+  if (Platform.isAndroid) {
+    Workmanager.executeTask((task, inputData) async {
+      final gpodder = Gpodder();
+      final status = await gpodder.getChanges();
+      if (status == 200) {
+        await gpodder.updateChange();
+      }
+      return Future.value(true);
+    });
+  }
+}
 
 class GroupEntity {
   final String name;
@@ -134,16 +150,21 @@ class SubscribeItem {
 
   ///Podcast group, default Home.
   String group;
+
+  ///sync to gpodder
+  bool syncWithGpodder;
   SubscribeItem(this.url, this.title,
       {this.subscribeState = SubscribeState.none,
       this.id = '',
       this.imgUrl = '',
-      this.group = ''});
+      this.group = '',
+      this.syncWithGpodder = true});
 }
 
 class GroupList extends ChangeNotifier {
   /// List of all gourps.
   final List<PodcastGroup> _groups = [];
+
   List<PodcastGroup> get groups => _groups;
 
   final DBHelper _dbHelper = DBHelper();
@@ -155,6 +176,7 @@ class GroupList extends ChangeNotifier {
 
   /// Default false, true during loading groups from storage.
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   /// Svae ordered gourps info before saved.
@@ -177,14 +199,22 @@ class GroupList extends ChangeNotifier {
 
   /// Add subsribe item
   SubscribeItem _subscribeItem;
-  setSubscribeItem(SubscribeItem item) async {
+  setSubscribeItem(SubscribeItem item, {bool syncGpodder = true}) async {
     _subscribeItem = item;
+    if (syncGpodder) _syncAdd(item.url);
     await _start();
   }
 
   _setCurrentSubscribeItem(SubscribeItem item) {
     _currentSubscribeItem = item;
     notifyListeners();
+  }
+
+  Future<void> _syncAdd(String rssUrl) async {
+    final check = await _checkGpodderLoggedin();
+    if (check) {
+      await _addStorage.addList([rssUrl]);
+    }
   }
 
   Future _start() async {
@@ -197,7 +227,8 @@ class GroupList extends ChangeNotifier {
         _subscribeItem.url,
         _subscribeItem.title,
         _subscribeItem.imgUrl,
-        _subscribeItem.group
+        _subscribeItem.group,
+        _subscribeItem.syncWithGpodder
       ]);
     }
   }
@@ -217,7 +248,8 @@ class GroupList extends ChangeNotifier {
           _subscribeItem.url,
           _subscribeItem.title,
           _subscribeItem.imgUrl,
-          _subscribeItem.group
+          _subscribeItem.group,
+          _subscribeItem.syncWithGpodder
         ]);
       } else if (message is List) {
         _setCurrentSubscribeItem(SubscribeItem(
@@ -236,6 +268,65 @@ class GroupList extends ChangeNotifier {
         notifyListeners();
       }
     });
+  }
+
+  ///Set gpodder sync
+  final _loginInfp = KeyValueStorage(gpodderApiKey);
+  final _addStorage = KeyValueStorage(gpodderAddKey);
+  final _removeStorage = KeyValueStorage(gpodderRemoveKey);
+  final _remoteAddStorage = KeyValueStorage(gpodderRemoteAddKey);
+  final _remoteRemoveStorage = KeyValueStorage(gpodderRemoteRemoveKey);
+
+  Future<bool> _checkGpodderLoggedin() async {
+    final loginInfo = await _loginInfp.getStringList();
+    return loginInfo.isNotEmpty;
+  }
+
+  Future<void> gpodderSyncNow() async {
+    final addList = await _remoteAddStorage.getStringList();
+    final removeList = await _remoteRemoveStorage.getStringList();
+
+    if (removeList.isNotEmpty) {
+      for (var rssLink in removeList) {
+        final exist = await _dbHelper.checkPodcast(rssLink);
+        if (exist != '') {
+          await _unsubscribe(exist);
+        }
+      }
+      await _remoteAddStorage.clearList();
+    }
+    if (addList.isNotEmpty) {
+      for (var rssLink in addList) {
+        final exist = await _dbHelper.checkPodcast(rssLink);
+        if (exist == '') {
+          var item = SubscribeItem(rssLink, rssLink, group: 'Home');
+          _subscribeItem = item;
+          await _start();
+
+          await Future.delayed(Duration(milliseconds: 200));
+        }
+      }
+      await _remoteRemoveStorage.clearList();
+    }
+  }
+
+  void setWorkManager(int hour) {
+    Workmanager.initialize(
+      callbackDispatcher,
+      isInDebugMode: false,
+    );
+    Workmanager.registerPeriodicTask("2", "gpodder_sync",
+        frequency: Duration(hours: hour),
+        initialDelay: Duration(seconds: 10),
+        constraints: Constraints(
+          networkType: NetworkType.connected,
+        ));
+    developer.log('work manager init done + (gpodder sync)');
+  }
+
+  Future cancelWork() async {
+    await Workmanager.cancelByUniqueName('2');
+    developer.log('work job cancelled');
   }
 
   void addToOrderChanged(PodcastGroup group) {
@@ -261,6 +352,7 @@ class GroupList extends ChangeNotifier {
   @override
   void addListener(VoidCallback listener) {
     loadGroups().then((value) => super.addListener(listener));
+    gpodderSyncNow();
   }
 
   @override
@@ -414,7 +506,14 @@ class GroupList extends ChangeNotifier {
   }
 
   /// Unsubscribe podcast
-  Future<void> removePodcast(String id) async {
+  Future<void> _syncRemove(String rssUrl) async {
+    final check = await _checkGpodderLoggedin();
+    if (check) {
+      await _removeStorage.addList([rssUrl]);
+    }
+  }
+
+  Future<void> _unsubscribe(String id) async {
     _isLoading = true;
     notifyListeners();
     for (var group in _groups) {
@@ -429,7 +528,15 @@ class GroupList extends ChangeNotifier {
     notifyListeners();
   }
 
-  saveOrder(PodcastGroup group) async {
+  Future<void> removePodcast(
+    PodcastLocal podcast,
+  ) async {
+    _syncRemove(podcast.rssUrl);
+    final id = podcast.id;
+    await _unsubscribe(id);
+  }
+
+  Future<void> saveOrder(PodcastGroup group) async {
     group.podcastList = group.orderedPodcasts.map((e) => e.id).toList();
     await _saveGroup();
     await group.getPodcasts();
@@ -563,6 +670,13 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         }
         await dbHelper.savePodcastRss(p, uuid);
 
+        //   if (item.syncWithGpodder) {
+        //     final gpodder = Gpodder();
+        //     await gpodder.updateChange({
+        //       'add': [item.url]
+        //     });
+        //   }
+
         sendPort.send([item.title, item.url, 3, uuid]);
 
         await Future.delayed(Duration(seconds: 2));
@@ -600,9 +714,9 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
   }
 
   subReceivePort.distinct().listen((message) {
-    if (message is List<String>) {
+    if (message is List<dynamic>) {
       items.add(SubscribeItem(message[0], message[1],
-          imgUrl: message[2], group: message[3]));
+          imgUrl: message[2], group: message[3], syncWithGpodder: message[4]));
       if (!_running) {
         _subscribe(items.first);
         _running = true;

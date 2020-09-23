@@ -11,11 +11,11 @@ import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../local_storage/key_value_storage.dart';
-import '../service/api_search.dart';
+import '../service/search_api.dart';
 import '../state/podcast_group.dart';
 import '../state/search_state.dart';
-import '../type/searchepisodes.dart';
-import '../type/searchpodcast.dart';
+import '../type/search_api/searchepisodes.dart';
+import '../type/search_api/searchpodcast.dart';
 import '../util/extension_helper.dart';
 import 'pocast_discovery.dart';
 
@@ -359,7 +359,7 @@ class _SearchListState extends State<SearchList> {
   Future<List<OnlinePodcast>> _getList(
       String searchText, int nextOffset) async {
     if (nextOffset == 0) _saveHistory(searchText);
-    final searchEngine = SearchEngine();
+    final searchEngine = ListenNotesSearch();
     var searchResult = await searchEngine.searchPodcasts(
         searchText: searchText, nextOffset: nextOffset);
     _offset = searchResult.nextOffset;
@@ -562,7 +562,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
 
   Future<List<OnlineEpisode>> _getEpisodes(
       {String id, int nextEpisodeDate}) async {
-    var searchEngine = SearchEngine();
+    var searchEngine = ListenNotesSearch();
     var searchResult = await searchEngine.fetchEpisode(
         id: id, nextEpisodeDate: nextEpisodeDate);
     _nextEpisdoeDate = searchResult.nextEpisodeDate;

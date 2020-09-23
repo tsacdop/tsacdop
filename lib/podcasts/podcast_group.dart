@@ -466,7 +466,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                           splashColor: Colors.red.withAlpha(70),
                                           onPressed: () {
                                             groupList.removePodcast(
-                                                widget.podcastLocal.id);
+                                                widget.podcastLocal);
                                             Navigator.of(context).pop();
                                           },
                                           child: Text(

@@ -46,6 +46,13 @@ const String notificationLayoutKey = 'notificationLayoutKey';
 const String showNotesFontKey = 'showNotesFontKey';
 const String speedListKey = 'speedListKey';
 const String searchHistoryKey = 'searchHistoryKey';
+const String gpodderApiKey = 'gpodderApiKey';
+const String gpodderAddKey = 'gpodderAddKey';
+const String gpodderRemoveKey = 'gpodderRemoveKey';
+const String gpodderSyncStatusKey = 'gpodderSyncStatusKey';
+const String gpodderSyncDateTimeKey = 'gpodderSyncDateTimeKey';
+const String gpodderRemoteAddKey = 'gpodderRemoteAddKey';
+const String gpodderRemoteRemoveKey = 'gpodderRemoteRemoveKey';
 
 class KeyValueStorage {
   final String key;
@@ -177,5 +184,14 @@ class KeyValueStorage {
       await prefs.setDouble(key, defaultValue);
     }
     return prefs.getDouble(key);
+  }
+
+  Future<void> addList(List<String> addList) async {
+    final list = await getStringList();
+    await saveStringList(list..addAll(addList));
+  }
+
+  Future<void> clearList() async {
+    await saveStringList([]);
   }
 }

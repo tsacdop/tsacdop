@@ -140,6 +140,8 @@
   },
   "goodNight": "晚安",
   "@goodNight": {},
+  "gpodderLoginDes": "恭喜！您已经成功绑定 gpodder.net 账号，Tsacdop 将会自动同步您的订阅到 gpodder.net 账户。",
+  "@gpodderLoginDes": {},
   "groupExisted": "组名已使用",
   "@groupExisted": {
     "description": "Group name validate in add group dialog. User can't add group with same name."
@@ -180,12 +182,25 @@
   "@hoursCount": {},
   "import": "导入",
   "@import": {},
+  "intergateWith": "绑定 {service}",
+  "@intergateWith": {
+    "description": "Integrate with",
+    "placeholders": {
+      "service": {}
+    }
+  },
   "introFourthPage": "您可以长按节目打开快捷菜单。",
   "@introFourthPage": {},
   "introSecondPage": "您可以通过搜索订阅播客，也可以直接导入OPML文件。",
   "@introSecondPage": {},
   "introThirdPage": "您可以创建分组，上下滑动切换分组。",
   "@introThirdPage": {},
+  "invalidName": "用户名错误",
+  "@invalidName": {},
+  "lastUpdate": "最近更新",
+  "@lastUpdate": {
+    "description": "gpodder.net update"
+  },
   "later": "稍后",
   "@later": {},
   "lightMode": "明亮模式",
@@ -204,6 +219,23 @@
   "@listened": {},
   "loadMore": "加载更多",
   "@loadMore": {},
+  "loggedInAs": "使用{userName}登入",
+  "@loggedInAs": {
+    "description": "gpodder.net",
+    "placeholders": {
+      "userName": {}
+    }
+  },
+  "login": "登入",
+  "@login": {
+    "description": "gpodder.net login"
+  },
+  "loginFailed": "登入失败",
+  "@loginFailed": {},
+  "logout": "注销",
+  "@logout": {
+    "description": "gpodder.net logout"
+  },
   "mark": "标记",
   "@mark": {
     "description": "In listen history page, if a episode is marked as listened."
@@ -292,6 +324,10 @@
   },
   "oldestFirst": "由旧到新",
   "@oldestFirst": {},
+  "passwdRequired": "密码为空",
+  "@passwdRequired": {},
+  "password": "密码",
+  "@password": {},
   "pause": "暂停",
   "@pause": {},
   "play": "播放",
@@ -547,12 +583,18 @@
   "@skipToNext": {},
   "sleepTimer": "睡眠模式",
   "@sleepTimer": {},
+  "status": "状态",
+  "@status": {
+    "description": "gpodder.net status"
+  },
   "stop": "停止",
   "@stop": {},
   "subscribe": "订阅",
   "@subscribe": {},
   "subscribeExportDes": "导出 OPML 文件",
   "@subscribeExportDes": {},
+  "syncNow": "立即同步",
+  "@syncNow": {},
   "systemDefault": "系统默认",
   "@systemDefault": {},
   "timeLastPlayed": "上次播放{time}",
@@ -628,6 +670,10 @@
   "@updateEpisodesCount": {},
   "updateFailed": "更新失败",
   "@updateFailed": {},
+  "username": "用户名",
+  "@username": {},
+  "usernameRequired": "用户名为空",
+  "@usernameRequired": {},
   "version": "版本：{version}",
   "@version": {
     "placeholders": {

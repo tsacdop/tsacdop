@@ -390,7 +390,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 FlatButton(
                     splashColor: Colors.red.withAlpha(70),
                     onPressed: () async {
-                      await groupList.removePodcast(widget.podcastLocal.id);
+                      await groupList.removePodcast(widget.podcastLocal);
                       Navigator.of(context).pop();
                     },
                     child:

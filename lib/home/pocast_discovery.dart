@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../local_storage/key_value_storage.dart';
-import '../service/api_search.dart';
+import '../service/search_api.dart';
 import '../state/search_state.dart';
-import '../type/search_genre.dart';
-import '../type/searchpodcast.dart';
+import '../type/search_api/search_genre.dart';
+import '../type/search_api/searchpodcast.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 import 'search_podcast.dart';
@@ -113,7 +113,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
       ));
 
   Future<List<OnlinePodcast>> _getTopPodcasts({int page}) async {
-    final searchEngine = SearchEngine();
+    final searchEngine = ListenNotesSearch();
     var searchResult = await searchEngine.fetchBestPodcast(
       genre: '',
       page: page,
@@ -141,13 +141,12 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                         if (snapshot.hasData && snapshot.data.isNotEmpty) {
                           final history = snapshot.data;
                           return SizedBox(
-                            height: 50,
                             child: Wrap(
                               direction: Axis.horizontal,
                               children: history
                                   .map<Widget>((e) => Padding(
                                         padding: const EdgeInsets.fromLTRB(
-                                            8, 8, 0, 8),
+                                            8, 2, 0, 0),
                                         child: FlatButton.icon(
                                           color: Colors
                                               .accents[history.indexOf(e)]
@@ -159,7 +158,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                                           onPressed: () => widget.onTap(e),
                                           label: Text(e),
                                           icon: Icon(
-                                            Icons.bookmark_border,
+                                            Icons.search,
                                             size: 20,
                                           ),
                                         ),
@@ -313,7 +312,7 @@ class __TopPodcastListState extends State<_TopPodcastList> {
   bool _loading;
   int _page;
   Future<List<OnlinePodcast>> _getTopPodcasts({Genre genre, int page}) async {
-    final searchEngine = SearchEngine();
+    final searchEngine = ListenNotesSearch();
     var searchResult = await searchEngine.fetchBestPodcast(
       genre: genre.id,
       page: page,

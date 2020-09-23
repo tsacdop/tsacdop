@@ -33,6 +33,7 @@ Future generalDialog(BuildContext context,
 
 Future generalSheet(BuildContext context, {Widget child, String title}) async =>
     await showModalBottomSheet(
+      useRootNavigator: true,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -41,21 +42,21 @@ Future generalSheet(BuildContext context, {Widget child, String title}) async =>
       elevation: 2,
       context: context,
       builder: (context) {
+        final statusHeight = MediaQuery.of(context).padding.top;
         return SafeArea(
-          child: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
+          child: ConstrainedBox(
+            constraints:
+                BoxConstraints(maxHeight: context.height - statusHeight - 80),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Padding(
-                  padding: EdgeInsets.only(top: 10.0, bottom: 2.0),
-                  child: Container(
-                    height: 4,
-                    width: 25,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2.0),
-                        color: context.primaryColorDark),
-                  ),
+                Container(
+                  height: 4,
+                  width: 25,
+                  margin: EdgeInsets.only(top: 10.0, bottom: 2.0),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2.0),
+                      color: context.primaryColorDark),
                 ),
                 Padding(
                   padding: EdgeInsets.only(
@@ -69,7 +70,7 @@ Future generalSheet(BuildContext context, {Widget child, String title}) async =>
                   ),
                 ),
                 Divider(height: 1),
-                child,
+                Flexible(child: SingleChildScrollView(child: child)),
               ],
             ),
           ),
