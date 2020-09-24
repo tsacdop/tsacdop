@@ -390,7 +390,6 @@ class __TopPodcastListState extends State<_TopPodcastList> {
                               () {
                                 _loading = true;
                                 _page++;
-                                print(_page);
                                 _searchFuture = _getTopPodcasts(
                                     genre: widget.genre, page: _page);
                               },

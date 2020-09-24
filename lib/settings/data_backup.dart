@@ -12,8 +12,6 @@ import 'package:line_icons/line_icons.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/util/custom_widget.dart';
-import 'package:tuple/tuple.dart';
 import 'package:wc_flutter_share/wc_flutter_share.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -23,6 +21,7 @@ import '../service/opml_build.dart';
 import '../state/podcast_group.dart';
 import '../state/setting_state.dart';
 import '../type/settings_backup.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
 class DataBackup extends StatefulWidget {
@@ -151,9 +150,11 @@ class _DataBackupState extends State<DataBackup> {
   }
 
   Future<void> _syncNow() async {
-    setState(() {
-      _syncing = true;
-    });
+    if (mounted) {
+      setState(() {
+        _syncing = true;
+      });
+    }
     final gpodder = Gpodder();
     final status = await gpodder.getChanges();
 
@@ -169,10 +170,12 @@ class _DataBackupState extends State<DataBackup> {
     }
   }
 
-  Future<Tuple2<int, int>> _getSyncStatus() async {
-    final syncDateTime = await KeyValueStorage(gpodderSyncDateTimeKey).getInt();
-    final statusIndex = await KeyValueStorage(gpodderSyncStatusKey).getInt();
-    return Tuple2(syncDateTime, statusIndex);
+  Future<List<int>> _getSyncStatus() async {
+    var dateTimeStorage = KeyValueStorage(gpodderSyncDateTimeKey);
+    var statusStorage = KeyValueStorage(gpodderSyncStatusKey);
+    final syncDateTime = await dateTimeStorage.getInt();
+    final statusIndex = await statusStorage.getInt();
+    return [syncDateTime, statusIndex];
   }
 
   @override
@@ -186,228 +189,167 @@ class _DataBackupState extends State<DataBackup> {
             Theme.of(context).accentColorBrightness,
       ),
       child: Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            title: Text(s.settingsBackup),
-            backgroundColor: context.primaryColor,
-          ),
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(10.0),
-              ),
-              FutureBuilder<List<String>>(
-                  future: _getLoginInfo(),
-                  initialData: [],
-                  builder: (context, snapshot) {
-                    final loginInfo = snapshot.data;
-                    return Container(
-                      height: 160,
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Stack(
-                            children: [
-                              Hero(
-                                tag: 'gpodder.net',
-                                child: CircleAvatar(
-                                  minRadius: 40,
-                                  backgroundColor: context.primaryColor,
-                                  child: SizedBox(
-                                      height: 60,
-                                      width: 60,
-                                      child: Image.asset('assets/gpodder.png')),
-                                ),
+        appBar: AppBar(
+          elevation: 0,
+          title: Text(s.settingsBackup),
+          backgroundColor: context.primaryColor,
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(10.0),
+            ),
+            FutureBuilder<List<String>>(
+                future: _getLoginInfo(),
+                initialData: [],
+                builder: (context, snapshot) {
+                  final loginInfo = snapshot.data;
+                  return Container(
+                    height: 160,
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Stack(
+                          children: [
+                            Hero(
+                              tag: 'gpodder.net',
+                              child: CircleAvatar(
+                                minRadius: 40,
+                                backgroundColor: context.primaryColor,
+                                child: SizedBox(
+                                    height: 60,
+                                    width: 60,
+                                    child: Image.asset('assets/gpodder.png')),
                               ),
-                              if (_syncing)
-                                Positioned(
-                                  left: context.width / 2 - 40,
-                                  child: SizedBox(
-                                    height: 80,
-                                    width: 80,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1,
-                                    ),
-                                  ),
-                                ),
-                              if (_syncing)
-                                Positioned(
-                                    bottom: 39,
-                                    left: context.width / 2 - 12,
-                                    child: _OpenEye()),
-                              if (_syncing)
-                                Positioned(
-                                    bottom: 39,
-                                    left: context.width / 2 + 3,
-                                    child: _OpenEye()),
-                            ],
-                          ),
-                          Text(
-                              loginInfo.isEmpty
-                                  ? s.intergateWith('gpodder.net')
-                                  : s.loggedInAs(loginInfo.first),
-                              style: TextStyle(color: Colors.purple[700])),
-                          ButtonTheme(
-                            height: 32,
-                            child: OutlineButton(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100.0),
-                                  side: BorderSide(color: Colors.purple[700])),
-                              highlightedBorderColor: Colors.purple[700],
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    LineIcons.user,
-                                    color: Colors.purple[700],
-                                    size: context.textTheme.headline6.fontSize,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(loginInfo.isEmpty ? s.login : s.logout,
-                                      style:
-                                          TextStyle(color: Colors.purple[700])),
-                                ],
-                              ),
-                              onPressed: () {
-                                if (loginInfo.isEmpty) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => _LoginGpodder(),
-                                          fullscreenDialog: true));
-                                } else {
-                                  _logout();
-                                }
-                              },
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-              FutureBuilder<List<String>>(
-                  future: _getLoginInfo(),
-                  initialData: [],
-                  builder: (context, snapshot) {
-                    final loginInfo = snapshot.data;
-                    if (loginInfo.isNotEmpty) {
-                      return ListTile(
-                        contentPadding:
-                            const EdgeInsets.only(left: 70.0, right: 20),
-                        onTap: _syncNow,
-                        title: Text(s.syncNow),
-                        subtitle: FutureBuilder<Tuple2<int, int>>(
-                            future: _getSyncStatus(),
-                            initialData: Tuple2(0, 0),
-                            builder: (context, snapshot) {
-                              final dateTime = snapshot.data.item1;
-                              final status = snapshot.data.item2;
-                              return Wrap(
-                                children: [
-                                  Text(
-                                      '${s.lastUpdate}: ${dateTime.toDate(context)}'),
-                                  SizedBox(width: 8),
-                                  Text('${s.status}: '),
-                                  _syncStauts(status),
-                                ],
-                              );
-                            }),
-                      );
-                    }
-                    return Center();
-                  }),
-              Divider(height: 1),
-              Container(
-                height: 30.0,
-                padding: EdgeInsets.fromLTRB(70, 0, 70, 0),
-                alignment: Alignment.centerLeft,
-                child: Text(s.subscribe,
-                    style: context.textTheme.bodyText1
-                        .copyWith(color: context.accentColor)),
-              ),
-              Padding(
-                padding:
-                    EdgeInsets.only(left: 70.0, right: 20, top: 10, bottom: 10),
-                child: Text(s.subscribeExportDes),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 70.0, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    ButtonTheme(
-                      height: 32,
-                      child: OutlineButton(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100.0),
-                              side: BorderSide(color: Colors.green[700])),
-                          highlightedBorderColor: Colors.green[700],
-                          child: Row(
-                            children: [
-                              Icon(
-                                LineIcons.save,
-                                color: Colors.green[700],
-                                size: context.textTheme.headline6.fontSize,
+                            if (_syncing)
+                              Positioned(
+                                left: context.width / 2 - 40,
+                                child: SizedBox(
+                                  height: 80,
+                                  width: 80,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1,
+                                  ),
+                                ),
                               ),
-                              SizedBox(width: 10),
-                              Text(s.save,
-                                  style: TextStyle(color: Colors.green[700])),
-                            ],
+                            if (_syncing)
+                              Positioned(
+                                  bottom: 39,
+                                  left: context.width / 2 - 12,
+                                  child: _OpenEye()),
+                            if (_syncing)
+                              Positioned(
+                                  bottom: 39,
+                                  left: context.width / 2 + 3,
+                                  child: _OpenEye()),
+                          ],
+                        ),
+                        Text(
+                            loginInfo.isEmpty
+                                ? s.intergateWith('gpodder.net')
+                                : s.loggedInAs(loginInfo.first),
+                            style: TextStyle(color: Colors.purple[700])),
+                        ButtonTheme(
+                          height: 32,
+                          child: OutlineButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100.0),
+                                side: BorderSide(color: Colors.purple[700])),
+                            highlightedBorderColor: Colors.purple[700],
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  LineIcons.user,
+                                  color: Colors.purple[700],
+                                  size: context.textTheme.headline6.fontSize,
+                                ),
+                                SizedBox(width: 10),
+                                Text(loginInfo.isEmpty ? s.login : s.logout,
+                                    style:
+                                        TextStyle(color: Colors.purple[700])),
+                              ],
+                            ),
+                            onPressed: () {
+                              if (loginInfo.isEmpty) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => _LoginGpodder(),
+                                        fullscreenDialog: true));
+                              } else {
+                                _logout();
+                              }
+                            },
                           ),
-                          onPressed: () async {
-                            var file = await _exportOmpl(context);
-                            await _saveFile(file);
-                          }),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 10),
-                    ButtonTheme(
-                      height: 32,
-                      child: OutlineButton(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100.0),
-                              side: BorderSide(color: Colors.blue[700])),
-                          highlightedBorderColor: Colors.blue[700],
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.share,
-                                size: context.textTheme.headline6.fontSize,
-                                color: Colors.blue[700],
-                              ),
-                              SizedBox(width: 10),
-                              Text(s.share,
-                                  style: TextStyle(color: Colors.blue[700])),
-                            ],
-                          ),
-                          onPressed: () async {
-                            var file = await _exportOmpl(context);
-                            await _shareFile(file);
+                  );
+                }),
+            FutureBuilder<List<String>>(
+                future: _getLoginInfo(),
+                initialData: [],
+                builder: (context, snapshot) {
+                  final loginInfo = snapshot.data;
+                  if (loginInfo.isNotEmpty) {
+                    return ListTile(
+                      contentPadding:
+                          const EdgeInsets.only(left: 70.0, right: 20),
+                      onTap: _syncNow,
+                      title: Text(s.syncNow),
+                      subtitle: FutureBuilder<List<int>>(
+                          future: _getSyncStatus(),
+                          initialData: [0, 0],
+                          builder: (context, snapshot) {
+                            final dateTime = snapshot.data[0];
+                            final status = snapshot.data[1];
+                            return Wrap(
+                              children: [
+                                Text(
+                                    '${s.lastUpdate}: ${dateTime.toDate(context)}'),
+                                SizedBox(width: 8),
+                                Text('${s.status}: '),
+                                _syncStauts(status),
+                              ],
+                            );
                           }),
-                    )
-                  ],
-                ),
-              ),
-              Divider(),
-              Container(
-                height: 30.0,
-                padding: EdgeInsets.symmetric(horizontal: 70),
-                alignment: Alignment.centerLeft,
-                child: Text(s.settings,
-                    style: context.textTheme.bodyText1
-                        .copyWith(color: Theme.of(context).accentColor)),
-              ),
-              Padding(
-                padding:
-                    EdgeInsets.only(left: 70.0, right: 20, top: 10, bottom: 10),
-                child: Text(s.settingsExportDes),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 70.0, right: 10),
-                child: Wrap(children: [
+                    );
+                  }
+                  return Center();
+                }),
+            // ListTile(
+            //   onTap: () async {
+            //     final subscribeWorker = context.read<GroupList>();
+            //     await subscribeWorker.cancelWork();
+            //     subscribeWorker.setWorkManager();
+            //   },
+            //   title: Text('reset'),
+            // ),
+            Divider(height: 1),
+            Container(
+              height: 30.0,
+              padding: EdgeInsets.fromLTRB(70, 0, 70, 0),
+              alignment: Alignment.centerLeft,
+              child: Text(s.subscribe,
+                  style: context.textTheme.bodyText1
+                      .copyWith(color: context.accentColor)),
+            ),
+            Padding(
+              padding:
+                  EdgeInsets.only(left: 70.0, right: 20, top: 10, bottom: 10),
+              child: Text(s.subscribeExportDes),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 70.0, right: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
                   ButtonTheme(
                     height: 32,
                     child: OutlineButton(
@@ -416,7 +358,6 @@ class _DataBackupState extends State<DataBackup> {
                             side: BorderSide(color: Colors.green[700])),
                         highlightedBorderColor: Colors.green[700],
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               LineIcons.save,
@@ -429,7 +370,7 @@ class _DataBackupState extends State<DataBackup> {
                           ],
                         ),
                         onPressed: () async {
-                          var file = await _exportSetting(context);
+                          var file = await _exportOmpl(context);
                           await _saveFile(file);
                         }),
                   ),
@@ -442,7 +383,6 @@ class _DataBackupState extends State<DataBackup> {
                             side: BorderSide(color: Colors.blue[700])),
                         highlightedBorderColor: Colors.blue[700],
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.share,
@@ -455,41 +395,113 @@ class _DataBackupState extends State<DataBackup> {
                           ],
                         ),
                         onPressed: () async {
-                          var file = await _exportSetting(context);
+                          var file = await _exportOmpl(context);
                           await _shareFile(file);
                         }),
-                  ),
-                  SizedBox(width: 10),
-                  ButtonTheme(
-                    height: 32,
-                    child: OutlineButton(
-                      highlightedBorderColor: Colors.red[700],
+                  )
+                ],
+              ),
+            ),
+            Divider(),
+            Container(
+              height: 30.0,
+              padding: EdgeInsets.symmetric(horizontal: 70),
+              alignment: Alignment.centerLeft,
+              child: Text(s.settings,
+                  style: context.textTheme.bodyText1
+                      .copyWith(color: Theme.of(context).accentColor)),
+            ),
+            Padding(
+              padding:
+                  EdgeInsets.only(left: 70.0, right: 20, top: 10, bottom: 10),
+              child: Text(s.settingsExportDes),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 70.0, right: 10),
+              child: Wrap(children: [
+                ButtonTheme(
+                  height: 32,
+                  child: OutlineButton(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(color: Colors.red[700])),
+                          side: BorderSide(color: Colors.green[700])),
+                      highlightedBorderColor: Colors.green[700],
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            LineIcons.paperclip_solid,
+                            LineIcons.save,
+                            color: Colors.green[700],
                             size: context.textTheme.headline6.fontSize,
-                            color: Colors.red[700],
                           ),
                           SizedBox(width: 10),
-                          Text(s.import,
-                              style: TextStyle(color: Colors.red[700])),
+                          Text(s.save,
+                              style: TextStyle(color: Colors.green[700])),
                         ],
                       ),
-                      onPressed: () {
-                        _getFilePath(context);
-                      },
+                      onPressed: () async {
+                        var file = await _exportSetting(context);
+                        await _saveFile(file);
+                      }),
+                ),
+                SizedBox(width: 10),
+                ButtonTheme(
+                  height: 32,
+                  child: OutlineButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(color: Colors.blue[700])),
+                      highlightedBorderColor: Colors.blue[700],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.share,
+                            size: context.textTheme.headline6.fontSize,
+                            color: Colors.blue[700],
+                          ),
+                          SizedBox(width: 10),
+                          Text(s.share,
+                              style: TextStyle(color: Colors.blue[700])),
+                        ],
+                      ),
+                      onPressed: () async {
+                        var file = await _exportSetting(context);
+                        await _shareFile(file);
+                      }),
+                ),
+                SizedBox(width: 10),
+                ButtonTheme(
+                  height: 32,
+                  child: OutlineButton(
+                    highlightedBorderColor: Colors.red[700],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100.0),
+                        side: BorderSide(color: Colors.red[700])),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          LineIcons.paperclip_solid,
+                          size: context.textTheme.headline6.fontSize,
+                          color: Colors.red[700],
+                        ),
+                        SizedBox(width: 10),
+                        Text(s.import,
+                            style: TextStyle(color: Colors.red[700])),
+                      ],
                     ),
+                    onPressed: () {
+                      _getFilePath(context);
+                    },
                   ),
-                ]),
-              ),
-              Divider(height: 1)
-            ],
-          )),
+                ),
+              ]),
+            ),
+            Divider(height: 1)
+          ],
+        ),
+      ),
     );
   }
 }
@@ -634,7 +646,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
       }
     }
     await subscribeWorker.cancelWork();
-    subscribeWorker.setWorkManager(4);
+    subscribeWorker.setWorkManager();
   }
 
   String _validateName(String value) {
@@ -750,6 +762,8 @@ class __LoginGpodderState extends State<_LoginGpodder> {
                           child: Text(
                             s.gpodderLoginDes,
                             textAlign: TextAlign.center,
+                            style:
+                                context.textTheme.subtitle1.copyWith(height: 2),
                           ),
                         ),
                         Center(

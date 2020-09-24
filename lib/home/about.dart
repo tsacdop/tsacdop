@@ -191,15 +191,6 @@ class AboutApp extends StatelessWidget {
                             'https://github.com/stonega'),
                         _listItem(context, 'Medium', LineIcons.medium,
                             'https://medium.com/@stonegate'),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          child: Text(
-                            'I need to pay for podcast search API and '
-                            'always get headache without caffeine.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey[500]),
-                          ),
-                        ),
                         Center(
                           child: SizedBox(
                             width: 200,
@@ -221,7 +212,6 @@ class AboutApp extends StatelessWidget {
                                   children: <Widget>[
                                     Text('Buy me a coffee',
                                         style: TextStyle(
-                                            color: context.accentColor,
                                             fontWeight: FontWeight.bold)),
                                     SizedBox(width: 10),
                                     Image(
@@ -234,6 +224,15 @@ class AboutApp extends StatelessWidget {
                                 ),
                               ),
                             ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          child: Text(
+                            'I need to pay for podcast search API and '
+                            'always get headache without caffeine.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey[500]),
                           ),
                         ),
                       ],

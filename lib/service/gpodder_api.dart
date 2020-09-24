@@ -194,7 +194,6 @@ class Gpodder {
       final timeStamp = changes['timestamp'];
       final addList = changes['add'].cast<String>();
       final removeList = changes['remove'].cast<String>();
-      print(removeList);
       await _storage.saveStringList([username, deviceId, timeStamp.toString()]);
       await _remoteAddStorage.addList(addList);
       await _remoteRemoveStorage.addList(removeList);

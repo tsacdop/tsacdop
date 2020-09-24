@@ -107,7 +107,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
         ),
         Divider(height: 1),
         ListTile(
-          title: Text('português'),
+          title: Text('Português'),
           onTap: () => _setLocale(Locale('pt')),
           contentPadding: const EdgeInsets.only(left: 20, right: 20),
           trailing: Radio<Locale>(

@@ -30,6 +30,7 @@ void callbackDispatcher() {
       final status = await gpodder.getChanges();
       if (status == 200) {
         await gpodder.updateChange();
+        developer.log('Gpodder sync successfully');
       }
       return Future.value(true);
     });
@@ -310,14 +311,14 @@ class GroupList extends ChangeNotifier {
     }
   }
 
-  void setWorkManager(int hour) {
+  void setWorkManager() {
     Workmanager.initialize(
       callbackDispatcher,
       isInDebugMode: false,
     );
     Workmanager.registerPeriodicTask("2", "gpodder_sync",
-        frequency: Duration(hours: hour),
-        initialDelay: Duration(seconds: 10),
+        frequency: Duration(hours: 4),
+        initialDelay: Duration(seconds: 1),
         constraints: Constraints(
           networkType: NetworkType.connected,
         ));
