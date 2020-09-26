@@ -34,8 +34,12 @@ class RefreshWorker extends ChangeNotifier {
         refreshIsolateEntryPoint, receivePort.sendPort);
   }
 
-  void _listen() {
+  void _listen(List<String> podcasts) {
     receivePort.distinct().listen((message) {
+      if (message is SendPort) {
+        refreshSendPort = message;
+        refreshSendPort.send(podcasts);
+      }
       if (message is List) {
         _currentRefreshItem =
             RefreshItem(message[0], RefreshState.values[message[1]]);
@@ -51,11 +55,11 @@ class RefreshWorker extends ChangeNotifier {
     });
   }
 
-  Future<void> start() async {
+  Future<void> start(List<String> podcasts) async {
     if (!_created) {
       _complete = false;
-      _createIsolate();
-      _listen();
+      await _createIsolate();
+      _listen(podcasts);
       _created = true;
     }
   }
@@ -68,14 +72,30 @@ class RefreshWorker extends ChangeNotifier {
 }
 
 Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
-  var refreshstorage = KeyValueStorage(refreshdateKey);
-  await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
-  var dbHelper = DBHelper();
-  var podcastList = await dbHelper.getPodcastLocalAll();
-  for (var podcastLocal in podcastList) {
-    sendPort.send([podcastLocal.title, 1]);
-    var updateCount = await dbHelper.updatePodcastRss(podcastLocal);
-    developer.log('Refresh ${podcastLocal.title}$updateCount');
+  var refreshReceivePort = ReceivePort();
+  sendPort.send(refreshReceivePort.sendPort);
+  var _dbHelper = DBHelper();
+
+  Future<void> _refreshAll(List<String> podcasts) async {
+    var podcastList;
+    if (podcasts.isEmpty) {
+      var refreshstorage = KeyValueStorage(refreshdateKey);
+      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+      podcastList = await _dbHelper.getPodcastLocalAll(updateOnly: true);
+    } else {
+      podcastList = await _dbHelper.getPodcastLocal(podcasts, updateOnly: true);
+    }
+    for (var podcastLocal in podcastList) {
+      sendPort.send([podcastLocal.title, 1]);
+      var updateCount = await _dbHelper.updatePodcastRss(podcastLocal);
+      developer.log('Refresh ${podcastLocal.title}$updateCount');
+    }
+    sendPort.send("done");
   }
-  sendPort.send("done");
+
+  refreshReceivePort.distinct().listen((message) {
+    if (message is List<dynamic>) {
+      _refreshAll(message);
+    }
+  });
 }

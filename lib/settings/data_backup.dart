@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:device_info/device_info.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:confetti/confetti.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -299,23 +301,37 @@ class _DataBackupState extends State<DataBackup> {
                   final loginInfo = snapshot.data;
                   if (loginInfo.isNotEmpty) {
                     return ListTile(
-                      contentPadding:
-                          const EdgeInsets.only(left: 70.0, right: 20),
+                      contentPadding: const EdgeInsets.only(
+                          left: 70.0, right: 20, top: 10, bottom: 10),
                       onTap: _syncNow,
                       title: Text(s.syncNow),
+                      trailing: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => _GpodderInfo()));
+                        },
+                        icon: Icon(LineIcons.info_circle_solid),
+                      ),
                       subtitle: FutureBuilder<List<int>>(
                           future: _getSyncStatus(),
                           initialData: [0, 0],
                           builder: (context, snapshot) {
                             final dateTime = snapshot.data[0];
                             final status = snapshot.data[1];
-                            return Wrap(
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                     '${s.lastUpdate}: ${dateTime.toDate(context)}'),
                                 SizedBox(width: 8),
-                                Text('${s.status}: '),
-                                _syncStauts(status),
+                                Row(
+                                  children: [
+                                    Text('${s.status}: '),
+                                    _syncStauts(status),
+                                  ],
+                                ),
                               ],
                             );
                           }),
@@ -323,6 +339,7 @@ class _DataBackupState extends State<DataBackup> {
                   }
                   return Center();
                 }),
+
             // ListTile(
             //   onTap: () async {
             //     final subscribeWorker = context.read<GroupList>();
@@ -402,7 +419,7 @@ class _DataBackupState extends State<DataBackup> {
                 ],
               ),
             ),
-            Divider(),
+            Divider(height: 1),
             Container(
               height: 30.0,
               padding: EdgeInsets.symmetric(horizontal: 70),
@@ -568,11 +585,19 @@ class __LoginGpodderState extends State<_LoginGpodder> {
   var _username = '';
   var _password = '';
   LoginStatus _loginStatus;
+  ConfettiController _controller;
 
   @override
   void initState() {
     _loginStatus = LoginStatus.none;
+    _controller = ConfettiController(duration: Duration(seconds: 3));
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   final GlobalKey<FormFieldState<String>> _passwordFieldKey =
@@ -601,6 +626,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
             if (mounted) {
               setState(() {
                 _loginStatus = LoginStatus.complete;
+                _controller.play();
               });
             }
           }
@@ -635,9 +661,11 @@ class __LoginGpodderState extends State<_LoginGpodder> {
           var rssLink = rssExp.stringMatch(rss.xmlUrl);
           if (rssLink != null) {
             final dbHelper = DBHelper();
-            final exist = dbHelper.checkPodcast(rssLink);
+            final exist = await dbHelper.checkPodcast(rssLink);
             if (exist == '') {
-              var item = SubscribeItem(rssLink, rss.text, group: 'Home');
+              var item = SubscribeItem(
+                  rssLink, rss.text == '' ? rssLink : rss.text,
+                  group: 'Home');
               await subscribeWorker.setSubscribeItem(item, syncGpodder: false);
               await Future.delayed(Duration(milliseconds: 200));
             }
@@ -757,14 +785,37 @@ class __LoginGpodderState extends State<_LoginGpodder> {
               _loginStatus == LoginStatus.complete
                   ? SliverList(
                       delegate: SliverChildListDelegate([
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(40.0, 50, 40, 100),
-                          child: Text(
-                            s.gpodderLoginDes,
-                            textAlign: TextAlign.center,
-                            style:
-                                context.textTheme.subtitle1.copyWith(height: 2),
-                          ),
+                        Stack(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(40.0, 50, 40, 100),
+                              child: Text(
+                                s.gpodderLoginDes,
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.subtitle1
+                                    .copyWith(height: 2),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.center,
+                              child: ConfettiWidget(
+                                confettiController: _controller,
+                                blastDirectionality:
+                                    BlastDirectionality.explosive,
+                                emissionFrequency: 0.05,
+                                maximumSize: Size(20, 10),
+                                shouldLoop: false,
+                                colors: const [
+                                  Colors.green,
+                                  Colors.blue,
+                                  Colors.pink,
+                                  Colors.orange,
+                                  Colors.purple
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         Center(
                           child: OutlineButton(
@@ -773,7 +824,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
                               },
                               highlightedBorderColor: context.accentColor,
                               child: Text(s.back)),
-                        )
+                        ),
                       ]),
                     )
                   : Form(
@@ -916,6 +967,155 @@ class _PasswordFieldState extends State<PasswordField> {
             _obscureText ? Icons.visibility : Icons.visibility_off,
             color: context.accentColor,
             semanticLabel: _obscureText ? 'Show' : 'Hide',
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GpodderInfo extends StatefulWidget {
+  _GpodderInfo({Key key}) : super(key: key);
+
+  @override
+  __GpodderInfoState createState() => __GpodderInfoState();
+}
+
+class __GpodderInfoState extends State<_GpodderInfo> {
+  final _gpodder = Gpodder();
+  var _syncing = false;
+
+  Future<List<String>> _getLoginInfo() async {
+    final storage = KeyValueStorage(gpodderApiKey);
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    final deviceInfo = await storage.getStringList();
+    deviceInfo.add("Tsacdop on ${androidInfo.model}");
+    return deviceInfo;
+  }
+
+  Future<void> _fullSync() async {
+    if (mounted) {
+      setState(() {
+        _syncing = true;
+      });
+    }
+    final uploadStatus = await _gpodder.uploadSubscriptions();
+    if (uploadStatus == 200) {
+      var subscribeWorker = context.read<GroupList>();
+      var rssExp = RegExp(r'^(https?):\/\/(.*)');
+      final opml = await _gpodder.getAllPodcast();
+      if (opml != '') {
+        Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(opml);
+        for (var entry in data.entries) {
+          var list = entry.value.reversed;
+          for (var rss in list) {
+            var rssLink = rssExp.stringMatch(rss.xmlUrl);
+            if (rssLink != null) {
+              final dbHelper = DBHelper();
+              final exist = await dbHelper.checkPodcast(rssLink);
+              if (exist == '') {
+                var item = SubscribeItem(
+                    rssLink, rss.text == '' ? rssLink : rss.text,
+                    group: 'Home');
+                await subscribeWorker.setSubscribeItem(item,
+                    syncGpodder: false);
+                await Future.delayed(Duration(milliseconds: 200));
+              }
+            }
+          }
+        }
+      }
+    }
+    //await _syncNow();
+    if (mounted) {
+      setState(() {
+        _syncing = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.s;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Theme.of(context).primaryColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).accentColorBrightness,
+      ),
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+          top: false,
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                brightness: Brightness.dark,
+                iconTheme: IconThemeData(
+                  color: Colors.white,
+                ),
+                elevation: 0,
+                backgroundColor: context.accentColor,
+                expandedHeight: 200,
+                flexibleSpace: Container(
+                  height: 200,
+                  width: double.infinity,
+                  color: context.accentColor,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CircleAvatar(
+                        minRadius: 50,
+                        backgroundColor: context.primaryColor.withOpacity(0.3),
+                        child: SizedBox(
+                            height: 80,
+                            width: 80,
+                            child: Image.asset('assets/gpodder.png')),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(s.intergateWith('gpodder.net'),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  FutureBuilder<List<String>>(
+                      future: _getLoginInfo(),
+                      initialData: [],
+                      builder: (context, snapshot) {
+                        final deviceId =
+                            snapshot.data.isNotEmpty ? snapshot.data[1] : '';
+                        final deviceName =
+                            snapshot.data.isNotEmpty ? snapshot.data[3] : '';
+                        return Column(
+                          children: [
+                            ListTile(
+                              title: Text('Divice id'),
+                              subtitle: Text(deviceId),
+                            ),
+                            ListTile(
+                              title: Text('Divice name'),
+                              subtitle: Text(deviceName),
+                            ),
+                          ],
+                        );
+                      }),
+                  ListTile(
+                      onTap: _fullSync,
+                      // contentPadding:
+                      //     const EdgeInsets.only(left: 70.0, right: 20),
+                      title: Text('Full sync'),
+                      subtitle: Text('If sync have error')),
+                ]),
+              ),
+            ],
           ),
         ),
       ),

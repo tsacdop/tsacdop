@@ -21,7 +21,7 @@ void callbackDispatcher() {
   if (Platform.isAndroid) {
     Workmanager.executeTask((task, inputData) async {
       var dbHelper = DBHelper();
-      var podcastList = await dbHelper.getPodcastLocalAll();
+      var podcastList = await dbHelper.getPodcastLocalAll(updateOnly: false);
       //lastWork is a indicator for if the app was opened since last backgroundwork
       //if the app wes opend,then the old marked new episode would be marked not new.
       var lastWorkStorage = KeyValueStorage(lastWorkKey);

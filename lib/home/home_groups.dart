@@ -361,11 +361,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                 alignment: Alignment.centerLeft,
                                 color: context.scaffoldBackgroundColor,
                                 child: TabBar(
-                                  labelPadding: EdgeInsets.only(
-                                      top: 5.0,
-                                      bottom: 10.0,
-                                      left: 6.0,
-                                      right: 6.0),
+                                  labelPadding:
+                                      EdgeInsets.fromLTRB(6.0, 5.0, 6.0, 10.0),
                                   indicator: CircleTabIndicator(
                                       color: context.accentColor, radius: 3),
                                   isScrollable: true,
@@ -439,17 +436,30 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                   .podcasts
                                   .map<Widget>((podcastLocal) {
                                 return Container(
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.light
-                                          ? Theme.of(context).primaryColor
-                                          : Colors.black12),
-                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                  key: ObjectKey(podcastLocal.title),
-                                  child: PodcastPreview(
-                                    podcastLocal: podcastLocal,
-                                  ),
-                                );
+                                    decoration: BoxDecoration(
+                                        color: context.brightness ==
+                                                Brightness.light
+                                            ? context.primaryColor
+                                            : Colors.black12),
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 5.0),
+                                    key: ObjectKey(podcastLocal.title),
+                                    child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              SlideLeftRoute(
+                                                  page: PodcastDetail(
+                                                podcastLocal: podcastLocal,
+                                              )),
+                                            );
+                                          },
+                                          child: PodcastPreview(
+                                            podcastLocal: podcastLocal,
+                                          ),
+                                        )));
                               }).toList(),
                             ),
                           ),
@@ -513,27 +523,11 @@ class PodcastPreview extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Selector<AudioPlayerNotifier, bool>(
-                      selector: (_, audio) => audio.playerRunning,
-                      builder: (_, playerRunning, __) => IconButton(
-                        icon: Icon(Icons.arrow_forward),
-                        tooltip: context.s.homeGroupsSeeAll,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            SlideLeftRoute(
-                                page: PodcastDetail(
-                              podcastLocal: podcastLocal,
-                            )),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(Icons.arrow_forward),
+                    )),
               ),
             ],
           ),

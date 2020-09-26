@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +25,6 @@ class PopupMenu extends StatefulWidget {
 class _PopupMenuState extends State<PopupMenu> {
   Future<String> _getRefreshDate(BuildContext context) async {
     int refreshDate;
-    final s = context.s;
     var refreshstorage = KeyValueStorage('refreshdate');
     var i = await refreshstorage.getInt();
     if (i == 0) {
@@ -36,20 +34,21 @@ class _PopupMenuState extends State<PopupMenu> {
     } else {
       refreshDate = i;
     }
-    var date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
-    var difference = DateTime.now().difference(date);
-    if (difference.inSeconds < 60) {
-      return s.secondsAgo(difference.inSeconds);
-    } else if (difference.inMinutes < 60) {
-      return s.minsAgo(difference.inMinutes);
-    } else if (difference.inHours < 24) {
-      return s.hoursAgo(difference.inHours);
-    } else if (difference.inDays < 7) {
-      return s.daysAgo(difference.inDays);
-    } else {
-      return DateFormat.yMMMd()
-          .format(DateTime.fromMillisecondsSinceEpoch(refreshDate));
-    }
+    return refreshDate.toDate(context);
+    //  var date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
+    //  var difference = DateTime.now().difference(date);
+    //  if (difference.inSeconds < 60) {
+    //    return s.secondsAgo(difference.inSeconds);
+    //  } else if (difference.inMinutes < 60) {
+    //    return s.minsAgo(difference.inMinutes);
+    //  } else if (difference.inHours < 24) {
+    //    return s.hoursAgo(difference.inHours);
+    //  } else if (difference.inDays < 7) {
+    //    return s.daysAgo(difference.inDays);
+    //  } else {
+    //    return DateFormat.yMMMd()
+    //        .format(DateTime.fromMillisecondsSinceEpoch(refreshDate));
+    //  }
   }
 
   void _saveOmpl(String path) async {
@@ -198,8 +197,7 @@ class _PopupMenuState extends State<PopupMenu> {
         } else if (value == 2) {
           _getFilePath();
         } else if (value == 1) {
-          //_refreshAll();
-          refreshWorker.start();
+          refreshWorker.start([]);
         } else if (value == 3) {
           //  setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
         } else if (value == 4) {

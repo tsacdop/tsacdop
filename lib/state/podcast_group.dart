@@ -152,14 +152,14 @@ class SubscribeItem {
   ///Podcast group, default Home.
   String group;
 
-  ///sync to gpodder
-  bool syncWithGpodder;
-  SubscribeItem(this.url, this.title,
-      {this.subscribeState = SubscribeState.none,
-      this.id = '',
-      this.imgUrl = '',
-      this.group = '',
-      this.syncWithGpodder = true});
+  SubscribeItem(
+    this.url,
+    this.title, {
+    this.subscribeState = SubscribeState.none,
+    this.id = '',
+    this.imgUrl = '',
+    this.group = '',
+  });
 }
 
 class GroupList extends ChangeNotifier {
@@ -219,7 +219,7 @@ class GroupList extends ChangeNotifier {
   }
 
   Future _start() async {
-    if (_created == false) {
+    if (!_created) {
       await _createIsolate();
       _created = true;
       listen();
@@ -229,7 +229,6 @@ class GroupList extends ChangeNotifier {
         _subscribeItem.title,
         _subscribeItem.imgUrl,
         _subscribeItem.group,
-        _subscribeItem.syncWithGpodder
       ]);
     }
   }
@@ -250,7 +249,6 @@ class GroupList extends ChangeNotifier {
           _subscribeItem.title,
           _subscribeItem.imgUrl,
           _subscribeItem.group,
-          _subscribeItem.syncWithGpodder
         ]);
       } else if (message is List) {
         _setCurrentSubscribeItem(SubscribeItem(
@@ -717,7 +715,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
   subReceivePort.distinct().listen((message) {
     if (message is List<dynamic>) {
       items.add(SubscribeItem(message[0], message[1],
-          imgUrl: message[2], group: message[3], syncWithGpodder: message[4]));
+          imgUrl: message[2], group: message[3]));
       if (!_running) {
         _subscribe(items.first);
         _running = true;

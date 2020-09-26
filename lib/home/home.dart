@@ -526,12 +526,13 @@ class _PlaylistButton extends StatefulWidget {
 class __PlaylistButtonState extends State<_PlaylistButton> {
   bool _loadPlay;
 
-  _getPlaylist() async {
-    await Provider.of<AudioPlayerNotifier>(context, listen: false)
-        .loadPlaylist();
-    setState(() {
-      _loadPlay = true;
-    });
+  Future<void> _getPlaylist() async {
+    await context.read<AudioPlayerNotifier>().loadPlaylist();
+    if (mounted) {
+      setState(() {
+        _loadPlay = true;
+      });
+    }
   }
 
   @override
@@ -545,157 +546,158 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
   Widget build(BuildContext context) {
     var audio = context.watch<AudioPlayerNotifier>();
     final s = context.s;
-    return MyPopupMenuButton<int>(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      elevation: 1,
-      icon: Icon(Icons.playlist_play),
-      tooltip: s.menu,
-      itemBuilder: (context) => [
-        MyPopupMenuItem(
-          height: 50,
-          value: 1,
-          child: Container(
-            decoration: BoxDecoration(
-              //  color: Theme.of(context).accentColor,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  topRight: Radius.circular(10.0)),
-            ),
-            child: Selector<AudioPlayerNotifier, Tuple3<bool, Playlist, int>>(
-              selector: (_, audio) =>
-                  Tuple3(audio.playerRunning, audio.queue, audio.lastPositin),
-              builder: (_, data, __) => !_loadPlay
-                  ? Container(
-                      height: 8.0,
-                    )
-                  : data.item1 || data.item2.playlist.length == 0
-                      ? Container(
-                          height: 8.0,
-                        )
-                      : InkWell(
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10.0),
-                              topRight: Radius.circular(10.0)),
-                          onTap: () {
-                            audio.playlistLoad();
-                            Navigator.pop<int>(context);
-                          },
-                          child: Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 5),
-                              ),
-                              Stack(
-                                alignment: Alignment.center,
-                                children: <Widget>[
-                                  CircleAvatar(
-                                      radius: 20,
-                                      backgroundImage: data
-                                          .item2.playlist.first.avatarImage),
-                                  Container(
-                                    height: 40.0,
-                                    width: 40.0,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.black12),
-                                    child: Icon(
-                                      Icons.play_arrow,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 2),
-                              ),
-                              Container(
-                                height: 70,
-                                width: 140,
-                                child: Column(
+    return Material(
+      child: MyPopupMenuButton<int>(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        elevation: 1,
+        icon: Icon(Icons.playlist_play),
+        tooltip: s.menu,
+        itemBuilder: (context) => [
+          MyPopupMenuItem(
+            height: 50,
+            value: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0)),
+              ),
+              child: Selector<AudioPlayerNotifier, Tuple3<bool, Playlist, int>>(
+                selector: (_, audio) =>
+                    Tuple3(audio.playerRunning, audio.queue, audio.lastPositin),
+                builder: (_, data, __) => !_loadPlay
+                    ? SizedBox(
+                        height: 8.0,
+                      )
+                    : data.item1 || data.item2.playlist.length == 0
+                        ? SizedBox(
+                            height: 8.0,
+                          )
+                        : InkWell(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0)),
+                            onTap: () {
+                              audio.playlistLoad();
+                              Navigator.pop<int>(context);
+                            },
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5),
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
                                   children: <Widget>[
-                                    Text(
-                                      (data.item3 ~/ 1000).toTime,
-                                      // style:
-                                      // TextStyle(color: Colors.white)
-                                    ),
-                                    Text(
-                                      data.item2.playlist.first.title,
-                                      maxLines: 2,
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.fade,
-                                      // style: TextStyle(color: Colors.white),
+                                    CircleAvatar(
+                                        radius: 20,
+                                        backgroundImage: data
+                                            .item2.playlist.first.avatarImage),
+                                    Container(
+                                      height: 40.0,
+                                      width: 40.0,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black12),
+                                      child: Icon(
+                                        Icons.play_arrow,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              Divider(
-                                height: 1,
-                              ),
-                            ],
+                                Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 2),
+                                ),
+                                Container(
+                                  height: 70,
+                                  width: 140,
+                                  child: Column(
+                                    children: <Widget>[
+                                      Text(
+                                        (data.item3 ~/ 1000).toTime,
+                                        // style:
+                                        // TextStyle(color: Colors.white)
+                                      ),
+                                      Text(
+                                        data.item2.playlist.first.title,
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.fade,
+                                        // style: TextStyle(color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Divider(
+                                  height: 1,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-            ),
-          ),
-        ),
-        PopupMenuItem(
-          value: 0,
-          child: Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.playlist_play),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0),
-                ),
-                Text(s.homeMenuPlaylist),
-              ],
-            ),
-          ),
-        ),
-        PopupMenuDivider(
-          height: 1,
-        ),
-        PopupMenuItem(
-          value: 2,
-          child: Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.history),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                ),
-                Text(s.settingsHistory),
-              ],
-            ),
-          ),
-        ),
-        PopupMenuDivider(
-          height: 1,
-        ),
-      ],
-      onSelected: (value) {
-        if (value == 0) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PlaylistPage(
-                initPage: InitPage.playlist,
               ),
             ),
-          );
-        } else if (value == 2) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PlaylistPage(
-                initPage: InitPage.history,
+          ),
+          PopupMenuItem(
+            value: 0,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.playlist_play),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Text(s.homeMenuPlaylist),
+                ],
               ),
             ),
-          );
-        }
-      },
+          ),
+          PopupMenuDivider(
+            height: 1,
+          ),
+          PopupMenuItem(
+            value: 2,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.history),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Text(s.settingsHistory),
+                ],
+              ),
+            ),
+          ),
+          PopupMenuDivider(
+            height: 1,
+          ),
+        ],
+        onSelected: (value) {
+          if (value == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PlaylistPage(
+                  initPage: InitPage.playlist,
+                ),
+              ),
+            );
+          } else if (value == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PlaylistPage(
+                  initPage: InitPage.history,
+                ),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 }
@@ -707,6 +709,19 @@ class _RecentUpdate extends StatefulWidget {
 
 class _RecentUpdateState extends State<_RecentUpdate>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
+  Future _updateRssItem() async {
+    final refreshWorker = context.read<RefreshWorker>();
+    refreshWorker.start(_group);
+    await Future.delayed(Duration(seconds: 1));
+    Fluttertoast.showToast(
+      msg: 'Refresh started',
+      gravity: ToastGravity.BOTTOM,
+    );
+  }
+
   Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group,
       {bool hideListened}) async {
     var storage = KeyValueStorage(recentLayoutKey);
@@ -718,7 +733,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     }
     var dbHelper = DBHelper();
     List<EpisodeBrief> episodes;
-    if (group.first == 'All') {
+    if (group.isEmpty) {
       episodes =
           await dbHelper.getRecentRssItem(top, hideListened: _hideListened);
     } else {
@@ -731,7 +746,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
   Future<int> _getUpdateCounts(List<String> group) async {
     var dbHelper = DBHelper();
     var episodes = <EpisodeBrief>[];
-    if (group.first == 'All') {
+    if (group.isEmpty) {
       episodes = await dbHelper.getRecentNewRssItem();
     } else {
       episodes = await dbHelper.getGroupNewRssItem(group);
@@ -768,7 +783,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     super.initState();
     _loadMore = false;
     _groupName = 'All';
-    _group = ['All'];
+    _group = [];
     _scroll = false;
   }
 
@@ -820,24 +835,28 @@ class _RecentUpdateState extends State<_RecentUpdate>
                               }
                               return true;
                             },
-                            child: CustomScrollView(
-                                key: PageStorageKey<String>('update'),
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                slivers: <Widget>[
-                                  SliverToBoxAdapter(
-                                    child: Container(
-                                        height: 40,
-                                        color: context.primaryColor,
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: Row(
-                                            children: <Widget>[
-                                              Consumer<GroupList>(
-                                                builder: (context, groupList,
-                                                        child) =>
-                                                    Material(
-                                                  color: Colors.transparent,
-                                                  child:
+                            child: RefreshIndicator(
+                              key: _refreshIndicatorKey,
+                              color: context.accentColor,
+                              onRefresh: () async {
+                                await _updateRssItem();
+                              },
+                              child: CustomScrollView(
+                                  key: PageStorageKey<String>('update'),
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  slivers: <Widget>[
+                                    SliverToBoxAdapter(
+                                      child: Container(
+                                          height: 40,
+                                          color: context.primaryColor,
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: Row(
+                                              children: <Widget>[
+                                                Consumer<GroupList>(
+                                                  builder: (context, groupList,
+                                                          child) =>
                                                       PopupMenuButton<String>(
                                                     shape: RoundedRectangleBorder(
                                                         borderRadius:
@@ -903,7 +922,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                       if (value == 'All') {
                                                         setState(() {
                                                           _groupName = 'All';
-                                                          _group = ['All'];
+                                                          _group = [];
                                                         });
                                                       } else {
                                                         for (var group
@@ -923,129 +942,128 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                     },
                                                   ),
                                                 ),
-                                              ),
-                                              Spacer(),
-                                              FutureBuilder<int>(
-                                                  future:
-                                                      _getUpdateCounts(_group),
-                                                  initialData: 0,
-                                                  builder: (context, snapshot) {
-                                                    return snapshot.data != 0
-                                                        ? Material(
-                                                            color: Colors
-                                                                .transparent,
-                                                            child: IconButton(
-                                                                tooltip: s
-                                                                    .addNewEpisodeTooltip,
-                                                                icon: SizedBox(
-                                                                    height: 15,
-                                                                    width: 20,
-                                                                    child: CustomPaint(
-                                                                        painter: AddToPlaylistPainter(
-                                                                            context
-                                                                                .textTheme.bodyText1.color,
-                                                                            Colors
-                                                                                .red))),
-                                                                onPressed:
-                                                                    () async {
-                                                                  await audio
-                                                                      .addNewEpisode(
-                                                                          _group);
-                                                                  if (mounted) {
-                                                                    setState(
-                                                                        () {});
-                                                                  }
-                                                                  Fluttertoast
-                                                                      .showToast(
-                                                                    msg: _groupName ==
-                                                                            'All'
-                                                                        ? s.addNewEpisodeAll(snapshot
-                                                                            .data)
-                                                                        : s.addEpisodeGroup(
-                                                                            _groupName,
-                                                                            snapshot.data),
-                                                                    gravity:
-                                                                        ToastGravity
-                                                                            .BOTTOM,
-                                                                  );
-                                                                }),
-                                                          )
-                                                        : Material(
-                                                            color: Colors
-                                                                .transparent,
-                                                            child: IconButton(
-                                                                tooltip: s
-                                                                    .addNewEpisodeTooltip,
-                                                                icon: SizedBox(
-                                                                    height: 15,
-                                                                    width: 20,
-                                                                    child:
-                                                                        CustomPaint(
-                                                                            painter:
-                                                                                AddToPlaylistPainter(
-                                                                      context
-                                                                          .textColor,
-                                                                      context
-                                                                          .textColor,
-                                                                    ))),
-                                                                onPressed:
-                                                                    () {}),
-                                                          );
-                                                  }),
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: IconButton(
-                                                  tooltip:
-                                                      s.hideListenedSetting,
-                                                  icon: SizedBox(
-                                                    width: 30,
-                                                    height: 15,
-                                                    child: HideListened(
-                                                      hideListened:
-                                                          _hideListened ??
-                                                              false,
+                                                Spacer(),
+                                                FutureBuilder<int>(
+                                                    future: _getUpdateCounts(
+                                                        _group),
+                                                    initialData: 0,
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      return snapshot.data != 0
+                                                          ? Material(
+                                                              color: Colors
+                                                                  .transparent,
+                                                              child: IconButton(
+                                                                  tooltip: s
+                                                                      .addNewEpisodeTooltip,
+                                                                  icon: SizedBox(
+                                                                      height:
+                                                                          15,
+                                                                      width: 20,
+                                                                      child: CustomPaint(
+                                                                          painter: AddToPlaylistPainter(
+                                                                              context
+                                                                                  .textTheme.bodyText1.color,
+                                                                              Colors
+                                                                                  .red))),
+                                                                  onPressed:
+                                                                      () async {
+                                                                    await audio
+                                                                        .addNewEpisode(
+                                                                            _group);
+                                                                    if (mounted) {
+                                                                      setState(
+                                                                          () {});
+                                                                    }
+                                                                    Fluttertoast
+                                                                        .showToast(
+                                                                      msg: _groupName ==
+                                                                              'All'
+                                                                          ? s.addNewEpisodeAll(snapshot
+                                                                              .data)
+                                                                          : s.addEpisodeGroup(
+                                                                              _groupName,
+                                                                              snapshot.data),
+                                                                      gravity:
+                                                                          ToastGravity
+                                                                              .BOTTOM,
+                                                                    );
+                                                                  }),
+                                                            )
+                                                          : Material(
+                                                              color: Colors
+                                                                  .transparent,
+                                                              child: IconButton(
+                                                                  tooltip: s
+                                                                      .addNewEpisodeTooltip,
+                                                                  icon: SizedBox(
+                                                                      height: 15,
+                                                                      width: 20,
+                                                                      child: CustomPaint(
+                                                                          painter: AddToPlaylistPainter(
+                                                                        context
+                                                                            .textColor,
+                                                                        context
+                                                                            .textColor,
+                                                                      ))),
+                                                                  onPressed: () {}),
+                                                            );
+                                                    }),
+                                                Material(
+                                                  color: Colors.transparent,
+                                                  child: IconButton(
+                                                    tooltip:
+                                                        s.hideListenedSetting,
+                                                    icon: SizedBox(
+                                                      width: 30,
+                                                      height: 15,
+                                                      child: HideListened(
+                                                        hideListened:
+                                                            _hideListened ??
+                                                                false,
+                                                      ),
                                                     ),
+                                                    onPressed: () {
+                                                      setState(() =>
+                                                          _hideListened =
+                                                              !_hideListened);
+                                                    },
                                                   ),
-                                                  onPressed: () {
-                                                    setState(() =>
-                                                        _hideListened =
-                                                            !_hideListened);
-                                                  },
                                                 ),
-                                              ),
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: LayoutButton(
-                                                  layout: _layout,
-                                                  onPressed: (layout) =>
-                                                      setState(() {
-                                                    _layout = layout;
-                                                  }),
+                                                Material(
+                                                  color: Colors.transparent,
+                                                  child: LayoutButton(
+                                                    layout: _layout,
+                                                    onPressed: (layout) =>
+                                                        setState(() {
+                                                      _layout = layout;
+                                                    }),
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )),
-                                  ),
-                                  EpisodeGrid(
-                                    episodes: snapshot.data,
-                                    layout: _layout,
-                                    initNum: _scroll ? 0 : 12,
-                                  ),
-                                  SliverList(
-                                    delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                        return _loadMore
-                                            ? Container(
-                                                height: 2,
-                                                child:
-                                                    LinearProgressIndicator())
-                                            : Center();
-                                      },
-                                      childCount: 1,
+                                              ],
+                                            ),
+                                          )),
                                     ),
-                                  ),
-                                ]))
+                                    EpisodeGrid(
+                                      episodes: snapshot.data,
+                                      layout: _layout,
+                                      initNum: _scroll ? 0 : 12,
+                                    ),
+                                    SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                        (context, index) {
+                                          return _loadMore
+                                              ? Container(
+                                                  height: 2,
+                                                  child:
+                                                      LinearProgressIndicator())
+                                              : Center();
+                                        },
+                                        childCount: 1,
+                                      ),
+                                    ),
+                                  ]),
+                            ))
                     : Center();
               },
             );

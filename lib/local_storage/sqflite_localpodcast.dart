@@ -38,7 +38,8 @@ class DBHelper {
         description TEXT, add_date INTEGER, imagePath TEXT, provider TEXT, link TEXT, 
         background_image TEXT DEFAULT '', hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0,
         episode_count INTEGER DEFAULT 0, skip_seconds INTEGER DEFAULT 0, 
-        auto_download INTEGER DEFAULT 0, skip_seconds_end INTEGER DEFAULT 0)""");
+        auto_download INTEGER DEFAULT 0, skip_seconds_end INTEGER DEFAULT 0,
+        never_update INTEGER DEFAULT 0)""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
@@ -62,27 +63,41 @@ class DBHelper {
           "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
       await db.execute(
           "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
+      await db.execute(
+          "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
     } else if (oldVersion == 2) {
       await db.execute(
           "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
       await db.execute(
           "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
+      await db.execute(
+          "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
     } else if (oldVersion == 3) {
       await db.execute(
-          "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
+          "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0");
+      await db.execute(
+          "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
     }
   }
 
-  Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts) async {
+  Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts,
+      {bool updateOnly = false}) async {
     var dbClient = await database;
     var podcastLocal = <PodcastLocal>[];
 
     for (var s in podcasts) {
       List<Map> list;
-      list = await dbClient.rawQuery(
-          """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
+      if (updateOnly) {
+        list = await dbClient.rawQuery(
+            """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
+          link ,update_count, episode_count FROM PodcastLocal WHERE id = ? AND 
+          never_update = 0""", [s]);
+      } else {
+        list = await dbClient.rawQuery(
+            """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
           link ,update_count, episode_count FROM PodcastLocal WHERE id = ?""",
-          [s]);
+            [s]);
+      }
       if (list.length > 0) {
         podcastLocal.add(PodcastLocal(
             list.first['title'],
@@ -101,10 +116,21 @@ class DBHelper {
     return podcastLocal;
   }
 
-  Future<List<PodcastLocal>> getPodcastLocalAll() async {
+  Future<List<PodcastLocal>> getPodcastLocalAll(
+      {bool updateOnly = false}) async {
     var dbClient = await database;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath, provider, link FROM PodcastLocal ORDER BY add_date DESC');
+
+    List<Map> list;
+    if (updateOnly) {
+      list = await dbClient.rawQuery(
+          """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath,
+         provider, link FROM PodcastLocal WHERE never_update = 0 ORDER BY 
+         add_date DESC""");
+    } else {
+      list = await dbClient.rawQuery(
+          """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath,
+         provider, link FROM PodcastLocal ORDER BY add_date DESC""");
+    }
 
     var podcastLocal = <PodcastLocal>[];
 
@@ -129,6 +155,21 @@ class DBHelper {
         .rawQuery('SELECT episode_count FROM PodcastLocal WHERE id = ?', [id]);
     if (list.isNotEmpty) return list.first['episode_count'];
     return 0;
+  }
+
+  Future<bool> getNeverUpdate(String id) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT never_update FROM PodcastLocal WHERE id = ?', [id]);
+    if (list.isNotEmpty) return list.first['never_update'] == 1;
+    return false;
+  }
+
+  Future<int> saveNeverUpdate(String id, {bool boo}) async {
+    var dbClient = await database;
+    return await dbClient.rawUpdate(
+        "UPDATE PodcastLocal SET never_update = ? WHERE id = ?",
+        [boo ? 1 : 0, id]);
   }
 
   Future<int> getPodcastUpdateCounts(String id) async {

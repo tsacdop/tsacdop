@@ -58,6 +58,11 @@ class _PodcastSettingState extends State<PodcastSetting> {
     if (mounted) setState(() {});
   }
 
+  Future<void> _setNeverUpdate(bool boo) async {
+    await _dbHelper.saveNeverUpdate(widget.podcastLocal.id, boo: boo);
+    if (mounted) setState(() {});
+  }
+
   Future<void> _saveSkipSecondsStart(int seconds) async {
     await _dbHelper.saveSkipSecondsStart(widget.podcastLocal.id, seconds);
   }
@@ -68,6 +73,10 @@ class _PodcastSettingState extends State<PodcastSetting> {
 
   Future<bool> _getAutoDownload(String id) async {
     return await _dbHelper.getAutoDownload(id);
+  }
+
+  Future<bool> _getNeverUpdate(String id) async {
+    return await _dbHelper.getNeverUpdate(id);
   }
 
   Future<int> _getSkipSecondStart(String id) async {
@@ -217,6 +226,21 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 ),
               );
             }),
+        FutureBuilder<bool>(
+            future: _getNeverUpdate(widget.podcastLocal.id),
+            initialData: false,
+            builder: (context, snapshot) {
+              return ListTile(
+                onTap: () => _setNeverUpdate(!snapshot.data),
+                leading: Icon(Icons.lock),
+                title: Text('Never update'),
+                trailing: Transform.scale(
+                  scale: 0.9,
+                  child:
+                      Switch(value: snapshot.data, onChanged: _setNeverUpdate),
+                ),
+              );
+            }),
         FutureBuilder<int>(
           future: _getSkipSecondStart(widget.podcastLocal.id),
           initialData: 0,
@@ -246,42 +270,42 @@ class _PodcastSettingState extends State<PodcastSetting> {
               },
               onConfirm: () async {
                 await _saveSkipSecondsStart(_secondsStart);
-                setState(() => _showStartTimePicker = false);
+                if (mounted) setState(() => _showStartTimePicker = false);
               },
               onChange: (value) => _secondsStart = value.inSeconds),
-        FutureBuilder<int>(
-          future: _getSkipSecondEnd(widget.podcastLocal.id),
-          initialData: 0,
-          builder: (context, snapshot) => ListTile(
-            onTap: () {
-              _secondsEnd = 0;
-              setState(() {
-                _removeConfirm = false;
-                _markConfirm = false;
-                _showStartTimePicker = false;
-                _showEndTimePicker = !_showEndTimePicker;
-              });
-            },
-            leading: Icon(Icons.fast_rewind),
-            title: Text(s.skipSecondsAtEnd),
-            trailing: Padding(
-              padding: const EdgeInsets.only(right: 10.0),
-              child: Text(snapshot.data.toTime),
-            ),
-          ),
-        ),
-        if (_showEndTimePicker)
-          _TimePicker(
-            onCancel: () {
-              _secondsEnd = 0;
-              setState(() => _showEndTimePicker = false);
-            },
-            onConfirm: () async {
-              await _saveSkipSecondsEnd(_secondsEnd);
-              setState(() => _showEndTimePicker = false);
-            },
-            onChange: (value) => _secondsEnd = value.inSeconds,
-          ),
+        // FutureBuilder<int>(
+        //   future: _getSkipSecondEnd(widget.podcastLocal.id),
+        //   initialData: 0,
+        //   builder: (context, snapshot) => ListTile(
+        //     onTap: () {
+        //       _secondsEnd = 0;
+        //       setState(() {
+        //         _removeConfirm = false;
+        //         _markConfirm = false;
+        //         _showStartTimePicker = false;
+        //         _showEndTimePicker = !_showEndTimePicker;
+        //       });
+        //     },
+        //     leading: Icon(Icons.fast_rewind),
+        //     title: Text(s.skipSecondsAtEnd),
+        //     trailing: Padding(
+        //       padding: const EdgeInsets.only(right: 10.0),
+        //       child: Text(snapshot.data.toTime),
+        //     ),
+        //   ),
+        // ),
+        // if (_showEndTimePicker)
+        //   _TimePicker(
+        //     onCancel: () {
+        //       _secondsEnd = 0;
+        //       setState(() => _showEndTimePicker = false);
+        //     },
+        //     onConfirm: () async {
+        //       await _saveSkipSecondsEnd(_secondsEnd);
+        //       setState(() => _showEndTimePicker = false);
+        //     },
+        //     onChange: (value) => _secondsEnd = value.inSeconds,
+        //   ),
         ListTile(
             onTap: () {
               if (_coverStatus != RefreshCoverStatus.start) {
@@ -419,7 +443,6 @@ class _TimePicker extends StatelessWidget {
         children: [
           SizedBox(height: 10),
           DurationPicker(
-            key: key,
             onChange: onChange,
           ),
           Row(
