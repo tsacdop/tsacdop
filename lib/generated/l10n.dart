@@ -1173,10 +1173,10 @@ class S {
     );
   }
 
-  /// `Never auto update`
+  /// `Turn off auto update`
   String get neverAutoUpdate {
     return Intl.message(
-      'Never auto update',
+      'Turn off auto update',
       name: 'neverAutoUpdate',
       desc: 'Never auto  update in podcast settings.',
       args: [],

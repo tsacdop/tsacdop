@@ -194,7 +194,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "minsAgo" : m12,
     "minsCount" : m13,
     "network" : MessageLookupByLibrary.simpleMessage("Rede"),
-    "neverAutoUpdate" : MessageLookupByLibrary.simpleMessage("Never auto update"),
+    "neverAutoUpdate" : MessageLookupByLibrary.simpleMessage("Turn off auto update"),
     "newGroup" : MessageLookupByLibrary.simpleMessage("Criar um novo grupo"),
     "newestFirst" : MessageLookupByLibrary.simpleMessage("Mais recentes primeiro"),
     "next" : MessageLookupByLibrary.simpleMessage("Seguinte"),

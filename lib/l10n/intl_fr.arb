@@ -268,7 +268,7 @@
   "@minsCount": {},
   "network": "Réseau",
   "@network": {},
-  "neverAutoUpdate": "Never auto update",
+  "neverAutoUpdate": "Turn off auto update",
   "@neverAutoUpdate": {
     "description": "Never auto  update in podcast settings."
   },
