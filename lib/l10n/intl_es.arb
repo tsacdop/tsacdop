@@ -70,6 +70,10 @@
   "@downloaded": {},
   "downloadRemovedToast": "Download removed",
   "@downloadRemovedToast": {},
+  "downloadStart": "Downloading",
+  "@downloadStart": {
+    "description": "Toast of downloading"
+  },
   "editGroupName": "Editar nombre del grupo",
   "@editGroupName": {},
   "endOfEpisode": "Fin del episodio",
@@ -264,6 +268,10 @@
   "@minsCount": {},
   "network": "Red",
   "@network": {},
+  "neverAutoUpdate": "Never auto update",
+  "@neverAutoUpdate": {
+    "description": "Never auto  update in podcast settings."
+  },
   "newestFirst": "Mas recientes primero",
   "@newestFirst": {},
   "newGroup": "Crear grupo nuevo",
@@ -384,6 +392,10 @@
   },
   "refreshArtwork": "Actualizar portada",
   "@refreshArtwork": {},
+  "refreshStarted": "Regreshing",
+  "@refreshStarted": {
+    "description": "Toast for refresh"
+  },
   "remove": "Remover",
   "@remove": {
     "description": "Remove not \"removed\". \nRemove a podcast or a group."
@@ -586,6 +598,18 @@
   "status": "Status",
   "@status": {
     "description": "gpodder.net status"
+  },
+  "statusAuthError": "Authentication error",
+  "@statusAuthError": {
+    "description": "Sync error"
+  },
+  "statusFail": "Failed",
+  "@statusFail": {
+    "description": "Sync fail"
+  },
+  "statusSuccess": "Successful",
+  "@statusSuccess": {
+    "description": "Sync status"
   },
   "stop": "Stop",
   "@stop": {},

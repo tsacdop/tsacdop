@@ -984,6 +984,7 @@ class _GpodderInfo extends StatefulWidget {
 class __GpodderInfoState extends State<_GpodderInfo> {
   final _gpodder = Gpodder();
   var _syncing = false;
+  final _gpodderUrl = "https://gpodder.net";
 
   Future<List<String>> _getLoginInfo() async {
     final storage = KeyValueStorage(gpodderApiKey);
@@ -1075,7 +1076,7 @@ class __GpodderInfoState extends State<_GpodderInfo> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(s.intergateWith('gpodder.net'),
+                        child: Text('gpodder.net',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold)),
@@ -1097,22 +1098,24 @@ class __GpodderInfoState extends State<_GpodderInfo> {
                         return Column(
                           children: [
                             ListTile(
-                              title: Text('Divice id'),
+                              title: Text('Device id'),
                               subtitle: Text(deviceId),
                             ),
                             ListTile(
-                              title: Text('Divice name'),
+                              title: Text('Device name'),
                               subtitle: Text(deviceName),
                             ),
                           ],
                         );
                       }),
                   ListTile(
+                      onTap: () => _gpodderUrl.launchUrl,
+                      title: Text('Visit gpodder.net'),
+                      subtitle: Text('Manage subscriptions online')),
+                  ListTile(
                       onTap: _fullSync,
-                      // contentPadding:
-                      //     const EdgeInsets.only(left: 70.0, right: 20),
                       title: Text('Full sync'),
-                      subtitle: Text('If sync have error')),
+                      subtitle: Text('If error happened when syncing')),
                 ]),
               ),
             ],

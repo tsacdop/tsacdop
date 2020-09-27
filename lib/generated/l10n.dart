@@ -335,6 +335,16 @@ class S {
     );
   }
 
+  /// `Downloading`
+  String get downloadStart {
+    return Intl.message(
+      'Downloading',
+      name: 'downloadStart',
+      desc: 'Toast of downloading',
+      args: [],
+    );
+  }
+
   /// `Edit group name`
   String get editGroupName {
     return Intl.message(
@@ -1163,6 +1173,16 @@ class S {
     );
   }
 
+  /// `Never auto update`
+  String get neverAutoUpdate {
+    return Intl.message(
+      'Never auto update',
+      name: 'neverAutoUpdate',
+      desc: 'Never auto  update in podcast settings.',
+      args: [],
+    );
+  }
+
   /// `Newest first`
   String get newestFirst {
     return Intl.message(
@@ -1592,6 +1612,16 @@ class S {
       'Update artwork',
       name: 'refreshArtwork',
       desc: '',
+      args: [],
+    );
+  }
+
+  /// `Refreshing`
+  String get refreshStarted {
+    return Intl.message(
+      'Refreshing',
+      name: 'refreshStarted',
+      desc: 'Toast for refresh',
       args: [],
     );
   }
@@ -2518,6 +2548,36 @@ class S {
       'Status',
       name: 'status',
       desc: 'gpodder.net status',
+      args: [],
+    );
+  }
+
+  /// `Authentication error`
+  String get statusAuthError {
+    return Intl.message(
+      'Authentication error',
+      name: 'statusAuthError',
+      desc: 'Sync error',
+      args: [],
+    );
+  }
+
+  /// `Failed`
+  String get statusFail {
+    return Intl.message(
+      'Failed',
+      name: 'statusFail',
+      desc: 'Sync fail',
+      args: [],
+    );
+  }
+
+  /// `Successful`
+  String get statusSuccess {
+    return Intl.message(
+      'Successful',
+      name: 'statusSuccess',
+      desc: 'Sync status',
       args: [],
     );
   }

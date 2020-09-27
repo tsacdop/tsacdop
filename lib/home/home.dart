@@ -717,7 +717,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     refreshWorker.start(_group);
     await Future.delayed(Duration(seconds: 1));
     Fluttertoast.showToast(
-      msg: 'Refresh started',
+      msg: context.s.refreshStarted,
       gravity: ToastGravity.BOTTOM,
     );
   }

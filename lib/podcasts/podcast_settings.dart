@@ -233,7 +233,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
               return ListTile(
                 onTap: () => _setNeverUpdate(!snapshot.data),
                 leading: Icon(Icons.lock),
-                title: Text('Never update'),
+                title: Text(s.neverAutoUpdate),
                 trailing: Transform.scale(
                   scale: 0.9,
                   child:

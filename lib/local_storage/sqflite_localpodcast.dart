@@ -306,7 +306,7 @@ class DBHelper {
     var dbClient = await database;
     final milliseconds = DateTime.now().millisecondsSinceEpoch;
     var recent = await getPlayHistory(1);
-    if (recent.isNotEmpty && recent.first.url == history.url) {
+    if (recent.isNotEmpty) {
       await dbClient.rawDelete("DELETE FROM PlayHistory WHERE add_date = ?",
           [recent.first.playdate.millisecondsSinceEpoch]);
     }
@@ -362,7 +362,7 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         "SELECT SUM(listen_time) FROM PlayHistory WHERE enclosure_url = ?",
         [url]);
-    if (list.isEmpty) {
+    if (list.isNotEmpty) {
       i = list.first['SUM(listen_time)'];
       return i ?? 0;
     }

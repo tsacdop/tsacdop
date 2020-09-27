@@ -70,6 +70,10 @@
   "@downloaded": {},
   "downloadRemovedToast": "下载已删除",
   "@downloadRemovedToast": {},
+  "downloadStart": "下载中",
+  "@downloadStart": {
+    "description": "Toast of downloading"
+  },
   "editGroupName": "修改组名",
   "@editGroupName": {},
   "endOfEpisode": "节目结束",
@@ -264,6 +268,10 @@
   "@minsCount": {},
   "network": "网络",
   "@network": {},
+  "neverAutoUpdate": "无需自动更新",
+  "@neverAutoUpdate": {
+    "description": "Never auto  update in podcast settings."
+  },
   "newestFirst": "由新到旧",
   "@newestFirst": {},
   "newGroup": "创建分组",
@@ -384,6 +392,10 @@
   },
   "refreshArtwork": "更新头像",
   "@refreshArtwork": {},
+  "refreshStarted": "刷新中",
+  "@refreshStarted": {
+    "description": "Toast for refresh"
+  },
   "remove": "移除",
   "@remove": {
     "description": "Remove not \"removed\". \nRemove a podcast or a group."
@@ -586,6 +598,18 @@
   "status": "状态",
   "@status": {
     "description": "gpodder.net status"
+  },
+  "statusAuthError": "验证错误",
+  "@statusAuthError": {
+    "description": "Sync error"
+  },
+  "statusFail": "失败",
+  "@statusFail": {
+    "description": "Sync fail"
+  },
+  "statusSuccess": "成功",
+  "@statusSuccess": {
+    "description": "Sync status"
   },
   "stop": "停止",
   "@stop": {},

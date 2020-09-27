@@ -132,6 +132,10 @@ class EpisodeGrid extends StatelessWidget {
       }
       if (dataConfirm) {
         context.read<DownloadState>().startTask(episode);
+        Fluttertoast.showToast(
+          msg: context.s.downloadStart,
+          gravity: ToastGravity.BOTTOM,
+        );
       }
     }
   }
