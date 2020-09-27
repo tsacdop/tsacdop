@@ -1,5 +1,20 @@
 # Tsacdop Changelog
 
+## 0.4.18
+
+Release date 2020/9/27
+
+### New features
+
+* Support gpodder.net sync.
+* Portuguese translation, thanks Bruno.
+* Turn off auto update for podcast.
+* Pull to refresh in recent tab, supports group update.
+
+### Minor changes
+
+* Longpress 'see all' to open full podcast list.
+
 ## 0.4.17
 
 Release date 2020/9/16

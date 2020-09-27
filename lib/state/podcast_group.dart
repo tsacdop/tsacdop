@@ -316,7 +316,7 @@ class GroupList extends ChangeNotifier {
     );
     Workmanager.registerPeriodicTask("2", "gpodder_sync",
         frequency: Duration(hours: 4),
-        initialDelay: Duration(seconds: 1),
+        initialDelay: Duration(seconds: 10),
         constraints: Constraints(
           networkType: NetworkType.connected,
         ));

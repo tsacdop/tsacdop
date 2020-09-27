@@ -711,60 +711,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-
-  Future _updateRssItem() async {
-    final refreshWorker = context.read<RefreshWorker>();
-    refreshWorker.start(_group);
-    await Future.delayed(Duration(seconds: 1));
-    Fluttertoast.showToast(
-      msg: context.s.refreshStarted,
-      gravity: ToastGravity.BOTTOM,
-    );
-  }
-
-  Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group,
-      {bool hideListened}) async {
-    var storage = KeyValueStorage(recentLayoutKey);
-    var hideListenedStorage = KeyValueStorage(hideListenedKey);
-    var index = await storage.getInt(defaultValue: 1);
-    if (_layout == null) _layout = Layout.values[index];
-    if (_hideListened == null) {
-      _hideListened = await hideListenedStorage.getBool(defaultValue: false);
-    }
-    var dbHelper = DBHelper();
-    List<EpisodeBrief> episodes;
-    if (group.isEmpty) {
-      episodes =
-          await dbHelper.getRecentRssItem(top, hideListened: _hideListened);
-    } else {
-      episodes = await dbHelper.getGroupRssItem(top, group,
-          hideListened: _hideListened);
-    }
-    return episodes;
-  }
-
-  Future<int> _getUpdateCounts(List<String> group) async {
-    var dbHelper = DBHelper();
-    var episodes = <EpisodeBrief>[];
-    if (group.isEmpty) {
-      episodes = await dbHelper.getRecentNewRssItem();
-    } else {
-      episodes = await dbHelper.getGroupNewRssItem(group);
-    }
-    return episodes.length;
-  }
-
-  /// Load more episodes.
-  Future<void> _loadMoreEpisode() async {
-    if (mounted) setState(() => _loadMore = true);
-    await Future.delayed(Duration(seconds: 3));
-    if (mounted) {
-      setState(() {
-        _top = _top + 30;
-        _loadMore = false;
-      });
-    }
-  }
+  final _dbHelper = DBHelper();
 
   /// Episodes loaded first time.
   int _top = 90;
@@ -787,10 +734,174 @@ class _RecentUpdateState extends State<_RecentUpdate>
     _scroll = false;
   }
 
+  Future _updateRssItem() async {
+    final refreshWorker = context.read<RefreshWorker>();
+    refreshWorker.start(_group);
+    await Future.delayed(Duration(seconds: 1));
+    Fluttertoast.showToast(
+      msg: context.s.refreshStarted,
+      gravity: ToastGravity.BOTTOM,
+    );
+  }
+
+  Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group,
+      {bool hideListened}) async {
+    var storage = KeyValueStorage(recentLayoutKey);
+    var hideListenedStorage = KeyValueStorage(hideListenedKey);
+    var index = await storage.getInt(defaultValue: 1);
+    if (_layout == null) _layout = Layout.values[index];
+    if (_hideListened == null) {
+      _hideListened = await hideListenedStorage.getBool(defaultValue: false);
+    }
+
+    List<EpisodeBrief> episodes;
+    if (group.isEmpty) {
+      episodes =
+          await _dbHelper.getRecentRssItem(top, hideListened: _hideListened);
+    } else {
+      episodes = await _dbHelper.getGroupRssItem(top, group,
+          hideListened: _hideListened);
+    }
+    return episodes;
+  }
+
+  Future<int> _getUpdateCounts(List<String> group) async {
+    var episodes = <EpisodeBrief>[];
+
+    if (group.isEmpty) {
+      episodes = await _dbHelper.getRecentNewRssItem();
+    } else {
+      episodes = await _dbHelper.getGroupNewRssItem(group);
+    }
+    return episodes.length;
+  }
+
+  /// Load more episodes.
+  Future<void> _loadMoreEpisode() async {
+    if (mounted) setState(() => _loadMore = true);
+    await Future.delayed(Duration(seconds: 3));
+    if (mounted) {
+      setState(() {
+        _top = _top + 30;
+        _loadMore = false;
+      });
+    }
+  }
+
+  Widget _switchGroupButton() {
+    return Consumer<GroupList>(
+      builder: (context, groupList, child) => PopupMenuButton<String>(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 1,
+        tooltip: context.s.groupFilter,
+        child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            height: 50,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(_groupName == 'All' ? context.s.all : _groupName),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                ),
+                Icon(
+                  LineIcons.filter_solid,
+                  size: 18,
+                )
+              ],
+            )),
+        itemBuilder: (context) => [
+          PopupMenuItem(
+              child: Row(children: [
+                Text(context.s.all),
+                Spacer(),
+                if (_groupName == 'All') DotIndicator()
+              ]),
+              value: 'All')
+        ]..addAll(groupList.groups
+            .map<PopupMenuEntry<String>>((e) => PopupMenuItem(
+                value: e.name,
+                child: Row(
+                  children: [
+                    Text(e.name),
+                    Spacer(),
+                    if (e.name == _groupName) DotIndicator()
+                  ],
+                )))
+            .toList()),
+        onSelected: (value) {
+          if (value == 'All') {
+            setState(() {
+              _groupName = 'All';
+              _group = [];
+            });
+          } else {
+            for (var group in groupList.groups) {
+              if (group.name == value) {
+                setState(() {
+                  _groupName = value;
+                  _group = group.podcastList;
+                });
+              }
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _addNewButton() {
+    final audio = context.read<AudioPlayerNotifier>();
+    final s = context.s;
+    return FutureBuilder<int>(
+        future: _getUpdateCounts(_group),
+        initialData: 0,
+        builder: (context, snapshot) {
+          return snapshot.data != 0
+              ? Material(
+                  color: Colors.transparent,
+                  child: IconButton(
+                      tooltip: s.addNewEpisodeTooltip,
+                      icon: SizedBox(
+                          height: 15,
+                          width: 20,
+                          child: CustomPaint(
+                              painter: AddToPlaylistPainter(
+                                  context.textTheme.bodyText1.color,
+                                  Colors.red))),
+                      onPressed: () async {
+                        await audio.addNewEpisode(_group);
+                        if (mounted) {
+                          setState(() {});
+                        }
+                        Fluttertoast.showToast(
+                          msg: _groupName == 'All'
+                              ? s.addNewEpisodeAll(snapshot.data)
+                              : s.addEpisodeGroup(_groupName, snapshot.data),
+                          gravity: ToastGravity.BOTTOM,
+                        );
+                      }),
+                )
+              : Material(
+                  color: Colors.transparent,
+                  child: IconButton(
+                      tooltip: s.addNewEpisodeTooltip,
+                      icon: SizedBox(
+                          height: 15,
+                          width: 20,
+                          child: CustomPaint(
+                              painter: AddToPlaylistPainter(
+                            context.textColor,
+                            context.textColor,
+                          ))),
+                      onPressed: () {}),
+                );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
     return Selector<RefreshWorker, bool>(
       selector: (_, worker) => worker.complete,
@@ -837,7 +948,9 @@ class _RecentUpdateState extends State<_RecentUpdate>
                             },
                             child: RefreshIndicator(
                               key: _refreshIndicatorKey,
-                              color: context.accentColor,
+                              color: Colors.white,
+                              backgroundColor: context.accentColor,
+                              semanticsLabel: s.refreshStarted,
                               onRefresh: () async {
                                 await _updateRssItem();
                               },
@@ -854,161 +967,9 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                             color: Colors.transparent,
                                             child: Row(
                                               children: <Widget>[
-                                                Consumer<GroupList>(
-                                                  builder: (context, groupList,
-                                                          child) =>
-                                                      PopupMenuButton<String>(
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    10))),
-                                                    elevation: 1,
-                                                    tooltip: s.groupFilter,
-                                                    child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 20),
-                                                        height: 50,
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: <Widget>[
-                                                            Text(_groupName ==
-                                                                    'All'
-                                                                ? s.all
-                                                                : _groupName),
-                                                            Padding(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      horizontal:
-                                                                          5),
-                                                            ),
-                                                            Icon(
-                                                              LineIcons
-                                                                  .filter_solid,
-                                                              size: 18,
-                                                            )
-                                                          ],
-                                                        )),
-                                                    itemBuilder: (context) => [
-                                                      PopupMenuItem(
-                                                          child: Row(children: [
-                                                            Text(s.all),
-                                                            Spacer(),
-                                                            if (_groupName ==
-                                                                'All')
-                                                              DotIndicator()
-                                                          ]),
-                                                          value: 'All')
-                                                    ]..addAll(groupList.groups
-                                                        .map<
-                                                            PopupMenuEntry<
-                                                                String>>((e) =>
-                                                            PopupMenuItem(
-                                                                value: e.name,
-                                                                child: Row(
-                                                                  children: [
-                                                                    Text(
-                                                                        e.name),
-                                                                    Spacer(),
-                                                                    if (e.name ==
-                                                                        _groupName)
-                                                                      DotIndicator()
-                                                                  ],
-                                                                )))
-                                                        .toList()),
-                                                    onSelected: (value) {
-                                                      if (value == 'All') {
-                                                        setState(() {
-                                                          _groupName = 'All';
-                                                          _group = [];
-                                                        });
-                                                      } else {
-                                                        for (var group
-                                                            in groupList
-                                                                .groups) {
-                                                          if (group.name ==
-                                                              value) {
-                                                            setState(() {
-                                                              _groupName =
-                                                                  value;
-                                                              _group = group
-                                                                  .podcastList;
-                                                            });
-                                                          }
-                                                        }
-                                                      }
-                                                    },
-                                                  ),
-                                                ),
+                                                _switchGroupButton(),
                                                 Spacer(),
-                                                FutureBuilder<int>(
-                                                    future: _getUpdateCounts(
-                                                        _group),
-                                                    initialData: 0,
-                                                    builder:
-                                                        (context, snapshot) {
-                                                      return snapshot.data != 0
-                                                          ? Material(
-                                                              color: Colors
-                                                                  .transparent,
-                                                              child: IconButton(
-                                                                  tooltip: s
-                                                                      .addNewEpisodeTooltip,
-                                                                  icon: SizedBox(
-                                                                      height:
-                                                                          15,
-                                                                      width: 20,
-                                                                      child: CustomPaint(
-                                                                          painter: AddToPlaylistPainter(
-                                                                              context
-                                                                                  .textTheme.bodyText1.color,
-                                                                              Colors
-                                                                                  .red))),
-                                                                  onPressed:
-                                                                      () async {
-                                                                    await audio
-                                                                        .addNewEpisode(
-                                                                            _group);
-                                                                    if (mounted) {
-                                                                      setState(
-                                                                          () {});
-                                                                    }
-                                                                    Fluttertoast
-                                                                        .showToast(
-                                                                      msg: _groupName ==
-                                                                              'All'
-                                                                          ? s.addNewEpisodeAll(snapshot
-                                                                              .data)
-                                                                          : s.addEpisodeGroup(
-                                                                              _groupName,
-                                                                              snapshot.data),
-                                                                      gravity:
-                                                                          ToastGravity
-                                                                              .BOTTOM,
-                                                                    );
-                                                                  }),
-                                                            )
-                                                          : Material(
-                                                              color: Colors
-                                                                  .transparent,
-                                                              child: IconButton(
-                                                                  tooltip: s
-                                                                      .addNewEpisodeTooltip,
-                                                                  icon: SizedBox(
-                                                                      height: 15,
-                                                                      width: 20,
-                                                                      child: CustomPaint(
-                                                                          painter: AddToPlaylistPainter(
-                                                                        context
-                                                                            .textColor,
-                                                                        context
-                                                                            .textColor,
-                                                                      ))),
-                                                                  onPressed: () {}),
-                                                            );
-                                                    }),
+                                                _addNewButton(),
                                                 Material(
                                                   color: Colors.transparent,
                                                   child: IconButton(

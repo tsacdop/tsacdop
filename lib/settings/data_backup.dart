@@ -339,15 +339,14 @@ class _DataBackupState extends State<DataBackup> {
                   }
                   return Center();
                 }),
-
-            // ListTile(
-            //   onTap: () async {
-            //     final subscribeWorker = context.read<GroupList>();
-            //     await subscribeWorker.cancelWork();
-            //     subscribeWorker.setWorkManager();
-            //   },
-            //   title: Text('reset'),
-            // ),
+            //  ListTile(
+            //    onTap: () async {
+            //      final subscribeWorker = context.read<GroupList>();
+            //      await subscribeWorker.cancelWork();
+            //      subscribeWorker.setWorkManager();
+            //    },
+            //    title: Text('reset'),
+            //  ),
             Divider(height: 1),
             Container(
               height: 30.0,
