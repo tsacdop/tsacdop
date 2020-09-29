@@ -28,6 +28,7 @@ ItunesPodcast _$ItunesPodcastFromJson(Map<String, dynamic> json) {
     feedUrl: json['feedUrl'] as String,
     artworkUrl600: json['artworkUrl600'] as String,
     releaseDate: json['releaseDate'] as String,
+    collectionId: json['collectionId'] as int,
   );
 }
 
@@ -38,4 +39,5 @@ Map<String, dynamic> _$ItunesPodcastToJson(ItunesPodcast instance) =>
       'feedUrl': instance.feedUrl,
       'artworkUrl600': instance.artworkUrl600,
       'releaseDate': instance.releaseDate,
+      'collectionId': instance.collectionId,
     };

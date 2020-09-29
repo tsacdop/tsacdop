@@ -188,7 +188,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
               FutureBuilder<List<PlayHistory>>(
                 future: _getPlayHistory(_top),
                 builder: (context, snapshot) {
-                  var width = MediaQuery.of(context).size.width;
+                  var width = context.width;
                   return snapshot.hasData
                       ? NotificationListener<ScrollNotification>(
                           onNotification: (scrollInfo) {

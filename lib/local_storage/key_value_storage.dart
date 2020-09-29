@@ -53,6 +53,8 @@ const String gpodderSyncStatusKey = 'gpodderSyncStatusKey';
 const String gpodderSyncDateTimeKey = 'gpodderSyncDateTimeKey';
 const String gpodderRemoteAddKey = 'gpodderRemoteAddKey';
 const String gpodderRemoteRemoveKey = 'gpodderRemoteRemoveKey';
+const String hidePodcastDiscoveryKey = 'hidePodcastDiscoveryKey';
+const String searchEngineKey = 'searchEngineKey';
 
 class KeyValueStorage {
   final String key;

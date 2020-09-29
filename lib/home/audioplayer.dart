@@ -857,7 +857,7 @@ class SleepModeState extends State<SleepMode>
                           child: Text(
                             context.s.sleepTimer,
                             style: TextStyle(
-                                color: Theme.of(context).accentColor,
+                                color: context.accentColor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16),
                           ),

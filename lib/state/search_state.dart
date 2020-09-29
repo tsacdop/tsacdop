@@ -8,6 +8,7 @@ class SearchState extends ChangeNotifier {
   bool get update => _update;
   OnlinePodcast _selectedPodcast;
   OnlinePodcast get selectedPodcast => _selectedPodcast;
+
   set selectedPodcast(OnlinePodcast podcast) {
     _selectedPodcast = podcast;
     notifyListeners();

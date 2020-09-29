@@ -235,8 +235,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                 Text(s.featureDiscoveryOMPLDes),
                                                 FlatButton(
                                                   color: Colors.cyan[600],
-                                                  padding:
-                                                      const EdgeInsets.all(0),
+                                                  padding: EdgeInsets.zero,
                                                   child: Text(s.understood,
                                                       style: Theme.of(context)
                                                           .textTheme
@@ -882,20 +881,21 @@ class _RecentUpdateState extends State<_RecentUpdate>
                         );
                       }),
                 )
-              : Material(
-                  color: Colors.transparent,
-                  child: IconButton(
-                      tooltip: s.addNewEpisodeTooltip,
-                      icon: SizedBox(
-                          height: 15,
-                          width: 20,
-                          child: CustomPaint(
-                              painter: AddToPlaylistPainter(
-                            context.textColor,
-                            context.textColor,
-                          ))),
-                      onPressed: () {}),
-                );
+              : Center();
+          // Material(
+          //     color: Colors.transparent,
+          //     child: IconButton(
+          //         tooltip: s.addNewEpisodeTooltip,
+          //         icon: SizedBox(
+          //             height: 15,
+          //             width: 20,
+          //             child: CustomPaint(
+          //                 painter: AddToPlaylistPainter(
+          //               context.textColor,
+          //               context.textColor,
+          //             ))),
+          //         onPressed: () {}),
+          //   );
         });
   }
 
@@ -951,9 +951,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                               color: Colors.white,
                               backgroundColor: context.accentColor,
                               semanticsLabel: s.refreshStarted,
-                              onRefresh: () async {
-                                await _updateRssItem();
-                              },
+                              onRefresh: _updateRssItem,
                               child: CustomScrollView(
                                   key: PageStorageKey<String>('update'),
                                   physics:

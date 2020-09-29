@@ -112,6 +112,41 @@ class DiscoveryPageState extends State<DiscoveryPage> {
         ],
       ));
 
+  Widget _historyList() => FutureBuilder<List<String>>(
+      future: _getSearchHistory(),
+      initialData: [],
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data.isNotEmpty) {
+          final history = snapshot.data;
+          return SizedBox(
+            child: Wrap(
+              direction: Axis.horizontal,
+              children: history
+                  .map<Widget>((e) => Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 2, 0, 0),
+                        child: FlatButton.icon(
+                          color:
+                              Colors.accents[history.indexOf(e)].withAlpha(70),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100.0),
+                          ),
+                          onPressed: () => widget.onTap(e),
+                          label: Text(e),
+                          icon: Icon(
+                            Icons.search,
+                            size: 20,
+                          ),
+                        ),
+                      ))
+                  .toList(),
+            ),
+          );
+        }
+        return SizedBox(
+          height: 0,
+        );
+      });
+
   Future<List<OnlinePodcast>> _getTopPodcasts({int page}) async {
     final searchEngine = ListenNotesSearch();
     var searchResult = await searchEngine.fetchBestPodcast(
@@ -124,176 +159,163 @@ class DiscoveryPageState extends State<DiscoveryPage> {
     return _podcastList;
   }
 
+  Future<bool> _getHideDiscovery() async {
+    final storage = KeyValueStorage(hidePodcastDiscoveryKey);
+    return await storage.getBool(defaultValue: false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final searchState = context.watch<SearchState>();
-    return PodcastSlideup(
-      child: _selectedGenre == null
-          ? SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FutureBuilder<List<String>>(
-                      future: _getSearchHistory(),
-                      initialData: [],
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                          final history = snapshot.data;
-                          return SizedBox(
-                            child: Wrap(
-                              direction: Axis.horizontal,
-                              children: history
-                                  .map<Widget>((e) => Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            8, 2, 0, 0),
-                                        child: FlatButton.icon(
-                                          color: Colors
-                                              .accents[history.indexOf(e)]
-                                              .withAlpha(70),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(100.0),
-                                          ),
-                                          onPressed: () => widget.onTap(e),
-                                          label: Text(e),
-                                          icon: Icon(
-                                            Icons.search,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
-                          );
-                        }
-                        return SizedBox(
-                          height: 0,
-                        );
-                      }),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
-                    child: Text('Popular',
-                        style: context.textTheme.headline6
-                            .copyWith(color: context.accentColor)),
-                  ),
-                  SizedBox(
-                    height: 200,
-                    child: FutureBuilder<List<OnlinePodcast>>(
-                        future: _searchTopPodcast,
-                        builder: (context, snapshot) {
-                          return ScrollConfiguration(
-                            behavior: NoGrowBehavior(),
-                            child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: snapshot.hasData
-                                    ? snapshot.data.map<Widget>((podcast) {
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: context.primaryColor),
-                                          width: 120,
-                                          margin: EdgeInsets.fromLTRB(
-                                              10, 10, 0, 10),
-                                          child: Material(
-                                            color: Colors.transparent,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            clipBehavior: Clip.hardEdge,
-                                            child: InkWell(
-                                              onTap: () {
-                                                searchState.selectedPodcast =
-                                                    podcast;
-                                                widget.onTap('');
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
-                                                child: Column(
-                                                  children: [
-                                                    Expanded(
-                                                      flex: 2,
-                                                      child: Center(
-                                                          child: PodcastAvatar(
-                                                              podcast)),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: Text(
-                                                        podcast.title,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        maxLines: 2,
-                                                        overflow:
-                                                            TextOverflow.fade,
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: Center(
-                                                        child: SizedBox(
-                                                            height: 32,
-                                                            child:
-                                                                SubscribeButton(
-                                                                    podcast)),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }).toList()
-                                    : [
-                                        _loadTopPodcasts(),
-                                        _loadTopPodcasts(),
-                                        _loadTopPodcasts(),
-                                        _loadTopPodcasts(),
-                                      ]),
-                          );
-                        }),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
-                    child: Text('Categories',
-                        style: context.textTheme.headline6
-                            .copyWith(color: context.accentColor)),
-                  ),
-                  ListView(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    children: genres
-                        .map<Widget>((e) => ListTile(
-                              contentPadding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                              onTap: () {
-                                widget.onTap('');
-                                setState(() => _selectedGenre = e);
-                              },
-                              title: Text(e.name),
-                            ))
-                        .toList(),
-                  ),
-                  SizedBox(
-                    height: 40,
-                    child: Center(
-                      child: Image(
-                        image: context.brightness == Brightness.light
-                            ? AssetImage('assets/listennotes.png')
-                            : AssetImage('assets/listennotes_light.png'),
-                        height: 15,
-                      ),
-                    ),
-                  )
-                ],
-              ),
+    return FutureBuilder<bool>(
+      future: _getHideDiscovery(),
+      initialData: true,
+      builder: (context, snapshot) => snapshot.data
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [_historyList(), Spacer()],
             )
-          : _TopPodcastList(genre: _selectedGenre),
+          : PodcastSlideup(
+              searchEngine: SearchEngine.listenNotes,
+              child: _selectedGenre == null
+                  ? SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _historyList(),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
+                            child: Text('Popular',
+                                style: context.textTheme.headline6
+                                    .copyWith(color: context.accentColor)),
+                          ),
+                          SizedBox(
+                            height: 200,
+                            child: FutureBuilder<List<OnlinePodcast>>(
+                                future: _searchTopPodcast,
+                                builder: (context, snapshot) {
+                                  return ScrollConfiguration(
+                                    behavior: NoGrowBehavior(),
+                                    child: ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: snapshot.hasData
+                                            ? snapshot.data
+                                                .map<Widget>((podcast) {
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      color:
+                                                          context.primaryColor),
+                                                  width: 120,
+                                                  margin: EdgeInsets.fromLTRB(
+                                                      10, 10, 0, 10),
+                                                  child: Material(
+                                                    color: Colors.transparent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    clipBehavior: Clip.hardEdge,
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        searchState
+                                                                .selectedPodcast =
+                                                            podcast;
+                                                        widget.onTap('');
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsets.all(4.0),
+                                                        child: Column(
+                                                          children: [
+                                                            Expanded(
+                                                              flex: 2,
+                                                              child: Center(
+                                                                  child: PodcastAvatar(
+                                                                      podcast)),
+                                                            ),
+                                                            Expanded(
+                                                              flex: 1,
+                                                              child: Text(
+                                                                podcast.title,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                maxLines: 2,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .fade,
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              flex: 1,
+                                                              child: Center(
+                                                                child: SizedBox(
+                                                                    height: 32,
+                                                                    child: SubscribeButton(
+                                                                        podcast)),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList()
+                                            : [
+                                                _loadTopPodcasts(),
+                                                _loadTopPodcasts(),
+                                                _loadTopPodcasts(),
+                                                _loadTopPodcasts(),
+                                              ]),
+                                  );
+                                }),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
+                            child: Text('Categories',
+                                style: context.textTheme.headline6
+                                    .copyWith(color: context.accentColor)),
+                          ),
+                          ListView(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            children: genres
+                                .map<Widget>((e) => ListTile(
+                                      contentPadding:
+                                          EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      onTap: () {
+                                        widget.onTap('');
+                                        setState(() => _selectedGenre = e);
+                                      },
+                                      title: Text(e.name),
+                                    ))
+                                .toList(),
+                          ),
+                          SizedBox(
+                            height: 40,
+                            child: Center(
+                              child: Image(
+                                image: context.brightness == Brightness.light
+                                    ? AssetImage('assets/listennotes.png')
+                                    : AssetImage(
+                                        'assets/listennotes_light.png'),
+                                height: 15,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  : _TopPodcastList(genre: _selectedGenre),
+            ),
     );
   }
 }

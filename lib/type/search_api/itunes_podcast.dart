@@ -51,7 +51,7 @@ class ItunesPodcast {
       _$ItunesPodcastFromJson(json);
   Map<String, dynamic> toJson() => _$ItunesPodcastToJson(this);
 
-  int get latestPubDate => DateFormat('YYYY-MM-DDTHH:MM:SSZ', 'en_US')
+  int get latestPubDate => DateFormat('yyyy-MM-DDTHH:MM:SSZ', 'en_US')
       .parse(releaseDate)
       .millisecondsSinceEpoch;
   OnlinePodcast get toOnlinePodcast => OnlinePodcast(

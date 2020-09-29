@@ -8,6 +8,7 @@ import '../util/custom_dropdown.dart';
 import '../util/custom_widget.dart';
 import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
+import '../service/search_api.dart';
 import 'popup_menu.dart';
 
 class LayoutSetting extends StatefulWidget {
@@ -18,10 +19,20 @@ class LayoutSetting extends StatefulWidget {
 }
 
 class _LayoutSettingState extends State<LayoutSetting> {
+  final _hideDiscoveyStorage = KeyValueStorage(hidePodcastDiscoveryKey);
   Future<Layout> _getLayout(String key) async {
     var keyValueStorage = KeyValueStorage(key);
     var layout = await keyValueStorage.getInt();
     return Layout.values[layout];
+  }
+
+  Future<bool> _getHideDiscovery() async {
+    return await _hideDiscoveyStorage.getBool(defaultValue: false);
+  }
+
+  Future<void> _saveHideDiscovery(bool boo) async {
+    await _hideDiscoveyStorage.saveBool(boo);
+    if (mounted) setState(() {});
   }
 
   Future<bool> _hideListened() async {
@@ -33,6 +44,18 @@ class _LayoutSettingState extends State<LayoutSetting> {
   Future<void> _saveHideListened(bool boo) async {
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
     await hideListenedStorage.saveBool(boo);
+    if (mounted) setState(() {});
+  }
+
+  Future<SearchEngine> _getSearchEngine() async {
+    final storage = KeyValueStorage(searchEngineKey);
+    final index = await storage.getInt(defaultValue: 1);
+    return SearchEngine.values[index];
+  }
+
+  Future<void> _saveSearchEngine(SearchEngine engine) async {
+    final storage = KeyValueStorage(searchEngineKey);
+    await storage.saveInt(engine.index);
     if (mounted) setState(() {});
   }
 
@@ -188,9 +211,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   padding: const EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text(s.settingsPopupMenu,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1
+                      style: context.textTheme.bodyText1
                           .copyWith(color: context.accentColor)),
                 ),
                 ListTile(
@@ -217,8 +238,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                           .copyWith(color: Theme.of(context).accentColor)),
                 ),
                 ListTile(
-                  contentPadding: EdgeInsets.only(
-                      left: 70.0, right: 20, bottom: 10, top: 10),
+                  contentPadding: EdgeInsets.fromLTRB(70, 10, 10, 10),
                   title: Text(s.settingsPlayerHeight),
                   subtitle: Text(s.settingsPlayerHeightDes),
                   trailing: Selector<AudioPlayerNotifier, PlayerHeight>(
@@ -236,6 +256,56 @@ class _LayoutSettingState extends State<LayoutSetting> {
                         }).toList(),
                         onChanged: (index) =>
                             audio.setPlayerHeight = PlayerHeight.values[index]),
+                  ),
+                ),
+                Divider(height: 1),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                ),
+                Container(
+                  height: 30.0,
+                  padding: EdgeInsets.symmetric(horizontal: 70),
+                  alignment: Alignment.centerLeft,
+                  child: Text('Podcast search',
+                      style: context.textTheme.bodyText1
+                          .copyWith(color: context.accentColor)),
+                ),
+                FutureBuilder<bool>(
+                  future: _getHideDiscovery(),
+                  initialData: false,
+                  builder: (context, snapshot) => ListTile(
+                    contentPadding: EdgeInsets.fromLTRB(70, 10, 10, 10),
+                    onTap: () => _saveHideDiscovery(!snapshot.data),
+                    title: Text('Hide podcast discovery'),
+                    subtitle: Text('Hide podcast discovery in search page'),
+                    trailing: Transform.scale(
+                      scale: 0.9,
+                      child: Switch(
+                          value: snapshot.data, onChanged: _saveHideDiscovery),
+                    ),
+                  ),
+                ),
+                FutureBuilder(
+                  future: _getSearchEngine(),
+                  initialData: SearchEngine.listenNotes,
+                  builder: (context, snapshot) => ListTile(
+                    contentPadding: EdgeInsets.fromLTRB(70, 10, 10, 10),
+                    title: Text('Default search engine'),
+                    subtitle: Text('Choose default search engine'),
+                    trailing: MyDropdownButton(
+                        hint: Text(''),
+                        underline: Center(),
+                        elevation: 1,
+                        value: snapshot.data,
+                        items: [
+                          DropdownMenuItem<SearchEngine>(
+                              value: SearchEngine.listenNotes,
+                              child: Text('ListenNotes')),
+                          DropdownMenuItem<SearchEngine>(
+                              value: SearchEngine.podcastIndex,
+                              child: Text('PodcastIndex')),
+                        ],
+                        onChanged: (value) => _saveSearchEngine(value)),
                   ),
                 ),
                 Divider(height: 1),
