@@ -104,9 +104,9 @@ class PodcastsIndexSearch {
   }
 
   Future<PodcastIndexSearchResult<dynamic>> searchPodcasts(
-      {String searchText, int limit}) async {
+      {String searchText, int limit = 99}) async {
     final url = "$_baseUrl/api/1.0/search/byterm"
-        "?q=${Uri.encodeComponent(searchText)}&max=$limit";
+        "?q=${Uri.encodeComponent(searchText)}&max=$limit&fulltext=true";
     final headers = _initSearch();
     final response = await _dio.get(url, options: Options(headers: headers));
     Map searchResultMap = jsonDecode(response.toString());

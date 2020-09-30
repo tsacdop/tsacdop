@@ -57,6 +57,10 @@ class RefreshWorker extends ChangeNotifier {
 
   Future<void> start(List<String> podcasts) async {
     if (!_created) {
+      if (podcasts.isEmpty) {
+        final refreshstorage = KeyValueStorage(refreshdateKey);
+        await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+      }
       _complete = false;
       await _createIsolate();
       _listen(podcasts);
@@ -79,8 +83,6 @@ Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
   Future<void> _refreshAll(List<String> podcasts) async {
     var podcastList;
     if (podcasts.isEmpty) {
-      var refreshstorage = KeyValueStorage(refreshdateKey);
-      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
       podcastList = await _dbHelper.getPodcastLocalAll(updateOnly: true);
     } else {
       podcastList = await _dbHelper.getPodcastLocal(podcasts, updateOnly: true);

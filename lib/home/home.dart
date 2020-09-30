@@ -546,6 +546,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
     var audio = context.watch<AudioPlayerNotifier>();
     final s = context.s;
     return Material(
+      color: Colors.transparent,
       child: MyPopupMenuButton<int>(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),

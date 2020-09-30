@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -171,9 +172,49 @@ class DiscoveryPageState extends State<DiscoveryPage> {
       future: _getHideDiscovery(),
       initialData: true,
       builder: (context, snapshot) => snapshot.data
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [_historyList(), Spacer()],
+          ? SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _historyList(),
+                  SizedBox(height: 100),
+                  SizedBox(
+                    height: 150,
+                    child: Center(
+                      child: Icon(
+                        Icons.search,
+                        size: 80,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LineIcons.microphone_solid,
+                          size: 30,
+                          color: Colors.redAccent,
+                        ),
+                        SizedBox(width: 50),
+                        Icon(
+                          LineIcons.broadcast_tower_solid,
+                          size: 30,
+                          color: Colors.deepPurple,
+                        ),
+                        SizedBox(width: 50),
+                        Icon(
+                          LineIcons.rss_square_solid,
+                          size: 30,
+                          color: Colors.blueGrey,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             )
           : PodcastSlideup(
               searchEngine: SearchEngine.listenNotes,

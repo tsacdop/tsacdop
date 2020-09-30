@@ -128,25 +128,16 @@ class MyHomePageDelegate extends SearchDelegate<int> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 1,
-          icon: snapshot.data == SearchEngine.podcastIndex
-              ? SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: CircleAvatar(
-                    backgroundImage: AssetImage('assets/podcastindex_logo.png'),
-                    backgroundColor: Colors.redAccent[700].withAlpha(70),
-                    maxRadius: 25,
-                  ),
-                )
-              : SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: CircleAvatar(
-                    backgroundImage: AssetImage('assets/listennotes_logo.png'),
-                    backgroundColor: Colors.red.withAlpha(70),
-                    maxRadius: 25,
-                  ),
-                ),
+          icon: SizedBox(
+            height: 30,
+            width: 30,
+            child: CircleAvatar(
+              backgroundImage: snapshot.data == SearchEngine.podcastIndex
+                  ? AssetImage('assets/podcastindex_logo.png')
+                  : AssetImage('assets/listennotes_logo.png'),
+              maxRadius: 25,
+            ),
+          ),
           onSelected: (value) {
             _searchEngine = value;
             showSuggestions(context);
@@ -175,7 +166,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
                 padding: EdgeInsets.only(left: 10),
                 child: Row(
                   children: <Widget>[
-                    Text('PodcastIndex'),
+                    Text('Podcastindex'),
                     Spacer(),
                     if (_searchEngine == SearchEngine.podcastIndex)
                       DotIndicator()
@@ -186,6 +177,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
           ],
         ),
       ),
+      SizedBox(width: 10),
     ];
   }
 
@@ -509,7 +501,19 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
                     )
                   ],
                 ),
-              )
+              ),
+              SliverToBoxAdapter(
+                  child: SizedBox(
+                height: 20,
+                child: Center(
+                  child: Image(
+                    image: context.brightness == Brightness.light
+                        ? AssetImage('assets/listennotes.png')
+                        : AssetImage('assets/listennotes_light.png'),
+                    height: 15,
+                  ),
+                ),
+              ))
             ],
           );
         },
@@ -531,6 +535,7 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
   bool _loading;
   Future _searchFuture;
   List _podcastList = [];
+  final _searchEngine = PodcastsIndexSearch();
 
   Future<void> _saveHistory(String query) async {
     final storage = KeyValueStorage(searchHistoryKey);
@@ -554,10 +559,9 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
 
   Future<List<OnlinePodcast>> _getPodcatsIndexList(String searchText,
       {int limit}) async {
-    if (_limit == 20) _saveHistory(searchText);
-    final searchEngine = PodcastsIndexSearch();
-    var searchResult =
-        await searchEngine.searchPodcasts(searchText: searchText, limit: limit);
+    if (_limit == 10) _saveHistory(searchText);
+    var searchResult = await _searchEngine.searchPodcasts(
+        searchText: searchText, limit: limit);
     var list = searchResult.feeds.cast();
     _podcastList = <OnlinePodcast>[
       for (var podcast in list) podcast.toOnlinePodcast
@@ -626,7 +630,17 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
                       )
                     ],
                   ),
-                )
+                ),
+                SliverToBoxAdapter(
+                    child: SizedBox(
+                  height: 20,
+                  child: Center(
+                    child: Image(
+                      image: AssetImage('assets/podcastindex.png'),
+                      height: 15,
+                    ),
+                  ),
+                ))
               ],
             );
           }),
