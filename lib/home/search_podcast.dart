@@ -409,7 +409,8 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
   int _nextOffset = 0;
   final List<OnlinePodcast> _podcastList = [];
   int _offset;
-  bool _loading;
+  bool _loading = false;
+  bool _loadError = false;
   Future _searchFuture;
 
   @override
@@ -434,8 +435,14 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
       String searchText, int nextOffset) async {
     if (nextOffset == 0) _saveHistory(searchText);
     final searchEngine = ListenNotesSearch();
-    var searchResult = await searchEngine.searchPodcasts(
-        searchText: searchText, nextOffset: nextOffset);
+    var searchResult;
+    try {
+      searchResult = await searchEngine.searchPodcasts(
+          searchText: searchText, nextOffset: nextOffset);
+    } catch (e) {
+      _loading = false;
+      return [];
+    }
     _offset = searchResult.nextOffset;
     _podcastList.addAll(searchResult.results.cast());
     _loading = false;
@@ -455,6 +462,25 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
               alignment: Alignment.topCenter,
               child: CircularProgressIndicator(),
             );
+          }
+          if (snapshot.data.isEmpty) {
+            if (_loadError) {
+              return Container(
+                padding: EdgeInsets.only(top: 200),
+                alignment: Alignment.topCenter,
+                child: Text('Network error.',
+                    style: context.textTheme.headline6
+                        .copyWith(color: Colors.red)),
+              );
+            } else {
+              return Container(
+                padding: EdgeInsets.only(top: 200),
+                alignment: Alignment.topCenter,
+                child: Text('No result.',
+                    style: context.textTheme.headline6
+                        .copyWith(color: context.accentColor)),
+              );
+            }
           }
           var content = snapshot.data;
           return CustomScrollView(
@@ -533,6 +559,7 @@ class _PodcastIndexSearch extends StatefulWidget {
 class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
   int _limit;
   bool _loading;
+  bool _loadError;
   Future _searchFuture;
   List _podcastList = [];
   final _searchEngine = PodcastsIndexSearch();
@@ -553,6 +580,7 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
   void initState() {
     super.initState();
     _loading = false;
+    _loadError = false;
     _limit = 10;
     _searchFuture = _getPodcatsIndexList(widget.query, limit: _limit);
   }
@@ -560,8 +588,15 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
   Future<List<OnlinePodcast>> _getPodcatsIndexList(String searchText,
       {int limit}) async {
     if (_limit == 10) _saveHistory(searchText);
-    var searchResult = await _searchEngine.searchPodcasts(
-        searchText: searchText, limit: limit);
+    var searchResult;
+    try {
+      searchResult = await _searchEngine.searchPodcasts(
+          searchText: searchText, limit: limit);
+    } catch (e) {
+      _loadError = true;
+      _loading = false;
+      return [];
+    }
     var list = searchResult.feeds.cast();
     _podcastList = <OnlinePodcast>[
       for (var podcast in list) podcast.toOnlinePodcast
@@ -583,6 +618,25 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
                 alignment: Alignment.topCenter,
                 child: CircularProgressIndicator(),
               );
+            }
+            if (snapshot.data.isEmpty) {
+              if (_loadError) {
+                return Container(
+                  padding: EdgeInsets.only(top: 200),
+                  alignment: Alignment.topCenter,
+                  child: Text('Network error.',
+                      style: context.textTheme.headline6
+                          .copyWith(color: Colors.red)),
+                );
+              } else {
+                return Container(
+                  padding: EdgeInsets.only(top: 200),
+                  alignment: Alignment.topCenter,
+                  child: Text('No result found.',
+                      style: context.textTheme.headline6
+                          .copyWith(color: context.accentColor)),
+                );
+              }
             }
             var content = snapshot.data;
             return CustomScrollView(

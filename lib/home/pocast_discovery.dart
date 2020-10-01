@@ -179,7 +179,6 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _historyList(),
-                    SizedBox(height: 50),
                     SizedBox(
                       height: 150,
                       child: Center(
