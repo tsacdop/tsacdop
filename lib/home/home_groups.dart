@@ -543,20 +543,6 @@ class ShowEpisode extends StatelessWidget {
   final DBHelper _dbHelper = DBHelper();
   ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
 
-  String _datToString(BuildContext context, {int pubDate}) {
-    final s = context.s;
-    var date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
-    var difference = DateTime.now().toUtc().difference(date);
-    if (difference.inHours < 24) {
-      return s.hoursAgo(difference.inHours);
-    } else if (difference.inDays < 7) {
-      return s.daysAgo(difference.inDays);
-    } else {
-      return DateFormat.yMMMd().format(
-          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
-    }
-  }
-
   Future<Tuple5<int, bool, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
     final menuList = await _getEpisodeMenu();
@@ -587,7 +573,7 @@ class ShowEpisode extends StatelessWidget {
   }
 
   Future<bool> _getTapToOpenPopupMenu() async {
-    var tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
+    final tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
     var boo = await tapToOpenPopupMenuStorage.getInt(defaultValue: 0);
     return boo == 1;
   }
@@ -676,7 +662,7 @@ class ShowEpisode extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = context.width;
     final s = context.s;
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    final audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return CustomScrollView(
       physics: NeverScrollableScrollPhysics(),
       primary: false,
@@ -749,7 +735,7 @@ class ShowEpisode extends StatelessWidget {
                                       color: context.accentColor,
                                     ),
                                     onPressed: () {
-                                      if (data.item1 != episodes[index]) {
+                                      if (data != episodes[index]) {
                                         audio.episodeLoad(episodes[index]);
                                       }
                                     }),
