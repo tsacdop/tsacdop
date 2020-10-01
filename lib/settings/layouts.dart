@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../local_storage/key_value_storage.dart';
+import '../service/search_api.dart';
 import '../state/audio_state.dart';
 import '../util/custom_dropdown.dart';
 import '../util/custom_widget.dart';
 import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
-import '../service/search_api.dart';
 import 'popup_menu.dart';
 
 class LayoutSetting extends StatefulWidget {
@@ -49,7 +49,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
 
   Future<SearchEngine> _getSearchEngine() async {
     final storage = KeyValueStorage(searchEngineKey);
-    final index = await storage.getInt(defaultValue: 1);
+    final index = await storage.getInt(defaultValue: 0);
     return SearchEngine.values[index];
   }
 
@@ -266,7 +266,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
-                  child: Text('Podcast search',
+                  child: Text(s.search,
                       style: context.textTheme.bodyText1
                           .copyWith(color: context.accentColor)),
                 ),
@@ -276,8 +276,8 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   builder: (context, snapshot) => ListTile(
                     contentPadding: EdgeInsets.fromLTRB(70, 10, 10, 10),
                     onTap: () => _saveHideDiscovery(!snapshot.data),
-                    title: Text('Hide podcast discovery'),
-                    subtitle: Text('Hide podcast discovery in search page'),
+                    title: Text(s.hidePodcastDiscovery),
+                    subtitle: Text(s.hidePodcastDiscoveryDes),
                     trailing: Transform.scale(
                       scale: 0.9,
                       child: Switch(
@@ -290,8 +290,8 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   initialData: SearchEngine.listenNotes,
                   builder: (context, snapshot) => ListTile(
                     contentPadding: EdgeInsets.fromLTRB(70, 10, 10, 10),
-                    title: Text('Default search engine'),
-                    subtitle: Text('Choose default search engine'),
+                    title: Text(s.defaultSearchEngine),
+                    subtitle: Text(s.defaultSearchEngineDes),
                     trailing: MyDropdownButton(
                         hint: Text(''),
                         underline: Center(),
@@ -299,11 +299,11 @@ class _LayoutSettingState extends State<LayoutSetting> {
                         value: snapshot.data,
                         items: [
                           DropdownMenuItem<SearchEngine>(
+                              value: SearchEngine.podcastIndex,
+                              child: Text('Podcastindex')),
+                          DropdownMenuItem<SearchEngine>(
                               value: SearchEngine.listenNotes,
                               child: Text('ListenNotes')),
-                          DropdownMenuItem<SearchEngine>(
-                              value: SearchEngine.podcastIndex,
-                              child: Text('PodcastIndex')),
                         ],
                         onChanged: (value) => _saveSearchEngine(value)),
                   ),

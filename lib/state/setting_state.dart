@@ -494,6 +494,8 @@ class SettingState extends ChangeNotifier {
         await KeyValueStorage(notificationLayoutKey).getInt(defaultValue: 0);
     var showNotesFont = await showNotesFontStorage.getInt(defaultValue: 1);
     var speedList = await KeyValueStorage(speedListKey).getStringList();
+    var hidePodcastDiscovery = await KeyValueStorage(hidePodcastDiscoveryKey)
+        .getBool(defaultValue: false);
 
     return SettingsBackup(
         theme: theme,
@@ -524,7 +526,8 @@ class SettingState extends ChangeNotifier {
         hideListened: hideListened,
         notificationLayout: notificationLayout,
         showNotesFont: showNotesFont,
-        speedList: speedList);
+        speedList: speedList,
+        hidePodcastDiscovery: hidePodcastDiscovery);
   }
 
   Future<void> restore(SettingsBackup backup) async {

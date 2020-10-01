@@ -28,6 +28,8 @@ class SettingsBackup {
   final int notificationLayout;
   final int showNotesFont;
   final List<String> speedList;
+  final bool hidePodcastDiscovery;
+
   SettingsBackup(
       {this.theme,
       this.accentColor,
@@ -57,7 +59,8 @@ class SettingsBackup {
       this.hideListened,
       this.notificationLayout,
       this.showNotesFont,
-      this.speedList});
+      this.speedList,
+      this.hidePodcastDiscovery});
 
   Map<String, Object> toJson() {
     return {
@@ -88,7 +91,8 @@ class SettingsBackup {
       'hideListened': hideListened,
       'notificationLayout': notificationLayout,
       'showNotesFont': showNotesFont,
-      'speedList': speedList
+      'speedList': speedList,
+      'hidePodcastDiscovery': hidePodcastDiscovery
     };
   }
 
@@ -123,6 +127,7 @@ class SettingsBackup {
         hideListened: json['hideListened'] as bool,
         notificationLayout: json['notificationLayout'] as int,
         showNotesFont: json['showNotesFont'] as int,
-        speedList: speedList);
+        speedList: speedList,
+        hidePodcastDiscovery: json['hidePodcastDiscovery'] as bool);
   }
 }
