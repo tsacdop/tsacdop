@@ -22,7 +22,7 @@ The podcast search engine is powered by [ListenNotes](https://listennotes.com).
 * Podcast group management
 * Playlist support
 * Sleep timer / speed setting
-* OMPL file export and import
+* OPML file export and import
 * Auto syncing in background
 * Listening and subscription history record
 * Dark mode / accent color

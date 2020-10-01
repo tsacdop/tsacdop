@@ -44,7 +44,7 @@ class _DataBackupState extends State<DataBackup> {
         now.month.toString() +
         now.day.toString() +
         now.second.toString();
-    var file = File(path.join(tempdir.path, 'tsacdop_ompl_$datePlus.xml'));
+    var file = File(path.join(tempdir.path, 'tsacdop_opml_$datePlus.xml'));
     await file.writeAsString(opml.toXmlString());
     return file;
   }
@@ -57,7 +57,7 @@ class _DataBackupState extends State<DataBackup> {
   Future<void> _shareFile(File file) async {
     final bytes = await file.readAsBytes();
     await WcFlutterShare.share(
-        sharePopupTitle: 'share Clip',
+        sharePopupTitle: 'Share file',
         fileName: file.path.split('/').last,
         mimeType: 'text/plain',
         bytesOfFile: bytes.buffer.asUint8List());
@@ -653,7 +653,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
     var rssExp = RegExp(r'^(https?):\/\/(.*)');
     final opml = await gpodder.getAllPodcast();
     if (opml != '') {
-      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(opml);
+      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml);
       for (var entry in data.entries) {
         var list = entry.value.reversed;
         for (var rss in list) {
@@ -1005,7 +1005,7 @@ class __GpodderInfoState extends State<_GpodderInfo> {
       var rssExp = RegExp(r'^(https?):\/\/(.*)');
       final opml = await _gpodder.getAllPodcast();
       if (opml != '') {
-        Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(opml);
+        Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml);
         for (var entry in data.entries) {
           var list = entry.value.reversed;
           for (var rss in list) {

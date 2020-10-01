@@ -440,7 +440,7 @@ class GroupList extends ChangeNotifier {
     }
   }
 
-  /// Subscribe podcast from OMPL.
+  /// Subscribe podcast from OPML.
   Future<bool> _subscribeNewPodcast(
       {String id, String groupName = 'Home'}) async {
     //List<String> groupNames = _groups.map((e) => e.name).toList();

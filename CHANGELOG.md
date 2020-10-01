@@ -10,8 +10,6 @@ Release date 2020/10/1
 * Option to hide podcast discovery in search page.
 * Italian translation support, thanks Edoardo.
 
-  
-
 ### Bug fixed
 
 * Mark all listened error.
@@ -217,13 +215,13 @@ Release date 2020/7/16
 
 ## New features
 
-* OMPL backup file supports group.
+* OPML backup file supports group.
 * Add settings backup and restore.
 * Enable R8 and dart obfuscate.
 
 ## Bugs fixed
 
-* OMPL import not shown in group.
+* OPML import not shown in group.
 
 ## Minor UI change
 

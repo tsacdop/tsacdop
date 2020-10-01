@@ -54,13 +54,13 @@ class PodcastsBackup {
     return builder.build();
   }
 
-  static parseOMPL(String opml) {
+  static parseOPML(String opml) {
     var data = <String, List<OmplOutline>>{};
     // var opml = file.readAsStringSync();
     var content = xml.XmlDocument.parse(opml);
     var title =
         content.findAllElements('head').first.findElements('title').first.text;
-    developer.log(title, name: 'Import OMPL');
+    developer.log(title, name: 'Import OPML');
     var groups = content.findAllElements('body').first.findElements('outline');
     if (title != 'Tsacdop Feed Groups') {
       var total = content

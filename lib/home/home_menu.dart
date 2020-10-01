@@ -58,7 +58,7 @@ class _PopupMenuState extends State<PopupMenu> {
     var file = File(path);
     try {
       final opml = file.readAsStringSync();
-      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOMPL(opml);
+      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml);
       for (var entry in data.entries) {
         var title = entry.key;
         var list = entry.value.reversed;
