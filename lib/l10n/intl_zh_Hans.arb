@@ -433,6 +433,8 @@
   "@search": {},
   "searchEpisode": "搜索节目",
   "@searchEpisode": {},
+  "searchHelper": "请输入播客名，关键字或者RSS链接。",
+  "@searchHelper": {},
   "searchInvalidRss": "RSS 链接错误",
   "@searchInvalidRss": {},
   "searchPodcast": "搜索播客",

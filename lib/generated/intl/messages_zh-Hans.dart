@@ -251,6 +251,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "schedule" : MessageLookupByLibrary.simpleMessage("定时"),
     "search" : MessageLookupByLibrary.simpleMessage("搜索"),
     "searchEpisode" : MessageLookupByLibrary.simpleMessage("搜索节目"),
+    "searchHelper" : MessageLookupByLibrary.simpleMessage("请输入播客名，关键字或者RSS链接。"),
     "searchInvalidRss" : MessageLookupByLibrary.simpleMessage("RSS 链接错误"),
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("搜索播客"),
     "secCount" : m24,

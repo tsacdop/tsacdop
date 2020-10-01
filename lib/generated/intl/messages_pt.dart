@@ -251,6 +251,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "schedule" : MessageLookupByLibrary.simpleMessage("Horário"),
     "search" : MessageLookupByLibrary.simpleMessage("Procurar"),
     "searchEpisode" : MessageLookupByLibrary.simpleMessage("Procurar episódio"),
+    "searchHelper" : MessageLookupByLibrary.simpleMessage("Type the podcast name, keywords or enter a feed url."),
     "searchInvalidRss" : MessageLookupByLibrary.simpleMessage("Ligação RSS inválida"),
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("Procurar podcasts"),
     "secCount" : m24,

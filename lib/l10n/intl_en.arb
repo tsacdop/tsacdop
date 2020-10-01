@@ -433,6 +433,8 @@
   "@search": {},
   "searchEpisode": "Search episode",
   "@searchEpisode": {},
+  "searchHelper": "Type the podcast name, keywords or enter a feed url.",
+  "@searchHelper": {},
   "searchInvalidRss": "Invalid RSS link",
   "@searchInvalidRss": {},
   "searchPodcast": "Search for podcasts",

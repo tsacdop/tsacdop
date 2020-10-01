@@ -1746,6 +1746,16 @@ class S {
     );
   }
 
+  /// `Type the podcast name, keywords or enter a feed url.`
+  String get searchHelper {
+    return Intl.message(
+      'Type the podcast name, keywords or enter a feed url.',
+      name: 'searchHelper',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Invalid RSS link`
   String get searchInvalidRss {
     return Intl.message(

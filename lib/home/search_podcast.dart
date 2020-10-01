@@ -147,20 +147,6 @@ class MyHomePageDelegate extends SearchDelegate<int> {
           },
           itemBuilder: (context) => [
             PopupMenuItem(
-              value: SearchEngine.listenNotes,
-              child: Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Row(
-                  children: <Widget>[
-                    Text('ListenNotes'),
-                    Spacer(),
-                    if (_searchEngine == SearchEngine.listenNotes)
-                      DotIndicator()
-                  ],
-                ),
-              ),
-            ),
-            PopupMenuItem(
               value: SearchEngine.podcastIndex,
               child: Container(
                 padding: EdgeInsets.only(left: 10),
@@ -169,6 +155,20 @@ class MyHomePageDelegate extends SearchDelegate<int> {
                     Text('Podcastindex'),
                     Spacer(),
                     if (_searchEngine == SearchEngine.podcastIndex)
+                      DotIndicator()
+                  ],
+                ),
+              ),
+            ),
+            PopupMenuItem(
+              value: SearchEngine.listenNotes,
+              child: Container(
+                padding: EdgeInsets.only(left: 10),
+                child: Row(
+                  children: <Widget>[
+                    Text('ListenNotes'),
+                    Spacer(),
+                    if (_searchEngine == SearchEngine.listenNotes)
                       DotIndicator()
                   ],
                 ),
