@@ -44,7 +44,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
 
   Future<SearchEngine> _getSearchEngine() async {
     final storage = KeyValueStorage(searchEngineKey);
-    final index = await storage.getInt(defaultValue: 0);
+    final index = await storage.getInt();
     if (_searchEngine == null) {
       _searchEngine = SearchEngine.values[index];
     }

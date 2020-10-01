@@ -49,7 +49,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
 
   Future<SearchEngine> _getSearchEngine() async {
     final storage = KeyValueStorage(searchEngineKey);
-    final index = await storage.getInt(defaultValue: 0);
+    final index = await storage.getInt();
     return SearchEngine.values[index];
   }
 

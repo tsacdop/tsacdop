@@ -13,7 +13,7 @@ import '../type/search_api/search_top_podcast.dart';
 import '../type/search_api/searchepisodes.dart';
 import '../type/search_api/searchpodcast.dart';
 
-enum SearchEngine { listenNotes, podcastIndex }
+enum SearchEngine { podcastIndex, listenNotes }
 
 class ListenNotesSearch {
   final _apiKey = environment['apiKey'];
