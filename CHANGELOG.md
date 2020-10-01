@@ -1,5 +1,21 @@
 # Tsacdop Changelog
 
+## 0.4.19
+
+Release date 2020/10/1
+
+### New features
+
+* Set podcastindex as  default search engine.
+* Option to hide podcast discovery in search page.
+* Italian translation support, thanks Edoardo.
+
+  
+
+### Bug fixed
+
+* Mark all listened error.
+
 ## 0.4.18
 
 Release date 2020/9/27
