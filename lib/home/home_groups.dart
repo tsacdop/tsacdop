@@ -11,8 +11,6 @@ import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/podcasts/podcastlist.dart';
-import 'package:tsacdop/util/general_dialog.dart';
 import 'package:tuple/tuple.dart';
 
 import '../episodes/episode_detail.dart';
@@ -20,6 +18,7 @@ import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../podcasts/podcast_detail.dart';
 import '../podcasts/podcast_manage.dart';
+import '../podcasts/podcastlist.dart';
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
@@ -28,6 +27,7 @@ import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../util/general_dialog.dart';
 import '../util/pageroute.dart';
 
 class ScrollPodcasts extends StatefulWidget {
@@ -542,12 +542,8 @@ class ShowEpisode extends StatelessWidget {
   final PodcastLocal podcastLocal;
   final DBHelper _dbHelper = DBHelper();
   ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
-  String stringForSeconds(double seconds) {
-    if (seconds == null) return null;
-    return '${(seconds ~/ 60)}:${(seconds.truncate() % 60).toString().padLeft(2, '0')}';
-  }
 
-  String _dateToString(BuildContext context, {int pubDate}) {
+  String _datToString(BuildContext context, {int pubDate}) {
     final s = context.s;
     var date = DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true);
     var difference = DateTime.now().toUtc().difference(date);
@@ -563,12 +559,11 @@ class ShowEpisode extends StatelessWidget {
 
   Future<Tuple5<int, bool, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
-    var menuList = await _getEpisodeMenu();
-    var tapToOpen = await _getTapToOpenPopupMenu();
-    var listened = await _isListened(episode);
-
-    var liked = await _isLiked(episode);
-    var downloaded = await _isDownloaded(episode);
+    final menuList = await _getEpisodeMenu();
+    final tapToOpen = await _getTapToOpenPopupMenu();
+    final listened = await _isListened(episode);
+    final liked = await _isLiked(episode);
+    final downloaded = await _isDownloaded(episode);
 
     return Tuple5(listened, liked, downloaded, tapToOpen, menuList);
   }
@@ -578,8 +573,7 @@ class ShowEpisode extends StatelessWidget {
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.isLiked(episode.enclosureUrl);
+    return await _dbHelper.isLiked(episode.enclosureUrl);
   }
 
   Future<List<int>> _getEpisodeMenu() async {
@@ -589,8 +583,7 @@ class ShowEpisode extends StatelessWidget {
   }
 
   Future<bool> _isDownloaded(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.isDownloaded(episode.enclosureUrl);
+    return await _dbHelper.isDownloaded(episode.enclosureUrl);
   }
 
   Future<bool> _getTapToOpenPopupMenu() async {
@@ -600,22 +593,19 @@ class ShowEpisode extends StatelessWidget {
   }
 
   Future<void> _markListened(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
-    var marked = await dbHelper.checkMarked(episode);
+    var marked = await _dbHelper.checkMarked(episode);
     if (!marked) {
       final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-      await dbHelper.saveHistory(history);
+      await _dbHelper.saveHistory(history);
     }
   }
 
   Future<void> _saveLiked(String url) async {
-    var dbHelper = DBHelper();
-    await dbHelper.setLiked(url);
+    await _dbHelper.setLiked(url);
   }
 
   Future<void> _setUnliked(String url) async {
-    var dbHelper = DBHelper();
-    await dbHelper.setUniked(url);
+    await _dbHelper.setUniked(url);
   }
 
   Future<void> _requestDownload(BuildContext context,
@@ -684,7 +674,7 @@ class ShowEpisode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _width = context.width;
+    final width = context.width;
     final s = context.s;
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return CustomScrollView(
@@ -723,9 +713,8 @@ class ShowEpisode extends StatelessWidget {
                           final menuList = snapshot.data.item5;
                           return Container(
                             decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)),
-                              color: Theme.of(context).scaffoldBackgroundColor,
+                              borderRadius: BorderRadius.circular(5.0),
+                              color: context.scaffoldBackgroundColor,
                             ),
                             alignment: Alignment.center,
                             child: FocusedMenuHolder(
@@ -913,8 +902,8 @@ class ShowEpisode extends StatelessWidget {
                                             tag:
                                                 '${episodes[index].enclosureUrl}scroll',
                                             child: Container(
-                                              height: _width / 18,
-                                              width: _width / 18,
+                                              height: width / 18,
+                                              width: width / 18,
                                               child: CircleAvatar(
                                                 backgroundImage:
                                                     podcastLocal.avatarImage,
@@ -983,13 +972,13 @@ class ShowEpisode extends StatelessWidget {
                                               CrossAxisAlignment.center,
                                           children: <Widget>[
                                             Text(
-                                              _dateToString(context,
-                                                  pubDate:
-                                                      episodes[index].pubDate),
+                                              episodes[index]
+                                                  .pubDate
+                                                  .toDate(context),
                                               overflow: TextOverflow.visible,
                                               style: TextStyle(
                                                 height: 1,
-                                                fontSize: _width / 35,
+                                                fontSize: width / 35,
                                                 color: c,
                                                 fontStyle: FontStyle.italic,
                                               ),
@@ -1003,7 +992,7 @@ class ShowEpisode extends StatelessWidget {
                                                       .duration
                                                       .toTime,
                                                   style: TextStyle(
-                                                    fontSize: _width / 35,
+                                                    fontSize: width / 35,
                                                     // color: _c,
                                                     // fontStyle: FontStyle.italic,
                                                   ),
@@ -1020,7 +1009,7 @@ class ShowEpisode extends StatelessWidget {
                                                 : Text(
                                                     '|',
                                                     style: TextStyle(
-                                                      fontSize: _width / 35,
+                                                      fontSize: width / 35,
                                                     ),
                                                   ),
                                             if (episodes[index]
@@ -1034,7 +1023,7 @@ class ShowEpisode extends StatelessWidget {
                                                 child: Text(
                                                   '${(episodes[index].enclosureLength) ~/ 1000000}MB',
                                                   style: TextStyle(
-                                                      fontSize: _width / 35),
+                                                      fontSize: width / 35),
                                                 ),
                                               ),
                                           ],
