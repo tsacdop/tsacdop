@@ -306,7 +306,7 @@ class DBHelper {
     var dbClient = await database;
     final milliseconds = DateTime.now().millisecondsSinceEpoch;
     var recent = await getPlayHistory(1);
-    if (recent.isNotEmpty) {
+    if (recent.isNotEmpty && recent.first.title == history.title) {
       await dbClient.rawDelete("DELETE FROM PlayHistory WHERE add_date = ?",
           [recent.first.playdate.millisecondsSinceEpoch]);
     }
@@ -671,8 +671,8 @@ class DBHelper {
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
-        WHERE P.id = ? AND H.SUM(listen_time) > 0 ORDER BY E.milliseconds ASC""",
-                [id]);
+        WHERE P.id = ? GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
+        OR SUM(H.listen_time) = 0 ORDER BY E.milliseconds ASC""", [id]);
             break;
           case Filter.liked:
             list = await dbClient.rawQuery(
