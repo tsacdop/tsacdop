@@ -265,6 +265,26 @@ class S {
     );
   }
 
+  /// `Default podcast search engine`
+  String get defaultSearchEngine {
+    return Intl.message(
+      'Default podcast search engine',
+      name: 'defaultSearchEngine',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose the default podcast search engine`
+  String get defaultSearchEngineDes {
+    return Intl.message(
+      'Choose the default podcast search engine',
+      name: 'defaultSearchEngineDes',
+      desc: 'Choose the default podcast search engine',
+      args: [],
+    );
+  }
+
   /// `Delete`
   String get delete {
     return Intl.message(
@@ -726,6 +746,26 @@ class S {
     return Intl.message(
       'Hide listened',
       name: 'hideListenedSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hide podcast discovery`
+  String get hidePodcastDiscovery {
+    return Intl.message(
+      'Hide podcast discovery',
+      name: 'hidePodcastDiscovery',
+      desc: 'Hide podcast discovery',
+      args: [],
+    );
+  }
+
+  /// `Hide podcast discovery in search page`
+  String get hidePodcastDiscoveryDes {
+    return Intl.message(
+      'Hide podcast discovery in search page',
+      name: 'hidePodcastDiscoveryDes',
       desc: '',
       args: [],
     );
@@ -2924,6 +2964,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
       Locale.fromSubtags(languageCode: 'en'),
       Locale.fromSubtags(languageCode: 'es'),
       Locale.fromSubtags(languageCode: 'fr'),
+      Locale.fromSubtags(languageCode: 'it'),
       Locale.fromSubtags(languageCode: 'pt'),
       Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
     ];

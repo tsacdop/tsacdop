@@ -117,6 +117,16 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
         ),
         Divider(height: 1),
         ListTile(
+          title: Text('Italiano'),
+          onTap: () => _setLocale(Locale('it')),
+          contentPadding: const EdgeInsets.only(left: 20, right: 20),
+          trailing: Radio<Locale>(
+              value: Locale('it'),
+              groupValue: Locale(Intl.getCurrentLocale()),
+              onChanged: _setLocale),
+        ),
+        Divider(height: 1),
+        ListTile(
           onTap: () =>
               'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project'
                   .launchUrl,

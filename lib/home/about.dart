@@ -5,7 +5,7 @@ import 'package:line_icons/line_icons.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
-const String version = '0.4.18';
+const String version = '0.4.19';
 
 class AboutApp extends StatelessWidget {
   Widget _listItem(
@@ -270,6 +270,8 @@ class AboutApp extends StatelessWidget {
                             name: 'Joel Israel', flag: 'mx'),
                         _translatorInfo(context,
                             name: 'Bruno Pinheiro', flag: 'pt'),
+                        _translatorInfo(context,
+                            name: 'Edoardo Maria Elidoro', flag: 'it'),
                       ],
                     ),
                   ),

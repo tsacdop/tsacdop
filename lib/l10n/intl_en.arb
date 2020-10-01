@@ -54,6 +54,12 @@
   "@daysAgo": {},
   "daysCount": "{count, plural, zero{Never} one{{count} day} other{{count} days}}",
   "@daysCount": {},
+  "defaultSearchEngine": "Default podcast search engine",
+  "@defaultSearchEngine": {},
+  "defaultSearchEngineDes": "Choose the default podcast search engine",
+  "@defaultSearchEngineDes": {
+    "description": "Choose the default podcast search engine"
+  },
   "delete": "Delete",
   "@delete": {},
   "developer": "Developer",
@@ -158,6 +164,12 @@
   "@groups": {},
   "hideListenedSetting": "Hide listened",
   "@hideListenedSetting": {},
+  "hidePodcastDiscovery": "Hide podcast discovery",
+  "@hidePodcastDiscovery": {
+    "description": "Hide podcast discovery"
+  },
+  "hidePodcastDiscoveryDes": "Hide podcast discovery in search page",
+  "@hidePodcastDiscoveryDes": {},
   "homeGroupsSeeAll": "See All",
   "@homeGroupsSeeAll": {},
   "homeMenuPlaylist": "Playlist",

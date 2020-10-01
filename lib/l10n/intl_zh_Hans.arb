@@ -54,6 +54,12 @@
   "@daysAgo": {},
   "daysCount": "{count, plural, zero{从不} other{{count}天}}",
   "@daysCount": {},
+  "defaultSearchEngine": "默认播客搜索引擎",
+  "@defaultSearchEngine": {},
+  "defaultSearchEngineDes": "选择默认播客搜索引擎",
+  "@defaultSearchEngineDes": {
+    "description": "Choose the default podcast search engine"
+  },
   "delete": "删除",
   "@delete": {},
   "developer": "关于我",
@@ -158,6 +164,12 @@
   "@groups": {},
   "hideListenedSetting": "隐藏已收听",
   "@hideListenedSetting": {},
+  "hidePodcastDiscovery": "隐藏播客推荐",
+  "@hidePodcastDiscovery": {
+    "description": "Hide podcast discovery"
+  },
+  "hidePodcastDiscoveryDes": "在搜索页面隐藏播客推荐",
+  "@hidePodcastDiscoveryDes": {},
   "homeGroupsSeeAll": "查看全部",
   "@homeGroupsSeeAll": {},
   "homeMenuPlaylist": "播放列表",
