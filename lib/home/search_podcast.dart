@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/type/search_api/index_episode.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -440,6 +439,7 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
       searchResult = await searchEngine.searchPodcasts(
           searchText: searchText, nextOffset: nextOffset);
     } catch (e) {
+      _loadError = true;
       _loading = false;
       return [];
     }
