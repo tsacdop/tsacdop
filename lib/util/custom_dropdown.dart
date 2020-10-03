@@ -1534,7 +1534,7 @@ class DropdownButtonFormField<T> extends FormField<T> {
           onSaved: onSaved,
           initialValue: value,
           validator: validator,
-          autovalidate: autovalidate,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           builder: (field) {
             final state = field as _DropdownButtonFormFieldState<T>;
             final effectiveDecoration = decoration.applyDefaults(

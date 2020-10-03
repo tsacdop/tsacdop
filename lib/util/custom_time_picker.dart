@@ -917,8 +917,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _thetaController = AnimationController(
-      duration: _kDialAnimateDuration,
       vsync: this,
+      duration: _kDialAnimateDuration,
     );
     _thetaTween = Tween<double>(begin: _getThetaForTime(widget.selectedTime));
     _theta = _thetaController

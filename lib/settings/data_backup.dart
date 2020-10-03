@@ -828,7 +828,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
                     )
                   : Form(
                       key: _formKey,
-                      autovalidate: false,
+                      autovalidateMode: AutovalidateMode.disabled,
                       child: AutofillGroup(
                         child: SliverList(
                           delegate: SliverChildListDelegate(

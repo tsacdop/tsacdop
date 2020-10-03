@@ -44,9 +44,9 @@ class _PodcastManageState extends State<PodcastManage>
     _menuValue = 0;
     _index = 0;
     _menuController = AnimationController(
-        duration: const Duration(milliseconds: 150), vsync: this);
+        vsync: this, duration: const Duration(milliseconds: 150));
     _controller = AnimationController(
-        duration: const Duration(milliseconds: 500), vsync: this);
+        vsync: this, duration: const Duration(milliseconds: 500));
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
         if (mounted) {
