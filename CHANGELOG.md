@@ -1,5 +1,13 @@
 # Tsacdop Changelog
 
+## 0.4.20
+
+Release date 2020/10/3
+
+### Bug fixed
+
+* Rss feed parse error.
+
 ## 0.4.19
 
 Release date 2020/10/1
