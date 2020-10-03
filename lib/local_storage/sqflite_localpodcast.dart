@@ -473,17 +473,24 @@ class DBHelper {
         try {
           date = DateFormat('EEE, dd MMM yyyy HH:mm Z', 'en_US').parse(pubDate);
         } catch (e) {
-          //parse date using regex, still have issue in parse maonth/day
           var year = yyyy.stringMatch(pubDate);
           var time = hhmm.stringMatch(pubDate);
           var month = ddmmm.stringMatch(pubDate);
           if (year != null && time != null && month != null) {
-            date = DateFormat('dd MMM yyyy HH:mm', 'en_US')
-                .parse(month + year + time);
+            try {
+              date = DateFormat('dd MMM yyyy HH:mm', 'en_US')
+                  .parse('$month $year $time');
+            } catch (e) {
+              date = DateTime.now();
+            }
           } else if (year != null && time != null && month == null) {
             var month = mmDd.stringMatch(pubDate);
-            date =
-                DateFormat('yyyy-MM-dd HH:mm', 'en_US').parse('$month $time');
+            try {
+              date =
+                  DateFormat('yyyy-MM-dd HH:mm', 'en_US').parse('$month $time');
+            } catch (e) {
+              date = DateTime.now();
+            }
           } else {
             date = DateTime.now();
           }
