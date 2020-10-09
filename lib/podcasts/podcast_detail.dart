@@ -429,58 +429,58 @@ class _PodcastDetailState extends State<PodcastDetail> {
         height: 30,
         child: Row(
           children: <Widget>[
-            SizedBox(width: 10),
-            _customPopupMenu(
-              tooltip: s.homeSubMenuSortBy,
-              child: Container(
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100.0),
-                    border: Border.all(color: context.primaryColorDark),
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(s.homeSubMenuSortBy),
-                      SizedBox(width: 5),
-                      Icon(
-                        _reverse
-                            ? LineIcons.hourglass_start_solid
-                            : LineIcons.hourglass_end_solid,
-                        size: 18,
-                      )
-                    ],
-                  )),
-              itemBuilder: [
-                PopupMenuItem(
-                  value: 0,
-                  child: Row(
-                    children: [
-                      Text(s.newestFirst),
-                      Spacer(),
-                      if (!_reverse) DotIndicator()
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: [
-                      Text(s.oldestFirst),
-                      Spacer(),
-                      if (_reverse) DotIndicator()
-                    ],
-                  ),
-                )
-              ],
-              onSelected: (value) {
-                if (value == 0) {
-                  setState(() => _reverse = false);
-                } else if (value == 1) setState(() => _reverse = true);
-              },
-            ),
-            SizedBox(width: 10),
+            //SizedBox(width: 10),
+            // _customPopupMenu(
+            //   tooltip: s.homeSubMenuSortBy,
+            //   child: Container(
+            //       height: 30,
+            //       decoration: BoxDecoration(
+            //         borderRadius: BorderRadius.circular(100.0),
+            //         border: Border.all(color: context.primaryColorDark),
+            //       ),
+            //       padding: EdgeInsets.symmetric(horizontal: 10),
+            //       child: Row(
+            //         mainAxisSize: MainAxisSize.min,
+            //         children: <Widget>[
+            //           Text(s.homeSubMenuSortBy),
+            //           SizedBox(width: 5),
+            //           Icon(
+            //             _reverse
+            //                 ? LineIcons.hourglass_start_solid
+            //                 : LineIcons.hourglass_end_solid,
+            //             size: 18,
+            //           )
+            //         ],
+            //       )),
+            //   itemBuilder: [
+            //     PopupMenuItem(
+            //       value: 0,
+            //       child: Row(
+            //         children: [
+            //           Text(s.newestFirst),
+            //           Spacer(),
+            //           if (!_reverse) DotIndicator()
+            //         ],
+            //       ),
+            //     ),
+            //     PopupMenuItem(
+            //       value: 1,
+            //       child: Row(
+            //         children: [
+            //           Text(s.oldestFirst),
+            //           Spacer(),
+            //           if (_reverse) DotIndicator()
+            //         ],
+            //       ),
+            //     )
+            //   ],
+            //   onSelected: (value) {
+            //     if (value == 0) {
+            //       setState(() => _reverse = false);
+            //     } else if (value == 1) setState(() => _reverse = true);
+            //   },
+            // ),
+            SizedBox(width: 15),
             _customPopupMenu(
                 tooltip: s.filter,
                 child: Container(
@@ -617,6 +617,27 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   }
                 }),
             Spacer(),
+            Material(
+                color: Colors.transparent,
+                clipBehavior: Clip.hardEdge,
+                borderRadius: BorderRadius.circular(100),
+                child: SizedBox(
+                  width: 30,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    tooltip: s.homeSubMenuSortBy,
+                    icon: Icon(
+                      _reverse
+                          ? LineIcons.hourglass_start_solid
+                          : LineIcons.hourglass_end_solid,
+                      color: _reverse ? context.accentColor : null,
+                    ),
+                    iconSize: 18,
+                    onPressed: () {
+                      setState(() => _reverse = !_reverse);
+                    },
+                  ),
+                )),
             FutureBuilder<bool>(
                 future: _getHideListened(),
                 builder: (context, snapshot) {
