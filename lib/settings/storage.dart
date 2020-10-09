@@ -7,6 +7,7 @@ import '../local_storage/key_value_storage.dart';
 import '../settings/downloads_manage.dart';
 import '../state/setting_state.dart';
 import '../util/custom_dropdown.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
 class StorageSetting extends StatefulWidget {
@@ -95,6 +96,7 @@ class _StorageSettingState extends State<StorageSetting>
       child: Scaffold(
         appBar: AppBar(
           title: Text(s.settingStorage),
+          leading: CustomBackButton(),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),

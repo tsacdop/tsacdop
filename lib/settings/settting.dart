@@ -7,6 +7,7 @@ import 'package:line_icons/line_icons.dart';
 import '../home/home.dart';
 import '../intro_slider/app_intro.dart';
 import '../podcasts/podcast_manage.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 import '../util/general_dialog.dart';
 import 'data_backup.dart';
@@ -53,6 +54,7 @@ class _SettingsState extends State<Settings> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(s.settings),
+          leading: CustomBackButton(),
           elevation: 0,
           backgroundColor: context.primaryColor,
         ),

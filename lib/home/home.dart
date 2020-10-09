@@ -161,9 +161,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                 padding:
                                                     const EdgeInsets.all(0),
                                                 child: Text(s.understood,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .button
+                                                    style: context
+                                                        .textTheme.button
                                                         .copyWith(
                                                             color:
                                                                 Colors.white)),
@@ -191,6 +190,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                           ),
                                           child: IconButton(
                                             tooltip: s.add,
+                                            splashRadius: 25,
                                             icon: const Icon(
                                                 Icons.add_circle_outline),
                                             onPressed: () async {

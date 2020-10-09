@@ -22,6 +22,7 @@ class ThemeSetting extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(s.settingsAppearance),
+          leading: CustomBackButton(),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
@@ -376,15 +377,20 @@ class __ColorPickerState extends State<_ColorPicker>
                                                                     : color ==
                                                                             Colors
                                                                                 .cyan
-                                                                        ? _accentList(
-                                                                            Colors
-                                                                                .cyanAccent)
-                                                                        : color == Colors.lightBlue
-                                                                            ? _accentList(Colors
-                                                                                .lightBlueAccent)
+                                                                        ? _accentList(Colors
+                                                                            .cyanAccent)
+                                                                        : color ==
+                                                                                Colors.lightBlue
+                                                                            ? _accentList(Colors.lightBlueAccent)
                                                                             : color == Colors.blue
                                                                                 ? _accentList(Colors.blueAccent)
-                                                                                : color == Colors.indigo ? _accentList(Colors.indigoAccent) : color == Colors.purple ? _accentList(Colors.purpleAccent) : color == Colors.deepPurple ? _accentList(Colors.deepPurpleAccent) : []
+                                                                                : color == Colors.indigo
+                                                                                    ? _accentList(Colors.indigoAccent)
+                                                                                    : color == Colors.purple
+                                                                                        ? _accentList(Colors.purpleAccent)
+                                                                                        : color == Colors.deepPurple
+                                                                                            ? _accentList(Colors.deepPurpleAccent)
+                                                                                            : []
                           ],
                         ),
                       ))

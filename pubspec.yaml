@@ -21,7 +21,7 @@ dependencies:
   connectivity: ^0.4.9
   convert: ^2.1.1
   crypto: ^2.1.5
-  device_info: ^0.4.2+8
+  device_info: ^0.4.2+7
   dio: ^3.0.10
   dio_cookie_manager: ^1.0.0
   extended_nested_scroll_view: ^1.0.1

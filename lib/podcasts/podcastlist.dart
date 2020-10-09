@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 import '../util/general_dialog.dart';
 import '../util/pageroute.dart';
@@ -77,7 +78,9 @@ class _AboutPodcastState extends State<AboutPodcast> {
           children: <Widget>[
             !_load
                 ? Center()
-                : _description != null ? Html(data: _description) : Center(),
+                : _description != null
+                    ? Html(data: _description)
+                    : Center(),
             if (widget.podcastLocal.author != null)
               Text(widget.podcastLocal.author,
                   style: TextStyle(color: Colors.blue))
@@ -113,6 +116,7 @@ class _PodcastListState extends State<PodcastList> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(context.s.podcast(2)),
+          leading: CustomBackButton(),
           centerTitle: true,
         ),
         body: SafeArea(

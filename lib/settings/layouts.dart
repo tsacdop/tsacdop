@@ -196,6 +196,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
       child: Scaffold(
           appBar: AppBar(
             title: Text(s.settingsLayout),
+            leading: CustomBackButton(),
             elevation: 0,
             backgroundColor: context.primaryColor,
           ),

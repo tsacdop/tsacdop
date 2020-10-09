@@ -75,6 +75,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   var skipSilenceStorage = KeyValueStorage(skipSilenceKey);
   var boostVolumeStorage = KeyValueStorage(boostVolumeKey);
   var volumeGainStorage = KeyValueStorage(volumeGainKey);
+  var markListenedAfterSkipStorage = KeyValueStorage(markListenedAfterSkipKey);
 
   /// Current playing episdoe.
   EpisodeBrief _episode;
@@ -165,6 +166,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   // ignore: prefer_final_fields
   bool _playerRunning = false;
+
+  bool _markListened;
 
   AudioProcessingState get audioState => _audioState;
   int get backgroundAudioDuration => _backgroundAudioDuration;
@@ -332,6 +335,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
         await fastForwardSecondsStorage.getInt(defaultValue: 30);
     _rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
 
+    /// Get if auto mark listened after skip
+    _markListened = await skipSilenceStorage.getBool(defaultValue: false);
+
     /// Start audio service.
     await AudioService.start(
         backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
@@ -444,8 +450,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
         _lastPostion = 0;
         notifyListeners();
         await positionStorage.saveInt(_lastPostion);
-        final history = PlayHistory(_episode.title, _episode.enclosureUrl,
-            _backgroundAudioPosition ~/ 1000, _seekSliderValue);
+        var history;
+        if (_markListened) {
+          history = PlayHistory(_episode.title, _episode.enclosureUrl, 0, 1);
+        } else {
+          history = PlayHistory(_episode.title, _episode.enclosureUrl,
+              _backgroundAudioPosition ~/ 1000, _seekSliderValue);
+        }
         await dbHelper.saveHistory(history);
       }
       if (event is Map && event['playerRunning'] == false && _playerRunning) {
@@ -667,7 +678,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   //Set sleep timer
-  sleepTimer(int mins) {
+  void sleepTimer(int mins) {
     if (_sleepTimerMode == SleepTimerMode.timer) {
       _startSleepTimer = true;
       _switchValue = 1;
@@ -703,7 +714,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
 //Cancel sleep timer
-  cancelTimer() {
+  void cancelTimer() {
     if (_sleepTimerMode == SleepTimerMode.timer) {
       _stopTimer.cancel();
       _timeLeft = 0;

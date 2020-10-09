@@ -126,6 +126,7 @@ class _AboutAppState extends State<AboutApp> {
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
           title: Text(s.homeToprightMenuAbout),
+          leading: CustomBackButton(),
           elevation: _scroll ? 1 : 0,
         ),
         body: SafeArea(

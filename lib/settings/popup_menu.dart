@@ -99,6 +99,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
       child: Scaffold(
           appBar: AppBar(
             elevation: 0,
+            leading: CustomBackButton(),
             backgroundColor: context.primaryColor,
           ),
           body: Column(

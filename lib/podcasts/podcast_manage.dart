@@ -9,6 +9,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../state/podcast_group.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 import '../util/general_dialog.dart';
 import '../util/pageroute.dart';
@@ -203,6 +204,7 @@ class _PodcastManageState extends State<PodcastManage>
         appBar: AppBar(
           centerTitle: true,
           title: Text(context.s.groups(2)),
+          leading: CustomBackButton(),
           actions: <Widget>[
             DescribedFeatureOverlay(
               featureId: addGroupFeature,

@@ -115,6 +115,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     overflow: TextOverflow.ellipsis,
                   )
                 : Center(),
+            leading: CustomBackButton(),
             elevation: _showTitle ? 1 : 0,
             //actions: [
             //  PopupMenuButton(

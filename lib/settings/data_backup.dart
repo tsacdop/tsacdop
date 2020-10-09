@@ -1055,6 +1055,7 @@ class __GpodderInfoState extends State<_GpodderInfo> {
                 iconTheme: IconThemeData(
                   color: Colors.white,
                 ),
+                leading: CustomBackButton(),
                 elevation: 0,
                 backgroundColor: context.accentColor,
                 expandedHeight: 200,

@@ -5,6 +5,7 @@ import 'package:tuple/tuple.dart';
 
 import '../state/setting_state.dart';
 import '../util/custom_dropdown.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
 class SyncingSetting extends StatelessWidget {
@@ -22,6 +23,7 @@ class SyncingSetting extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(s.settingsSyncing),
+          leading: CustomBackButton(),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),

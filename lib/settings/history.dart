@@ -15,6 +15,7 @@ import '../state/podcast_group.dart';
 import '../type/play_histroy.dart';
 import '../type/search_api/searchpodcast.dart';
 import '../type/sub_history.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
 class PlayedHistory extends StatefulWidget {
@@ -135,6 +136,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
               return <Widget>[
                 SliverAppBar(
                   backgroundColor: Theme.of(context).primaryColor,
+                  leading: CustomBackButton(),
                   elevation: 0,
                   expandedHeight: 260,
                   floating: false,

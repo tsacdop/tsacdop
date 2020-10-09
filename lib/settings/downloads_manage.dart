@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
 class DownloadsManage extends StatefulWidget {
@@ -124,6 +125,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
       ),
       child: Scaffold(
         appBar: AppBar(
+          leading: CustomBackButton(),
           elevation: 0,
           backgroundColor: context.primaryColor,
         ),

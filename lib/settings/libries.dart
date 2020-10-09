@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 import 'licenses.dart';
 
@@ -25,6 +27,7 @@ class Libries extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(context.s.settingsLibraries),
+          leading: CustomBackButton(),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),

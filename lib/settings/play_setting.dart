@@ -12,6 +12,7 @@ import '../state/audio_state.dart';
 import '../state/setting_state.dart';
 import '../util/custom_dropdown.dart';
 import '../util/custom_time_picker.dart';
+import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 
 const List kSecondsToSelect = [5, 10, 15, 20, 25, 30, 45, 60];
@@ -33,7 +34,12 @@ const List<double> kSpeedToSelect = [
   5.0
 ];
 
-class PlaySetting extends StatelessWidget {
+class PlaySetting extends StatefulWidget {
+  @override
+  _PlaySettingState createState() => _PlaySettingState();
+}
+
+class _PlaySettingState extends State<PlaySetting> {
   String _volumeEffect(BuildContext context, int i) {
     final s = context.s;
     if (i == 2000) {
@@ -42,6 +48,17 @@ class PlaySetting extends StatelessWidget {
       return s.playerHeightMed;
     }
     return s.playerHeightTall;
+  }
+
+  Future<bool> _getMarkListenedSkip() async {
+    final storage = KeyValueStorage(markListenedAfterSkipKey);
+    return storage.getBool(defaultValue: false);
+  }
+
+  Future<void> _saveMarkListenedSkip(bool boo) async {
+    final storage = KeyValueStorage(markListenedAfterSkipKey);
+    await storage.saveBool(boo);
+    if (mounted) setState(() {});
   }
 
   Widget _modeWidget(BuildContext context) {
@@ -218,6 +235,7 @@ class PlaySetting extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(s.play),
+          leading: CustomBackButton(),
           elevation: 0,
           backgroundColor: context.primaryColor,
         ),
@@ -268,6 +286,22 @@ class PlaySetting extends StatelessWidget {
                   ),
                 ),
               ),
+              FutureBuilder<bool>(
+                initialData: false,
+                future: _getMarkListenedSkip(),
+                builder: (context, snapshot) => ListTile(
+                  onTap: () => _saveMarkListenedSkip(!snapshot.data),
+                  contentPadding:
+                      EdgeInsets.only(left: 70.0, right: 20, bottom: 10),
+                  title: Text('Mark listened when episode skipped'),
+                  subtitle: Text('Mark as listened'),
+                  trailing: Transform.scale(
+                    scale: 0.9,
+                    child: Switch(
+                        value: snapshot.data, onChanged: _saveMarkListenedSkip),
+                  ),
+                ),
+              ),
               Divider(height: 1),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -277,10 +311,8 @@ class PlaySetting extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 70),
                 alignment: Alignment.centerLeft,
                 child: Text(s.playback,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        .copyWith(color: Theme.of(context).accentColor)),
+                    style: context.textTheme.bodyText1
+                        .copyWith(color: context.accentColor)),
               ),
               ListTile(
                 contentPadding:

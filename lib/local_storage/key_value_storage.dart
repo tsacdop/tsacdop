@@ -55,6 +55,7 @@ const String gpodderRemoteAddKey = 'gpodderRemoteAddKey';
 const String gpodderRemoteRemoveKey = 'gpodderRemoteRemoveKey';
 const String hidePodcastDiscoveryKey = 'hidePodcastDiscoveryKey';
 const String searchEngineKey = 'searchEngineKey';
+const String markListenedAfterSkipKey = 'markListenedAfterSkipKey';
 
 class KeyValueStorage {
   final String key;

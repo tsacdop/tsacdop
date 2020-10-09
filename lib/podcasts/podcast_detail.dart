@@ -348,7 +348,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     final s = context.s;
     return _customPopupMenu(
         tooltip: s.menu,
-        clip: false,
+        // clip: false,
         onSelected: (value) {
           switch (value) {
             case 0:
@@ -388,7 +388,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
             ),
           PopupMenuItem(
             value: 1,
-            child: Container(
+            child: Padding(
               padding: EdgeInsets.only(left: 10),
               child: Row(
                 children: <Widget>[
@@ -406,7 +406,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
           ),
           PopupMenuItem(
             value: 2,
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.only(left: 10),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -779,6 +779,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                 backgroundColor: color,
                                 floating: true,
                                 pinned: true,
+                                leading: CustomBackButton(),
                                 flexibleSpace: LayoutBuilder(
                                     builder: (context, constraints) {
                                   _topHeight = constraints.biggest.height;
@@ -828,7 +829,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                 "${widget.podcastLocal.imagePath}")),
                                           ),
                                         ),
-                                        Container(
+                                        Align(
                                           alignment: Alignment.center,
                                           child: _podcastInfo(context),
                                         ),

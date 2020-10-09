@@ -1204,3 +1204,19 @@ class TabIndicator extends CustomPainter {
     return oldDelegate.fraction != fraction || oldDelegate.index != index;
   }
 }
+
+/// Custom back button
+class CustomBackButton extends StatelessWidget {
+  const CustomBackButton({Key key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      splashRadius: 25,
+      icon: const BackButtonIcon(),
+      tooltip: context.s.back,
+      onPressed: () {
+        Navigator.maybePop(context);
+      },
+    );
+  }
+}
