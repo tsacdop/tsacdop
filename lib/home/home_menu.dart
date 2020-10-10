@@ -103,108 +103,114 @@ class _PopupMenuState extends State<PopupMenu> {
   Widget build(BuildContext context) {
     var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
     final s = context.s;
-    return PopupMenuButton<int>(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      elevation: 1,
-      tooltip: s.menu,
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 1,
-          child: Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Icon(LineIcons.cloud_download_alt_solid),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      s.homeToprightMenuRefreshAll,
-                    ),
-                    FutureBuilder<String>(
-                        future: _getRefreshDate(context),
-                        builder: (_, snapshot) {
-                          if (snapshot.hasData) {
-                            return Text(
-                              snapshot.data,
-                              style: TextStyle(color: Colors.red, fontSize: 12),
-                            );
-                          } else {
-                            return Center();
-                          }
-                        })
-                  ],
-                ),
-              ],
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(100),
+      clipBehavior: Clip.hardEdge,
+      child: PopupMenuButton<int>(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        elevation: 1,
+        tooltip: s.menu,
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: 1,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Icon(LineIcons.cloud_download_alt_solid),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        s.homeToprightMenuRefreshAll,
+                      ),
+                      FutureBuilder<String>(
+                          future: _getRefreshDate(context),
+                          builder: (_, snapshot) {
+                            if (snapshot.hasData) {
+                              return Text(
+                                snapshot.data,
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              );
+                            } else {
+                              return Center();
+                            }
+                          })
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        PopupMenuItem(
-          value: 2,
-          child: Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(LineIcons.paperclip_solid),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0),
-                ),
-                Text(s.homeToprightMenuImportOMPL),
-              ],
+          PopupMenuItem(
+            value: 2,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: <Widget>[
+                  Icon(LineIcons.paperclip_solid),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Text(s.homeToprightMenuImportOMPL),
+                ],
+              ),
             ),
           ),
-        ),
-        PopupMenuItem(
-          value: 4,
-          child: Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(LineIcons.cog_solid),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0),
-                ),
-                Text(s.settings),
-              ],
+          PopupMenuItem(
+            value: 4,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: <Widget>[
+                  Icon(LineIcons.cog_solid),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Text(s.settings),
+                ],
+              ),
             ),
           ),
-        ),
-        PopupMenuItem(
-          value: 5,
-          child: Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(LineIcons.info_circle_solid),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0),
-                ),
-                Text(s.homeToprightMenuAbout),
-              ],
+          PopupMenuItem(
+            value: 5,
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: <Widget>[
+                  Icon(LineIcons.info_circle_solid),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Text(s.homeToprightMenuAbout),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-      onSelected: (value) {
-        if (value == 5) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AboutApp()));
-        } else if (value == 2) {
-          _getFilePath();
-        } else if (value == 1) {
-          refreshWorker.start([]);
-        } else if (value == 3) {
-          //  setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
-        } else if (value == 4) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Settings()));
-        }
-      },
+        ],
+        onSelected: (value) {
+          if (value == 5) {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => AboutApp()));
+          } else if (value == 2) {
+            _getFilePath();
+          } else if (value == 1) {
+            refreshWorker.start([]);
+          } else if (value == 3) {
+            //  setting.theme != 2 ? setting.setTheme(2) : setting.setTheme(1);
+          } else if (value == 4) {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Settings()));
+          }
+        },
+      ),
     );
   }
 }

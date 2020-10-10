@@ -543,7 +543,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
 
   @override
   Widget build(BuildContext context) {
-    var audio = context.watch<AudioPlayerNotifier>();
+    final audio = context.watch<AudioPlayerNotifier>();
     final s = context.s;
     return Material(
       color: Colors.transparent,
