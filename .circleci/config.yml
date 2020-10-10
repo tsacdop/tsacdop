@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cirrusci/flutter:latest
+      - image: cirrusci/flutter:stable
 
     branches:
       only: master
@@ -14,8 +14,8 @@ jobs:
           command: flutter doctor
       - run:
           name: Update package
-          command: flutter clean
-      - run: gradle -v
+          command: flutter pub upgrade
+      - run: cd android && ./gradlew build -d && cd ..
       - run: echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
       - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
       - run: dart tool/env.dart
