@@ -1,5 +1,6 @@
 [![Tsacdop Banner][]][google play]
 
+![github action][]
 [![Build Status - Cirrus][]][build status]
 [![GitHub Release][]][github release - recent]
 [![Github Downloads][]][github release - recent]
@@ -165,7 +166,8 @@ For help getting started with Flutter, view our
 [Flutter Install]: https://flutter.dev/docs/get-started/install
 [tsacdop banner]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/banner.png
 [build status - cirrus]: https://circleci.com/gh/stonega/tsacdop/tree/master.svg?style=shield
-[build status]: https://circleci.com/gh/stonega/tsacdop/tree/master
+[github action]: https://github.com/stonega/tsacdop/workflows/Flutter%20Build/badge.svg
+[build status ]: https://circleci.com/gh/stonega/tsacdop/tree/master
 [github release]: https://img.shields.io/github/v/release/stonega/tsacdop
 [github release - recent]: https://github.com/stonega/tsacdop/releases
 [github downloads]: https://img.shields.io/github/downloads/stonega/tsacdop/total?color=%230000d&label=downloads
