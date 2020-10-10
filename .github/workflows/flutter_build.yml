@@ -16,7 +16,7 @@ jobs:
           channel: "stable" # 'dev', 'alpha', default to: 'stable'
       - run: flutter pub get
       - run: echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
-      - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
+      - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> ${HOME}/.profile
       - run: dart tool/env.dart
       - run: flutter build apk --split-per-abi  --obfuscate --split-debug-info=debug/
       - run: flutter build appbundle  --obfuscate --split-debug-info=debug/
