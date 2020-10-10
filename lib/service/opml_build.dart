@@ -51,7 +51,7 @@ class PodcastsBackup {
         }
       });
     });
-    return builder.build();
+    return builder.buildDocument();
   }
 
   static parseOPML(String opml) {

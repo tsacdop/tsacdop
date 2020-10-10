@@ -102,7 +102,7 @@ class _DataBackupState extends State<DataBackup> {
   Widget _syncStauts(int index) {
     switch (index) {
       case 1:
-        return Text('Success', style: TextStyle(color: Colors.green));
+        return Text('Successed', style: TextStyle(color: Colors.green));
         break;
       case 2:
         return Text('Failed', style: TextStyle(color: Colors.red));
@@ -194,6 +194,7 @@ class _DataBackupState extends State<DataBackup> {
         appBar: AppBar(
           elevation: 0,
           title: Text(s.settingsBackup),
+          leading: CustomBackButton(),
           backgroundColor: context.primaryColor,
         ),
         body: Column(
@@ -749,6 +750,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
                   color: Colors.white,
                 ),
                 elevation: 0,
+                leading: CustomBackButton(),
                 backgroundColor: context.accentColor,
                 expandedHeight: 200,
                 flexibleSpace: Container(
