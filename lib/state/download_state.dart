@@ -73,6 +73,13 @@ class AutoDownloader {
     _completer?.complete();
   }
 
+  Future<Directory> _getDownloadDirectory() async {
+    final storage = KeyValueStorage(downloadPositionKey);
+    final index = await storage.getInt();
+    final externalDirs = await getExternalStorageDirectories();
+    return externalDirs[index];
+  }
+
   Future _saveMediaId(EpisodeTask episodeTask) async {
     final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
         query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
@@ -91,7 +98,7 @@ class AutoDownloader {
   Future startTask(List<EpisodeBrief> episodes,
       {bool showNotification = false}) async {
     for (var episode in episodes) {
-      final dir = await getExternalStorageDirectory();
+      final dir = await _getDownloadDirectory();
       var localPath = path.join(dir.path, episode.feedTitle);
       final saveDir = Directory(localPath);
       var hasExisted = await saveDir.exists();
@@ -182,6 +189,13 @@ class DownloadState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<Directory> _getDownloadDirectory() async {
+    final storage = KeyValueStorage(downloadPositionKey);
+    final index = await storage.getInt();
+    final externalDirs = await getExternalStorageDirectories();
+    return externalDirs[index];
+  }
+
   void _bindBackgroundIsolate() {
     var _port = ReceivePort();
     var isSuccess = IsolateNameServer.registerPortWithName(
@@ -256,7 +270,7 @@ class DownloadState extends ChangeNotifier {
     var dbHelper = DBHelper();
     var isDownloaded = await dbHelper.isDownloaded(episode.enclosureUrl);
     if (!isDownloaded) {
-      final dir = await getExternalStorageDirectory();
+      final dir = await _getDownloadDirectory();
       var localPath =
           path.join(dir.path, episode.feedTitle?.replaceAll('/', ''));
       final saveDir = Directory(localPath);
