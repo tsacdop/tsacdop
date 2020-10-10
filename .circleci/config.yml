@@ -15,6 +15,7 @@ jobs:
       - run:
           name: Update package
           command: flutter pub upgrade
+      - run: chmod +x android/gradlew
       - run: android/gradlew build -d
       - run: echo $ENCODED_KEYSTORE | base64 -di > ${HOME}/keystore.jks
       - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
