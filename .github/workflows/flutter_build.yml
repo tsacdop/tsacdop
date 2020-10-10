@@ -14,6 +14,13 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: "stable" # 'dev', 'alpha', default to: 'stable'
+      - env:
+          API_KEY: ${{ secrets.API_KEY }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
+          PI_API_SECRET: ${{ secrets.PI_API_SECRET}}
+          PI_API_KEY: ${{ secrets.PI_API_KEY}}
       - run: flutter pub get
       - run: echo $ENCODED_KEYSTORE | base64 -di > android/app/keystore.jks
       - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> ${HOME}/.profile
