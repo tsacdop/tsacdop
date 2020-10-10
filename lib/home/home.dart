@@ -547,6 +547,8 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
     final s = context.s;
     return Material(
       color: Colors.transparent,
+      borderRadius: BorderRadius.circular(100),
+      clipBehavior: Clip.hardEdge,
       child: MyPopupMenuButton<int>(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),

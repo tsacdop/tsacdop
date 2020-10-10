@@ -61,21 +61,22 @@ enum PlayerHeight { short, mid, tall }
 
 class AudioPlayerNotifier extends ChangeNotifier {
   DBHelper dbHelper = DBHelper();
-  var positionStorage = KeyValueStorage(audioPositionKey);
-  var autoPlayStorage = KeyValueStorage(autoPlayKey);
-  var autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
-  var defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
-  var autoSleepTimerModeStorage = KeyValueStorage(autoSleepTimerModeKey);
-  var autoSleepTimerStartStorage = KeyValueStorage(autoSleepTimerStartKey);
-  var autoSleepTimerEndStorage = KeyValueStorage(autoSleepTimerEndKey);
-  var fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
-  var rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
-  var playerHeightStorage = KeyValueStorage(playerHeightKey);
-  var speedStorage = KeyValueStorage(speedKey);
-  var skipSilenceStorage = KeyValueStorage(skipSilenceKey);
-  var boostVolumeStorage = KeyValueStorage(boostVolumeKey);
-  var volumeGainStorage = KeyValueStorage(volumeGainKey);
-  var markListenedAfterSkipStorage = KeyValueStorage(markListenedAfterSkipKey);
+  final _positionStorage = KeyValueStorage(audioPositionKey);
+  final _autoPlayStorage = KeyValueStorage(autoPlayKey);
+  final _autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
+  final _defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
+  final _autoSleepTimerModeStorage = KeyValueStorage(autoSleepTimerModeKey);
+  final _autoSleepTimerStartStorage = KeyValueStorage(autoSleepTimerStartKey);
+  final _autoSleepTimerEndStorage = KeyValueStorage(autoSleepTimerEndKey);
+  final _fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
+  final _rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
+  final _playerHeightStorage = KeyValueStorage(playerHeightKey);
+  final _speedStorage = KeyValueStorage(speedKey);
+  final _skipSilenceStorage = KeyValueStorage(skipSilenceKey);
+  final _boostVolumeStorage = KeyValueStorage(boostVolumeKey);
+  final _volumeGainStorage = KeyValueStorage(volumeGainKey);
+  final _markListenedAfterSkipStorage =
+      KeyValueStorage(markListenedAfterSkipKey);
 
   /// Current playing episdoe.
   EpisodeBrief _episode;
@@ -218,29 +219,29 @@ class AudioPlayerNotifier extends ChangeNotifier {
       setBoostVolume(boostVolume: _boostVolume, gain: _volumeGain);
     }
     notifyListeners();
-    volumeGainStorage.saveInt(volumeGain);
+    _volumeGainStorage.saveInt(volumeGain);
   }
 
   Future<void> _initAudioData() async {
-    var index = await playerHeightStorage.getInt(defaultValue: 0);
+    var index = await _playerHeightStorage.getInt(defaultValue: 0);
     _playerHeight = PlayerHeight.values[index];
-    _currentSpeed = await speedStorage.getDoubel(defaultValue: 1.0);
-    _skipSilence = await skipSilenceStorage.getBool(defaultValue: false);
-    _boostVolume = await boostVolumeStorage.getBool(defaultValue: false);
-    _volumeGain = await volumeGainStorage.getInt(defaultValue: 3000);
+    _currentSpeed = await _speedStorage.getDoubel(defaultValue: 1.0);
+    _skipSilence = await _skipSilenceStorage.getBool(defaultValue: false);
+    _boostVolume = await _boostVolumeStorage.getBool(defaultValue: false);
+    _volumeGain = await _volumeGainStorage.getInt(defaultValue: 3000);
   }
 
   Future _savePlayerHeight() async {
-    await playerHeightStorage.saveInt(_playerHeight.index);
+    await _playerHeightStorage.saveInt(_playerHeight.index);
   }
 
   Future _getAutoPlay() async {
-    var i = await autoPlayStorage.getInt();
+    var i = await _autoPlayStorage.getInt();
     _autoPlay = i == 0;
   }
 
   Future _getAutoSleepTimer() async {
-    var i = await autoSleepTimerStorage.getInt();
+    var i = await _autoSleepTimerStorage.getInt();
     _autoSleepTimer = i == 1;
   }
 
@@ -262,7 +263,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _queue = Playlist();
     await _queue.getPlaylist();
     await _getAutoPlay();
-    _lastPostion = await positionStorage.getInt();
+    _lastPostion = await _positionStorage.getInt();
     if (_lastPostion > 0 && _queue.playlist.length > 0) {
       final episode = _queue.playlist.first;
       final duration = episode.duration * 1000;
@@ -332,11 +333,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
     /// Get fastword and rewind seconds.
     _fastForwardSeconds =
-        await fastForwardSecondsStorage.getInt(defaultValue: 30);
-    _rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
+        await _fastForwardSecondsStorage.getInt(defaultValue: 30);
+    _rewindSeconds = await _rewindSecondsStorage.getInt(defaultValue: 10);
 
     /// Get if auto mark listened after skip
-    _markListened = await skipSilenceStorage.getBool(defaultValue: false);
+    _markListened =
+        await _markListenedAfterSkipStorage.getBool(defaultValue: false);
 
     /// Start audio service.
     await AudioService.start(
@@ -362,17 +364,17 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await _getAutoSleepTimer();
     if (_autoSleepTimer) {
       var startTime =
-          await autoSleepTimerStartStorage.getInt(defaultValue: 1380);
-      var endTime = await autoSleepTimerEndStorage.getInt(defaultValue: 360);
+          await _autoSleepTimerStartStorage.getInt(defaultValue: 1380);
+      var endTime = await _autoSleepTimerEndStorage.getInt(defaultValue: 360);
       var currentTime = DateTime.now().hour * 60 + DateTime.now().minute;
       if ((startTime > endTime &&
               (currentTime > startTime || currentTime < endTime)) ||
           ((startTime < endTime) &&
               (currentTime > startTime && currentTime < endTime))) {
-        var mode = await autoSleepTimerModeStorage.getInt();
+        var mode = await _autoSleepTimerModeStorage.getInt();
         _sleepTimerMode = SleepTimerMode.values[mode];
         var defaultTimer =
-            await defaultSleepTimerStorage.getInt(defaultValue: 30);
+            await _defaultSleepTimerStorage.getInt(defaultValue: 30);
         sleepTimer(defaultTimer);
       }
     }
@@ -449,7 +451,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         _queue.delFromPlaylist(_episode);
         _lastPostion = 0;
         notifyListeners();
-        await positionStorage.saveInt(_lastPostion);
+        await _positionStorage.saveInt(_lastPostion);
         var history;
         if (_markListened) {
           history = PlayHistory(_episode.title, _episode.enclosureUrl, 0, 1);
@@ -498,7 +500,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         if (_backgroundAudioPosition > 0 &&
             _backgroundAudioPosition < _backgroundAudioDuration) {
           _lastPostion = _backgroundAudioPosition;
-          positionStorage.saveInt(_lastPostion);
+          _positionStorage.saveInt(_lastPostion);
         }
         notifyListeners();
       }
@@ -576,7 +578,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     var index = await _queue.delFromPlaylist(episodeNew);
     if (index == 0) {
       _lastPostion = 0;
-      await positionStorage.saveInt(0);
+      await _positionStorage.saveInt(0);
     }
     _queueUpdate = !_queueUpdate;
     notifyListeners();
@@ -592,7 +594,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await _queue.addToPlayListAt(episode, newIndex);
     if (newIndex == 0) {
       _lastPostion = 0;
-      await positionStorage.saveInt(0);
+      await _positionStorage.saveInt(0);
     }
   }
 
@@ -604,7 +606,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     } else {
       await _queue.addToPlayListAt(episode, 0, existed: false);
       _lastPostion = 0;
-      positionStorage.saveInt(_lastPostion);
+      _positionStorage.saveInt(_lastPostion);
     }
     _queueUpdate = !_queueUpdate;
     notifyListeners();
@@ -658,14 +660,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
   Future<void> setSpeed(double speed) async {
     await AudioService.customAction('setSpeed', speed);
     _currentSpeed = speed;
-    await speedStorage.saveDouble(_currentSpeed);
+    await _speedStorage.saveDouble(_currentSpeed);
     notifyListeners();
   }
 
   Future<void> setSkipSilence({@required bool skipSilence}) async {
     await AudioService.customAction('setSkipSilence', skipSilence);
     _skipSilence = skipSilence;
-    await skipSilenceStorage.saveBool(_skipSilence);
+    await _skipSilenceStorage.saveBool(_skipSilence);
     notifyListeners();
   }
 
@@ -674,7 +676,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         'setBoostVolume', [boostVolume, _volumeGain]);
     _boostVolume = boostVolume;
     notifyListeners();
-    await boostVolumeStorage.saveBool(boostVolume);
+    await _boostVolumeStorage.saveBool(boostVolume);
   }
 
   //Set sleep timer
