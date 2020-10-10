@@ -19,10 +19,10 @@ jobs:
       - run: echo 'export KEYSTORE=${HOME}/keystore.jks' >> $BASH_ENV
       - run: dart tool/env.dart
       - run:
-          name: Build the Android version
-          command: flutter build appbundle  --obfuscate --split-debug-info=debug/
-      - run:
           name: Build the Android apk
           command: flutter build apk --split-per-abi  --obfuscate --split-debug-info=debug/
+      - run:
+          name: Build the Android version
+          command: flutter build appbundle  --obfuscate --split-debug-info=debug/
       - store_artifacts:
           path: build/app/outputs/
