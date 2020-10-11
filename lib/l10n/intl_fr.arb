@@ -487,6 +487,10 @@
   "@settingsDiscovery": {
     "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
   },
+  "settingsDownloadPosition": "Download position",
+  "@settingsDownloadPosition": {
+    "description": "Choose folder for downloads."
+  },
   "settingsEnableSyncing": "Activer la synchronisation",
   "@settingsEnableSyncing": {},
   "settingsEnableSyncingDes": "Actualiser tous les podcasts en arrière-plan pour toujours afficher les derniers épisodes",
@@ -525,6 +529,12 @@
   "@settingsManageDownload": {},
   "settingsManageDownloadDes": "Gestion des fichiers audio téléchargés",
   "@settingsManageDownloadDes": {},
+  "settingsMarkListenedSkip": "Mark as listened when skipped",
+  "@settingsMarkListenedSkip": {
+    "description": "Mark episode as listened when skipped to next."
+  },
+  "settingsMarkListenedSkipDes": "Auto mark episode as listened when it was skipped to next",
+  "@settingsMarkListenedSkipDes": {},
   "settingsMenuAutoPlay": "Lecture automatique",
   "@settingsMenuAutoPlay": {},
   "settingsNetworkCellular": "Utilisation du réseau mobile",

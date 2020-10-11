@@ -41,23 +41,25 @@ class _DownloadsManageState extends State<DownloadsManage> {
     return await dbHelper.isListened(episode.enclosureUrl);
   }
 
-  _getStorageSize() async {
+  Future<void> _getStorageSize() async {
     _size = 0;
     _fileNum = 0;
-    var dir = await getExternalStorageDirectory();
-    dir.list().forEach((d) {
-      var fileDir = Directory(d.path);
-      fileDir.list().forEach((file) async {
-        await File(file.path).stat().then((value) {
-          _size += value.size;
-          _fileNum += 1;
-          if (mounted) setState(() {});
+    final dirs = await getExternalStorageDirectories();
+    for (var dir in dirs) {
+      dir.list().forEach((d) {
+        var fileDir = Directory(d.path);
+        fileDir.list().forEach((file) async {
+          await File(file.path).stat().then((value) {
+            _size += value.size;
+            _fileNum += 1;
+            if (mounted) setState(() {});
+          });
         });
       });
-    });
+    }
   }
 
-  _delSelectedEpisodes() async {
+  Future<void> _delSelectedEpisodes() async {
     setState(() => _clearing = true);
     // await Future.forEach(_selectedList, (EpisodeBrief episode) async
     for (var episode in _selectedList) {
@@ -149,7 +151,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                             text: TextSpan(
                               text: 'Total ',
                               style: TextStyle(
-                                color: Theme.of(context).accentColor,
+                                color: context.accentColor,
                                 fontSize: 20,
                               ),
                               children: <TextSpan>[
@@ -157,7 +159,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   text: _fileNum.toString(),
                                   style: GoogleFonts.cairo(
                                       textStyle: TextStyle(
-                                    color: Theme.of(context).accentColor,
+                                    color: context.accentColor,
                                     fontSize: 40,
                                   )),
                                 ),
@@ -166,7 +168,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                         ? ' episode'
                                         : ' episodes ',
                                     style: TextStyle(
-                                      color: Theme.of(context).accentColor,
+                                      color: context.accentColor,
                                       fontSize: 20,
                                     )),
                                 TextSpan(

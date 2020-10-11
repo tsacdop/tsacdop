@@ -293,8 +293,8 @@ class _PlaySettingState extends State<PlaySetting> {
                   onTap: () => _saveMarkListenedSkip(!snapshot.data),
                   contentPadding:
                       EdgeInsets.only(left: 70.0, right: 20, bottom: 10),
-                  title: Text('Mark listened when episode skipped'),
-                  subtitle: Text('Mark as listened'),
+                  title: Text(s.settingsMarkListenedSkip),
+                  subtitle: Text(s.settingsManageDownloadDes),
                   trailing: Transform.scale(
                     scale: 0.9,
                     child: Switch(

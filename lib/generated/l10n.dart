@@ -2012,6 +2012,16 @@ class S {
     );
   }
 
+  /// `Download position`
+  String get settingsDownloadPosition {
+    return Intl.message(
+      'Download position',
+      name: 'settingsDownloadPosition',
+      desc: 'Choose folder for downloads.',
+      args: [],
+    );
+  }
+
   /// `Enable synchronisation`
   String get settingsEnableSyncing {
     return Intl.message(
@@ -2197,6 +2207,26 @@ class S {
     return Intl.message(
       'Manage downloaded audio files',
       name: 'settingsManageDownloadDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Mark as listened when skipped`
+  String get settingsMarkListenedSkip {
+    return Intl.message(
+      'Mark as listened when skipped',
+      name: 'settingsMarkListenedSkip',
+      desc: 'Mark episode as listened when skipped to next.',
+      args: [],
+    );
+  }
+
+  /// `Auto mark episode as listened when it was skipped to next`
+  String get settingsMarkListenedSkipDes {
+    return Intl.message(
+      'Auto mark episode as listened when it was skipped to next',
+      name: 'settingsMarkListenedSkipDes',
       desc: '',
       args: [],
     );

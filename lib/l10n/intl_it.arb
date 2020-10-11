@@ -447,7 +447,7 @@
   "@settings": {},
   "settingsAccentColor": "Accento",
   "@settingsAccentColor": {},
-  "settingsAccentColorDes": "Includi il colore del tema",
+  "settingsAccentColorDes": "Scegli il colore del tema",
   "@settingsAccentColorDes": {},
   "settingsAppearance": "Aspetto",
   "@settingsAppearance": {},
@@ -487,6 +487,10 @@
   "@settingsDiscovery": {
     "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
   },
+  "settingsDownloadPosition": "Download position",
+  "@settingsDownloadPosition": {
+    "description": "Choose folder for downloads."
+  },
   "settingsEnableSyncing": "Abilita sincronizzazione",
   "@settingsEnableSyncing": {},
   "settingsEnableSyncingDes": "Ricarica tutti i podcast in background per ottenere gli ultimi episodi",
@@ -525,6 +529,12 @@
   "@settingsManageDownload": {},
   "settingsManageDownloadDes": "Gestisci i file audio scaricati",
   "@settingsManageDownloadDes": {},
+  "settingsMarkListenedSkip": "Mark as listened when skipped",
+  "@settingsMarkListenedSkip": {
+    "description": "Mark episode as listened when skipped to next."
+  },
+  "settingsMarkListenedSkipDes": "Auto mark episode as listened when it was skipped to next",
+  "@settingsMarkListenedSkipDes": {},
   "settingsMenuAutoPlay": "Riproduci automaticamente",
   "@settingsMenuAutoPlay": {},
   "settingsNetworkCellular": "Chiedi prima di usare i dati mobili",
@@ -549,7 +559,7 @@
   "@settingsPrefrence": {},
   "settingsRealDark": "Oscurità",
   "@settingsRealDark": {},
-  "settingsRealDarkDes": "Arriva se la versione notte non è abbastanza scura",
+  "settingsRealDarkDes": "Attiva se la versione notte non è abbastanza scura",
   "@settingsRealDarkDes": {},
   "settingsRewindSec": "Riavvolgimento rapido",
   "@settingsRewindSec": {},

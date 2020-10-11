@@ -487,6 +487,10 @@
   "@settingsDiscovery": {
     "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
   },
+  "settingsDownloadPosition": "下载位置",
+  "@settingsDownloadPosition": {
+    "description": "Choose folder for downloads."
+  },
   "settingsEnableSyncing": "开启自动更新",
   "@settingsEnableSyncing": {},
   "settingsEnableSyncingDes": "在后台更新所有订阅播客",
@@ -525,6 +529,12 @@
   "@settingsManageDownload": {},
   "settingsManageDownloadDes": "管理下载节目文件",
   "@settingsManageDownloadDes": {},
+  "settingsMarkListenedSkip": "跳过后标记为已收听",
+  "@settingsMarkListenedSkip": {
+    "description": "Mark episode as listened when skipped to next."
+  },
+  "settingsMarkListenedSkipDes": "当节目被跳过时自动标记为已收听",
+  "@settingsMarkListenedSkipDes": {},
   "settingsMenuAutoPlay": "自动播放下一节目",
   "@settingsMenuAutoPlay": {},
   "settingsNetworkCellular": "蜂窝数据确认",

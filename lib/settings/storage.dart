@@ -201,13 +201,13 @@ class _StorageSettingState extends State<StorageSetting>
                   initialData: 0,
                   builder: (context, snapshot) {
                     return ListTile(
-                      contentPadding: EdgeInsets.only(left: 70.0, right: 20),
-                      title: Text('Donwload position'),
+                      contentPadding: EdgeInsets.fromLTRB(70, 10, 20, 10),
+                      title: Text(s.settingsDownloadPosition),
                       subtitle: Text(_dirs == null ? '' : _dirs[snapshot.data],
                           maxLines: 2, overflow: TextOverflow.ellipsis),
                       onTap: () => generalSheet(
                         context,
-                        title: 'Download position',
+                        title: s.settingsDownloadPosition,
                         child: Column(children: [
                           SizedBox(
                             height: 10,
@@ -300,22 +300,6 @@ class _StorageSettingState extends State<StorageSetting>
           ),
         ),
       ),
-    );
-  }
-}
-
-class _DownloadPosition extends StatefulWidget {
-  _DownloadPosition({Key key}) : super(key: key);
-
-  @override
-  __DownloadPositionState createState() => __DownloadPositionState();
-}
-
-class __DownloadPositionState extends State<_DownloadPosition> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [],
     );
   }
 }

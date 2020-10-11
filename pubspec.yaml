@@ -21,6 +21,7 @@ dependencies:
   connectivity: ^0.4.9
   convert: ^2.1.1
   crypto: ^2.1.5
+  device_info: ^0.4.2+8
   dio: ^3.0.10
   dio_cookie_manager: ^1.0.0
   extended_nested_scroll_view: ^1.0.1
@@ -55,9 +56,6 @@ dependencies:
   workmanager: ^0.2.3
   wc_flutter_share: ^0.2.2
   audio_service: ^0.15.1
-  device_info:
-    git:
-      url: https://github.com/stonega/device_info.git
   just_audio:
     git:
       url: https://github.com/stonega/just_audio.git
