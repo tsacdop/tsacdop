@@ -394,10 +394,16 @@ class EpisodeGrid extends StatelessWidget {
         options: options,
         itemCount: episodes.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          childAspectRatio:
-              layout == Layout.three ? 1 : layout == Layout.two ? 1.5 : 4,
-          crossAxisCount:
-              layout == Layout.three ? 3 : layout == Layout.two ? 2 : 1,
+          childAspectRatio: layout == Layout.three
+              ? 1
+              : layout == Layout.two
+                  ? 1.5
+                  : 4,
+          crossAxisCount: layout == Layout.three
+              ? 3
+              : layout == Layout.two
+                  ? 2
+                  : 1,
           mainAxisSpacing: 6.0,
           crossAxisSpacing: 6.0,
         ),
