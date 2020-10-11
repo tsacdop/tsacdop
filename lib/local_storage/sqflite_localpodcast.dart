@@ -671,40 +671,78 @@ class DBHelper {
     var list = <Map>[];
     if (hideListened) {
       if (count == -1) {
-        switch (filter) {
-          case Filter.all:
-            list = await dbClient.rawQuery(
-                """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        if (reverse) {
+          switch (filter) {
+            case Filter.all:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         WHERE P.id = ? GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
         OR SUM(H.listen_time) = 0 ORDER BY E.milliseconds ASC""", [id]);
-            break;
-          case Filter.liked:
-            list = await dbClient.rawQuery(
-                """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+              break;
+            case Filter.liked:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.liked = 1 ORDER BY E.milliseconds ASC""", [id]);
-            break;
-          case Filter.downloaded:
-            list = await dbClient.rawQuery(
-                """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+              break;
+            case Filter.downloaded:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.media_id != E.enclosure_url ORDER BY E.milliseconds ASC""",
-                [id]);
-            break;
-          case Filter.search:
-            list = await dbClient.rawQuery(
-                """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+                  [id]);
+              break;
+            case Filter.search:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.title LIKE ? ORDER BY E.milliseconds ASC""",
-                [id, '%$query%']);
-            break;
-          default:
+                  [id, '%$query%']);
+              break;
+            default:
+          }
+        } else {
+          switch (filter) {
+            case Filter.all:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
+        WHERE P.id = ? GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
+        OR SUM(H.listen_time) = 0 ORDER BY E.milliseconds DESC""", [id]);
+              break;
+            case Filter.liked:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE P.id = ? AND E.liked = 1 ORDER BY E.milliseconds DESC""", [id]);
+              break;
+            case Filter.downloaded:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE P.id = ? AND E.media_id != E.enclosure_url ORDER BY E.milliseconds DESC""",
+                  [id]);
+              break;
+            case Filter.search:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE P.id = ? AND E.title LIKE ? ORDER BY E.milliseconds DESC""",
+                  [id, '%$query%']);
+              break;
+            default:
+          }
         }
       } else if (reverse) {
         switch (filter) {
@@ -798,38 +836,74 @@ class DBHelper {
       }
     } else {
       if (count == -1) {
-        switch (filter) {
-          case Filter.all:
-            list = await dbClient.rawQuery(
-                """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        if (reverse) {
+          switch (filter) {
+            case Filter.all:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? ORDER BY E.milliseconds ASC""", [id]);
-            break;
-          case Filter.liked:
-            list = await dbClient.rawQuery(
-                """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+              break;
+            case Filter.liked:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.liked = 1 ORDER BY E.milliseconds ASC""", [id]);
-            break;
-          case Filter.downloaded:
-            list = await dbClient.rawQuery(
-                """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+              break;
+            case Filter.downloaded:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.media_id != E.enclosure_url ORDER BY E.milliseconds ASC""",
-                [id]);
-            break;
-          case Filter.search:
-            list = await dbClient.rawQuery(
-                """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+                  [id]);
+              break;
+            case Filter.search:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
         E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
         P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE P.id = ? AND E.title LIKE ? ORDER BY E.milliseconds ASC""",
-                [id, '%$query%']);
-            break;
-          default:
+                  [id, '%$query%']);
+              break;
+            default:
+          }
+        } else {
+          switch (filter) {
+            case Filter.all:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE P.id = ? ORDER BY E.milliseconds DESC""", [id]);
+              break;
+            case Filter.liked:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE P.id = ? AND E.liked = 1 ORDER BY E.milliseconds DESC""", [id]);
+              break;
+            case Filter.downloaded:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE P.id = ? AND E.media_id != E.enclosure_url ORDER BY E.milliseconds DESC""",
+                  [id]);
+              break;
+            case Filter.search:
+              list = await dbClient.rawQuery(
+                  """SELECT E.title, E.enclosure_url, E.enclosure_length, 
+        E.milliseconds, P.imagePath, P.title as feed_title, E.duration, E.explicit, 
+        P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        WHERE P.id = ? AND E.title LIKE ? ORDER BY E.milliseconds DESC""",
+                  [id, '%$query%']);
+              break;
+            default:
+          }
         }
       } else if (reverse) {
         switch (filter) {

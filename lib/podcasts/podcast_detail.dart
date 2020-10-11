@@ -86,6 +86,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   bool _selectAll;
 
+  bool _selectBefore;
+
+  bool _selectAfter;
+
   @override
   void initState() {
     super.initState();
@@ -95,6 +99,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
     _scroll = false;
     _multiSelect = false;
     _selectAll = false;
+    _selectAfter = false;
+    _selectBefore = false;
   }
 
   @override
@@ -696,6 +702,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   ),
                   onPressed: () {
                     setState(() {
+                      _top = -1;
                       _selectedEpisodes = [];
                       _multiSelect = true;
                     });
@@ -862,32 +869,48 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       filter: _filter,
                                       query: _query),
                                   builder: (context, snapshot) {
-                                    if (_selectAll) {
-                                      _selectedEpisodes = snapshot.data;
+                                    if (snapshot.hasData) {
+                                      if (_selectAll) {
+                                        _selectedEpisodes = snapshot.data;
+                                      }
+                                      if (_selectBefore) {
+                                        final index = snapshot.data
+                                            .indexOf(_selectedEpisodes.first);
+                                        if (index != 0) {
+                                          _selectedEpisodes = snapshot.data
+                                              .sublist(0, index + 1);
+                                        }
+                                      }
+                                      if (_selectAfter) {
+                                        final index = snapshot.data
+                                            .indexOf(_selectedEpisodes.first);
+                                        _selectedEpisodes =
+                                            snapshot.data.sublist(index);
+                                      }
+                                      return EpisodeGrid(
+                                        episodes: snapshot.data,
+                                        showFavorite: true,
+                                        showNumber: _filter == Filter.all &&
+                                                !_hideListened
+                                            ? true
+                                            : false,
+                                        layout: _layout,
+                                        reverse: _reverse,
+                                        episodeCount: _episodeCount,
+                                        initNum: _scroll ? 0 : 12,
+                                        multiSelect: _multiSelect,
+                                        selectedList: _selectedEpisodes ?? [],
+                                        onSelect: (value) => setState(() {
+                                          _selectAll = false;
+                                          _selectBefore = false;
+                                          _selectAfter = false;
+                                          _selectedEpisodes = value;
+                                        }),
+                                      );
                                     }
-                                    return (snapshot.hasData)
-                                        ? EpisodeGrid(
-                                            episodes: snapshot.data,
-                                            showFavorite: true,
-                                            showNumber: _filter == Filter.all &&
-                                                    !_hideListened
-                                                ? true
-                                                : false,
-                                            layout: _layout,
-                                            reverse: _reverse,
-                                            episodeCount: _episodeCount,
-                                            initNum: _scroll ? 0 : 12,
-                                            multiSelect: _multiSelect,
-                                            selectedList:
-                                                _selectedEpisodes ?? [],
-                                            onSelect: (value) => setState(() {
-                                              _selectAll = false;
-                                              _selectedEpisodes = value;
-                                            }),
-                                          )
-                                        : SliverToBoxAdapter(
-                                            child: Center(),
-                                          );
+                                    return SliverToBoxAdapter(
+                                      child: Center(),
+                                    );
                                   }),
                               SliverList(
                                 delegate: SliverChildBuilderDelegate(
@@ -919,7 +942,23 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     onSelectAll: (value) {
                                       setState(() {
                                         _selectAll = value;
-                                        _selectedEpisodes = [];
+                                        _selectAfter = false;
+                                        _selectBefore = false;
+                                        if (!value) {
+                                          _selectedEpisodes = [];
+                                        }
+                                      });
+                                    },
+                                    onSelectAfter: (value) {
+                                      setState(() {
+                                        _selectBefore = false;
+                                        _selectAfter = true;
+                                      });
+                                    },
+                                    onSelectBefore: (value) {
+                                      setState(() {
+                                        _selectAfter = false;
+                                        _selectBefore = true;
                                       });
                                     },
                                     onClose: (value) {
@@ -927,6 +966,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         if (value) {
                                           _multiSelect = false;
                                           _selectAll = false;
+                                          _selectAfter = false;
+                                          _selectBefore = false;
                                         }
                                       });
                                     },
@@ -959,12 +1000,16 @@ class MultiSelectMenuBar extends StatefulWidget {
       this.selectAll,
       this.onSelectAll,
       this.onClose,
+      this.onSelectAfter,
+      this.onSelectBefore,
       Key key})
       : super(key: key);
   final List<EpisodeBrief> selectedList;
   final bool selectAll;
   final ValueChanged<bool> onSelectAll;
   final ValueChanged<bool> onClose;
+  final ValueChanged<bool> onSelectBefore;
+  final ValueChanged<bool> onSelectAfter;
 
   @override
   _MultiSelectMenuBarState createState() => _MultiSelectMenuBarState();
@@ -1146,22 +1191,84 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
       tween: Tween<double>(begin: 0, end: 1),
       duration: Duration(milliseconds: 500),
       builder: (context, value, child) => Container(
-        height: 80.0 * value,
+        height: 90.0 * value,
         decoration: BoxDecoration(color: context.primaryColor),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                height: 30,
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Text('${widget.selectedList.length} selected',
-                          style: context.textTheme.headline6
-                              .copyWith(color: context.accentColor))),
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 40,
+                    child: Center(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Text('${widget.selectedList.length} selected',
+                              style: context.textTheme.headline6
+                                  .copyWith(color: context.accentColor))),
+                    ),
+                  ),
+                  Spacer(),
+                  if (widget.selectedList.length == 1)
+                    SizedBox(
+                      height: 25,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: context.accentColor),
+                                primary: context.textColor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(100)))),
+                            onPressed: () {
+                              widget.onSelectBefore(true);
+                            },
+                            child: Text('Before')),
+                      ),
+                    ),
+                  if (widget.selectedList.length == 1)
+                    SizedBox(
+                      height: 25,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: context.accentColor),
+                                primary: context.textColor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(100)))),
+                            onPressed: () {
+                              widget.onSelectAfter(true);
+                            },
+                            child: Text('After')),
+                      ),
+                    ),
+                  SizedBox(
+                    height: 25,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: context.accentColor),
+                              backgroundColor:
+                                  widget.selectAll ? context.accentColor : null,
+                              primary: widget.selectAll
+                                  ? Colors.white
+                                  : context.textColor,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(100)))),
+                          onPressed: () {
+                            widget.onSelectAll(!widget.selectAll);
+                          },
+                          child: Text('All')),
+                    ),
+                  )
+                ],
               ),
               Row(
                 children: [
@@ -1287,12 +1394,6 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                         }
                       }),
                   Spacer(),
-                  _buttonOnMenu(
-                      child: Icon(Icons.select_all_rounded,
-                          color: widget.selectAll ? context.accentColor : null),
-                      onTap: () {
-                        widget.onSelectAll(!widget.selectAll);
-                      }),
                   _buttonOnMenu(
                       child: Icon(Icons.close),
                       onTap: () => widget.onClose(true))
