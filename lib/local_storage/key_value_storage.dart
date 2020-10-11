@@ -57,6 +57,7 @@ const String hidePodcastDiscoveryKey = 'hidePodcastDiscoveryKey';
 const String searchEngineKey = 'searchEngineKey';
 const String markListenedAfterSkipKey = 'markListenedAfterSkipKey';
 const String downloadPositionKey = 'downloadPositionKey';
+const String deleteAfterPlayedKey = 'removeAfterPlayedKey';
 
 class KeyValueStorage {
   final String key;

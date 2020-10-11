@@ -335,7 +335,7 @@ class DownloadState extends ChangeNotifier {
         taskId: task.taskId, shouldDeleteContent: false);
   }
 
-  Future delTask(EpisodeBrief episode) async {
+  Future<void> delTask(EpisodeBrief episode) async {
     var task = episodeToTask(episode);
     await FlutterDownloader.remove(
         taskId: task.taskId, shouldDeleteContent: true);
@@ -350,22 +350,25 @@ class DownloadState extends ChangeNotifier {
     _removeTask(episode);
   }
 
-  _removeTask(EpisodeBrief episode) {
+  void _removeTask(EpisodeBrief episode) {
     _episodeTasks.removeWhere((element) => element.episode == episode);
     notifyListeners();
   }
 
-  _autoDelete() async {
+  Future<void> _autoDelete() async {
     developer.log('Start auto delete outdated episodes');
-    var autoDeleteStorage = KeyValueStorage(autoDeleteKey);
-    var autoDelete = await autoDeleteStorage.getInt();
+    final autoDeleteStorage = KeyValueStorage(autoDeleteKey);
+    final deletePlayedStorage = KeyValueStorage(deleteAfterPlayedKey);
+    final autoDelete = await autoDeleteStorage.getInt();
+    final deletePlayed = await deletePlayedStorage.getBool(defaultValue: false);
     if (autoDelete == 0) {
       await autoDeleteStorage.saveInt(30);
     } else if (autoDelete > 0) {
       var deadline = DateTime.now()
           .subtract(Duration(days: autoDelete))
           .millisecondsSinceEpoch;
-      var episodes = await dbHelper.getOutdatedEpisode(deadline);
+      var episodes = await dbHelper.getOutdatedEpisode(deadline,
+          deletePlayed: deletePlayed);
       if (episodes.isNotEmpty) {
         for (var episode in episodes) {
           await delTask(episode);

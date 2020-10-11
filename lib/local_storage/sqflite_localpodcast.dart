@@ -1091,7 +1091,8 @@ class DBHelper {
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> getOutdatedEpisode(int deadline) async {
+  Future<List<EpisodeBrief>> getOutdatedEpisode(int deadline,
+      {bool deletePlayed}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     List<Map> list = await dbClient.rawQuery(
@@ -1100,18 +1101,45 @@ class DBHelper {
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.download_date < ? AND E.enclosure_url != E.media_id
         ORDER BY E.milliseconds DESC""", [deadline]);
-    for (var i in list) {
-      episodes.add(EpisodeBrief(
-          i['title'],
-          i['enclosure_url'],
-          i['enclosure_length'],
-          i['milliseconds'],
-          i['feed_title'],
-          i['primaryColor'],
-          i['duration'],
-          i['explicit'],
-          i['imagePath'],
-          i['is_new']));
+    if (list.isNotEmpty) {
+      for (var i in list) {
+        episodes.add(EpisodeBrief(
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feed_title'],
+            i['primaryColor'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['is_new']));
+      }
+    }
+    if (deletePlayed) {
+      List<Map> results = await dbClient.rawQuery(
+          """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
+        E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
+        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P 
+        ON E.feed_id = P.id LEFT JOIN PlayHistory H ON E.enclosure_url = 
+        H.enclosure_url WHERE E.enclosure_url != E.media_id 
+        GROUP BY E.enclosure_url HAVING SUM(H.listen_time) > 0 ORDER BY 
+        E.milliseconds DESC""");
+      if (results.isNotEmpty) {
+        for (var i in results) {
+          episodes.add(EpisodeBrief(
+              i['title'],
+              i['enclosure_url'],
+              i['enclosure_length'],
+              i['milliseconds'],
+              i['feed_title'],
+              i['primaryColor'],
+              i['duration'],
+              i['explicit'],
+              i['imagePath'],
+              i['is_new']));
+        }
+      }
     }
     return episodes;
   }

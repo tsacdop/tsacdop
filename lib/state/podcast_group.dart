@@ -362,7 +362,7 @@ class GroupList extends ChangeNotifier {
   }
 
   /// Load groups from storage at start.
-  Future loadGroups() async {
+  Future<void> loadGroups() async {
     _isLoading = true;
     notifyListeners();
     _groupStorage.getGroups().then((loadgroups) async {
@@ -376,7 +376,7 @@ class GroupList extends ChangeNotifier {
   }
 
   /// Update podcasts of each group
-  Future updateGroups() async {
+  Future<void> updateGroups() async {
     for (var group in _groups) {
       await group.getPodcasts();
     }
@@ -384,7 +384,7 @@ class GroupList extends ChangeNotifier {
   }
 
   /// Add new group.
-  Future addGroup(PodcastGroup podcastGroup) async {
+  Future<void> addGroup(PodcastGroup podcastGroup) async {
     _isLoading = true;
     _groups.add(podcastGroup);
     await _saveGroup();
@@ -393,7 +393,7 @@ class GroupList extends ChangeNotifier {
   }
 
   /// Remove group.
-  Future delGroup(PodcastGroup podcastGroup) async {
+  Future<void> delGroup(PodcastGroup podcastGroup) async {
     _isLoading = true;
     for (var podcast in podcastGroup.podcastList) {
       if (!_groups.first.podcastList.contains(podcast)) {

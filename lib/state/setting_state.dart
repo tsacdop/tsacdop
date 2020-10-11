@@ -496,6 +496,11 @@ class SettingState extends ChangeNotifier {
     var speedList = await KeyValueStorage(speedListKey).getStringList();
     var hidePodcastDiscovery = await KeyValueStorage(hidePodcastDiscoveryKey)
         .getBool(defaultValue: false);
+    final markListenedAfterSKip =
+        await KeyValueStorage(markListenedAfterSkipKey)
+            .getBool(defaultValue: false);
+    final deleteAfterPlayed = await KeyValueStorage(deleteAfterPlayedKey)
+        .getBool(defaultValue: false);
 
     return SettingsBackup(
         theme: theme,
@@ -527,7 +532,9 @@ class SettingState extends ChangeNotifier {
         notificationLayout: notificationLayout,
         showNotesFont: showNotesFont,
         speedList: speedList,
-        hidePodcastDiscovery: hidePodcastDiscovery);
+        hidePodcastDiscovery: hidePodcastDiscovery,
+        markListenedAfterSkip: markListenedAfterSKip,
+        deleteAfterPlayed: deleteAfterPlayed);
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -563,6 +570,10 @@ class SettingState extends ChangeNotifier {
         .saveInt(backup.notificationLayout);
     await showNotesFontStorage.saveInt(backup.showNotesFont);
     await KeyValueStorage(speedListKey).saveStringList(backup.speedList);
+    await KeyValueStorage(markListenedAfterSkipKey)
+        .saveBool(backup.markListenedAfterSkip);
+    await KeyValueStorage(deleteAfterPlayedKey)
+        .saveBool(backup.deleteAfterPlayed);
 
     if (backup.locale == '') {
       await localeStorage.saveStringList([]);
