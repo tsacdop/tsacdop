@@ -84,6 +84,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
   ///Toggle for multi-select.
   bool _multiSelect;
 
+  bool _selectAll;
+
   @override
   void initState() {
     super.initState();
@@ -92,6 +94,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     _controller = ScrollController();
     _scroll = false;
     _multiSelect = false;
+    _selectAll = false;
   }
 
   @override
@@ -146,9 +149,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
       {int count, bool reverse, Filter filter, String query}) async {
     var episodes = <EpisodeBrief>[];
     _episodeCount = await _dbHelper.getPodcastCounts(podcastLocal.id);
-    var storage = KeyValueStorage(podcastLayoutKey);
-    var hideListenedStorage = KeyValueStorage(hideListenedKey);
-    var index = await storage.getInt(defaultValue: 1);
+    final layoutStorage = KeyValueStorage(podcastLayoutKey);
+    final hideListenedStorage = KeyValueStorage(hideListenedKey);
+    final index = await layoutStorage.getInt(defaultValue: 1);
     if (_layout == null) _layout = Layout.values[index];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
@@ -859,6 +862,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       filter: _filter,
                                       query: _query),
                                   builder: (context, snapshot) {
+                                    if (_selectAll) {
+                                      _selectedEpisodes = snapshot.data;
+                                    }
                                     return (snapshot.hasData)
                                         ? EpisodeGrid(
                                             episodes: snapshot.data,
@@ -874,8 +880,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                             multiSelect: _multiSelect,
                                             selectedList:
                                                 _selectedEpisodes ?? [],
-                                            onSelect: (value) => setState(() =>
-                                                _selectedEpisodes = value),
+                                            onSelect: (value) => setState(() {
+                                              _selectAll = false;
+                                              _selectedEpisodes = value;
+                                            }),
                                           )
                                         : SliverToBoxAdapter(
                                             child: Center(),
@@ -907,9 +915,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                 if (_multiSelect)
                                   MultiSelectMenuBar(
                                     selectedList: _selectedEpisodes,
+                                    selectAll: _selectAll,
+                                    onSelectAll: (value) {
+                                      setState(() {
+                                        _selectAll = value;
+                                        _selectedEpisodes = [];
+                                      });
+                                    },
                                     onClose: (value) {
                                       setState(() {
-                                        if (value) _multiSelect = false;
+                                        if (value) {
+                                          _multiSelect = false;
+                                          _selectAll = false;
+                                        }
                                       });
                                     },
                                   ),
@@ -936,9 +954,16 @@ class _PodcastDetailState extends State<PodcastDetail> {
 }
 
 class MultiSelectMenuBar extends StatefulWidget {
-  MultiSelectMenuBar({this.selectedList, this.onClose, Key key})
+  MultiSelectMenuBar(
+      {this.selectedList,
+      this.selectAll,
+      this.onSelectAll,
+      this.onClose,
+      Key key})
       : super(key: key);
   final List<EpisodeBrief> selectedList;
+  final bool selectAll;
+  final ValueChanged<bool> onSelectAll;
   final ValueChanged<bool> onClose;
 
   @override
@@ -1121,138 +1146,160 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
       tween: Tween<double>(begin: 0, end: 1),
       duration: Duration(milliseconds: 500),
       builder: (context, value, child) => Container(
-        height: 50.0 * value,
+        height: 80.0 * value,
         decoration: BoxDecoration(color: context.primaryColor),
-        child: Row(
-          children: [
-            _buttonOnMenu(
-                child: _liked
-                    ? Icon(Icons.favorite, color: Colors.red)
-                    : Icon(
-                        Icons.favorite_border,
-                        color: Colors.grey[700],
-                      ),
-                onTap: () async {
-                  if (widget.selectedList.isNotEmpty) {
-                    if (!_liked) {
-                      await _saveLiked();
-                      Fluttertoast.showToast(
-                        msg: s.liked,
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                    } else {
-                      await _setUnliked();
-                      Fluttertoast.showToast(
-                        msg: s.unliked,
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                    }
-                  }
-                  //  OverlayEntry _overlayEntry;
-                  //  _overlayEntry = _createOverlayEntry();
-                  //  Overlay.of(context).insert(_overlayEntry);
-                  //  await Future.delayed(Duration(seconds: 2));
-                  //  _overlayEntry?.remove();
-                }),
-            _buttonOnMenu(
-              child: _downloaded
-                  ? Center(
-                      child: SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CustomPaint(
-                          painter: DownloadPainter(
-                              color: context.accentColor,
-                              fraction: 1,
-                              progressColor: context.accentColor,
-                              progress: 1),
-                        ),
-                      ),
-                    )
-                  : Center(
-                      child: SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CustomPaint(
-                          painter: DownloadPainter(
-                            color: Colors.grey[700],
-                            fraction: 0,
-                            progressColor: context.accentColor,
-                          ),
-                        ),
-                      ),
-                    ),
-              onTap: () {
-                if (widget.selectedList.isNotEmpty) {
-                  if (!_downloaded) _requestDownload();
-                }
-              },
-            ),
-            _buttonOnMenu(
-                child: _inPlaylist
-                    ? Icon(Icons.playlist_add_check, color: context.accentColor)
-                    : Icon(
-                        Icons.playlist_add,
-                        color: Colors.grey[700],
-                      ),
-                onTap: () async {
-                  if (widget.selectedList.isNotEmpty) {
-                    if (!_inPlaylist) {
-                      for (var episode in widget.selectedList) {
-                        audio.addToPlaylist(episode);
-                        Fluttertoast.showToast(
-                          msg: s.toastAddPlaylist,
-                          gravity: ToastGravity.BOTTOM,
-                        );
-                      }
-                      setState(() => _inPlaylist = true);
-                    } else {
-                      for (var episode in widget.selectedList) {
-                        audio.delFromPlaylist(episode);
-                        Fluttertoast.showToast(
-                          msg: s.toastRemovePlaylist,
-                          gravity: ToastGravity.BOTTOM,
-                        );
-                      }
-                      setState(() => _inPlaylist = false);
-                    }
-                  }
-                }),
-            _buttonOnMenu(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: CustomPaint(
-                    size: Size(25, 20),
-                    painter: ListenedAllPainter(
-                        _marked ? context.accentColor : Colors.grey[700],
-                        stroke: 2.0),
-                  ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 30,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Text('${widget.selectedList.length} selected',
+                          style: context.textTheme.headline6
+                              .copyWith(color: context.accentColor))),
                 ),
-                onTap: () async {
-                  if (widget.selectedList.isNotEmpty) {
-                    if (!_marked) {
-                      await _markListened();
-                      Fluttertoast.showToast(
-                        msg: s.markListened,
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                    } else {
-                      await _markNotListened();
-                      Fluttertoast.showToast(
-                        msg: s.markNotListened,
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                    }
-                  }
-                }),
-            Spacer(),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                child: Text('${widget.selectedList.length} selected',
-                    style: context.textTheme.headline6)),
-            _buttonOnMenu(
-                child: Icon(Icons.close), onTap: () => widget.onClose(true))
-          ],
+              ),
+              Row(
+                children: [
+                  _buttonOnMenu(
+                      child: _liked
+                          ? Icon(Icons.favorite, color: Colors.red)
+                          : Icon(
+                              Icons.favorite_border,
+                              color: Colors.grey[700],
+                            ),
+                      onTap: () async {
+                        if (widget.selectedList.isNotEmpty) {
+                          if (!_liked) {
+                            await _saveLiked();
+                            Fluttertoast.showToast(
+                              msg: s.liked,
+                              gravity: ToastGravity.BOTTOM,
+                            );
+                          } else {
+                            await _setUnliked();
+                            Fluttertoast.showToast(
+                              msg: s.unliked,
+                              gravity: ToastGravity.BOTTOM,
+                            );
+                          }
+                        }
+                        //  OverlayEntry _overlayEntry;
+                        //  _overlayEntry = _createOverlayEntry();
+                        //  Overlay.of(context).insert(_overlayEntry);
+                        //  await Future.delayed(Duration(seconds: 2));
+                        //  _overlayEntry?.remove();
+                      }),
+                  _buttonOnMenu(
+                    child: _downloaded
+                        ? Center(
+                            child: SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CustomPaint(
+                                painter: DownloadPainter(
+                                    color: context.accentColor,
+                                    fraction: 1,
+                                    progressColor: context.accentColor,
+                                    progress: 1),
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CustomPaint(
+                                painter: DownloadPainter(
+                                  color: Colors.grey[700],
+                                  fraction: 0,
+                                  progressColor: context.accentColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                    onTap: () {
+                      if (widget.selectedList.isNotEmpty) {
+                        if (!_downloaded) _requestDownload();
+                      }
+                    },
+                  ),
+                  _buttonOnMenu(
+                      child: _inPlaylist
+                          ? Icon(Icons.playlist_add_check,
+                              color: context.accentColor)
+                          : Icon(
+                              Icons.playlist_add,
+                              color: Colors.grey[700],
+                            ),
+                      onTap: () async {
+                        if (widget.selectedList.isNotEmpty) {
+                          if (!_inPlaylist) {
+                            for (var episode in widget.selectedList) {
+                              audio.addToPlaylist(episode);
+                              Fluttertoast.showToast(
+                                msg: s.toastAddPlaylist,
+                                gravity: ToastGravity.BOTTOM,
+                              );
+                            }
+                            setState(() => _inPlaylist = true);
+                          } else {
+                            for (var episode in widget.selectedList) {
+                              audio.delFromPlaylist(episode);
+                              Fluttertoast.showToast(
+                                msg: s.toastRemovePlaylist,
+                                gravity: ToastGravity.BOTTOM,
+                              );
+                            }
+                            setState(() => _inPlaylist = false);
+                          }
+                        }
+                      }),
+                  _buttonOnMenu(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: CustomPaint(
+                          size: Size(25, 20),
+                          painter: ListenedAllPainter(
+                              _marked ? context.accentColor : Colors.grey[700],
+                              stroke: 2.0),
+                        ),
+                      ),
+                      onTap: () async {
+                        if (widget.selectedList.isNotEmpty) {
+                          if (!_marked) {
+                            await _markListened();
+                            Fluttertoast.showToast(
+                              msg: s.markListened,
+                              gravity: ToastGravity.BOTTOM,
+                            );
+                          } else {
+                            await _markNotListened();
+                            Fluttertoast.showToast(
+                              msg: s.markNotListened,
+                              gravity: ToastGravity.BOTTOM,
+                            );
+                          }
+                        }
+                      }),
+                  Spacer(),
+                  _buttonOnMenu(
+                      child: Icon(Icons.select_all_rounded,
+                          color: widget.selectAll ? context.accentColor : null),
+                      onTap: () {
+                        widget.onSelectAll(!widget.selectAll);
+                      }),
+                  _buttonOnMenu(
+                      child: Icon(Icons.close),
+                      onTap: () => widget.onClose(true))
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
