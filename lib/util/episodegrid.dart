@@ -439,7 +439,7 @@ class EpisodeGrid extends StatelessWidget {
                             color: isListened > 0
                                 ? context.brightness == Brightness.light
                                     ? Colors.grey[200]
-                                    : Color.fromRGBO(40, 40, 40, 1)
+                                    : Color.fromRGBO(50, 50, 50, 1)
                                 : context.scaffoldBackgroundColor,
                             boxShadow: [
                               BoxShadow(
