@@ -201,10 +201,10 @@ class EpisodeGrid extends StatelessWidget {
 
   /// Circel avatar widget.
   Widget _circleImage(BuildContext context,
-          {EpisodeBrief episode, Color color, bool boo}) =>
+          {EpisodeBrief episode, Color color, bool boo, double radius}) =>
       Container(
-        height: context.width / 16,
-        width: context.width / 16,
+        height: radius ?? context.width / 16,
+        width: radius ?? context.width / 16,
         child: boo
             ? Center()
             : CircleAvatar(
@@ -283,6 +283,14 @@ class EpisodeGrid extends StatelessWidget {
   Widget _episodeCard(BuildContext context,
       {int index, Color color, bool isLiked, bool isDownloaded, bool boo}) {
     var width = context.width;
+    if (layout == Layout.one) {
+      return _layoutOneCard(context,
+          index: index,
+          color: color,
+          isLiked: isLiked,
+          isDownloaded: isDownloaded,
+          boo: boo);
+    }
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -371,6 +379,111 @@ class EpisodeGrid extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _layoutOneCard(BuildContext context,
+      {int index, Color color, bool isLiked, bool isDownloaded, bool boo}) {
+    var width = context.width;
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: _circleImage(context,
+                  episode: episodes[index],
+                  color: color,
+                  boo: boo,
+                  radius: context.width / 8),
+            ),
+          ),
+          Expanded(
+            flex: 4,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(episodes[index].feedTitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, color: color)),
+                      ),
+                      _isNewIndicator(episodes[index]),
+                      _downloadIndicater(context,
+                          episode: episodes[index], isDownloaded: isDownloaded),
+                      _numberIndicater(context, index: index, color: color)
+                    ],
+                  ),
+                ),
+                Expanded(
+                    flex: 2,
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child: _title(episodes[index]))),
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        if (episodes[index].duration != 0)
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              episodes[index].duration.toTime,
+                              style: TextStyle(fontSize: width / 35),
+                            ),
+                          ),
+                        if (episodes[index].duration != 0 &&
+                            episodes[index].enclosureLength != null &&
+                            episodes[index].enclosureLength != 0 &&
+                            layout != Layout.three)
+                          Text(
+                            '|',
+                            style: TextStyle(
+                              fontSize: width / 35,
+                            ),
+                          ),
+                        if (episodes[index].enclosureLength != null &&
+                            episodes[index].enclosureLength != 0)
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              '${(episodes[index].enclosureLength) ~/ 1000000}MB',
+                              style: TextStyle(fontSize: width / 35),
+                            ),
+                          ),
+                        SizedBox(width: 4),
+                        if (isLiked)
+                          Icon(
+                            Icons.favorite,
+                            color: Colors.red,
+                            size: width / 35,
+                          ),
+                        Spacer(),
+                        _pubDate(context,
+                            episode: episodes[index], color: color),
+                      ]),
+                )
+              ],
+            ),
+          ),
+          SizedBox(width: 8)
         ],
       ),
     );
