@@ -471,9 +471,17 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   }
 }
 
-class PodcastPreview extends StatelessWidget {
+class PodcastPreview extends StatefulWidget {
   final PodcastLocal podcastLocal;
+
   PodcastPreview({this.podcastLocal, Key key}) : super(key: key);
+
+  @override
+  _PodcastPreviewState createState() => _PodcastPreviewState();
+}
+
+class _PodcastPreviewState extends State<PodcastPreview> {
+  Future _getRssItem;
 
   Future<List<EpisodeBrief>> _getRssItemTop(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
@@ -482,8 +490,14 @@ class PodcastPreview extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _getRssItem = _getRssItemTop(widget.podcastLocal);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final c = podcastLocal.backgroudColor(context);
+    final c = widget.podcastLocal.backgroudColor(context);
     return Column(
       children: <Widget>[
         Expanded(
@@ -491,12 +505,12 @@ class PodcastPreview extends StatelessWidget {
               selector: (_, worker) => worker.created,
               builder: (context, created, child) {
                 return FutureBuilder<List<EpisodeBrief>>(
-                  future: _getRssItemTop(podcastLocal),
+                  future: _getRssItem,
                   builder: (context, snapshot) {
                     return (snapshot.hasData)
                         ? ShowEpisode(
                             episodes: snapshot.data,
-                            podcastLocal: podcastLocal,
+                            podcastLocal: widget.podcastLocal,
                           )
                         : Padding(
                             padding: const EdgeInsets.all(5.0),
@@ -514,7 +528,7 @@ class PodcastPreview extends StatelessWidget {
             children: <Widget>[
               Expanded(
                 flex: 4,
-                child: Text(podcastLocal.title,
+                child: Text(widget.podcastLocal.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontWeight: FontWeight.bold, color: c)),
