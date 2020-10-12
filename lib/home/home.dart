@@ -24,6 +24,7 @@ import '../util/custom_popupmenu.dart';
 import '../util/custom_widget.dart';
 import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
+import '../util/muiliselect_bar.dart';
 import 'audioplayer.dart';
 import 'download_list.dart';
 import 'home_groups.dart';
@@ -315,9 +316,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                               color: Colors.cyan[600],
                                               padding: const EdgeInsets.all(0),
                                               child: Text(s.dismiss,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .button
+                                                  style: context
+                                                      .textTheme.button
                                                       .copyWith(
                                                           color: Colors.white)),
                                               onPressed: () =>
@@ -727,6 +727,13 @@ class _RecentUpdateState extends State<_RecentUpdate>
   Layout _layout;
   bool _hideListened;
   bool _scroll;
+
+  ///Selected episode list.
+  List<EpisodeBrief> _selectedEpisodes;
+
+  ///Toggle for multi-select.
+  bool _multiSelect;
+
   @override
   void initState() {
     super.initState();
@@ -734,9 +741,10 @@ class _RecentUpdateState extends State<_RecentUpdate>
     _groupName = 'All';
     _group = [];
     _scroll = false;
+    _multiSelect = false;
   }
 
-  Future _updateRssItem() async {
+  Future<void> _updateRssItem() async {
     final refreshWorker = context.read<RefreshWorker>();
     refreshWorker.start(_group);
     await Future.delayed(Duration(seconds: 1));
@@ -955,77 +963,198 @@ class _RecentUpdateState extends State<_RecentUpdate>
                               backgroundColor: context.accentColor,
                               semanticsLabel: s.refreshStarted,
                               onRefresh: _updateRssItem,
-                              child: CustomScrollView(
-                                  key: PageStorageKey<String>('update'),
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  slivers: <Widget>[
-                                    SliverToBoxAdapter(
-                                      child: Container(
-                                          height: 40,
-                                          color: context.primaryColor,
-                                          child: Material(
-                                            color: Colors.transparent,
-                                            child: Row(
-                                              children: <Widget>[
-                                                _switchGroupButton(),
-                                                Spacer(),
-                                                _addNewButton(),
-                                                Material(
-                                                  color: Colors.transparent,
-                                                  child: IconButton(
-                                                    tooltip:
-                                                        s.hideListenedSetting,
-                                                    icon: SizedBox(
-                                                      width: 30,
-                                                      height: 15,
-                                                      child: HideListened(
-                                                        hideListened:
-                                                            _hideListened ??
-                                                                false,
-                                                      ),
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() =>
-                                                          _hideListened =
-                                                              !_hideListened);
-                                                    },
-                                                  ),
-                                                ),
-                                                Material(
-                                                  color: Colors.transparent,
-                                                  child: LayoutButton(
-                                                    layout: _layout,
-                                                    onPressed: (layout) =>
-                                                        setState(() {
-                                                      _layout = layout;
-                                                    }),
-                                                  ),
-                                                ),
-                                              ],
+                              child: Stack(
+                                children: [
+                                  ScrollConfiguration(
+                                    behavior: NoGrowBehavior(),
+                                    child: CustomScrollView(
+                                        key: PageStorageKey<String>('update'),
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        slivers: <Widget>[
+                                          SliverToBoxAdapter(
+                                            child: SizedBox(
+                                              height: 40,
+                                              //  color: context.primaryColor,
+                                              //  child: Material(
+                                              //    color: Colors.transparent,
+                                              //    child: Row(
+                                              //      children: <Widget>[
+                                              //        _switchGroupButton(),
+                                              //        Spacer(),
+                                              //        _addNewButton(),
+                                              //        Material(
+                                              //          color: Colors.transparent,
+                                              //          child: IconButton(
+                                              //            tooltip: s
+                                              //                .hideListenedSetting,
+                                              //            icon: SizedBox(
+                                              //              width: 30,
+                                              //              height: 15,
+                                              //              child: HideListened(
+                                              //                hideListened:
+                                              //                    _hideListened ??
+                                              //                        false,
+                                              //              ),
+                                              //            ),
+                                              //            onPressed: () {
+                                              //              setState(() =>
+                                              //                  _hideListened =
+                                              //                      !_hideListened);
+                                              //            },
+                                              //          ),
+                                              //        ),
+                                              //        Material(
+                                              //          color: Colors.transparent,
+                                              //          child: LayoutButton(
+                                              //            layout: _layout,
+                                              //            onPressed: (layout) =>
+                                              //                setState(() {
+                                              //              _layout = layout;
+                                              //            }),
+                                              //          ),
+                                              //        ),
+                                              //        Material(
+                                              //            color:
+                                              //                Colors.transparent,
+                                              //            clipBehavior:
+                                              //                Clip.hardEdge,
+                                              //            borderRadius:
+                                              //                BorderRadius
+                                              //                    .circular(100),
+                                              //            child: IconButton(
+                                              //              icon: SizedBox(
+                                              //                width: 20,
+                                              //                height: 10,
+                                              //                child: CustomPaint(
+                                              //                    painter: MultiSelectPainter(
+                                              //                        color: context
+                                              //                            .accentColor)),
+                                              //              ),
+                                              //              onPressed: () {
+                                              //                setState(() {
+                                              //                  _selectedEpisodes =
+                                              //                      [];
+                                              //                  _multiSelect =
+                                              //                      true;
+                                              //                });
+                                              //              },
+                                              //            )),
+                                              //      ],
+                                              //    ),
+                                              // ),
                                             ),
-                                          )),
-                                    ),
-                                    EpisodeGrid(
-                                      episodes: snapshot.data,
-                                      layout: _layout,
-                                      initNum: _scroll ? 0 : 12,
-                                    ),
-                                    SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                        (context, index) {
-                                          return _loadMore
-                                              ? Container(
-                                                  height: 2,
-                                                  child:
-                                                      LinearProgressIndicator())
-                                              : Center();
-                                        },
-                                        childCount: 1,
-                                      ),
-                                    ),
-                                  ]),
-                            ))
+                                          ),
+                                          EpisodeGrid(
+                                            episodes: snapshot.data,
+                                            layout: _layout,
+                                            initNum: _scroll ? 0 : 12,
+                                            multiSelect: _multiSelect,
+                                            selectedList:
+                                                _selectedEpisodes ?? [],
+                                            onSelect: (value) => setState(() {
+                                              _selectedEpisodes = value;
+                                            }),
+                                          ),
+                                          SliverList(
+                                            delegate:
+                                                SliverChildBuilderDelegate(
+                                              (context, index) {
+                                                return _loadMore
+                                                    ? Container(
+                                                        height: 2,
+                                                        child:
+                                                            LinearProgressIndicator())
+                                                    : Center();
+                                              },
+                                              childCount: 1,
+                                            ),
+                                          ),
+                                        ]),
+                                  ),
+                                  Column(
+                                    children: [
+                                      if (!_multiSelect)
+                                        Container(
+                                            height: 40,
+                                            color: context.primaryColor,
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: Row(
+                                                children: <Widget>[
+                                                  _switchGroupButton(),
+                                                  Spacer(),
+                                                  _addNewButton(),
+                                                  Material(
+                                                    color: Colors.transparent,
+                                                    child: IconButton(
+                                                      tooltip:
+                                                          s.hideListenedSetting,
+                                                      icon: SizedBox(
+                                                        width: 30,
+                                                        height: 15,
+                                                        child: HideListened(
+                                                          hideListened:
+                                                              _hideListened ??
+                                                                  false,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        setState(() =>
+                                                            _hideListened =
+                                                                !_hideListened);
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Material(
+                                                    color: Colors.transparent,
+                                                    child: LayoutButton(
+                                                      layout: _layout,
+                                                      onPressed: (layout) =>
+                                                          setState(() {
+                                                        _layout = layout;
+                                                      }),
+                                                    ),
+                                                  ),
+                                                  Material(
+                                                      color: Colors.transparent,
+                                                      child: IconButton(
+                                                        icon: SizedBox(
+                                                          width: 20,
+                                                          height: 10,
+                                                          child: CustomPaint(
+                                                              painter: MultiSelectPainter(
+                                                                  color: context
+                                                                      .accentColor)),
+                                                        ),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            _selectedEpisodes =
+                                                                [];
+                                                            _multiSelect = true;
+                                                          });
+                                                        },
+                                                      )),
+                                                ],
+                                              ),
+                                            )),
+                                      if (_multiSelect)
+                                        MultiSelectMenuBar(
+                                          selectedList: _selectedEpisodes,
+                                          onClose: (value) {
+                                            setState(() {
+                                              if (value) {
+                                                _multiSelect = false;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
                     : Center();
               },
             );
@@ -1122,122 +1251,127 @@ class _MyFavoriteState extends State<_MyFavorite>
                             }
                             return true;
                           },
-                          child: CustomScrollView(
-                            key: PageStorageKey<String>('favorite'),
-                            slivers: <Widget>[
-                              SliverToBoxAdapter(
-                                child: Container(
-                                    height: 40,
-                                    color: context.primaryColor,
-                                    child: Row(
-                                      children: <Widget>[
-                                        Material(
-                                          color: Colors.transparent,
-                                          child: PopupMenuButton<int>(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10))),
-                                            elevation: 1,
-                                            tooltip: s.homeSubMenuSortBy,
-                                            child: Container(
-                                                height: 50,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: <Widget>[
-                                                    Text(s.homeSubMenuSortBy),
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 5),
-                                                    ),
-                                                    Icon(
-                                                      LineIcons
-                                                          .hourglass_start_solid,
-                                                      size: 18,
-                                                    )
-                                                  ],
-                                                )),
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem(
-                                                value: 0,
-                                                child: Row(
-                                                  children: [
-                                                    Text(s.updateDate),
-                                                    Spacer(),
-                                                    if (_sortBy == 0)
-                                                      DotIndicator()
-                                                  ],
+                          child: Stack(
+                            children: [
+                              ScrollConfiguration(
+                                behavior: NoGrowBehavior(),
+                                child: CustomScrollView(
+                                  key: PageStorageKey<String>('favorite'),
+                                  slivers: <Widget>[
+                                    SliverToBoxAdapter(
+                                        child: SizedBox(height: 40)),
+                                    EpisodeGrid(
+                                      episodes: snapshot.data,
+                                      layout: _layout,
+                                      initNum: 0,
+                                    ),
+                                    SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                        (context, index) {
+                                          return _loadMore
+                                              ? Container(
+                                                  height: 2,
+                                                  child:
+                                                      LinearProgressIndicator())
+                                              : Center();
+                                        },
+                                        childCount: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                height: 40,
+                                color: context.primaryColor,
+                                child: Row(
+                                  children: <Widget>[
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: PopupMenuButton<int>(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10))),
+                                        elevation: 1,
+                                        tooltip: s.homeSubMenuSortBy,
+                                        child: Container(
+                                            height: 50,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                Text(s.homeSubMenuSortBy),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 5),
                                                 ),
-                                              ),
-                                              PopupMenuItem(
-                                                value: 1,
-                                                child: Row(
-                                                  children: [
-                                                    Text(s.likeDate),
-                                                    Spacer(),
-                                                    if (_sortBy == 1)
-                                                      DotIndicator()
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                            onSelected: (value) {
-                                              if (value == 0) {
-                                                setState(() => _sortBy = 0);
-                                              } else if (value == 1) {
-                                                setState(() => _sortBy = 1);
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        Material(
-                                          color: Colors.transparent,
-                                          child: IconButton(
-                                            icon: SizedBox(
-                                              width: 30,
-                                              height: 15,
-                                              child: HideListened(
-                                                hideListened:
-                                                    _hideListened ?? false,
-                                              ),
+                                                Icon(
+                                                  LineIcons
+                                                      .hourglass_start_solid,
+                                                  size: 18,
+                                                )
+                                              ],
+                                            )),
+                                        itemBuilder: (context) => [
+                                          PopupMenuItem(
+                                            value: 0,
+                                            child: Row(
+                                              children: [
+                                                Text(s.updateDate),
+                                                Spacer(),
+                                                if (_sortBy == 0) DotIndicator()
+                                              ],
                                             ),
-                                            onPressed: () {
-                                              setState(() => _hideListened =
-                                                  !_hideListened);
-                                            },
+                                          ),
+                                          PopupMenuItem(
+                                            value: 1,
+                                            child: Row(
+                                              children: [
+                                                Text(s.likeDate),
+                                                Spacer(),
+                                                if (_sortBy == 1) DotIndicator()
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                        onSelected: (value) {
+                                          if (value == 0) {
+                                            setState(() => _sortBy = 0);
+                                          } else if (value == 1) {
+                                            setState(() => _sortBy = 1);
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: IconButton(
+                                        icon: SizedBox(
+                                          width: 30,
+                                          height: 15,
+                                          child: HideListened(
+                                            hideListened:
+                                                _hideListened ?? false,
                                           ),
                                         ),
-                                        Material(
-                                          color: Colors.transparent,
-                                          child: LayoutButton(
-                                            layout: _layout,
-                                            onPressed: (layout) => setState(() {
-                                              _layout = layout;
-                                            }),
-                                          ),
-                                        ),
-                                      ],
-                                    )),
-                              ),
-                              EpisodeGrid(
-                                episodes: snapshot.data,
-                                layout: _layout,
-                                initNum: 0,
-                              ),
-                              SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    return _loadMore
-                                        ? Container(
-                                            height: 2,
-                                            child: LinearProgressIndicator())
-                                        : Center();
-                                  },
-                                  childCount: 1,
+                                        onPressed: () {
+                                          setState(() =>
+                                              _hideListened = !_hideListened);
+                                        },
+                                      ),
+                                    ),
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: LayoutButton(
+                                        layout: _layout,
+                                        onPressed: (layout) => setState(() {
+                                          _layout = layout;
+                                        }),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
