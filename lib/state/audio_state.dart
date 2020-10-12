@@ -454,7 +454,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
         await _positionStorage.saveInt(_lastPostion);
         var history;
         if (_markListened) {
-          history = PlayHistory(_episode.title, _episode.enclosureUrl, 0, 1);
+          history = PlayHistory(_episode.title, _episode.enclosureUrl,
+              _backgroundAudioPosition ~/ 1000, 1);
         } else {
           history = PlayHistory(_episode.title, _episode.enclosureUrl,
               _backgroundAudioPosition ~/ 1000, _seekSliderValue);

@@ -22,6 +22,7 @@ class MultiSelectMenuBar extends StatefulWidget {
       this.onClose,
       this.onSelectAfter,
       this.onSelectBefore,
+      this.hideFavorite = false,
       Key key})
       : assert(onClose != null),
         super(key: key);
@@ -31,6 +32,7 @@ class MultiSelectMenuBar extends StatefulWidget {
   final ValueChanged<bool> onClose;
   final ValueChanged<bool> onSelectBefore;
   final ValueChanged<bool> onSelectAfter;
+  final bool hideFavorite;
 
   @override
   _MultiSelectMenuBarState createState() => _MultiSelectMenuBarState();
@@ -296,36 +298,37 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                 ),
               Row(
                 children: [
-                  _buttonOnMenu(
-                      child: _liked
-                          ? Icon(Icons.favorite, color: Colors.red)
-                          : Icon(
-                              Icons.favorite_border,
-                              color: Colors.grey[700],
-                            ),
-                      onTap: () async {
-                        if (widget.selectedList.isNotEmpty) {
-                          if (!_liked) {
-                            await _saveLiked();
-                            Fluttertoast.showToast(
-                              msg: s.liked,
-                              gravity: ToastGravity.BOTTOM,
-                            );
-                          } else {
-                            await _setUnliked();
-                            Fluttertoast.showToast(
-                              msg: s.unliked,
-                              gravity: ToastGravity.BOTTOM,
-                            );
+                  if (!widget.hideFavorite)
+                    _buttonOnMenu(
+                        child: _liked
+                            ? Icon(Icons.favorite, color: Colors.red)
+                            : Icon(
+                                Icons.favorite_border,
+                                color: Colors.grey[700],
+                              ),
+                        onTap: () async {
+                          if (widget.selectedList.isNotEmpty) {
+                            if (!_liked) {
+                              await _saveLiked();
+                              Fluttertoast.showToast(
+                                msg: s.liked,
+                                gravity: ToastGravity.BOTTOM,
+                              );
+                            } else {
+                              await _setUnliked();
+                              Fluttertoast.showToast(
+                                msg: s.unliked,
+                                gravity: ToastGravity.BOTTOM,
+                              );
+                            }
+                            audio.setEpisodeState = true;
                           }
-                          audio.setEpisodeState = true;
-                        }
-                        //  OverlayEntry _overlayEntry;
-                        //  _overlayEntry = _createOverlayEntry();
-                        //  Overlay.of(context).insert(_overlayEntry);
-                        //  await Future.delayed(Duration(seconds: 2));
-                        //  _overlayEntry?.remove();
-                      }),
+                          //  OverlayEntry _overlayEntry;
+                          //  _overlayEntry = _createOverlayEntry();
+                          //  Overlay.of(context).insert(_overlayEntry);
+                          //  await Future.delayed(Duration(seconds: 2));
+                          //  _overlayEntry?.remove();
+                        }),
                   _buttonOnMenu(
                     child: _downloaded
                         ? Center(
