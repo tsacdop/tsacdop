@@ -1215,7 +1215,7 @@ class DBHelper {
         }
       }
     }
-    return episodes;
+    return episodes.toSet().toList();
   }
 
   Future<List<EpisodeBrief>> getDownloadedEpisode(int mode,
