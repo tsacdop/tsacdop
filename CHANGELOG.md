@@ -1,5 +1,26 @@
 # Tsacdop Changelog
 
+## 0.5.0
+
+Release date 2020/10/13
+
+### New fewtures
+
+* Support multi select on recent and favorite tab.
+* Select all/ select before/ select after.
+* Option to delete episode download file when played.
+* OPtion to mark as listened after skipped.
+
+### Bug fixed
+
+* Feed pubdate parse error.
+
+### Minor changes
+
+* Single colume layout update.
+* About page UI update.
+* More smooth animation when open podcast detail page.
+
 ## 0.4.20
 
 Release date 2020/10/3

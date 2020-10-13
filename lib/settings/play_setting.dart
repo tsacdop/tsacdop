@@ -294,7 +294,7 @@ class _PlaySettingState extends State<PlaySetting> {
                   contentPadding:
                       EdgeInsets.only(left: 70.0, right: 20, bottom: 10),
                   title: Text(s.settingsMarkListenedSkip),
-                  subtitle: Text(s.settingsManageDownloadDes),
+                  subtitle: Text(s.settingsMarkListenedSkipDes),
                   trailing: Transform.scale(
                     scale: 0.9,
                     child: Switch(
