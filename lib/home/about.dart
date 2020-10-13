@@ -201,25 +201,11 @@ class _AboutAppState extends State<AboutApp> {
                       ],
                     ),
                     Padding(
-                      padding: EdgeInsets.all(10.0),
-                    ),
-                    Container(
                       padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        border: Border.all(
-                            color: Theme.of(context).accentColor, width: 1),
-                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          //  Text(
-                          //    s.developer,
-                          //    style: TextStyle(
-                          //        color: context.accentColor,
-                          //        fontWeight: FontWeight.bold),
-                          //  ),
                           _listItem(context, 'Twitter @tsacdop',
                               LineIcons.twitter, 'https://twitter.com/tsacdop'),
                           _listItem(context, 'GitHub', LineIcons.github_alt,
@@ -244,7 +230,7 @@ class _AboutAppState extends State<AboutApp> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      Text('Buy me a coffee',
+                                      Text('Buy Me A Coffee',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold)),
                                       SizedBox(width: 10),
@@ -260,28 +246,14 @@ class _AboutAppState extends State<AboutApp> {
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            child: Text(
-                              'I need to pay for podcast search API and '
-                              'always get headache without caffeine.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey[500]),
-                            ),
-                          ),
                         ],
                       ),
                     ),
                     Padding(
                       padding: EdgeInsets.all(10.0),
                     ),
-                    Container(
+                    Padding(
                       padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        border:
-                            Border.all(color: context.accentColor, width: 1),
-                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
