@@ -85,6 +85,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   bool _selectAll;
   bool _selectBefore;
   bool _selectAfter;
+  bool _loadEpisodes = false;
 
   @override
   void initState() {
@@ -97,6 +98,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
     _selectAll = false;
     _selectAfter = false;
     _selectBefore = false;
+    Future.delayed(Duration(milliseconds: 200))
+        .then((value) => setState(() => _loadEpisodes = true));
   }
 
   @override
@@ -434,57 +437,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
         height: 30,
         child: Row(
           children: <Widget>[
-            //SizedBox(width: 10),
-            // _customPopupMenu(
-            //   tooltip: s.homeSubMenuSortBy,
-            //   child: Container(
-            //       height: 30,
-            //       decoration: BoxDecoration(
-            //         borderRadius: BorderRadius.circular(100.0),
-            //         border: Border.all(color: context.primaryColorDark),
-            //       ),
-            //       padding: EdgeInsets.symmetric(horizontal: 10),
-            //       child: Row(
-            //         mainAxisSize: MainAxisSize.min,
-            //         children: <Widget>[
-            //           Text(s.homeSubMenuSortBy),
-            //           SizedBox(width: 5),
-            //           Icon(
-            //             _reverse
-            //                 ? LineIcons.hourglass_start_solid
-            //                 : LineIcons.hourglass_end_solid,
-            //             size: 18,
-            //           )
-            //         ],
-            //       )),
-            //   itemBuilder: [
-            //     PopupMenuItem(
-            //       value: 0,
-            //       child: Row(
-            //         children: [
-            //           Text(s.newestFirst),
-            //           Spacer(),
-            //           if (!_reverse) DotIndicator()
-            //         ],
-            //       ),
-            //     ),
-            //     PopupMenuItem(
-            //       value: 1,
-            //       child: Row(
-            //         children: [
-            //           Text(s.oldestFirst),
-            //           Spacer(),
-            //           if (_reverse) DotIndicator()
-            //         ],
-            //       ),
-            //     )
-            //   ],
-            //   onSelected: (value) {
-            //     if (value == 0) {
-            //       setState(() => _reverse = false);
-            //     } else if (value == 1) setState(() => _reverse = true);
-            //   },
-            // ),
             SizedBox(width: 15),
             _customPopupMenu(
                 tooltip: s.filter,
@@ -858,56 +810,57 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   child: _multiSelect
                                       ? Center()
                                       : _actionBar(context)),
-                              FutureBuilder<List<EpisodeBrief>>(
-                                  future: _getRssItem(widget.podcastLocal,
-                                      count: _top,
-                                      reverse: _reverse,
-                                      filter: _filter,
-                                      query: _query),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      if (_selectAll) {
-                                        _selectedEpisodes = snapshot.data;
-                                      }
-                                      if (_selectBefore) {
-                                        final index = snapshot.data
-                                            .indexOf(_selectedEpisodes.first);
-                                        if (index != 0) {
-                                          _selectedEpisodes = snapshot.data
-                                              .sublist(0, index + 1);
-                                        }
-                                      }
-                                      if (_selectAfter) {
-                                        final index = snapshot.data
-                                            .indexOf(_selectedEpisodes.first);
-                                        _selectedEpisodes =
-                                            snapshot.data.sublist(index);
-                                      }
-                                      return EpisodeGrid(
-                                        episodes: snapshot.data,
-                                        showFavorite: true,
-                                        showNumber: _filter == Filter.all &&
-                                                !_hideListened
-                                            ? true
-                                            : false,
-                                        layout: _layout,
+                              if (_loadEpisodes)
+                                FutureBuilder<List<EpisodeBrief>>(
+                                    future: _getRssItem(widget.podcastLocal,
+                                        count: _top,
                                         reverse: _reverse,
-                                        episodeCount: _episodeCount,
-                                        initNum: _scroll ? 0 : 12,
-                                        multiSelect: _multiSelect,
-                                        selectedList: _selectedEpisodes ?? [],
-                                        onSelect: (value) => setState(() {
-                                          _selectAll = false;
-                                          _selectBefore = false;
-                                          _selectAfter = false;
-                                          _selectedEpisodes = value;
-                                        }),
+                                        filter: _filter,
+                                        query: _query),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        if (_selectAll) {
+                                          _selectedEpisodes = snapshot.data;
+                                        }
+                                        if (_selectBefore) {
+                                          final index = snapshot.data
+                                              .indexOf(_selectedEpisodes.first);
+                                          if (index != 0) {
+                                            _selectedEpisodes = snapshot.data
+                                                .sublist(0, index + 1);
+                                          }
+                                        }
+                                        if (_selectAfter) {
+                                          final index = snapshot.data
+                                              .indexOf(_selectedEpisodes.first);
+                                          _selectedEpisodes =
+                                              snapshot.data.sublist(index);
+                                        }
+                                        return EpisodeGrid(
+                                          episodes: snapshot.data,
+                                          showFavorite: true,
+                                          showNumber: _filter == Filter.all &&
+                                                  !_hideListened
+                                              ? true
+                                              : false,
+                                          layout: _layout,
+                                          reverse: _reverse,
+                                          episodeCount: _episodeCount,
+                                          initNum: _scroll ? 0 : 12,
+                                          multiSelect: _multiSelect,
+                                          selectedList: _selectedEpisodes ?? [],
+                                          onSelect: (value) => setState(() {
+                                            _selectAll = false;
+                                            _selectBefore = false;
+                                            _selectAfter = false;
+                                            _selectedEpisodes = value;
+                                          }),
+                                        );
+                                      }
+                                      return SliverToBoxAdapter(
+                                        child: Center(),
                                       );
-                                    }
-                                    return SliverToBoxAdapter(
-                                      child: Center(),
-                                    );
-                                  }),
+                                    }),
                               SliverList(
                                 delegate: SliverChildBuilderDelegate(
                                   (context, index) {

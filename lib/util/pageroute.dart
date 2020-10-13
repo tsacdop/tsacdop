@@ -5,26 +5,38 @@ class SlideLeftRoute extends PageRouteBuilder {
   final Widget page;
   SlideLeftRoute({this.page})
       : super(
-          pageBuilder: (
-            context,
-            animation,
-            secondaryAnimation,
-          ) =>
-              page,
-          transitionsBuilder: (
-            context,
-            animation,
-            secondaryAnimation,
-            child,
-          ) =>
-              SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1, 0),
-              end: Offset.zero,
-            ).animate(animation),
-            child: child,
-          ),
-        );
+            pageBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+            ) =>
+                page,
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              var begin = Offset(1.0, 0.0);
+              var end = Offset.zero;
+              var curve = Curves.easeOutQuart;
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var tweenSequence = TweenSequence(<TweenSequenceItem<Offset>>[
+                TweenSequenceItem<Offset>(
+                  tween: tween,
+                  weight: 90.0,
+                ),
+                TweenSequenceItem<Offset>(
+                  tween: ConstantTween<Offset>(Offset.zero),
+                  weight: 10.0,
+                ),
+              ]);
+              return SlideTransition(
+                position: animation.drive(tweenSequence),
+                child: child,
+              );
+            });
 }
 
 class SlideLeftHideRoute extends PageRouteBuilder {
