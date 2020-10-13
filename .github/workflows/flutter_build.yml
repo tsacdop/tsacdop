@@ -35,7 +35,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
           PI_API_SECRET: ${{ secrets.PI_API_SECRET}}
           PI_API_KEY: ${{ secrets.PI_API_KEY}}
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: release-apk
           path: |
