@@ -534,393 +534,266 @@ class EpisodeGrid extends StatelessWidget {
                   audio.queue.playlist.map((e) => e.enclosureUrl).toList(),
                   audio.episodeState),
               builder: (_, data, __) => OpenContainerWrapper(
+                avatarSize: layout == Layout.one
+                    ? context.width / 8
+                    : context.width / 16,
                 episode: episodes[index],
-                closedBuilder: (context, action, boo) => FutureBuilder<
-                        Tuple5<int, bool, bool, bool, List<int>>>(
-                    future: _initData(episodes[index]),
-                    initialData: Tuple5(0, false, false, false, []),
-                    builder: (context, snapshot) {
-                      var isListened = snapshot.data.item1;
-                      var isLiked = snapshot.data.item2;
-                      var isDownloaded = snapshot.data.item3;
-                      var tapToOpen = snapshot.data.item4;
-                      var menuList = snapshot.data.item5;
-                      return Container(
-                        decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0)),
-                            color: isListened > 0
-                                ? context.brightness == Brightness.light
-                                    ? Colors.grey[200]
-                                    : Color.fromRGBO(50, 50, 50, 1)
-                                : context.scaffoldBackgroundColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: context.brightness == Brightness.light
-                                    ? context.primaryColor
-                                    : Color.fromRGBO(40, 40, 40, 1),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                              ),
-                            ]),
-                        alignment: Alignment.center,
-                        child: multiSelect
-                            ? Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    if (!selectedList
-                                        .contains(episodes[index])) {
-                                      _selectedList = selectedList;
-                                      _selectedList.add(episodes[index]);
-                                    } else {
-                                      _selectedList = selectedList;
-                                      _selectedList.remove(episodes[index]);
-                                    }
-                                    onSelect(_selectedList);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                      border: Border.all(
-                                        color: selectedList
-                                                .contains(episodes[index])
-                                            ? context.accentColor
-                                            : context.brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context
-                                                    .scaffoldBackgroundColor,
-                                        width: 1.0,
-                                      ),
+                closedBuilder: (context, action, boo) =>
+                    FutureBuilder<Tuple5<int, bool, bool, bool, List<int>>>(
+                  future: _initData(episodes[index]),
+                  initialData: Tuple5(0, false, false, false, []),
+                  builder: (context, snapshot) {
+                    var isListened = snapshot.data.item1;
+                    var isLiked = snapshot.data.item2;
+                    var isDownloaded = snapshot.data.item3;
+                    var tapToOpen = snapshot.data.item4;
+                    var menuList = snapshot.data.item5;
+                    return Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                          color: isListened > 0
+                              ? context.brightness == Brightness.light
+                                  ? Colors.grey[200]
+                                  : Color.fromRGBO(50, 50, 50, 1)
+                              : context.scaffoldBackgroundColor,
+                          boxShadow: [
+                            BoxShadow(
+                              color: context.brightness == Brightness.light
+                                  ? context.primaryColor
+                                  : Color.fromRGBO(40, 40, 40, 1),
+                              blurRadius: 0.5,
+                              spreadRadius: 0.5,
+                            ),
+                          ]),
+                      alignment: Alignment.center,
+                      child: multiSelect
+                          ? Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  if (!selectedList.contains(episodes[index])) {
+                                    _selectedList = selectedList;
+                                    _selectedList.add(episodes[index]);
+                                  } else {
+                                    _selectedList = selectedList;
+                                    _selectedList.remove(episodes[index]);
+                                  }
+                                  onSelect(_selectedList);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    border: Border.all(
+                                      color: selectedList
+                                              .contains(episodes[index])
+                                          ? context.accentColor
+                                          : context.brightness ==
+                                                  Brightness.light
+                                              ? context.primaryColor
+                                              : context.scaffoldBackgroundColor,
+                                      width: 1.0,
                                     ),
-                                    child: _episodeCard(context,
-                                        index: index,
-                                        isLiked: isLiked,
-                                        isDownloaded: isDownloaded,
-                                        color: c,
-                                        boo: boo),
                                   ),
-                                ),
-                              )
-                            : Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  border: Border.all(
-                                    color:
-                                        context.brightness == Brightness.light
-                                            ? context.primaryColor
-                                            : context.scaffoldBackgroundColor,
-                                    width: 1.0,
-                                  ),
-                                ),
-                                child: FocusedMenuHolder(
-                                  blurSize: 0.0,
-                                  menuItemExtent: 45,
-                                  menuBoxDecoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius:
-                                          BorderRadius.circular(15.0)),
-                                  duration: Duration(milliseconds: 100),
-                                  tapMode: tapToOpen
-                                      ? TapMode.onTap
-                                      : TapMode.onLongPress,
-                                  animateMenuItems: false,
-                                  blurBackgroundColor:
-                                      context.brightness == Brightness.light
-                                          ? Colors.white38
-                                          : Colors.black38,
-                                  bottomOffsetHeight: 10,
-                                  menuOffset: 6,
-                                  menuItems: <FocusedMenuItem>[
-                                    FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
-                                        title: Text(
-                                            data.item1 != episodes[index]
-                                                ? s.play
-                                                : s.playing),
-                                        trailingIcon: Icon(
-                                          LineIcons.play_circle_solid,
-                                          color: Theme.of(context).accentColor,
-                                        ),
-                                        onPressed: () {
-                                          if (data.item1 != episodes[index]) {
-                                            audio.episodeLoad(episodes[index]);
-                                          }
-                                        }),
-                                    menuList.contains(1)
-                                        ? FocusedMenuItem(
-                                            backgroundColor: context
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context.dialogBackgroundColor,
-                                            title: data.item2.contains(
-                                                    episodes[index]
-                                                        .enclosureUrl)
-                                                ? Text(s.remove)
-                                                : Text(s.later),
-                                            trailingIcon: Icon(
-                                              LineIcons.clock_solid,
-                                              color: Colors.cyan,
-                                            ),
-                                            onPressed: () {
-                                              if (!data.item2.contains(
-                                                  episodes[index]
-                                                      .enclosureUrl)) {
-                                                audio.addToPlaylist(
-                                                    episodes[index]);
-                                                Fluttertoast.showToast(
-                                                  msg: s.toastAddPlaylist,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              } else {
-                                                audio.delFromPlaylist(
-                                                    episodes[index]);
-                                                Fluttertoast.showToast(
-                                                  msg: s.toastRemovePlaylist,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              }
-                                            })
-                                        : null,
-                                    menuList.contains(2)
-                                        ? FocusedMenuItem(
-                                            backgroundColor: context
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context.dialogBackgroundColor,
-                                            title: isLiked
-                                                ? Text(s.unlike)
-                                                : Text(s.like),
-                                            trailingIcon: Icon(LineIcons.heart,
-                                                color: Colors.red, size: 21),
-                                            onPressed: () async {
-                                              if (isLiked) {
-                                                await _setUnliked(
-                                                    episodes[index]
-                                                        .enclosureUrl);
-                                                audio.setEpisodeState = true;
-                                                Fluttertoast.showToast(
-                                                  msg: s.unliked,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              } else {
-                                                await _saveLiked(episodes[index]
-                                                    .enclosureUrl);
-                                                audio.setEpisodeState = true;
-                                                Fluttertoast.showToast(
-                                                  msg: s.liked,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              }
-                                            })
-                                        : null,
-                                    menuList.contains(3)
-                                        ? FocusedMenuItem(
-                                            backgroundColor: context
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context.dialogBackgroundColor,
-                                            title: isListened > 0
-                                                ? Text(s.markNotListened,
-                                                    style: TextStyle(
-                                                        color: context.textColor
-                                                            .withOpacity(0.5)))
-                                                : Text(
-                                                    s.markListened,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                            trailingIcon: SizedBox(
-                                              width: 23,
-                                              height: 23,
-                                              child: CustomPaint(
-                                                  painter: ListenedAllPainter(
-                                                      Colors.blue,
-                                                      stroke: 1.5)),
-                                            ),
-                                            onPressed: () async {
-                                              if (isListened < 1) {
-                                                await _markListened(
-                                                    episodes[index]);
-                                                audio.setEpisodeState = true;
-                                                Fluttertoast.showToast(
-                                                  msg: s.markListened,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              } else {
-                                                await _markNotListened(
-                                                    episodes[index]
-                                                        .enclosureUrl);
-                                                audio.setEpisodeState = true;
-                                                Fluttertoast.showToast(
-                                                  msg: s.markNotListened,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                              }
-                                            })
-                                        : null,
-                                    menuList.contains(4)
-                                        ? FocusedMenuItem(
-                                            backgroundColor: context
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? context.primaryColor
-                                                : context.dialogBackgroundColor,
-                                            title: isDownloaded
-                                                ? Text(s.downloaded,
-                                                    style: TextStyle(
-                                                        color: context.textColor
-                                                            .withOpacity(0.5)))
-                                                : Text(s.download),
-                                            trailingIcon: Icon(
-                                                LineIcons.download_solid,
-                                                color: Colors.green),
-                                            onPressed: () async {
-                                              if (!isDownloaded) {
-                                                await _requestDownload(context,
-                                                    episode: episodes[index]);
-                                                //  downloader
-                                                //      .startTask(episodes[index]);
-                                              }
-                                            })
-                                        : null
-                                  ],
-                                  action: action,
                                   child: _episodeCard(context,
                                       index: index,
                                       isLiked: isLiked,
                                       isDownloaded: isDownloaded,
                                       color: c,
                                       boo: boo),
-                                  //    Padding(
-                                  //      padding: const EdgeInsets.all(8.0),
-                                  //      child: Column(
-                                  //        mainAxisAlignment: MainAxisAlignment.start,
-                                  //        children: <Widget>[
-                                  //          Expanded(
-                                  //            flex: layout == Layout.one ? 1 : 2,
-                                  //            child: Row(
-                                  //              mainAxisAlignment:
-                                  //                  MainAxisAlignment.start,
-                                  //              crossAxisAlignment:
-                                  //                  CrossAxisAlignment.center,
-                                  //              children: <Widget>[
-                                  //                layout != Layout.one
-                                  //                    ? _circleImage(context,
-                                  //                        episode: episodes[index],
-                                  //                        color: c,
-                                  //                        boo: boo)
-                                  //                    : _pubDate(context,
-                                  //                        episode: episodes[index],
-                                  //                        color: c),
-                                  //                Spacer(),
-                                  //                _isNewIndicator(episodes[index]),
-                                  //                _downloadIndicater(context,
-                                  //                    episode: episodes[index],
-                                  //                    isDownloaded: isDownloaded),
-                                  //                _numberIndicater(context,
-                                  //                    index: index, color: c)
-                                  //              ],
-                                  //            ),
-                                  //          ),
-                                  //          Expanded(
-                                  //            flex: layout == Layout.one ? 3 : 5,
-                                  //            child: layout != Layout.one
-                                  //                ? _title(episodes[index])
-                                  //                : Row(
-                                  //                    crossAxisAlignment:
-                                  //                        CrossAxisAlignment.center,
-                                  //                    children: [
-                                  //                      _circleImage(context,
-                                  //                          episode: episodes[index],
-                                  //                          color: c,
-                                  //                          boo: boo),
-                                  //                      SizedBox(
-                                  //                        width: 5,
-                                  //                      ),
-                                  //                      Expanded(
-                                  //                          child:
-                                  //                              _title(episodes[index]))
-                                  //                    ],
-                                  //                  ),
-                                  //          ),
-                                  //          Expanded(
-                                  //            flex: 1,
-                                  //            child: Row(
-                                  //              crossAxisAlignment:
-                                  //                  CrossAxisAlignment.start,
-                                  //              mainAxisAlignment:
-                                  //                  MainAxisAlignment.start,
-                                  //              children: <Widget>[
-                                  //                if (layout != Layout.one)
-                                  //                  _pubDate(context,
-                                  //                      episode: episodes[index],
-                                  //                      color: c),
-                                  //                Spacer(),
-                                  //                if (layout != Layout.three &&
-                                  //                    episodes[index].duration != 0)
-                                  //                  Align(
-                                  //                    alignment: Alignment.center,
-                                  //                    child: Text(
-                                  //                      episodes[index].duration.toTime,
-                                  //                      style: TextStyle(
-                                  //                          fontSize: _width / 35),
-                                  //                    ),
-                                  //                  ),
-                                  //                if (episodes[index].duration != 0 &&
-                                  //                    episodes[index].enclosureLength !=
-                                  //                        null &&
-                                  //                    episodes[index].enclosureLength !=
-                                  //                        0 &&
-                                  //                    layout != Layout.three)
-                                  //                  Text(
-                                  //                    '|',
-                                  //                    style: TextStyle(
-                                  //                      fontSize: _width / 35,
-                                  //                    ),
-                                  //                  ),
-                                  //                if (layout != Layout.three &&
-                                  //                    episodes[index].enclosureLength !=
-                                  //                        null &&
-                                  //                    episodes[index].enclosureLength !=
-                                  //                        0)
-                                  //                  Align(
-                                  //                    alignment: Alignment.center,
-                                  //                    child: Text(
-                                  //                      '${(episodes[index].enclosureLength) ~/ 1000000}MB',
-                                  //                      style: TextStyle(
-                                  //                          fontSize: _width / 35),
-                                  //                    ),
-                                  //                  ),
-                                  //                Padding(
-                                  //                  padding: EdgeInsets.all(1),
-                                  //                ),
-                                  //                if ((showFavorite ||
-                                  //                        layout != Layout.three) &&
-                                  //                    isLiked)
-                                  //                  Icon(
-                                  //                    Icons.favorite,
-                                  //                    color: Colors.red,
-                                  //                    size: _width / 35,
-                                  //                  )
-                                  //              ],
-                                  //            ),
-                                  //          ),
-                                  //        ],
-                                  //      ),
-                                  //    ),
                                 ),
                               ),
-                      );
-                    }),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.0),
+                                border: Border.all(
+                                  color: context.brightness == Brightness.light
+                                      ? context.primaryColor
+                                      : context.scaffoldBackgroundColor,
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: FocusedMenuHolder(
+                                blurSize: 0.0,
+                                menuItemExtent: 45,
+                                menuBoxDecoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(15.0)),
+                                duration: Duration(milliseconds: 100),
+                                tapMode: tapToOpen
+                                    ? TapMode.onTap
+                                    : TapMode.onLongPress,
+                                animateMenuItems: false,
+                                blurBackgroundColor:
+                                    context.brightness == Brightness.light
+                                        ? Colors.white38
+                                        : Colors.black38,
+                                bottomOffsetHeight: 10,
+                                menuOffset: 6,
+                                menuItems: <FocusedMenuItem>[
+                                  FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                      title: Text(data.item1 != episodes[index]
+                                          ? s.play
+                                          : s.playing),
+                                      trailingIcon: Icon(
+                                        LineIcons.play_circle_solid,
+                                        color: Theme.of(context).accentColor,
+                                      ),
+                                      onPressed: () {
+                                        if (data.item1 != episodes[index]) {
+                                          audio.episodeLoad(episodes[index]);
+                                        }
+                                      }),
+                                  menuList.contains(1)
+                                      ? FocusedMenuItem(
+                                          backgroundColor: context.brightness ==
+                                                  Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                          title: data.item2.contains(
+                                                  episodes[index].enclosureUrl)
+                                              ? Text(s.remove)
+                                              : Text(s.later),
+                                          trailingIcon: Icon(
+                                            LineIcons.clock_solid,
+                                            color: Colors.cyan,
+                                          ),
+                                          onPressed: () {
+                                            if (!data.item2.contains(
+                                                episodes[index].enclosureUrl)) {
+                                              audio.addToPlaylist(
+                                                  episodes[index]);
+                                              Fluttertoast.showToast(
+                                                msg: s.toastAddPlaylist,
+                                                gravity: ToastGravity.BOTTOM,
+                                              );
+                                            } else {
+                                              audio.delFromPlaylist(
+                                                  episodes[index]);
+                                              Fluttertoast.showToast(
+                                                msg: s.toastRemovePlaylist,
+                                                gravity: ToastGravity.BOTTOM,
+                                              );
+                                            }
+                                          })
+                                      : null,
+                                  menuList.contains(2)
+                                      ? FocusedMenuItem(
+                                          backgroundColor: context.brightness ==
+                                                  Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                          title: isLiked
+                                              ? Text(s.unlike)
+                                              : Text(s.like),
+                                          trailingIcon: Icon(LineIcons.heart,
+                                              color: Colors.red, size: 21),
+                                          onPressed: () async {
+                                            if (isLiked) {
+                                              await _setUnliked(
+                                                  episodes[index].enclosureUrl);
+                                              audio.setEpisodeState = true;
+                                              Fluttertoast.showToast(
+                                                msg: s.unliked,
+                                                gravity: ToastGravity.BOTTOM,
+                                              );
+                                            } else {
+                                              await _saveLiked(
+                                                  episodes[index].enclosureUrl);
+                                              audio.setEpisodeState = true;
+                                              Fluttertoast.showToast(
+                                                msg: s.liked,
+                                                gravity: ToastGravity.BOTTOM,
+                                              );
+                                            }
+                                          })
+                                      : null,
+                                  menuList.contains(3)
+                                      ? FocusedMenuItem(
+                                          backgroundColor: context.brightness ==
+                                                  Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                          title: isListened > 0
+                                              ? Text(s.markNotListened,
+                                                  style: TextStyle(
+                                                      color: context.textColor
+                                                          .withOpacity(0.5)))
+                                              : Text(
+                                                  s.markListened,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                          trailingIcon: SizedBox(
+                                            width: 23,
+                                            height: 23,
+                                            child: CustomPaint(
+                                                painter: ListenedAllPainter(
+                                                    Colors.blue,
+                                                    stroke: 1.5)),
+                                          ),
+                                          onPressed: () async {
+                                            if (isListened < 1) {
+                                              await _markListened(
+                                                  episodes[index]);
+                                              audio.setEpisodeState = true;
+                                              Fluttertoast.showToast(
+                                                msg: s.markListened,
+                                                gravity: ToastGravity.BOTTOM,
+                                              );
+                                            } else {
+                                              await _markNotListened(
+                                                  episodes[index].enclosureUrl);
+                                              audio.setEpisodeState = true;
+                                              Fluttertoast.showToast(
+                                                msg: s.markNotListened,
+                                                gravity: ToastGravity.BOTTOM,
+                                              );
+                                            }
+                                          })
+                                      : null,
+                                  menuList.contains(4)
+                                      ? FocusedMenuItem(
+                                          backgroundColor: context.brightness ==
+                                                  Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                          title: isDownloaded
+                                              ? Text(s.downloaded,
+                                                  style: TextStyle(
+                                                      color: context.textColor
+                                                          .withOpacity(0.5)))
+                                              : Text(s.download),
+                                          trailingIcon: Icon(
+                                              LineIcons.download_solid,
+                                              color: Colors.green),
+                                          onPressed: () async {
+                                            if (!isDownloaded) {
+                                              await _requestDownload(context,
+                                                  episode: episodes[index]);
+                                              //  downloader
+                                              //      .startTask(episodes[index]);
+                                            }
+                                          })
+                                      : null
+                                ],
+                                action: action,
+                                child: _episodeCard(context,
+                                    index: index,
+                                    isLiked: isLiked,
+                                    isDownloaded: isDownloaded,
+                                    color: c,
+                                    boo: boo),
+                              ),
+                            ),
+                    );
+                  },
+                ),
               ),
             ),
           );
@@ -931,15 +804,13 @@ class EpisodeGrid extends StatelessWidget {
 }
 
 class OpenContainerWrapper extends StatelessWidget {
-  const OpenContainerWrapper({
-    this.closedBuilder,
-    this.episode,
-    this.playerRunning,
-  });
+  const OpenContainerWrapper(
+      {this.closedBuilder, this.episode, this.playerRunning, this.avatarSize});
 
   final OpenContainerBuilder closedBuilder;
   final EpisodeBrief episode;
   final bool playerRunning;
+  final double avatarSize;
 
   @override
   Widget build(BuildContext context) {
@@ -949,6 +820,7 @@ class OpenContainerWrapper extends StatelessWidget {
         playerRunning: data.item1,
         playerHeight: kMinPlayerHeight[data.item2.index],
         flightWidget: CircleAvatar(backgroundImage: episode.avatarImage),
+        flightWidgetSize: avatarSize,
         transitionDuration: Duration(milliseconds: 400),
         beginColor: Theme.of(context).primaryColor,
         endColor: Theme.of(context).primaryColor,
@@ -958,10 +830,10 @@ class OpenContainerWrapper extends StatelessWidget {
         openColor: Theme.of(context).scaffoldBackgroundColor,
         openElevation: 0,
         closedElevation: 0,
-        openShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))),
-        closedShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(5.0))),
+        openShape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        closedShape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
         transitionType: ContainerTransitionType.fadeThrough,
         openBuilder: (context, _, boo) {
           return EpisodeDetail(

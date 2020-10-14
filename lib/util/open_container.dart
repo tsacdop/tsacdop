@@ -72,6 +72,7 @@ class OpenContainer extends StatefulWidget {
     @required this.closedBuilder,
     @required this.openBuilder,
     this.flightWidget,
+    this.flightWidgetSize,
     this.playerRunning,
     this.playerHeight,
     this.tappable = true,
@@ -106,6 +107,7 @@ class OpenContainer extends StatefulWidget {
   final Color endColor;
   final Color closedColor;
   final Widget flightWidget;
+  final double flightWidgetSize;
   final bool playerRunning;
   final double playerHeight;
 
@@ -249,6 +251,7 @@ class _OpenContainerState extends State<OpenContainer> {
       transitionDuration: widget.transitionDuration,
       transitionType: widget.transitionType,
       flightWidget: widget.flightWidget,
+      flightWidgetSize: widget.flightWidgetSize,
       playerRunning: widget.playerRunning,
       playerHeight: widget.playerHeight,
     ));
@@ -364,6 +367,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
     @required this.transitionDuration,
     @required this.transitionType,
     this.flightWidget,
+    this.flightWidgetSize,
     this.playerRunning,
     this.playerHeight,
   })  : assert(closedColor != null),
@@ -394,6 +398,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
         _openOpacityTween = _getOpenOpacityTween(transitionType);
 
   final Widget flightWidget;
+  final double flightWidgetSize;
   final bool playerRunning;
   final double playerHeight;
   static _FlippableTweenSequence<Color> _getColorTween({
@@ -733,8 +738,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
                   ? MediaQuery.of(context).size.height - 40 - playerHeight
                   : MediaQuery.of(context).size.height - 40);
 
-          var _width = MediaQuery.of(context).size.width;
-          _avatarScaleTween.begin = _width / 16;
+          _avatarScaleTween.begin = flightWidgetSize;
           _avatarScaleTween.end = 30;
           return SizedBox.expand(
             child: Stack(

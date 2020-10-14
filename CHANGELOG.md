@@ -14,12 +14,15 @@ Release date 2020/10/13
 ### Bug fixed
 
 * Feed pubdate parse error.
+* Episodes load with initial position failed.
 
 ### Minor changes
 
 * Single colume layout update.
 * About page UI update.
 * More smooth animation when open podcast detail page.
+* Change sort by button style in podcast detail page.
+* Auto rewind 3 seconds when resuming from paused state.
 
 ## 0.4.20
 
