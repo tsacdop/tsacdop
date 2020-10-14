@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
@@ -578,21 +579,29 @@ class _PodcastDetailState extends State<PodcastDetail> {
                 color: Colors.transparent,
                 clipBehavior: Clip.hardEdge,
                 borderRadius: BorderRadius.circular(100),
-                child: SizedBox(
-                  width: 30,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    tooltip: s.homeSubMenuSortBy,
-                    icon: Icon(
-                      _reverse
-                          ? LineIcons.hourglass_start_solid
-                          : LineIcons.hourglass_end_solid,
-                      color: _reverse ? context.accentColor : null,
+                child: TweenAnimationBuilder(
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOutQuart,
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  builder: (context, angle, child) => Transform.rotate(
+                    angle: math.pi * 2 * angle,
+                    child: SizedBox(
+                      width: 30,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        tooltip: s.homeSubMenuSortBy,
+                        icon: Icon(
+                          _reverse
+                              ? LineIcons.hourglass_start_solid
+                              : LineIcons.hourglass_end_solid,
+                          color: _reverse ? context.accentColor : null,
+                        ),
+                        iconSize: 18,
+                        onPressed: () {
+                          setState(() => _reverse = !_reverse);
+                        },
+                      ),
                     ),
-                    iconSize: 18,
-                    onPressed: () {
-                      setState(() => _reverse = !_reverse);
-                    },
                   ),
                 )),
             FutureBuilder<bool>(
@@ -858,8 +867,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         );
                                       }
                                       return SliverToBoxAdapter(
-                                        child: Center(),
-                                      );
+                                          child: Center());
                                     }),
                               SliverList(
                                 delegate: SliverChildBuilderDelegate(

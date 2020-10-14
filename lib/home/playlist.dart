@@ -73,6 +73,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
         appBar: AppBar(
           elevation: 0,
           backgroundColor: context.accentColor.withAlpha(70),
+          leading: CustomBackButton(),
         ),
         body: SafeArea(
           child: Selector<AudioPlayerNotifier,
@@ -138,8 +139,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             text: 'Today ',
                                             style: GoogleFonts.cairo(
                                               textStyle: TextStyle(
-                                                color: Theme.of(context)
-                                                    .accentColor,
+                                                color: context.accentColor,
                                                 fontSize: 20,
                                               ),
                                             ),
@@ -215,8 +215,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                     color: context.brightness == Brightness.dark
                                         ? Colors.grey[800]
                                         : Colors.grey[200],
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10.0)),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   )
                                 : BoxDecoration(color: Colors.transparent),
                             child: data.item2
@@ -530,7 +529,7 @@ class __HistoryListState extends State<_HistoryList> {
     return playHistory;
   }
 
-  _loadMoreData() async {
+  Future<void> _loadMoreData() async {
     if (mounted) {
       setState(() {
         _loadMore = true;
@@ -603,8 +602,11 @@ class __HistoryListState extends State<_HistoryList> {
                                           child: ListTile(
                                             contentPadding: EdgeInsets.fromLTRB(
                                                 24, 8, 20, 8),
-                                            onTap: () =>
-                                                audio.episodeLoad(episode),
+                                            onTap: () => audio.episodeLoad(
+                                                episode,
+                                                startPosition: seekValue < 0.9
+                                                    ? (seconds * 1000).toInt()
+                                                    : 0),
                                             leading: CircleAvatar(
                                                 backgroundColor:
                                                     c?.withOpacity(0.5),
@@ -619,8 +621,8 @@ class __HistoryListState extends State<_HistoryList> {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                            subtitle: Container(
-                                              height: 35,
+                                            subtitle: SizedBox(
+                                              height: 40,
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.start,
@@ -629,14 +631,14 @@ class __HistoryListState extends State<_HistoryList> {
                                                 children: <Widget>[
                                                   if (seekValue < 0.9)
                                                     Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          vertical: 5.0),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 5.0),
                                                       child: Material(
                                                         color:
                                                             Colors.transparent,
                                                         child: InkWell(
-                                                          onTap: () async {
+                                                          onTap: () {
                                                             audio.episodeLoad(
                                                                 episode,
                                                                 startPosition:
@@ -644,6 +646,9 @@ class __HistoryListState extends State<_HistoryList> {
                                                                             1000)
                                                                         .toInt());
                                                           },
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
                                                           child: Stack(
                                                               children: [
                                                                 ShaderMask(
@@ -682,8 +687,8 @@ class __HistoryListState extends State<_HistoryList> {
                                                                     decoration:
                                                                         BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.all(
-                                                                              Radius.circular(20.0)),
+                                                                          BorderRadius.circular(
+                                                                              20.0),
                                                                       color: context
                                                                           .accentColor,
                                                                     ),
@@ -782,9 +787,7 @@ class __HistoryListState extends State<_HistoryList> {
                   child: SizedBox(
                       height: 25,
                       width: 25,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                      )),
+                      child: CircularProgressIndicator()),
                 );
         });
   }
