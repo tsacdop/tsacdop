@@ -297,7 +297,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
       final history = PlayHistory(_episode.title, _episode.enclosureUrl,
           backgroundAudioPosition ~/ 1000, seekSliderValue);
       await dbHelper.saveHistory(history);
-      AudioService.addQueueItemAt(episodeNew.toMediaItem(), 0);
+      await AudioService.addQueueItemAt(episodeNew.toMediaItem(), 0);
+      if (startPosition > 0) {
+        await AudioService.seekTo(Duration(milliseconds: startPosition));
+      }
       _queue.playlist.removeAt(0);
       _queue.playlist.removeWhere((item) => item == episode);
       _queue.playlist.insert(0, episodeNew);
@@ -409,7 +412,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         if (position > 0 &&
             _backgroundAudioDuration > 0 &&
             _episode.enclosureUrl == url) {
-          AudioService.seekTo(Duration(milliseconds: position));
+          await AudioService.seekTo(Duration(milliseconds: position));
           position = 0;
         }
         notifyListeners();
@@ -622,7 +625,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _remoteErrorMessage = null;
     notifyListeners();
     if (_audioState != AudioProcessingState.connecting &&
-        _audioState != AudioProcessingState.none) AudioService.play();
+        _audioState != AudioProcessingState.none) {
+      AudioService.play();
+    }
   }
 
   Future<void> forwardAudio(int s) async {
@@ -917,7 +922,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
         _session.setActive(true);
         if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
             _audioPlayer.playbackEvent.state != AudioPlaybackState.none) {
-          _audioPlayer.play();
+          await _audioPlayer.play();
+          await _seekRelative(Duration(seconds: -3));
         }
       }
     }
@@ -930,9 +936,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
         mediaItem.extras['skipSecondsEnd'] > 0) {
       _audioPlayer
           .seek(Duration(seconds: mediaItem.extras['skipSecondsStart']));
-      // await _audioPlayer.setClip(
-      //   start: Duration(seconds: mediaItem.extras['skipSecondsStart']),
-      // );
     }
     if (_audioPlayer.playbackEvent.state != AudioPlaybackState.connecting ||
         _audioPlayer.playbackEvent.state != AudioPlaybackState.none) {
