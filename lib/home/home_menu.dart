@@ -35,20 +35,6 @@ class _PopupMenuState extends State<PopupMenu> {
       refreshDate = i;
     }
     return refreshDate.toDate(context);
-    //  var date = DateTime.fromMillisecondsSinceEpoch(refreshDate);
-    //  var difference = DateTime.now().difference(date);
-    //  if (difference.inSeconds < 60) {
-    //    return s.secondsAgo(difference.inSeconds);
-    //  } else if (difference.inMinutes < 60) {
-    //    return s.minsAgo(difference.inMinutes);
-    //  } else if (difference.inHours < 24) {
-    //    return s.hoursAgo(difference.inHours);
-    //  } else if (difference.inDays < 7) {
-    //    return s.daysAgo(difference.inDays);
-    //  } else {
-    //    return DateFormat.yMMMd()
-    //        .format(DateTime.fromMillisecondsSinceEpoch(refreshDate));
-    //  }
   }
 
   void _saveOmpl(String path) async {

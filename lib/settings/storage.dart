@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/util/general_dialog.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../settings/downloads_manage.dart';
@@ -11,6 +10,7 @@ import '../state/setting_state.dart';
 import '../util/custom_dropdown.dart';
 import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../util/general_dialog.dart';
 
 class StorageSetting extends StatefulWidget {
   @override

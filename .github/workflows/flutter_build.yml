@@ -31,13 +31,10 @@ jobs:
 
       - run: flutter build appbundle  --obfuscate --split-debug-info=debug/
         env:
-          API_KEY: ${{ secrets.API_KEY }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
-          PI_API_SECRET: ${{ secrets.PI_API_SECRET}}
-          PI_API_KEY: ${{ secrets.PI_API_KEY}}
       - uses: actions/upload-artifact@v2
         with:
-          name: release-apk
+          name: release-file
           path: build/app/outputs/**/release/*

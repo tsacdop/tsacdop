@@ -845,8 +845,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
     return _episodeList;
   }
 
-  Future<List<OnlineEpisode>> _getIndexEpisodes(
-      {String id, int nextEpisodeDate}) async {
+  Future<List<OnlineEpisode>> _getIndexEpisodes({String id}) async {
     var searchEngine = PodcastsIndexSearch();
     var searchResult = await searchEngine.fetchEpisode(rssUrl: id);
     var episodes = searchResult.items.cast();
