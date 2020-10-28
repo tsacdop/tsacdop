@@ -32,6 +32,7 @@ Future main() async {
         ChangeNotifierProvider(create: (_) => GroupList()),
         ChangeNotifierProvider(create: (_) => RefreshWorker()),
         ChangeNotifierProvider(create: (_) => SearchState()),
+        
         ChangeNotifierProvider(
           lazy: false,
           create: (_) => DownloadState(),
