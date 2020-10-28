@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/podcasts/podcast_detail.dart';
+import 'package:tsacdop/util/pageroute.dart';
 import 'package:tuple/tuple.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -975,74 +977,6 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                           SliverToBoxAdapter(
                                             child: SizedBox(
                                               height: 40,
-                                              //  color: context.primaryColor,
-                                              //  child: Material(
-                                              //    color: Colors.transparent,
-                                              //    child: Row(
-                                              //      children: <Widget>[
-                                              //        _switchGroupButton(),
-                                              //        Spacer(),
-                                              //        _addNewButton(),
-                                              //        Material(
-                                              //          color: Colors.transparent,
-                                              //          child: IconButton(
-                                              //            tooltip: s
-                                              //                .hideListenedSetting,
-                                              //            icon: SizedBox(
-                                              //              width: 30,
-                                              //              height: 15,
-                                              //              child: HideListened(
-                                              //                hideListened:
-                                              //                    _hideListened ??
-                                              //                        false,
-                                              //              ),
-                                              //            ),
-                                              //            onPressed: () {
-                                              //              setState(() =>
-                                              //                  _hideListened =
-                                              //                      !_hideListened);
-                                              //            },
-                                              //          ),
-                                              //        ),
-                                              //        Material(
-                                              //          color: Colors.transparent,
-                                              //          child: LayoutButton(
-                                              //            layout: _layout,
-                                              //            onPressed: (layout) =>
-                                              //                setState(() {
-                                              //              _layout = layout;
-                                              //            }),
-                                              //          ),
-                                              //        ),
-                                              //        Material(
-                                              //            color:
-                                              //                Colors.transparent,
-                                              //            clipBehavior:
-                                              //                Clip.hardEdge,
-                                              //            borderRadius:
-                                              //                BorderRadius
-                                              //                    .circular(100),
-                                              //            child: IconButton(
-                                              //              icon: SizedBox(
-                                              //                width: 20,
-                                              //                height: 10,
-                                              //                child: CustomPaint(
-                                              //                    painter: MultiSelectPainter(
-                                              //                        color: context
-                                              //                            .accentColor)),
-                                              //              ),
-                                              //              onPressed: () {
-                                              //                setState(() {
-                                              //                  _selectedEpisodes =
-                                              //                      [];
-                                              //                  _multiSelect =
-                                              //                      true;
-                                              //                });
-                                              //              },
-                                              //            )),
-                                              //      ],
-                                              //    ),
-                                              // ),
                                             ),
                                           ),
                                           EpisodeGrid(
@@ -1050,6 +984,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                             layout: _layout,
                                             initNum: _scroll ? 0 : 12,
                                             multiSelect: _multiSelect,
+                                            openPodcast: true,
                                             selectedList:
                                                 _selectedEpisodes ?? [],
                                             onSelect: (value) => setState(() {
@@ -1272,6 +1207,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                                       episodes: snapshot.data,
                                       layout: _layout,
                                       initNum: 0,
+                                      openPodcast: true,
                                       multiSelect: _multiSelect,
                                       selectedList: _selectedEpisodes ?? [],
                                       onSelect: (value) => setState(() {
@@ -1549,6 +1485,7 @@ class _MyDownloadState extends State<_MyDownload>
                       : EpisodeGrid(
                           episodes: episodes,
                           layout: _layout,
+                          openPodcast: true,
                           initNum: 0,
                         ),
                 ],

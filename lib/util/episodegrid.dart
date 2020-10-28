@@ -16,14 +16,17 @@ import '../episodes/episode_detail.dart';
 import '../home/audioplayer.dart';
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../podcasts/podcast_detail.dart';
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
+import '../type/podcastlocal.dart';
 import 'custom_widget.dart';
 import 'extension_helper.dart';
 import 'general_dialog.dart';
 import 'open_container.dart';
+import 'pageroute.dart';
 
 enum Layout { three, two, one }
 
@@ -38,6 +41,7 @@ class EpisodeGrid extends StatelessWidget {
   final bool reverse;
   final bool multiSelect;
   final ValueChanged<List<EpisodeBrief>> onSelect;
+  final bool openPodcast;
   final List<EpisodeBrief> selectedList;
 
   /// Count of animation items.
@@ -53,16 +57,17 @@ class EpisodeGrid extends StatelessWidget {
       this.episodeCount = 0,
       this.layout = Layout.three,
       this.reverse,
+      this.openPodcast = false,
       this.multiSelect = false,
       this.onSelect,
       this.selectedList})
       : super(key: key);
 
   List<EpisodeBrief> _selectedList = [];
+  final _dbHelper = DBHelper();
 
   Future<int> _isListened(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.isListened(episode.enclosureUrl);
+    return await _dbHelper.isListened(episode.enclosureUrl);
   }
 
   Future<Tuple5<int, bool, bool, bool, List<int>>> _initData(
@@ -76,8 +81,7 @@ class EpisodeGrid extends StatelessWidget {
   }
 
   Future<bool> _isLiked(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.isLiked(episode.enclosureUrl);
+    return await _dbHelper.isLiked(episode.enclosureUrl);
   }
 
   Future<List<int>> _getEpisodeMenu() async {
@@ -87,8 +91,7 @@ class EpisodeGrid extends StatelessWidget {
   }
 
   Future<bool> _isDownloaded(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.isDownloaded(episode.enclosureUrl);
+    return await _dbHelper.isDownloaded(episode.enclosureUrl);
   }
 
   Future<bool> _getTapToOpenPopupMenu() async {
@@ -98,24 +101,20 @@ class EpisodeGrid extends StatelessWidget {
   }
 
   Future<void> _markListened(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
     final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-    await dbHelper.saveHistory(history);
+    await _dbHelper.saveHistory(history);
   }
 
   Future<void> _markNotListened(String url) async {
-    var dbHelper = DBHelper();
-    await dbHelper.markNotListened(url);
+    await _dbHelper.markNotListened(url);
   }
 
   Future<void> _saveLiked(String url) async {
-    var dbHelper = DBHelper();
-    await dbHelper.setLiked(url);
+    await _dbHelper.setLiked(url);
   }
 
   Future<void> _setUnliked(String url) async {
-    var dbHelper = DBHelper();
-    await dbHelper.setUniked(url);
+    await _dbHelper.setUniked(url);
   }
 
   Future<void> _requestDownload(BuildContext context,
@@ -186,6 +185,11 @@ class EpisodeGrid extends StatelessWidget {
     return ifUseData;
   }
 
+  Future<PodcastLocal> _getPodcast(String url) async {
+    var podcasts = await _dbHelper.getPodcastWithUrl(url);
+    return podcasts;
+  }
+
   /// Episode title widget.
   Widget _title(EpisodeBrief episode) => Container(
         alignment:
@@ -202,14 +206,28 @@ class EpisodeGrid extends StatelessWidget {
   /// Circel avatar widget.
   Widget _circleImage(BuildContext context,
           {EpisodeBrief episode, Color color, bool boo, double radius}) =>
-      Container(
-        height: radius ?? context.width / 16,
-        width: radius ?? context.width / 16,
-        child: boo
-            ? Center()
-            : CircleAvatar(
-                backgroundColor: color.withOpacity(0.5),
-                backgroundImage: episode.avatarImage),
+      InkWell(
+        onTap: () async {
+          if (openPodcast) {
+            final podcast = await _getPodcast(episode.enclosureUrl);
+            Navigator.push(
+              context,
+              SlideLeftRoute(
+                  page: PodcastDetail(
+                podcastLocal: podcast,
+              )),
+            );
+          }
+        },
+        child: Container(
+          height: radius ?? context.width / 16,
+          width: radius ?? context.width / 16,
+          child: boo
+              ? Center()
+              : CircleAvatar(
+                  backgroundColor: color.withOpacity(0.5),
+                  backgroundImage: episode.avatarImage),
+        ),
       );
 
   Widget _downloadIndicater(BuildContext context,

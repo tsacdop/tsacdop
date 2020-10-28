@@ -91,7 +91,7 @@ class DBHelper {
         list = await dbClient.rawQuery(
             """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
           link ,update_count, episode_count FROM PodcastLocal WHERE id = ? AND 
-          never_update = 0""", [s]);
+          never_update = 1""", [s]);
       } else {
         list = await dbClient.rawQuery(
             """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
@@ -147,6 +147,29 @@ class DBHelper {
           list.first['link']));
     }
     return podcastLocal;
+  }
+
+  Future<PodcastLocal> getPodcastWithUrl(String url) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        """SELECT P.id, P.title, P.imageUrl, P.rssUrl, P.primaryColor, P.author, P.imagePath,
+         P.provider, P.link ,P.update_count, P.episode_count FROM PodcastLocal P INNER JOIN 
+         Episodes E ON P.id = E.feed_id WHERE E.enclosure_url = ?""", [url]);
+    if (list.isNotEmpty) {
+      return PodcastLocal(
+          list.first['title'],
+          list.first['imageUrl'],
+          list.first['rssUrl'],
+          list.first['primaryColor'],
+          list.first['author'],
+          list.first['id'],
+          list.first['imagePath'],
+          list.first['provider'],
+          list.first['link'],
+          upateCount: list.first['update_count'],
+          episodeCount: list.first['episode_count']);
+    }
+    return null;
   }
 
   Future<int> getPodcastCounts(String id) async {

@@ -114,7 +114,13 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   )
-                : Center(),
+                : Text(
+                    widget.episodeItem.feedTitle,
+                    maxLines: 1,
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: context.textColor.withOpacity(0.7)),
+                  ),
             leading: CustomBackButton(),
             elevation: _showTitle ? 1 : 0,
             //actions: [
@@ -175,6 +181,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                   scrollDirection: Axis.vertical,
                   controller: _controller,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -187,30 +194,28 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                           ),
                         ),
                       ),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.only(
-                            left: 20.0, right: 20, top: 10, bottom: 10),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                         child: Row(
                           children: [
                             Text(
                                 s.published(DateFormat.yMMMd().format(
                                     DateTime.fromMillisecondsSinceEpoch(
                                         widget.episodeItem.pubDate))),
-                                style: TextStyle(
-                                    color: Theme.of(context).accentColor)),
+                                style: TextStyle(color: context.accentColor)),
                             SizedBox(width: 10),
                             if (widget.episodeItem.explicit == 1)
                               Text('E',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.red))
+                                      color: Colors.red)),
+                            Spacer(),
                           ],
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(
-                            left: 20.0, right: 20, top: 5, bottom: 5),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                         child: Row(
                           children: <Widget>[
                             if (widget.episodeItem.duration != 0)
