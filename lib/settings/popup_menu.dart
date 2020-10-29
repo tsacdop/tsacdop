@@ -39,11 +39,13 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
     if (mounted) setState(() {});
   }
 
-  Widget _popupMenuItem(List<int> menu, int e,
-      {Widget icon,
-      String text,
-      String description = '',
-      bool enable = false}) {
+  Widget _popupMenuItem(
+    List<int> menu,
+    int e, {
+    Widget icon,
+    String text,
+    String description = '',
+  }) {
     return Padding(
       key: ObjectKey(text),
       padding: EdgeInsets.only(left: 60.0, right: 20),
@@ -67,6 +69,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                   }
                 },
           trailing: Checkbox(
+              activeColor: context.accentColor,
               value: e < 10,
               onChanged: e == 0
                   ? null
@@ -208,8 +211,10 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                                 break;
                               case 5:
                                 return _popupMenuItem(menu, e,
-                                    icon: Icon(LineIcons.bolt_solid,
-                                    color: Colors.amber,),
+                                    icon: Icon(
+                                      LineIcons.bolt_solid,
+                                      color: Colors.amber,
+                                    ),
                                     text: s.playNext,
                                     description: s.playNextDes);
                                 break;

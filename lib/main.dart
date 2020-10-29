@@ -32,7 +32,6 @@ Future main() async {
         ChangeNotifierProvider(create: (_) => GroupList()),
         ChangeNotifierProvider(create: (_) => RefreshWorker()),
         ChangeNotifierProvider(create: (_) => SearchState()),
-        
         ChangeNotifierProvider(
           lazy: false,
           create: (_) => DownloadState(),
@@ -59,28 +58,8 @@ class MyApp extends StatelessWidget {
             themeMode: setting.theme,
             debugShowCheckedModeBanner: false,
             title: 'Tsacdop',
-            theme: lightTheme.copyWith(
-                accentColor: setting.accentSetColor,
-                cursorColor: setting.accentSetColor,
-                textSelectionHandleColor: setting.accentSetColor,
-                toggleableActiveColor: setting.accentSetColor,
-                buttonTheme: ButtonThemeData(
-                    hoverColor: setting.accentSetColor.withAlpha(70),
-                    splashColor: setting.accentSetColor.withAlpha(70))),
-            darkTheme: ThemeData.dark().copyWith(
-                accentColor: setting.accentSetColor,
-                primaryColorDark: Colors.grey[800],
-                scaffoldBackgroundColor:
-                    setting.realDark ? Colors.black87 : Color(0XFF212121),
-                primaryColor:
-                    setting.realDark ? Colors.black : Color(0XFF1B1B1B),
-                popupMenuTheme: PopupMenuThemeData().copyWith(
-                    color: setting.realDark ? Colors.grey[900] : null),
-                appBarTheme: AppBarTheme(elevation: 0),
-                buttonTheme: ButtonThemeData(height: 32),
-                dialogBackgroundColor:
-                    setting.realDark ? Colors.grey[900] : null,
-                cursorColor: setting.accentSetColor),
+            theme: setting.lightTheme,
+            darkTheme: setting.darkTheme,
             localizationsDelegates: [
               S.delegate,
               GlobalMaterialLocalizations.delegate,

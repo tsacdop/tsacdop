@@ -18,7 +18,7 @@ dependencies:
   confetti: ^0.5.4+1
   cookie_jar: ^1.0.1
   cupertino_icons: ^1.0.0
-  connectivity: ^0.4.9
+  connectivity: ^2.0.0
   convert: ^2.1.1
   crypto: ^2.1.5
   device_info: ^0.4.2+8

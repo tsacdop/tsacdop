@@ -59,27 +59,6 @@ void callbackDispatcher() {
   }
 }
 
-ThemeData lightTheme = ThemeData(
-  accentColorBrightness: Brightness.dark,
-  primaryColor: Colors.grey[100],
-  primaryColorLight: Colors.white,
-  primaryColorDark: Colors.grey[300],
-  dialogBackgroundColor: Colors.white,
-  backgroundColor: Colors.grey[100],
-  appBarTheme: AppBarTheme(
-    color: Colors.grey[100],
-    elevation: 0,
-  ),
-  textTheme: TextTheme(
-    bodyText2: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
-  ),
-  tabBarTheme: TabBarTheme(
-    labelColor: Colors.black,
-    unselectedLabelColor: Colors.grey[400],
-  ),
-  buttonTheme: ButtonThemeData(height: 32),
-);
-
 final showNotesFontStyles = <TextStyle>[
   TextStyle(
     height: 1.8,
@@ -136,6 +115,44 @@ class SettingState extends ChangeNotifier {
   /// Spp thememode. default auto.
   ThemeMode _theme;
   ThemeMode get theme => _theme;
+
+  ThemeData get lightTheme => ThemeData(
+      accentColorBrightness: Brightness.dark,
+      primaryColor: Colors.grey[100],
+      primaryColorLight: Colors.white,
+      primaryColorDark: Colors.grey[300],
+      dialogBackgroundColor: Colors.white,
+      backgroundColor: Colors.grey[100],
+      appBarTheme: AppBarTheme(
+        color: Colors.grey[100],
+        elevation: 0,
+      ),
+      textTheme: TextTheme(
+        bodyText2: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
+      ),
+      tabBarTheme: TabBarTheme(
+        labelColor: Colors.black,
+        unselectedLabelColor: Colors.grey[400],
+      ),
+      accentColor: _accentSetColor,
+      cursorColor: _accentSetColor,
+      textSelectionHandleColor: _accentSetColor,
+      toggleableActiveColor: _accentSetColor,
+      buttonTheme: ButtonThemeData(
+          height: 32,
+          hoverColor: _accentSetColor.withAlpha(70),
+          splashColor: _accentSetColor.withAlpha(70)));
+  ThemeData get darkTheme => ThemeData.dark().copyWith(
+      accentColor: _accentSetColor,
+      primaryColorDark: Colors.grey[800],
+      scaffoldBackgroundColor: _realDark ? Colors.black87 : Color(0XFF212121),
+      primaryColor: _realDark ? Colors.black : Color(0XFF1B1B1B),
+      popupMenuTheme: PopupMenuThemeData()
+          .copyWith(color: _realDark ? Colors.grey[900] : null),
+      appBarTheme: AppBarTheme(elevation: 0),
+      buttonTheme: ButtonThemeData(height: 32),
+      dialogBackgroundColor: _realDark ? Colors.grey[900] : null,
+      cursorColor: _accentSetColor);
 
   set setTheme(ThemeMode mode) {
     _theme = mode;
