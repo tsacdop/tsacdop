@@ -1495,6 +1495,26 @@ class S {
     );
   }
 
+  /// `Play next`
+  String get playNext {
+    return Intl.message(
+      'Play next',
+      name: 'playNext',
+      desc: 'Popup menu for episode.',
+      args: [],
+    );
+  }
+
+  /// `Add episode to top of the playlist`
+  String get playNextDes {
+    return Intl.message(
+      'Add episode to top of the playlist',
+      name: 'playNextDes',
+      desc: 'Description for next play.',
+      args: [],
+    );
+  }
+
   /// `Plugins`
   String get plugins {
     return Intl.message(

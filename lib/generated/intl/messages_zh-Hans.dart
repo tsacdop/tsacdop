@@ -220,6 +220,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "password" : MessageLookupByLibrary.simpleMessage("密码"),
     "pause" : MessageLookupByLibrary.simpleMessage("暂停"),
     "play" : MessageLookupByLibrary.simpleMessage("播放"),
+    "playNext" : MessageLookupByLibrary.simpleMessage("下一首"),
+    "playNextDes" : MessageLookupByLibrary.simpleMessage("添加节目到播放列表的顶部"),
     "playback" : MessageLookupByLibrary.simpleMessage("播放控制"),
     "player" : MessageLookupByLibrary.simpleMessage("播放器"),
     "playerHeightMed" : MessageLookupByLibrary.simpleMessage("中"),

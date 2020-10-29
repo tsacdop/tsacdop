@@ -752,130 +752,142 @@ class ShowEpisode extends StatelessWidget {
                                         audio.episodeLoad(episodes[index]);
                                       }
                                     }),
-                                menuList.contains(1)
-                                    ? FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
-                                        title: data.item2.contains(
-                                                episodes[index].enclosureUrl)
-                                            ? Text(s.remove)
-                                            : Text(s.later),
-                                        trailingIcon: Icon(
-                                          LineIcons.clock_solid,
-                                          color: Colors.cyan,
-                                        ),
-                                        onPressed: () {
-                                          if (!data.item2.contains(
-                                              episodes[index].enclosureUrl)) {
-                                            audio
-                                                .addToPlaylist(episodes[index]);
-                                            Fluttertoast.showToast(
-                                              msg: s.toastAddPlaylist,
-                                              gravity: ToastGravity.BOTTOM,
-                                            );
-                                          } else {
-                                            audio.delFromPlaylist(
-                                                episodes[index]);
-                                            Fluttertoast.showToast(
-                                              msg: s.toastRemovePlaylist,
-                                              gravity: ToastGravity.BOTTOM,
-                                            );
-                                          }
-                                        })
-                                    : null,
-                                menuList.contains(2)
-                                    ? FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
-                                        title: isLiked
-                                            ? Text(s.unlike)
-                                            : Text(s.like),
-                                        trailingIcon: Icon(LineIcons.heart,
-                                            color: Colors.red, size: 21),
-                                        onPressed: () async {
-                                          if (isLiked) {
-                                            await _setUnliked(
-                                                episodes[index].enclosureUrl);
-                                            audio.setEpisodeState = true;
-                                            Fluttertoast.showToast(
-                                              msg: s.unliked,
-                                              gravity: ToastGravity.BOTTOM,
-                                            );
-                                          } else {
-                                            await _saveLiked(
-                                                episodes[index].enclosureUrl);
-                                            audio.setEpisodeState = true;
-                                            Fluttertoast.showToast(
-                                              msg: s.liked,
-                                              gravity: ToastGravity.BOTTOM,
-                                            );
-                                          }
-                                        })
-                                    : null,
-                                menuList.contains(3)
-                                    ? FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
-                                        title: isListened > 0
-                                            ? Text(s.listened,
-                                                style: TextStyle(
-                                                    color: context.textColor
-                                                        .withOpacity(0.5)))
-                                            : Text(
-                                                s.markListened,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                        trailingIcon: SizedBox(
-                                          width: 23,
-                                          height: 23,
-                                          child: CustomPaint(
-                                              painter: ListenedAllPainter(
-                                                  Colors.blue,
-                                                  stroke: 1.5)),
-                                        ),
-                                        onPressed: () async {
-                                          if (isListened < 1) {
-                                            await _markListened(
-                                                episodes[index]);
-                                            audio.setEpisodeState = true;
-                                            Fluttertoast.showToast(
-                                              msg: s.markListened,
-                                              gravity: ToastGravity.BOTTOM,
-                                            );
-                                          }
-                                        })
-                                    : null,
-                                menuList.contains(4)
-                                    ? FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
-                                        title: isDownloaded
-                                            ? Text(s.downloaded,
-                                                style: TextStyle(
-                                                    color: context.textColor
-                                                        .withOpacity(0.5)))
-                                            : Text(s.download),
-                                        trailingIcon: Icon(
-                                            LineIcons.download_solid,
-                                            color: Colors.green),
-                                        onPressed: () {
-                                          if (!isDownloaded) {
-                                            _requestDownload(context,
-                                                episode: episodes[index]);
-                                            //   downloader
-                                            //       .startTask(episodes[index]);
-                                          }
-                                        })
-                                    : null
+                                if (menuList.contains(1))
+                                  FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                      title: data.item2.contains(
+                                              episodes[index].enclosureUrl)
+                                          ? Text(s.remove)
+                                          : Text(s.later),
+                                      trailingIcon: Icon(
+                                        LineIcons.clock_solid,
+                                        color: Colors.cyan,
+                                      ),
+                                      onPressed: () {
+                                        if (!data.item2.contains(
+                                            episodes[index].enclosureUrl)) {
+                                          audio.addToPlaylist(episodes[index]);
+                                          Fluttertoast.showToast(
+                                            msg: s.toastAddPlaylist,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        } else {
+                                          audio
+                                              .delFromPlaylist(episodes[index]);
+                                          Fluttertoast.showToast(
+                                            msg: s.toastRemovePlaylist,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      }),
+                                if (menuList.contains(2))
+                                  FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                      title: isLiked
+                                          ? Text(s.unlike)
+                                          : Text(s.like),
+                                      trailingIcon: Icon(LineIcons.heart,
+                                          color: Colors.red, size: 21),
+                                      onPressed: () async {
+                                        if (isLiked) {
+                                          await _setUnliked(
+                                              episodes[index].enclosureUrl);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: s.unliked,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        } else {
+                                          await _saveLiked(
+                                              episodes[index].enclosureUrl);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: s.liked,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      }),
+                                if (menuList.contains(3))
+                                  FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                      title: isListened > 0
+                                          ? Text(s.listened,
+                                              style: TextStyle(
+                                                  color: context.textColor
+                                                      .withOpacity(0.5)))
+                                          : Text(
+                                              s.markListened,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                      trailingIcon: SizedBox(
+                                        width: 23,
+                                        height: 23,
+                                        child: CustomPaint(
+                                            painter: ListenedAllPainter(
+                                                Colors.blue,
+                                                stroke: 1.5)),
+                                      ),
+                                      onPressed: () async {
+                                        if (isListened < 1) {
+                                          await _markListened(episodes[index]);
+                                          audio.setEpisodeState = true;
+                                          Fluttertoast.showToast(
+                                            msg: s.markListened,
+                                            gravity: ToastGravity.BOTTOM,
+                                          );
+                                        }
+                                      }),
+                                if (menuList.contains(4))
+                                  FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                      title: isDownloaded
+                                          ? Text(s.downloaded,
+                                              style: TextStyle(
+                                                  color: context.textColor
+                                                      .withOpacity(0.5)))
+                                          : Text(s.download),
+                                      trailingIcon: Icon(
+                                          LineIcons.download_solid,
+                                          color: Colors.green),
+                                      onPressed: () {
+                                        if (!isDownloaded) {
+                                          _requestDownload(context,
+                                              episode: episodes[index]);
+                                          //   downloader
+                                          //       .startTask(episodes[index]);
+                                        }
+                                      }),
+                                if (menuList.contains(5))
+                                  FocusedMenuItem(
+                                      backgroundColor:
+                                          context.brightness == Brightness.light
+                                              ? context.primaryColor
+                                              : context.dialogBackgroundColor,
+                                      title: Text(s.playNext),
+                                      trailingIcon: Icon(
+                                        LineIcons.bolt_solid,
+                                        color: Colors.amber,
+                                      ),
+                                      onPressed: () {
+                                        audio.moveToTop(episodes[index]);
+                                        Fluttertoast.showToast(
+                                          msg: s.playNextDes,
+                                          gravity: ToastGravity.BOTTOM,
+                                        );
+                                      }),
                               ],
                               action: () => Navigator.push(
                                 context,

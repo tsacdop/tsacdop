@@ -364,6 +364,14 @@
   "@playerHeightTall": {},
   "playing": "正在播放",
   "@playing": {},
+  "playNext": "下一首",
+  "@playNext": {
+    "description": "Popup menu for episode."
+  },
+  "playNextDes": "添加节目到播放列表的顶部",
+  "@playNextDes": {
+    "description": "Description for next play."
+  },
   "plugins": "插件",
   "@plugins": {},
   "podcast": "{count, plural, zero{} other{播客}}",

@@ -364,6 +364,14 @@
   "@playerHeightTall": {},
   "playing": "In riproduzione",
   "@playing": {},
+  "playNext": "",
+  "@playNext": {
+    "description": "Popup menu for episode."
+  },
+  "playNextDes": "",
+  "@playNextDes": {
+    "description": "Description for next play."
+  },
   "plugins": "Plugin",
   "@plugins": {},
   "podcast": "{count, plural, zero{} one{Podcast} other{Podcast}}",

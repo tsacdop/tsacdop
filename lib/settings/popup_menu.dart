@@ -117,7 +117,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                   )),
               FutureBuilder<List<int>>(
                   future: _getEpisodeMenu(),
-                  initialData: [0, 1, 12, 13, 14],
+                  initialData: [0, 1, 12, 13, 14, 15],
                   builder: (context, snapshot) {
                     var menu = snapshot.data;
                     return Expanded(
@@ -206,8 +206,15 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                                     text: s.download,
                                     description: s.popupMenuDownloadDes);
                                 break;
+                              case 5:
+                                return _popupMenuItem(menu, e,
+                                    icon: Icon(LineIcons.bolt_solid,
+                                    color: Colors.amber,),
+                                    text: s.playNext,
+                                    description: s.playNextDes);
+                                break;
                               default:
-                                return Text('Text');
+                                return Center();
                                 break;
                             }
                           }).toList(),

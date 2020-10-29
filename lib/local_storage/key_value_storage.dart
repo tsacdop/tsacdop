@@ -132,9 +132,10 @@ class KeyValueStorage {
   Future<List<int>> getMenu() async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getStringList(key) == null || prefs.getStringList(key).isEmpty) {
-      await prefs.setStringList(key, ['0', '1', '2', '13', '14']);
+      await prefs.setStringList(key, ['0', '1', '2', '13', '14', '15']);
     }
     var list = prefs.getStringList(key);
+    if(list.length == 5) list = [...list,'15'];
     return list.map(int.parse).toList();
   }
 

@@ -220,6 +220,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "password" : MessageLookupByLibrary.simpleMessage("Password"),
     "pause" : MessageLookupByLibrary.simpleMessage("Pausa"),
     "play" : MessageLookupByLibrary.simpleMessage("Riproduci"),
+    "playNext" : MessageLookupByLibrary.simpleMessage(""),
+    "playNextDes" : MessageLookupByLibrary.simpleMessage(""),
     "playback" : MessageLookupByLibrary.simpleMessage("Controlli di riproduzione"),
     "player" : MessageLookupByLibrary.simpleMessage("Player"),
     "playerHeightMed" : MessageLookupByLibrary.simpleMessage("Medio"),
