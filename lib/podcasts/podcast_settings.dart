@@ -193,6 +193,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
   Widget build(BuildContext context) {
     final s = context.s;
     final groupList = context.watch<GroupList>();
+    final textStyle = context.textTheme.bodyText1;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -203,9 +204,10 @@ class _PodcastSettingState extends State<PodcastSetting> {
             builder: (context, snapshot) {
               return ListTile(
                 onTap: () => _setAutoDownload(!snapshot.data),
+                dense: true,
                 leading: SizedBox(
-                  height: 22,
-                  width: 24,
+                  height: 18,
+                  width: 18,
                   child: CustomPaint(
                     painter: DownloadPainter(
                       color: context.brightness == Brightness.light
@@ -216,9 +218,9 @@ class _PodcastSettingState extends State<PodcastSetting> {
                     ),
                   ),
                 ),
-                title: Text(s.autoDownload),
+                title: Text(s.autoDownload, style: textStyle),
                 trailing: Transform.scale(
-                  scale: 0.9,
+                  scale: 0.8,
                   child:
                       Switch(value: snapshot.data, onChanged: _setAutoDownload),
                 ),
@@ -229,11 +231,12 @@ class _PodcastSettingState extends State<PodcastSetting> {
             initialData: false,
             builder: (context, snapshot) {
               return ListTile(
+                dense: true,
                 onTap: () => _setNeverUpdate(!snapshot.data),
-                leading: Icon(Icons.lock),
-                title: Text(s.neverAutoUpdate),
+                leading: Icon(Icons.lock, size: 18),
+                title: Text(s.neverAutoUpdate, style: textStyle),
                 trailing: Transform.scale(
-                  scale: 0.9,
+                  scale: 0.8,
                   child:
                       Switch(value: snapshot.data, onChanged: _setNeverUpdate),
                 ),
@@ -252,8 +255,9 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 _showStartTimePicker = !_showStartTimePicker;
               });
             },
-            leading: Icon(Icons.fast_forward),
-            title: Text(s.skipSecondsAtStart),
+            dense: true,
+            leading: Icon(Icons.fast_forward, size: 18),
+            title: Text(s.skipSecondsAtStart, style: textStyle),
             trailing: Padding(
               padding: const EdgeInsets.only(right: 10.0),
               child: Text(snapshot.data.toTime),
@@ -271,47 +275,15 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 if (mounted) setState(() => _showStartTimePicker = false);
               },
               onChange: (value) => _secondsStart = value.inSeconds),
-        // FutureBuilder<int>(
-        //   future: _getSkipSecondEnd(widget.podcastLocal.id),
-        //   initialData: 0,
-        //   builder: (context, snapshot) => ListTile(
-        //     onTap: () {
-        //       _secondsEnd = 0;
-        //       setState(() {
-        //         _removeConfirm = false;
-        //         _markConfirm = false;
-        //         _showStartTimePicker = false;
-        //         _showEndTimePicker = !_showEndTimePicker;
-        //       });
-        //     },
-        //     leading: Icon(Icons.fast_rewind),
-        //     title: Text(s.skipSecondsAtEnd),
-        //     trailing: Padding(
-        //       padding: const EdgeInsets.only(right: 10.0),
-        //       child: Text(snapshot.data.toTime),
-        //     ),
-        //   ),
-        // ),
-        // if (_showEndTimePicker)
-        //   _TimePicker(
-        //     onCancel: () {
-        //       _secondsEnd = 0;
-        //       setState(() => _showEndTimePicker = false);
-        //     },
-        //     onConfirm: () async {
-        //       await _saveSkipSecondsEnd(_secondsEnd);
-        //       setState(() => _showEndTimePicker = false);
-        //     },
-        //     onChange: (value) => _secondsEnd = value.inSeconds,
-        //   ),
         ListTile(
             onTap: () {
               if (_coverStatus != RefreshCoverStatus.start) {
                 _refreshArtWork();
               }
             },
-            title: Text(s.refreshArtwork),
-            leading: Icon(Icons.refresh),
+            dense: true,
+            title: Text(s.refreshArtwork, style: textStyle),
+            leading: Icon(Icons.refresh, size: 18),
             trailing: Padding(
                 padding: const EdgeInsets.only(right: 15.0),
                 child: SizedBox(
@@ -328,12 +300,13 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 _markConfirm = !_markConfirm;
               });
             },
+            dense: true,
             title: Text(s.menuMarkAllListened,
-                style: TextStyle(
+                style: textStyle.copyWith(
                     color: context.accentColor, fontWeight: FontWeight.bold)),
             leading: SizedBox(
-              height: 22,
-              width: 24,
+              height: 18,
+              width: 18,
               child: CustomPaint(
                 painter: ListenedAllPainter(
                     context.brightness == Brightness.light
@@ -391,9 +364,11 @@ class _PodcastSettingState extends State<PodcastSetting> {
               _removeConfirm = !_removeConfirm;
             });
           },
+          dense: true,
           title: Text(s.remove,
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-          leading: Icon(Icons.delete, color: Colors.red),
+              style: textStyle.copyWith(
+                  color: Colors.red, fontWeight: FontWeight.bold)),
+          leading: Icon(Icons.delete, color: Colors.red, size:18),
         ),
         if (_removeConfirm)
           Container(

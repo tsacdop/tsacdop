@@ -51,13 +51,14 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = context.textTheme.bodyText1;
     final s = context.s;
     return Column(
       children: [
         ListTile(
           title: Text(
             s.systemDefault,
-            style: TextStyle(
+            style: textStyle.copyWith(
                 color: Intl.systemLocale.contains(Intl.getCurrentLocale())
                     ? context.accentColor
                     : null),
@@ -68,7 +69,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
         ),
         Divider(height: 1),
         ListTile(
-            title: Text('English'),
+            title: Text('English',style: textStyle),
             onTap: () => _setLocale(Locale('en')),
             contentPadding: const EdgeInsets.only(left: 20, right: 20),
             trailing: Radio<Locale>(
@@ -77,7 +78,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                 onChanged: _setLocale)),
         Divider(height: 1),
         ListTile(
-            title: Text('简体中文'),
+            title: Text('简体中文', style: textStyle),
             onTap: () => _setLocale(Locale('zh_Hans')),
             contentPadding: const EdgeInsets.only(left: 20, right: 20),
             trailing: Radio<Locale>(
@@ -87,7 +88,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
             )),
         Divider(height: 1),
         ListTile(
-          title: Text('Français'),
+          title: Text('Français', style: textStyle),
           onTap: () => _setLocale(Locale('fr')),
           contentPadding: const EdgeInsets.only(left: 20, right: 20),
           trailing: Radio<Locale>(
@@ -97,7 +98,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
         ),
         Divider(height: 1),
         ListTile(
-          title: Text('Español'),
+          title: Text('Español',style: textStyle),
           onTap: () => _setLocale(Locale('es')),
           contentPadding: const EdgeInsets.only(left: 20, right: 20),
           trailing: Radio<Locale>(
@@ -107,7 +108,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
         ),
         Divider(height: 1),
         ListTile(
-          title: Text('Português'),
+          title: Text('Português',style: textStyle),
           onTap: () => _setLocale(Locale('pt')),
           contentPadding: const EdgeInsets.only(left: 20, right: 20),
           trailing: Radio<Locale>(
@@ -117,7 +118,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
         ),
         Divider(height: 1),
         ListTile(
-          title: Text('Italiano'),
+          title: Text('Italiano', style: textStyle),
           onTap: () => _setLocale(Locale('it')),
           contentPadding: const EdgeInsets.only(left: 20, right: 20),
           trailing: Radio<Locale>(
