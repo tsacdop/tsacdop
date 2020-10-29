@@ -357,7 +357,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
     final s = context.s;
     return _customPopupMenu(
         tooltip: s.menu,
-        // clip: false,
+        child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: widget.podcastLocal
+                    .backgroudColor(context)
+                    .withOpacity(0.6),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.more_vert),
+            )),
         onSelected: (value) {
           switch (value) {
             case 0:
@@ -742,7 +754,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                 iconTheme: IconThemeData(
                                   color: Colors.white,
                                 ),
-                                expandedHeight: 150 + context.paddingTop,
+                                expandedHeight: 130 + context.paddingTop,
                                 backgroundColor: color,
                                 floating: true,
                                 pinned: true,
@@ -755,9 +767,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       children: <Widget>[
                                         Container(
                                           margin: EdgeInsets.only(
-                                              top: 120 + context.paddingTop),
+                                              top: 100 + context.paddingTop),
                                           padding: EdgeInsets.only(
-                                              left: 80, right: 120),
+                                              left: 80, right: 20),
                                           color: Colors.white10,
                                           alignment: Alignment.centerLeft,
                                           child: Column(
@@ -789,7 +801,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         ),
                                         Container(
                                           alignment: Alignment.centerRight,
-                                          padding: EdgeInsets.only(right: 10),
+                                          padding: EdgeInsets.only(
+                                              top: 10, right: 10),
                                           child: SizedBox(
                                             height: 120,
                                             child: Image.file(File(
@@ -803,11 +816,15 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       ],
                                     ),
                                     title: _topHeight < 70 + context.paddingTop
-                                        ? Text(widget.podcastLocal.title,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.clip,
-                                            style:
-                                                TextStyle(color: Colors.white))
+                                        ? SizedBox(
+                                            width: context.width * 4 / 5,
+                                            child: Text(
+                                                widget.podcastLocal.title,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.clip,
+                                                style: TextStyle(
+                                                    color: Colors.white)),
+                                          )
                                         : Center(),
                                   );
                                 }),
