@@ -11,9 +11,9 @@ import 'package:provider/provider.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
-import '../util/duraiton_picker.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
+import '../widgets/duraiton_picker.dart';
+import '../widgets/general_dialog.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;

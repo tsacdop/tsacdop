@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'extension_helper.dart';
+import '../util/extension_helper.dart';
 
 enum SlideDirection { up, down }
 

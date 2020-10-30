@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
 
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../widgets/custom_widget.dart';
 
 const String version = '0.5.0';
 

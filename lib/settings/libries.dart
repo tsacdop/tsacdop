@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../widgets/custom_widget.dart';
 import 'licenses.dart';
 
 class Libries extends StatelessWidget {

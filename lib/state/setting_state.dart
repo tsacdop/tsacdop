@@ -21,7 +21,7 @@ void callbackDispatcher() {
   if (Platform.isAndroid) {
     Workmanager.executeTask((task, inputData) async {
       var dbHelper = DBHelper();
-      var podcastList = await dbHelper.getPodcastLocalAll(updateOnly: false);
+      var podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
       //lastWork is a indicator for if the app was opened since last backgroundwork
       //if the app wes opend,then the old marked new episode would be marked not new.
       var lastWorkStorage = KeyValueStorage(lastWorkKey);
@@ -105,6 +105,26 @@ class SettingState extends ChangeNotifier {
     await _getAccentSetColor();
     await _getShowIntro();
     await _getRealDark();
+  }
+
+  @override
+  void addListener(VoidCallback listener) {
+    super.addListener(listener);
+    _getLocale();
+    _getAutoUpdate();
+    _getDownloadUsingData();
+    _getSleepTimerData();
+    _getPlayerSeconds();
+    _getShowNotesFonts();
+    _getUpdateInterval().then((value) async {
+      if (_initUpdateTag == 0) {
+        setWorkManager(24);
+      } else if (_autoUpdate && _initialShowIntor < 3) {
+        await cancelWork();
+        setWorkManager(_initUpdateTag);
+        await saveShowIntro(3);
+      }
+    });
   }
 
   Locale _locale;
@@ -301,26 +321,6 @@ class SettingState extends ChangeNotifier {
     _saveShowNotesFonts();
   }
 
-  @override
-  void addListener(VoidCallback listener) {
-    super.addListener(listener);
-    _getLocale();
-    _getAutoUpdate();
-    _getDownloadUsingData();
-    _getSleepTimerData();
-    _getPlayerSeconds();
-    _getShowNotesFonts();
-    _getUpdateInterval().then((value) async {
-      if (_initUpdateTag == 0) {
-        setWorkManager(24);
-      } else if (_autoUpdate && _initialShowIntor == 1) {
-        await cancelWork();
-        setWorkManager(_initUpdateTag);
-        await saveShowIntro(2);
-      }
-    });
-  }
-
   Future _getTheme() async {
     var mode = await themeStorage.getInt();
     _theme = ThemeMode.values[mode];
@@ -358,7 +358,7 @@ class SettingState extends ChangeNotifier {
 
   Future _getShowIntro() async {
     _initialShowIntor = await introStorage.getInt();
-    _showIntro = _initialShowIntor == 0 ? true : false;
+    _showIntro = _initialShowIntor == 0;
   }
 
   Future _getRealDark() async {
@@ -616,7 +616,7 @@ class SettingState extends ChangeNotifier {
       if (_autoUpdate) {
         await cancelWork();
         setWorkManager(_initUpdateTag);
-        await saveShowIntro(2);
+        await saveShowIntro(3);
       }
     });
   }

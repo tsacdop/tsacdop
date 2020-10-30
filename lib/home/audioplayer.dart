@@ -15,11 +15,11 @@ import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
-import '../util/audiopanel.dart';
-import '../util/custom_slider.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
 import '../util/pageroute.dart';
+import '../widgets/audiopanel.dart';
+import '../widgets/custom_slider.dart';
+import '../widgets/custom_widget.dart';
 import 'playlist.dart';
 
 final List<BoxShadow> _customShadow = [

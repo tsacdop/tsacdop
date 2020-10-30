@@ -13,9 +13,9 @@ import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
-import '../util/custom_widget.dart';
-import '../util/duraiton_picker.dart';
 import '../util/extension_helper.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/duraiton_picker.dart';
 
 enum MarkStatus { start, complete, none }
 enum RefreshCoverStatus { start, complete, error, none }

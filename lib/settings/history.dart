@@ -15,8 +15,8 @@ import '../state/podcast_group.dart';
 import '../type/play_histroy.dart';
 import '../type/search_api/searchpodcast.dart';
 import '../type/sub_history.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../widgets/custom_widget.dart';
 
 class PlayedHistory extends StatefulWidget {
   @override

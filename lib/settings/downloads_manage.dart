@@ -11,8 +11,8 @@ import 'package:provider/provider.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../widgets/custom_widget.dart';
 
 class DownloadsManage extends StatefulWidget {
   @override

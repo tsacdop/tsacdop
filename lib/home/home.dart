@@ -4,12 +4,11 @@ import 'dart:io';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/podcasts/podcast_detail.dart';
-import 'package:tsacdop/util/pageroute.dart';
 import 'package:tuple/tuple.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -21,12 +20,13 @@ import '../state/refresh_podcast.dart';
 import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../type/playlist.dart';
-import '../util/audiopanel.dart';
-import '../util/custom_popupmenu.dart';
-import '../util/custom_widget.dart';
-import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
-import '../util/muiliselect_bar.dart';
+import '../widgets/audiopanel.dart';
+import '../widgets/custom_popupmenu.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/episodegrid.dart';
+import '../widgets/feature_discovery.dart';
+import '../widgets/muiliselect_bar.dart';
 import 'audioplayer.dart';
 import 'download_list.dart';
 import 'home_groups.dart';
@@ -34,13 +34,6 @@ import 'home_menu.dart';
 import 'import_ompl.dart';
 import 'playlist.dart';
 import 'search_podcast.dart';
-
-const String addFeature = 'addFeature';
-const String menuFeature = 'menuFeature';
-const String playlistFeature = 'playlistFeature';
-const String longTapFeature = 'longTapFeature';
-const String groupsFeature = 'groupsFeature';
-const String podcastFeature = 'podcastFeature';
 
 class Home extends StatefulWidget {
   @override
@@ -67,24 +60,24 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    super.initState();
     _controller = TabController(length: 3, vsync: this);
-    FeatureDiscovery.isDisplayed(context, addFeature).then((value) {
-      if (!value) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          FeatureDiscovery.discoverFeatures(
-            context,
-            const <String>{
-              addFeature,
-              menuFeature,
-              playlistFeature,
-              groupsFeature,
-              podcastFeature,
-            },
-          );
-        });
-      }
+    //  FeatureDiscovery.hasPreviouslyCompleted(context, addFeature).then((value) {
+    //   if (!value) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      FeatureDiscovery.discoverFeatures(
+        context,
+        const <String>{
+          addFeature,
+          menuFeature,
+          playlistFeature,
+          //groupsFeature,
+          //podcastFeature,
+        },
+      );
     });
+    //   }
+    // });
+    super.initState();
   }
 
   @override
@@ -144,58 +137,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
-                                        DescribedFeatureOverlay(
+                                        featureDiscoveryOverlay(
+                                          context,
                                           featureId: addFeature,
                                           tapTarget:
                                               Icon(Icons.add_circle_outline),
-                                          title: Text(s.featureDiscoverySearch),
+                                          title: s.featureDiscoverySearch,
                                           backgroundColor: Colors.cyan[600],
-                                          overflowMode: feature1OverflowMode,
-                                          onDismiss: () {
-                                            return Future.value(true);
-                                          },
-                                          description: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(s.featureDiscoverySearchDes),
-                                              FlatButton(
-                                                color: Colors.cyan[500],
-                                                padding:
-                                                    const EdgeInsets.all(0),
-                                                child: Text(s.understood,
-                                                    style: context
-                                                        .textTheme.button
-                                                        .copyWith(
-                                                            color:
-                                                                Colors.white)),
-                                                onPressed: () async =>
-                                                    FeatureDiscovery
-                                                        .completeCurrentStep(
-                                                            context),
-                                              ),
-                                              FlatButton(
-                                                color: Colors.cyan[500],
-                                                padding:
-                                                    const EdgeInsets.all(0),
-                                                child: Text(s.dismiss,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .button
-                                                        .copyWith(
-                                                            color:
-                                                                Colors.white)),
-                                                onPressed: () =>
-                                                    FeatureDiscovery.dismissAll(
-                                                        context),
-                                              ),
-                                            ],
-                                          ),
+                                          buttonColor: Colors.cyan[500],
+                                          description:
+                                              s.featureDiscoverySearchDes,
                                           child: IconButton(
                                             tooltip: s.add,
                                             splashRadius: 25,
-                                            icon: const Icon(
-                                                Icons.add_circle_outline),
+                                            icon:
+                                                Icon(Icons.add_circle_outline),
                                             onPressed: () async {
                                               await showSearch<int>(
                                                 context: context,
@@ -225,49 +181,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                             height: 30,
                                           ),
                                         ),
-                                        DescribedFeatureOverlay(
+                                        featureDiscoveryOverlay(context,
                                             featureId: menuFeature,
                                             tapTarget: Icon(Icons.more_vert),
                                             backgroundColor: Colors.cyan[500],
-                                            onDismiss: () => Future.value(true),
-                                            title: Text(s.featureDiscoveryOMPL),
-                                            description: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                              children: <Widget>[
-                                                Text(s.featureDiscoveryOMPLDes),
-                                                FlatButton(
-                                                  color: Colors.cyan[600],
-                                                  padding: EdgeInsets.zero,
-                                                  child: Text(s.understood,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .button
-                                                          .copyWith(
-                                                              color: Colors
-                                                                  .white)),
-                                                  onPressed: () async =>
-                                                      FeatureDiscovery
-                                                          .completeCurrentStep(
-                                                              context),
-                                                ),
-                                                FlatButton(
-                                                  color: Colors.cyan[600],
-                                                  padding:
-                                                      const EdgeInsets.all(0),
-                                                  child: Text(s.dismiss,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .button
-                                                          .copyWith(
-                                                              color: Colors
-                                                                  .white)),
-                                                  onPressed: () =>
-                                                      FeatureDiscovery
-                                                          .dismissAll(context),
-                                                ),
-                                              ],
-                                            ),
+                                            buttonColor: Colors.cyan[600],
+                                            title: s.featureDiscoveryOMPL,
+                                            description:
+                                                s.featureDiscoveryOMPLDes,
                                             child: PopupMenu()),
                                       ],
                                     ),
@@ -276,68 +197,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                 ],
                               ),
                             ),
-                            SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  return DescribedFeatureOverlay(
-                                    featureId: groupsFeature,
-                                    tapTarget: Center(
-                                        child: Text(
-                                      s.featureDiscoveryPodcast,
-                                      textAlign: TextAlign.center,
-                                    )),
-                                    backgroundColor: Colors.cyan[500],
-                                    enablePulsingAnimation: false,
-                                    onDismiss: () => Future.value(true),
-                                    title: Text(s.featureDiscoveryPodcastTitle),
-                                    description: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(s.featureDiscoveryPodcastDes),
-                                        Row(
-                                          children: [
-                                            FlatButton(
-                                              color: Colors.cyan[600],
-                                              padding: const EdgeInsets.all(0),
-                                              child: Text(s.understood,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .button
-                                                      .copyWith(
-                                                          color: Colors.white)),
-                                              onPressed: () async =>
-                                                  FeatureDiscovery
-                                                      .completeCurrentStep(
-                                                          context),
-                                            ),
-                                            Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 5)),
-                                            FlatButton(
-                                              color: Colors.cyan[600],
-                                              padding: const EdgeInsets.all(0),
-                                              child: Text(s.dismiss,
-                                                  style: context
-                                                      .textTheme.button
-                                                      .copyWith(
-                                                          color: Colors.white)),
-                                              onPressed: () =>
-                                                  FeatureDiscovery.dismissAll(
-                                                      context),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    child: SizedBox(
-                                      height: height,
-                                      width: width,
-                                      child: ScrollPodcasts(),
-                                    ),
-                                  );
-                                },
-                                childCount: 1,
+                            SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: height,
+                                width: width,
+                                child: ScrollPodcasts(),
                               ),
                             ),
                             SliverPersistentHeader(
@@ -368,57 +232,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           controller: _controller,
                           children: <Widget>[
                             NestedScrollViewInnerScrollPositionKeyWidget(
-                                Key('tab0'),
-                                DescribedFeatureOverlay(
-                                    featureId: podcastFeature,
-                                    tapTarget: Text(s.featureDiscoveryEpisode,
-                                        textAlign: TextAlign.center),
-                                    backgroundColor: Colors.cyan[500],
-                                    enablePulsingAnimation: false,
-                                    onDismiss: () => Future.value(true),
-                                    title: Text(s.featureDiscoveryEpisodeTitle),
-                                    description: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(s.featureDiscoveryEpisodeDes),
-                                        Row(
-                                          children: [
-                                            FlatButton(
-                                              color: Colors.cyan[600],
-                                              padding: const EdgeInsets.all(0),
-                                              child: Text(s.understood,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .button
-                                                      .copyWith(
-                                                          color: Colors.white)),
-                                              onPressed: () async =>
-                                                  FeatureDiscovery
-                                                      .completeCurrentStep(
-                                                          context),
-                                            ),
-                                            Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 5)),
-                                            FlatButton(
-                                              color: Colors.cyan[600],
-                                              padding: const EdgeInsets.all(0),
-                                              child: Text(s.dismiss,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .button
-                                                      .copyWith(
-                                                          color: Colors.white)),
-                                              onPressed: () =>
-                                                  FeatureDiscovery.dismissAll(
-                                                      context),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    child: _RecentUpdate())),
+                                Key('tab0'), _RecentUpdate()),
                             NestedScrollViewInnerScrollPositionKeyWidget(
                                 Key('tab1'), _MyFavorite()),
                             NestedScrollViewInnerScrollPositionKeyWidget(
@@ -469,39 +283,13 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             children: <Widget>[
               _tabBar,
               Spacer(),
-              DescribedFeatureOverlay(
+              featureDiscoveryOverlay(context,
                   featureId: playlistFeature,
                   tapTarget: Icon(Icons.playlist_play),
                   backgroundColor: Colors.cyan[500],
-                  title: Text(s.featureDiscoveryPlaylist),
-                  onDismiss: () => Future.value(true),
-                  description: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(s.featureDiscoveryPlaylistDes),
-                      FlatButton(
-                        color: Colors.cyan[600],
-                        padding: const EdgeInsets.all(0),
-                        child: Text(s.understood,
-                            style: Theme.of(context)
-                                .textTheme
-                                .button
-                                .copyWith(color: Colors.white)),
-                        onPressed: () async =>
-                            FeatureDiscovery.completeCurrentStep(context),
-                      ),
-                      FlatButton(
-                        color: Colors.cyan[600],
-                        padding: const EdgeInsets.all(0),
-                        child: Text(s.dismiss,
-                            style: Theme.of(context)
-                                .textTheme
-                                .button
-                                .copyWith(color: Colors.white)),
-                        onPressed: () => FeatureDiscovery.dismissAll(context),
-                      ),
-                    ],
-                  ),
+                  title: s.featureDiscoveryPlaylist,
+                  description: s.featureDiscoveryPlaylistDes,
+                  buttonColor: Colors.cyan[600],
                   child: _PlaylistButton()),
             ],
           ),
@@ -895,20 +683,6 @@ class _RecentUpdateState extends State<_RecentUpdate>
                       }),
                 )
               : Center();
-          // Material(
-          //     color: Colors.transparent,
-          //     child: IconButton(
-          //         tooltip: s.addNewEpisodeTooltip,
-          //         icon: SizedBox(
-          //             height: 15,
-          //             width: 20,
-          //             child: CustomPaint(
-          //                 painter: AddToPlaylistPainter(
-          //               context.textColor,
-          //               context.textColor,
-          //             ))),
-          //         onPressed: () {}),
-          //   );
         });
   }
 

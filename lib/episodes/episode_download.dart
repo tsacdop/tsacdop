@@ -8,15 +8,15 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import '../local_storage/key_value_storage.dart';
 
+import '../local_storage/key_value_storage.dart';
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../type/episode_task.dart';
 import '../type/episodebrief.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/general_dialog.dart';
 
 class DownloadButton extends StatefulWidget {
   final EpisodeBrief episode;

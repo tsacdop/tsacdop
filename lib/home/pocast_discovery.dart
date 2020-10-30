@@ -7,8 +7,8 @@ import '../service/search_api.dart';
 import '../state/search_state.dart';
 import '../type/search_api/search_genre.dart';
 import '../type/search_api/searchpodcast.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../widgets/custom_widget.dart';
 import 'search_podcast.dart';
 
 class DiscoveryPage extends StatefulWidget {

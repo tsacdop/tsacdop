@@ -16,8 +16,8 @@ import '../state/audio_state.dart';
 import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
-import '../util/audiopanel.dart';
-import '../util/custom_widget.dart';
+import '../widgets/audiopanel.dart';
+import '../widgets/custom_widget.dart';
 import '../util/extension_helper.dart';
 import 'episode_download.dart';
 

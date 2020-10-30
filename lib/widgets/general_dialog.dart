@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'extension_helper.dart';
+import '../util/extension_helper.dart';
 
 Future generalDialog(BuildContext context,
         {Widget title, Widget content, List<Widget> actions}) async =>

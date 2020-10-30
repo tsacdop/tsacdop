@@ -10,8 +10,8 @@ import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
+import '../util/extension_helper.dart';
 import 'custom_widget.dart';
-import 'extension_helper.dart';
 import 'general_dialog.dart';
 
 class MultiSelectMenuBar extends StatefulWidget {

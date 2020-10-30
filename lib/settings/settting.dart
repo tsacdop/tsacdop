@@ -4,12 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 
-import '../home/home.dart';
 import '../intro_slider/app_intro.dart';
-import '../podcasts/podcast_manage.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/feature_discovery.dart';
+import '../widgets/general_dialog.dart';
 import 'data_backup.dart';
 import 'history.dart';
 import 'languages.dart';
@@ -219,7 +218,7 @@ class _SettingsState extends State<Settings> {
                 ),
                 ListTile(
                   onTap: () {
-                    FeatureDiscovery.clearPreferences(context, const <String>{
+                    FeatureDiscovery.clearPreferences(context, <String>{
                       addFeature,
                       menuFeature,
                       playlistFeature,

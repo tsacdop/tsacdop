@@ -91,7 +91,7 @@ class DBHelper {
         list = await dbClient.rawQuery(
             """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
           link ,update_count, episode_count FROM PodcastLocal WHERE id = ? AND 
-          never_update = 1""", [s]);
+          never_update = 0""", [s]);
       } else {
         list = await dbClient.rawQuery(
             """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 

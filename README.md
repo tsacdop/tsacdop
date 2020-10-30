@@ -1,7 +1,6 @@
 [![Tsacdop Banner][]][google play]
 
 [![github action][]][github action link]
-[![Build Status - Cirrus][]][build status]
 [![GitHub Release][]][github release - recent]
 [![Github Downloads][]][github release - recent]
 [![Localizely][]][localizely - website]

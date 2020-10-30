@@ -67,7 +67,9 @@ class MyApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: S.delegate.supportedLocales,
-            home: setting.showIntro ? SlideIntro(goto: Goto.home) : Home(),
+            home: setting.showIntro
+                ? SlideIntro(goto: Goto.home)
+                : FeatureDiscovery(child: Home()),
           ),
         );
       },

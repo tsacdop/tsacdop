@@ -11,10 +11,10 @@ import 'package:provider/provider.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
 import '../type/podcastlocal.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
 import '../util/pageroute.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/general_dialog.dart';
 import 'podcast_detail.dart';
 import 'podcast_settings.dart';
 

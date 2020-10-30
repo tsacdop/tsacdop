@@ -24,10 +24,10 @@ import '../state/podcast_group.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
 import '../util/pageroute.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/general_dialog.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override

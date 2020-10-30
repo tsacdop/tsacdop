@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../state/setting_state.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/general_dialog.dart';
 
 class ThemeSetting extends StatelessWidget {
   @override

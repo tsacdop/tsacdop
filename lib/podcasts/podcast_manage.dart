@@ -9,17 +9,14 @@ import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../state/podcast_group.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
 import '../util/pageroute.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/feature_discovery.dart';
+import '../widgets/general_dialog.dart';
 import 'custom_tabview.dart';
 import 'podcast_group.dart';
 import 'podcastlist.dart';
-
-const String addGroupFeature = 'addGroupFeature';
-const String configureGroup = 'configureFeature';
-const String configurePodcast = 'configurePodcast';
 
 class PodcastManage extends StatefulWidget {
   @override
@@ -67,16 +64,9 @@ class _PodcastManageState extends State<PodcastManage>
         _controller.stop();
       }
     });
-    FeatureDiscovery.isDisplayed(context, addGroupFeature).then((value) {
-      if (!value) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          FeatureDiscovery.discoverFeatures(context, const <String>{
-            addGroupFeature,
-            configureGroup,
-            configurePodcast
-          });
-        });
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FeatureDiscovery.discoverFeatures(context,
+          const <String>{addGroupFeature, configureGroup, configurePodcast});
     });
   }
 
@@ -96,46 +86,19 @@ class _PodcastManageState extends State<PodcastManage>
         } else if (_fraction > 0) {
           _controller.reverse();
         }
-        return DescribedFeatureOverlay(
+        return featureDiscoveryOverlay(
+          context,
           featureId: configureGroup,
           tapTarget: Icon(Icons.menu),
-          title: Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: Text(s.featureDiscoveryEditGroup),
-          ),
-          overflowMode: OverflowMode.clipContent,
+          title: s.featureDiscoveryEditGroup,
           backgroundColor: Colors.cyan[600],
-          onDismiss: () => Future.value(true),
-          description: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(s.featureDiscoveryEditGroupDes),
-              FlatButton(
-                color: Colors.cyan[500],
-                padding: const EdgeInsets.all(0),
-                child: Text(s.understood,
-                    style: Theme.of(context)
-                        .textTheme
-                        .button
-                        .copyWith(color: Colors.white)),
-                onPressed: () async =>
-                    FeatureDiscovery.completeCurrentStep(context),
-              ),
-              FlatButton(
-                color: Colors.cyan[500],
-                padding: const EdgeInsets.all(0),
-                child: Text(s.dismiss,
-                    style: Theme.of(context)
-                        .textTheme
-                        .button
-                        .copyWith(color: Colors.white)),
-                onPressed: () => FeatureDiscovery.dismissAll(context),
-              ),
-            ],
-          ),
+          description: s.featureDiscoveryEditGroupDes,
+          buttonColor: Colors.cyan[500],
           child: Transform(
-            alignment: FractionalOffset(0.5, 0.5),
-            transform: Matrix4.rotationY(math.pi * _fraction),
+            alignment: FractionalOffset.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..rotateY(math.pi * _fraction),
             child: InkWell(
               onTap: () async {
                 if (_fraction == 0) {
@@ -206,41 +169,16 @@ class _PodcastManageState extends State<PodcastManage>
           title: Text(context.s.groups(2)),
           leading: CustomBackButton(),
           actions: <Widget>[
-            DescribedFeatureOverlay(
+            featureDiscoveryOverlay(
+              context,
               featureId: addGroupFeature,
               tapTarget: Icon(Icons.add),
-              title: Text(s.featureDiscoveryGroup),
-              overflowMode: OverflowMode.clipContent,
+              title: s.featureDiscoveryGroup,
               backgroundColor: Colors.cyan[600],
-              onDismiss: () => Future.value(true),
-              description: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(s.featureDiscoveryGroupDes),
-                  FlatButton(
-                    color: Colors.cyan[500],
-                    padding: const EdgeInsets.all(0),
-                    child: Text(context.s.understood,
-                        style: Theme.of(context)
-                            .textTheme
-                            .button
-                            .copyWith(color: Colors.white)),
-                    onPressed: () async =>
-                        FeatureDiscovery.completeCurrentStep(context),
-                  ),
-                  FlatButton(
-                    color: Colors.cyan[500],
-                    padding: const EdgeInsets.all(0),
-                    child: Text(context.s.dismiss,
-                        style: Theme.of(context)
-                            .textTheme
-                            .button
-                            .copyWith(color: Colors.white)),
-                    onPressed: () => FeatureDiscovery.dismissAll(context),
-                  ),
-                ],
-              ),
+              description: s.featureDiscoveryGroupDes,
+              buttonColor: Colors.cyan[500],
               child: IconButton(
+                  splashRadius: 25,
                   onPressed: () => showGeneralDialog(
                       context: context,
                       barrierDismissible: true,
@@ -288,39 +226,14 @@ class _PodcastManageState extends State<PodcastManage>
                                   )),
                             ),
                             pageBuilder: (context, index) =>
-                                DescribedFeatureOverlay(
+                                featureDiscoveryOverlay(
+                              context,
                               featureId: configurePodcast,
                               tapTarget: Text(s.podcast(1)),
-                              title: Text(s.featureDiscoveryGroupPodcast),
-                              overflowMode: OverflowMode.clipContent,
-                              onDismiss: () => Future.value(true),
-                              enablePulsingAnimation: false,
+                              title: s.featureDiscoveryGroupPodcast,
                               backgroundColor: Colors.cyan[600],
-                              description: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: <Widget>[
-                                  Text(s.featureDiscoveryGroupPodcastDes),
-                                  FlatButton(
-                                    color: Colors.cyan[500],
-                                    padding: const EdgeInsets.all(0),
-                                    child: Text(context.s.understood,
-                                        style: context.textTheme.button
-                                            .copyWith(color: Colors.white)),
-                                    onPressed: () async =>
-                                        FeatureDiscovery.completeCurrentStep(
-                                            context),
-                                  ),
-                                  FlatButton(
-                                    color: Colors.cyan[500],
-                                    padding: const EdgeInsets.all(0),
-                                    child: Text(context.s.dismiss,
-                                        style: context.textTheme.button
-                                            .copyWith(color: Colors.white)),
-                                    onPressed: () =>
-                                        FeatureDiscovery.dismissAll(context),
-                                  ),
-                                ],
-                              ),
+                              buttonColor: Colors.cyan[500],
+                              description: s.featureDiscoveryGroupPodcastDes,
                               child: Container(
                                   key: ValueKey<String>(_groups[index].name),
                                   child:
@@ -525,9 +438,8 @@ class _OrderMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = context.s;
     return PopupMenuButton(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 1,
       tooltip: s.menu,
       itemBuilder: (context) => [
         PopupMenuItem(
@@ -589,13 +501,11 @@ class _AddGroupState extends State<AddGroup> {
                 : Color.fromRGBO(5, 5, 5, 1),
       ),
       child: AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 1,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-        titlePadding:
-            const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
-        actionsPadding: EdgeInsets.all(0),
+        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+        titlePadding: EdgeInsets.all(20),
+        actionsPadding: EdgeInsets.zero,
         actions: <Widget>[
           FlatButton(
             splashColor: context.accentColor.withAlpha(70),
@@ -630,12 +540,12 @@ class _AddGroupState extends State<AddGroup> {
                 hintStyle: TextStyle(fontSize: 18),
                 filled: true,
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Theme.of(context).accentColor, width: 2.0),
+                  borderSide:
+                      BorderSide(color: context.accentColor, width: 2.0),
                 ),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Theme.of(context).accentColor, width: 2.0),
+                  borderSide:
+                      BorderSide(color: context.accentColor, width: 2.0),
                 ),
               ),
               cursorRadius: Radius.circular(2),

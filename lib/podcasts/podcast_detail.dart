@@ -22,12 +22,12 @@ import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../type/fireside_data.dart';
 import '../type/podcastlocal.dart';
-import '../util/audiopanel.dart';
-import '../util/custom_widget.dart';
-import '../util/episodegrid.dart';
 import '../util/extension_helper.dart';
-import '../util/general_dialog.dart';
-import '../util/muiliselect_bar.dart';
+import '../widgets/audiopanel.dart';
+import '../widgets/custom_widget.dart';
+import '../widgets/episodegrid.dart';
+import '../widgets/general_dialog.dart';
+import '../widgets/muiliselect_bar.dart';
 import 'podcast_settings.dart';
 
 class PodcastDetail extends StatefulWidget {
@@ -363,8 +363,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: widget.podcastLocal
-                    .backgroudColor(context)
+                color: widget.podcastLocal.primaryColor
+                    .colorizedark()
                     .withOpacity(0.6),
                 shape: BoxShape.circle,
               ),

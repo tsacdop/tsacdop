@@ -16,8 +16,8 @@ import '../state/podcast_group.dart';
 import '../state/search_state.dart';
 import '../type/search_api/searchepisodes.dart';
 import '../type/search_api/searchpodcast.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../widgets/custom_widget.dart';
 import 'pocast_discovery.dart';
 
 class MyHomePageDelegate extends SearchDelegate<int> {

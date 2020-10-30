@@ -3,8 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../type/episodebrief.dart';
+import '../util/extension_helper.dart';
 import 'episodegrid.dart';
-import 'extension_helper.dart';
 
 const kTwoPi = math.pi * 2;
 const kPi = math.pi;

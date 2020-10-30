@@ -10,10 +10,10 @@ import '../home/audioplayer.dart';
 import '../local_storage/key_value_storage.dart';
 import '../state/audio_state.dart';
 import '../state/setting_state.dart';
-import '../util/custom_dropdown.dart';
-import '../util/custom_time_picker.dart';
-import '../util/custom_widget.dart';
 import '../util/extension_helper.dart';
+import '../widgets/custom_dropdown.dart';
+import '../widgets/custom_time_picker.dart';
+import '../widgets/custom_widget.dart';
 
 const List kSecondsToSelect = [5, 10, 15, 20, 25, 30, 45, 60];
 const List<double> kSpeedToSelect = [

@@ -22,11 +22,11 @@ import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
+import '../util/extension_helper.dart';
+import '../util/open_container.dart';
+import '../util/pageroute.dart';
 import 'custom_widget.dart';
-import 'extension_helper.dart';
 import 'general_dialog.dart';
-import 'open_container.dart';
-import 'pageroute.dart';
 
 enum Layout { three, two, one }
 
