@@ -242,7 +242,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     Selector<AudioPlayerNotifier, bool>(
-                        selector: (_, audio) => audio.playerRunning,
+                        selector: (_, audio) => audio?.playerRunning ?? false,
                         builder: (_, data, __) {
                           return Padding(
                             padding: EdgeInsets.only(bottom: data ? 60.0 : 0),

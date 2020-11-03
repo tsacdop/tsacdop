@@ -30,6 +30,7 @@ class _SettingsState extends State<Settings> {
           url.launchUrl;
           Navigator.pop(context);
         },
+        dense: true,
         leading: Icon(
           icon,
           size: 20,
@@ -37,6 +38,7 @@ class _SettingsState extends State<Settings> {
         title: Text(
           name,
           maxLines: 2,
+          style: context.textTheme.bodyText2,
         ),
       );
 
@@ -193,18 +195,14 @@ class _SettingsState extends State<Settings> {
                       children: [
                         _feedbackItem(LineIcons.github, s.feedbackGithub,
                             'https://github.com/stonega/tsacdop/issues'),
-                        Divider(height: 1),
                         _feedbackItem(LineIcons.telegram, s.feedbackTelegram,
                             'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
-                        Divider(height: 1),
                         _feedbackItem(
                             LineIcons.envelope_open_text_solid,
                             s.feedbackEmail,
                             'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
-                        Divider(height: 1),
                         _feedbackItem(LineIcons.google_play, s.feedbackPlay,
                             'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop'),
-                        Divider(height: 1),
                       ],
                     ),
                   ),

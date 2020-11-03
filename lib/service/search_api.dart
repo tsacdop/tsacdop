@@ -16,13 +16,15 @@ import '../type/search_api/searchpodcast.dart';
 enum SearchEngine { podcastIndex, listenNotes }
 
 class ListenNotesSearch {
+  final _dio = Dio(BaseOptions(connectTimeout: 30000, receiveTimeout: 90000));
+  final _baseUrl = "https://listen-api.listennotes.com/api/v2/";
   final _apiKey = environment['apiKey'];
 
   Future<SearchPodcast<dynamic>> searchPodcasts(
       {String searchText, int nextOffset}) async {
-    var url = "https://listen-api.listennotes.com/api/v2/search?q="
+    var url = "${_baseUrl}search?q="
         "${Uri.encodeComponent(searchText)}${"&sort_by_date=0&type=podcast&offset=$nextOffset"}";
-    var response = await Dio().get(url,
+    var response = await _dio.get(url,
         options: Options(headers: {
           'X-ListenAPI-Key': "$_apiKey",
           'Accept': "application/json"
@@ -35,8 +37,8 @@ class ListenNotesSearch {
   Future<SearchEpisodes<dynamic>> fetchEpisode(
       {String id, int nextEpisodeDate}) async {
     var url =
-        "https://listen-api.listennotes.com/api/v2/podcasts/$id?next_episode_pub_date=$nextEpisodeDate";
-    var response = await Dio().get(url,
+        "${_baseUrl}podcasts/$id?next_episode_pub_date=$nextEpisodeDate";
+    var response = await _dio.get(url,
         options: Options(headers: {
           'X-ListenAPI-Key': "$_apiKey",
           'Accept': "application/json"
@@ -49,7 +51,7 @@ class ListenNotesSearch {
   Future<SearchTopPodcast<dynamic>> fetchBestPodcast(
       {String genre, int page, String region = 'us'}) async {
     var url =
-        "https://listen-api.listennotes.com/api/v2/best_podcasts?genre_id=$genre&page=$page&region=$region";
+        "${_baseUrl}best_podcasts?genre_id=$genre&page=$page&region=$region";
     var response = await Dio().get(url,
         options: Options(headers: {
           'X-ListenAPI-Key': "$_apiKey",

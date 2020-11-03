@@ -15,6 +15,12 @@ class LanguagesSetting extends StatefulWidget {
 }
 
 class _LanguagesSettingState extends State<LanguagesSetting> {
+  @override
+  void initState() {
+    super.initState();
+    findSystemLocale();
+  }
+
   _setLocale(Locale locale, {bool systemDefault = false}) async {
     var localeStorage = KeyValueStorage(localeKey);
     if (systemDefault) {
@@ -43,15 +49,23 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    findSystemLocale();
-  }
+  Widget _langListTile(String lang, {Locale locale}) => ListTile(
+        title: Text(lang, style: context.textTheme.bodyText2),
+        onTap: () => _setLocale(locale),
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+        trailing: Transform.scale(
+          scale: 0.8,
+          child: Radio<Locale>(
+              value: locale,
+              groupValue: Locale(Intl.getCurrentLocale()),
+              onChanged: _setLocale),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = context.textTheme.bodyText1;
+    final textStyle = context.textTheme.bodyText2;
     final s = context.s;
     return Column(
       children: [
@@ -63,75 +77,24 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
                     ? context.accentColor
                     : null),
           ),
+          dense: true,
           onTap: () =>
               _setLocale(Locale(Intl.systemLocale), systemDefault: true),
           contentPadding: const EdgeInsets.only(left: 20, right: 20),
         ),
-        Divider(height: 1),
-        ListTile(
-            title: Text('English',style: textStyle),
-            onTap: () => _setLocale(Locale('en')),
-            contentPadding: const EdgeInsets.only(left: 20, right: 20),
-            trailing: Radio<Locale>(
-                value: Locale('en'),
-                groupValue: Locale(Intl.getCurrentLocale()),
-                onChanged: _setLocale)),
-        Divider(height: 1),
-        ListTile(
-            title: Text('简体中文', style: textStyle),
-            onTap: () => _setLocale(Locale('zh_Hans')),
-            contentPadding: const EdgeInsets.only(left: 20, right: 20),
-            trailing: Radio<Locale>(
-              value: Locale('zh_Hans'),
-              groupValue: Locale(Intl.getCurrentLocale()),
-              onChanged: _setLocale,
-            )),
-        Divider(height: 1),
-        ListTile(
-          title: Text('Français', style: textStyle),
-          onTap: () => _setLocale(Locale('fr')),
-          contentPadding: const EdgeInsets.only(left: 20, right: 20),
-          trailing: Radio<Locale>(
-              value: Locale('fr'),
-              groupValue: Locale(Intl.getCurrentLocale()),
-              onChanged: _setLocale),
-        ),
-        Divider(height: 1),
-        ListTile(
-          title: Text('Español',style: textStyle),
-          onTap: () => _setLocale(Locale('es')),
-          contentPadding: const EdgeInsets.only(left: 20, right: 20),
-          trailing: Radio<Locale>(
-              value: Locale('es'),
-              groupValue: Locale(Intl.getCurrentLocale()),
-              onChanged: _setLocale),
-        ),
-        Divider(height: 1),
-        ListTile(
-          title: Text('Português',style: textStyle),
-          onTap: () => _setLocale(Locale('pt')),
-          contentPadding: const EdgeInsets.only(left: 20, right: 20),
-          trailing: Radio<Locale>(
-              value: Locale('pt'),
-              groupValue: Locale(Intl.getCurrentLocale()),
-              onChanged: _setLocale),
-        ),
-        Divider(height: 1),
-        ListTile(
-          title: Text('Italiano', style: textStyle),
-          onTap: () => _setLocale(Locale('it')),
-          contentPadding: const EdgeInsets.only(left: 20, right: 20),
-          trailing: Radio<Locale>(
-              value: Locale('it'),
-              groupValue: Locale(Intl.getCurrentLocale()),
-              onChanged: _setLocale),
-        ),
+        _langListTile('English', locale: Locale('en')),
+        _langListTile('简体中文', locale: Locale('zh_Hans')),
+        _langListTile('Français', locale: Locale('fr')),
+        _langListTile('Español', locale: Locale('es')),
+        _langListTile('Português', locale: Locale('pt')),
+        _langListTile('Italiano', locale: Locale('it')),
         Divider(height: 1),
         ListTile(
           onTap: () =>
               'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop localization project'
                   .launchUrl,
           contentPadding: const EdgeInsets.only(left: 20, right: 20),
+          dense: true,
           title: Align(
             alignment: Alignment.centerLeft,
             child: Image(

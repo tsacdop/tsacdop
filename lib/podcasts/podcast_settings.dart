@@ -193,7 +193,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
   Widget build(BuildContext context) {
     final s = context.s;
     final groupList = context.watch<GroupList>();
-    final textStyle = context.textTheme.bodyText1;
+    final textStyle = context.textTheme.bodyText2;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
