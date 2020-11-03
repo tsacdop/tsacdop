@@ -23,12 +23,12 @@ MediaControl pauseControl = MediaControl(
   label: 'Pause',
   action: MediaAction.pause,
 );
-MediaControl skipToNextControl = MediaControl(
+MediaControl skipToNext = MediaControl(
   androidIcon: 'drawable/baseline_skip_next_white_24',
   label: 'Next',
   action: MediaAction.skipToNext,
 );
-MediaControl skipToPreviousControl = MediaControl(
+MediaControl skipToPrevious = MediaControl(
   androidIcon: 'drawable/ic_action_skip_previous',
   label: 'Previous',
   action: MediaAction.skipToPrevious,
@@ -60,7 +60,7 @@ enum PlayerHeight { short, mid, tall }
 //enum ShareStatus { generate, download, complete, undefined, error }
 
 class AudioPlayerNotifier extends ChangeNotifier {
-  DBHelper dbHelper = DBHelper();
+  final _dbHelper = DBHelper();
   final _positionStorage = KeyValueStorage(audioPositionKey);
   final _autoPlayStorage = KeyValueStorage(autoPlayKey);
   final _autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
@@ -82,7 +82,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   EpisodeBrief _episode;
 
   /// Current playlist.
-  Playlist _queue;
+  Playlist _queue = Playlist('Playlist');
 
   /// Notifier for playlist change.
   bool _queueUpdate = false;
@@ -255,12 +255,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
     super.addListener(listener);
     _initAudioData();
     AudioService.connect();
-    var running = AudioService.running;
-    if (running) {}
   }
 
   Future<void> loadPlaylist() async {
-    _queue = Playlist();
     await _queue.getPlaylist();
     await _getAutoPlay();
     _lastPostion = await _positionStorage.getInt();
@@ -270,7 +267,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       final seekValue = duration != 0 ? _lastPostion / duration : 1.0;
       final history = PlayHistory(
           episode.title, episode.enclosureUrl, _lastPostion ~/ 1000, seekValue);
-      await dbHelper.saveHistory(history);
+      await _dbHelper.saveHistory(history);
     }
     var lastWorkStorage = KeyValueStorage(lastWorkKey);
     await lastWorkStorage.saveInt(0);
@@ -291,12 +288,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   Future<void> episodeLoad(EpisodeBrief episode,
       {int startPosition = 0}) async {
-    final episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    final episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     //TODO  load episode from last position when player running
     if (playerRunning) {
       final history = PlayHistory(_episode.title, _episode.enclosureUrl,
           backgroundAudioPosition ~/ 1000, seekSliderValue);
-      await dbHelper.saveHistory(history);
+      await _dbHelper.saveHistory(history);
       await AudioService.addQueueItemAt(episodeNew.toMediaItem(), 0);
       if (startPosition > 0) {
         await AudioService.seekTo(Duration(milliseconds: startPosition));
@@ -309,7 +306,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       notifyListeners();
       await _queue.savePlaylist();
       if (episodeNew.isNew == 1) {
-        await dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
+        await _dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
       }
     } else {
       await _queue.getPlaylist();
@@ -403,7 +400,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     AudioService.currentMediaItemStream
         .where((event) => event != null)
         .listen((item) async {
-      var episode = await dbHelper.getRssItemWithMediaId(item.id);
+      var episode = await _dbHelper.getRssItemWithMediaId(item.id);
 
       _backgroundAudioDuration = item.duration?.inMilliseconds ?? 0;
       if (episode != null) {
@@ -463,7 +460,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
           history = PlayHistory(_episode.title, _episode.enclosureUrl,
               _backgroundAudioPosition ~/ 1000, _seekSliderValue);
         }
-        await dbHelper.saveHistory(history);
+        await _dbHelper.saveHistory(history);
       }
       if (event is Map && event['playerRunning'] == false && _playerRunning) {
         _playerRunning = false;
@@ -471,7 +468,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         if (_lastPostion > 0) {
           final history = PlayHistory(_episode.title, _episode.enclosureUrl,
               _lastPostion ~/ 1000, _seekSliderValue);
-          await dbHelper.saveHistory(history);
+          await _dbHelper.saveHistory(history);
         }
         _episode = null;
       }
@@ -522,7 +519,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> addToPlaylist(EpisodeBrief episode) async {
-    var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    var episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (!_queue.playlist.contains(episodeNew)) {
       if (playerRunning) {
         await AudioService.addQueueItem(episodeNew.toMediaItem());
@@ -534,7 +531,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> addToPlaylistAt(EpisodeBrief episode, int index) async {
-    var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    var episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (playerRunning) {
       await AudioService.addQueueItemAt(episodeNew.toMediaItem(), index);
     }
@@ -546,9 +543,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
   Future<void> addNewEpisode(List<String> group) async {
     var newEpisodes = <EpisodeBrief>[];
     if (group.isEmpty) {
-      newEpisodes = await dbHelper.getRecentNewRssItem();
+      newEpisodes = await _dbHelper.getRecentNewRssItem();
     } else {
-      newEpisodes = await dbHelper.getGroupNewRssItem(group);
+      newEpisodes = await _dbHelper.getGroupNewRssItem(group);
     }
     if (newEpisodes.length > 0 && newEpisodes.length < 100) {
       for (var episode in newEpisodes) {
@@ -556,9 +553,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
       }
     }
     if (group.isEmpty) {
-      await dbHelper.removeAllNewMark();
+      await _dbHelper.removeAllNewMark();
     } else {
-      await dbHelper.removeGroupNewMark(group);
+      await _dbHelper.removeGroupNewMark(group);
     }
   }
 
@@ -567,7 +564,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
       var index = _queue.playlist
           .indexWhere((item) => item.enclosureUrl == episode.enclosureUrl);
       if (index > 0) {
-        var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+        var episodeNew =
+            await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
         await delFromPlaylist(episode);
         await addToPlaylistAt(episodeNew, index);
       }
@@ -575,7 +573,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<int> delFromPlaylist(EpisodeBrief episode) async {
-    var episodeNew = await dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    var episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (playerRunning) {
       await AudioService.removeQueueItem(episodeNew.toMediaItem());
     }
@@ -605,7 +603,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
   Future<bool> moveToTop(EpisodeBrief episode) async {
     await delFromPlaylist(episode);
     if (playerRunning) {
-      await AudioService.addQueueItemAt(episode.toMediaItem(), 1);
+      final episodeNew =
+          await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+      await AudioService.addQueueItemAt(episodeNew.toMediaItem(), 1);
       await _queue.addToPlayListAt(episode, 1, existed: false);
     } else {
       await _queue.addToPlayListAt(episode, 0, existed: false);
@@ -888,6 +888,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     } else {
       await AudioServiceBackground.setQueue(_queue);
       await AudioServiceBackground.setMediaItem(mediaItem);
+
       await _audioPlayer.setUrl(mediaItem.id, cacheMax: _cacheMax);
       var duration = await _audioPlayer.durationFuture;
       if (duration != null) {
@@ -1111,16 +1112,16 @@ class AudioPlayerTask extends BackgroundAudioTask {
     switch (index) {
       case 0:
         if (_playing) {
-          return [pauseControl, forward, skipToNextControl, stopControl];
+          return [pauseControl, forward, skipToNext, stopControl];
         } else {
-          return [playControl, forward, skipToNextControl, stopControl];
+          return [playControl, forward, skipToNext, stopControl];
         }
         break;
       case 1:
         if (_playing) {
-          return [pauseControl, rewind, skipToNextControl, stopControl];
+          return [pauseControl, rewind, skipToNext, stopControl];
         } else {
-          return [playControl, rewind, skipToNextControl, stopControl];
+          return [playControl, rewind, skipToNext, stopControl];
         }
         break;
       case 2:
@@ -1132,9 +1133,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
         break;
       default:
         if (_playing) {
-          return [pauseControl, forward, skipToNextControl, stopControl];
+          return [pauseControl, forward, skipToNext, stopControl];
         } else {
-          return [playControl, forward, skipToNextControl, stopControl];
+          return [playControl, forward, skipToNext, stopControl];
         }
         break;
     }
