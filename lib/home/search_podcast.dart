@@ -407,8 +407,8 @@ class _ListenNotesSearch extends StatefulWidget {
 }
 
 class __ListenNotesSearchState extends State<_ListenNotesSearch> {
-  int _nextOffset = 0;
   final List<OnlinePodcast> _podcastList = [];
+  int _nextOffset = 0;
   int _offset;
   bool _loading = false;
   bool _loadError = false;
@@ -446,7 +446,8 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
       return [];
     }
     _offset = searchResult.nextOffset;
-    _podcastList.addAll(searchResult.results.cast());
+    var searchList = <OnlinePodcast>[...searchResult.results.cast().toList()];
+    _podcastList.addAll(searchList);
     _loading = false;
     return _podcastList;
   }
