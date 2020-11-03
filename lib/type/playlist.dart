@@ -1,16 +1,60 @@
+import 'package:uuid/uuid.dart';
+
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import 'episodebrief.dart';
 
+class PlaylistEntity {
+  final String name;
+  final String id;
+  final List<String> episodeList;
+
+  PlaylistEntity(this.name, this.id, this.episodeList);
+
+  Map<String, Object> toJson() {
+    return {'name': name, 'id': id, 'episodeList': episodeList};
+  }
+
+  static PlaylistEntity fromJson(Map<String, Object> json) {
+    var list = List<String>.from(json['episodeList']);
+    return PlaylistEntity(json['name'] as String, json['id'] as String, list);
+  }
+}
+
 class Playlist {
-  String name;
+  /// Playlist name. the default playlist is named "Playlist".
+  final String name;
+
+  /// Unique id for playlist.
+  final String id;
+
+  /// Episode url list for playlist.
+  final List<String> episodeList;
+
+  Playlist(this.name, {String id, List<String> episodeList})
+      : id = id ?? Uuid().v4(),
+        episodeList = episodeList ?? [];
+
+  PlaylistEntity toEntity() {
+    return PlaylistEntity(name, id, episodeList);
+  }
+
+  static Playlist fromEntity(PlaylistEntity entity) {
+    return Playlist(
+      entity.name,
+      id: entity.id,
+      episodeList: entity.episodeList,
+    );
+  }
+
   final DBHelper _dbHelper = DBHelper();
-  List<EpisodeBrief> _playlist;
+  List<EpisodeBrief> _playlist = [];
   List<EpisodeBrief> get playlist => _playlist;
   final KeyValueStorage _playlistStorage = KeyValueStorage(playlistKey);
 
   Future<void> getPlaylist() async {
     var urls = await _playlistStorage.getStringList();
+    episodeList.addAll(urls);
     if (urls.length == 0) {
       _playlist = [];
     } else {

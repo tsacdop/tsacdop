@@ -66,28 +66,22 @@ class PodcastGroup extends Equatable {
   final String color;
 
   /// Id lists of podcasts in group.
-  List<String> _podcastList;
-
-  List<String> get podcastList => _podcastList;
-
-  set podcastList(list) {
-    _podcastList = list;
-  }
+  List<String> podcastList;
 
   PodcastGroup(this.name,
       {this.color = '#000000', String id, List<String> podcastList})
       : id = id ?? Uuid().v4(),
-        _podcastList = podcastList ?? [];
+        podcastList = podcastList ?? [];
 
   Future<void> getPodcasts() async {
     var dbHelper = DBHelper();
-    if (_podcastList != []) {
+    if (podcastList != []) {
       try {
-        _podcasts = await dbHelper.getPodcastLocal(_podcastList);
+        _podcasts = await dbHelper.getPodcastLocal(podcastList);
       } catch (e) {
         await Future.delayed(Duration(milliseconds: 200));
         try {
-          _podcasts = await dbHelper.getPodcastLocal(_podcastList);
+          _podcasts = await dbHelper.getPodcastLocal(podcastList);
         } catch (e) {
           developer.log(e.toString());
         }
@@ -526,13 +520,14 @@ class GroupList extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
-
+  
+  /// Delete podcsat from device.
   Future<void> removePodcast(
     PodcastLocal podcast,
   ) async {
     _syncRemove(podcast.rssUrl);
-    final id = podcast.id;
-    await _unsubscribe(id);
+    await _unsubscribe(podcast.id);
+    await File(podcast.imagePath)?.delete();
   }
 
   Future<void> saveOrder(PodcastGroup group) async {
