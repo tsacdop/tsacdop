@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../state/podcast_group.dart';
+import '../type/playlist.dart';
 
 const String groupsKey = 'groups';
 const String playlistKey = 'playlist';
@@ -57,6 +58,7 @@ const String searchEngineKey = 'searchEngineKey';
 const String markListenedAfterSkipKey = 'markListenedAfterSkipKey';
 const String downloadPositionKey = 'downloadPositionKey';
 const String deleteAfterPlayedKey = 'removeAfterPlayedKey';
+const String playlistsAllKey = 'playlistsAllKey';
 
 class KeyValueStorage {
   final String key;
@@ -84,6 +86,33 @@ class KeyValueStorage {
         key,
         json.encode(
             {'groups': groupList.map((group) => group.toJson()).toList()}));
+  }
+
+  Future<List<PlaylistEntity>> getPlaylists() async {
+    var prefs = await SharedPreferences.getInstance();
+    if (prefs.getString(key) == null) {
+      var episodeList = prefs.getStringList(playlistKey);
+      var playlist = Playlist('Playlist', episodeList: episodeList);
+      await prefs.setString(
+          key,
+          json.encode({
+            'playlists': [playlist.toEntity().toJson()]
+          }));
+    }
+    return json
+        .decode(prefs.getString(key))['playlists']
+        .cast<Map<String, Object>>()
+        .map<PlaylistEntity>(PlaylistEntity.fromJson)
+        .toList(growable: false);
+  }
+
+  Future<bool> savePlaylists(List<PlaylistEntity> playlists) async {
+    var prefs = await SharedPreferences.getInstance();
+    return prefs.setString(
+        key,
+        json.encode({
+          'playlists': playlists.map((playlist) => playlist.toJson()).toList()
+        }));
   }
 
   Future<bool> saveInt(int setting) async {
@@ -135,7 +164,7 @@ class KeyValueStorage {
       await prefs.setStringList(key, ['0', '1', '2', '13', '14', '15']);
     }
     var list = prefs.getStringList(key);
-    if(list.length == 5) list = [...list,'15'];
+    if (list.length == 5) list = [...list, '15'];
     return list.map(int.parse).toList();
   }
 
