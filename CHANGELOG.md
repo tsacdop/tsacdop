@@ -1,5 +1,21 @@
 # Tsacdop Changelog
 
+## 0.5.1
+
+Release date 2020/11/1
+
+### Bug fixed
+
+* ListenNotes search error.
+* Sync podcasts marked as never auto update.
+* Download failed when network is busy.
+
+### Minor change
+
+* User can add episode to the top of playlist in popup menu.
+* Show podcast name in episode detail page.
+* Tap pocdast avatar in episode card to open podcast page.
+
 ## 0.5.0
 
 Release date 2020/10/13
