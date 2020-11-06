@@ -23,12 +23,12 @@ MediaControl pauseControl = MediaControl(
   label: 'Pause',
   action: MediaAction.pause,
 );
-MediaControl skipToNext = MediaControl(
+MediaControl skipToNextControl = MediaControl(
   androidIcon: 'drawable/baseline_skip_next_white_24',
   label: 'Next',
   action: MediaAction.skipToNext,
 );
-MediaControl skipToPrevious = MediaControl(
+MediaControl skipToPreviousControl = MediaControl(
   androidIcon: 'drawable/ic_action_skip_previous',
   label: 'Previous',
   action: MediaAction.skipToPrevious,
@@ -38,13 +38,13 @@ MediaControl stopControl = MediaControl(
   label: 'Stop',
   action: MediaAction.stop,
 );
-MediaControl forward = MediaControl(
+MediaControl forwardControl = MediaControl(
   androidIcon: 'drawable/baseline_fast_forward_white_24',
   label: 'forward',
   action: MediaAction.fastForward,
 );
 
-MediaControl rewind = MediaControl(
+MediaControl rewindControl = MediaControl(
   androidIcon: 'drawable/baseline_fast_rewind_white_24',
   label: 'rewind',
   action: MediaAction.rewind,
@@ -1111,32 +1111,37 @@ class AudioPlayerTask extends BackgroundAudioTask {
   List<MediaControl> _getControls(int index) {
     switch (index) {
       case 0:
-        if (_playing) {
-          return [pauseControl, forward, skipToNext, stopControl];
-        } else {
-          return [playControl, forward, skipToNext, stopControl];
-        }
+        return [
+          _playing ? pauseControl : playControl,
+          forwardControl,
+          skipToNextControl,
+          stopControl
+        ];
         break;
       case 1:
-        if (_playing) {
-          return [pauseControl, rewind, skipToNext, stopControl];
-        } else {
-          return [playControl, rewind, skipToNext, stopControl];
-        }
+        return [
+          _playing ? pauseControl : playControl,
+          rewindControl,
+          skipToNextControl,
+          stopControl
+        ];
         break;
       case 2:
-        if (_playing) {
-          return [rewind, pauseControl, forward, stopControl];
-        } else {
-          return [rewind, playControl, forward, stopControl];
-        }
+        return [
+          rewindControl,
+          _playing ? pauseControl : playControl,
+          forwardControl,
+          stopControl
+        ];
+
         break;
       default:
-        if (_playing) {
-          return [pauseControl, forward, skipToNext, stopControl];
-        } else {
-          return [playControl, forward, skipToNext, stopControl];
-        }
+        return [
+          _playing ? pauseControl : playControl,
+          forwardControl,
+          skipToNextControl,
+          stopControl
+        ];
         break;
     }
   }
