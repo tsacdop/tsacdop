@@ -31,14 +31,16 @@ class _SettingsState extends State<Settings> {
           Navigator.pop(context);
         },
         dense: true,
-        leading: Icon(
-          icon,
-          size: 20,
-        ),
-        title: Text(
-          name,
-          maxLines: 2,
-          style: context.textTheme.bodyText2,
+        title: Row(
+          children: [
+            Icon(icon, size: 20),
+            SizedBox(width: 20),
+            Text(
+              name,
+              maxLines: 2,
+              style: context.textTheme.bodyText2,
+            ),
+          ],
         ),
       );
 

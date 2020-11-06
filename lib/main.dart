@@ -16,6 +16,7 @@ import 'state/refresh_podcast.dart';
 import 'state/search_state.dart';
 import 'state/setting_state.dart';
 
+///Initial theme settings
 final SettingState themeSetting = SettingState();
 Future main() async {
   timeDilation = 1.0;
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingState>(
-      builder: (_, setting, __) {
+      builder: (_, setting, child) {
         return FeatureDiscovery(
           child: MaterialApp(
             themeMode: setting.theme,
@@ -67,12 +68,11 @@ class MyApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: S.delegate.supportedLocales,
-            home: setting.showIntro
-                ? SlideIntro(goto: Goto.home)
-                : FeatureDiscovery(child: Home()),
+            home: setting.showIntro ? SlideIntro(goto: Goto.home) : child,
           ),
         );
       },
+      child: FeatureDiscovery(child: Home()),
     );
   }
 }

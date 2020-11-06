@@ -86,7 +86,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
       },
       child: IconButton(
         tooltip: context.s.back,
-        splashRadius: 25,
+        splashRadius: 20,
         icon: AnimatedIcon(
           icon: AnimatedIcons.menu_arrow,
           progress: transitionAnimation,
@@ -115,7 +115,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
       if (query.isNotEmpty)
         IconButton(
           tooltip: context.s.clear,
-          splashRadius: 25,
+          splashRadius: 20,
           icon: const Icon(Icons.clear),
           onPressed: () {
             query = '';

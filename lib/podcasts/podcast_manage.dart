@@ -178,7 +178,7 @@ class _PodcastManageState extends State<PodcastManage>
               description: s.featureDiscoveryGroupDes,
               buttonColor: Colors.cyan[500],
               child: IconButton(
-                  splashRadius: 25,
+                  splashRadius: 20,
                   onPressed: () => showGeneralDialog(
                       context: context,
                       barrierDismissible: true,

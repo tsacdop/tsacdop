@@ -336,12 +336,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
           String tooltip,
           List<PopupMenuEntry<int>> itemBuilder,
           Function(int) onSelected,
-          bool clip = true}) =>
+          }) =>
       Material(
         key: UniqueKey(),
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(100),
-        clipBehavior: clip ? Clip.hardEdge : Clip.none,
+        clipBehavior: Clip.hardEdge,
         child: PopupMenuButton<int>(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -358,7 +358,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     return _customPopupMenu(
         tooltip: s.menu,
         child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            padding: EdgeInsets.all(10),
             child: Container(
               width: 30,
               height: 30,

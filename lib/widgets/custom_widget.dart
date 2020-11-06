@@ -1211,7 +1211,7 @@ class CustomBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      splashRadius: 25,
+      splashRadius: 20,
       icon: const BackButtonIcon(),
       tooltip: context.s.back,
       onPressed: () {

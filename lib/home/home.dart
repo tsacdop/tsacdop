@@ -149,7 +149,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                               s.featureDiscoverySearchDes,
                                           child: IconButton(
                                             tooltip: s.add,
-                                            splashRadius: 25,
+                                            splashRadius: 20,
                                             icon:
                                                 Icon(Icons.add_circle_outline),
                                             onPressed: () async {
@@ -189,7 +189,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                             title: s.featureDiscoveryOMPL,
                                             description:
                                                 s.featureDiscoveryOMPLDes,
-                                            child: PopupMenu()),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(right: 5.0),
+                                              child: PopupMenu(),
+                                            )),
                                       ],
                                     ),
                                   ),

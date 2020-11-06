@@ -205,20 +205,23 @@ class _PodcastSettingState extends State<PodcastSetting> {
               return ListTile(
                 onTap: () => _setAutoDownload(!snapshot.data),
                 dense: true,
-                leading: SizedBox(
-                  height: 18,
-                  width: 18,
-                  child: CustomPaint(
-                    painter: DownloadPainter(
-                      color: context.brightness == Brightness.light
-                          ? Colors.grey[600]
-                          : Colors.white,
-                      fraction: 0,
-                      progressColor: context.accentColor,
+                title: Row(
+                  children: [
+                    SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CustomPaint(
+                        painter: DownloadPainter(
+                          color: context.textColor,
+                          fraction: 0,
+                          progressColor: context.accentColor,
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(width: 20),
+                    Text(s.autoDownload, style: textStyle),
+                  ],
                 ),
-                title: Text(s.autoDownload, style: textStyle),
                 trailing: Transform.scale(
                   scale: 0.8,
                   child:
@@ -233,8 +236,13 @@ class _PodcastSettingState extends State<PodcastSetting> {
               return ListTile(
                 dense: true,
                 onTap: () => _setNeverUpdate(!snapshot.data),
-                leading: Icon(Icons.lock, size: 18),
-                title: Text(s.neverAutoUpdate, style: textStyle),
+                title: Row(
+                  children: [
+                    Icon(Icons.lock, size: 18),
+                    SizedBox(width: 20),
+                    Text(s.neverAutoUpdate, style: textStyle),
+                  ],
+                ),
                 trailing: Transform.scale(
                   scale: 0.8,
                   child:
@@ -256,8 +264,13 @@ class _PodcastSettingState extends State<PodcastSetting> {
               });
             },
             dense: true,
-            leading: Icon(Icons.fast_forward, size: 18),
-            title: Text(s.skipSecondsAtStart, style: textStyle),
+            title: Row(
+              children: [
+                Icon(Icons.fast_forward, size: 18),
+                SizedBox(width: 20),
+                Text(s.skipSecondsAtStart, style: textStyle),
+              ],
+            ),
             trailing: Padding(
               padding: const EdgeInsets.only(right: 10.0),
               child: Text(snapshot.data.toTime),
@@ -282,8 +295,13 @@ class _PodcastSettingState extends State<PodcastSetting> {
               }
             },
             dense: true,
-            title: Text(s.refreshArtwork, style: textStyle),
-            leading: Icon(Icons.refresh, size: 18),
+            title: Row(
+              children: [
+                Icon(Icons.refresh, size: 18),
+                SizedBox(width: 20),
+                Text(s.refreshArtwork, style: textStyle),
+              ],
+            ),
             trailing: Padding(
                 padding: const EdgeInsets.only(right: 15.0),
                 child: SizedBox(
@@ -301,19 +319,23 @@ class _PodcastSettingState extends State<PodcastSetting> {
               });
             },
             dense: true,
-            title: Text(s.menuMarkAllListened,
-                style: textStyle.copyWith(
-                    color: context.accentColor, fontWeight: FontWeight.bold)),
-            leading: SizedBox(
-              height: 18,
-              width: 18,
-              child: CustomPaint(
-                painter: ListenedAllPainter(
-                    context.brightness == Brightness.light
-                        ? Colors.grey[600]
-                        : Colors.white,
-                    stroke: 2),
-              ),
+            title: Row(
+              children: [
+                SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CustomPaint(
+                    painter: ListenedAllPainter(
+                        context.accentColor,
+                        stroke: 2),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Text(s.menuMarkAllListened,
+                    style: textStyle.copyWith(
+                        color: context.accentColor,
+                        fontWeight: FontWeight.bold)),
+              ],
             ),
             trailing: Padding(
               padding: const EdgeInsets.only(right: 10.0),
@@ -365,10 +387,15 @@ class _PodcastSettingState extends State<PodcastSetting> {
             });
           },
           dense: true,
-          title: Text(s.remove,
-              style: textStyle.copyWith(
-                  color: Colors.red, fontWeight: FontWeight.bold)),
-          leading: Icon(Icons.delete, color: Colors.red, size:18),
+          title: Row(
+            children: [
+              Icon(Icons.delete, color: Colors.red, size: 18),
+              SizedBox(width: 20),
+              Text(s.remove,
+                  style: textStyle.copyWith(
+                      color: Colors.red, fontWeight: FontWeight.bold)),
+            ],
+          ),
         ),
         if (_removeConfirm)
           Container(
