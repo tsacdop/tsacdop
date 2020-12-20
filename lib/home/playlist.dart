@@ -77,11 +77,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
         ),
         body: SafeArea(
           child: Selector<AudioPlayerNotifier,
-              Tuple4<Playlist, bool, bool, EpisodeBrief>>(
-            selector: (_, audio) => Tuple4(audio.queue, audio.playerRunning,
-                audio.queueUpdate, audio.episode),
+              Tuple3<Playlist, bool, EpisodeBrief>>(
+            selector: (_, audio) =>
+                Tuple3(audio.playlist, audio.playerRunning, audio.episode),
             builder: (_, data, __) {
-              var episodes = data.item1.playlist;
+              var episodes = data.item1.episodes;
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,12 +227,12 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                       CircleAvatar(
                                           radius: 15,
                                           backgroundImage:
-                                              data.item4.avatarImage),
+                                              data.item3.avatarImage),
                                       Container(
                                         width: 150,
                                         alignment: Alignment.center,
                                         child: Text(
-                                          data.item4.title,
+                                          data.item3.title,
                                           maxLines: 1,
                                           overflow: TextOverflow.fade,
                                           textAlign: TextAlign.center,
@@ -254,7 +254,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                     icon: Icon(Icons.play_circle_filled,
                                         size: 40, color: context.accentColor),
                                     onPressed: () {
-                                      audio.playlistLoad();
+                                      //audio.playlistLoad();
                                       // setState(() {});
                                     }),
                           ),
@@ -293,7 +293,7 @@ class __ReorderablePlaylistState extends State<_ReorderablePlaylist> {
     return Selector<AudioPlayerNotifier, Tuple2<Playlist, bool>>(
         selector: (_, audio) => Tuple2(audio.queue, audio.playerRunning),
         builder: (_, data, __) {
-          var episodes = data.item1.playlist;
+          var episodes = data.item1.episodes;
           return ReorderableListView(
               onReorder: (oldIndex, newIndex) {
                 if (newIndex > oldIndex) {
@@ -708,19 +708,12 @@ class __HistoryListState extends State<_HistoryList> {
                                                   SizedBox(
                                                     child: Selector<
                                                         AudioPlayerNotifier,
-                                                        Tuple2<
-                                                            List<EpisodeBrief>,
-                                                            bool>>(
+                                                        List<EpisodeBrief>>(
                                                       selector: (_, audio) =>
-                                                          Tuple2(
-                                                              audio.queue
-                                                                  .playlist,
-                                                              audio
-                                                                  .queueUpdate),
+                                                          audio.queue.episodes,
                                                       builder: (_, data, __) {
-                                                        return data.item1
-                                                                .contains(
-                                                                    episode)
+                                                        return data.contains(
+                                                                episode)
                                                             ? IconButton(
                                                                 icon: Icon(
                                                                     Icons

@@ -487,13 +487,10 @@ class __MenuBarState extends State<_MenuBar> {
                     },
                   ),
                   DownloadButton(episode: widget.episodeItem),
-                  Selector<AudioPlayerNotifier,
-                      Tuple2<List<EpisodeBrief>, bool>>(
-                    selector: (_, audio) =>
-                        Tuple2(audio.queue.playlist, audio.queueUpdate),
+                  Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
+                    selector: (_, audio) => audio.queue.episodes,
                     builder: (_, data, __) {
-                      final inPlaylist =
-                          data.item1.contains(widget.episodeItem);
+                      final inPlaylist = data.contains(widget.episodeItem);
                       return inPlaylist
                           ? _buttonOnMenu(
                               child: Icon(Icons.playlist_add_check,

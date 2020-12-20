@@ -23,38 +23,47 @@ class PodcastGroupList extends StatefulWidget {
 }
 
 class _PodcastGroupListState extends State<PodcastGroupList> {
+  PodcastGroup _group;
+  @override
+  void initState() {
+    super.initState();
+    _group = widget.group;
+  }
+
+  @override
+  void didUpdateWidget(PodcastGroupList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.group != widget.group) setState(() => _group = widget.group);
+  }
+
   @override
   Widget build(BuildContext context) {
-    var groupList = Provider.of<GroupList>(context, listen: false);
-    return widget.group.podcastList.length == 0
+    return _group.podcastList.isEmpty
         ? Container(
-            color: Theme.of(context).primaryColor,
+            color: context.primaryColor,
           )
         : Container(
-            color: Theme.of(context).primaryColor,
+            color: context.primaryColor,
             child: ReorderableListView(
               onReorder: (oldIndex, newIndex) {
                 setState(() {
-                  if (newIndex > oldIndex) {
-                    newIndex -= 1;
-                  }
-                  final podcast = widget.group.podcasts.removeAt(oldIndex);
-                  widget.group.podcasts.insert(newIndex, podcast);
+                  _group.reorderGroup(oldIndex, newIndex);
                 });
-                widget.group.orderedPodcasts = widget.group.podcasts;
-                groupList.addToOrderChanged(widget.group);
+                context.read<GroupList>().addToOrderChanged(_group);
               },
-              children: widget.group.podcasts.map<Widget>((podcastLocal) {
-                return Container(
-                  decoration:
-                      BoxDecoration(color: Theme.of(context).primaryColor),
-                  key: ObjectKey(podcastLocal.title),
-                  child: _PodcastCard(
-                    podcastLocal: podcastLocal,
-                    group: widget.group,
-                  ),
-                );
-              }).toList(),
+              children: _group.podcasts.map<Widget>(
+                (podcastLocal) {
+                  return Container(
+                    decoration:
+                        BoxDecoration(color: Theme.of(context).primaryColor),
+                    key: ObjectKey(podcastLocal.title),
+                    child: _PodcastCard(
+                      podcastLocal: podcastLocal,
+                      group: _group,
+                    ),
+                  );
+                },
+              ).toList(),
             ),
           );
   }
@@ -310,7 +319,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                             _addGroup = false;
                                           });
                                           await groupList.changeGroup(
-                                            widget.podcastLocal.id,
+                                            widget.podcastLocal,
                                             _selectedGroups,
                                           );
                                           Fluttertoast.showToast(
@@ -530,8 +539,8 @@ class _RenameGroupState extends State<RenameGroup> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         elevation: 1,
         contentPadding: EdgeInsets.symmetric(horizontal: 20),
-        titlePadding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
-        actionsPadding: EdgeInsets.all(0),
+        titlePadding: EdgeInsets.all(20),
+        actionsPadding: EdgeInsets.zero,
         actions: <Widget>[
           FlatButton(
             splashColor: context.accentColor.withAlpha(70),

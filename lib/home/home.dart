@@ -13,6 +13,7 @@ import 'package:tuple/tuple.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../playlists/playlist_home.dart';
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
@@ -190,7 +191,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                             description:
                                                 s.featureDiscoveryOMPLDes,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(right: 5.0),
+                                              padding: const EdgeInsets.only(
+                                                  right: 5.0),
                                               child: PopupMenu(),
                                             )),
                                       ],
@@ -319,7 +321,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
   bool _loadPlay;
 
   Future<void> _getPlaylist() async {
-    await context.read<AudioPlayerNotifier>().loadPlaylist();
+    await context.read<AudioPlayerNotifier>().initPlaylist();
     if (mounted) {
       setState(() {
         _loadPlay = true;
@@ -336,7 +338,6 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
 
   @override
   Widget build(BuildContext context) {
-    final audio = context.watch<AudioPlayerNotifier>();
     final s = context.s;
     return Material(
       color: Colors.transparent,
@@ -365,7 +366,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                     ? SizedBox(
                         height: 8.0,
                       )
-                    : data.item1 || data.item2.playlist.length == 0
+                    : data.item1 || data.item2.episodes.isEmpty
                         ? SizedBox(
                             height: 8.0,
                           )
@@ -374,7 +375,9 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                 topLeft: Radius.circular(10.0),
                                 topRight: Radius.circular(10.0)),
                             onTap: () {
-                              audio.playlistLoad();
+                              context
+                                  .read<AudioPlayerNotifier>()
+                                  .playFromLastPosition();
                               Navigator.pop<int>(context);
                             },
                             child: Column(
@@ -388,7 +391,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                     CircleAvatar(
                                         radius: 20,
                                         backgroundImage: data
-                                            .item2.playlist.first.avatarImage),
+                                            .item2.episodes.first.avatarImage),
                                     Container(
                                       height: 40.0,
                                       width: 40.0,
@@ -416,7 +419,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                         // TextStyle(color: Colors.white)
                                       ),
                                       Text(
-                                        data.item2.playlist.first.title,
+                                        data.item2.episodes.first.title,
                                         maxLines: 2,
                                         textAlign: TextAlign.center,
                                         overflow: TextOverflow.fade,
@@ -476,9 +479,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PlaylistPage(
-                  initPage: InitPage.playlist,
-                ),
+                builder: (context) => PlaylistHome(),
               ),
             );
           } else if (value == 2) {

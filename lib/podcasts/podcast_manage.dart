@@ -195,15 +195,14 @@ class _PodcastManageState extends State<PodcastManage>
         ),
         body: WillPopScope(
           onWillPop: () async {
-            await Provider.of<GroupList>(context, listen: false)
-                .clearOrderChanged();
+            await context.read<GroupList>().clearOrderChanged();
             return true;
           },
           child: Consumer<GroupList>(
             builder: (_, groupList, __) {
-              var _isLoading = groupList.isLoading;
+              // var _isLoading = groupList.isLoading;
               var _groups = groupList.groups;
-              return _isLoading
+              return _groups.isEmpty
                   ? Center()
                   : Stack(
                       children: <Widget>[

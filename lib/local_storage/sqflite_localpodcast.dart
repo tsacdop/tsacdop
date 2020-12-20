@@ -109,7 +109,7 @@ class DBHelper {
             list.first['imagePath'],
             list.first['provider'],
             list.first['link'],
-            upateCount: list.first['update_count'],
+            updateCount: list.first['update_count'],
             episodeCount: list.first['episode_count']));
       }
     }
@@ -166,7 +166,7 @@ class DBHelper {
           list.first['imagePath'],
           list.first['provider'],
           list.first['link'],
-          upateCount: list.first['update_count'],
+          updateCount: list.first['update_count'],
           episodeCount: list.first['episode_count']);
     }
     return null;
@@ -1376,7 +1376,7 @@ class DBHelper {
       await txn.rawUpdate(
           "UPDATE Episodes SET is_new = 0 WHERE enclosure_url = ?", [url]);
     });
-    developer.log('remove new episode $url');
+    developer.log('remove episode mark $url');
   }
 
   Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy,

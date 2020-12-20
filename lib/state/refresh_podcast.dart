@@ -48,6 +48,7 @@ class RefreshWorker extends ChangeNotifier {
         _currentRefreshItem = RefreshItem('', RefreshState.none);
         _complete = true;
         notifyListeners();
+        _complete = false;
         refreshIsolate?.kill();
         refreshIsolate = null;
         _created = false;

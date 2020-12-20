@@ -1220,3 +1220,19 @@ class CustomBackButton extends StatelessWidget {
     );
   }
 }
+
+// Episode tag widget.
+Widget episodeTag(String text, Color color) {
+  if (text == '') {
+    return Center();
+  }
+  return Container(
+    decoration:
+        BoxDecoration(color: color, borderRadius: BorderRadius.circular(15.0)),
+    height: 25.0,
+    margin: EdgeInsets.only(right: 10.0),
+    padding: EdgeInsets.symmetric(horizontal: 8.0),
+    alignment: Alignment.center,
+    child: Text(text, style: TextStyle(fontSize: 14.0, color: Colors.black)),
+  );
+}

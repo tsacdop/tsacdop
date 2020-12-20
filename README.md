@@ -76,7 +76,8 @@ If you want to build the app, you need to create a new file named `.env.dart` in
 You can get your own API key on [ListenNotes](https://www.listennotes.com/api/), remember that you need to get pro plan API, because basic plan dosen't provide rss link for serach result. If no api key is added, the search function in the app won't work. But you can still add podcasts by using an RSS link or importing an OMPL file.
 
 ``` dart
-final environment = {"apiKey":"APIKEY"};
+final environment = {"apiKey":"APIKEY", "podcastIndexApiKey": "PODCASTINDEXAPIKEY",
+  "podcastIndexApiSecret": "PODCASTINDEXAPISECRET"};
 ```
 
 4. Run the app with Android Studio or Visual Studio. Or the command line.
@@ -112,21 +113,21 @@ If you have an issue or found a bug, please raise a GitHub issue. Pull requests 
 ``` 
 UI
 src
-├──home
+└──home
    ├──home.dart [Homepage]
    ├──searc_podcast.dart [Search Page]
    └──playlist.dart [Playlist Page]
-├──podcasts
+└──podcasts
    ├──podcast_manage.dart [Group Page]
    └──podcast_detail.dart [Podcast Page]
-├──episodes
+└──episodes
    └──episode_detail.dart [Episode Page]
-├──settings
+└──settings
    └──setting.dart [Setting Page]
 
 STATE
 src
-├──state
+└──state
    ├──audio_state.dart [Audio State]
    ├──download_state.dart [Episode Download]
    ├──podcast_group.dart [Podcast Groups]
@@ -135,8 +136,9 @@ src
 
 Service
 src
-├──service
+└──service
    ├──api_service.dart [Podcast Search]
+   ├──gpodder_api.dart [Gpodder intergate]
    └──ompl_builde.dart [OMPL export]
 ```
 

@@ -413,12 +413,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       child: Column(
         children: <Widget>[
           Expanded(
-            child:
-                Selector<AudioPlayerNotifier, Tuple2<List<EpisodeBrief>, bool>>(
-              selector: (_, audio) =>
-                  Tuple2(audio.queue.playlist, audio.queueUpdate),
+            child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
+              selector: (_, audio) => audio.playlist.episodes,
               builder: (_, data, __) {
-                var episodesToPlay = data.item1.sublist(1);
+                var episodesToPlay = data.sublist(1);
                 return AnimatedList(
                   key: miniPlaylistKey,
                   shrinkWrap: true,
@@ -436,7 +434,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   onTap: () {
-                                    audio.episodeLoad(data.item1[index]);
+                                    audio.episodeLoad(data[index]);
                                     miniPlaylistKey.currentState.removeItem(
                                         index,
                                         (context, animation) => Center());
@@ -506,8 +504,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                         duration: Duration(milliseconds: 100));
                                     await Future.delayed(
                                         Duration(milliseconds: 100));
-                                    await audio
-                                        .moveToTop(data.item1[index + 1]);
+                                    await audio.moveToTop(data[index + 1]);
                                   },
                                   child: SizedBox(
                                     height: 30.0,

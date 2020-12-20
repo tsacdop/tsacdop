@@ -19,20 +19,19 @@ class PodcastLocal extends Equatable {
 
   final String description;
 
-  int _upateCount;
-  int get updateCount => _upateCount;
-  set updateCount(i) => _upateCount = i;
+  final int updateCount;
+  final int episodeCount;
 
-  int _episodeCount;
-  int get episodeCount => _episodeCount;
-  set episodeCount(i) => _episodeCount = i;
+  //set setUpdateCount(i) => updateCount = i;
+
+  //set setEpisodeCount(i) => episodeCount = i;
 
   PodcastLocal(this.title, this.imageUrl, this.rssUrl, this.primaryColor,
       this.author, this.id, this.imagePath, this.provider, this.link,
-      {this.description = '', int upateCount, int episodeCount})
+      {this.description = '', int updateCount, int episodeCount})
       : assert(rssUrl != null),
-        _episodeCount = episodeCount ?? 0,
-        _upateCount = upateCount ?? 0;
+        episodeCount = episodeCount ?? 0,
+        updateCount = updateCount ?? 0;
 
   ImageProvider get avatarImage {
     return File(imagePath).existsSync()
@@ -44,6 +43,14 @@ class PodcastLocal extends Equatable {
     return context.brightness == Brightness.light
         ? primaryColor.colorizedark()
         : primaryColor.colorizeLight();
+  }
+
+  PodcastLocal copyWith({int updateCount, int episodeCount}) {
+    return PodcastLocal(title, imageUrl, rssUrl, primaryColor, author, id,
+        imagePath, provider, link,
+        description: description,
+        updateCount: updateCount ?? 0,
+        episodeCount: episodeCount ?? 0);
   }
 
   @override

@@ -1,6 +1,6 @@
+import 'package:equatable/equatable.dart';
 import 'package:uuid/uuid.dart';
 
-import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import 'episodebrief.dart';
 
@@ -21,7 +21,7 @@ class PlaylistEntity {
   }
 }
 
-class Playlist {
+class Playlist extends Equatable {
   /// Playlist name. the default playlist is named "Playlist".
   final String name;
 
@@ -31,12 +31,19 @@ class Playlist {
   /// Episode url list for playlist.
   final List<String> episodeList;
 
-  Playlist(this.name, {String id, List<String> episodeList})
+  /// Eposides in playlist.
+  final List<EpisodeBrief> episodes;
+
+  bool get isEmpty => episodeList.isEmpty;
+
+  Playlist(this.name,
+      {String id, List<String> episodeList, List<EpisodeBrief> episodes})
       : id = id ?? Uuid().v4(),
-        episodeList = episodeList ?? [];
+        episodeList = episodeList ?? [],
+        episodes = episodes ?? [];
 
   PlaylistEntity toEntity() {
-    return PlaylistEntity(name, id, episodeList);
+    return PlaylistEntity(name, id, episodeList.toSet().toList());
   }
 
   static Playlist fromEntity(PlaylistEntity entity) {
@@ -48,58 +55,70 @@ class Playlist {
   }
 
   final DBHelper _dbHelper = DBHelper();
-  List<EpisodeBrief> _playlist = [];
-  List<EpisodeBrief> get playlist => _playlist;
-  final KeyValueStorage _playlistStorage = KeyValueStorage(playlistKey);
+//  final KeyValueStorage _playlistStorage = KeyValueStorage(playlistKey);
 
   Future<void> getPlaylist() async {
-    var urls = await _playlistStorage.getStringList();
-    episodeList.addAll(urls);
-    if (urls.length == 0) {
-      _playlist = [];
-    } else {
-      _playlist = [];
-      for (var url in urls) {
+    episodes.clear();
+    if (episodeList.isNotEmpty) {
+      for (var url in episodeList) {
+        print(url);
         var episode = await _dbHelper.getRssItemWithUrl(url);
-        if (episode != null) _playlist.add(episode);
+        if (episode != null) episodes.add(episode);
       }
     }
   }
 
-  Future<void> savePlaylist() async {
-    var urls = <String>[];
-    urls.addAll(_playlist.map((e) => e.enclosureUrl));
-    await _playlistStorage.saveStringList(urls.toSet().toList());
-  }
+// Future<void> savePlaylist() async {
+//    var urls = <String>[];
+//    urls.addAll(_playlist.map((e) => e.enclosureUrl));
+//    await _playlistStorage.saveStringList(urls.toSet().toList());
+//  }
 
-  Future<void> addToPlayList(EpisodeBrief episodeBrief) async {
-    if (!_playlist.contains(episodeBrief)) {
-      _playlist.add(episodeBrief);
-      await savePlaylist();
-      if (episodeBrief.isNew == 1) {
-        await _dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
-      }
+  void addToPlayList(EpisodeBrief episodeBrief) {
+    if (!episodes.contains(episodeBrief)) {
+      episodes.add(episodeBrief);
+      episodeList.add(episodeBrief.enclosureUrl);
     }
   }
 
-  Future<void> addToPlayListAt(EpisodeBrief episodeBrief, int index,
-      {bool existed = true}) async {
+  void addToPlayListAt(EpisodeBrief episodeBrief, int index,
+      {bool existed = true}) {
     if (existed) {
-      _playlist.removeWhere(
-          (episode) => episode.enclosureUrl == episodeBrief.enclosureUrl);
-      if (episodeBrief.isNew == 1) {
-        await _dbHelper.removeEpisodeNewMark(episodeBrief.enclosureUrl);
-      }
+      episodes.removeWhere((episode) => episode == episodeBrief);
+      episodeList.removeWhere((url) => url == episodeBrief.enclosureUrl);
     }
-    _playlist.insert(index, episodeBrief);
-    await savePlaylist();
+    episodes.insert(index, episodeBrief);
+    episodeList.insert(index, episodeBrief.enclosureUrl);
   }
 
-  Future<int> delFromPlaylist(EpisodeBrief episodeBrief) async {
-    var index = _playlist.indexOf(episodeBrief);
-    _playlist.removeWhere(
+  void updateEpisode(EpisodeBrief episode) {
+    var index = episodes.indexOf(episode);
+    if (index != -1) episodes[index] = episode;
+  }
+
+  int delFromPlaylist(EpisodeBrief episodeBrief) {
+    var index = episodes.indexOf(episodeBrief);
+    episodes.removeWhere(
         (episode) => episode.enclosureUrl == episodeBrief.enclosureUrl);
-    await savePlaylist();
+    episodeList.removeWhere((url) => url == episodeBrief.enclosureUrl);
     return index;
   }
+
+  void reorderPlaylist(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    final episode = episodes.removeAt(oldIndex);
+    episodes.insert(newIndex, episode);
+    episodeList.removeAt(oldIndex);
+    episodeList.insert(newIndex, episode.enclosureUrl);
+  }
+
+  void clear() {
+    episodeList.clear();
+    episodes.clear();
+  }
+
+  @override
+  List<Object> get props => [id, name];
 }

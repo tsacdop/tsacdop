@@ -59,6 +59,7 @@ const String markListenedAfterSkipKey = 'markListenedAfterSkipKey';
 const String downloadPositionKey = 'downloadPositionKey';
 const String deleteAfterPlayedKey = 'removeAfterPlayedKey';
 const String playlistsAllKey = 'playlistsAllKey';
+const String playerStateKey = 'playerStateKey';
 
 class KeyValueStorage {
   final String key;
@@ -92,13 +93,14 @@ class KeyValueStorage {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getString(key) == null) {
       var episodeList = prefs.getStringList(playlistKey);
-      var playlist = Playlist('Playlist', episodeList: episodeList);
+      var playlist = Playlist('Queue', episodeList: episodeList);
       await prefs.setString(
           key,
           json.encode({
             'playlists': [playlist.toEntity().toJson()]
           }));
     }
+    print(prefs.getString(key));
     return json
         .decode(prefs.getString(key))['playlists']
         .cast<Map<String, Object>>()
@@ -113,6 +115,21 @@ class KeyValueStorage {
         json.encode({
           'playlists': playlists.map((playlist) => playlist.toJson()).toList()
         }));
+  }
+
+  Future<bool> savePlayerState(
+      String playlist, String episode, int position) async {
+    var prefs = await SharedPreferences.getInstance();
+    return prefs.setStringList(key, [playlist, episode, position.toString()]);
+  }
+
+  Future<List<String>> getPlayerState() async {
+    var prefs = await SharedPreferences.getInstance();
+    if (prefs.getStringList(key) == null) {
+      final position = prefs.getInt(audioPositionKey) ?? 0;
+      await savePlayerState('', '', position);
+    }
+    return prefs.getStringList(key);
   }
 
   Future<bool> saveInt(int setting) async {
@@ -212,7 +229,7 @@ class KeyValueStorage {
     return prefs.setDouble(key, data);
   }
 
-  Future<double> getDoubel({double defaultValue = 0.0}) async {
+  Future<double> getDouble({double defaultValue = 0.0}) async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getDouble(key) == null) {
       await prefs.setDouble(key, defaultValue);

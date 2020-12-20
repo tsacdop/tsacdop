@@ -549,7 +549,7 @@ class EpisodeGrid extends StatelessWidget {
                 Tuple3<EpisodeBrief, List<String>, bool>>(
               selector: (_, audio) => Tuple3(
                   audio?.episode,
-                  audio.queue.playlist.map((e) => e.enclosureUrl).toList(),
+                  audio.queue.episodes.map((e) => e.enclosureUrl).toList(),
                   audio.episodeState),
               builder: (_, data, __) => OpenContainerWrapper(
                 avatarSize: layout == Layout.one

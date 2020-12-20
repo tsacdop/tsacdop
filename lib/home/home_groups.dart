@@ -85,14 +85,12 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final s = context.s;
-    return Selector<GroupList, Tuple3<List<PodcastGroup>, bool, bool>>(
-      selector: (_, groupList) =>
-          Tuple3(groupList.groups, groupList.created, groupList.isLoading),
+    return Selector<GroupList, Tuple2<List<PodcastGroup>, bool>>(
+      selector: (_, groupList) => Tuple2(groupList.groups, groupList.created),
       builder: (_, data, __) {
         var groups = data.item1;
         var import = data.item2;
-        var isLoading = data.item3;
-        return isLoading
+        return groups.isEmpty
             ? Container(
                 height: (width - 20) / 3 + 140,
               )
@@ -246,7 +244,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                     ),
                   )
                 : DefaultTabController(
-                    length: groups[_groupIndex].podcastList.length,
+                    length: groups[_groupIndex].podcasts.length,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -696,7 +694,7 @@ class ShowEpisode extends StatelessWidget {
                         Tuple2<EpisodeBrief, List<String>>>(
                     selector: (_, audio) => Tuple2(
                           audio?.episode,
-                          audio.queue.playlist
+                          audio.queue.episodes
                               .map((e) => e.enclosureUrl)
                               .toList(),
                         ),

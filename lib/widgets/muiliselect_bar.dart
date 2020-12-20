@@ -1,5 +1,6 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
+import '../type/playlist.dart';
 import '../util/extension_helper.dart';
 import 'custom_widget.dart';
 import 'general_dialog.dart';
@@ -44,6 +46,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
   bool _marked;
   bool _inPlaylist;
   bool _downloaded;
+  bool _showPlaylists;
   final _dbHelper = DBHelper();
 
   @override
@@ -53,6 +56,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
     _marked = false;
     _downloaded = false;
     _inPlaylist = false;
+    _showPlaylists = false;
   }
 
   @override
@@ -63,6 +67,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
         _marked = false;
         _downloaded = false;
         _inPlaylist = false;
+        _showPlaylists = false;
       });
       super.didUpdateWidget(oldWidget);
     }
@@ -179,6 +184,11 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
     }
   }
 
+  Future<EpisodeBrief> _getEpisode(String url) async {
+    var dbHelper = DBHelper();
+    return await dbHelper.getRssItemWithUrl(url);
+  }
+
   Widget _buttonOnMenu({Widget child, VoidCallback onTap}) => Material(
         color: Colors.transparent,
         child: InkWell(
@@ -190,6 +200,106 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
           ),
         ),
       );
+
+  Widget _playlistList() => SizedBox(
+      height: 50,
+      child: Selector<AudioPlayerNotifier, List<Playlist>>(
+        selector: (_, audio) => audio.playlists,
+        builder: (_, data, child) {
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  for (var p in data)
+                    if (p.name == 'Queue')
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() => _showPlaylists = false);
+                            showGeneralDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                barrierLabel: MaterialLocalizations.of(context)
+                                    .modalBarrierDismissLabel,
+                                barrierColor: Colors.black54,
+                                transitionDuration:
+                                    const Duration(milliseconds: 200),
+                                pageBuilder:
+                                    (context, animaiton, secondaryAnimation) =>
+                                        _NewPlaylist(widget.selectedList));
+                          },
+                          child: Container(
+                            height: 30,
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 30,
+                                  width: 30,
+                                  color: context.primaryColorDark,
+                                  child: Center(child: Icon(Icons.add)),
+                                ),
+                                SizedBox(width: 10),
+                                Text('New')
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: InkWell(
+                          onTap: () {
+                            context
+                                .read<AudioPlayerNotifier>()
+                                .addEpisodesToPlaylist(p,
+                                    episodes: widget.selectedList);
+                            setState(() {
+                              _showPlaylists = false;
+                            });
+                          },
+                          child: Container(
+                            height: 30,
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 30,
+                                  width: 30,
+                                  color: context.primaryColorDark,
+                                  child: p.episodeList.isEmpty
+                                      ? Center()
+                                      : FutureBuilder<EpisodeBrief>(
+                                          future:
+                                              _getEpisode(p.episodeList.first),
+                                          builder: (_, snapshot) {
+                                            if (snapshot.data != null) {
+                                              return SizedBox(
+                                                  height: 30,
+                                                  width: 30,
+                                                  child: Image(
+                                                      image: snapshot
+                                                          .data.avatarImage));
+                                            }
+                                            return Center();
+                                          }),
+                                ),
+                                SizedBox(width: 10),
+                                Text(p.name),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                ],
+              ),
+            ),
+          );
+        },
+      ));
   OverlayEntry _createOverlayEntry() {
     RenderBox renderBox = context.findRenderObject();
     var offset = renderBox.localToGlobal(Offset.zero);
@@ -214,7 +324,13 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
       tween: Tween<double>(begin: 0, end: 1),
       duration: Duration(milliseconds: 500),
       builder: (context, value, child) => Container(
-        height: widget.selectAll == null ? 40 : 90.0 * value,
+        height: widget.selectAll == null
+            ? _showPlaylists
+                ? 90
+                : 40
+            : _showPlaylists
+                ? 140
+                : 90.0 * value,
         decoration: BoxDecoration(color: context.primaryColor),
         child: SingleChildScrollView(
           child: Column(
@@ -296,6 +412,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                     )
                   ],
                 ),
+              if (_showPlaylists) _playlistList(),
               Row(
                 children: [
                   if (!widget.hideFavorite)
@@ -421,6 +538,18 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                           }
                         }
                       }),
+                  _buttonOnMenu(
+                      child: Icon(
+                        Icons.add_box_outlined,
+                        color: Colors.grey[700],
+                      ),
+                      onTap: () {
+                        if (widget.selectedList.isNotEmpty) {
+                          setState(() {
+                            _showPlaylists = !_showPlaylists;
+                          });
+                        }
+                      }),
                   Spacer(),
                   if (widget.selectAll == null)
                     SizedBox(
@@ -441,6 +570,107 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NewPlaylist extends StatefulWidget {
+  final List<EpisodeBrief> episodes;
+  _NewPlaylist(this.episodes, {Key key}) : super(key: key);
+
+  @override
+  __NewPlaylistState createState() => __NewPlaylistState();
+}
+
+class __NewPlaylistState extends State<_NewPlaylist> {
+  String _playlistName;
+  int _error;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.s;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor:
+            Theme.of(context).brightness == Brightness.light
+                ? Color.fromRGBO(113, 113, 113, 1)
+                : Color.fromRGBO(5, 5, 5, 1),
+      ),
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 1,
+        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+        titlePadding: EdgeInsets.all(20),
+        actionsPadding: EdgeInsets.zero,
+        actions: <Widget>[
+          FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              s.cancel,
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          ),
+          FlatButton(
+            splashColor: context.accentColor.withAlpha(70),
+            onPressed: () async {
+              if (context
+                  .read<AudioPlayerNotifier>()
+                  .playlistExisted(_playlistName)) {
+                setState(() => _error = 1);
+              } else {
+                final episodesList =
+                    widget.episodes.map((e) => e.enclosureUrl).toList();
+                final playlist = Playlist(_playlistName,
+                    episodeList: episodesList, episodes: widget.episodes);
+                context.read<AudioPlayerNotifier>().addPlaylist(playlist);
+                Navigator.of(context).pop();
+              }
+            },
+            child:
+                Text(s.confirm, style: TextStyle(color: context.accentColor)),
+          )
+        ],
+        title:
+            SizedBox(width: context.width - 160, child: Text('New playlist')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                hintText: 'New playlist',
+                hintStyle: TextStyle(fontSize: 18),
+                filled: true,
+                focusedBorder: UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: context.accentColor, width: 2.0),
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: context.accentColor, width: 2.0),
+                ),
+              ),
+              cursorRadius: Radius.circular(2),
+              autofocus: true,
+              maxLines: 1,
+              onChanged: (value) {
+                _playlistName = value;
+              },
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              child: (_error == 1)
+                  ? Text(
+                      'Playlist existed',
+                      style: TextStyle(color: Colors.red[400]),
+                    )
+                  : Center(),
+            ),
+          ],
         ),
       ),
     );
