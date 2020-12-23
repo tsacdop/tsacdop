@@ -269,6 +269,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await _getAutoPlay();
 
     var state = await _playerStateStorage.getPlayerState();
+    print(state.toString());
     if (state[0] != '') {
       _playlist = _playlists.firstWhere((p) => p.id == state[0],
           orElse: () => _playlists.first);
@@ -306,7 +307,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   Future<void> playlistLoad(Playlist playlist) async {
     var p = playlist;
-    if(playlist.name != 'Queue') {
+    if (playlist.name != 'Queue') {
       await updatePlaylist(p, updateEpisodes: true);
     }
     _playlist = p;
@@ -337,6 +338,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
       final history = PlayHistory(_episode.title, _episode.enclosureUrl,
           backgroundAudioPosition ~/ 1000, seekSliderValue);
       await _dbHelper.saveHistory(history);
+      if (_playlist.name != 'Queue') {
+        AudioService.customAction('setIsQueue', true);
+        AudioService.customAction('changeQueue', [
+          for (var e in _queue.episodes) jsonEncode(e.toMediaItem().toJson())
+        ]);
+      }
       await AudioService.addQueueItemAt(episodeNew.toMediaItem(), 0);
       if (startPosition > 0) {
         await AudioService.seekTo(Duration(milliseconds: startPosition));
@@ -358,6 +365,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _playerRunning = true;
       notifyListeners();
       _startAudioService(_queue, position: startPosition);
+    }
+  }
+
+  Future<void> loadEpisodeFromPlaylist(EpisodeBrief episode) async {
+    if (_playlist.episodes.contains(episode)) {
+      var index = _playlist.episodes.indexOf(episode);
+      await AudioService.customAction('changeIndex', index);
     }
   }
 
@@ -516,7 +530,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
               _lastPostion ~/ 1000, _seekSliderValue);
           await _dbHelper.saveHistory(history);
         }
-        _episode = null;
+        //_episode = null;
       }
     });
 
@@ -1019,7 +1033,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _skipState = AudioProcessingState.skippingToNext;
     _playing = false;
     await _audioPlayer.stop();
-    AudioServiceBackground.sendCustomEvent(_queue.first.title);
+    AudioServiceBackground.sendCustomEvent(mediaItem.title);
     if (_isQueue) {
       if (_queue.length > 0) {
         _queue.removeAt(0);
@@ -1225,16 +1239,32 @@ class AudioPlayerTask extends BackgroundAudioTask {
         break;
       case 'changeQueue':
         await _changeQueue(argument);
+        break;
+      case 'changeIndex':
+        await _changeIndex(argument);
+        break;
     }
   }
 
   Future _changeQueue(List<dynamic> items) async {
     var queue = [for (var i in items) MediaItem.fromJson(json.decode(i))];
     await _audioPlayer.stop();
+    AudioServiceBackground.sendCustomEvent(mediaItem.title);
     _queue.clear();
     _queue.addAll(queue);
     _index = 0;
     await AudioServiceBackground.setQueue(_queue);
+    await AudioServiceBackground.setMediaItem(mediaItem);
+    await _audioPlayer.setUrl(mediaItem.id, cacheMax: _cacheMax);
+    var duration = await _audioPlayer.durationFuture ?? Duration.zero;
+    AudioServiceBackground.setMediaItem(mediaItem.copyWith(duration: duration));
+    _playFromStart();
+  }
+
+  Future _changeIndex(int index) async {
+    await _audioPlayer.stop();
+    AudioServiceBackground.sendCustomEvent(mediaItem.title);
+    _index = index;
     await AudioServiceBackground.setMediaItem(mediaItem);
     await _audioPlayer.setUrl(mediaItem.id, cacheMax: _cacheMax);
     var duration = await _audioPlayer.durationFuture ?? Duration.zero;

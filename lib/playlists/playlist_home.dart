@@ -56,6 +56,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         systemNavigationBarIconBrightness:
@@ -66,6 +67,12 @@ class _PlaylistHomeState extends State<PlaylistHome> {
       child: Scaffold(
           appBar: AppBar(
             leading: CustomBackButton(),
+            title: Selector<AudioPlayerNotifier, EpisodeBrief>(
+              selector: (_, audio) => audio.episode,
+              builder: (_, data, __) {
+                return Text(data?.title ?? '', maxLines: 1);
+              },
+            ),
             backgroundColor: context.scaffoldBackgroundColor,
           ),
           body: Column(
@@ -126,23 +133,58 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                     })
                               ],
                             ),
-                            data.item4 != null
-                                ? Padding(
+                            if (data.item2)
+                              Selector<AudioPlayerNotifier,
+                                  Tuple3<bool, double, String>>(
+                                selector: (_, audio) => Tuple3(
+                                    audio.buffering,
+                                    (audio.backgroundAudioDuration -
+                                            audio.backgroundAudioPosition) /
+                                        1000,
+                                    audio.remoteErrorMessage),
+                                builder: (_, data, __) {
+                                  return Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0),
-                                    child: Text(data.item4.title, maxLines: 1),
-                                  )
-                                : Center(),
+                                        horizontal: 10),
+                                    child: data.item3 != null
+                                        ? Text(data.item3,
+                                            style: const TextStyle(
+                                                color: Color(0xFFFF0000)))
+                                        : data.item1
+                                            ? Text(
+                                                s.buffering,
+                                                style: TextStyle(
+                                                    color: context.accentColor),
+                                              )
+                                            : Text(
+                                                s.timeLeft((data.item2)
+                                                        .toInt()
+                                                        .toTime ??
+                                                    ''),
+                                                maxLines: 2,
+                                              ),
+                                  );
+                                },
+                              )
                           ],
                         )),
                         data.item3 != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: SizedBox(
-                                    width: 80,
-                                    height: 80,
-                                    child:
-                                        Image(image: data.item4.avatarImage)),
+                                child: InkWell(
+                                  onTap: () {
+                                    if (running) {
+                                      context
+                                          .read<AudioPlayerNotifier>()
+                                          .playNext();
+                                    }
+                                  },
+                                  child: SizedBox(
+                                      width: 80,
+                                      height: 80,
+                                      child:
+                                          Image(image: data.item4.avatarImage)),
+                                ),
                               )
                             : Container(
                                 decoration: BoxDecoration(
@@ -214,11 +256,13 @@ class __QueueState extends State<_Queue> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    return Selector<AudioPlayerNotifier, Tuple2<Playlist, bool>>(
-        selector: (_, audio) => Tuple2(audio.playlist, audio.playerRunning),
+    return Selector<AudioPlayerNotifier, Tuple3<Playlist, bool, EpisodeBrief>>(
+        selector: (_, audio) =>
+            Tuple3(audio.playlist, audio.playerRunning, audio.episode),
         builder: (_, data, __) {
           var episodes = data.item1.episodes.toSet().toList();
           var queue = data.item1;
+          var running = data.item2;
           return queue.name == 'Queue'
               ? ReorderableListView(
                   onReorder: (oldIndex, newIndex) {
@@ -258,6 +302,8 @@ class __QueueState extends State<_Queue> {
                   itemBuilder: (context, index) {
                     final episode = queue.episodes[index];
                     final c = episode.backgroudColor(context);
+                    final isPlaying =
+                        data.item3 != null && data.item3 == episode;
                     return SizedBox(
                       height: 90.0,
                       child: Column(
@@ -265,11 +311,15 @@ class __QueueState extends State<_Queue> {
                         children: <Widget>[
                           Expanded(
                             child: ListTile(
+                              tileColor:
+                                  isPlaying ? context.primaryColorDark : null,
                               contentPadding: EdgeInsets.symmetric(vertical: 8),
                               onTap: () async {
-                                await context
-                                    .read<AudioPlayerNotifier>()
-                                    .episodeLoad(episode);
+                                if (!isPlaying) {
+                                  await context
+                                      .read<AudioPlayerNotifier>()
+                                      .loadEpisodeFromPlaylist(episode);
+                                }
                               },
                               title: Container(
                                 padding: EdgeInsets.fromLTRB(0, 5.0, 20.0, 5.0),
@@ -284,7 +334,8 @@ class __QueueState extends State<_Queue> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.unfold_more, color: c),
+                                  // Icon(Icons.unfold_more, color: c),
+                                  SizedBox(width: 24),
                                   CircleAvatar(
                                       backgroundColor: c.withOpacity(0.5),
                                       backgroundImage: episode.avatarImage),
@@ -323,7 +374,18 @@ class __QueueState extends State<_Queue> {
                                   ],
                                 ),
                               ),
-                              //trailing: Icon(Icons.menu),
+                              trailing: isPlaying && running
+                                  ? Container(
+                                      height: 20,
+                                      width: 20,
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: WaveLoader(
+                                          color: context.accentColor))
+                                  : SizedBox(width: 1),
                             ),
                           ),
                           Divider(
@@ -688,7 +750,14 @@ class __PlaylistsState extends State<_Playlists> {
                                   style: context.textTheme.headline6,
                                 ),
                                 Text('${queue.episodes.length} episodes'),
-                                OutlinedButton(
+                                TextButton(
+                                    style: OutlinedButton.styleFrom(
+                                        side: BorderSide(
+                                            color: context.primaryColorDark),
+                                        primary: context.accentColor,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(100)))),
                                     onPressed: () {
                                       context
                                           .read<AudioPlayerNotifier>()
@@ -738,11 +807,11 @@ class __PlaylistsState extends State<_Playlists> {
                       ),
                       title: Text(data[index].name),
                       subtitle: Text(episodeList.isNotEmpty
-                          ? s.episode(data[index].episodeList.length)
+                          ? '${data[index].episodeList.length} episodes'
                           : '0 episode'),
                       trailing: IconButton(
                         splashRadius: 20,
-                        icon: Icon(Icons.play_arrow),
+                        icon: Icon(LineIcons.play_circle_solid, size: 30),
                         onPressed: () {
                           context
                               .read<AudioPlayerNotifier>()

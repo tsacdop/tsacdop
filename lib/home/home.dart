@@ -359,14 +359,15 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                     topLeft: Radius.circular(10.0),
                     topRight: Radius.circular(10.0)),
               ),
-              child: Selector<AudioPlayerNotifier, Tuple3<bool, Playlist, int>>(
-                selector: (_, audio) =>
-                    Tuple3(audio.playerRunning, audio.queue, audio.lastPositin),
+              child: Selector<AudioPlayerNotifier,
+                  Tuple3<bool, EpisodeBrief, int>>(
+                selector: (_, audio) => Tuple3(
+                    audio.playerRunning, audio.episode, audio.lastPositin),
                 builder: (_, data, __) => !_loadPlay
                     ? SizedBox(
                         height: 8.0,
                       )
-                    : data.item1 || data.item2.episodes.isEmpty
+                    : data.item1 || data.item2 == null
                         ? SizedBox(
                             height: 8.0,
                           )
@@ -390,8 +391,8 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                   children: <Widget>[
                                     CircleAvatar(
                                         radius: 20,
-                                        backgroundImage: data
-                                            .item2.episodes.first.avatarImage),
+                                        backgroundImage:
+                                            data.item2.avatarImage),
                                     Container(
                                       height: 40.0,
                                       width: 40.0,
@@ -419,7 +420,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                         // TextStyle(color: Colors.white)
                                       ),
                                       Text(
-                                        data.item2.episodes.first.title,
+                                        data.item2.title,
                                         maxLines: 2,
                                         textAlign: TextAlign.center,
                                         overflow: TextOverflow.fade,
