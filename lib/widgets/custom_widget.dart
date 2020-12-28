@@ -409,6 +409,50 @@ class AddToPlaylistPainter extends CustomPainter {
   }
 }
 
+/// Remove new flag icon.
+class RemoveNewFlagPainter extends CustomPainter {
+  final Color color;
+  final Color textColor;
+  RemoveNewFlagPainter(this.color, this.textColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var _paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    var _path = Path();
+
+    _path.moveTo(size.width * 3 / 5, size.height / 5);
+    _path.lineTo(size.width * 4 / 5, size.height * 2 / 5);
+    _path.lineTo(size.width * 2 / 5, size.height * 4 / 5);
+    _path.lineTo(size.width / 5, size.height * 3 / 5);
+    _path.lineTo(size.width * 3 / 5, size.height / 5);
+    _path.moveTo(size.width * 2 / 5, size.height * 2 / 5);
+    _path.lineTo(size.width * 3 / 5, size.height * 3 / 5);
+
+    var textPainter = TextPainter(
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+        text: TextSpan(
+          text: 'N',
+          style: TextStyle(
+              fontStyle: FontStyle.italic, color: textColor, fontSize: 10),
+        ))
+      ..layout();
+    textPainter.paint(canvas, Offset(size.width * 4 / 7, size.height * 3 / 5));
+    canvas.drawPath(_path, _paint);
+  }
+
+  @override
+  bool shouldRepaint(RemoveNewFlagPainter oldDelegate) => false;
+
+  @override
+  bool shouldRebuildSemantics(RemoveNewFlagPainter oldDelegate) => false;
+}
+
 //Wave play indicator
 class WavePainter extends CustomPainter {
   final double _fraction;
