@@ -108,9 +108,9 @@ class _PopupMenuState extends State<PopupMenu> {
               child: Container(
                 padding: EdgeInsets.only(left: 10),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Icon(LineIcons.cloud_download_alt_solid),
+                    Icon(LineIcons.redo_alt_solid, size: 20),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
                     ),
