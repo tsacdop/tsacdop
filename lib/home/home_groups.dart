@@ -81,6 +81,26 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
             BoxDecoration(shape: BoxShape.circle, color: context.primaryColor),
       );
 
+  Widget _updateIndicator(PodcastLocal podcastLocal) => FutureBuilder<int>(
+      future: _getPodcastUpdateCounts(podcastLocal.id),
+      initialData: 0,
+      builder: (context, snapshot) {
+        return snapshot.data > 0
+            ? Align(
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 10,
+                  width: 10,
+                  decoration: BoxDecoration(
+                      color: Colors.red,
+                      border: Border.all(color: context.primaryColor, width: 2),
+                      shape: BoxShape.circle),
+                ),
+              )
+            : Center();
+      });
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -379,38 +399,12 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                           maxHeight: 50,
                                           maxWidth: 50,
                                           child: CircleAvatar(
-                                            backgroundColor:
-                                                color.withOpacity(0.5),
-                                            backgroundImage:
-                                                podcastLocal.avatarImage,
-                                            child: FutureBuilder<int>(
-                                                future: _getPodcastUpdateCounts(
-                                                    podcastLocal.id),
-                                                initialData: 0,
-                                                builder: (context, snapshot) {
-                                                  return snapshot.data > 0
-                                                      ? Align(
-                                                          alignment: Alignment
-                                                              .bottomRight,
-                                                          child: Container(
-                                                            alignment: Alignment
-                                                                .center,
-                                                            height: 10,
-                                                            width: 10,
-                                                            decoration: BoxDecoration(
-                                                                color:
-                                                                    Colors.red,
-                                                                border: Border.all(
-                                                                    color: context
-                                                                        .primaryColor,
-                                                                    width: 2),
-                                                                shape: BoxShape
-                                                                    .circle),
-                                                          ),
-                                                        )
-                                                      : Center();
-                                                }),
-                                          ),
+                                              backgroundColor:
+                                                  color.withOpacity(0.5),
+                                              backgroundImage:
+                                                  podcastLocal.avatarImage,
+                                              child: _updateIndicator(
+                                                  podcastLocal)),
                                         ),
                                       ),
                                     );
