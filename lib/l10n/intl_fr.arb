@@ -364,11 +364,11 @@
   "@playerHeightTall": {},
   "playing": "En cours",
   "@playing": {},
-  "playNext": "",
+  "playNext": "Play next",
   "@playNext": {
     "description": "Popup menu for episode."
   },
-  "playNextDes": "",
+  "playNextDes": "Add episode to top of the playlist",
   "@playNextDes": {
     "description": "Description for next play."
   },
@@ -406,9 +406,17 @@
   },
   "publishedYearly": "Annuel",
   "@publishedYearly": {},
+  "queue": "Queue",
+  "@queue": {
+    "description": "Queue"
+  },
   "recoverSubscribe": "Restaurer l'abonnement",
   "@recoverSubscribe": {
     "description": "User can recover subscribe podcast after remove it in subscribe history page."
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh"
   },
   "refreshArtwork": "Mettre à jour la vignette",
   "@refreshArtwork": {},
@@ -430,6 +438,10 @@
     "placeholders": {
       "date": {}
     }
+  },
+  "removeNewMark": "Remove new mark",
+  "@removeNewMark": {
+    "description": "Remove new mark for new episodes."
   },
   "removePodcastDes": "Êtes-vous sûr de vouloir vous désabonner ?",
   "@removePodcastDes": {},

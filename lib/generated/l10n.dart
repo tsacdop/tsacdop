@@ -1658,12 +1658,32 @@ class S {
     );
   }
 
+  /// `Queue`
+  String get queue {
+    return Intl.message(
+      'Queue',
+      name: 'queue',
+      desc: 'Queue',
+      args: [],
+    );
+  }
+
   /// `Recover subscribe`
   String get recoverSubscribe {
     return Intl.message(
       'Recover subscribe',
       name: 'recoverSubscribe',
       desc: 'User can recover subscribe podcast after remove it in subscribe history page.',
+      args: [],
+    );
+  }
+
+  /// `Refresh`
+  String get refresh {
+    return Intl.message(
+      'Refresh',
+      name: 'refresh',
+      desc: 'Refresh',
       args: [],
     );
   }
@@ -1715,6 +1735,16 @@ class S {
       name: 'removedAt',
       desc: 'For example ：Removed at 2020.10.10',
       args: [date],
+    );
+  }
+
+  /// `Remove new mark`
+  String get removeNewMark {
+    return Intl.message(
+      'Remove new mark',
+      name: 'removeNewMark',
+      desc: 'Remove new mark for new episodes.',
+      args: [],
     );
   }
 

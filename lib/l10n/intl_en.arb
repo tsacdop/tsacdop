@@ -406,9 +406,17 @@
   },
   "publishedYearly": "Published yearly",
   "@publishedYearly": {},
+  "queue": "Queue",
+  "@queue": {
+    "description": "Queue"
+  },
   "recoverSubscribe": "Recover subscribe",
   "@recoverSubscribe": {
     "description": "User can recover subscribe podcast after remove it in subscribe history page."
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh"
   },
   "refreshArtwork": "Update artwork",
   "@refreshArtwork": {},
@@ -430,6 +438,10 @@
     "placeholders": {
       "date": {}
     }
+  },
+  "removeNewMark": "Remove new mark",
+  "@removeNewMark": {
+    "description": "Remove new mark for new episodes."
   },
   "removePodcastDes": "Are you sure you want to unsubscribe?",
   "@removePodcastDes": {},

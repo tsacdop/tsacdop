@@ -406,9 +406,17 @@
   },
   "publishedYearly": "每年更新",
   "@publishedYearly": {},
+  "queue": "队列",
+  "@queue": {
+    "description": "Queue"
+  },
   "recoverSubscribe": "恢复订阅",
   "@recoverSubscribe": {
     "description": "User can recover subscribe podcast after remove it in subscribe history page."
+  },
+  "refresh": "刷新",
+  "@refresh": {
+    "description": "Refresh"
   },
   "refreshArtwork": "更新头像",
   "@refreshArtwork": {},
@@ -430,6 +438,10 @@
     "placeholders": {
       "date": {}
     }
+  },
+  "removeNewMark": "移除New标记",
+  "@removeNewMark": {
+    "description": "Remove new mark for new episodes."
   },
   "removePodcastDes": "您确认要取消订阅吗？",
   "@removePodcastDes": {},
