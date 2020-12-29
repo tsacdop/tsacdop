@@ -1361,7 +1361,7 @@ class DBHelper {
 
   Future<void> removeGroupNewMark(List<String> group) async {
     var dbClient = await database;
-    if (group.length > 0) {
+    if (group.isNotEmpty) {
       var s = group.map<String>((e) => "'$e'").toList();
       await dbClient.transaction((txn) async {
         await txn.rawUpdate(
