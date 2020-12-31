@@ -1119,6 +1119,45 @@ class DBHelper {
     return episodes;
   }
 
+  Future<List<EpisodeBrief>> getRandomRssItem(int random,
+      {bool hideListened = false}) async {
+    var dbClient = await database;
+    var episodes = <EpisodeBrief>[];
+    var list = <Map>[];
+    if (hideListened) {
+      list = await dbClient.rawQuery(
+          """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
+        E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
+        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
+        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
+        GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
+        OR SUM(H.listen_time) = 0 ORDER BY RANDOM() LIMIT ? """,
+          [random]);
+    } else {
+      list = await dbClient.rawQuery(
+          """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
+        E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
+        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+        ORDER BY RANDOM() LIMIT ? """, [random]);
+    }
+    if (list.isNotEmpty) {
+      for (var i in list) {
+        episodes.add(EpisodeBrief(
+            i['title'],
+            i['enclosure_url'],
+            i['enclosure_length'],
+            i['milliseconds'],
+            i['feed_title'],
+            i['primaryColor'],
+            i['duration'],
+            i['explicit'],
+            i['imagePath'],
+            i['is_new']));
+      }
+    }
+    return episodes;
+  }
+
   Future<List<EpisodeBrief>> getGroupRssItem(int top, List<String> group,
       {bool hideListened = false}) async {
     var dbClient = await database;
@@ -1361,7 +1400,7 @@ class DBHelper {
 
   Future<void> removeGroupNewMark(List<String> group) async {
     var dbClient = await database;
-    if (group.length > 0) {
+    if (group.isNotEmpty) {
       var s = group.map<String>((e) => "'$e'").toList();
       await dbClient.transaction((txn) async {
         await txn.rawUpdate(

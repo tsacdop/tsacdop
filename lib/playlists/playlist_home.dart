@@ -168,7 +168,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                               )
                           ],
                         )),
-                        data.item3 != null
+                        data.item4 != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: InkWell(
@@ -285,9 +285,10 @@ class __QueueState extends State<_Queue> {
                               key: ValueKey(episode.enclosureUrl),
                             );
                           } else {
-                            return Container(
-                              key: ValueKey('sd'),
-                            );
+                            return EpisodeCard(episode,
+                                key: ValueKey('playing'),
+                                isPlaying: true,
+                                tileColor: context.primaryColorDark);
                           }
                         }).toList()
                       : episodes
@@ -301,98 +302,19 @@ class __QueueState extends State<_Queue> {
                   itemCount: queue.episodeList.length,
                   itemBuilder: (context, index) {
                     final episode = queue.episodes[index];
-                    final c = episode.backgroudColor(context);
                     final isPlaying =
                         data.item3 != null && data.item3 == episode;
-                    return SizedBox(
-                      height: 90.0,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          Expanded(
-                            child: ListTile(
-                              tileColor:
-                                  isPlaying ? context.primaryColorDark : null,
-                              contentPadding: EdgeInsets.symmetric(vertical: 8),
-                              onTap: () async {
-                                if (!isPlaying) {
-                                  await context
-                                      .read<AudioPlayerNotifier>()
-                                      .loadEpisodeFromPlaylist(episode);
-                                }
-                              },
-                              title: Container(
-                                padding: EdgeInsets.fromLTRB(0, 5.0, 20.0, 5.0),
-                                child: Text(
-                                  episode.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              leading: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // Icon(Icons.unfold_more, color: c),
-                                  SizedBox(width: 24),
-                                  CircleAvatar(
-                                      backgroundColor: c.withOpacity(0.5),
-                                      backgroundImage: episode.avatarImage),
-                                ],
-                              ),
-                              subtitle: Container(
-                                padding: EdgeInsets.only(top: 5, bottom: 5),
-                                height: 35,
-                                child: Row(
-                                  children: <Widget>[
-                                    if (episode.explicit == 1)
-                                      Container(
-                                          decoration: BoxDecoration(
-                                              color: Colors.red[800],
-                                              shape: BoxShape.circle),
-                                          height: 25.0,
-                                          width: 25.0,
-                                          margin: EdgeInsets.only(right: 10.0),
-                                          alignment: Alignment.center,
-                                          child: Text('E',
-                                              style: TextStyle(
-                                                  color: Colors.white))),
-                                    if (episode.duration != 0)
-                                      episodeTag(
-                                          episode.duration == 0
-                                              ? ''
-                                              : s.minsCount(
-                                                  episode.duration ~/ 60),
-                                          Colors.cyan[300]),
-                                    if (episode.enclosureLength != null)
-                                      episodeTag(
-                                          episode.enclosureLength == 0
-                                              ? ''
-                                              : '${(episode.enclosureLength) ~/ 1000000}MB',
-                                          Colors.lightBlue[300]),
-                                  ],
-                                ),
-                              ),
-                              trailing: isPlaying && running
-                                  ? Container(
-                                      height: 20,
-                                      width: 20,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: WaveLoader(
-                                          color: context.accentColor))
-                                  : SizedBox(width: 1),
-                            ),
-                          ),
-                          Divider(
-                            height: 2,
-                          ),
-                        ],
-                      ),
+                    return EpisodeCard(
+                      episode,
+                      isPlaying: isPlaying && running,
+                      tileColor: isPlaying ? context.primaryColorDark : null,
+                      onTap: () async {
+                        if (!isPlaying) {
+                          await context
+                              .read<AudioPlayerNotifier>()
+                              .loadEpisodeFromPlaylist(episode);
+                        }
+                      },
                     );
                   });
         });
@@ -857,6 +779,7 @@ class _NewPlaylist extends StatefulWidget {
 }
 
 class __NewPlaylistState extends State<_NewPlaylist> {
+  final _dbHelper = DBHelper();
   String _playlistName = '';
   NewPlaylistOption _option;
   int _error;
@@ -865,6 +788,14 @@ class __NewPlaylistState extends State<_NewPlaylist> {
   void initState() {
     super.initState();
     _option = NewPlaylistOption.blank;
+  }
+
+  Future<List<EpisodeBrief>> _random() async {
+    return await _dbHelper.getRandomRssItem(10);
+  }
+
+  Future<List<EpisodeBrief>> _recent() async {
+    return await _dbHelper.getRecentRssItem(10);
   }
 
   Widget _createOption(NewPlaylistOption option) {
@@ -954,7 +885,22 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                     );
                     break;
                   case NewPlaylistOption.latest10:
+                    final recent = await _recent();
+                    playlist = Playlist(
+                      _playlistName,
+                      episodeList: [for(var e in recent) e.enclosureUrl],
+                    );
+                    await playlist.getPlaylist();
+                    break;
                   case NewPlaylistOption.randon10:
+                    final random = await _random();
+                    playlist = Playlist(
+                      _playlistName,
+                      episodeList: [for(var e in random) e.enclosureUrl],
+                    );
+                    await playlist.getPlaylist();
+                    break;
+                  default:
                     break;
                 }
                 context.read<AudioPlayerNotifier>().addPlaylist(playlist);
