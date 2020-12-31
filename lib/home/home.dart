@@ -20,7 +20,6 @@ import '../state/podcast_group.dart';
 import '../state/refresh_podcast.dart';
 import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
-import '../type/playlist.dart';
 import '../util/extension_helper.dart';
 import '../widgets/audiopanel.dart';
 import '../widgets/custom_popupmenu.dart';

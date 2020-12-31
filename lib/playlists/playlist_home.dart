@@ -255,7 +255,6 @@ class _Queue extends StatefulWidget {
 class __QueueState extends State<_Queue> {
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
     return Selector<AudioPlayerNotifier, Tuple3<Playlist, bool, EpisodeBrief>>(
         selector: (_, audio) =>
             Tuple3(audio.playlist, audio.playerRunning, audio.episode),
