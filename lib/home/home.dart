@@ -456,24 +456,24 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
           PopupMenuDivider(
             height: 1,
           ),
-          PopupMenuItem(
-            value: 2,
-            child: Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.history),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  ),
-                  Text(s.settingsHistory),
-                ],
-              ),
-            ),
-          ),
-          PopupMenuDivider(
-            height: 1,
-          ),
+         // PopupMenuItem(
+         //   value: 2,
+         //   child: Container(
+         //     padding: EdgeInsets.only(left: 10),
+         //     child: Row(
+         //       children: <Widget>[
+         //         Icon(Icons.history),
+         //         Padding(
+         //           padding: const EdgeInsets.symmetric(horizontal: 5.0),
+         //         ),
+         //         Text(s.settingsHistory),
+         //       ],
+         //     ),
+         //   ),
+         // ),
+         // PopupMenuDivider(
+         //   height: 1,
+         // ),
         ],
         onSelected: (value) {
           if (value == 0) {

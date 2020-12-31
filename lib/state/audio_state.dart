@@ -280,7 +280,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
     if (state[1] != '') {
       _episode = await _dbHelper.getRssItemWithUrl(state[1]);
     } else {
-      _episode = _queue.episodes.isNotEmpty ? _queue.episodes.first : null;
+      _episode =
+          _playlist.episodes.isNotEmpty ? _playlist.episodes.first : null;
     }
     _lastPostion = int.parse(state[2] ?? '0');
 
@@ -338,18 +339,19 @@ class AudioPlayerNotifier extends ChangeNotifier {
       final history = PlayHistory(_episode.title, _episode.enclosureUrl,
           backgroundAudioPosition ~/ 1000, seekSliderValue);
       await _dbHelper.saveHistory(history);
+      _queue.addToPlayListAt(episodeNew, 0);
+      await updatePlaylist(_queue);
       if (_playlist.name != 'Queue') {
         AudioService.customAction('setIsQueue', true);
         AudioService.customAction('changeQueue', [
           for (var e in _queue.episodes) jsonEncode(e.toMediaItem().toJson())
         ]);
+        _playlist = _queue;
       }
       await AudioService.addQueueItemAt(episodeNew.toMediaItem(), 0);
       if (startPosition > 0) {
         await AudioService.seekTo(Duration(milliseconds: startPosition));
       }
-      _queue.addToPlayListAt(episodeNew, 0);
-      await updatePlaylist(_queue);
       _remoteErrorMessage = null;
       notifyListeners();
       if (episodeNew.isNew == 1) {
@@ -357,7 +359,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       }
     } else {
       await _queue.getPlaylist();
-      await _queue.addToPlayListAt(episodeNew, 0);
+      _queue.addToPlayListAt(episodeNew, 0);
       _backgroundAudioDuration = 0;
       _backgroundAudioPosition = 0;
       _seekSliderValue = 0;
@@ -375,7 +377,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> _startAudioService(playlist,
+  Future<void> _startAudioService(Playlist playlist,
       {int index = 0, int position = 0}) async {
     _stopOnComplete = false;
     _sleepTimerMode = SleepTimerMode.undefined;
