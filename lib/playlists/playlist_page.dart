@@ -18,24 +18,49 @@ class PlaylistDetail extends StatefulWidget {
 
 class _PlaylistDetailState extends State<PlaylistDetail> {
   final List<EpisodeBrief> _selectedEpisodes = [];
+  bool _resetSelected;
+  @override
+  void setState(fn) {
+    _resetSelected = false;
+    super.setState(fn);
+  }
 
   @override
   Widget build(BuildContext context) {
     final s = context.s;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          splashRadius: 20,
+          icon: Icon(Icons.close),
+          tooltip: context.s.back,
+          onPressed: () {
+            Navigator.maybePop(context);
+          },
+        ),
         title: Text(_selectedEpisodes.isEmpty
             ? widget.playlist.name
             : '${_selectedEpisodes.length} selected'),
         actions: [
           IconButton(
-              icon: Icon(Icons.delete),
+              splashRadius: 20,
+              icon: Icon(Icons.delete_outline_rounded),
               onPressed: () {
                 context.read<AudioPlayerNotifier>().removeEpisodeFromPlaylist(
                     widget.playlist,
                     episodes: _selectedEpisodes);
                 setState(_selectedEpisodes.clear);
               }),
+          if (_selectedEpisodes.isNotEmpty)
+            IconButton(
+                splashRadius: 20,
+                icon: Icon(Icons.select_all_outlined),
+                onPressed: () {
+                  setState(() {
+                    _selectedEpisodes.clear();
+                    _resetSelected = !_resetSelected;
+                  });
+                }),
           SizedBox(
             height: 40,
             width: 40,
@@ -89,7 +114,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                   }, onRemove: (episode) {
                     _selectedEpisodes.remove(episode);
                     setState(() {});
-                  });
+                  }, reset: _resetSelected);
                 }).toList());
           }),
     );
@@ -98,10 +123,11 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
 
 class _PlaylistItem extends StatefulWidget {
   final EpisodeBrief episode;
+  final bool reset;
   final ValueChanged<EpisodeBrief> onSelect;
   final ValueChanged<EpisodeBrief> onRemove;
   _PlaylistItem(this.episode,
-      {@required this.onSelect, @required this.onRemove, Key key})
+      {@required this.onSelect, @required this.onRemove, this.reset, Key key})
       : super(key: key);
 
   @override
@@ -133,6 +159,14 @@ class __PlaylistItemState extends State<_PlaylistItem>
         _controller.stop();
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant _PlaylistItem oldWidget) {
+    if (oldWidget.reset != widget.reset && _animation.value == 1.0) {
+      _controller.reverse();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
