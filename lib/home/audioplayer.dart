@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:marquee/marquee.dart';
@@ -23,7 +22,6 @@ import '../util/pageroute.dart';
 import '../widgets/audiopanel.dart';
 import '../widgets/custom_slider.dart';
 import '../widgets/custom_widget.dart';
-import 'playlist.dart';
 
 final List<BoxShadow> _customShadow = [
   BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),
@@ -232,7 +230,8 @@ class PlayerWidget extends StatelessWidget {
           return Center();
         } else {
           var minHeight = kMinPlayerHeight[data.item2.index];
-          var maxHeight = kMaxPlayerHeight[data.item2.index];
+          var maxHeight = math.min(kMaxPlayerHeight[data.item2.index] as double,
+              context.height - 20);
           return AudioPanel(
               minHeight: minHeight,
               maxHeight: maxHeight,
@@ -422,191 +421,195 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             return Column(
               children: <Widget>[
                 Expanded(
-                  child: data.item1.name == 'Queue'
-                      ? AnimatedList(
-                          key: miniPlaylistKey,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          initialItemCount: episodes.length,
-                          itemBuilder: (context, index, animation) =>
-                              ScaleTransition(
-                            alignment: Alignment.center,
-                            scale: animation,
-                            child: Column(
-                              children: <Widget>[
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: () {
-                                            audio.episodeLoad(episodes[index]);
-                                            miniPlaylistKey.currentState
-                                                .removeItem(
-                                                    index,
-                                                    (context, animation) =>
-                                                        Center());
-                                          },
-                                          child: Container(
-                                            height: 60,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            alignment: Alignment.centerLeft,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                Container(
-                                                  padding: EdgeInsets.all(10.0),
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                15.0)),
-                                                    child: Container(
-                                                        height: 30.0,
-                                                        width: 30.0,
-                                                        child: Image.file(File(
-                                                            "${episodes[index].imagePath}"))),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Align(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    child: Text(
-                                                      episodes[index].title,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20.0),
-                                      child: Material(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                        clipBehavior: Clip.hardEdge,
-                                        color: context.primaryColor,
-                                        child: InkWell(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(15.0)),
-                                          onTap: () async {
-                                            var episdoe =
-                                                episodes.removeAt(index);
-                                            episodes.insert(0, episdoe);
-                                            miniPlaylistKey.currentState
-                                                .removeItem(
-                                              index,
-                                              (context, animation) {
-                                                return Center();
-                                              },
-                                              duration: Duration.zero,
-                                            );
-                                            miniPlaylistKey.currentState
-                                                .insertItem(
-                                                    0,
-                                                    duration: Duration(
-                                                        milliseconds: 100));
-                                            await Future.delayed(
-                                                Duration(milliseconds: 100));
-                                            await audio.moveToTop(
-                                                data.item1.episodes[index + 1]);
-                                          },
-                                          child: SizedBox(
-                                            height: 30.0,
-                                            width: 30.0,
-                                            child: Transform.rotate(
-                                              angle: math.pi,
-                                              child: Icon(
-                                                LineIcons.download_solid,
-                                                size: 20.0,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Divider(height: 1),
-                              ],
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: episodes.length,
-                          itemBuilder: (context, index) {
-                            final isPlaying = episodes[index] != null &&
-                                episodes[index] == data.item2;
-                            return InkWell(
-                              onTap: () async {
-                                if (!isPlaying) {
-                                  await context
-                                      .read<AudioPlayerNotifier>()
-                                      .loadEpisodeFromPlaylist(episodes[index]);
-                                }
-                              },
-                              child: Container(
-                                color: isPlaying
-                                    ? context.accentColor
-                                    : Colors.transparent,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Container(
-                                      padding: EdgeInsets.all(10.0),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0)),
-                                        child: Container(
-                                            height: 30.0,
-                                            width: 30.0,
-                                            child: Image.file(File(
-                                                "${episodes[index].imagePath}"))),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          episodes[index].title,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    if (isPlaying)
-                                      Container(
-                                          height: 20,
-                                          width: 20,
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: WaveLoader(
-                                              color: context.primaryColor)),
-                                  ],
+                  child:
+                      // data.item1.name == 'Queue'
+                      //     ? AnimatedList(
+                      //         key: miniPlaylistKey,
+                      //         shrinkWrap: true,
+                      //         scrollDirection: Axis.vertical,
+                      //         initialItemCount: episodes.length,
+                      //         itemBuilder: (context, index, animation) =>
+                      //             ScaleTransition(
+                      //           alignment: Alignment.center,
+                      //           scale: animation,
+                      //           child: Column(
+                      //             children: <Widget>[
+                      //               Row(
+                      //                 children: <Widget>[
+                      //                   Expanded(
+                      //                     child: Material(
+                      //                       color: Colors.transparent,
+                      //                       child: InkWell(
+                      //                         onTap: () {
+                      //                           audio.episodeLoad(episodes[index]);
+                      //                           miniPlaylistKey.currentState
+                      //                               .removeItem(
+                      //                                   index,
+                      //                                   (context, animation) =>
+                      //                                       Center());
+                      //                         },
+                      //                         child: Container(
+                      //                           height: 60,
+                      //                           padding: EdgeInsets.symmetric(
+                      //                               horizontal: 20),
+                      //                           alignment: Alignment.centerLeft,
+                      //                           child: Row(
+                      //                             mainAxisAlignment:
+                      //                                 MainAxisAlignment.center,
+                      //                             crossAxisAlignment:
+                      //                                 CrossAxisAlignment.center,
+                      //                             mainAxisSize: MainAxisSize.min,
+                      //                             children: <Widget>[
+                      //                               Container(
+                      //                                 padding: EdgeInsets.all(10.0),
+                      //                                 child: ClipRRect(
+                      //                                   borderRadius:
+                      //                                       BorderRadius.all(
+                      //                                           Radius.circular(
+                      //                                               15.0)),
+                      //                                   child: Container(
+                      //                                       height: 30.0,
+                      //                                       width: 30.0,
+                      //                                       child: Image.file(File(
+                      //                                           "${episodes[index].imagePath}"))),
+                      //                                 ),
+                      //                               ),
+                      //                               Expanded(
+                      //                                 child: Align(
+                      //                                   alignment:
+                      //                                       Alignment.centerLeft,
+                      //                                   child: Text(
+                      //                                     episodes[index].title,
+                      //                                     maxLines: 1,
+                      //                                     overflow:
+                      //                                         TextOverflow.ellipsis,
+                      //                                   ),
+                      //                                 ),
+                      //                               ),
+                      //                             ],
+                      //                           ),
+                      //                         ),
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                   Padding(
+                      //                     padding: const EdgeInsets.symmetric(
+                      //                         horizontal: 20.0),
+                      //                     child: Material(
+                      //                       borderRadius:
+                      //                           BorderRadius.circular(100),
+                      //                       clipBehavior: Clip.hardEdge,
+                      //                       color: context.primaryColor,
+                      //                       child: InkWell(
+                      //                         borderRadius: BorderRadius.all(
+                      //                             Radius.circular(15.0)),
+                      //                         onTap: () async {
+                      //                           var episdoe =
+                      //                               episodes.removeAt(index);
+                      //                           episodes.insert(0, episdoe);
+                      //                           miniPlaylistKey.currentState
+                      //                               .removeItem(
+                      //                             index,
+                      //                             (context, animation) {
+                      //                               return Center();
+                      //                             },
+                      //                             duration: Duration.zero,
+                      //                           );
+                      //                           miniPlaylistKey.currentState
+                      //                               .insertItem(
+                      //                                   0,
+                      //                                   duration: Duration(
+                      //                                       milliseconds: 100));
+                      //                           await Future.delayed(
+                      //                               Duration(milliseconds: 100));
+                      //                           await audio.moveToTop(
+                      //                               data.item1.episodes[index + 1]);
+                      //                         },
+                      //                         child: SizedBox(
+                      //                           height: 30.0,
+                      //                           width: 30.0,
+                      //                           child: Transform.rotate(
+                      //                             angle: math.pi,
+                      //                             child: Icon(
+                      //                               LineIcons.download_solid,
+                      //                               size: 20.0,
+                      //                             ),
+                      //                           ),
+                      //                         ),
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //               Divider(height: 1),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       )
+                      ListView.builder(
+                    itemCount: episodes.length,
+                    itemBuilder: (context, index) {
+                      final isPlaying = episodes[index] != null &&
+                          episodes[index] == data.item2;
+                      return InkWell(
+                        onTap: () async {
+                          if (!isPlaying) {
+                            if (data.item1.name == 'Queue')
+                              audio.episodeLoad(episodes[index]);
+                            else
+                              await context
+                                  .read<AudioPlayerNotifier>()
+                                  .loadEpisodeFromPlaylist(episodes[index]);
+                          }
+                        },
+                        child: Container(
+                          color: isPlaying
+                              ? context.accentColor
+                              : Colors.transparent,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                padding: EdgeInsets.all(10.0),
+                                child: ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.0)),
+                                  child: Container(
+                                      height: 30.0,
+                                      width: 30.0,
+                                      child: Image.file(File(
+                                          "${episodes[index].imagePath}"))),
                                 ),
                               ),
-                            );
-                          },
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    episodes[index].title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              if (isPlaying)
+                                Container(
+                                    height: 20,
+                                    width: 20,
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: WaveLoader(
+                                        color: context.primaryColor)),
+                            ],
+                          ),
                         ),
+                      );
+                    },
+                  ),
                 ),
                 SizedBox(
                   height: 60.0,

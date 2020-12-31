@@ -1280,3 +1280,115 @@ Widget episodeTag(String text, Color color) {
     child: Text(text, style: TextStyle(fontSize: 14.0, color: Colors.black)),
   );
 }
+
+// Sleep time picker.
+class SleepTimerPicker extends StatefulWidget {
+  final ValueChanged<Duration> onChange;
+  SleepTimerPicker({this.onChange, Key key}) : super(key: key);
+
+  @override
+  _SleepTimerPickerState createState() => _SleepTimerPickerState();
+}
+
+class _SleepTimerPickerState extends State<SleepTimerPicker> {
+  final textStyle = TextStyle(fontSize: 60);
+  int hour;
+  int minute;
+  @override
+  void initState() {
+    _initTimer();
+    super.initState();
+  }
+
+  _initTimer(){
+    int h = DateTime.now().hour;
+    int m = DateTime.now().minute;
+    if(m > 50){
+      hour = (h+1) % 24;
+      minute = 0;
+    }
+    else {
+      hour = h;
+      minute = m ~/10 * 10 +10;
+    }
+  }
+
+  _getDuration() {
+    int h = DateTime.now().hour;
+    int m = DateTime.now().minute;
+    Duration d =
+        Duration(hours: hour, minutes: minute) - Duration(hours: h, minutes: m);
+    if (d >= Duration.zero) {
+      return d;
+    } else {
+      return Duration(hours: 24) - d;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: 100,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (hour >= 23)
+                    hour = 0;
+                  else
+                    hour++;
+                });
+                widget.onChange(_getDuration());
+              },
+              onLongPress: () {
+                setState(() {
+                  hour = DateTime.now().hour;
+                });
+                widget.onChange(_getDuration());
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    color: context.primaryColorDark,
+                    borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Text(hour.toString().padLeft(2, '0'), style: textStyle),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                ':',
+                style: textStyle,
+              ),
+            ),
+            GestureDetector(
+              onTap: (() {
+                setState(() {
+                  if (minute >= 55)
+                    minute = 0;
+                  else
+                    minute += 5;
+                });
+                widget.onChange(_getDuration());
+              }),
+              onLongPress: () {
+                setState(() {
+                  minute = 0;
+                });
+                widget.onChange(_getDuration());
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    color: context.primaryColorDark,
+                    borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child:
+                    Text(minute.toString().padLeft(2, '0'), style: textStyle),
+              ),
+            ),
+          ],
+        ));
+  }
+}
