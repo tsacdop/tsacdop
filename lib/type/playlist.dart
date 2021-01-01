@@ -36,9 +36,12 @@ class Playlist extends Equatable {
 
   bool get isEmpty => episodeList.isEmpty;
 
+  int get length => episodes.length;
+
   Playlist(this.name,
       {String id, List<String> episodeList, List<EpisodeBrief> episodes})
       : id = id ?? Uuid().v4(),
+        assert(name != ''),
         episodeList = episodeList ?? [],
         episodes = episodes ?? [];
 

@@ -53,7 +53,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _controller.forward();
     _slideDirection = SlideDirection.up;
     super.initState();
-    _expandHeight = widget.maxHeight + 300;
+    _expandHeight = widget.maxHeight + 316;
   }
 
   @override
@@ -67,7 +67,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   void didUpdateWidget(AudioPanel oldWidget) {
     if (oldWidget.maxHeight != widget.maxHeight) {
       setState(() {
-        _expandHeight = widget.maxHeight + 300;
+        _expandHeight = widget.maxHeight + 316;
       });
     }
     super.didUpdateWidget(oldWidget);
@@ -92,10 +92,8 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                 child: GestureDetector(
                   onTap: backToMini,
                   child: Container(
-                    color: Theme.of(context)
-                        .scaffoldBackgroundColor
-                        .withOpacity(0.9 *
-                            math.min(_animation.value / widget.maxHeight, 1)),
+                    color: context.scaffoldBackgroundColor.withOpacity(
+                        0.9 * math.min(_animation.value / widget.maxHeight, 1)),
                   ),
                 ),
               )
@@ -111,7 +109,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
             height: _getHeight(),
             child: _animation.value < widget.minHeight + 30
                 ? Container(
-                    color: Theme.of(context).primaryColor,
+                    color: context.primaryColor,
                     child: Opacity(
                       opacity: _animation.value > widget.minHeight
                           ? (widget.minHeight + 30 - _animation.value) / 40
@@ -122,13 +120,19 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                 : Container(
                     decoration: BoxDecoration(
                       color: context.primaryColor,
-                      //  borderRadius: BorderRadius.only(
-                      //      topLeft: Radius.circular(20.0),
-                      //      topRight: Radius.circular(20.0)),
-
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(16.0),
+                          topRight: Radius.circular(16.0)),
                       boxShadow: [
                         BoxShadow(
                           offset: Offset(0, -1),
+                          blurRadius: 1,
+                          color: context.brightness == Brightness.light
+                              ? Colors.grey[400].withOpacity(0.5)
+                              : Colors.grey[800],
+                        ),
+                        BoxShadow(
+                          offset: Offset(-1, 0),
                           blurRadius: 1,
                           color: context.brightness == Brightness.light
                               ? Colors.grey[400].withOpacity(0.5)
@@ -146,7 +150,13 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                         child: SizedBox(
                           height: math.max(widget.maxHeight,
                               math.min(_animation.value, _expandHeight)),
-                          child: widget.expandedPanel,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(height: 16),
+                              Expanded(child: widget.expandedPanel),
+                            ],
+                          ),
                         ),
                       ),
                     ),
