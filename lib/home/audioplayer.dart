@@ -1089,536 +1089,527 @@ class _ControlPanelState extends State<ControlPanel>
           color: context.primaryColor,
           height: 300,
           child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Consumer<AudioPlayerNotifier>(
-                  builder: (_, data, __) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Container(
-                          padding:
-                              EdgeInsets.only(top: 20, left: 30, right: 30),
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              activeTrackColor: height <= widget.maxHeight
-                                  ? context.accentColor.withAlpha(70)
-                                  : Colors.transparent,
-                              inactiveTrackColor: height > widget.maxHeight
-                                  ? Colors.transparent
-                                  : context.primaryColorDark,
-                              trackHeight: 8.0,
-                              trackShape: MyRectangularTrackShape(),
-                              thumbColor: context.accentColor,
-                              thumbShape: RoundSliderThumbShape(
-                                enabledThumbRadius: 6.0,
-                                disabledThumbRadius: 6.0,
-                              ),
-                              overlayColor: context.accentColor.withAlpha(32),
-                              overlayShape:
-                                  RoundSliderOverlayShape(overlayRadius: 4.0),
-                            ),
-                            child: Slider(
-                                value: data.seekSliderValue,
-                                onChanged: (val) {
-                                  audio.sliderSeek(val);
-                                }),
-                          ),
-                        ),
-                        Container(
-                          height: 20.0,
-                          padding: EdgeInsets.symmetric(horizontal: 30.0),
-                          child: height > widget.maxHeight
-                              ? Center()
-                              : Row(
-                                  children: <Widget>[
-                                    Text(
-                                      (data.backgroundAudioPosition ~/ 1000)
-                                              .toTime ??
-                                          '',
-                                      style: TextStyle(fontSize: 10),
-                                    ),
-                                    Expanded(
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        child: data.remoteErrorMessage != null
-                                            ? Text(data.remoteErrorMessage,
-                                                style: const TextStyle(
-                                                    color: Color(0xFFFF0000)))
-                                            : Text(
-                                                data.audioState ==
-                                                            AudioProcessingState
-                                                                .buffering ||
-                                                        data.audioState ==
-                                                            AudioProcessingState
-                                                                .connecting ||
-                                                        data.audioState ==
-                                                            AudioProcessingState
-                                                                .none ||
-                                                        data.audioState ==
-                                                            AudioProcessingState
-                                                                .skippingToNext
-                                                    ? context.s.buffering
-                                                    : '',
-                                                style: TextStyle(
-                                                    color: context.accentColor),
-                                              ),
-                                      ),
-                                    ),
-                                    Text(
-                                      (data.backgroundAudioDuration ~/ 1000)
-                                              .toTime ??
-                                          '',
-                                      style: TextStyle(fontSize: 10),
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                SizedBox(
-                  height: 100,
-                  child: Selector<AudioPlayerNotifier, bool>(
-                    selector: (_, audio) => audio.playing,
-                    builder: (_, playing, __) {
-                      return Material(
-                        color: Colors.transparent,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            FlatButton(
-                              color: Colors.transparent,
-                              padding: EdgeInsets.only(right: 10, left: 10),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100.0),
-                                  side: BorderSide(color: Colors.transparent)),
-                              onPressed: playing ? () => audio.rewind() : null,
-                              child: Row(
-                                children: [
-                                  Icon(Icons.fast_rewind,
-                                      size: 32, color: Colors.grey[500]),
-                                  SizedBox(width: 5),
-                                  Selector<AudioPlayerNotifier, int>(
-                                      selector: (_, audio) =>
-                                          audio.rewindSeconds,
-                                      builder: (_, seconds, __) => Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 5.0),
-                                            child: Text('$seconds s',
-                                                style: GoogleFonts.teko(
-                                                  textBaseline:
-                                                      TextBaseline.ideographic,
-                                                  textStyle: TextStyle(
-                                                      color: Colors.grey[500],
-                                                      fontSize: 25),
-                                                )),
-                                          )),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 30),
-                              height: 60,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                  color: context.primaryColor,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color:
-                                          context.brightness == Brightness.dark
-                                              ? Colors.black12
-                                              : Colors.white10,
-                                      width: 1),
-                                  boxShadow:
-                                      context.brightness == Brightness.dark
-                                          ? _customShadowNight
-                                          : _customShadow),
-                              child: playing
-                                  ? Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(30)),
-                                        onTap: playing
-                                            ? () {
-                                                audio.pauseAduio();
-                                              }
-                                            : null,
-                                        child: SizedBox(
-                                          height: 60,
-                                          width: 60,
-                                          child: Icon(
-                                            Icons.pause,
-                                            size: 40,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(30)),
-                                        onTap: playing
-                                            ? null
-                                            : () {
-                                                audio.resumeAudio();
-                                              },
-                                        child: SizedBox(
-                                          height: 60,
-                                          width: 60,
-                                          child: Icon(
-                                            Icons.play_arrow,
-                                            size: 40,
-                                            color: context.accentColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                            FlatButton(
-                              padding: EdgeInsets.only(left: 10.0, right: 10),
-                              onPressed:
-                                  playing ? () => audio.fastForward() : null,
-                              color: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100.0),
-                                  side: BorderSide(color: Colors.transparent)),
-                              child: Row(
-                                children: [
-                                  Selector<AudioPlayerNotifier, int>(
-                                      selector: (_, audio) =>
-                                          audio.fastForwardSeconds,
-                                      builder: (_, seconds, __) => Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 5.0),
-                                            child: Text('$seconds s',
-                                                style: GoogleFonts.teko(
-                                                  textStyle: TextStyle(
-                                                      color: Colors.grey[500],
-                                                      fontSize: 25),
-                                                )),
-                                          )),
-                                  SizedBox(width: 10),
-                                  Icon(Icons.fast_forward,
-                                      size: 32.0, color: Colors.grey[500]),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                SizedBox(
-                  height: 80.0,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Consumer<AudioPlayerNotifier>(
+                builder: (_, data, __) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: Selector<AudioPlayerNotifier, String>(
-                          selector: (_, audio) => audio.episode.title,
-                          builder: (_, title, __) {
-                            return Container(
-                              padding: EdgeInsets.only(left: 60, right: 60),
-                              child: LayoutBuilder(
-                                builder: (context, size) {
-                                  var span = TextSpan(
-                                      text: title,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20));
-                                  var tp = TextPainter(
-                                      text: span,
-                                      maxLines: 1,
-                                      textDirection: TextDirection.ltr);
-                                  tp.layout(maxWidth: size.maxWidth);
-                                  if (tp.didExceedMaxLines) {
-                                    return Marquee(
-                                      text: title,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                      scrollAxis: Axis.horizontal,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      blankSpace: 30.0,
-                                      velocity: 50.0,
-                                      pauseAfterRound: Duration.zero,
-                                      startPadding: 30.0,
-                                      accelerationDuration:
-                                          Duration(milliseconds: 100),
-                                      accelerationCurve: Curves.linear,
-                                      decelerationDuration:
-                                          Duration(milliseconds: 100),
-                                      decelerationCurve: Curves.linear,
-                                    );
-                                  } else {
-                                    return Text(
-                                      title,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
-                                    );
-                                  }
-                                },
-                              ),
-                            );
-                          },
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.only(top: 20, left: 30, right: 30),
+                        child: SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            //activeTrackColor: height <= widget.maxHeight
+                            activeTrackColor: context.accentColor.withAlpha(70),
+                            //   : Colors.transparent,
+                            inactiveTrackColor: context.primaryColorDark,
+                            trackHeight: 8.0,
+                            trackShape: MyRectangularTrackShape(),
+                            thumbColor: context.accentColor,
+                            thumbShape: RoundSliderThumbShape(
+                              enabledThumbRadius: 6.0,
+                              disabledThumbRadius: 6.0,
+                            ),
+                            overlayColor: context.accentColor.withAlpha(32),
+                            overlayShape:
+                                RoundSliderOverlayShape(overlayRadius: 4.0),
+                          ),
+                          child: Slider(
+                              value: data.seekSliderValue,
+                              onChanged: (val) {
+                                audio.sliderSeek(val);
+                              }),
                         ),
                       ),
-                      if (height <= widget.maxHeight) LastPosition()
+                      Container(
+                        height: 20.0,
+                        padding: EdgeInsets.symmetric(horizontal: 30.0),
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                              (data.backgroundAudioPosition ~/ 1000).toTime ??
+                                  '',
+                              style: TextStyle(fontSize: 10),
+                            ),
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: data.remoteErrorMessage != null
+                                    ? Text(data.remoteErrorMessage,
+                                        style: const TextStyle(
+                                            color: Color(0xFFFF0000)))
+                                    : Text(
+                                        data.audioState ==
+                                                    AudioProcessingState
+                                                        .buffering ||
+                                                data.audioState ==
+                                                    AudioProcessingState
+                                                        .connecting ||
+                                                data.audioState ==
+                                                    AudioProcessingState.none ||
+                                                data.audioState ==
+                                                    AudioProcessingState
+                                                        .skippingToNext
+                                            ? context.s.buffering
+                                            : '',
+                                        style: TextStyle(
+                                            color: context.accentColor),
+                                      ),
+                              ),
+                            ),
+                            Text(
+                              (data.backgroundAudioDuration ~/ 1000).toTime ??
+                                  '',
+                              style: TextStyle(fontSize: 10),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                  ),
-                ),
-                if (height > widget.maxHeight)
-                  SizedBox(
-                    height: height - widget.maxHeight,
-                    child: SingleChildScrollView(
-                        physics: NeverScrollableScrollPhysics(),
-                        child: SizedBox(
-                            height: 300,
-                            child: ScrollConfiguration(
-                              behavior: NoGrowBehavior(),
-                              child: TabBarView(
-                                  controller: _tabController,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20.0),
-                                      child: PlaylistWidget(),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20.0),
-                                      child: SleepMode(),
-                                    )
-                                  ]),
-                            ))),
-                  ),
-                Expanded(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      if (height <= widget.maxHeight)
-                        Selector<AudioPlayerNotifier,
-                            Tuple4<EpisodeBrief, bool, bool, double>>(
-                          selector: (_, audio) => Tuple4(
-                              audio.episode,
-                              audio.stopOnComplete,
-                              audio.startSleepTimer,
-                              audio.currentSpeed),
-                          builder: (_, data, __) {
-                            final currentSpeed = data.item4 ?? 1.0;
-                            return Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  if (_setSpeed == 0)
-                                    Expanded(
-                                      child: InkWell(
-                                        onTap: () async {
-                                          widget.onClose();
-                                          if (!widget.isPlayingPage) {
-                                            Navigator.push(
-                                                context,
-                                                FadeRoute(
-                                                    page: EpisodeDetail(
-                                                        episodeItem: data.item1,
-                                                        heroTag: 'playpanel')));
-                                          }
-                                        },
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              height: 30.0,
-                                              width: 30.0,
-                                              child: CircleAvatar(
-                                                backgroundImage:
-                                                    data.item1.avatarImage,
-                                              ),
-                                            ),
-                                            SizedBox(width: 5),
-                                            SizedBox(
-                                              width: 100,
-                                              child: Text(
-                                                data.item1.feedTitle,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.fade,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  if (_setSpeed > 0)
-                                    Expanded(
-                                      child: SingleChildScrollView(
-                                        padding: EdgeInsets.all(10.0),
-                                        scrollDirection: Axis.horizontal,
-                                        child: FutureBuilder<List<double>>(
-                                          future: _getSpeedList(),
-                                          initialData: [],
-                                          builder: (context, snapshot) => Row(
-                                            children: snapshot.data
-                                                .map<Widget>((e) => InkWell(
-                                                      onTap: () {
-                                                        if (_setSpeed == 1) {
-                                                          audio.setSpeed(e);
-                                                        }
-                                                      },
-                                                      child: Container(
-                                                        height: 30,
-                                                        width: 30,
-                                                        margin: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 5),
-                                                        decoration: e ==
-                                                                    currentSpeed &&
-                                                                _setSpeed > 0
-                                                            ? BoxDecoration(
-                                                                color: context
-                                                                    .accentColor,
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                boxShadow: context
-                                                                            .brightness ==
-                                                                        Brightness
-                                                                            .light
-                                                                    ? customShadow(
-                                                                        1.0)
-                                                                    : customShadowNight(
-                                                                        1.0),
-                                                              )
-                                                            : BoxDecoration(
-                                                                color: context
-                                                                    .primaryColor,
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                boxShadow: context
-                                                                            .brightness ==
-                                                                        Brightness
-                                                                            .light
-                                                                    ? customShadow(1 -
-                                                                        _setSpeed)
-                                                                    : customShadowNight(1 -
-                                                                        _setSpeed)),
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: _setSpeed > 0
-                                                            ? Text(e.toString(),
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: e ==
-                                                                            currentSpeed
-                                                                        ? Colors
-                                                                            .white
-                                                                        : null))
-                                                            : Center(),
-                                                      ),
-                                                    ))
-                                                .toList(),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  IconButton(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () {
-                                      if (_setSpeed == 0) {
-                                        _controller.forward();
-                                      } else {
-                                        _controller.reverse();
-                                      }
-                                    },
-                                    icon: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        Transform.rotate(
-                                            angle: math.pi * _setSpeed,
-                                            child: Text('X')),
-                                        Text(currentSpeed.toStringAsFixed(1)),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      if (_setSpeed == 0)
-                        Positioned(
-                          bottom: widget.maxHeight == kMaxPlayerHeight[2]
-                              ? 35.0
-                              : widget.maxHeight == kMaxPlayerHeight[1]
-                                  ? 25.0
-                                  : 15.0,
-                          child: InkWell(
-                              child: SizedBox(
-                                height: 50,
-                                width: 100,
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: CustomPaint(
-                                      size: Size(100, 5),
-                                      painter: TabIndicator(
-                                          index: _tabIndex,
-                                          indicatorSize: 20,
-                                          fraction:
-                                              (height - widget.maxHeight) / 300,
-                                          accentColor: context.accentColor,
-                                          color: context.textColor)),
-                                ),
-                              ),
-                              onTap: widget.onExpand),
-                        ),
-                      if (_setSpeed == 0 && height > widget.maxHeight)
-                        Transform.translate(
-                          offset:
-                              Offset(0, 5) * (height - widget.maxHeight) / 300,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: context.width / 2 - 80),
-                            child: TabBar(
-                              controller: _tabController,
-                              indicatorSize: TabBarIndicatorSize.label,
-                              labelColor: context.accentColor,
-                              unselectedLabelColor: context.textColor,
-                              indicator: BoxDecoration(),
-                              tabs: [
-                                Container(
-                                    height: 20,
-                                    width: 20,
-                                    child: Icon(Icons.playlist_play)),
-                                Container(
-                                    height: 20,
-                                    width: 20,
-                                    child: Transform.rotate(
-                                        angle: math.pi * 0.7,
-                                        child: Icon(Icons.brightness_2,
-                                            size: 18))),
+                  );
+                },
+              ),
+              SizedBox(
+                height: 100,
+                child: Selector<AudioPlayerNotifier, bool>(
+                  selector: (_, audio) => audio.playing,
+                  builder: (_, playing, __) {
+                    return Material(
+                      color: Colors.transparent,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          FlatButton(
+                            color: Colors.transparent,
+                            padding: EdgeInsets.only(right: 10, left: 10),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100.0),
+                                side: BorderSide(color: Colors.transparent)),
+                            onPressed: playing ? () => audio.rewind() : null,
+                            child: Row(
+                              children: [
+                                Icon(Icons.fast_rewind,
+                                    size: 32, color: Colors.grey[500]),
+                                SizedBox(width: 5),
+                                Selector<AudioPlayerNotifier, int>(
+                                    selector: (_, audio) => audio.rewindSeconds,
+                                    builder: (_, seconds, __) => Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5.0),
+                                          child: Text('$seconds s',
+                                              style: GoogleFonts.teko(
+                                                textBaseline:
+                                                    TextBaseline.ideographic,
+                                                textStyle: TextStyle(
+                                                    color: Colors.grey[500],
+                                                    fontSize: 25),
+                                              )),
+                                        )),
                               ],
                             ),
                           ),
-                        ),
-                    ],
-                  ),
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 30),
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                                color: context.primaryColor,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: context.brightness == Brightness.dark
+                                        ? Colors.black12
+                                        : Colors.white10,
+                                    width: 1),
+                                boxShadow: context.brightness == Brightness.dark
+                                    ? _customShadowNight
+                                    : _customShadow),
+                            child: playing
+                                ? Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(30)),
+                                      onTap: playing
+                                          ? () {
+                                              audio.pauseAduio();
+                                            }
+                                          : null,
+                                      child: SizedBox(
+                                        height: 60,
+                                        width: 60,
+                                        child: Icon(
+                                          Icons.pause,
+                                          size: 40,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(30)),
+                                      onTap: playing
+                                          ? null
+                                          : () {
+                                              audio.resumeAudio();
+                                            },
+                                      child: SizedBox(
+                                        height: 60,
+                                        width: 60,
+                                        child: Icon(
+                                          Icons.play_arrow,
+                                          size: 40,
+                                          color: context.accentColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                          FlatButton(
+                            padding: EdgeInsets.only(left: 10.0, right: 10),
+                            onPressed:
+                                playing ? () => audio.fastForward() : null,
+                            color: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100.0),
+                                side: BorderSide(color: Colors.transparent)),
+                            child: Row(
+                              children: [
+                                Selector<AudioPlayerNotifier, int>(
+                                    selector: (_, audio) =>
+                                        audio.fastForwardSeconds,
+                                    builder: (_, seconds, __) => Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5.0),
+                                          child: Text('$seconds s',
+                                              style: GoogleFonts.teko(
+                                                textStyle: TextStyle(
+                                                    color: Colors.grey[500],
+                                                    fontSize: 25),
+                                              )),
+                                        )),
+                                SizedBox(width: 10),
+                                Icon(Icons.fast_forward,
+                                    size: 32.0, color: Colors.grey[500]),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ]),
+              ),
+              SizedBox(
+                height: 80.0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: Selector<AudioPlayerNotifier, String>(
+                        selector: (_, audio) => audio.episode.title,
+                        builder: (_, title, __) {
+                          return Container(
+                            padding: EdgeInsets.only(left: 60, right: 60),
+                            child: LayoutBuilder(
+                              builder: (context, size) {
+                                var span = TextSpan(
+                                    text: title,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20));
+                                var tp = TextPainter(
+                                    text: span,
+                                    maxLines: 1,
+                                    textDirection: TextDirection.ltr);
+                                tp.layout(maxWidth: size.maxWidth);
+                                if (tp.didExceedMaxLines) {
+                                  return Marquee(
+                                    text: title,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                    scrollAxis: Axis.horizontal,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    blankSpace: 30.0,
+                                    velocity: 50.0,
+                                    pauseAfterRound: Duration.zero,
+                                    startPadding: 30.0,
+                                    accelerationDuration:
+                                        Duration(milliseconds: 100),
+                                    accelerationCurve: Curves.linear,
+                                    decelerationDuration:
+                                        Duration(milliseconds: 100),
+                                    decelerationCurve: Curves.linear,
+                                  );
+                                } else {
+                                  return Text(
+                                    title,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  );
+                                }
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    if (height <= widget.maxHeight) LastPosition()
+                  ],
+                ),
+              ),
+              if (height > widget.maxHeight)
+                SizedBox(
+                  height: height - widget.maxHeight,
+                  child: SingleChildScrollView(
+                      physics: NeverScrollableScrollPhysics(),
+                      child: SizedBox(
+                          height: 300,
+                          child: ScrollConfiguration(
+                            behavior: NoGrowBehavior(),
+                            child: TabBarView(
+                                controller: _tabController,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0),
+                                    child: PlaylistWidget(),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0),
+                                    child: SleepMode(),
+                                  )
+                                ]),
+                          ))),
+                ),
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (height <= widget.maxHeight)
+                      Selector<AudioPlayerNotifier,
+                          Tuple4<EpisodeBrief, bool, bool, double>>(
+                        selector: (_, audio) => Tuple4(
+                            audio.episode,
+                            audio.stopOnComplete,
+                            audio.startSleepTimer,
+                            audio.currentSpeed),
+                        builder: (_, data, __) {
+                          final currentSpeed = data.item4 ?? 1.0;
+                          return Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                if (_setSpeed == 0)
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () async {
+                                        widget.onClose();
+                                        if (!widget.isPlayingPage) {
+                                          Navigator.push(
+                                              context,
+                                              FadeRoute(
+                                                  page: EpisodeDetail(
+                                                      episodeItem: data.item1,
+                                                      heroTag: 'playpanel')));
+                                        }
+                                      },
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            height: 30.0,
+                                            width: 30.0,
+                                            child: CircleAvatar(
+                                              backgroundImage:
+                                                  data.item1.avatarImage,
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          SizedBox(
+                                            width: 100,
+                                            child: Text(
+                                              data.item1.feedTitle,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.fade,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                if (_setSpeed > 0)
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      padding: EdgeInsets.all(10.0),
+                                      scrollDirection: Axis.horizontal,
+                                      child: FutureBuilder<List<double>>(
+                                        future: _getSpeedList(),
+                                        initialData: [],
+                                        builder: (context, snapshot) => Row(
+                                          children: snapshot.data
+                                              .map<Widget>((e) => InkWell(
+                                                    onTap: () {
+                                                      if (_setSpeed == 1) {
+                                                        audio.setSpeed(e);
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      height: 30,
+                                                      width: 30,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 5),
+                                                      decoration: e ==
+                                                                  currentSpeed &&
+                                                              _setSpeed > 0
+                                                          ? BoxDecoration(
+                                                              color: context
+                                                                  .accentColor,
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              boxShadow: context
+                                                                          .brightness ==
+                                                                      Brightness
+                                                                          .light
+                                                                  ? customShadow(
+                                                                      1.0)
+                                                                  : customShadowNight(
+                                                                      1.0),
+                                                            )
+                                                          : BoxDecoration(
+                                                              color: context
+                                                                  .primaryColor,
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              boxShadow: context
+                                                                          .brightness ==
+                                                                      Brightness
+                                                                          .light
+                                                                  ? customShadow(1 -
+                                                                      _setSpeed)
+                                                                  : customShadowNight(1 -
+                                                                      _setSpeed)),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: _setSpeed > 0
+                                                          ? Text(e.toString(),
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: e ==
+                                                                          currentSpeed
+                                                                      ? Colors
+                                                                          .white
+                                                                      : null))
+                                                          : Center(),
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    if (_setSpeed == 0) {
+                                      _controller.forward();
+                                    } else {
+                                      _controller.reverse();
+                                    }
+                                  },
+                                  icon: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: <Widget>[
+                                      Transform.rotate(
+                                          angle: math.pi * _setSpeed,
+                                          child: Text('X')),
+                                      Text(currentSpeed.toStringAsFixed(1)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    if (_setSpeed == 0)
+                      Positioned(
+                        bottom: widget.maxHeight == kMaxPlayerHeight[2]
+                            ? 35.0
+                            : widget.maxHeight == kMaxPlayerHeight[1]
+                                ? 25.0
+                                : 15.0,
+                        child: InkWell(
+                            child: SizedBox(
+                              height: 50,
+                              width: 100,
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: CustomPaint(
+                                    size: Size(100, 5),
+                                    painter: TabIndicator(
+                                        index: _tabIndex,
+                                        indicatorSize: 20,
+                                        fraction:
+                                            (height + 16 - widget.maxHeight) /
+                                                316,
+                                        accentColor: context.accentColor,
+                                        color: context.textColor)),
+                              ),
+                            ),
+                            onTap: widget.onExpand),
+                      ),
+                    if (_setSpeed == 0 && height > widget.maxHeight)
+                      Transform.translate(
+                        offset:
+                            Offset(0, 5) * (height - widget.maxHeight) / 300,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: context.width / 2 - 80),
+                          child: TabBar(
+                            controller: _tabController,
+                            indicatorSize: TabBarIndicatorSize.label,
+                            labelColor: context.accentColor,
+                            unselectedLabelColor: context.textColor,
+                            indicator: BoxDecoration(),
+                            tabs: [
+                              Container(
+                                  height: 20,
+                                  width: 20,
+                                  child: Icon(Icons.playlist_play)),
+                              Container(
+                                  height: 20,
+                                  width: 20,
+                                  child: Transform.rotate(
+                                      angle: math.pi * 0.7,
+                                      child:
+                                          Icon(Icons.brightness_2, size: 18))),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
