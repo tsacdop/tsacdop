@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/widgets/general_dialog.dart';
 
 import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
@@ -19,10 +20,11 @@ class PlaylistDetail extends StatefulWidget {
 class _PlaylistDetailState extends State<PlaylistDetail> {
   final List<EpisodeBrief> _selectedEpisodes = [];
   bool _resetSelected;
+
   @override
-  void setState(fn) {
+  void initState() {
     _resetSelected = false;
-    super.setState(fn);
+    super.initState();
   }
 
   @override
@@ -42,15 +44,16 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
             ? widget.playlist.name
             : '${_selectedEpisodes.length} selected'),
         actions: [
-          IconButton(
-              splashRadius: 20,
-              icon: Icon(Icons.delete_outline_rounded),
-              onPressed: () {
-                context.read<AudioPlayerNotifier>().removeEpisodeFromPlaylist(
-                    widget.playlist,
-                    episodes: _selectedEpisodes);
-                setState(_selectedEpisodes.clear);
-              }),
+          if (_selectedEpisodes.isNotEmpty)
+            IconButton(
+                splashRadius: 20,
+                icon: Icon(Icons.delete_outline_rounded),
+                onPressed: () {
+                  context.read<AudioPlayerNotifier>().removeEpisodeFromPlaylist(
+                      widget.playlist,
+                      episodes: _selectedEpisodes);
+                  setState(_selectedEpisodes.clear);
+                }),
           if (_selectedEpisodes.isNotEmpty)
             IconButton(
                 splashRadius: 20,
@@ -61,35 +64,51 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                     _resetSelected = !_resetSelected;
                   });
                 }),
-          SizedBox(
-            height: 40,
-            width: 40,
-            child: Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(100),
-              clipBehavior: Clip.hardEdge,
-              child: SizedBox(
-                height: 40,
-                width: 40,
-                child: PopupMenuButton<int>(
-                    icon: Icon(Icons.more_vert),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    elevation: 1,
-                    tooltip: s.menu,
-                    itemBuilder: (context) => [
-                          PopupMenuItem(value: 1, child: Text('Clear all')),
-                        ],
-                    onSelected: (value) {
-                      if (value == 1) {
-                        context
-                            .read<AudioPlayerNotifier>()
-                            .clearPlaylist(widget.playlist);
-                      }
-                    }),
-              ),
-            ),
-          )
+          IconButton(
+            splashRadius: 20,
+            icon: Icon(Icons.more_vert),
+            onPressed: () => generalSheet(context,
+                    title: widget.playlist.name,
+                    child: _PlaylistSetting(widget.playlist))
+                .then((value) {
+              if (!context
+                  .read<AudioPlayerNotifier>()
+                  .playlists
+                  .contains(widget.playlist)) {
+                Navigator.pop(context);
+              }
+              setState(() {});
+            }),
+          ),
+          //SizedBox(
+          //  height: 40,
+          //  width: 40,
+          //  child: Material(
+          //    color: Colors.transparent,
+          //    borderRadius: BorderRadius.circular(100),
+          //    clipBehavior: Clip.hardEdge,
+          //    child: SizedBox(
+          //      height: 40,
+          //      width: 40,
+          //      child: PopupMenuButton<int>(
+          //          icon: Icon(Icons.more_vert),
+          //          shape: RoundedRectangleBorder(
+          //              borderRadius: BorderRadius.circular(10)),
+          //          elevation: 1,
+          //          tooltip: s.menu,
+          //          itemBuilder: (context) => [
+          //                PopupMenuItem(value: 1, child: Text('Clear all')),
+          //              ],
+          //          onSelected: (value) {
+          //            if (value == 1) {
+          //              context
+          //                  .read<AudioPlayerNotifier>()
+          //                  .clearPlaylist(widget.playlist);
+          //            }
+          //          }),
+          //    ),
+          //  ),
+          //)
         ],
       ),
       body: Selector<AudioPlayerNotifier, List<Playlist>>(
@@ -285,5 +304,118 @@ class __PlaylistItemState extends State<_PlaylistItem>
             ),
           ],
         ));
+  }
+}
+
+class _PlaylistSetting extends StatefulWidget {
+  final Playlist playlist;
+  _PlaylistSetting(this.playlist, {Key key}) : super(key: key);
+
+  @override
+  __PlaylistSettingState createState() => __PlaylistSettingState();
+}
+
+class __PlaylistSettingState extends State<_PlaylistSetting> {
+  bool _clearConfirm;
+  bool _removeConfirm;
+
+  @override
+  void initState() {
+    _clearConfirm = false;
+    _removeConfirm = false;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.s;
+    final textStyle = context.textTheme.bodyText2;
+    return Column(
+      children: [
+        ListTile(
+          onTap: () {
+            setState(() => _clearConfirm = true);
+          },
+          dense: true,
+          title: Row(
+            children: [
+              Icon(Icons.highlight_off, size: 18),
+              SizedBox(width: 20),
+              Text('Clear all', style: textStyle),
+            ],
+          ),
+        ),
+        if (_clearConfirm)
+          Container(
+            width: double.infinity,
+            color: context.primaryColorDark,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                FlatButton(
+                  onPressed: () => setState(() {
+                    _clearConfirm = false;
+                  }),
+                  child:
+                      Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
+                ),
+                FlatButton(
+                    splashColor: Colors.red.withAlpha(70),
+                    onPressed: () async {
+                      context
+                          .read<AudioPlayerNotifier>()
+                          .clearPlaylist(widget.playlist);
+                      Navigator.of(context).pop();
+                    },
+                    child:
+                        Text(s.confirm, style: TextStyle(color: Colors.red))),
+              ],
+            ),
+          ),
+        if (widget.playlist.name != 'Queue')
+          ListTile(
+            onTap: () {
+              setState(() => _removeConfirm = true);
+            },
+            dense: true,
+            title: Row(
+              children: [
+                Icon(Icons.delete, color: Colors.red, size: 18),
+                SizedBox(width: 20),
+                Text('Remove playlist',
+                    style: textStyle.copyWith(
+                        color: Colors.red, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        if (_removeConfirm)
+          Container(
+            width: double.infinity,
+            color: context.primaryColorDark,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                FlatButton(
+                  onPressed: () => setState(() {
+                    _removeConfirm = false;
+                  }),
+                  child:
+                      Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
+                ),
+                FlatButton(
+                    splashColor: Colors.red.withAlpha(70),
+                    onPressed: () async {
+                      context
+                          .read<AudioPlayerNotifier>()
+                          .deletePlaylist(widget.playlist);
+                      Navigator.of(context).pop();
+                    },
+                    child:
+                        Text(s.confirm, style: TextStyle(color: Colors.red))),
+              ],
+            ),
+          ),
+      ],
+    );
   }
 }
