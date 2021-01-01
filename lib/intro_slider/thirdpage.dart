@@ -22,15 +22,14 @@ class _ThirdPageState extends State<ThirdPage> {
             Container(
               height: 200,
               alignment: Alignment.center,
-              padding: EdgeInsets.all(40),
+              padding: EdgeInsets.fromLTRB(40, context.paddingTop + 20, 40, 20),
               child: Text(
                 context.s.introThirdPage,
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),
-            Container(
+            SizedBox(
                 height: context.width * 3 / 4,
-                // color: Colors.red,
                 child: FlareActor(
                   'assets/swipe.flr',
                   alignment: Alignment.center,

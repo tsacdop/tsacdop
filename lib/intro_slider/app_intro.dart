@@ -22,13 +22,13 @@ class SlideIntro extends StatefulWidget {
 }
 
 class _SlideIntroState extends State<SlideIntro> {
-  final List<BoxShadow> _customShadow = [
-    BoxShadow(blurRadius: 2, offset: Offset(-2, -2), color: Colors.white54),
-    BoxShadow(
-        blurRadius: 8,
-        offset: Offset(2, 2),
-        color: Colors.grey[600].withOpacity(0.4))
-  ];
+  //final List<BoxShadow> _customShadow = [
+  //  BoxShadow(blurRadius: 2, offset: Offset(-2, -2), color: Colors.white54),
+  //  BoxShadow(
+  //      blurRadius: 8,
+  //      offset: Offset(2, 2),
+  //      color: Colors.grey[600].withOpacity(0.4))
+  //];
   PageController _controller;
   double _position;
   @override
@@ -47,6 +47,28 @@ class _SlideIntroState extends State<SlideIntro> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Widget _indicatorWidget(int index) {
+    final distance = (_position - index).abs();
+    final size = distance > 1 ? 10.0 : 10 * (2 - distance);
+    return Center(
+      child: Container(
+        alignment: Alignment.center,
+        child: distance < 0.2
+            ? Text(
+                (index + 1).toString(),
+                style: TextStyle(color: Color.fromRGBO(35, 204, 198, 1)),
+              )
+            : Center(),
+        height: size,
+        width: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+        ),
+      ),
+    );
   }
 
   @override
@@ -76,117 +98,35 @@ class _SlideIntroState extends State<SlideIntro> {
                 left: 0,
                 child: Container(
                   color: Colors.grey[100].withOpacity(0.5),
-                  width: MediaQuery.of(context).size.width,
-                  //   alignment: Alignment.center,
+                  width: context.width,
                   padding:
                       EdgeInsets.only(left: 40, right: 20, bottom: 30, top: 20),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                alignment: Alignment.center,
-                                child: _position < 0.2
-                                    ? Text(
-                                        '1',
-                                        style: TextStyle(
-                                            color: Color.fromRGBO(
-                                                35, 204, 198, 1)),
-                                      )
-                                    : Center(),
-                                margin: EdgeInsets.symmetric(horizontal: 10),
-                                height: _position > 1
-                                    ? 10
-                                    : (1 - _position) * 10 + 10,
-                                width: _position > 1
-                                    ? 10
-                                    : (1 - _position) * 10 + 10,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                    boxShadow: _customShadow),
-                              ),
-                              Container(
-                                child: _position < 1.2 && _position > 0.8
-                                    ? Text('2',
-                                        style: TextStyle(
-                                            color: Color.fromRGBO(
-                                                77, 145, 190, 1)))
-                                    : Center(),
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.symmetric(horizontal: 10),
-                                height: _position > 2
-                                    ? 10
-                                    : 20 - (_position - 1).abs() * 10,
-                                width: _position > 2
-                                    ? 10
-                                    : 20 - (_position - 1).abs() * 10,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                    boxShadow: _customShadow),
-                              ),
-                              Container(
-                                child: _position < 2.2 && _position > 1.8
-                                    ? Text('3',
-                                        style: TextStyle(
-                                            color: Color.fromRGBO(
-                                                35, 204, 198, 1)))
-                                    : Center(),
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.symmetric(horizontal: 10),
-                                height: _position < 1
-                                    ? 10
-                                    : 20 - (_position - 2).abs() * 10,
-                                width: _position < 1
-                                    ? 10
-                                    : 20 - (_position - 2).abs() * 10,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                    boxShadow: _customShadow),
-                              ),
-                              Container(
-                                child: _position > 2.8
-                                    ? Text(
-                                        '4',
-                                        style: TextStyle(
-                                            color: Color.fromRGBO(
-                                                77, 145, 190, 1)),
-                                      )
-                                    : Center(),
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.symmetric(horizontal: 10),
-                                height: _position < 2
-                                    ? 10
-                                    : 20 - (3 - _position) * 10,
-                                width: _position < 2
-                                    ? 10
-                                    : 20 - (3 - _position) * 10,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                    boxShadow: _customShadow),
-                              ),
-                            ],
-                          ),
+                      SizedBox(
+                        width: context.width / 3,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            _indicatorWidget(0),
+                            _indicatorWidget(1),
+                            _indicatorWidget(2),
+                            _indicatorWidget(3)
+                          ],
                         ),
                       ),
+                      Spacer(),
                       Container(
                         alignment: Alignment.center,
                         height: 40,
                         width: 80,
                         decoration: BoxDecoration(
                           border: Border.all(width: 1, color: Colors.white),
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          borderRadius: BorderRadius.circular(20),
                           color: Colors.white,
-                          boxShadow: _customShadow,
+                          //boxShadow: _customShadow,
                         ),
                         child: Material(
                           color: Colors.transparent,
@@ -204,10 +144,11 @@ class _SlideIntroState extends State<SlideIntro> {
                                       child: Center(
                                           child: Text(context.s.next,
                                               style: TextStyle(
-                                                  color: Colors.black)))))
+                                                  color: Colors.black,
+                                                  fontWeight:
+                                                      FontWeight.bold)))))
                               : InkWell(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
+                                  borderRadius: BorderRadius.circular(20),
                                   onTap: () {
                                     if (widget.goto == Goto.home) {
                                       Navigator.push(context,
@@ -225,7 +166,9 @@ class _SlideIntroState extends State<SlideIntro> {
                                       child: Center(
                                           child: Text(context.s.done,
                                               style: TextStyle(
-                                                  color: Colors.black))))),
+                                                  color: Colors.black,
+                                                  fontWeight:
+                                                      FontWeight.bold))))),
                         ),
                       ),
                     ],

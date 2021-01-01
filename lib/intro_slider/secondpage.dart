@@ -17,21 +17,19 @@ class _SecondPageState extends State<SecondPage> {
       child: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Container(
               height: 200,
               alignment: Alignment.center,
-              padding:
-                  EdgeInsets.only(top: 20, bottom: 20, left: 40, right: 40),
+              padding: EdgeInsets.fromLTRB(40, context.paddingTop + 20, 40, 20),
               child: Text(
                 context.s.introSecondPage,
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),
-            Container(
+            SizedBox(
                 height: context.width * 3 / 4,
-                // color: Colors.red,
                 child: FlareActor(
                   'assets/add.flr',
                   isPaused: false,
@@ -39,7 +37,6 @@ class _SecondPageState extends State<SecondPage> {
                   animation: 'add',
                   fit: BoxFit.cover,
                 )),
-            Spacer(),
           ],
         ),
       ),
