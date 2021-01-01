@@ -871,7 +871,9 @@ class __NewPlaylistState extends State<_NewPlaylist> {
           FlatButton(
             splashColor: context.accentColor.withAlpha(70),
             onPressed: () async {
-              if (context
+              if (_playlistName == '') {
+                setState(() => _error = 0);
+              } else if (context
                   .read<AudioPlayerNotifier>()
                   .playlistExisted(_playlistName)) {
                 setState(() => _error = 1);
@@ -887,7 +889,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                     final recent = await _recent();
                     playlist = Playlist(
                       _playlistName,
-                      episodeList: [for(var e in recent) e.enclosureUrl],
+                      episodeList: [for (var e in recent) e.enclosureUrl],
                     );
                     await playlist.getPlaylist();
                     break;
@@ -895,7 +897,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                     final random = await _random();
                     playlist = Playlist(
                       _playlistName,
-                      episodeList: [for(var e in random) e.enclosureUrl],
+                      episodeList: [for (var e in random) e.enclosureUrl],
                     );
                     await playlist.getPlaylist();
                     break;
@@ -938,14 +940,15 @@ class __NewPlaylistState extends State<_NewPlaylist> {
               },
             ),
             Container(
-              alignment: Alignment.centerLeft,
-              child: (_error == 1)
-                  ? Text(
-                      'Playlist existed',
-                      style: TextStyle(color: Colors.red[400]),
-                    )
-                  : Center(),
-            ),
+                alignment: Alignment.centerLeft,
+                child: _error != null
+                    ? Text(
+                        _error == 1
+                            ? 'Playlist existed'
+                            : 'Playlist name is empty',
+                        style: TextStyle(color: Colors.red[400]),
+                      )
+                    : Center()),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [

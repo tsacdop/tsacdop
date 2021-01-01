@@ -21,6 +21,7 @@ import '../podcasts/podcastlist.dart';
 import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
+import '../state/refresh_podcast.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
@@ -493,23 +494,27 @@ class _PodcastPreviewState extends State<PodcastPreview> {
     return Column(
       children: <Widget>[
         Expanded(
-          child: Selector<GroupList, bool>(
-              selector: (_, worker) => worker.created,
-              builder: (context, created, child) {
-                return FutureBuilder<List<EpisodeBrief>>(
-                  future: _getRssItem,
-                  builder: (context, snapshot) {
-                    return (snapshot.hasData)
-                        ? ShowEpisode(
-                            episodes: snapshot.data,
-                            podcastLocal: widget.podcastLocal,
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.all(5.0),
-                          );
-                  },
-                );
-              }),
+          child: Selector<RefreshWorker, bool>(
+            selector: (_, worker) => worker.complete,
+            builder: (_, complete, __) => Selector<GroupList, bool>(
+                selector: (_, worker) => worker.created,
+                builder: (context, created, child) {
+                  _getRssItem = _getRssItemTop(widget.podcastLocal);
+                  return FutureBuilder<List<EpisodeBrief>>(
+                    future: _getRssItem,
+                    builder: (context, snapshot) {
+                      return (snapshot.hasData)
+                          ? ShowEpisode(
+                              episodes: snapshot.data,
+                              podcastLocal: widget.podcastLocal,
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.all(5.0),
+                            );
+                    },
+                  );
+                }),
+          ),
         ),
         Container(
           height: 40,

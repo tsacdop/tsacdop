@@ -505,7 +505,8 @@ class WavePainter extends CustomPainter {
 
 class WaveLoader extends StatefulWidget {
   final Color color;
-  WaveLoader({this.color, Key key}) : super(key: key);
+  final bool animate;
+  WaveLoader({this.color, this.animate = true, Key key}) : super(key: key);
   @override
   _WaveLoaderState createState() => _WaveLoaderState();
 }
@@ -547,7 +548,8 @@ class _WaveLoaderState extends State<WaveLoader>
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-        painter: WavePainter(_fraction, widget.color ?? Colors.white));
+        painter: WavePainter(
+            widget.animate ? _fraction : 1, widget.color ?? Colors.white));
   }
 }
 
@@ -1300,16 +1302,15 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
     super.initState();
   }
 
-  _initTimer(){
+  _initTimer() {
     int h = DateTime.now().hour;
     int m = DateTime.now().minute;
-    if(m > 50){
-      hour = (h+1) % 24;
+    if (m > 50) {
+      hour = (h + 1) % 24;
       minute = 0;
-    }
-    else {
+    } else {
       hour = h;
-      minute = m ~/10 * 10 +10;
+      minute = m ~/ 10 * 10 + 10;
     }
   }
 

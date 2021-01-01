@@ -30,6 +30,9 @@ import '../widgets/general_dialog.dart';
 import '../widgets/muiliselect_bar.dart';
 import 'podcast_settings.dart';
 
+const KDefaultAvatar = """http://xuanmei.us/assets/default/avatar_small-
+170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg""";
+
 class PodcastDetail extends StatefulWidget {
   PodcastDetail({Key key, @required this.podcastLocal, this.hide = false})
       : super(key: key);
@@ -88,6 +91,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
   bool _selectAfter;
   bool _loadEpisodes = false;
 
+  ///Show podcast info.
+  bool _showInfo;
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +105,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     _selectAll = false;
     _selectAfter = false;
     _selectBefore = false;
+    _showInfo = false;
     Future.delayed(Duration(milliseconds: 200))
         .then((value) => setState(() => _loadEpisodes = true));
   }
@@ -202,16 +209,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
   Widget _podcastInfo(BuildContext context) {
     return Container(
       height: 170,
-      padding: EdgeInsets.only(top: 40, left: 80, right: 130),
+      padding: EdgeInsets.only(top: 50, left: 80, right: 130),
       alignment: Alignment.topLeft,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10),
-        child: Text(
-          widget.podcastLocal.title,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: context.textTheme.headline5.copyWith(color: Colors.white),
-        ),
+      child: Text(
+        widget.podcastLocal.title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: context.textTheme.headline5.copyWith(color: Colors.white),
       ),
     );
   }
@@ -233,28 +237,26 @@ class _PodcastDetailState extends State<PodcastDetail> {
                     errorWidget: (context, url, error) => Center(),
                     imageBuilder: (context, backgroundImageProvider) =>
                         Container(
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: backgroundImageProvider,
-                                    fit: BoxFit.cover)),
+                            // decoration: BoxDecoration(
+                            //     image: DecorationImage(
+                            //         image: backgroundImageProvider,
+                            //         fit: BoxFit.cover)),
                             alignment: Alignment.centerRight,
                             child: Container(
-                              color: Colors.black26,
+                              //color: Colors.black26,
                               padding: EdgeInsets.symmetric(vertical: 5.0),
-                              width: MediaQuery.of(context).size.width,
-                              alignment: Alignment.centerRight,
+                              width: double.infinity,
+                              alignment: Alignment.centerLeft,
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: hosts
                                         .map<Widget>((host) {
-                                          final image = host.image ==
-                                                  "http://xuanmei.us/assets/default/avatar_small-"
-                                                      "170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg"
-                                              ? "https://fireside.fm/assets/default/avatar_small"
-                                                  "-170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg"
-                                              : host.image;
+                                          final image =
+                                              host.image == KDefaultAvatar
+                                                  ? KDefaultAvatar
+                                                  : host.image;
                                           return Container(
                                               padding: EdgeInsets.all(5.0),
                                               width: 80.0,
@@ -299,11 +301,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                   Text(
                                                     host.name,
                                                     style: TextStyle(
-                                                      backgroundColor: Colors
-                                                          .black
-                                                          .withOpacity(0.5),
-                                                      color: Colors.white,
-                                                    ),
+                                                        fontWeight:
+                                                            FontWeight.bold
+                                                        // backgroundColor: Colors
+                                                        //     .black
+                                                        //     .withOpacity(0.5),
+                                                        //color: Colors.white,
+                                                        ),
                                                     textAlign: TextAlign.center,
                                                     maxLines: 2,
                                                     overflow: TextOverflow.fade,
@@ -320,9 +324,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   return Center();
                 }
               }),
-        Padding(padding: EdgeInsets.all(10.0)),
         Container(
-          padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 10.0),
+          padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
           alignment: Alignment.topLeft,
           color: context.scaffoldBackgroundColor,
           child: AboutPodcast(podcastLocal: widget.podcastLocal),
@@ -331,12 +334,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
-  Widget _customPopupMenu(
-          {Widget child,
-          String tooltip,
-          List<PopupMenuEntry<int>> itemBuilder,
-          Function(int) onSelected,
-          }) =>
+  Widget _customPopupMenu({
+    Widget child,
+    String tooltip,
+    List<PopupMenuEntry<int>> itemBuilder,
+    Function(int) onSelected,
+  }) =>
       Material(
         key: UniqueKey(),
         color: Colors.transparent,
@@ -708,6 +711,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
             top: false,
             child: RefreshIndicator(
               key: _refreshIndicatorKey,
+              displacement: context.paddingTop + 40,
               color: context.accentColor,
               onRefresh: () async {
                 await _updateRssItem(context, widget.podcastLocal);
@@ -765,38 +769,60 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   return FlexibleSpaceBar(
                                     background: Stack(
                                       children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              top: 100 + context.paddingTop),
-                                          padding: EdgeInsets.only(
-                                              left: 80, right: 20),
-                                          color: Colors.white10,
-                                          alignment: Alignment.centerLeft,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                  widget.podcastLocal.author ??
-                                                      '',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      color: Colors.white)),
-                                              if (widget.podcastLocal.provider
-                                                  .isNotEmpty)
+                                        // if (widget.podcastLocal.provider
+                                        //     .contains('fireside'))
+                                        //   Positioned.fill(
+                                        //     child: FutureBuilder(
+                                        //         future: _getHosts(
+                                        //             widget.podcastLocal),
+                                        //         builder: (context, snapshot) {
+                                        //           if (snapshot.hasData) {
+                                        //             return CachedNetworkImage(
+                                        //               imageUrl:
+                                        //                   snapshot.data.item1,
+                                        //               fit: BoxFit.fill,
+                                        //             );
+                                        //           } else
+                                        //             return Center();
+                                        //         }),
+                                        //   ),
+                                        InkWell(
+                                          onTap: () => setState(
+                                              () => _showInfo = !_showInfo),
+                                          child: Container(
+                                            margin: EdgeInsets.only(
+                                                top: 100 + context.paddingTop),
+                                            padding: EdgeInsets.only(
+                                                left: 80, right: 20),
+                                            color: Colors.white10,
+                                            alignment: Alignment.centerLeft,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
                                                 Text(
-                                                  s.hostedOn(widget
-                                                      .podcastLocal.provider),
-                                                  maxLines: 1,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                            ],
+                                                    widget.podcastLocal
+                                                            .author ??
+                                                        '',
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
+                                                if (widget.podcastLocal.provider
+                                                    .isNotEmpty)
+                                                  Text(
+                                                    s.hostedOn(widget
+                                                        .podcastLocal.provider),
+                                                    maxLines: 1,
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                         Container(
@@ -830,7 +856,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                 }),
                               ),
                               SliverToBoxAdapter(
-                                child: _hostsList(context, widget.podcastLocal),
+                                child: _showInfo
+                                    ? _hostsList(context, widget.podcastLocal)
+                                    : SizedBox(height: 10),
                               ),
                               SliverToBoxAdapter(
                                   child: _multiSelect
@@ -1004,63 +1032,73 @@ class _AboutPodcastState extends State<AboutPodcast> {
   Widget build(BuildContext context) {
     return !_load
         ? Center()
-        : LayoutBuilder(
-            builder: (context, size) {
-              final span = TextSpan(text: _description);
-              final tp = TextPainter(
-                  text: span, maxLines: 3, textDirection: TextDirection.ltr);
-              tp.layout(maxWidth: size.maxWidth);
-
-              if (tp.didExceedMaxLines) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() => _expand = !_expand);
-                  },
-                  child: !_expand
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Linkify(
-                              onOpen: (link) {
-                                link.url.launchUrl;
-                              },
-                              text: _description,
-                              linkStyle: TextStyle(
-                                  color: Theme.of(context).accentColor,
-                                  decoration: TextDecoration.underline,
-                                  textBaseline: TextBaseline.ideographic),
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        )
-                      : Linkify(
-                          onOpen: (link) {
-                            link.url.launchUrl;
-                          },
-                          text: _description,
-                          linkStyle: TextStyle(
-                              color: Theme.of(context).accentColor,
-                              decoration: TextDecoration.underline,
-                              textBaseline: TextBaseline.ideographic),
-                        ),
-                );
-              } else {
-                return Linkify(
-                  text: _description,
-                  onOpen: (link) {
-                    link.url.launchUrl;
-                  },
-                  linkStyle: TextStyle(
-                      color: Theme.of(context).accentColor,
-                      decoration: TextDecoration.underline,
-                      textBaseline: TextBaseline.ideographic),
-                );
-              }
+        : Linkify(
+            text: _description,
+            onOpen: (link) {
+              link.url.launchUrl;
             },
+            linkStyle: TextStyle(
+                color: Theme.of(context).accentColor,
+                decoration: TextDecoration.underline,
+                textBaseline: TextBaseline.ideographic),
           );
+    // LayoutBuilder(
+    //     builder: (context, size) {
+    //       final span = TextSpan(text: _description);
+    //       final tp = TextPainter(
+    //           text: span, maxLines: 3, textDirection: TextDirection.ltr);
+    //       tp.layout(maxWidth: size.maxWidth);
+
+    //       if (tp.didExceedMaxLines) {
+    //         return GestureDetector(
+    //           onTap: () {
+    //             setState(() => _expand = !_expand);
+    //           },
+    //           child: !_expand
+    //               ? Column(
+    //                   mainAxisAlignment: MainAxisAlignment.start,
+    //                   mainAxisSize: MainAxisSize.min,
+    //                   crossAxisAlignment: CrossAxisAlignment.start,
+    //                   children: <Widget>[
+    //                     Linkify(
+    //                       onOpen: (link) {
+    //                         link.url.launchUrl;
+    //                       },
+    //                       text: _description,
+    //                       linkStyle: TextStyle(
+    //                           color: Theme.of(context).accentColor,
+    //                           decoration: TextDecoration.underline,
+    //                           textBaseline: TextBaseline.ideographic),
+    //                       maxLines: 3,
+    //                       overflow: TextOverflow.ellipsis,
+    //                     ),
+    //                   ],
+    //                 )
+    //               : Linkify(
+    //                   onOpen: (link) {
+    //                     link.url.launchUrl;
+    //                   },
+    //                   text: _description,
+    //                   linkStyle: TextStyle(
+    //                       color: Theme.of(context).accentColor,
+    //                       decoration: TextDecoration.underline,
+    //                       textBaseline: TextBaseline.ideographic),
+    //                 ),
+    //         );
+    //       } else {
+    //         return Linkify(
+    //           text: _description,
+    //           onOpen: (link) {
+    //             link.url.launchUrl;
+    //           },
+    //           linkStyle: TextStyle(
+    //               color: Theme.of(context).accentColor,
+    //               decoration: TextDecoration.underline,
+    //               textBaseline: TextBaseline.ideographic),
+    //         );
+    //       }
+    //     },
+    //   );
   }
 }
 
