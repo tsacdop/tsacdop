@@ -264,7 +264,7 @@ class GroupList extends ChangeNotifier {
     }
   }
 
-  Future _start() async {
+  Future<void> _start() async {
     if (!_created) {
       await _createIsolate();
       _created = true;

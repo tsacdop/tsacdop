@@ -269,7 +269,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await _getAutoPlay();
 
     var state = await _playerStateStorage.getPlayerState();
-    print(state.toString());
     if (state[0] != '') {
       _playlist = _playlists.firstWhere((p) => p.id == state[0],
           orElse: () => _playlists.first);
@@ -298,12 +297,20 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> playFromLastPosition() async {
-    _audioState = AudioProcessingState.none;
-    _playerRunning = true;
-    notifyListeners();
-    _startAudioService(_playlist,
-        position: _lastPostion ?? 0,
-        index: _playlist.episodes.indexOf(_episode));
+    if (_playlist.episodes.isNotEmpty) {
+      await _playlist.getPlaylist();
+      if (_episode == null || !_playlist.episodes.contains(_episode))
+        _episode = _playlist.episodes.first;
+      _audioState = AudioProcessingState.none;
+      _backgroundAudioDuration = 0;
+      _backgroundAudioPosition = 0;
+      _seekSliderValue = 0;
+      _playerRunning = true;
+      notifyListeners();
+      _startAudioService(_playlist,
+          position: _lastPostion ?? 0,
+          index: _playlist.episodes.indexOf(_episode));
+    }
   }
 
   Future<void> playlistLoad(Playlist playlist) async {
@@ -326,7 +333,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         _audioState = AudioProcessingState.none;
         _playerRunning = true;
         notifyListeners();
-        _startAudioService(_playlist, position: _lastPostion ?? 0, index: 0);
+        _startAudioService(_playlist, position: 0, index: 0);
       }
     }
   }
@@ -683,6 +690,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
       for (var p in _playlists)
         if (p != playlist) p
     ];
+    if (_playlist == playlist && !_playerRunning) {
+      _playlist = _queue;
+      _episode = _queue.episodes.first;
+    }
     notifyListeners();
     _savePlaylists();
   }
@@ -731,7 +742,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
       {bool updateEpisodes = true}) async {
     if (updateEpisodes) await playlist.getPlaylist();
     _playlists = [for (var p in _playlists) p.id == playlist.id ? playlist : p];
-    notifyListeners();
+    if (_playlist.id == playlist.id && !_playerRunning) {
+      _playlist = _playlists.firstWhere((e) => e.id == _playlist.id);
+      notifyListeners();
+    }
     _savePlaylists();
   }
 
