@@ -278,20 +278,22 @@ class AudioPlayerNotifier extends ChangeNotifier {
       if (state[1] != '') {
         var episode = await _dbHelper.getRssItemWithUrl(state[1]);
         if ((!_playlist.isQueue && _playlist.contains(episode)) ||
-            (_playlist.isQueue && _queue.episodes.first == episode)) {
+            (_playlist.isQueue &&
+                _queue.isNotEmpty &&
+                _queue.episodes.first == episode)) {
           _episode = episode;
           _lastPosition = int.parse(state[2] ?? '0');
         } else {
-          _episode = _playlist.episodes.first;
+          _episode = _playlist.isNotEmpty ? _playlist.episodes.first : null;
           _lastPosition = 0;
         }
       } else {
-        _episode = _playlist.episodes.first;
+        _episode = _playlist.isNotEmpty ? _playlist.episodes.first : null;
         _lastPosition = 0;
       }
     } else {
       _playlist = _playlists.first;
-      _episode = _playlist.episodes.first;
+      _episode = _playlist.isNotEmpty ? _playlist.episodes?.first : null;
       _lastPosition = 0;
     }
     notifyListeners();
@@ -311,8 +313,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
   Future<void> playFromLastPosition() async {
     if (_playlist.episodes.isNotEmpty) {
       await _playlist.getPlaylist();
-      if (_episode == null || !_playlist.episodes.contains(_episode))
-        _episode = _playlist.episodes.first;
+      if (_episode == null || !_playlist.episodes.contains(_episode)) {
+        _episode = _playlist.isNotEmpty ? _playlist.episodes.first : null;
+      }
       _audioState = AudioProcessingState.none;
       _backgroundAudioDuration = 0;
       _backgroundAudioPosition = 0;
@@ -332,7 +335,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
     _playlist = p;
     notifyListeners();
-    if (playlist.episodeList.isNotEmpty) {
+    if (playlist.isNotEmpty) {
       if (playerRunning) {
         AudioService.customAction('setIsQueue', playlist.name == 'Queue');
         AudioService.customAction('changeQueue',
@@ -716,7 +719,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     ];
     if (_playlist == playlist && !_playerRunning) {
       _playlist = _queue;
-      _episode = _queue.episodes.first;
+      _episode = _playlist.isNotEmpty ? _queue.episodes.first : null;
     }
     notifyListeners();
     _savePlaylists();
@@ -764,8 +767,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
           delFromPlaylist(e);
         }
       }
-    } else
+    } else {
       playlist.clear();
+      if (_playlist.isQueue) _episode = null;
+    }
     updatePlaylist(playlist, updateEpisodes: false);
   }
 
@@ -943,9 +948,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  /// Save player state.
-  Future<void> _savePlayerPosiont() {}
 }
 
 class AudioPlayerTask extends BackgroundAudioTask {
