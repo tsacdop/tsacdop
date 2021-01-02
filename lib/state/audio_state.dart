@@ -672,12 +672,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
       newIndex -= 1;
     }
     var episode = _queue.episodes[oldIndex];
+    _queue.addToPlayListAt(episode, newIndex);
+    updatePlaylist(_queue, updateEpisodes: false);
     if (playerRunning && _playlist.name == 'Queue') {
       await AudioService.removeQueueItem(episode.toMediaItem());
       await AudioService.addQueueItemAt(episode.toMediaItem(), newIndex);
     }
-    _queue.addToPlayListAt(episode, newIndex);
-    updatePlaylist(_queue, updateEpisodes: false);
     if (newIndex == 0) {
       _lastPosition = 0;
       await _positionStorage.saveInt(0);
@@ -963,7 +963,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   bool _isQueue;
   bool get hasNext => _queue.length > 0;
 
-  MediaItem get mediaItem => _queue.length > 0 ? _queue[_index] : null;
+  MediaItem get mediaItem => hasNext ? _queue[_index] : null;
 
   StreamSubscription<AudioPlaybackState> _playerStateSubscription;
   StreamSubscription<AudioPlaybackEvent> _eventSubscription;
@@ -1252,7 +1252,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       //onPlay();
     } else {
       _queue.insert(index, mediaItem);
-      if (index < _index) _index += 1;
+      //if (index < _index) _index += 1;
       await AudioServiceBackground.setQueue(_queue);
     }
   }
