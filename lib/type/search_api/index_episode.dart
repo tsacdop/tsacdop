@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:tsacdop/type/search_api/searchepisodes.dart';
+import 'searchepisodes.dart';
 
 part 'index_episode.g.dart';
 
