@@ -779,32 +779,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
                               SliverAppBar(
                                 brightness: Brightness.dark,
                                 actions: <Widget>[
-                                  Container(
-                                    width: 30,
-                                    height: 30,
-                                    margin:
-                                        EdgeInsets.symmetric(horizontal: 10),
-                                    decoration: BoxDecoration(
-                                      color: widget.podcastLocal.primaryColor
-                                          .colorizedark()
-                                          .withOpacity(0.6),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: IconButton(
-                                      icon: Icon(Icons.more_vert),
-                                      padding: EdgeInsets.zero,
-                                      splashRadius: 15,
-                                      tooltip: s.menu,
-                                      onPressed: () => generalSheet(
-                                        context,
-                                        title: widget.podcastLocal.title,
-                                        child: PodcastSetting(
-                                            podcastLocal: widget.podcastLocal),
-                                      ).then((value) {
-                                        _checkPodcast();
-                                        setState(() {});
-                                      }),
-                                    ),
+                                  IconButton(
+                                    icon: Icon(Icons.more_vert),
+                                    splashRadius: 20,
+                                    tooltip: s.menu,
+                                    onPressed: () => generalSheet(
+                                      context,
+                                      title: widget.podcastLocal.title,
+                                      child: PodcastSetting(
+                                          podcastLocal: widget.podcastLocal),
+                                    ).then((value) {
+                                      _checkPodcast();
+                                      if (mounted) setState(() {});
+                                    }),
                                   ),
                                   //_rightTopMenu(context)
                                 ],
@@ -823,26 +810,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   return FlexibleSpaceBar(
                                     background: Stack(
                                       children: <Widget>[
-                                        // if (widget.podcastLocal.provider
-                                        //     .contains('fireside'))
-                                        //   Positioned.fill(
-                                        //     child: FutureBuilder(
-                                        //         future: _getHosts(
-                                        //             widget.podcastLocal),
-                                        //         builder: (context, snapshot) {
-                                        //           if (snapshot.hasData) {
-                                        //             return CachedNetworkImage(
-                                        //               imageUrl:
-                                        //                   snapshot.data.item1,
-                                        //               fit: BoxFit.fill,
-                                        //             );
-                                        //           } else
-                                        //             return Center();
-                                        //         }),
-                                        //   ),
                                         Padding(
                                           padding: EdgeInsets.only(
-                                              top: 100 + context.paddingTop),
+                                              top: 120 + context.paddingTop),
                                           child: InkWell(
                                             onTap: () => setState(
                                                 () => _showInfo = !_showInfo),
@@ -891,16 +861,18 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                       ],
                                                     ),
                                                   ),
-                                                  UpDownIndicator(_showInfo, color: Colors.white),
+                                                  UpDownIndicator(
+                                                      status: _showInfo,
+                                                      color: Colors.white),
                                                 ],
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          alignment: Alignment.centerRight,
+                                          alignment: Alignment.bottomRight,
                                           padding: EdgeInsets.only(
-                                              top: 10, right: 10),
+                                              top: 10, right: 10, bottom: 20),
                                           child: SizedBox(
                                             height: 120,
                                             child: Image.file(File(
