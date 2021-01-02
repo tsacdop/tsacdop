@@ -14,6 +14,7 @@ import '../type/podcastlocal.dart';
 import '../util/extension_helper.dart';
 import '../widgets/duraiton_picker.dart';
 import '../widgets/general_dialog.dart';
+import 'podcast_settings.dart';
 
 class PodcastGroupList extends StatefulWidget {
   final PodcastGroup group;
@@ -186,16 +187,7 @@ class __PodcastCardState extends State<_PodcastCard>
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           InkWell(
-            onTap: () => setState(
-              () {
-                _loadMenu = !_loadMenu;
-                if (_value == 0) {
-                  _controller.forward();
-                } else {
-                  _controller.reverse();
-                }
-              },
-            ),
+            onTap: () => setState(() => _addGroup = !_addGroup),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12),
               height: 100,
@@ -203,62 +195,64 @@ class __PodcastCardState extends State<_PodcastCard>
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.unfold_more,
-                        color: c,
+                    Icon(
+                      Icons.unfold_more,
+                      color: c,
+                    ),
+                    CircleAvatar(
+                      radius: 30,
+                      child:
+                          Image.file(File("${widget.podcastLocal.imagePath}")),
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              widget.podcastLocal.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.fade,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                          ),
+                          Row(
+                            children: _belongGroups.map((group) {
+                              return Container(
+                                  padding: EdgeInsets.only(right: 5.0),
+                                  child: Text(group.name));
+                            }).toList(),
+                          ),
+                        ],
                       ),
                     ),
-                    Container(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        child: Container(
-                          height: 60,
-                          width: 60,
-                          child: Image.file(
-                              File("${widget.podcastLocal.imagePath}")),
-                        ),
-                      ),
-                    ),
-                    Container(
-                        width: width / 2,
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                widget.podcastLocal.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.fade,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 15),
-                              ),
-                            ),
-                            Row(
-                              children: _belongGroups.map((group) {
-                                return Container(
-                                    padding: EdgeInsets.only(right: 5.0),
-                                    child: Text(group.name));
-                              }).toList(),
-                            ),
-                          ],
-                        )),
-                    Spacer(),
-                    Transform.rotate(
-                      angle: math.pi * _value,
-                      child: Icon(Icons.keyboard_arrow_down),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    ),
+                    IconButton(
+                        icon: Icon(Icons.add),
+                        splashRadius: 20,
+                        tooltip: s.menu,
+                        onPressed: () =>
+                            setState(() => _addGroup = !_addGroup)),
+                    IconButton(
+                        icon: Icon(Icons.more_vert),
+                        splashRadius: 20,
+                        tooltip: s.menu,
+                        onPressed: () => generalSheet(
+                              context,
+                              title: widget.podcastLocal.title,
+                              child: PodcastSetting(
+                                  podcastLocal: widget.podcastLocal),
+                            ).then((value) {
+                              setState(() {});
+                            })),
+                    SizedBox(width: 10),
                   ]),
             ),
           ),
-          !_loadMenu
+          !_addGroup
               ? Center()
               : Container(
                   child: Container(
