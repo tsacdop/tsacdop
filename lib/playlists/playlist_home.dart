@@ -67,6 +67,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
       child: Scaffold(
           appBar: AppBar(
             leading: CustomBackButton(),
+            centerTitle: true,
             title: Selector<AudioPlayerNotifier, EpisodeBrief>(
               selector: (_, audio) => audio.episode,
               builder: (_, data, __) {
@@ -218,10 +219,10 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                         icon: Icon(Icons.history),
                         label: 'History',
                         color: Colors.green,
-                        isSelected: _selected == 'Histtory',
+                        isSelected: _selected == 'History',
                         onTap: () => setState(() {
                               _body = _History();
-                              _selected = 'Histtory';
+                              _selected = 'History';
                             })),
                     _tabWidget(
                         icon: Icon(Icons.playlist_play),
@@ -284,6 +285,7 @@ class __QueueState extends State<_Queue> {
                             return EpisodeCard(episode,
                                 key: ValueKey('playing'),
                                 isPlaying: true,
+                                canReorder: true,
                                 tileColor: context.primaryColorDark);
                           }
                         }).toList()
@@ -610,6 +612,7 @@ class __PlaylistsState extends State<_Playlists> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return Selector<AudioPlayerNotifier, List<Playlist>>(
         selector: (_, audio) => audio.playlists,
         builder: (_, data, __) {
@@ -628,7 +631,7 @@ class __PlaylistsState extends State<_Playlists> {
                               fullscreenDialog: true,
                               builder: (context) =>
                                   PlaylistDetail(data[index])),
-                        );
+                        ).then((value) => setState(() {}));
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(15.0),
@@ -680,7 +683,7 @@ class __PlaylistsState extends State<_Playlists> {
                                           .read<AudioPlayerNotifier>()
                                           .playlistLoad(queue);
                                     },
-                                    child: Text('Play'))
+                                    child: Text(s.play))
                               ],
                             )
                           ],

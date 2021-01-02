@@ -101,6 +101,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
               child: EpisodeCard(
                 widget.episode,
                 isPlaying: false,
+                canReorder: true,
                 onTap: () async {
                   await context
                       .read<AudioPlayerNotifier>()
@@ -192,8 +193,13 @@ class EpisodeCard extends StatelessWidget {
   final Color tileColor;
   final VoidCallback onTap;
   final bool isPlaying;
+  final bool canReorder;
   const EpisodeCard(this.episode,
-      {this.tileColor, this.onTap, this.isPlaying, Key key})
+      {this.tileColor,
+      this.onTap,
+      this.isPlaying,
+      this.canReorder = false,
+      Key key})
       : super(key: key);
 
   @override
@@ -223,8 +229,8 @@ class EpisodeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Icon(Icons.unfold_more, color: c),
-                  SizedBox(width: 24),
+                  if (canReorder) Icon(Icons.unfold_more, color: c),
+                  SizedBox(width: canReorder ? 0 : 24),
                   CircleAvatar(
                       backgroundColor: c.withOpacity(0.5),
                       backgroundImage: episode.avatarImage),

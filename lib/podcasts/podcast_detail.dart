@@ -780,6 +780,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                 brightness: Brightness.dark,
                                 actions: <Widget>[
                                   Container(
+                                    width: 30,
+                                    height: 30,
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 10),
                                     decoration: BoxDecoration(
                                       color: widget.podcastLocal.primaryColor
                                           .colorizedark()
@@ -789,7 +793,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     child: IconButton(
                                       icon: Icon(Icons.more_vert),
                                       padding: EdgeInsets.zero,
-                                      splashRadius: 20,
+                                      splashRadius: 15,
                                       tooltip: s.menu,
                                       onPressed: () => generalSheet(
                                         context,
@@ -836,42 +840,60 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         //             return Center();
                                         //         }),
                                         //   ),
-                                        InkWell(
-                                          onTap: () => setState(
-                                              () => _showInfo = !_showInfo),
-                                          child: Container(
-                                            margin: EdgeInsets.only(
-                                                top: 100 + context.paddingTop),
-                                            padding: EdgeInsets.only(
-                                                left: 80, right: 20),
-                                            color: Colors.white10,
-                                            alignment: Alignment.centerLeft,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(
-                                                    widget.podcastLocal
-                                                            .author ??
-                                                        '',
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                        color: Colors.white)),
-                                                if (widget.podcastLocal.provider
-                                                    .isNotEmpty)
-                                                  Text(
-                                                    s.hostedOn(widget
-                                                        .podcastLocal.provider),
-                                                    maxLines: 1,
-                                                    style: TextStyle(
-                                                        color: Colors.white),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 100 + context.paddingTop),
+                                          child: InkWell(
+                                            onTap: () => setState(
+                                                () => _showInfo = !_showInfo),
+                                            child: Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 80, right: 130),
+                                              color: Colors.white10,
+                                              alignment: Alignment.centerLeft,
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        Text(
+                                                            widget.podcastLocal
+                                                                    .author ??
+                                                                '',
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white)),
+                                                        if (widget
+                                                            .podcastLocal
+                                                            .provider
+                                                            .isNotEmpty)
+                                                          Text(
+                                                            s.hostedOn(widget
+                                                                .podcastLocal
+                                                                .provider),
+                                                            maxLines: 1,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
-                                              ],
+                                                  UpDownIndicator(_showInfo, color: Colors.white),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

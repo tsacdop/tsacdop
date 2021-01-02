@@ -138,6 +138,13 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                               ? Colors.grey[400].withOpacity(0.5)
                               : Colors.grey[800],
                         ),
+                        BoxShadow(
+                          offset: Offset(1, 0),
+                          blurRadius: 1,
+                          color: context.brightness == Brightness.light
+                              ? Colors.grey[400].withOpacity(0.5)
+                              : Colors.grey[800],
+                        ),
                       ],
                     ),
                     child: SingleChildScrollView(

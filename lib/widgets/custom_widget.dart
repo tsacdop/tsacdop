@@ -1393,3 +1393,58 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
         ));
   }
 }
+
+class UpDownIndicator extends StatefulWidget {
+  final bool status;
+  final Color color;
+  UpDownIndicator(this.status, {this.color = Colors.white, Key key})
+      : super(key: key);
+
+  @override
+  _UpDownIndicatorState createState() => _UpDownIndicatorState();
+}
+
+class _UpDownIndicatorState extends State<UpDownIndicator>
+    with SingleTickerProviderStateMixin {
+  double _value;
+  AnimationController _controller;
+  Animation _animation;
+  @override
+  void initState() {
+    super.initState();
+    _value = 0;
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
+      ..addListener(() {
+        setState(() {
+          _value = _animation.value;
+        });
+      });
+  }
+
+  @override
+  void didUpdateWidget(covariant UpDownIndicator oldWidget) {
+    if (widget.status != oldWidget.status) {
+      widget.status ? _controller.forward() : _controller.reverse();
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: widget.status ? -math.pi * _value : math.pi * _value,
+      child: Icon(
+        Icons.keyboard_arrow_down,
+        color: widget.color,
+      ),
+    );
+  }
+}
