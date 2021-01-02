@@ -300,21 +300,6 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
           );
         },
       ));
-  OverlayEntry _createOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject();
-    var offset = renderBox.localToGlobal(Offset.zero);
-    return OverlayEntry(
-      builder: (constext) => Positioned(
-        left: offset.dx + 50,
-        top: offset.dy - 60,
-        child: Container(
-            width: 70,
-            height: 100,
-            //color: Colors.grey[200],
-            child: HeartOpen(width: 50, height: 80)),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
