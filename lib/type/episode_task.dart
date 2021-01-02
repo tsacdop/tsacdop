@@ -6,8 +6,8 @@ import 'episodebrief.dart';
 class EpisodeTask extends Equatable {
   final String taskId;
   final EpisodeBrief episode;
-  int progress;
-  DownloadTaskStatus status;
+  final int progress;
+  final DownloadTaskStatus status;
   EpisodeTask(
     this.episode,
     this.taskId, {
@@ -15,9 +15,9 @@ class EpisodeTask extends Equatable {
     this.status = DownloadTaskStatus.undefined,
   });
 
-  EpisodeTask copyWith({String taskId}) {
+  EpisodeTask copyWith({String taskId, int progress, DownloadTaskStatus status}) {
     return EpisodeTask(episode, taskId ?? this.taskId,
-        progress: progress, status: status);
+        progress: progress ?? this.progress, status: status ?? this.status);
   }
 
   @override

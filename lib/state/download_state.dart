@@ -53,8 +53,10 @@ class AutoDownloader {
 
       for (var episodeTask in _episodeTasks) {
         if (episodeTask.taskId == id) {
-          episodeTask.status = status;
-          episodeTask.progress = progress;
+          // episodeTask.status = status;
+          // episodeTask.progress = progress;
+          episodeTask =
+              episodeTask.copyWith(progress: progress, status: status);
           if (status == DownloadTaskStatus.complete) {
             _saveMediaId(episodeTask);
           } else if (status == DownloadTaskStatus.failed) {
@@ -213,8 +215,10 @@ class DownloadState extends ChangeNotifier {
 
       for (var episodeTask in _episodeTasks) {
         if (episodeTask.taskId == id) {
-          episodeTask.status = status;
-          episodeTask.progress = progress;
+          //episodeTask.status = status;
+          //episodeTask.progress = progress;
+          episodeTask =
+              episodeTask.copyWith(progress: progress, status: status);
           if (status == DownloadTaskStatus.complete) {
             _saveMediaId(episodeTask).then((value) {
               notifyListeners();
@@ -228,7 +232,7 @@ class DownloadState extends ChangeNotifier {
   }
 
   Future _saveMediaId(EpisodeTask episodeTask) async {
-    episodeTask.status = DownloadTaskStatus.complete;
+    episodeTask = episodeTask.copyWith(status: DownloadTaskStatus.complete);
     final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
         query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
     var filePath =
@@ -343,7 +347,8 @@ class DownloadState extends ChangeNotifier {
 
     for (var episodeTask in _episodeTasks) {
       if (episodeTask.taskId == task.taskId) {
-        episodeTask.status = DownloadTaskStatus.undefined;
+        //episodeTask.status = DownloadTaskStatus.undefined;
+        episodeTask = episodeTask.copyWith(status: DownloadTaskStatus.undefined);
       }
       notifyListeners();
     }
