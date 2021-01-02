@@ -1303,8 +1303,8 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
   }
 
   _initTimer() {
-    int h = DateTime.now().hour;
-    int m = DateTime.now().minute;
+    var h = DateTime.now().hour;
+    var m = DateTime.now().minute;
     if (m > 50) {
       hour = (h + 1) % 24;
       minute = 0;
@@ -1315,9 +1315,9 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
   }
 
   _getDuration() {
-    int h = DateTime.now().hour;
-    int m = DateTime.now().minute;
-    Duration d =
+    var h = DateTime.now().hour;
+    var m = DateTime.now().minute;
+    var d =
         Duration(hours: hour, minutes: minute) - Duration(hours: h, minutes: m);
     if (d >= Duration.zero) {
       return d;
@@ -1336,10 +1336,11 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  if (hour >= 23)
+                  if (hour >= 23) {
                     hour = 0;
-                  else
+                  } else {
                     hour++;
+                  }
                 });
                 widget.onChange(_getDuration());
               },
@@ -1367,10 +1368,11 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
             GestureDetector(
               onTap: (() {
                 setState(() {
-                  if (minute >= 55)
+                  if (minute >= 55) {
                     minute = 0;
-                  else
+                  } else {
                     minute += 5;
+                  }
                 });
                 widget.onChange(_getDuration());
               }),
@@ -1397,7 +1399,7 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
 class UpDownIndicator extends StatefulWidget {
   final bool status;
   final Color color;
-  UpDownIndicator(this.status, {this.color = Colors.white, Key key})
+  UpDownIndicator({this.status, this.color = Colors.white, Key key})
       : super(key: key);
 
   @override
@@ -1440,7 +1442,7 @@ class _UpDownIndicatorState extends State<UpDownIndicator>
   @override
   Widget build(BuildContext context) {
     return Transform.rotate(
-      angle: widget.status ? -math.pi * _value : math.pi * _value,
+      angle: widget.status ? math.pi * _value : -math.pi * _value,
       child: Icon(
         Icons.keyboard_arrow_down,
         color: widget.color,
