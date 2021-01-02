@@ -967,7 +967,7 @@ class SleepModeState extends State<SleepMode>
                                   width: 30.0,
                                   child: Icon(
                                     _openClock
-                                        ? LineIcons.circle_solid
+                                        ? LineIcons.stopwatch_solid
                                         : LineIcons.clock,
                                     size: 20.0,
                                   ),
