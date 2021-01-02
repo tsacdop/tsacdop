@@ -1,5 +1,22 @@
 # Tsacdop Changelog
 
+## 0.5.2
+
+Release date 2021/1/3
+First release in 2021
+
+## New features
+* Custom playlist support.
+* Playlist page redesign.
+* Podcast detail page and group management page UI update.
+* Add remove new mark button in recent tab antion bar.
+* Support time setting in sleep mode.
+
+## Minor change
+* Remove add new to playlist button.
+* Groups management perfomance improved.
+* Podcast page opennning animation improved.
+
 ## 0.5.1
 
 Release date 2020/11/1
