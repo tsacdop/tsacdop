@@ -265,9 +265,6 @@ class __QueueState extends State<_Queue> {
           return queue.name == 'Queue'
               ? ReorderableListView(
                   onReorder: (oldIndex, newIndex) {
-                    if (newIndex > oldIndex) {
-                      newIndex -= 1;
-                    }
                     context
                         .read<AudioPlayerNotifier>()
                         .reorderPlaylist(oldIndex, newIndex);

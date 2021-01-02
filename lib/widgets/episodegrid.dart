@@ -790,8 +790,6 @@ class EpisodeGrid extends StatelessWidget {
                                           if (!isDownloaded) {
                                             await _requestDownload(context,
                                                 episode: episodes[index]);
-                                            //  downloader
-                                            //      .startTask(episodes[index]);
                                           }
                                         }),
                                   if (menuList.contains(5))
