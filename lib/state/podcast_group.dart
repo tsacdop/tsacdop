@@ -434,7 +434,7 @@ class GroupList extends ChangeNotifier {
     }
     _groups = [
       for (var group in _groups)
-        if (group.id != podcastGroup) group
+        if (group.id != podcastGroup.id) group
     ];
     notifyListeners();
     await _saveGroup();

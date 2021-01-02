@@ -1038,7 +1038,6 @@ class __GpodderInfoState extends State<_GpodderInfo> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.dark,

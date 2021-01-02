@@ -29,7 +29,6 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    final c = widget.episode.backgroudColor(context);
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInSine,

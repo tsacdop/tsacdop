@@ -29,7 +29,6 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

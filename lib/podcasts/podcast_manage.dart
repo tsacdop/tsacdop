@@ -195,7 +195,7 @@ class _PodcastManageState extends State<PodcastManage>
         ),
         body: WillPopScope(
           onWillPop: () async {
-            await context.read<GroupList>().clearOrderChanged();
+            context.read<GroupList>().clearOrderChanged();
             return true;
           },
           child: Consumer<GroupList>(

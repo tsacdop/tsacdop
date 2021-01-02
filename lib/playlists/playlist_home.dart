@@ -610,7 +610,6 @@ class __PlaylistsState extends State<_Playlists> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
     return Selector<AudioPlayerNotifier, List<Playlist>>(
         selector: (_, audio) => audio.playlists,
         builder: (_, data, __) {
