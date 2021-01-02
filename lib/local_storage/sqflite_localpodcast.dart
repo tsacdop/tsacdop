@@ -414,11 +414,11 @@ class DBHelper {
       ORDER BY add_date DESC""");
     return list
         .map((record) => SubHistory(
-            record['status'] == 0 ? true : false,
             DateTime.fromMillisecondsSinceEpoch(record['remove_date']),
             DateTime.fromMillisecondsSinceEpoch(record['add_date']),
             record['rss_url'],
-            record['title']))
+            record['title'],
+            status: record['status'] == 0 ? true : false,))
         .toList();
   }
 
