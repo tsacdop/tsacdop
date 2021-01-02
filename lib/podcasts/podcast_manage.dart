@@ -165,7 +165,6 @@ class _PodcastManageState extends State<PodcastManage>
       ),
       child: Scaffold(
         appBar: AppBar(
-          centerTitle: true,
           title: Text(context.s.groups(2)),
           leading: CustomBackButton(),
           actions: <Widget>[
@@ -188,9 +187,14 @@ class _PodcastManageState extends State<PodcastManage>
                       transitionDuration: const Duration(milliseconds: 200),
                       pageBuilder: (context, animaiton, secondaryAnimation) =>
                           AddGroup()),
-                  icon: Icon(Icons.add)),
+                  icon: Icon(Icons.add_circle_outline)),
             ),
-            _OrderMenu(),
+            IconButton(
+                splashRadius: 20,
+                onPressed: () =>
+                    Navigator.push(context, ScaleRoute(page: PodcastList())),
+                icon: Icon(Icons.all_out)),
+           // _OrderMenu(),
           ],
         ),
         body: WillPopScope(
@@ -233,10 +237,10 @@ class _PodcastManageState extends State<PodcastManage>
                               backgroundColor: Colors.cyan[600],
                               buttonColor: Colors.cyan[500],
                               description: s.featureDiscoveryGroupPodcastDes,
-                              child: Container(
-                                  key: ValueKey<String>(_groups[index].name),
-                                  child:
-                                      PodcastGroupList(group: _groups[index])),
+                              child: PodcastGroupList(
+                                group: _groups[index],
+                                key: ValueKey<String>(_groups[index].name),
+                              ),
                             ),
                             onPositionChange: (value) =>
                                 // setState(() =>
@@ -329,9 +333,7 @@ class _PodcastManageState extends State<PodcastManage>
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 10.0)),
+                                SizedBox(height: 20),
                                 Material(
                                   color: Colors.transparent,
                                   child: InkWell(
@@ -396,21 +398,18 @@ class _PodcastManageState extends State<PodcastManage>
                                       height: 30,
                                       decoration: BoxDecoration(
                                           color: Colors.grey[700],
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10.0))),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
                                       padding:
                                           EdgeInsets.symmetric(horizontal: 10),
                                       child: Row(
                                         children: <Widget>[
                                           Icon(
-                                            Icons.delete_outline,
+                                            Icons.delete,
                                             color: Colors.red,
                                             size: 15.0,
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 5.0),
-                                          ),
+                                          SizedBox(width: 10),
                                           Text(s.remove,
                                               style:
                                                   TextStyle(color: Colors.red)),
