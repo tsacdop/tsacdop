@@ -5,7 +5,7 @@ import 'package:line_icons/line_icons.dart';
 import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
 
-const String version = '0.5.1';
+const String version = '0.5.2';
 
 class AboutApp extends StatefulWidget {
   @override
