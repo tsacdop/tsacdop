@@ -238,7 +238,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 onTap: () => _setNeverUpdate(!snapshot.data),
                 title: Row(
                   children: [
-                    Icon(Icons.lock, size: 18),
+                    Icon(Icons.lock_outlined, size: 18),
                     SizedBox(width: 20),
                     Text(s.neverAutoUpdate, style: textStyle),
                   ],
@@ -266,7 +266,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
             dense: true,
             title: Row(
               children: [
-                Icon(Icons.fast_forward, size: 18),
+                Icon(Icons.fast_forward_outlined, size: 18),
                 SizedBox(width: 20),
                 Text(s.skipSecondsAtStart, style: textStyle),
               ],
@@ -389,7 +389,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
           dense: true,
           title: Row(
             children: [
-              Icon(Icons.delete, color: Colors.red, size: 18),
+              Icon(Icons.delete_outlined, color: Colors.red, size: 18),
               SizedBox(width: 20),
               Text(s.remove,
                   style: textStyle.copyWith(
