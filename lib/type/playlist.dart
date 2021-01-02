@@ -34,9 +34,15 @@ class Playlist extends Equatable {
   /// Eposides in playlist.
   final List<EpisodeBrief> episodes;
 
-  bool get isEmpty => episodeList.isEmpty;
+  bool get isEmpty => episodes.isEmpty && episodeList.isEmpty;
+
+  bool get isNotEmpty => episodes.isNotEmpty && episodeList.isNotEmpty;
 
   int get length => episodes.length;
+
+  bool get isQueue => name == 'Queue';
+
+  bool contains(EpisodeBrief episode) => episodes.contains(episode);
 
   Playlist(this.name,
       {String id, List<String> episodeList, List<EpisodeBrief> episodes})

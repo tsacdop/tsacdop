@@ -120,7 +120,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   double _seekSliderValue = 0.0;
 
   /// Record plyaer position.
-  int _lastPostion = 0;
+  int _lastPosition = 0;
 
   /// Set true if sleep timer mode is end of episode.
   bool _stopOnComplete = false;
@@ -199,7 +199,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   EpisodeBrief get episode => _episode;
 
   /// Playlist provider.
-  int get lastPositin => _lastPostion;
+  int get lastPosition => _lastPosition;
   List<Playlist> get playlists => _playlists;
   Playlist get queue => _playlists.first;
   bool get playing => _playing;
@@ -269,20 +269,32 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await _getAutoPlay();
 
     var state = await _playerStateStorage.getPlayerState();
-    if (state[0] != '') {
-      _playlist = _playlists.firstWhere((p) => p.id == state[0],
-          orElse: () => _playlists.first);
+    var idList = [for (var p in _playlists) p.id];
+    if (idList.contains(state[1])) {
+      _playlist = _playlists.firstWhere(
+        (p) => p.id == state[0],
+      );
+      await _playlist.getPlaylist();
+      if (state[1] != '') {
+        var episode = await _dbHelper.getRssItemWithUrl(state[1]);
+        if ((!_playlist.isQueue && _playlist.contains(episode)) ||
+            (_playlist.isQueue && _queue.episodes.first == episode)) {
+          _episode = episode;
+          _lastPosition = int.parse(state[2] ?? '0');
+        } else {
+          _episode = _playlist.episodes.first;
+          _lastPosition = 0;
+        }
+      } else {
+        _episode = _playlist.episodes.first;
+        _lastPosition = 0;
+      }
     } else {
       _playlist = _playlists.first;
+      _episode = _playlist.episodes.first;
+      _lastPosition = 0;
     }
-    await _playlist.getPlaylist();
-    if (state[1] != '') {
-      _episode = await _dbHelper.getRssItemWithUrl(state[1]);
-    } else {
-      _episode =
-          _playlist.episodes.isNotEmpty ? _playlist.episodes.first : null;
-    }
-    _lastPostion = int.parse(state[2] ?? '0');
+    notifyListeners();
 
     /// Save plays history if app is closed accidentally.
     /// if (_lastPostion > 0 && _queue.episodes.isNotEmpty) {
@@ -308,7 +320,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _playerRunning = true;
       notifyListeners();
       _startAudioService(_playlist,
-          position: _lastPostion ?? 0,
+          position: _lastPosition ?? 0,
           index: _playlist.episodes.indexOf(_episode));
     }
   }
@@ -348,7 +360,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       await _dbHelper.saveHistory(history);
       _queue.addToPlayListAt(episodeNew, 0);
       await updatePlaylist(_queue);
-      if (_playlist.name != 'Queue') {
+      if (!_playlist.isQueue) {
         AudioService.customAction('setIsQueue', true);
         AudioService.customAction('changeQueue', [
           for (var e in _queue.episodes) jsonEncode(e.toMediaItem().toJson())
@@ -479,7 +491,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
         }
         notifyListeners();
       } else {
-        //  _queue.playlist.removeAt(0);
         AudioService.skipToNext();
       }
     });
@@ -511,16 +522,17 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
     AudioService.customEventStream.distinct().listen((event) async {
       if (event is String) {
-        if (_playlist.name == 'Queue' &&
-            _queue.episodes.isNotEmpty &&
+        if (_playlist.isQueue &&
+            _queue.isNotEmpty &&
             _queue.episodes.first.title == event) {
           _queue.delFromPlaylist(_episode);
+          updatePlaylist(_queue, updateEpisodes: false);
         }
-        _lastPostion = 0;
+        _lastPosition = 0;
         notifyListeners();
         // await _positionStorage.saveInt(_lastPostion);
         await _playerStateStorage.savePlayerState(
-            _playlist.id, _episode.enclosureUrl, _lastPostion);
+            _playlist.id, _episode.enclosureUrl, _lastPosition);
         var history;
         if (_markListened) {
           history = PlayHistory(_episode.title, _episode.enclosureUrl,
@@ -534,9 +546,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
       if (event is Map && event['playerRunning'] == false && _playerRunning) {
         _playerRunning = false;
         notifyListeners();
-        if (_lastPostion > 0) {
+        if (_lastPosition > 0) {
           final history = PlayHistory(_episode.title, _episode.enclosureUrl,
-              _lastPostion ~/ 1000, _seekSliderValue);
+              _lastPosition ~/ 1000, _seekSliderValue);
           await _dbHelper.saveHistory(history);
         }
         //_episode = null;
@@ -569,10 +581,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
         if (_backgroundAudioPosition > 0 &&
             _backgroundAudioPosition < _backgroundAudioDuration) {
-          _lastPostion = _backgroundAudioPosition;
+          _lastPosition = _backgroundAudioPosition;
           // _positionStorage.saveInt(_lastPostion);
           _playerStateStorage.savePlayerState(
-              _playlist.id, _episode.enclosureUrl, _lastPostion);
+              _playlist.id, _episode.enclosureUrl, _lastPosition);
         }
         notifyListeners();
       }
@@ -582,16 +594,17 @@ class AudioPlayerNotifier extends ChangeNotifier {
     });
   }
 
-  /// Playlists management.
+  /// Queue management.
   Future<void> addToPlaylist(EpisodeBrief episode) async {
     var episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (episodeNew.isNew == 1) {
       await _dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
     }
     if (!_queue.episodes.contains(episodeNew)) {
-      if (playerRunning && _playlist.name == 'Queue') {
+      if (playerRunning && _playlist.isQueue) {
         await AudioService.addQueueItem(episodeNew.toMediaItem());
       }
+      if (_playlist.isQueue && _queue.isEmpty) _episode = episodeNew;
       _queue.addToPlayList(episodeNew);
       await updatePlaylist(_queue, updateEpisodes: false);
     }
@@ -602,7 +615,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     if (episodeNew.isNew == 1) {
       await _dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
     }
-    if (playerRunning && _playlist.name == 'Queue') {
+    if (_playerRunning && _playlist.isQueue) {
       await AudioService.addQueueItemAt(episodeNew.toMediaItem(), index);
     }
     _queue.addToPlayListAt(episodeNew, index);
@@ -629,20 +642,25 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> updateMediaItem(EpisodeBrief episode) async {
-    if (episode.enclosureUrl == episode.mediaId && _episode != episode) {
+    if (episode.enclosureUrl == episode.mediaId &&
+        _episode != episode &&
+        _playlist.contains(episode)) {
       var episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
       _playlist.updateEpisode(episodeNew);
+      if (_playerRunning) {
+        await AudioService.updateMediaItem(episodeNew.toMediaItem());
+      }
     }
   }
 
   Future<int> delFromPlaylist(EpisodeBrief episode) async {
     var episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
-    if (playerRunning && _playlist.name == 'Queue') {
+    if (playerRunning && _playlist.isQueue) {
       await AudioService.removeQueueItem(episodeNew.toMediaItem());
     }
     var index = _queue.delFromPlaylist(episodeNew);
     if (index == 0) {
-      _lastPostion = 0;
+      _lastPosition = 0;
       await _positionStorage.saveInt(0);
     }
     updatePlaylist(_queue, updateEpisodes: false);
@@ -650,6 +668,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future reorderPlaylist(int oldIndex, int newIndex) async {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
     var episode = _queue.episodes[oldIndex];
     if (playerRunning && _playlist.name == 'Queue') {
       await AudioService.removeQueueItem(episode.toMediaItem());
@@ -658,27 +679,30 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _queue.addToPlayListAt(episode, newIndex);
     updatePlaylist(_queue, updateEpisodes: false);
     if (newIndex == 0) {
-      _lastPostion = 0;
+      _lastPosition = 0;
       await _positionStorage.saveInt(0);
     }
   }
 
   Future<bool> moveToTop(EpisodeBrief episode) async {
     await delFromPlaylist(episode);
-    if (playerRunning && _playlist.name == 'Queue') {
-      final episodeNew =
-          await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    final episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    if (_playerRunning && _playlist.isQueue) {
       await AudioService.addQueueItemAt(episodeNew.toMediaItem(), 1);
       _queue.addToPlayListAt(episode, 1, existed: false);
     } else {
       _queue.addToPlayListAt(episode, 0, existed: false);
-      _lastPostion = 0;
-      _positionStorage.saveInt(_lastPostion);
+      if (_playlist.isQueue) {
+        _lastPosition = 0;
+        _positionStorage.saveInt(_lastPosition);
+        _episode = episodeNew;
+      }
     }
     updatePlaylist(_queue, updateEpisodes: false);
     return true;
   }
 
+  /// Custom playlist management.
   void addPlaylist(Playlist playlist) {
     _playlists = [..._playlists, playlist];
     notifyListeners();
@@ -734,7 +758,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   void clearPlaylist(Playlist playlist) {
-    playlist.clear();
+    if (_playerRunning && _playlist.isQueue && playlist.isQueue) {
+      for (var e in playlist.episodes) {
+        if (e != _episode) {
+          delFromPlaylist(e);
+        }
+      }
+    } else
+      playlist.clear();
     updatePlaylist(playlist, updateEpisodes: false);
   }
 
@@ -742,11 +773,15 @@ class AudioPlayerNotifier extends ChangeNotifier {
       {bool updateEpisodes = true}) async {
     if (updateEpisodes) await playlist.getPlaylist();
     _playlists = [for (var p in _playlists) p.id == playlist.id ? playlist : p];
-    if (_playlist.id == playlist.id && !_playerRunning) {
-      _playlist = _playlists.firstWhere((e) => e.id == _playlist.id);
+    if (_playlist.id == playlist.id) {
+      if (playlist.isQueue) {
+        _playlist = _queue;
+      } else if (!_playerRunning) {
+        _playlist = _playlists.firstWhere((e) => e.id == _playlist.id);
+      }
       notifyListeners();
     }
-    _savePlaylists();
+    await _savePlaylists();
   }
 
   bool playlistExisted(String name) {
