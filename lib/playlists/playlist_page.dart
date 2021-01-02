@@ -29,6 +29,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.s;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -40,7 +41,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
           },
         ),
         title: Text(_selectedEpisodes.isEmpty
-            ? widget.playlist.name
+            ? widget.playlist.isQueue ? s.queue :widget.playlist.name
             : '${_selectedEpisodes.length} selected'),
         actions: [
           if (_selectedEpisodes.isNotEmpty)
@@ -79,35 +80,6 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
               setState(() {});
             }),
           ),
-          //SizedBox(
-          //  height: 40,
-          //  width: 40,
-          //  child: Material(
-          //    color: Colors.transparent,
-          //    borderRadius: BorderRadius.circular(100),
-          //    clipBehavior: Clip.hardEdge,
-          //    child: SizedBox(
-          //      height: 40,
-          //      width: 40,
-          //      child: PopupMenuButton<int>(
-          //          icon: Icon(Icons.more_vert),
-          //          shape: RoundedRectangleBorder(
-          //              borderRadius: BorderRadius.circular(10)),
-          //          elevation: 1,
-          //          tooltip: s.menu,
-          //          itemBuilder: (context) => [
-          //                PopupMenuItem(value: 1, child: Text('Clear all')),
-          //              ],
-          //          onSelected: (value) {
-          //            if (value == 1) {
-          //              context
-          //                  .read<AudioPlayerNotifier>()
-          //                  .clearPlaylist(widget.playlist);
-          //            }
-          //          }),
-          //    ),
-          //  ),
-          //)
         ],
       ),
       body: Selector<AudioPlayerNotifier, List<Playlist>>(
@@ -389,7 +361,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
               children: [
                 Icon(Icons.delete, color: Colors.red, size: 18),
                 SizedBox(width: 20),
-                Text('Remove playlist',
+                Text(s.remove,
                     style: textStyle.copyWith(
                         color: Colors.red, fontWeight: FontWeight.bold)),
               ],

@@ -34,11 +34,11 @@ class Playlist extends Equatable {
   /// Eposides in playlist.
   final List<EpisodeBrief> episodes;
 
-  bool get isEmpty => episodes.isEmpty && episodeList.isEmpty;
+  bool get isEmpty => episodeList.isEmpty;
 
-  bool get isNotEmpty => episodes.isNotEmpty && episodeList.isNotEmpty;
+  bool get isNotEmpty => episodeList.isNotEmpty;
 
-  int get length => episodes.length;
+  int get length => episodeList.length;
 
   bool get isQueue => name == 'Queue';
 
@@ -71,7 +71,11 @@ class Playlist extends Equatable {
     if (episodeList.isNotEmpty) {
       for (var url in episodeList) {
         var episode = await _dbHelper.getRssItemWithUrl(url);
-        if (episode != null) episodes.add(episode);
+        if (episode != null) {
+          episodes.add(episode);
+        } else {
+          episodeList.remove(url);
+        }
       }
     }
   }
