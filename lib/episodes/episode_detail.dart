@@ -230,9 +230,11 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                       EdgeInsets.symmetric(horizontal: 10.0),
                                   alignment: Alignment.center,
                                   child: Text(
-                                      s.minsCount(
-                                          widget.episodeItem.duration ~/ 60),
-                                      style: context.textTheme.button)),
+                                    s.minsCount(
+                                      widget.episodeItem.duration ~/ 60,
+                                    ),
+                                    style: TextStyle(color: Colors.black),
+                                  )),
                             if (widget.episodeItem.enclosureLength != null &&
                                 widget.episodeItem.enclosureLength != 0)
                               Container(
@@ -245,8 +247,9 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                 padding: EdgeInsets.symmetric(horizontal: 10.0),
                                 alignment: Alignment.center,
                                 child: Text(
-                                    '${(widget.episodeItem.enclosureLength) ~/ 1000000}MB',
-                                    style: context.textTheme.button),
+                                  '${(widget.episodeItem.enclosureLength) ~/ 1000000}MB',
+                                  style: TextStyle(color: Colors.black),
+                                ),
                               ),
                             FutureBuilder<PlayHistory>(
                                 future: _getPosition(widget.episodeItem),
@@ -286,7 +289,11 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                               ),
                                             ),
                                             SizedBox(width: 5),
-                                            Text(snapshot.data.seconds.toTime),
+                                            Text(
+                                              snapshot.data.seconds.toTime,
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
                                           ],
                                         ),
                                       ),
