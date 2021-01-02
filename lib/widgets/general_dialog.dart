@@ -60,10 +60,10 @@ Future generalSheet(BuildContext context, {Widget child, String title}) async =>
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      left: 50, right: 50, top: 6.0, bottom: 15),
+                      left: 50, right: 50, top: 6.0, bottom: 10),
                   child: Text(
                     title,
-                    style: context.textTheme.headline6,
+                    style: context.textTheme.subtitle2,
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.clip,
