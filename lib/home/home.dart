@@ -361,7 +361,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
               child: Selector<AudioPlayerNotifier,
                   Tuple3<bool, EpisodeBrief, int>>(
                 selector: (_, audio) => Tuple3(
-                    audio.playerRunning, audio.episode, audio.lastPositin),
+                    audio.playerRunning, audio.episode, audio.lastPosition),
                 builder: (_, data, __) => !_loadPlay
                     ? SizedBox(
                         height: 8.0,
