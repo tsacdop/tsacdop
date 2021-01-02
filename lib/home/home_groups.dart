@@ -10,7 +10,7 @@ import 'package:focused_menu/modals.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:tuple/tuple.dart';
+import 'package:tuple/tuple.dart' as tuple;
 
 import '../episodes/episode_detail.dart';
 import '../local_storage/key_value_storage.dart';
@@ -26,9 +26,11 @@ import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
 import '../util/extension_helper.dart';
+import '../util/hide_player_route.dart';
 import '../util/pageroute.dart';
 import '../widgets/custom_widget.dart';
 import '../widgets/general_dialog.dart';
+import 'home.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -106,8 +108,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final s = context.s;
-    return Selector<GroupList, Tuple2<List<PodcastGroup>, bool>>(
-      selector: (_, groupList) => Tuple2(groupList.groups, groupList.created),
+    return Selector<GroupList, tuple.Tuple2<List<PodcastGroup>, bool>>(
+      selector: (_, groupList) =>
+          tuple.Tuple2(groupList.groups, groupList.created),
       builder: (_, data, __) {
         var groups = data.item1;
         var import = data.item2;
@@ -441,12 +444,23 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                         child: InkWell(
                                           onTap: () {
                                             Navigator.push(
-                                              context,
-                                              SlideLeftRoute(
-                                                  page: PodcastDetail(
-                                                podcastLocal: podcastLocal,
-                                              )),
-                                            );
+                                                context,
+                                                HidePlayerRoute(
+                                                  PodcastDetail(
+                                                    podcastLocal: podcastLocal,
+                                                  ),
+                                                  PodcastDetail(
+                                                      podcastLocal:
+                                                          podcastLocal,
+                                                      hide: true),
+                                                  duration: Duration(
+                                                      milliseconds: 300),
+                                                )
+                                                //  SlideLeftRoute(
+                                                //      page: PodcastDetail(
+                                                //    podcastLocal: podcastLocal,
+                                                //  )),
+                                                );
                                           },
                                           child: PodcastPreview(
                                             podcastLocal: podcastLocal,
@@ -553,7 +567,7 @@ class ShowEpisode extends StatelessWidget {
   final DBHelper _dbHelper = DBHelper();
   ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
 
-  Future<Tuple5<int, bool, bool, bool, List<int>>> _initData(
+  Future<tuple.Tuple5<int, bool, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
     final menuList = await _getEpisodeMenu();
     final tapToOpen = await _getTapToOpenPopupMenu();
@@ -561,7 +575,7 @@ class ShowEpisode extends StatelessWidget {
     final liked = await _isLiked(episode);
     final downloaded = await _isDownloaded(episode);
 
-    return Tuple5(listened, liked, downloaded, tapToOpen, menuList);
+    return tuple.Tuple5(listened, liked, downloaded, tapToOpen, menuList);
   }
 
   Future<int> _isListened(EpisodeBrief episode) async {
@@ -690,17 +704,17 @@ class ShowEpisode extends StatelessWidget {
               (context, index) {
                 final c = podcastLocal.backgroudColor(context);
                 return Selector<AudioPlayerNotifier,
-                        Tuple2<EpisodeBrief, List<String>>>(
-                    selector: (_, audio) => Tuple2(
+                        tuple.Tuple2<EpisodeBrief, List<String>>>(
+                    selector: (_, audio) => tuple.Tuple2(
                           audio?.episode,
                           audio.queue.episodes
                               .map((e) => e.enclosureUrl)
                               .toList(),
                         ),
                     builder: (_, data, __) => FutureBuilder<
-                            Tuple5<int, bool, bool, bool, List<int>>>(
+                            tuple.Tuple5<int, bool, bool, bool, List<int>>>(
                         future: _initData(episodes[index]),
-                        initialData: Tuple5(0, false, false, false, []),
+                        initialData: tuple.Tuple5(0, false, false, false, []),
                         builder: (context, snapshot) {
                           final isListened = snapshot.data.item1;
                           final isLiked = snapshot.data.item2;
@@ -919,11 +933,13 @@ class ShowEpisode extends StatelessWidget {
                                             ),
                                           ),
                                           Spacer(),
-                                          Selector<AudioPlayerNotifier,
-                                                  Tuple2<EpisodeBrief, bool>>(
-                                              selector: (_, audio) => Tuple2(
-                                                  audio.episode,
-                                                  audio.playerRunning),
+                                          Selector<
+                                                  AudioPlayerNotifier,
+                                                  tuple.Tuple2<EpisodeBrief,
+                                                      bool>>(
+                                              selector: (_, audio) =>
+                                                  tuple.Tuple2(audio.episode,
+                                                      audio.playerRunning),
                                               builder: (_, data, __) {
                                                 return (episodes[index]
                                                                 .enclosureUrl ==

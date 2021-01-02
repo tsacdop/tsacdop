@@ -30,7 +30,7 @@ import '../widgets/general_dialog.dart';
 import '../widgets/muiliselect_bar.dart';
 import 'podcast_settings.dart';
 
-const KDefaultAvatar = """http://xuanmei.us/assets/default/avatar_small-
+const String kDefaultAvatar = """http://xuanmei.us/assets/default/avatar_small-
 170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg""";
 
 class PodcastDetail extends StatefulWidget {
@@ -89,7 +89,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
   bool _selectAll;
   bool _selectBefore;
   bool _selectAfter;
-  bool _loadEpisodes = false;
 
   ///Show podcast info.
   bool _showInfo;
@@ -106,8 +105,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
     _selectAfter = false;
     _selectBefore = false;
     _showInfo = false;
-    Future.delayed(Duration(milliseconds: 200))
-        .then((value) => setState(() => _loadEpisodes = true));
   }
 
   @override
@@ -293,8 +290,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                         if (snapshot.hasData)
                           ...snapshot.data.item2
                               .map<Widget>((host) {
-                                final image = host.image == KDefaultAvatar
-                                    ? KDefaultAvatar
+                                final image = host.image == kDefaultAvatar
+                                    ? kDefaultAvatar
                                     : host.image;
                                 return Container(
                                   padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
@@ -615,35 +612,36 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   }
                 }),
             Spacer(),
-            Material(
-                color: Colors.transparent,
-                clipBehavior: Clip.hardEdge,
-                borderRadius: BorderRadius.circular(100),
-                child: TweenAnimationBuilder(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.easeInOutQuart,
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  builder: (context, angle, child) => Transform.rotate(
-                    angle: math.pi * 2 * angle,
-                    child: SizedBox(
-                      width: 30,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        tooltip: s.homeSubMenuSortBy,
-                        icon: Icon(
-                          _reverse
-                              ? LineIcons.hourglass_start_solid
-                              : LineIcons.hourglass_end_solid,
-                          color: _reverse ? context.accentColor : null,
+            if (!widget.hide)
+              Material(
+                  color: Colors.transparent,
+                  clipBehavior: Clip.hardEdge,
+                  borderRadius: BorderRadius.circular(100),
+                  child: TweenAnimationBuilder(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOutQuart,
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    builder: (context, angle, child) => Transform.rotate(
+                      angle: math.pi * 2 * angle,
+                      child: SizedBox(
+                        width: 30,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          tooltip: s.homeSubMenuSortBy,
+                          icon: Icon(
+                            _reverse
+                                ? LineIcons.hourglass_start_solid
+                                : LineIcons.hourglass_end_solid,
+                            color: _reverse ? context.accentColor : null,
+                          ),
+                          iconSize: 18,
+                          onPressed: () {
+                            setState(() => _reverse = !_reverse);
+                          },
                         ),
-                        iconSize: 18,
-                        onPressed: () {
-                          setState(() => _reverse = !_reverse);
-                        },
                       ),
                     ),
-                  ),
-                )),
+                  )),
             FutureBuilder<bool>(
                 future: _getHideListened(),
                 builder: (context, snapshot) {
@@ -908,7 +906,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   child: _multiSelect
                                       ? Center()
                                       : _actionBar(context)),
-                              if (_loadEpisodes)
+                              if (!widget.hide)
                                 FutureBuilder<List<EpisodeBrief>>(
                                     future: _getRssItem(widget.podcastLocal,
                                         count: _top,
