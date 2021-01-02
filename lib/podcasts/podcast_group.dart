@@ -173,52 +173,44 @@ class __PodcastCardState extends State<_PodcastCard>
   Widget build(BuildContext context) {
     final c = widget.podcastLocal.backgroudColor(context);
     final s = context.s;
-    var width = context.width;
     var groupList = context.watch<GroupList>();
     _belongGroups = groupList.getPodcastGroup(widget.podcastLocal.id);
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: Divider.createBorderSide(context),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          InkWell(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
             onTap: () => setState(() => _addGroup = !_addGroup),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12),
+            child: SizedBox(
               height: 100,
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Icon(
                       Icons.unfold_more,
                       color: c,
                     ),
+                    SizedBox(width: 5),
                     CircleAvatar(
-                      radius: 30,
-                      child:
-                          Image.file(File("${widget.podcastLocal.imagePath}")),
+                      radius: 25,
+                      backgroundImage: widget.podcastLocal.avatarImage,
                     ),
+                    SizedBox(width: 10),
                     Expanded(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              widget.podcastLocal.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.fade,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
+                          Text(
+                            widget.podcastLocal.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.fade,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
                           ),
                           Row(
                             children: _belongGroups.map((group) {
@@ -246,246 +238,245 @@ class __PodcastCardState extends State<_PodcastCard>
                               child: PodcastSetting(
                                   podcastLocal: widget.podcastLocal),
                             ).then((value) {
-                              setState(() {});
+                              if (mounted) setState(() {});
                             })),
-                    SizedBox(width: 10),
                   ]),
             ),
           ),
-          !_addGroup
-              ? Center()
-              : Container(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        border: Border(
-                            bottom: BorderSide(
-                                color: Theme.of(context).primaryColorDark),
-                            top: BorderSide(
-                                color: Theme.of(context).primaryColorDark))),
-                    height: 50,
-                    child: _addGroup
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                      children:
-                                          groupList.groups.map<Widget>((group) {
-                                    return Container(
-                                      padding: EdgeInsets.only(left: 5.0),
-                                      child: FilterChip(
-                                        key: ValueKey<String>(group.id),
-                                        label: Text(group.name),
-                                        selected:
-                                            _selectedGroups.contains(group),
-                                        onSelected: (value) {
-                                          setState(() {
-                                            if (!value) {
-                                              _selectedGroups.remove(group);
-                                            } else {
-                                              _selectedGroups.add(group);
-                                            }
-                                          });
-                                        },
-                                      ),
-                                    );
-                                  }).toList()),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 100,
+        ),
+        !_addGroup
+            ? Center()
+            : Container(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: context.scaffoldBackgroundColor,
+                  ),
+                  // border: Border(
+                  //     bottom: BorderSide(
+                  //         color: Theme.of(context).primaryColorDark),
+                  //     top: BorderSide(
+                  //         color: Theme.of(context).primaryColorDark))),
+                  height: 50,
+                  child: _addGroup
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Expanded(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: <Widget>[
-                                    IconButton(
-                                      icon: Icon(Icons.clear),
-                                      onPressed: () => setState(() {
-                                        _addGroup = false;
-                                      }),
-                                    ),
-                                    IconButton(
-                                      onPressed: () async {
-                                        if (_selectedGroups.length > 0) {
-                                          setState(() {
-                                            _addGroup = false;
-                                          });
-                                          await groupList.changeGroup(
-                                            widget.podcastLocal,
-                                            _selectedGroups,
-                                          );
-                                          Fluttertoast.showToast(
-                                            msg: s.toastSettingSaved,
-                                            gravity: ToastGravity.BOTTOM,
-                                          );
-                                        } else {
-                                          Fluttertoast.showToast(
-                                            msg: s.toastOneGroup,
-                                            gravity: ToastGravity.BOTTOM,
-                                          );
-                                        }
+                                    children:
+                                        groupList.groups.map<Widget>((group) {
+                                  return Container(
+                                    padding: EdgeInsets.only(left: 5.0),
+                                    child: FilterChip(
+                                      key: ValueKey<String>(group.id),
+                                      label: Text(group.name),
+                                      selected: _selectedGroups.contains(group),
+                                      onSelected: (value) {
+                                        setState(() {
+                                          if (!value) {
+                                            _selectedGroups.remove(group);
+                                          } else {
+                                            _selectedGroups.add(group);
+                                          }
+                                        });
                                       },
-                                      icon: Icon(Icons.done),
                                     ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              _buttonOnMenu(
-                                  icon: Icon(Icons.add,
-                                      size: _value == 0 ? 1 : 20 * _value),
-                                  onTap: () {
-                                    setState(() {
-                                      _addGroup = true;
-                                    });
+                                  );
+                                }).toList()),
+                              ),
+                            ),
+                            Material(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: Icon(Icons.clear),
+                                    splashRadius: 20,
+                                    onPressed: () => setState(() {
+                                      _addGroup = false;
+                                    }),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.done),
+                                    splashRadius: 20,
+                                    onPressed: () async {
+                                      if (_selectedGroups.length > 0) {
+                                        setState(() {
+                                          _addGroup = false;
+                                        });
+                                        await groupList.changeGroup(
+                                          widget.podcastLocal,
+                                          _selectedGroups,
+                                        );
+                                        Fluttertoast.showToast(
+                                          msg: s.toastSettingSaved,
+                                          gravity: ToastGravity.BOTTOM,
+                                        );
+                                      } else {
+                                        Fluttertoast.showToast(
+                                          msg: s.toastOneGroup,
+                                          gravity: ToastGravity.BOTTOM,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            _buttonOnMenu(
+                                icon: Icon(Icons.add,
+                                    size: _value == 0 ? 1 : 20 * _value),
+                                onTap: () {
+                                  setState(() {
+                                    _addGroup = true;
+                                  });
+                                },
+                                tooltip: s.groups(0)),
+                            FutureBuilder<bool>(
+                              future: _getAutoDownload(widget.podcastLocal.id),
+                              initialData: false,
+                              builder: (context, snapshot) {
+                                return _buttonOnMenu(
+                                  icon: Container(
+                                    child: Icon(Icons.file_download,
+                                        size: _value * 15,
+                                        color: snapshot.data
+                                            ? Colors.white
+                                            : null),
+                                    height: _value == 0 ? 1 : 20 * _value,
+                                    width: _value == 0 ? 1 : 20 * _value,
+                                    decoration: BoxDecoration(
+                                        border: snapshot.data
+                                            ? Border.all(
+                                                width: 1,
+                                                color: snapshot.data
+                                                    ? context.accentColor
+                                                    : context.textTheme
+                                                        .subtitle1.color)
+                                            : null,
+                                        shape: BoxShape.circle,
+                                        color: snapshot.data
+                                            ? context.accentColor
+                                            : null),
+                                  ),
+                                  tooltip: s.autoDownload,
+                                  onTap: () async {
+                                    await _setAutoDownload(
+                                        widget.podcastLocal.id, !snapshot.data);
+                                    setState(() {});
                                   },
-                                  tooltip: s.groups(0)),
-                              FutureBuilder<bool>(
-                                future:
-                                    _getAutoDownload(widget.podcastLocal.id),
-                                initialData: false,
+                                );
+                              },
+                            ),
+                            FutureBuilder<int>(
+                                future: _getSkipSecond(widget.podcastLocal.id),
+                                initialData: 0,
                                 builder: (context, snapshot) {
                                   return _buttonOnMenu(
-                                    icon: Container(
-                                      child: Icon(Icons.file_download,
-                                          size: _value * 15,
-                                          color: snapshot.data
-                                              ? Colors.white
-                                              : null),
-                                      height: _value == 0 ? 1 : 20 * _value,
-                                      width: _value == 0 ? 1 : 20 * _value,
-                                      decoration: BoxDecoration(
-                                          border: snapshot.data
-                                              ? Border.all(
-                                                  width: 1,
-                                                  color: snapshot.data
-                                                      ? context.accentColor
-                                                      : context.textTheme
-                                                          .subtitle1.color)
-                                              : null,
-                                          shape: BoxShape.circle,
-                                          color: snapshot.data
-                                              ? context.accentColor
-                                              : null),
-                                    ),
-                                    tooltip: s.autoDownload,
-                                    onTap: () async {
-                                      await _setAutoDownload(
-                                          widget.podcastLocal.id,
-                                          !snapshot.data);
-                                      setState(() {});
-                                    },
-                                  );
-                                },
-                              ),
-                              FutureBuilder<int>(
-                                  future:
-                                      _getSkipSecond(widget.podcastLocal.id),
-                                  initialData: 0,
-                                  builder: (context, snapshot) {
-                                    return _buttonOnMenu(
-                                        icon: Icon(
-                                          Icons.fast_forward,
-                                          size: _value == 0 ? 1 : 20 * (_value),
-                                        ),
-                                        tooltip:
-                                            'Skip${snapshot.data == 0 ? '' : snapshot.data.toTime}',
-                                        onTap: () {
-                                          generalDialog(
-                                            context,
-                                            title: Text(s.skipSecondsAtStart,
-                                                maxLines: 2),
-                                            content: DurationPicker(
-                                              duration: Duration(
-                                                  seconds: _skipSeconds ?? 0),
-                                              onChange: (value) =>
-                                                  _seconds = value.inSeconds,
-                                            ),
-                                            actions: <Widget>[
-                                              FlatButton(
-                                                splashColor: context.accentColor
-                                                    .withAlpha(70),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  _seconds = 0;
-                                                },
-                                                child: Text(
-                                                  s.cancel,
-                                                  style: TextStyle(
-                                                      color: Colors.grey[600]),
-                                                ),
+                                      icon: Icon(
+                                        Icons.fast_forward,
+                                        size: _value == 0 ? 1 : 20 * (_value),
+                                      ),
+                                      tooltip:
+                                          'Skip${snapshot.data == 0 ? '' : snapshot.data.toTime}',
+                                      onTap: () {
+                                        generalDialog(
+                                          context,
+                                          title: Text(s.skipSecondsAtStart,
+                                              maxLines: 2),
+                                          content: DurationPicker(
+                                            duration: Duration(
+                                                seconds: _skipSeconds ?? 0),
+                                            onChange: (value) =>
+                                                _seconds = value.inSeconds,
+                                          ),
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              splashColor: context.accentColor
+                                                  .withAlpha(70),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                _seconds = 0;
+                                              },
+                                              child: Text(
+                                                s.cancel,
+                                                style: TextStyle(
+                                                    color: Colors.grey[600]),
                                               ),
-                                              FlatButton(
-                                                splashColor: context.accentColor
-                                                    .withAlpha(70),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  _saveSkipSeconds(
-                                                      widget.podcastLocal.id,
-                                                      _seconds);
-                                                },
-                                                child: Text(
-                                                  s.confirm,
-                                                  style: TextStyle(
-                                                      color:
-                                                          context.accentColor),
-                                                ),
-                                              )
-                                            ],
-                                          );
-                                        });
-                                  }),
-                              _buttonOnMenu(
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                    size: _value == 0 ? 1 : 20 * _value,
-                                  ),
-                                  tooltip: s.remove,
-                                  onTap: () {
-                                    generalDialog(
-                                      context,
-                                      title: Text(s.removeConfirm),
-                                      content: Text(s.removePodcastDes),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          splashColor:
-                                              context.accentColor.withAlpha(70),
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                          child: Text(
-                                            s.cancel,
-                                            style: TextStyle(
-                                                color: Colors.grey[600]),
-                                          ),
+                                            ),
+                                            FlatButton(
+                                              splashColor: context.accentColor
+                                                  .withAlpha(70),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                _saveSkipSeconds(
+                                                    widget.podcastLocal.id,
+                                                    _seconds);
+                                              },
+                                              child: Text(
+                                                s.confirm,
+                                                style: TextStyle(
+                                                    color: context.accentColor),
+                                              ),
+                                            )
+                                          ],
+                                        );
+                                      });
+                                }),
+                            _buttonOnMenu(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                  size: _value == 0 ? 1 : 20 * _value,
+                                ),
+                                tooltip: s.remove,
+                                onTap: () {
+                                  generalDialog(
+                                    context,
+                                    title: Text(s.removeConfirm),
+                                    content: Text(s.removePodcastDes),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                        splashColor:
+                                            context.accentColor.withAlpha(70),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: Text(
+                                          s.cancel,
+                                          style: TextStyle(
+                                              color: Colors.grey[600]),
                                         ),
-                                        FlatButton(
-                                          splashColor: Colors.red.withAlpha(70),
-                                          onPressed: () {
-                                            groupList.removePodcast(
-                                                widget.podcastLocal);
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text(
-                                            s.confirm,
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                        )
-                                      ],
-                                    );
-                                  }),
-                            ],
-                          ),
-                  ),
+                                      ),
+                                      FlatButton(
+                                        splashColor: Colors.red.withAlpha(70),
+                                        onPressed: () {
+                                          groupList.removePodcast(
+                                              widget.podcastLocal);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text(
+                                          s.confirm,
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      )
+                                    ],
+                                  );
+                                }),
+                          ],
+                        ),
                 ),
-        ],
-      ),
+              ),
+        Divider(height: 1)
+      ],
     );
   }
 }
@@ -573,12 +564,12 @@ class _RenameGroupState extends State<RenameGroup> {
                 hintStyle: TextStyle(fontSize: 18),
                 filled: true,
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Theme.of(context).accentColor, width: 2.0),
+                  borderSide:
+                      BorderSide(color: context.accentColor, width: 2.0),
                 ),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Theme.of(context).accentColor, width: 2.0),
+                  borderSide:
+                      BorderSide(color: context.accentColor, width: 2.0),
                 ),
               ),
               cursorRadius: Radius.circular(2),
