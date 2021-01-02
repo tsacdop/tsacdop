@@ -180,6 +180,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   Future<Tuple2<String, List<PodcastHost>>> _getHosts(
       PodcastLocal podcastLocal) async {
+    if (!podcastLocal.provider.contains('fireside')) return Tuple2('', []);
     var data = FiresideData(podcastLocal.id, podcastLocal.link);
     await data.getData();
     var backgroundImage = data.background;
@@ -220,110 +221,134 @@ class _PodcastDetailState extends State<PodcastDetail> {
     );
   }
 
+  Widget _podcastLink(
+      {String title, Widget child, VoidCallback onTap, Color backgroundColor}) {
+    return Container(
+        padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+        width: 60.0,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: onTap,
+              child: CircleAvatar(
+                radius: 20,
+                child: child,
+                backgroundColor: backgroundColor.withOpacity(0.5),
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              title,
+              style: TextStyle(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.fade,
+            ),
+          ],
+        ));
+  }
+
   Widget _hostsList(BuildContext context, PodcastLocal podcastLocal) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (podcastLocal.provider.contains('fireside'))
-          FutureBuilder(
-              future: _getHosts(podcastLocal),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  var hosts = snapshot.data.item2;
-                  var backgroundImage = snapshot.data.item1;
-                  return CachedNetworkImage(
-                    imageUrl: backgroundImage,
-                    errorWidget: (context, url, error) => Center(),
-                    imageBuilder: (context, backgroundImageProvider) =>
-                        Container(
-                            // decoration: BoxDecoration(
-                            //     image: DecorationImage(
-                            //         image: backgroundImageProvider,
-                            //         fit: BoxFit.cover)),
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                              //color: Colors.black26,
-                              padding: EdgeInsets.symmetric(vertical: 5.0),
-                              width: double.infinity,
-                              alignment: Alignment.centerLeft,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
+        FutureBuilder(
+            future: _getHosts(podcastLocal),
+            builder: (context, snapshot) {
+              //if (snapshot.hasData) {
+              //var hosts = snapshot.data.item2;
+              //var backgroundImage = snapshot.data.item1;
+              // CachedNetworkImage(
+              //   imageUrl: backgroundImage,
+              //   errorWidget: (context, url, error) => Center(),
+              //   imageBuilder: (context, backgroundImageProvider) =>
+              //       Container(
+              //           // decoration: BoxDecoration(
+              //           //     image: DecorationImage(
+              //           //         image: backgroundImageProvider,
+              //           //         fit: BoxFit.cover)),
+              //           alignment: Alignment.centerRight,
+              return Container(
+                width: double.infinity,
+                alignment: Alignment.centerLeft,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _podcastLink(
+                            title: 'Link',
+                            child: Icon(Icons.link, size: 30),
+                            backgroundColor: Colors.green[600],
+                            onTap: () => widget.podcastLocal.link.launchUrl),
+                        _podcastLink(
+                            title: 'Rss',
+                            child: Icon(LineIcons.rss_square_solid, size: 30),
+                            backgroundColor: Colors.blue[600],
+                            onTap: () => widget.podcastLocal.rssUrl.launchUrl),
+                        if (snapshot.hasData)
+                          ...snapshot.data.item2
+                              .map<Widget>((host) {
+                                final image = host.image == KDefaultAvatar
+                                    ? KDefaultAvatar
+                                    : host.image;
+                                return Container(
+                                  padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                  width: 60.0,
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: hosts
-                                        .map<Widget>((host) {
-                                          final image =
-                                              host.image == KDefaultAvatar
-                                                  ? KDefaultAvatar
-                                                  : host.image;
-                                          return Container(
-                                              padding: EdgeInsets.all(5.0),
-                                              width: 80.0,
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: <Widget>[
-                                                  CachedNetworkImage(
-                                                    imageUrl: image,
-                                                    progressIndicatorBuilder:
-                                                        (context, url,
-                                                                downloadProgress) =>
-                                                            SizedBox(
-                                                      width: 40,
-                                                      height: 2,
-                                                      child: LinearProgressIndicator(
-                                                          value:
-                                                              downloadProgress
-                                                                  .progress),
-                                                    ),
-                                                    errorWidget:
-                                                        (context, url, error) =>
-                                                            CircleAvatar(
-                                                      backgroundColor:
-                                                          Colors.grey[400],
-                                                      backgroundImage: AssetImage(
-                                                          'assets/fireside.jpg'),
-                                                    ),
-                                                    imageBuilder: (context,
-                                                            hostImage) =>
-                                                        CircleAvatar(
-                                                            backgroundColor:
-                                                                Colors
-                                                                    .grey[400],
-                                                            backgroundImage:
-                                                                hostImage),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.all(2),
-                                                  ),
-                                                  Text(
-                                                    host.name,
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold
-                                                        // backgroundColor: Colors
-                                                        //     .black
-                                                        //     .withOpacity(0.5),
-                                                        //color: Colors.white,
-                                                        ),
-                                                    textAlign: TextAlign.center,
-                                                    maxLines: 2,
-                                                    overflow: TextOverflow.fade,
-                                                  ),
-                                                ],
-                                              ));
-                                        })
-                                        .toList()
-                                        .cast<Widget>()),
-                              ),
-                            )),
-                  );
-                } else {
-                  return Center();
-                }
-              }),
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      CachedNetworkImage(
+                                        imageUrl: image,
+                                        progressIndicatorBuilder:
+                                            (context, url, downloadProgress) =>
+                                                CircleAvatar(
+                                          backgroundColor:
+                                              Colors.cyan[600].withOpacity(0.5),
+                                          child: SizedBox(
+                                            width: 30,
+                                            height: 2,
+                                            child: LinearProgressIndicator(
+                                                value:
+                                                    downloadProgress.progress),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            CircleAvatar(
+                                          backgroundColor: Colors.grey[400],
+                                          backgroundImage:
+                                              AssetImage('assets/fireside.jpg'),
+                                        ),
+                                        imageBuilder: (context, hostImage) =>
+                                            CircleAvatar(
+                                                backgroundColor:
+                                                    Colors.grey[400],
+                                                backgroundImage: hostImage),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        host.name,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.fade,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              })
+                              .toList()
+                              .cast<Widget>()
+                      ]),
+                ),
+              );
+            }),
         Container(
           padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
           alignment: Alignment.topLeft,
@@ -753,7 +778,32 @@ class _PodcastDetailState extends State<PodcastDetail> {
                             slivers: <Widget>[
                               SliverAppBar(
                                 brightness: Brightness.dark,
-                                actions: <Widget>[_rightTopMenu(context)],
+                                actions: <Widget>[
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: widget.podcastLocal.primaryColor
+                                          .colorizedark()
+                                          .withOpacity(0.6),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      icon: Icon(Icons.more_vert),
+                                      padding: EdgeInsets.zero,
+                                      splashRadius: 20,
+                                      tooltip: s.menu,
+                                      onPressed: () => generalSheet(
+                                        context,
+                                        title: widget.podcastLocal.title,
+                                        child: PodcastSetting(
+                                            podcastLocal: widget.podcastLocal),
+                                      ).then((value) {
+                                        _checkPodcast();
+                                        setState(() {});
+                                      }),
+                                    ),
+                                  ),
+                                  //_rightTopMenu(context)
+                                ],
                                 elevation: 0,
                                 iconTheme: IconThemeData(
                                   color: Colors.white,
