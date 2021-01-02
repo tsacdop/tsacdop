@@ -118,11 +118,18 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
             final episodes = playlist.episodes;
             return ReorderableListView(
                 onReorder: (oldIndex, newIndex) {
-                  context.read<AudioPlayerNotifier>().reorderEpisodesInPlaylist(
-                      widget.playlist,
-                      oldIndex: oldIndex,
-                      newIndex: newIndex);
-                  setState(() {});
+                  if (widget.playlist.isQueue) {
+                    context
+                        .read<AudioPlayerNotifier>()
+                        .reorderPlaylist(oldIndex, newIndex);
+                    setState(() {});
+                  } else {
+                    context
+                        .read<AudioPlayerNotifier>()
+                        .reorderEpisodesInPlaylist(widget.playlist,
+                            oldIndex: oldIndex, newIndex: newIndex);
+                    setState(() {});
+                  }
                 },
                 scrollDirection: Axis.vertical,
                 children: episodes.map<Widget>((episode) {
@@ -331,6 +338,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
     final s = context.s;
     final textStyle = context.textTheme.bodyText2;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListTile(
           onTap: () {
@@ -339,7 +347,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
           dense: true,
           title: Row(
             children: [
-              Icon(Icons.highlight_off, size: 18),
+              Icon(Icons.clear_all_outlined, size: 18),
               SizedBox(width: 20),
               Text('Clear all', style: textStyle),
             ],
@@ -415,6 +423,18 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
               ],
             ),
           ),
+        if (widget.playlist.isQueue)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline,
+                    size: 16, color: context.textColor.withAlpha(90)),
+                Text('This is the default queue, can\'t be removed.',
+                    style: TextStyle(color: context.textColor.withAlpha(90))),
+              ],
+            ),
+          )
       ],
     );
   }
