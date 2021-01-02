@@ -68,14 +68,20 @@ class Playlist extends Equatable {
 
   Future<void> getPlaylist() async {
     episodes.clear();
+    var error = [];
     if (episodeList.isNotEmpty) {
       for (var url in episodeList) {
         var episode = await _dbHelper.getRssItemWithUrl(url);
         if (episode != null) {
           episodes.add(episode);
         } else {
-          episodeList.remove(url);
+          error.add(url);
         }
+      }
+    }
+    if (error.isNotEmpty) {
+      for (var u in error) {
+        episodeList.remove(u);
       }
     }
   }
