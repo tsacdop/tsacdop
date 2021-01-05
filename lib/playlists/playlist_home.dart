@@ -208,7 +208,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                   children: [
                     _tabWidget(
                         icon: Icon(Icons.queue_music_rounded),
-                        label: 'Play Next',
+                        label: s.playNext,
                         color: Colors.blue,
                         isSelected: _selected == 'PlayNext',
                         onTap: () => setState(() {
@@ -217,7 +217,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                             })),
                     _tabWidget(
                         icon: Icon(Icons.history),
-                        label: 'History',
+                        label: s.settingsHistory,
                         color: Colors.green,
                         isSelected: _selected == 'History',
                         onTap: () => setState(() {
@@ -226,7 +226,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                             })),
                     _tabWidget(
                         icon: Icon(Icons.playlist_play),
-                        label: 'Playlists',
+                        label: s.playlists,
                         color: Colors.purple,
                         isSelected: _selected == 'Playlists',
                         onTap: () => setState(() {
@@ -666,10 +666,10 @@ class __PlaylistsState extends State<_Playlists> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Queue',
+                                  s.queue,
                                   style: context.textTheme.headline6,
                                 ),
-                                Text('${queue.episodes.length} episodes'),
+                                Text('${queue.length} ${s.episode(queue.length).toLowerCase()}'),
                                 TextButton(
                                     style: OutlinedButton.styleFrom(
                                         side: BorderSide(
@@ -726,9 +726,8 @@ class __PlaylistsState extends State<_Playlists> {
                                 }),
                       ),
                       title: Text(data[index].name),
-                      subtitle: Text(episodeList.isNotEmpty
-                          ? '${data[index].episodeList.length} episodes'
-                          : '0 episode'),
+                      subtitle: Text(
+                          '${data[index].length} ${s.episode(data[index].length).toLowerCase()}'),
                       trailing: IconButton(
                         splashRadius: 20,
                         icon: Icon(LineIcons.play_circle_solid, size: 30),
@@ -759,7 +758,7 @@ class __PlaylistsState extends State<_Playlists> {
                       color: context.primaryColorDark,
                       child: Center(child: Icon(Icons.add)),
                     ),
-                    title: Text('Create new playlist'),
+                    title: Text(s.createNewPlaylist),
                   );
                 }),
           );
@@ -911,15 +910,15 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                 Text(s.confirm, style: TextStyle(color: context.accentColor)),
           )
         ],
-        title:
-            SizedBox(width: context.width - 160, child: Text('New playlist')),
+        title: SizedBox(
+            width: context.width - 160, child: Text(s.createNewPlaylist)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             TextField(
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                hintText: 'New playlist',
+                hintText: s.createNewPlaylist,
                 hintStyle: TextStyle(fontSize: 18),
                 filled: true,
                 focusedBorder: UnderlineInputBorder(
@@ -942,19 +941,20 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                 alignment: Alignment.centerLeft,
                 child: _error != null
                     ? Text(
-                        _error == 1
-                            ? 'Playlist existed'
-                            : 'Playlist name is empty',
+                        _error == 1 ? s.playlistExisted : s.playlistNameEmpty,
                         style: TextStyle(color: Colors.red[400]),
                       )
                     : Center()),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _createOption(NewPlaylistOption.blank),
-                _createOption(NewPlaylistOption.randon10),
-                _createOption(NewPlaylistOption.latest10),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _createOption(NewPlaylistOption.blank),
+                  _createOption(NewPlaylistOption.randon10),
+                  _createOption(NewPlaylistOption.latest10),
+                ],
+              ),
             ),
           ],
         ),

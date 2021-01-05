@@ -71,15 +71,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m25(count) => "${Intl.plural(count, zero: 'Just now', one: '${count} second ago', other: '${count} seconds ago')}";
 
-  static m26(time) => "Last time ${time}";
+  static m26(count) => "${count} selected";
 
-  static m27(time) => "${time} Left";
+  static m27(time) => "Last time ${time}";
 
-  static m28(time) => "To ${time}";
+  static m28(time) => "${time} Left";
 
-  static m29(count) => "${Intl.plural(count, zero: 'No update', one: 'Updated ${count} episode', other: 'Updated ${count} episodes')}";
+  static m29(time) => "To ${time}";
 
-  static m30(version) => "Version: ${version}";
+  static m30(count) => "${Intl.plural(count, zero: 'No update', one: 'Updated ${count} episode', other: 'Updated ${count} episodes')}";
+
+  static m31(version) => "Version: ${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -100,11 +102,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "changelog" : MessageLookupByLibrary.simpleMessage("Changelog"),
     "chooseA" : MessageLookupByLibrary.simpleMessage("Choose a"),
     "clear" : MessageLookupByLibrary.simpleMessage("Clear"),
+    "clearAll" : MessageLookupByLibrary.simpleMessage("Clear all"),
     "color" : MessageLookupByLibrary.simpleMessage("color"),
     "confirm" : MessageLookupByLibrary.simpleMessage("CONFIRM"),
+    "createNewPlaylist" : MessageLookupByLibrary.simpleMessage("New playlist"),
     "darkMode" : MessageLookupByLibrary.simpleMessage("Dark mode"),
     "daysAgo" : m2,
     "daysCount" : m3,
+    "defaultQueueReminder" : MessageLookupByLibrary.simpleMessage("This is the default queue, can\'t be removed."),
     "defaultSearchEngine" : MessageLookupByLibrary.simpleMessage("Default podcast search engine"),
     "defaultSearchEngineDes" : MessageLookupByLibrary.simpleMessage("Choose the default podcast search engine"),
     "delete" : MessageLookupByLibrary.simpleMessage("Delete"),
@@ -228,6 +233,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "playerHeightShort" : MessageLookupByLibrary.simpleMessage("Low"),
     "playerHeightTall" : MessageLookupByLibrary.simpleMessage("High"),
     "playing" : MessageLookupByLibrary.simpleMessage("Playing"),
+    "playlistExisted" : MessageLookupByLibrary.simpleMessage("Playlist name existed"),
+    "playlistNameEmpty" : MessageLookupByLibrary.simpleMessage("Playlist name is empty"),
+    "playlists" : MessageLookupByLibrary.simpleMessage("Playlists"),
     "plugins" : MessageLookupByLibrary.simpleMessage("Plugins"),
     "podcast" : m21,
     "podcastSubscribed" : MessageLookupByLibrary.simpleMessage("Podcast subscribed"),
@@ -261,6 +269,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("Search for podcasts"),
     "secCount" : m24,
     "secondsAgo" : m25,
+    "selected" : m26,
     "settingStorage" : MessageLookupByLibrary.simpleMessage("Storage"),
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "settingsAccentColor" : MessageLookupByLibrary.simpleMessage("Accent color"),
@@ -352,9 +361,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "subscribeExportDes" : MessageLookupByLibrary.simpleMessage("Export OPML file of all podcasts"),
     "syncNow" : MessageLookupByLibrary.simpleMessage("Sync now"),
     "systemDefault" : MessageLookupByLibrary.simpleMessage("System default"),
-    "timeLastPlayed" : m26,
-    "timeLeft" : m27,
-    "to" : m28,
+    "timeLastPlayed" : m27,
+    "timeLeft" : m28,
+    "to" : m29,
     "toastAddPlaylist" : MessageLookupByLibrary.simpleMessage("Added to playlist"),
     "toastDiscovery" : MessageLookupByLibrary.simpleMessage("Discovery feature reenabled, please reopen the app"),
     "toastFileError" : MessageLookupByLibrary.simpleMessage("File error, subscribing failed"),
@@ -375,10 +384,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlike" : MessageLookupByLibrary.simpleMessage("Unlike"),
     "unliked" : MessageLookupByLibrary.simpleMessage("Episode removed from favorites"),
     "updateDate" : MessageLookupByLibrary.simpleMessage("Update date"),
-    "updateEpisodesCount" : m29,
+    "updateEpisodesCount" : m30,
     "updateFailed" : MessageLookupByLibrary.simpleMessage("Update failed, network error"),
     "username" : MessageLookupByLibrary.simpleMessage("Username"),
     "usernameRequired" : MessageLookupByLibrary.simpleMessage("Username required"),
-    "version" : m30
+    "version" : m31
   };
 }

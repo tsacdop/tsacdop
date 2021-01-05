@@ -211,6 +211,16 @@ class S {
     );
   }
 
+  /// `Clear all`
+  String get clearAll {
+    return Intl.message(
+      'Clear all',
+      name: 'clearAll',
+      desc: 'Clear all episodes in playlist.',
+      args: [],
+    );
+  }
+
   /// `color`
   String get color {
     return Intl.message(
@@ -226,6 +236,16 @@ class S {
     return Intl.message(
       'CONFIRM',
       name: 'confirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New playlist`
+  String get createNewPlaylist {
+    return Intl.message(
+      'New playlist',
+      name: 'createNewPlaylist',
       desc: '',
       args: [],
     );
@@ -264,6 +284,16 @@ class S {
       name: 'daysCount',
       desc: '',
       args: [count],
+    );
+  }
+
+  /// `This is the default queue, can't be removed.`
+  String get defaultQueueReminder {
+    return Intl.message(
+      'This is the default queue, can\'t be removed.',
+      name: 'defaultQueueReminder',
+      desc: 'Remind user that default queue can\'t be removed.',
+      args: [],
     );
   }
 
@@ -1495,6 +1525,36 @@ class S {
     );
   }
 
+  /// `Playlist name existed`
+  String get playlistExisted {
+    return Intl.message(
+      'Playlist name existed',
+      name: 'playlistExisted',
+      desc: 'Error string when creating new playlist.',
+      args: [],
+    );
+  }
+
+  /// `Playlist name is empty`
+  String get playlistNameEmpty {
+    return Intl.message(
+      'Playlist name is empty',
+      name: 'playlistNameEmpty',
+      desc: 'Error string when creating new playlist.',
+      args: [],
+    );
+  }
+
+  /// `Playlists`
+  String get playlists {
+    return Intl.message(
+      'Playlists',
+      name: 'playlists',
+      desc: 'Title for playlists tab.',
+      args: [],
+    );
+  }
+
   /// `Play next`
   String get playNext {
     return Intl.message(
@@ -1849,6 +1909,16 @@ class S {
       one: '$count second ago',
       other: '$count seconds ago',
       name: 'secondsAgo',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count} selected`
+  String selected(Object count) {
+    return Intl.message(
+      '$count selected',
+      name: 'selected',
       desc: '',
       args: [count],
     );

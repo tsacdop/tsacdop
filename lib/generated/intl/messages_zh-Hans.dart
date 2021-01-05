@@ -71,15 +71,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m25(count) => "${Intl.plural(count, zero: '刚刚', other: '${count}秒前')}";
 
-  static m26(time) => "上次播放${time}";
+  static m26(count) => "已选择 ${count} 项";
 
-  static m27(time) => "剩余 ${time}";
+  static m27(time) => "上次播放${time}";
 
-  static m28(time) => "到${time}";
+  static m28(time) => "剩余 ${time}";
 
-  static m29(count) => "${Intl.plural(count, zero: '未有更新', other: '更新 ${count} 集节目')}";
+  static m29(time) => "到${time}";
 
-  static m30(version) => "版本：${version}";
+  static m30(count) => "${Intl.plural(count, zero: '未有更新', other: '更新 ${count} 集节目')}";
+
+  static m31(version) => "版本：${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -100,11 +102,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "changelog" : MessageLookupByLibrary.simpleMessage("更新日志"),
     "chooseA" : MessageLookupByLibrary.simpleMessage("选择"),
     "clear" : MessageLookupByLibrary.simpleMessage("清除"),
+    "clearAll" : MessageLookupByLibrary.simpleMessage("清除全部"),
     "color" : MessageLookupByLibrary.simpleMessage("颜色"),
     "confirm" : MessageLookupByLibrary.simpleMessage("确认"),
+    "createNewPlaylist" : MessageLookupByLibrary.simpleMessage("创建播放列表"),
     "darkMode" : MessageLookupByLibrary.simpleMessage("夜晚模式"),
     "daysAgo" : m2,
     "daysCount" : m3,
+    "defaultQueueReminder" : MessageLookupByLibrary.simpleMessage("此为默认播放列表，无法删除。"),
     "defaultSearchEngine" : MessageLookupByLibrary.simpleMessage("默认播客搜索引擎"),
     "defaultSearchEngineDes" : MessageLookupByLibrary.simpleMessage("选择默认播客搜索引擎"),
     "delete" : MessageLookupByLibrary.simpleMessage("删除"),
@@ -228,6 +233,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "playerHeightShort" : MessageLookupByLibrary.simpleMessage("低"),
     "playerHeightTall" : MessageLookupByLibrary.simpleMessage("高"),
     "playing" : MessageLookupByLibrary.simpleMessage("正在播放"),
+    "playlistExisted" : MessageLookupByLibrary.simpleMessage("播放列表已存在"),
+    "playlistNameEmpty" : MessageLookupByLibrary.simpleMessage("播放列表名为空"),
+    "playlists" : MessageLookupByLibrary.simpleMessage("播放列表"),
     "plugins" : MessageLookupByLibrary.simpleMessage("插件"),
     "podcast" : m21,
     "podcastSubscribed" : MessageLookupByLibrary.simpleMessage("播客已订阅"),
@@ -261,6 +269,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("搜索播客"),
     "secCount" : m24,
     "secondsAgo" : m25,
+    "selected" : m26,
     "settingStorage" : MessageLookupByLibrary.simpleMessage("储存空间"),
     "settings" : MessageLookupByLibrary.simpleMessage("设置"),
     "settingsAccentColor" : MessageLookupByLibrary.simpleMessage("次要颜色"),
@@ -352,9 +361,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "subscribeExportDes" : MessageLookupByLibrary.simpleMessage("导出 OPML 文件"),
     "syncNow" : MessageLookupByLibrary.simpleMessage("立即同步"),
     "systemDefault" : MessageLookupByLibrary.simpleMessage("系统默认"),
-    "timeLastPlayed" : m26,
-    "timeLeft" : m27,
-    "to" : m28,
+    "timeLastPlayed" : m27,
+    "timeLeft" : m28,
+    "to" : m29,
     "toastAddPlaylist" : MessageLookupByLibrary.simpleMessage("添加到播放列表"),
     "toastDiscovery" : MessageLookupByLibrary.simpleMessage("重启应用后可查看"),
     "toastFileError" : MessageLookupByLibrary.simpleMessage("文件错误，导入失败"),
@@ -375,10 +384,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlike" : MessageLookupByLibrary.simpleMessage("取消喜欢"),
     "unliked" : MessageLookupByLibrary.simpleMessage("从收藏移除"),
     "updateDate" : MessageLookupByLibrary.simpleMessage("更新日期"),
-    "updateEpisodesCount" : m29,
+    "updateEpisodesCount" : m30,
     "updateFailed" : MessageLookupByLibrary.simpleMessage("更新失败"),
     "username" : MessageLookupByLibrary.simpleMessage("用户名"),
     "usernameRequired" : MessageLookupByLibrary.simpleMessage("用户名为空"),
-    "version" : m30
+    "version" : m31
   };
 }

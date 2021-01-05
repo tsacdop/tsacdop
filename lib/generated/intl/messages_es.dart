@@ -71,15 +71,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m25(count) => "${Intl.plural(count, zero: 'Justo ahora', one: 'Hace ${count} segundo ', other: 'Hace ${count} segundos')}";
 
-  static m26(time) => "Tiempo previo ${time}";
+  static m26(count) => "${count} selected";
 
-  static m27(time) => "${time} Restante";
+  static m27(time) => "Tiempo previo ${time}";
 
-  static m28(time) => "A ${time}";
+  static m28(time) => "${time} Restante";
 
-  static m29(count) => "${Intl.plural(count, zero: 'No hay actualizaciones', one: 'Se actualizo ${count} episodio', other: 'Se actualizaron ${count} episodios')}";
+  static m29(time) => "A ${time}";
 
-  static m30(version) => "Versión: ${version}";
+  static m30(count) => "${Intl.plural(count, zero: 'No hay actualizaciones', one: 'Se actualizo ${count} episodio', other: 'Se actualizaron ${count} episodios')}";
+
+  static m31(version) => "Versión: ${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -100,11 +102,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "changelog" : MessageLookupByLibrary.simpleMessage("Reporte de cambios"),
     "chooseA" : MessageLookupByLibrary.simpleMessage("Escoger un"),
     "clear" : MessageLookupByLibrary.simpleMessage("Limpiar"),
+    "clearAll" : MessageLookupByLibrary.simpleMessage("Clear all"),
     "color" : MessageLookupByLibrary.simpleMessage("color"),
     "confirm" : MessageLookupByLibrary.simpleMessage("ACEPTAR"),
+    "createNewPlaylist" : MessageLookupByLibrary.simpleMessage("New playlist"),
     "darkMode" : MessageLookupByLibrary.simpleMessage("Modo oscuro"),
     "daysAgo" : m2,
     "daysCount" : m3,
+    "defaultQueueReminder" : MessageLookupByLibrary.simpleMessage("This is the default queue, can\'t be removed."),
     "defaultSearchEngine" : MessageLookupByLibrary.simpleMessage("Default podcast search engine"),
     "defaultSearchEngineDes" : MessageLookupByLibrary.simpleMessage("Choose the default podcast search engine"),
     "delete" : MessageLookupByLibrary.simpleMessage("Eliminar"),
@@ -228,6 +233,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "playerHeightShort" : MessageLookupByLibrary.simpleMessage("Bajo"),
     "playerHeightTall" : MessageLookupByLibrary.simpleMessage("Alto"),
     "playing" : MessageLookupByLibrary.simpleMessage("Reproduciendo"),
+    "playlistExisted" : MessageLookupByLibrary.simpleMessage("Playlist name existed"),
+    "playlistNameEmpty" : MessageLookupByLibrary.simpleMessage("Playlist name is empty"),
+    "playlists" : MessageLookupByLibrary.simpleMessage("Playlists"),
     "plugins" : MessageLookupByLibrary.simpleMessage("Plugins"),
     "podcast" : m21,
     "podcastSubscribed" : MessageLookupByLibrary.simpleMessage("Podcast añadido"),
@@ -261,6 +269,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("Buscar podcast"),
     "secCount" : m24,
     "secondsAgo" : m25,
+    "selected" : m26,
     "settingStorage" : MessageLookupByLibrary.simpleMessage("Almacenamiento"),
     "settings" : MessageLookupByLibrary.simpleMessage("Ajustes"),
     "settingsAccentColor" : MessageLookupByLibrary.simpleMessage("Color de acento "),
@@ -352,9 +361,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "subscribeExportDes" : MessageLookupByLibrary.simpleMessage("Exportar OPML de todos los podcasts"),
     "syncNow" : MessageLookupByLibrary.simpleMessage("Sync now"),
     "systemDefault" : MessageLookupByLibrary.simpleMessage("Acorde al sistema"),
-    "timeLastPlayed" : m26,
-    "timeLeft" : m27,
-    "to" : m28,
+    "timeLastPlayed" : m27,
+    "timeLeft" : m28,
+    "to" : m29,
     "toastAddPlaylist" : MessageLookupByLibrary.simpleMessage("Añadido a la lista de reproducción "),
     "toastDiscovery" : MessageLookupByLibrary.simpleMessage("El tutorial se ha reiniciado, reinicia la app porfavor"),
     "toastFileError" : MessageLookupByLibrary.simpleMessage("Error de archivo, suscripción fallida"),
@@ -375,10 +384,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlike" : MessageLookupByLibrary.simpleMessage("No me gusta"),
     "unliked" : MessageLookupByLibrary.simpleMessage("Episodio removido de favoritos"),
     "updateDate" : MessageLookupByLibrary.simpleMessage("Fecha de actualización "),
-    "updateEpisodesCount" : m29,
+    "updateEpisodesCount" : m30,
     "updateFailed" : MessageLookupByLibrary.simpleMessage("Actualización fallida, error de red"),
     "username" : MessageLookupByLibrary.simpleMessage("Username"),
     "usernameRequired" : MessageLookupByLibrary.simpleMessage("Username required"),
-    "version" : m30
+    "version" : m31
   };
 }

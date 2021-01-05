@@ -44,16 +44,26 @@
   "@chooseA": {},
   "clear": "Pulisici",
   "@clear": {},
+  "clearAll": "Azzera tutto",
+  "@clearAll": {
+    "description": "Clear all episodes in playlist."
+  },
   "color": "colore",
   "@color": {},
   "confirm": "CONFERMA",
   "@confirm": {},
+  "createNewPlaylist": "New playlist",
+  "@createNewPlaylist": {},
   "darkMode": "Tema scuro",
   "@darkMode": {},
   "daysAgo": "{count, plural, zero{Oggi} one{{count} giorno fa} other{{count} giorni fa}}",
   "@daysAgo": {},
   "daysCount": "{count, plural, zero{Mai} one{{count} giorno} other{{count} giorni}}",
   "@daysCount": {},
+  "defaultQueueReminder": "This is the default queue, can't be removed.",
+  "@defaultQueueReminder": {
+    "description": "Remind user that default queue can't be removed."
+  },
   "defaultSearchEngine": "Motore di ricerca podcast predefinito",
   "@defaultSearchEngine": {},
   "defaultSearchEngineDes": "Scegli il motore di ricerca predefinito per i podcast",
@@ -364,6 +374,18 @@
   "@playerHeightTall": {},
   "playing": "Riproducendo",
   "@playing": {},
+  "playlistExisted": "Playlist name existed",
+  "@playlistExisted": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlistNameEmpty": "Playlist name is empty",
+  "@playlistNameEmpty": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlists": "Playlists",
+  "@playlists": {
+    "description": "Title for playlists tab."
+  },
   "playNext": "Riproduci successivo",
   "@playNext": {
     "description": "Popup menu for episode."
@@ -406,7 +428,7 @@
   },
   "publishedYearly": "Pubblicato annualmente",
   "@publishedYearly": {},
-  "queue": "Queue",
+  "queue": "Coda",
   "@queue": {
     "description": "Queue"
   },
@@ -414,7 +436,7 @@
   "@recoverSubscribe": {
     "description": "User can recover subscribe podcast after remove it in subscribe history page."
   },
-  "refresh": "Refresh",
+  "refresh": "Ricarica",
   "@refresh": {
     "description": "Refresh"
   },
@@ -439,7 +461,7 @@
       "date": {}
     }
   },
-  "removeNewMark": "Remove new mark",
+  "removeNewMark": "Rimuovi simbolo di \"nuovo\"",
   "@removeNewMark": {
     "description": "Remove new mark for new episodes."
   },
@@ -463,6 +485,12 @@
   "@secCount": {},
   "secondsAgo": "{count, plural, zero{Adesso} one{{count} secondo fa} other{{count} secondi fa}}",
   "@secondsAgo": {},
+  "selected": "{count} selected",
+  "@selected": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "settings": "Impostazioni",
   "@settings": {},
   "settingsAccentColor": "Tinta colore",

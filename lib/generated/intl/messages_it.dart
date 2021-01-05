@@ -71,15 +71,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m25(count) => "${Intl.plural(count, zero: 'Adesso', one: '${count} secondo fa', other: '${count} secondi fa')}";
 
-  static m26(time) => "Ultima riproduzione ${time}";
+  static m26(count) => "${count} selected";
 
-  static m27(time) => "${time} Restante";
+  static m27(time) => "Ultima riproduzione ${time}";
 
-  static m28(time) => "A ${time}";
+  static m28(time) => "${time} Restante";
 
-  static m29(count) => "${Intl.plural(count, zero: 'Nessun aggiornamento', one: 'Aggiornato ${count} episodio', other: 'Aggiornati ${count} episodi')}";
+  static m29(time) => "A ${time}";
 
-  static m30(version) => "Versione: ${version}";
+  static m30(count) => "${Intl.plural(count, zero: 'Nessun aggiornamento', one: 'Aggiornato ${count} episodio', other: 'Aggiornati ${count} episodi')}";
+
+  static m31(version) => "Versione: ${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -100,11 +102,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "changelog" : MessageLookupByLibrary.simpleMessage("Novità"),
     "chooseA" : MessageLookupByLibrary.simpleMessage("Scegli un"),
     "clear" : MessageLookupByLibrary.simpleMessage("Pulisici"),
+    "clearAll" : MessageLookupByLibrary.simpleMessage("Azzera tutto"),
     "color" : MessageLookupByLibrary.simpleMessage("colore"),
     "confirm" : MessageLookupByLibrary.simpleMessage("CONFERMA"),
+    "createNewPlaylist" : MessageLookupByLibrary.simpleMessage("New playlist"),
     "darkMode" : MessageLookupByLibrary.simpleMessage("Tema scuro"),
     "daysAgo" : m2,
     "daysCount" : m3,
+    "defaultQueueReminder" : MessageLookupByLibrary.simpleMessage("This is the default queue, can\'t be removed."),
     "defaultSearchEngine" : MessageLookupByLibrary.simpleMessage("Motore di ricerca podcast predefinito"),
     "defaultSearchEngineDes" : MessageLookupByLibrary.simpleMessage("Scegli il motore di ricerca predefinito per i podcast"),
     "delete" : MessageLookupByLibrary.simpleMessage("Elimina"),
@@ -228,6 +233,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "playerHeightShort" : MessageLookupByLibrary.simpleMessage("Basso"),
     "playerHeightTall" : MessageLookupByLibrary.simpleMessage("Alto"),
     "playing" : MessageLookupByLibrary.simpleMessage("Riproducendo"),
+    "playlistExisted" : MessageLookupByLibrary.simpleMessage("Playlist name existed"),
+    "playlistNameEmpty" : MessageLookupByLibrary.simpleMessage("Playlist name is empty"),
+    "playlists" : MessageLookupByLibrary.simpleMessage("Playlists"),
     "plugins" : MessageLookupByLibrary.simpleMessage("Plugin"),
     "podcast" : m21,
     "podcastSubscribed" : MessageLookupByLibrary.simpleMessage("Iscritto al podcast"),
@@ -242,14 +250,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "publishedMonthly" : MessageLookupByLibrary.simpleMessage("Pubblicato mensilmente"),
     "publishedWeekly" : MessageLookupByLibrary.simpleMessage("Pubblicato settimanalmente"),
     "publishedYearly" : MessageLookupByLibrary.simpleMessage("Pubblicato annualmente"),
-    "queue" : MessageLookupByLibrary.simpleMessage("Queue"),
+    "queue" : MessageLookupByLibrary.simpleMessage("Coda"),
     "recoverSubscribe" : MessageLookupByLibrary.simpleMessage("Recupera iscrizione"),
-    "refresh" : MessageLookupByLibrary.simpleMessage("Refresh"),
+    "refresh" : MessageLookupByLibrary.simpleMessage("Ricarica"),
     "refreshArtwork" : MessageLookupByLibrary.simpleMessage("Aggiorna copertine"),
     "refreshStarted" : MessageLookupByLibrary.simpleMessage("Aggiornando"),
     "remove" : MessageLookupByLibrary.simpleMessage("Rimuovi"),
     "removeConfirm" : MessageLookupByLibrary.simpleMessage("Conferma la rimozione"),
-    "removeNewMark" : MessageLookupByLibrary.simpleMessage("Remove new mark"),
+    "removeNewMark" : MessageLookupByLibrary.simpleMessage("Rimuovi simbolo di \"nuovo\""),
     "removePodcastDes" : MessageLookupByLibrary.simpleMessage("Sei sicurǝ di volerti disiscrivere?"),
     "removedAt" : m23,
     "save" : MessageLookupByLibrary.simpleMessage("Salva"),
@@ -261,6 +269,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "searchPodcast" : MessageLookupByLibrary.simpleMessage("Cerca un podcast"),
     "secCount" : m24,
     "secondsAgo" : m25,
+    "selected" : m26,
     "settingStorage" : MessageLookupByLibrary.simpleMessage("Archiviazione"),
     "settings" : MessageLookupByLibrary.simpleMessage("Impostazioni"),
     "settingsAccentColor" : MessageLookupByLibrary.simpleMessage("Tinta colore"),
@@ -352,9 +361,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "subscribeExportDes" : MessageLookupByLibrary.simpleMessage("Esporta file OPML di tutti i podcast"),
     "syncNow" : MessageLookupByLibrary.simpleMessage("Sincronizza ora"),
     "systemDefault" : MessageLookupByLibrary.simpleMessage("Predefinito di sistema"),
-    "timeLastPlayed" : m26,
-    "timeLeft" : m27,
-    "to" : m28,
+    "timeLastPlayed" : m27,
+    "timeLeft" : m28,
+    "to" : m29,
     "toastAddPlaylist" : MessageLookupByLibrary.simpleMessage("Aggiunto alla playlist"),
     "toastDiscovery" : MessageLookupByLibrary.simpleMessage("Tutorial abilitato, riapri l\'applicazione per visualizzarlo"),
     "toastFileError" : MessageLookupByLibrary.simpleMessage("Errore file, iscrizione fallita"),
@@ -375,10 +384,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlike" : MessageLookupByLibrary.simpleMessage("Rimuovi like"),
     "unliked" : MessageLookupByLibrary.simpleMessage("Episodio rimosso dai preferiti"),
     "updateDate" : MessageLookupByLibrary.simpleMessage("Data di aggiornamento"),
-    "updateEpisodesCount" : m29,
+    "updateEpisodesCount" : m30,
     "updateFailed" : MessageLookupByLibrary.simpleMessage("Aggiornamento fallito, errore di rete"),
     "username" : MessageLookupByLibrary.simpleMessage("Nome utente"),
     "usernameRequired" : MessageLookupByLibrary.simpleMessage("Nome utente obbligatorio"),
-    "version" : m30
+    "version" : m31
   };
 }

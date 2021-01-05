@@ -44,16 +44,26 @@
   "@chooseA": {},
   "clear": "清除",
   "@clear": {},
+  "clearAll": "清除全部",
+  "@clearAll": {
+    "description": "Clear all episodes in playlist."
+  },
   "color": "颜色",
   "@color": {},
   "confirm": "确认",
   "@confirm": {},
+  "createNewPlaylist": "创建播放列表",
+  "@createNewPlaylist": {},
   "darkMode": "夜晚模式",
   "@darkMode": {},
   "daysAgo": "{count, plural, zero{今天} other{{count}天前}}",
   "@daysAgo": {},
   "daysCount": "{count, plural, zero{从不} other{{count}天}}",
   "@daysCount": {},
+  "defaultQueueReminder": "此为默认播放列表，无法删除。",
+  "@defaultQueueReminder": {
+    "description": "Remind user that default queue can't be removed."
+  },
   "defaultSearchEngine": "默认播客搜索引擎",
   "@defaultSearchEngine": {},
   "defaultSearchEngineDes": "选择默认播客搜索引擎",
@@ -364,6 +374,18 @@
   "@playerHeightTall": {},
   "playing": "正在播放",
   "@playing": {},
+  "playlistExisted": "播放列表已存在",
+  "@playlistExisted": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlistNameEmpty": "播放列表名为空",
+  "@playlistNameEmpty": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlists": "播放列表",
+  "@playlists": {
+    "description": "Title for playlists tab."
+  },
   "playNext": "下一首",
   "@playNext": {
     "description": "Popup menu for episode."
@@ -463,6 +485,12 @@
   "@secCount": {},
   "secondsAgo": "{count, plural, zero{刚刚} other{{count}秒前}}",
   "@secondsAgo": {},
+  "selected": "已选择 {count} 项",
+  "@selected": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "settings": "设置",
   "@settings": {},
   "settingsAccentColor": "次要颜色",

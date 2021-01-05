@@ -44,16 +44,26 @@
   "@chooseA": {},
   "clear": "Effacer",
   "@clear": {},
+  "clearAll": "Clear all",
+  "@clearAll": {
+    "description": "Clear all episodes in playlist."
+  },
   "color": "Couleur",
   "@color": {},
   "confirm": "CONFIRMER",
   "@confirm": {},
+  "createNewPlaylist": "New playlist",
+  "@createNewPlaylist": {},
   "darkMode": "Mode sombre",
   "@darkMode": {},
   "daysAgo": "{count, plural, zero{Aujourd'hui} one{Il y a {count} jour} other{Il y a {count} jours}}",
   "@daysAgo": {},
   "daysCount": "{count, plural, zero{Jamais} one{{count} jour} other{{count} jours}}",
   "@daysCount": {},
+  "defaultQueueReminder": "This is the default queue, can't be removed.",
+  "@defaultQueueReminder": {
+    "description": "Remind user that default queue can't be removed."
+  },
   "defaultSearchEngine": "Default podcast search engine",
   "@defaultSearchEngine": {},
   "defaultSearchEngineDes": "Choose the default podcast search engine",
@@ -364,6 +374,18 @@
   "@playerHeightTall": {},
   "playing": "En cours",
   "@playing": {},
+  "playlistExisted": "Playlist name existed",
+  "@playlistExisted": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlistNameEmpty": "Playlist name is empty",
+  "@playlistNameEmpty": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlists": "Playlists",
+  "@playlists": {
+    "description": "Title for playlists tab."
+  },
   "playNext": "Play next",
   "@playNext": {
     "description": "Popup menu for episode."
@@ -463,6 +485,12 @@
   "@secCount": {},
   "secondsAgo": "{count, plural, zero{A l'instant} one{Il y a {count} seconde} other{Il y a {count} secondes}}",
   "@secondsAgo": {},
+  "selected": "{count} selected",
+  "@selected": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "settings": "Paramètres",
   "@settings": {},
   "settingsAccentColor": "Couleur principale",

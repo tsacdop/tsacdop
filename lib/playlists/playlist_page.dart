@@ -42,7 +42,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
         ),
         title: Text(_selectedEpisodes.isEmpty
             ? widget.playlist.isQueue ? s.queue :widget.playlist.name
-            : '${_selectedEpisodes.length} selected'),
+            : s.selected(_selectedEpisodes.length)),
         actions: [
           if (_selectedEpisodes.isNotEmpty)
             IconButton(
@@ -320,7 +320,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
             children: [
               Icon(Icons.clear_all_outlined, size: 18),
               SizedBox(width: 20),
-              Text('Clear all', style: textStyle),
+              Text(s.clearAll, style: textStyle),
             ],
           ),
         ),
@@ -401,7 +401,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
               children: [
                 Icon(Icons.info_outline,
                     size: 16, color: context.textColor.withAlpha(90)),
-                Text('This is the default queue, can\'t be removed.',
+                Text(s.defaultQueueReminder,
                     style: TextStyle(color: context.textColor.withAlpha(90))),
               ],
             ),
