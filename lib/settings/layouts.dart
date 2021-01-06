@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/state/setting_state.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../service/search_api.dart';
@@ -310,9 +311,61 @@ class _LayoutSettingState extends State<LayoutSetting> {
                   ),
                 ),
                 Divider(height: 1),
-                Padding(
-                  padding: EdgeInsets.all(10.0),
+                SizedBox(height: 20),
+                Container(
+                  height: 30.0,
+                  padding: EdgeInsets.symmetric(horizontal: 70),
+                  alignment: Alignment.centerLeft,
+                  child: Text('Default page',
+                      style: context.textTheme.bodyText1
+                          .copyWith(color: context.accentColor)),
                 ),
+                Selector<SettingState, bool>(
+                  selector: (_, setting) => setting.openPlaylistDefault,
+                  builder: (_, data, __) {
+                    return ListTile(
+                      contentPadding: EdgeInsets.fromLTRB(70, 10, 10, 10),
+                      onTap: () => context
+                          .read<SettingState>()
+                          .openPlaylistDefault = !data,
+                      title: Text('Open playlist page by default'),
+                      subtitle: Text(
+                          'Open playlist page instead of homepage by default'),
+                      trailing: Transform.scale(
+                        scale: 0.9,
+                        child: Switch(
+                            value: data,
+                            onChanged: (boo) => context
+                                .read<SettingState>()
+                                .openPlaylistDefault = boo),
+                      ),
+                    );
+                  },
+                ),
+                Selector<SettingState, bool>(
+                  selector: (_, setting) => setting.openAllPodcastDefalt,
+                  builder: (_, data, __) {
+                    return ListTile(
+                      contentPadding: EdgeInsets.fromLTRB(70, 10, 10, 10),
+                      onTap: () => context
+                          .read<SettingState>()
+                          .openAllPodcastDefault = !data,
+                      title: Text('Open all podcasts page by default'),
+                      subtitle: Text(
+                          'Open all podcasts page instead of group page by default'),
+                      trailing: Transform.scale(
+                        scale: 0.9,
+                        child: Switch(
+                            value: data,
+                            onChanged: (boo) => context
+                                .read<SettingState>()
+                                .openAllPodcastDefault = boo),
+                      ),
+                    );
+                  },
+                ),
+                Divider(height: 1),
+                SizedBox(height: 20),
                 Container(
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 70),

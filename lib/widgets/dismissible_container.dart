@@ -200,7 +200,7 @@ class EpisodeCard extends StatelessWidget {
       this.isPlaying,
       this.canReorder = false,
       Key key})
-      : super(key: key);
+      : assert(episode != null), super(key: key);
 
   @override
   Widget build(BuildContext context) {

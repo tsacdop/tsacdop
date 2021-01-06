@@ -5,10 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/util/pageroute.dart';
 import 'package:tuple/tuple.dart';
 
+import '../home/home.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/audio_state.dart';
+import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/playlist.dart';
@@ -30,7 +33,9 @@ class _PlaylistHomeState extends State<PlaylistHome> {
 
   @override
   void initState() {
+    Future.microtask(() => context.read<AudioPlayerNotifier>().initPlaylist());
     super.initState();
+    //context.read<AudioPlayerNotifier>().initPlaylist();
     _selected = 'PlayNext';
     _body = _Queue();
   }
@@ -64,184 +69,195 @@ class _PlaylistHomeState extends State<PlaylistHome> {
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
       ),
-      child: Scaffold(
-          appBar: AppBar(
-            leading: CustomBackButton(),
-            centerTitle: true,
-            title: Selector<AudioPlayerNotifier, EpisodeBrief>(
-              selector: (_, audio) => audio.episode,
-              builder: (_, data, __) {
-                return Text(data?.title ?? '', maxLines: 1);
-              },
+      child: WillPopScope(
+        onWillPop: () {
+          if (context.read<SettingState>().openPlaylistDefault) {
+            Navigator.push(context, SlideRightRoute(page: Home()));
+            return Future.value(false);
+          } else {
+            return Future.value(true);
+          }
+        },
+        child: Scaffold(
+            appBar: AppBar(
+              leading: CustomBackButton(),
+              centerTitle: true,
+              title: Selector<AudioPlayerNotifier, EpisodeBrief>(
+                selector: (_, audio) => audio.episode,
+                builder: (_, data, __) {
+                  return Text(data?.title ?? '', maxLines: 1);
+                },
+              ),
+              backgroundColor: context.scaffoldBackgroundColor,
             ),
-            backgroundColor: context.scaffoldBackgroundColor,
-          ),
-          body: Column(
-            children: [
-              SizedBox(
-                height: 100,
-                child: Selector<AudioPlayerNotifier,
-                    Tuple4<Playlist, bool, bool, EpisodeBrief>>(
-                  selector: (_, audio) => Tuple4(audio.playlist,
-                      audio.playerRunning, audio.playing, audio.episode),
-                  builder: (_, data, __) {
-                    final running = data.item2;
-                    final playing = data.item3;
-                    final audio = context.read<AudioPlayerNotifier>();
-                    return Row(
-                      children: [
-                        Expanded(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                    icon: Icon(Icons.fast_rewind),
-                                    onPressed: () {
+            body: Column(
+              children: [
+                SizedBox(
+                  height: 100,
+                  child: Selector<AudioPlayerNotifier,
+                      Tuple4<Playlist, bool, bool, EpisodeBrief>>(
+                    selector: (_, audio) => Tuple4(audio.playlist,
+                        audio.playerRunning, audio.playing, audio.episode),
+                    builder: (_, data, __) {
+                      final running = data.item2;
+                      final playing = data.item3;
+                      final audio = context.read<AudioPlayerNotifier>();
+                      return Row(
+                        children: [
+                          Expanded(
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                      icon: Icon(Icons.fast_rewind),
+                                      onPressed: () {
+                                        if (running) {
+                                          audio.rewind();
+                                        }
+                                      }),
+                                  SizedBox(width: 30),
+                                  IconButton(
+                                      padding: EdgeInsets.zero,
+                                      icon: Icon(
+                                          playing
+                                              ? LineIcons.pause_solid
+                                              : LineIcons.play_solid,
+                                          size: 40),
+                                      onPressed: () {
+                                        if (running) {
+                                          playing
+                                              ? audio.pauseAduio()
+                                              : audio.resumeAudio();
+                                        } else {
+                                          context
+                                              .read<AudioPlayerNotifier>()
+                                              .playFromLastPosition();
+                                        }
+                                      }),
+                                  SizedBox(width: 30),
+                                  IconButton(
+                                      icon: Icon(Icons.fast_forward),
+                                      onPressed: () {
+                                        if (running) {
+                                          audio.fastForward();
+                                        }
+                                      })
+                                ],
+                              ),
+                              if (data.item2)
+                                Selector<AudioPlayerNotifier,
+                                    Tuple3<bool, double, String>>(
+                                  selector: (_, audio) => Tuple3(
+                                      audio.buffering,
+                                      (audio.backgroundAudioDuration -
+                                              audio.backgroundAudioPosition) /
+                                          1000,
+                                      audio.remoteErrorMessage),
+                                  builder: (_, data, __) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: data.item3 != null
+                                          ? Text(data.item3,
+                                              style: const TextStyle(
+                                                  color: Color(0xFFFF0000)))
+                                          : data.item1
+                                              ? Text(
+                                                  s.buffering,
+                                                  style: TextStyle(
+                                                      color:
+                                                          context.accentColor),
+                                                )
+                                              : Text(
+                                                  s.timeLeft((data.item2)
+                                                          .toInt()
+                                                          .toTime ??
+                                                      ''),
+                                                  maxLines: 2,
+                                                ),
+                                    );
+                                  },
+                                )
+                            ],
+                          )),
+                          data.item4 != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: InkWell(
+                                    onTap: () {
                                       if (running) {
-                                        audio.rewind();
-                                      }
-                                    }),
-                                SizedBox(width: 30),
-                                IconButton(
-                                    padding: EdgeInsets.zero,
-                                    icon: Icon(
-                                        playing
-                                            ? LineIcons.pause_solid
-                                            : LineIcons.play_solid,
-                                        size: 40),
-                                    onPressed: () {
-                                      if (running) {
-                                        playing
-                                            ? audio.pauseAduio()
-                                            : audio.resumeAudio();
-                                      } else {
                                         context
                                             .read<AudioPlayerNotifier>()
-                                            .playFromLastPosition();
+                                            .playNext();
                                       }
-                                    }),
-                                SizedBox(width: 30),
-                                IconButton(
-                                    icon: Icon(Icons.fast_forward),
-                                    onPressed: () {
-                                      if (running) {
-                                        audio.fastForward();
-                                      }
-                                    })
-                              ],
-                            ),
-                            if (data.item2)
-                              Selector<AudioPlayerNotifier,
-                                  Tuple3<bool, double, String>>(
-                                selector: (_, audio) => Tuple3(
-                                    audio.buffering,
-                                    (audio.backgroundAudioDuration -
-                                            audio.backgroundAudioPosition) /
-                                        1000,
-                                    audio.remoteErrorMessage),
-                                builder: (_, data, __) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: data.item3 != null
-                                        ? Text(data.item3,
-                                            style: const TextStyle(
-                                                color: Color(0xFFFF0000)))
-                                        : data.item1
-                                            ? Text(
-                                                s.buffering,
-                                                style: TextStyle(
-                                                    color: context.accentColor),
-                                              )
-                                            : Text(
-                                                s.timeLeft((data.item2)
-                                                        .toInt()
-                                                        .toTime ??
-                                                    ''),
-                                                maxLines: 2,
-                                              ),
-                                  );
-                                },
-                              )
-                          ],
-                        )),
-                        data.item4 != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: InkWell(
-                                  onTap: () {
-                                    if (running) {
-                                      context
-                                          .read<AudioPlayerNotifier>()
-                                          .playNext();
-                                    }
-                                  },
-                                  child: SizedBox(
-                                      width: 80,
-                                      height: 80,
-                                      child:
-                                          Image(image: data.item4.avatarImage)),
-                                ),
-                              )
-                            : Container(
-                                decoration: BoxDecoration(
-                                    color: context.accentColor.withAlpha(70),
-                                    borderRadius: BorderRadius.circular(10)),
-                                width: 80,
-                                height: 80),
-                        SizedBox(
-                          width: 20,
-                        ),
-                      ],
-                    );
-                  },
+                                    },
+                                    child: SizedBox(
+                                        width: 80,
+                                        height: 80,
+                                        child: Image(
+                                            image: data.item4.avatarImage)),
+                                  ),
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                      color: context.accentColor.withAlpha(70),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  width: 80,
+                                  height: 80),
+                          SizedBox(
+                            width: 20,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 50,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _tabWidget(
-                        icon: Icon(Icons.queue_music_rounded),
-                        label: s.playNext,
-                        color: Colors.blue,
-                        isSelected: _selected == 'PlayNext',
-                        onTap: () => setState(() {
-                              _body = _Queue();
-                              _selected = 'PlayNext';
-                            })),
-                    _tabWidget(
-                        icon: Icon(Icons.history),
-                        label: s.settingsHistory,
-                        color: Colors.green,
-                        isSelected: _selected == 'History',
-                        onTap: () => setState(() {
-                              _body = _History();
-                              _selected = 'History';
-                            })),
-                    _tabWidget(
-                        icon: Icon(Icons.playlist_play),
-                        label: s.playlists,
-                        color: Colors.purple,
-                        isSelected: _selected == 'Playlists',
-                        onTap: () => setState(() {
-                              _body = _Playlists();
-                              _selected = 'Playlists';
-                            })),
-                  ],
+                SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _tabWidget(
+                          icon: Icon(Icons.queue_music_rounded),
+                          label: s.playNext,
+                          color: Colors.blue,
+                          isSelected: _selected == 'PlayNext',
+                          onTap: () => setState(() {
+                                _body = _Queue();
+                                _selected = 'PlayNext';
+                              })),
+                      _tabWidget(
+                          icon: Icon(Icons.history),
+                          label: s.settingsHistory,
+                          color: Colors.green,
+                          isSelected: _selected == 'History',
+                          onTap: () => setState(() {
+                                _body = _History();
+                                _selected = 'History';
+                              })),
+                      _tabWidget(
+                          icon: Icon(Icons.playlist_play),
+                          label: s.playlists,
+                          color: Colors.purple,
+                          isSelected: _selected == 'Playlists',
+                          onTap: () => setState(() {
+                                _body = _Playlists();
+                                _selected = 'Playlists';
+                              })),
+                    ],
+                  ),
                 ),
-              ),
-              Divider(height: 1),
-              Expanded(
-                  child: AnimatedSwitcher(
-                      duration: Duration(milliseconds: 300), child: _body))
-            ],
-          )),
+                Divider(height: 1),
+                Expanded(
+                    child: AnimatedSwitcher(
+                        duration: Duration(milliseconds: 300), child: _body))
+              ],
+            )),
+      ),
     );
   }
 }
@@ -260,61 +276,67 @@ class __QueueState extends State<_Queue> {
         selector: (_, audio) =>
             Tuple3(audio.playlist, audio.playerRunning, audio.episode),
         builder: (_, data, __) {
-          var episodes = data.item1.episodes.toSet().toList();
+          var episodes = data.item1?.episodes?.toSet()?.toList();
           var queue = data.item1;
           var running = data.item2;
-          return queue.name == 'Queue'
-              ? ReorderableListView(
-                  onReorder: (oldIndex, newIndex) {
-                    context
-                        .read<AudioPlayerNotifier>()
-                        .reorderPlaylist(oldIndex, newIndex);
-                    setState(() {});
-                  },
-                  scrollDirection: Axis.vertical,
-                  children: data.item2
-                      ? episodes.map<Widget>((episode) {
-                          if (episode.enclosureUrl !=
-                              episodes.first.enclosureUrl) {
-                            return DismissibleContainer(
-                              episode: episode,
-                              onRemove: (value) => setState(() {}),
-                              key: ValueKey(episode.enclosureUrl),
-                            );
-                          } else {
-                            return EpisodeCard(episode,
-                                key: ValueKey('playing'),
-                                isPlaying: true,
-                                canReorder: true,
-                                tileColor: context.primaryColorDark);
-                          }
-                        }).toList()
-                      : episodes
-                          .map<Widget>((episode) => DismissibleContainer(
-                                episode: episode,
-                                onRemove: (value) => setState(() {}),
-                                key: ValueKey(episode.enclosureUrl),
-                              ))
-                          .toList())
-              : ListView.builder(
-                  itemCount: queue.episodeList.length,
-                  itemBuilder: (context, index) {
-                    final episode = queue.episodes[index];
-                    final isPlaying =
-                        data.item3 != null && data.item3 == episode;
-                    return EpisodeCard(
-                      episode,
-                      isPlaying: isPlaying && running,
-                      tileColor: isPlaying ? context.primaryColorDark : null,
-                      onTap: () async {
-                        if (!isPlaying) {
-                          await context
-                              .read<AudioPlayerNotifier>()
-                              .loadEpisodeFromPlaylist(episode);
-                        }
+          return queue == null
+              ? Center()
+              : queue?.name == 'Queue'
+                  ? ReorderableListView(
+                      onReorder: (oldIndex, newIndex) {
+                        context
+                            .read<AudioPlayerNotifier>()
+                            .reorderPlaylist(oldIndex, newIndex);
+                        setState(() {});
                       },
-                    );
-                  });
+                      scrollDirection: Axis.vertical,
+                      children: data.item2
+                          ? episodes.map<Widget>((episode) {
+                              if (episode.enclosureUrl !=
+                                  episodes.first.enclosureUrl) {
+                                return DismissibleContainer(
+                                  episode: episode,
+                                  onRemove: (value) => setState(() {}),
+                                  key: ValueKey(episode.enclosureUrl),
+                                );
+                              } else {
+                                return EpisodeCard(episode,
+                                    key: ValueKey('playing'),
+                                    isPlaying: true,
+                                    canReorder: true,
+                                    tileColor: context.primaryColorDark);
+                              }
+                            }).toList()
+                          : episodes
+                              .map<Widget>((episode) => DismissibleContainer(
+                                    episode: episode,
+                                    onRemove: (value) => setState(() {}),
+                                    key: ValueKey(episode.enclosureUrl),
+                                  ))
+                              .toList())
+                  : ListView.builder(
+                      itemCount: queue?.length,
+                      itemBuilder: (context, index) {
+                        final episode =
+                            queue != null ? queue.episodes[index] : null;
+                        final isPlaying =
+                            data.item3 != null && data.item3 == episode;
+                        return episode == null
+                            ? Center()
+                            : EpisodeCard(
+                                episode,
+                                isPlaying: isPlaying && running,
+                                tileColor:
+                                    isPlaying ? context.primaryColorDark : null,
+                                onTap: () async {
+                                  if (!isPlaying) {
+                                    await context
+                                        .read<AudioPlayerNotifier>()
+                                        .loadEpisodeFromPlaylist(episode);
+                                  }
+                                },
+                              );
+                      });
         });
   }
 }

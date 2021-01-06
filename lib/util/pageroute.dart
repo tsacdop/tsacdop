@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 //Slide Transition
 class SlideLeftRoute extends PageRouteBuilder {
+  @override 
+  Duration get transitionDuration => Duration(milliseconds: 300);
   final Widget page;
   SlideLeftRoute({this.page})
       : super(
@@ -17,23 +19,38 @@ class SlideLeftRoute extends PageRouteBuilder {
               secondaryAnimation,
               child,
             ) {
-              var begin = Offset(1.0, 0.0);
-              var end = Offset.zero;
-              var curve = Curves.easeOutQuart;
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-              var tweenSequence = TweenSequence(<TweenSequenceItem<Offset>>[
-                TweenSequenceItem<Offset>(
-                  tween: tween,
-                  weight: 90.0,
-                ),
-                TweenSequenceItem<Offset>(
-                  tween: ConstantTween<Offset>(Offset.zero),
-                  weight: 10.0,
-                ),
-              ]);
               return SlideTransition(
-                position: animation.drive(tweenSequence),
+                position: Tween<Offset>(
+                  begin: const Offset(1, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            });
+}
+
+//Slide Transition
+class SlideRightRoute extends PageRouteBuilder {
+  final Widget page;
+  SlideRightRoute({this.page})
+      : super(
+            pageBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+            ) =>
+                page,
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(-1, 0),
+                  end: Offset.zero,
+                ).animate(animation),
                 child: child,
               );
             });

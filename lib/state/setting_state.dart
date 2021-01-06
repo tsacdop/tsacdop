@@ -74,37 +74,40 @@ final showNotesFontStyles = <TextStyle>[
 ];
 
 class SettingState extends ChangeNotifier {
-  var themeStorage = KeyValueStorage(themesKey);
-  var accentStorage = KeyValueStorage(accentsKey);
-  var autoupdateStorage = KeyValueStorage(autoUpdateKey);
-  var intervalStorage = KeyValueStorage(updateIntervalKey);
-  var downloadUsingDataStorage = KeyValueStorage(downloadUsingDataKey);
-  var introStorage = KeyValueStorage(introKey);
-  var realDarkStorage = KeyValueStorage(realDarkKey);
-  var autoPlayStorage = KeyValueStorage(autoPlayKey);
-  var defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
-  var autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
-  var autoSleepTimerModeStorage = KeyValueStorage(autoSleepTimerModeKey);
-  var autoSleepTimerStartStorage = KeyValueStorage(autoSleepTimerStartKey);
-  var autoSleepTimerEndStorage = KeyValueStorage(autoSleepTimerEndKey);
-  var tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
-  var cacheStorage = KeyValueStorage(cacheMaxKey);
-  var podcastLayoutStorage = KeyValueStorage(podcastLayoutKey);
-  var favLayoutStorage = KeyValueStorage(favLayoutKey);
-  var downloadLayoutStorage = KeyValueStorage(downloadLayoutKey);
-  var recentLayoutStorage = KeyValueStorage(recentLayoutKey);
-  var autoDeleteStorage = KeyValueStorage(autoDeleteKey);
-  var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
-  var fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
-  var rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
-  var localeStorage = KeyValueStorage(localeKey);
-  var showNotesFontStorage = KeyValueStorage(showNotesFontKey);
+  final _themeStorage = KeyValueStorage(themesKey);
+  final _accentStorage = KeyValueStorage(accentsKey);
+  final _autoupdateStorage = KeyValueStorage(autoUpdateKey);
+  final _intervalStorage = KeyValueStorage(updateIntervalKey);
+  final _downloadUsingDataStorage = KeyValueStorage(downloadUsingDataKey);
+  final _introStorage = KeyValueStorage(introKey);
+  final _realDarkStorage = KeyValueStorage(realDarkKey);
+  final _autoPlayStorage = KeyValueStorage(autoPlayKey);
+  final _defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
+  final _autoSleepTimerStorage = KeyValueStorage(autoSleepTimerKey);
+  final _autoSleepTimerModeStorage = KeyValueStorage(autoSleepTimerModeKey);
+  final _autoSleepTimerStartStorage = KeyValueStorage(autoSleepTimerStartKey);
+  final _autoSleepTimerEndStorage = KeyValueStorage(autoSleepTimerEndKey);
+  final _cacheStorage = KeyValueStorage(cacheMaxKey);
+  final _podcastLayoutStorage = KeyValueStorage(podcastLayoutKey);
+  final _favLayoutStorage = KeyValueStorage(favLayoutKey);
+  final _downloadLayoutStorage = KeyValueStorage(downloadLayoutKey);
+  final _recentLayoutStorage = KeyValueStorage(recentLayoutKey);
+  final _autoDeleteStorage = KeyValueStorage(autoDeleteKey);
+  final _autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+  final _fastForwardSecondsStorage = KeyValueStorage(fastForwardSecondsKey);
+  final _rewindSecondsStorage = KeyValueStorage(rewindSecondsKey);
+  final _localeStorage = KeyValueStorage(localeKey);
+  final _showNotesFontStorage = KeyValueStorage(showNotesFontKey);
+  final _openPlaylistDefaultStorage = KeyValueStorage(openPlaylistDefaultKey);
+  final _openAllPodcastDefaultStorage =
+      KeyValueStorage(openAllPodcastDefaultKey);
 
   Future initData() async {
     await _getTheme();
     await _getAccentSetColor();
     await _getShowIntro();
     await _getRealDark();
+    await _getOpenPlaylistDefault();
   }
 
   @override
@@ -116,6 +119,7 @@ class SettingState extends ChangeNotifier {
     _getSleepTimerData();
     _getPlayerSeconds();
     _getShowNotesFonts();
+    _getOpenAllPodcastDefault();
     _getUpdateInterval().then((value) async {
       if (_initUpdateTag == 0) {
         setWorkManager(24);
@@ -247,6 +251,24 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Open playlist page default
+  bool _openPlaylistDefault;
+  bool get openPlaylistDefault => _openPlaylistDefault;
+  set openPlaylistDefault(bool boo) {
+    _openPlaylistDefault = boo;
+    _setOpenPlaylistDefault();
+    notifyListeners();
+  }
+
+  /// Open all podcasts page default
+  bool _openAllPodcastDefault;
+  bool get openAllPodcastDefalt => _openAllPodcastDefault;
+  set openAllPodcastDefault(boo) {
+    _openAllPodcastDefault = boo;
+    _setOpenAllPodcastDefault();
+    notifyListeners();
+  }
+
   int _defaultSleepTimer;
   int get defaultSleepTimer => _defaultSleepTimer;
   set setDefaultSleepTimer(int i) {
@@ -322,12 +344,12 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _getTheme() async {
-    var mode = await themeStorage.getInt();
+    var mode = await _themeStorage.getInt();
     _theme = ThemeMode.values[mode];
   }
 
   Future _getAccentSetColor() async {
-    var colorString = await accentStorage.getString();
+    var colorString = await _accentStorage.getString();
     if (colorString.isNotEmpty) {
       var color = int.parse('FF${colorString.toUpperCase()}', radix: 16);
       _accentSetColor = Color(color).withOpacity(1.0);
@@ -339,53 +361,63 @@ class SettingState extends ChangeNotifier {
 
   Future _getAutoUpdate() async {
     _autoUpdate =
-        await autoupdateStorage.getBool(defaultValue: true, reverse: true);
+        await _autoupdateStorage.getBool(defaultValue: true, reverse: true);
   }
 
   Future _getUpdateInterval() async {
-    _initUpdateTag = await intervalStorage.getInt();
+    _initUpdateTag = await _intervalStorage.getInt();
     _updateInterval = _initUpdateTag;
   }
 
   Future _getDownloadUsingData() async {
-    _downloadUsingData = await downloadUsingDataStorage.getBool(
+    _downloadUsingData = await _downloadUsingDataStorage.getBool(
         defaultValue: true, reverse: true);
   }
 
   Future _saveDownloadUsingData() async {
-    await downloadUsingDataStorage.saveBool(_downloadUsingData, reverse: true);
+    await _downloadUsingDataStorage.saveBool(_downloadUsingData, reverse: true);
   }
 
   Future _getShowIntro() async {
-    _initialShowIntor = await introStorage.getInt();
+    _initialShowIntor = await _introStorage.getInt();
     _showIntro = _initialShowIntor == 0;
   }
 
   Future _getRealDark() async {
-    _realDark = await realDarkStorage.getBool(defaultValue: false);
+    _realDark = await _realDarkStorage.getBool(defaultValue: false);
+  }
+
+  Future _getOpenPlaylistDefault() async {
+    _openPlaylistDefault =
+        await _openPlaylistDefaultStorage.getBool(defaultValue: false);
+  }
+
+  Future _getOpenAllPodcastDefault() async {
+    _openAllPodcastDefault =
+        await _openAllPodcastDefaultStorage.getBool(defaultValue: false);
   }
 
   Future _getSleepTimerData() async {
     _defaultSleepTimer =
-        await defaultSleepTimerStorage.getInt(defaultValue: 30);
-    _autoSleepTimer = await autoSleepTimerStorage.getBool(defaultValue: false);
+        await _defaultSleepTimerStorage.getInt(defaultValue: 30);
+    _autoSleepTimer = await _autoSleepTimerStorage.getBool(defaultValue: false);
     _autoSleepTimerStart =
-        await autoSleepTimerStartStorage.getInt(defaultValue: 1380);
+        await _autoSleepTimerStartStorage.getInt(defaultValue: 1380);
     _autoSleepTimerEnd =
-        await autoSleepTimerEndStorage.getInt(defaultValue: 360);
+        await _autoSleepTimerEndStorage.getInt(defaultValue: 360);
     _autoPlay =
-        await autoPlayStorage.getBool(defaultValue: true, reverse: true);
-    _autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
+        await _autoPlayStorage.getBool(defaultValue: true, reverse: true);
+    _autoSleepTimerMode = await _autoSleepTimerModeStorage.getInt();
   }
 
   Future _getPlayerSeconds() async {
-    _rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
+    _rewindSeconds = await _rewindSecondsStorage.getInt(defaultValue: 10);
     _fastForwardSeconds =
-        await fastForwardSecondsStorage.getInt(defaultValue: 30);
+        await _fastForwardSecondsStorage.getInt(defaultValue: 30);
   }
 
   Future _getLocale() async {
-    var localeString = await localeStorage.getStringList();
+    var localeString = await _localeStorage.getStringList();
     if (localeString.isEmpty) {
       await findSystemLocale();
       var systemLanCode;
@@ -405,111 +437,119 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<void> _getShowNotesFonts() async {
-    _showNotesFontIndex = await showNotesFontStorage.getInt(defaultValue: 1);
+    _showNotesFontIndex = await _showNotesFontStorage.getInt(defaultValue: 1);
   }
 
   Future<void> _saveAccentSetColor() async {
-    await accentStorage
+    await _accentStorage
         .saveString(_accentSetColor.toString().substring(10, 16));
   }
 
   Future<void> _setRealDark() async {
-    await realDarkStorage.saveBool(_realDark);
+    await _realDarkStorage.saveBool(_realDark);
+  }
+
+  Future<void> _setOpenPlaylistDefault() async {
+    await _openPlaylistDefaultStorage.saveBool(_openPlaylistDefault);
+  }
+
+  Future<void> _setOpenAllPodcastDefault() async {
+    await _openAllPodcastDefaultStorage.saveBool(_openAllPodcastDefault);
   }
 
   Future<void> saveShowIntro(int i) async {
-    await introStorage.saveInt(i);
+    await _introStorage.saveInt(i);
   }
 
   Future<void> _saveUpdateInterval() async {
-    await intervalStorage.saveInt(_updateInterval);
+    await _intervalStorage.saveInt(_updateInterval);
   }
 
   Future<void> _saveTheme() async {
-    await themeStorage.saveInt(_theme.index);
+    await _themeStorage.saveInt(_theme.index);
   }
 
   Future<void> _saveAutoUpdate() async {
-    await autoupdateStorage.saveBool(_autoUpdate, reverse: true);
+    await _autoupdateStorage.saveBool(_autoUpdate, reverse: true);
   }
 
   Future<void> _saveAutoPlay() async {
-    await autoPlayStorage.saveBool(_autoPlay, reverse: true);
+    await _autoPlayStorage.saveBool(_autoPlay, reverse: true);
   }
 
   Future<void> _setDefaultSleepTimer() async {
-    await defaultSleepTimerStorage.saveInt(_defaultSleepTimer);
+    await _defaultSleepTimerStorage.saveInt(_defaultSleepTimer);
   }
 
   Future<void> _saveAutoSleepTimer() async {
-    await autoSleepTimerStorage.saveBool(_autoSleepTimer);
+    await _autoSleepTimerStorage.saveBool(_autoSleepTimer);
   }
 
   Future<void> _saveAutoSleepTimerMode() async {
-    await autoSleepTimerModeStorage.saveInt(_autoSleepTimerMode);
+    await _autoSleepTimerModeStorage.saveInt(_autoSleepTimerMode);
   }
 
   Future<void> _saveAutoSleepTimerStart() async {
-    await autoSleepTimerStartStorage.saveInt(_autoSleepTimerStart);
+    await _autoSleepTimerStartStorage.saveInt(_autoSleepTimerStart);
   }
 
   Future<void> _saveAutoSleepTimerEnd() async {
-    await autoSleepTimerEndStorage.saveInt(_autoSleepTimerEnd);
+    await _autoSleepTimerEndStorage.saveInt(_autoSleepTimerEnd);
   }
 
   Future<void> _saveFastForwardSeconds() async {
-    await fastForwardSecondsStorage.saveInt(_fastForwardSeconds);
+    await _fastForwardSecondsStorage.saveInt(_fastForwardSeconds);
   }
 
   Future<void> _saveRewindSeconds() async {
-    await rewindSecondsStorage.saveInt(_rewindSeconds);
+    await _rewindSecondsStorage.saveInt(_rewindSeconds);
   }
 
   Future<void> _saveShowNotesFonts() async {
-    await showNotesFontStorage.saveInt(_showNotesFontIndex);
+    await _showNotesFontStorage.saveInt(_showNotesFontIndex);
   }
 
   Future<SettingsBackup> backup() async {
-    var theme = await themeStorage.getInt();
-    var accentColor = await accentStorage.getString();
-    var realDark = await realDarkStorage.getBool(defaultValue: false);
+    var theme = await _themeStorage.getInt();
+    var accentColor = await _accentStorage.getString();
+    var realDark = await _realDarkStorage.getBool(defaultValue: false);
     var autoPlay =
-        await autoPlayStorage.getBool(defaultValue: true, reverse: true);
+        await _autoPlayStorage.getBool(defaultValue: true, reverse: true);
     var autoUpdate =
-        await autoupdateStorage.getBool(defaultValue: true, reverse: true);
-    var updateInterval = await intervalStorage.getInt();
-    var downloadUsingData = await downloadUsingDataStorage.getBool(
+        await _autoupdateStorage.getBool(defaultValue: true, reverse: true);
+    var updateInterval = await _intervalStorage.getInt();
+    var downloadUsingData = await _downloadUsingDataStorage.getBool(
         defaultValue: true, reverse: true);
-    var cacheMax = await cacheStorage.getInt(defaultValue: 500 * 1024 * 1024);
-    var podcastLayout = await podcastLayoutStorage.getInt();
-    var recentLayout = await recentLayoutStorage.getInt();
-    var favLayout = await favLayoutStorage.getInt();
-    var downloadLayout = await downloadLayoutStorage.getInt();
+    var cacheMax = await _cacheStorage.getInt(defaultValue: 500 * 1024 * 1024);
+    var podcastLayout = await _podcastLayoutStorage.getInt();
+    var recentLayout = await _recentLayoutStorage.getInt();
+    var favLayout = await _favLayoutStorage.getInt();
+    var downloadLayout = await _downloadLayoutStorage.getInt();
     var autoDownloadNetwork =
-        await autoDownloadStorage.getBool(defaultValue: false);
+        await _autoDownloadStorage.getBool(defaultValue: false);
     var episodePopupMenu = await KeyValueStorage(episodePopupMenuKey).getMenu();
-    var autoDelete = await autoDeleteStorage.getInt();
+    var autoDelete = await _autoDeleteStorage.getInt();
     var autoSleepTimer =
-        await autoSleepTimerStorage.getBool(defaultValue: false);
-    var autoSleepTimerStart = await autoSleepTimerStartStorage.getInt();
-    var autoSleepTimerEnd = await autoSleepTimerEndStorage.getInt();
-    var autoSleepTimerMode = await autoSleepTimerModeStorage.getInt();
-    var defaultSleepTime = await defaultSleepTimerStorage.getInt();
+        await _autoSleepTimerStorage.getBool(defaultValue: false);
+    var autoSleepTimerStart = await _autoSleepTimerStartStorage.getInt();
+    var autoSleepTimerEnd = await _autoSleepTimerEndStorage.getInt();
+    var autoSleepTimerMode = await _autoSleepTimerModeStorage.getInt();
+    var defaultSleepTime = await _defaultSleepTimerStorage.getInt();
     var tapToOpenPopupMenu = await KeyValueStorage(tapToOpenPopupMenuKey)
         .getBool(defaultValue: false);
     var fastForwardSeconds =
-        await fastForwardSecondsStorage.getInt(defaultValue: 30);
-    var rewindSeconds = await rewindSecondsStorage.getInt(defaultValue: 10);
+        await _fastForwardSecondsStorage.getInt(defaultValue: 30);
+    var rewindSeconds = await _rewindSecondsStorage.getInt(defaultValue: 10);
     var playerHeight =
         await KeyValueStorage(playerHeightKey).getInt(defaultValue: 0);
-    var localeList = await localeStorage.getStringList();
+    var localeList = await _localeStorage.getStringList();
     var backupLocale =
         localeList.isEmpty ? '' : '${'${localeList.first}-'}${localeList[1]}';
     var hideListened =
         await KeyValueStorage(hideListenedKey).getBool(defaultValue: false);
     var notificationLayout =
         await KeyValueStorage(notificationLayoutKey).getInt(defaultValue: 0);
-    var showNotesFont = await showNotesFontStorage.getInt(defaultValue: 1);
+    var showNotesFont = await _showNotesFontStorage.getInt(defaultValue: 1);
     var speedList = await KeyValueStorage(speedListKey).getStringList();
     var hidePodcastDiscovery = await KeyValueStorage(hidePodcastDiscoveryKey)
         .getBool(defaultValue: false);
@@ -555,37 +595,37 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<void> restore(SettingsBackup backup) async {
-    await themeStorage.saveInt(backup.theme);
-    await accentStorage.saveString(backup.accentColor);
-    await realDarkStorage.saveBool(backup.realDark);
-    await autoPlayStorage.saveBool(backup.autoPlay, reverse: true);
-    await autoupdateStorage.saveBool(backup.autoUpdate, reverse: true);
-    await intervalStorage.saveInt(backup.updateInterval);
-    await downloadUsingDataStorage.saveBool(backup.downloadUsingData,
+    await _themeStorage.saveInt(backup.theme);
+    await _accentStorage.saveString(backup.accentColor);
+    await _realDarkStorage.saveBool(backup.realDark);
+    await _autoPlayStorage.saveBool(backup.autoPlay, reverse: true);
+    await _autoupdateStorage.saveBool(backup.autoUpdate, reverse: true);
+    await _intervalStorage.saveInt(backup.updateInterval);
+    await _downloadUsingDataStorage.saveBool(backup.downloadUsingData,
         reverse: true);
-    await cacheStorage.saveInt(backup.cacheMax);
-    await podcastLayoutStorage.saveInt(backup.podcastLayout);
-    await recentLayoutStorage.saveInt(backup.recentLayout);
-    await favLayoutStorage.saveInt(backup.favLayout);
-    await downloadLayoutStorage.saveInt(backup.downloadLayout);
-    await autoDownloadStorage.saveBool(backup.autoDownloadNetwork);
+    await _cacheStorage.saveInt(backup.cacheMax);
+    await _podcastLayoutStorage.saveInt(backup.podcastLayout);
+    await _recentLayoutStorage.saveInt(backup.recentLayout);
+    await _favLayoutStorage.saveInt(backup.favLayout);
+    await _downloadLayoutStorage.saveInt(backup.downloadLayout);
+    await _autoDownloadStorage.saveBool(backup.autoDownloadNetwork);
     await KeyValueStorage(episodePopupMenuKey)
         .saveStringList(backup.episodePopupMenu);
-    await autoDeleteStorage.saveInt(backup.autoDelete);
-    await autoSleepTimerStorage.saveBool(backup.autoSleepTimer);
-    await autoSleepTimerStartStorage.saveInt(backup.autoSleepTimerStart);
-    await autoSleepTimerEndStorage.saveInt(backup.autoSleepTimerEnd);
-    await autoSleepTimerModeStorage.saveInt(backup.autoSleepTimerMode);
-    await defaultSleepTimerStorage.saveInt(backup.defaultSleepTime);
-    await fastForwardSecondsStorage.saveInt(backup.fastForwardSeconds);
-    await rewindSecondsStorage.saveInt(backup.rewindSeconds);
+    await _autoDeleteStorage.saveInt(backup.autoDelete);
+    await _autoSleepTimerStorage.saveBool(backup.autoSleepTimer);
+    await _autoSleepTimerStartStorage.saveInt(backup.autoSleepTimerStart);
+    await _autoSleepTimerEndStorage.saveInt(backup.autoSleepTimerEnd);
+    await _autoSleepTimerModeStorage.saveInt(backup.autoSleepTimerMode);
+    await _defaultSleepTimerStorage.saveInt(backup.defaultSleepTime);
+    await _fastForwardSecondsStorage.saveInt(backup.fastForwardSeconds);
+    await _rewindSecondsStorage.saveInt(backup.rewindSeconds);
     await KeyValueStorage(playerHeightKey).saveInt(backup.playerHeight);
     await KeyValueStorage(tapToOpenPopupMenuKey)
         .saveBool(backup.tapToOpenPopupMenu);
     await KeyValueStorage(hideListenedKey).saveBool(backup.hideListened);
     await KeyValueStorage(notificationLayoutKey)
         .saveInt(backup.notificationLayout);
-    await showNotesFontStorage.saveInt(backup.showNotesFont);
+    await _showNotesFontStorage.saveInt(backup.showNotesFont);
     await KeyValueStorage(speedListKey).saveStringList(backup.speedList);
     await KeyValueStorage(markListenedAfterSkipKey)
         .saveBool(backup.markListenedAfterSkip);
@@ -593,7 +633,7 @@ class SettingState extends ChangeNotifier {
         .saveBool(backup.deleteAfterPlayed);
 
     if (backup.locale == '') {
-      await localeStorage.saveStringList([]);
+      await _localeStorage.saveStringList([]);
       await S.load(Locale(Intl.systemLocale));
     } else {
       var localeList = backup.locale.split('-');
@@ -603,7 +643,7 @@ class SettingState extends ChangeNotifier {
       } else {
         backupLocale = Locale(localeList.first, localeList[1]);
       }
-      await localeStorage.saveStringList(
+      await _localeStorage.saveStringList(
           [backupLocale.languageCode, backupLocale.countryCode]);
       await S.load(backupLocale);
     }

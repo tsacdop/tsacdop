@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/playlists/playlist_home.dart';
+import 'package:tuple/tuple.dart';
 
 import 'generated/l10n.dart';
 import 'home/home.dart';
@@ -52,15 +54,17 @@ Future main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<SettingState>(
-      builder: (_, setting, child) {
+    return Selector<SettingState, Tuple3<ThemeMode, ThemeData, ThemeData>>(
+      selector: (_, setting) =>
+          Tuple3(setting.theme, setting.lightTheme, setting.darkTheme),
+      builder: (_, data, child) {
         return FeatureDiscovery(
           child: MaterialApp(
-            themeMode: setting.theme,
+            themeMode: data.item1,
             debugShowCheckedModeBanner: false,
             title: 'Tsacdop',
-            theme: setting.lightTheme,
-            darkTheme: setting.darkTheme,
+            theme: data.item2,
+            darkTheme: data.item3,
             localizationsDelegates: [
               S.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -68,11 +72,15 @@ class MyApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: S.delegate.supportedLocales,
-            home: setting.showIntro ? SlideIntro(goto: Goto.home) : child,
+            home: context.read<SettingState>().showIntro
+                ? SlideIntro(goto: Goto.home)
+                : context.read<SettingState>().openPlaylistDefault
+                    ? PlaylistHome()
+                    : Home(),
           ),
         );
       },
-      child: FeatureDiscovery(child: Home()),
+      //child: FeatureDiscovery(child: Home()),
     );
   }
 }

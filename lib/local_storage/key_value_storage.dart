@@ -60,6 +60,8 @@ const String downloadPositionKey = 'downloadPositionKey';
 const String deleteAfterPlayedKey = 'removeAfterPlayedKey';
 const String playlistsAllKey = 'playlistsAllKey';
 const String playerStateKey = 'playerStateKey';
+const String openPlaylistDefaultKey = 'openPlaylistDefaultKey';
+const String openAllPodcastDefaultKey = 'openAllPodcastDefaultKey';
 
 class KeyValueStorage {
   final String key;

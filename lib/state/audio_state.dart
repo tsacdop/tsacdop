@@ -84,7 +84,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   EpisodeBrief _episode;
 
   /// Playlists include queue and playlists created by user.
-  List<Playlist> _playlists;
+  List<Playlist> _playlists = [];
 
   /// Playing playlist.
   Playlist _playlist;
@@ -261,53 +261,55 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> initPlaylist() async {
-    var playlistEntities = await _playlistsStorgae.getPlaylists();
-    _playlists = [
-      for (var entity in playlistEntities) Playlist.fromEntity(entity)
-    ];
-    await _playlists.first.getPlaylist();
-    await _getAutoPlay();
+    if (_playlists.isEmpty) {
+      var playlistEntities = await _playlistsStorgae.getPlaylists();
+      _playlists = [
+        for (var entity in playlistEntities) Playlist.fromEntity(entity)
+      ];
+      await _playlists.first.getPlaylist();
+      await _getAutoPlay();
 
-    var state = await _playerStateStorage.getPlayerState();
-    var idList = [for (var p in _playlists) p.id];
-    if (idList.contains(state[1])) {
-      _playlist = _playlists.firstWhere(
-        (p) => p.id == state[0],
-      );
-      await _playlist.getPlaylist();
-      if (state[1] != '') {
-        var episode = await _dbHelper.getRssItemWithUrl(state[1]);
-        if ((!_playlist.isQueue && _playlist.contains(episode)) ||
-            (_playlist.isQueue &&
-                _queue.isNotEmpty &&
-                _queue.episodes.first == episode)) {
-          _episode = episode;
-          _lastPosition = int.parse(state[2] ?? '0');
+      var state = await _playerStateStorage.getPlayerState();
+      var idList = [for (var p in _playlists) p.id];
+      if (idList.contains(state[1])) {
+        _playlist = _playlists.firstWhere(
+          (p) => p.id == state[0],
+        );
+        await _playlist.getPlaylist();
+        if (state[1] != '') {
+          var episode = await _dbHelper.getRssItemWithUrl(state[1]);
+          if ((!_playlist.isQueue && _playlist.contains(episode)) ||
+              (_playlist.isQueue &&
+                  _queue.isNotEmpty &&
+                  _queue.episodes.first == episode)) {
+            _episode = episode;
+            _lastPosition = int.parse(state[2] ?? '0');
+          } else {
+            _episode = _playlist.isNotEmpty ? _playlist.episodes.first : null;
+            _lastPosition = 0;
+          }
         } else {
           _episode = _playlist.isNotEmpty ? _playlist.episodes.first : null;
           _lastPosition = 0;
         }
       } else {
-        _episode = _playlist.isNotEmpty ? _playlist.episodes.first : null;
+        _playlist = _playlists.first;
+        _episode = _playlist.isNotEmpty ? _playlist.episodes?.first : null;
         _lastPosition = 0;
       }
-    } else {
-      _playlist = _playlists.first;
-      _episode = _playlist.isNotEmpty ? _playlist.episodes?.first : null;
-      _lastPosition = 0;
-    }
-    notifyListeners();
+      notifyListeners();
 
-    /// Save plays history if app is closed accidentally.
-    /// if (_lastPostion > 0 && _queue.episodes.isNotEmpty) {
-    ///   final episode = _queue.episodes.first;
-    ///   final duration = episode.duration * 1000;
-    ///   final seekValue = duration != 0 ? _lastPostion / duration : 1.0;
-    ///   final history = PlayHistory(
-    ///       episode.title, episode.enclosureUrl, _lastPostion ~/ 1000, seekValue);
-    ///   await _dbHelper.saveHistory(history);
-    /// }
-    await KeyValueStorage(lastWorkKey).saveInt(0);
+      /// Save plays history if app is closed accidentally.
+      /// if (_lastPostion > 0 && _queue.episodes.isNotEmpty) {
+      ///   final episode = _queue.episodes.first;
+      ///   final duration = episode.duration * 1000;
+      ///   final seekValue = duration != 0 ? _lastPostion / duration : 1.0;
+      ///   final history = PlayHistory(
+      ///       episode.title, episode.enclosureUrl, _lastPostion ~/ 1000, seekValue);
+      ///   await _dbHelper.saveHistory(history);
+      /// }
+      await KeyValueStorage(lastWorkKey).saveInt(0);
+    }
   }
 
   Future<void> playFromLastPosition() async {
