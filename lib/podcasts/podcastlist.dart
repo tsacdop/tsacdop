@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/class/settingstate.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
 import '../state/podcast_group.dart';
@@ -16,6 +17,7 @@ import '../util/pageroute.dart';
 import '../widgets/custom_widget.dart';
 import '../widgets/general_dialog.dart';
 import 'podcast_detail.dart';
+import 'podcast_manage.dart';
 import 'podcast_settings.dart';
 
 class AboutPodcast extends StatefulWidget {
@@ -51,8 +53,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
     var _groupList = Provider.of<GroupList>(context, listen: false);
     final s = context.s;
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       titlePadding: EdgeInsets.only(
           top: 20, left: 20, right: context.width / 3, bottom: 20),
       actions: <Widget>[
@@ -117,7 +118,19 @@ class _PodcastListState extends State<PodcastList> {
         appBar: AppBar(
           title: Text(context.s.podcast(2)),
           leading: CustomBackButton(),
-          centerTitle: true,
+          actions: [
+            Selector<SettingState, bool>(
+                selector: (_, setting) => setting.openAllPodcastDefalt,
+                builder: (_, data, __) {
+                  return data
+                      ? IconButton(
+                          splashRadius: 20,
+                          icon: Icon(Icons.all_out),
+                          onPressed: () => Navigator.push(
+                              context, ScaleRoute(page: PodcastManage())))
+                      : Center();
+                })
+          ],
         ),
         body: SafeArea(
           child: Container(
@@ -142,7 +155,7 @@ class _PodcastListState extends State<PodcastList> {
                                 onTap: () {
                                   Navigator.push(
                                     context,
-                                    ScaleRoute(
+                                    SlideLeftRoute(
                                         page: PodcastDetail(
                                       podcastLocal: snapshot.data[index],
                                     )),

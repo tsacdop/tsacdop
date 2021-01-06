@@ -10,6 +10,7 @@ import 'package:focused_menu/modals.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/state/setting_state.dart';
 import 'package:tuple/tuple.dart' as tuple;
 
 import '../episodes/episode_detail.dart';
@@ -30,7 +31,6 @@ import '../util/hide_player_route.dart';
 import '../util/pageroute.dart';
 import '../widgets/custom_widget.dart';
 import '../widgets/general_dialog.dart';
-import 'home.dart';
 
 class ScrollPodcasts extends StatefulWidget {
   @override
@@ -115,11 +115,11 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
         var groups = data.item1;
         var import = data.item2;
         return groups.isEmpty
-            ? Container(
+            ? SizedBox(
                 height: (width - 20) / 3 + 140,
               )
             : groups[_groupIndex].podcastList.length == 0
-                ? Container(
+                ? SizedBox(
                     height: (width - 20) / 3 + 140,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -184,7 +184,12 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                               Navigator.push(
                                                 context,
                                                 SlideLeftRoute(
-                                                    page: PodcastManage()),
+                                                    page: context
+                                                            .read<
+                                                                SettingState>()
+                                                            .openAllPodcastDefalt
+                                                        ? PodcastList()
+                                                        : PodcastManage()),
                                               );
                                             }
                                           },
@@ -344,7 +349,12 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                               Navigator.push(
                                                 context,
                                                 SlideLeftRoute(
-                                                    page: PodcastManage()),
+                                                    page: context
+                                                            .read<
+                                                                SettingState>()
+                                                            .openAllPodcastDefalt
+                                                        ? PodcastList()
+                                                        : PodcastManage()),
                                               );
                                             }
                                           },
@@ -455,12 +465,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                                       hide: true),
                                                   duration: Duration(
                                                       milliseconds: 300),
-                                                )
-                                                //  SlideLeftRoute(
-                                                //      page: PodcastDetail(
-                                                //    podcastLocal: podcastLocal,
-                                                //  )),
-                                                );
+                                                ));
                                           },
                                           child: PodcastPreview(
                                             podcastLocal: podcastLocal,

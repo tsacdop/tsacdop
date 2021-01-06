@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/state/setting_state.dart';
 
 import '../state/podcast_group.dart';
 import '../util/extension_helper.dart';
@@ -189,12 +190,18 @@ class _PodcastManageState extends State<PodcastManage>
                           AddGroup()),
                   icon: Icon(Icons.add_circle_outline)),
             ),
-            IconButton(
-                splashRadius: 20,
-                onPressed: () =>
-                    Navigator.push(context, ScaleRoute(page: PodcastList())),
-                icon: Icon(Icons.all_out)),
-           // _OrderMenu(),
+            Selector<SettingState, bool>(
+                selector: (_, setting) => setting.openAllPodcastDefalt,
+                builder: (_, data, __) {
+                  return !data
+                      ? IconButton(
+                          splashRadius: 20,
+                          onPressed: () => Navigator.push(
+                              context, ScaleRoute(page: PodcastList())),
+                          icon: Icon(Icons.all_out))
+                      : Center();
+                })
+            // _OrderMenu(),
           ],
         ),
         body: WillPopScope(
