@@ -113,7 +113,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
     super.dispose();
   }
 
-  Future _updateRssItem(BuildContext context, PodcastLocal podcastLocal) async {
+  Future<void> _updateRssItem(
+      BuildContext context, PodcastLocal podcastLocal) async {
     final result = await _dbHelper.updatePodcastRss(podcastLocal);
     if (result >= 0) {
       Fluttertoast.showToast(
@@ -202,6 +203,14 @@ class _PodcastDetailState extends State<PodcastDetail> {
     if (exist == '') {
       Navigator.of(context).pop();
     }
+  }
+
+  Future<int> _getNewCount() async {
+    return await _dbHelper.getPodcastUpdateCounts(widget.podcastLocal.id);
+  }
+
+  Future<void> _removePodcastNewMark() async {
+    await _dbHelper.removePodcastNewMark(widget.podcastLocal.id);
   }
 
   Widget _podcastInfo(BuildContext context) {
@@ -471,7 +480,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   Widget _actionBar(BuildContext context) {
     final s = context.s;
-    return Container(
+    return SizedBox(
         height: 30,
         child: Row(
           children: <Widget>[
@@ -612,6 +621,40 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   }
                 }),
             Spacer(),
+            FutureBuilder<int>(
+                future: _getNewCount(),
+                initialData: 0,
+                builder: (context, snapshot) {
+                  return snapshot.data != 0
+                      ? Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        child: Material(
+                            color: Colors.transparent,
+                            clipBehavior: Clip.hardEdge,
+                            borderRadius: BorderRadius.circular(100),
+                            child: SizedBox(
+                              width: 30,
+                              child: IconButton(
+                                  padding: EdgeInsets.only(bottom: 5),
+                                  tooltip: s.removeNewMark,
+                                  icon: Container(
+                                      height: 18,
+                                      width: 18,
+                                      child: CustomPaint(
+                                          painter: RemoveNewFlagPainter(
+                                              context.textTheme.bodyText1.color,
+                                              Colors.red))),
+                                  onPressed: () async {
+                                    await _removePodcastNewMark();
+                                    if (mounted) {
+                                      setState(() {});
+                                    }
+                                  }),
+                            ),
+                          ),
+                      )
+                      : Center();
+                }),
             if (!widget.hide)
               Material(
                   color: Colors.transparent,

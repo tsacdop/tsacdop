@@ -180,6 +180,15 @@ class DBHelper {
     return 0;
   }
 
+  Future<void> removePodcastNewMark(String id) async {
+    var dbClient = await database;
+    await dbClient.transaction((txn) async {
+      await txn.rawUpdate(
+          "UPDATE Episodes SET is_new = 0 WHERE feed_id = ? AND is_new = 1",
+          [id]);
+    });
+  }
+
   Future<bool> getNeverUpdate(String id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
@@ -414,11 +423,12 @@ class DBHelper {
       ORDER BY add_date DESC""");
     return list
         .map((record) => SubHistory(
-            DateTime.fromMillisecondsSinceEpoch(record['remove_date']),
-            DateTime.fromMillisecondsSinceEpoch(record['add_date']),
-            record['rss_url'],
-            record['title'],
-            status: record['status'] == 0 ? true : false,))
+              DateTime.fromMillisecondsSinceEpoch(record['remove_date']),
+              DateTime.fromMillisecondsSinceEpoch(record['add_date']),
+              record['rss_url'],
+              record['title'],
+              status: record['status'] == 0 ? true : false,
+            ))
         .toList();
   }
 
@@ -1131,8 +1141,7 @@ class DBHelper {
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
         GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
-        OR SUM(H.listen_time) = 0 ORDER BY RANDOM() LIMIT ? """,
-          [random]);
+        OR SUM(H.listen_time) = 0 ORDER BY RANDOM() LIMIT ? """, [random]);
     } else {
       list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
