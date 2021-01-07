@@ -1,5 +1,13 @@
 # Tsacdop Changelog
 
+## 0.5.3
+Release date 2021/1/7
+
+## Minor change
+* Option to open playlist page by default.
+* Option to open podcast list page instead of group page.
+* Add remove new mark buttong in podcast page.
+
 ## 0.5.2
 
 Release date 2021/1/3
