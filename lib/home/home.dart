@@ -727,7 +727,6 @@ class _RecentUpdateState extends State<_RecentUpdate>
       selector: (_, refreshWorkder, groupWorker) =>
           Tuple2(refreshWorkder.created, groupWorker.created),
       builder: (_, data, __) {
-        print('${data.item1}Refresh completed');
         return FutureBuilder<List<EpisodeBrief>>(
           future: _getRssItem(_top, _group, hideListened: _hideListened),
           builder: (context, snapshot) {
