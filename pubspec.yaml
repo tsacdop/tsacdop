@@ -33,7 +33,7 @@ dependencies:
   fluttertoast: ^4.0.1
   flutter_isolate: ^1.0.0+14
   flutter_linkify: ^4.0.2
-  flutter_file_dialog: ^0.0.5
+  flutter_file_dialog: ^1.0.0
   flare_flutter: ^2.0.6
   fl_chart: ^0.12.2
   marquee: ^1.6.1
