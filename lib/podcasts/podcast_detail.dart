@@ -627,8 +627,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                 builder: (context, snapshot) {
                   return snapshot.data != 0
                       ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        child: Material(
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          child: Material(
                             color: Colors.transparent,
                             clipBehavior: Clip.hardEdge,
                             borderRadius: BorderRadius.circular(100),
@@ -652,7 +652,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   }),
                             ),
                           ),
-                      )
+                        )
                       : Center();
                 }),
             if (!widget.hide)
@@ -913,11 +913,24 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         Container(
                                           alignment: Alignment.bottomRight,
                                           padding: EdgeInsets.only(
-                                              top: 10, right: 10, bottom: 20),
-                                          child: SizedBox(
-                                            height: 120,
-                                            child: Image.file(File(
-                                                "${widget.podcastLocal.imagePath}")),
+                                              top: 10, right: 10, bottom: 10),
+                                          child: Container(
+                                            height: 100,
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 2),
+                                            ),
+                                            child: Image.file(
+                                              File(
+                                                  "${widget.podcastLocal.imagePath}"),
+                                              errorBuilder: (context, _, __) {
+                                                return ColoredBox(
+                                                    color: color,
+                                                    child: Icon(Icons.error));
+                                              },
+                                            ),
                                           ),
                                         ),
                                         Align(
