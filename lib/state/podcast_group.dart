@@ -663,8 +663,11 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         var author = p.itunes.author ?? p.author ?? '';
         var provider = p.generator ?? '';
         var link = p.link ?? '';
+        var funding = p.podcastFunding.isNotEmpty
+            ? [for (var f in p.podcastFunding) f.url]
+            : <String>[];
         var podcastLocal = PodcastLocal(p.title, imageUrl, realUrl,
-            primaryColor, author, uuid, imagePath, provider, link,
+            primaryColor, author, uuid, imagePath, provider, link, funding,
             description: p.description);
 
         await dbHelper.savePodcastLocal(podcastLocal);

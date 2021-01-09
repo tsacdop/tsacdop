@@ -22,16 +22,27 @@ class PodcastLocal extends Equatable {
   final int updateCount;
   final int episodeCount;
 
+  final List<String> funding;
+
   //set setUpdateCount(i) => updateCount = i;
 
   //set setEpisodeCount(i) => episodeCount = i;
 
-  PodcastLocal(this.title, this.imageUrl, this.rssUrl, this.primaryColor,
-      this.author, this.id, this.imagePath, this.provider, this.link,
-      {this.description = '', int updateCount, int episodeCount})
-      : assert(rssUrl != null),
-        episodeCount = episodeCount ?? 0,
-        updateCount = updateCount ?? 0;
+  PodcastLocal(
+    this.title,
+    this.imageUrl,
+    this.rssUrl,
+    this.primaryColor,
+    this.author,
+    this.id,
+    this.imagePath,
+    this.provider,
+    this.link,
+    this.funding, {
+    this.description = '',
+    this.updateCount = 0,
+    this.episodeCount = 0,
+  }) : assert(rssUrl != null);
 
   ImageProvider get avatarImage {
     return File(imagePath).existsSync()
@@ -46,11 +57,12 @@ class PodcastLocal extends Equatable {
   }
 
   PodcastLocal copyWith({int updateCount, int episodeCount}) {
-    return PodcastLocal(title, imageUrl, rssUrl, primaryColor, author, id,
-        imagePath, provider, link,
+    return PodcastLocal(title, imageUrl, rssUrl, primaryColor, author, id, 
+        imagePath, provider, link, funding,
         description: description,
         updateCount: updateCount ?? 0,
-        episodeCount: episodeCount ?? 0);
+        episodeCount: episodeCount ?? 0,
+       );
   }
 
   @override

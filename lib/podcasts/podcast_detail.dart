@@ -248,7 +248,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
             SizedBox(height: 4),
             Text(
               title,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: context.textTheme.subtitle2,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.fade,
@@ -296,6 +296,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
                             child: Icon(LineIcons.rss_square_solid, size: 30),
                             backgroundColor: Colors.blue[600],
                             onTap: () => widget.podcastLocal.rssUrl.launchUrl),
+                        if (widget.podcastLocal.funding.isNotEmpty)
+                          for (var funding in widget.podcastLocal.funding)
+                            _podcastLink(
+                                title: 'Donate',
+                                child: Icon(
+                                    funding.contains(
+                                      'paypal',
+                                    )
+                                        ? LineIcons.paypal
+                                        : LineIcons.donate_solid,
+                                    size: 30),
+                                backgroundColor: Colors.red[600],
+                                onTap: () => funding.launchUrl),
                         if (snapshot.hasData)
                           ...snapshot.data.item2
                               .map<Widget>((host) {
@@ -339,8 +352,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       SizedBox(height: 4),
                                       Text(
                                         host.name,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                        style: context.textTheme.subtitle2,
                                         textAlign: TextAlign.center,
                                         maxLines: 2,
                                         overflow: TextOverflow.fade,
@@ -913,7 +925,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         Container(
                                           alignment: Alignment.bottomRight,
                                           padding: EdgeInsets.only(
-                                              top: 10, right: 10, bottom: 10),
+                                              right: 20, bottom: 10),
                                           child: Container(
                                             height: 100,
                                             width: 100,

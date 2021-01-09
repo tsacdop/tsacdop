@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:dio/dio.dart';
@@ -27,7 +28,7 @@ class DBHelper {
     var documentsDirectory = await getDatabasesPath();
     var path = join(documentsDirectory, "podcasts.db");
     var theDb = await openDatabase(path,
-        version: 4, onCreate: _onCreate, onUpgrade: _onUpgrade);
+        version: 5, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -39,7 +40,7 @@ class DBHelper {
         background_image TEXT DEFAULT '', hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0,
         episode_count INTEGER DEFAULT 0, skip_seconds INTEGER DEFAULT 0, 
         auto_download INTEGER DEFAULT 0, skip_seconds_end INTEGER DEFAULT 0,
-        never_update INTEGER DEFAULT 0)""");
+        never_update INTEGER DEFAULT 0, funding TEXT DEFAULT '[]')""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
@@ -56,27 +57,41 @@ class DBHelper {
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion == 1) {
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD skip_seconds INTEGER DEFAULT 0 ");
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
-    } else if (oldVersion == 2) {
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
-    } else if (oldVersion == 3) {
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0");
-      await db.execute(
-          "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
+    switch (oldVersion) {
+      case (1):
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD skip_seconds INTEGER DEFAULT 0 ");
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
+        await db
+            .execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+        break;
+      case (2):
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
+        await db
+            .execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+        break;
+      case (3):
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
+        await db.execute(
+            "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
+        await db
+            .execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+        break;
+      case (4):
+        await db
+            .execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+        break;
     }
   }
 
@@ -90,12 +105,12 @@ class DBHelper {
       if (updateOnly) {
         list = await dbClient.rawQuery(
             """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
-          link ,update_count, episode_count FROM PodcastLocal WHERE id = ? AND 
+          link ,update_count, episode_count, funding FROM PodcastLocal WHERE id = ? AND 
           never_update = 0""", [s]);
       } else {
         list = await dbClient.rawQuery(
             """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath , provider, 
-          link ,update_count, episode_count FROM PodcastLocal WHERE id = ?""",
+          link ,update_count, episode_count, funding FROM PodcastLocal WHERE id = ?""",
             [s]);
       }
       if (list.length > 0) {
@@ -109,6 +124,7 @@ class DBHelper {
             list.first['imagePath'],
             list.first['provider'],
             list.first['link'],
+            List<String>.from(jsonDecode(list.first['funding'])),
             updateCount: list.first['update_count'],
             episodeCount: list.first['episode_count']));
       }
@@ -124,27 +140,29 @@ class DBHelper {
     if (updateOnly) {
       list = await dbClient.rawQuery(
           """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath,
-         provider, link FROM PodcastLocal WHERE never_update = 0 ORDER BY 
+         provider, link, funding FROM PodcastLocal WHERE never_update = 0 ORDER BY 
          add_date DESC""");
     } else {
       list = await dbClient.rawQuery(
           """SELECT id, title, imageUrl, rssUrl, primaryColor, author, imagePath,
-         provider, link FROM PodcastLocal ORDER BY add_date DESC""");
+         provider, link, funding FROM PodcastLocal ORDER BY add_date DESC""");
     }
 
     var podcastLocal = <PodcastLocal>[];
 
     for (var i in list) {
       podcastLocal.add(PodcastLocal(
-          i['title'],
-          i['imageUrl'],
-          i['rssUrl'],
-          i['primaryColor'],
-          i['author'],
-          i['id'],
-          i['imagePath'],
-          list.first['provider'],
-          list.first['link']));
+        i['title'],
+        i['imageUrl'],
+        i['rssUrl'],
+        i['primaryColor'],
+        i['author'],
+        i['id'],
+        i['imagePath'],
+        i['provider'],
+        i['link'],
+        List<String>.from(jsonDecode(list.first['funding'])),
+      ));
     }
     return podcastLocal;
   }
@@ -153,7 +171,7 @@ class DBHelper {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         """SELECT P.id, P.title, P.imageUrl, P.rssUrl, P.primaryColor, P.author, P.imagePath,
-         P.provider, P.link ,P.update_count, P.episode_count FROM PodcastLocal P INNER JOIN 
+         P.provider, P.link ,P.update_count, P.episode_count, P.funding FROM PodcastLocal P INNER JOIN 
          Episodes E ON P.id = E.feed_id WHERE E.enclosure_url = ?""", [url]);
     if (list.isNotEmpty) {
       return PodcastLocal(
@@ -166,6 +184,7 @@ class DBHelper {
           list.first['imagePath'],
           list.first['provider'],
           list.first['link'],
+          List<String>.from(jsonDecode(list.first['funding'])),
           updateCount: list.first['update_count'],
           episodeCount: list.first['episode_count']);
     }
@@ -271,7 +290,8 @@ class DBHelper {
     await dbClient.transaction((txn) async {
       await txn.rawInsert(
           """INSERT OR IGNORE INTO PodcastLocal (id, title, imageUrl, rssUrl, 
-          primaryColor, author, description, add_date, imagePath, provider, link) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+          primaryColor, author, description, add_date, imagePath, provider, link, funding) 
+          VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
           [
             podcastLocal.id,
             podcastLocal.title,
@@ -283,7 +303,8 @@ class DBHelper {
             _milliseconds,
             podcastLocal.imagePath,
             podcastLocal.provider,
-            podcastLocal.link
+            podcastLocal.link,
+            jsonEncode(podcastLocal.funding)
           ]);
       await txn.rawInsert(
           """REPLACE INTO SubscribeHistory(id, title, rss_url, add_date) VALUES (?, ?, ?, ?)""",
