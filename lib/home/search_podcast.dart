@@ -53,10 +53,11 @@ class MyHomePageDelegate extends SearchDelegate<int> {
 
   RegExp rssExp = RegExp(r'^(https?):\/\/(.*)');
 
-  Widget invalidRss(BuildContext context) => Container(
-        height: 50,
-        alignment: Alignment.center,
-        child: Text(context.s.searchInvalidRss),
+  Widget _invalidRss(BuildContext context) => Container(
+        padding: EdgeInsets.only(top: 200),
+        alignment: Alignment.topCenter,
+        child: Text(context.s.searchInvalidRss,
+            style: context.textTheme.headline6.copyWith(color: Colors.red)),
       );
 
   @override
@@ -196,7 +197,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
         future: _getRss(rssExp.stringMatch(query)),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return invalidRss(context);
+            return _invalidRss(context);
           } else if (snapshot.hasData) {
             return RssResult(
               url: rssExp.stringMatch(query),
@@ -244,10 +245,10 @@ class _RssResultState extends State<RssResult> {
     _loadItems = 10;
     _onlinePodcast = OnlinePodcast(
         rss: widget.url,
-        title: p.title,
-        publisher: p.author,
-        description: p.description,
-        image: p.itunes.image.href,
+        title: p?.title ?? widget.url,
+        publisher: p?.author ?? "",
+        description: p?.description ?? "No description for this podcast",
+        image: p?.itunes?.image?.href ?? p?.image?.url ?? "",
         count: p.items.length);
     super.initState();
   }
