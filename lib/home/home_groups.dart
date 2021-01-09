@@ -108,9 +108,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final s = context.s;
-    return Selector<GroupList, tuple.Tuple2<List<PodcastGroup>, bool>>(
-      selector: (_, groupList) =>
-          tuple.Tuple2(groupList.groups, groupList.created),
+    return Selector2<GroupList, RefreshWorker,
+        tuple.Tuple3<List<PodcastGroup>, bool, bool>>(
+      selector: (_, groupList, refreshWorker) => tuple.Tuple3(
+          groupList.groups, groupList.created, refreshWorker.created),
       builder: (_, data, __) {
         var groups = data.item1;
         var import = data.item2;
@@ -513,26 +514,23 @@ class _PodcastPreviewState extends State<PodcastPreview> {
     return Column(
       children: <Widget>[
         Expanded(
-          child: Selector<RefreshWorker, bool>(
-            selector: (_, worker) => worker.complete,
-            builder: (_, complete, __) => Selector<GroupList, bool>(
-                selector: (_, worker) => worker.created,
-                builder: (context, created, child) {
-                  _getRssItem = _getRssItemTop(widget.podcastLocal);
-                  return FutureBuilder<List<EpisodeBrief>>(
-                    future: _getRssItem,
-                    builder: (context, snapshot) {
-                      return (snapshot.hasData)
-                          ? ShowEpisode(
-                              episodes: snapshot.data,
-                              podcastLocal: widget.podcastLocal,
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.all(5.0),
-                            );
-                    },
-                  );
-                }),
+          child: Selector2<RefreshWorker, GroupList, tuple.Tuple2<bool, bool>>(
+            selector: (_, refreshWorker, groupWorker) =>
+                tuple.Tuple2(refreshWorker.created, groupWorker.created),
+            builder: (_, data, __) {
+              _getRssItem = _getRssItemTop(widget.podcastLocal);
+              return FutureBuilder<List<EpisodeBrief>>(
+                future: _getRssItem,
+                builder: (context, snapshot) {
+                  return (snapshot.hasData)
+                      ? ShowEpisode(
+                          episodes: snapshot.data,
+                          podcastLocal: widget.podcastLocal,
+                        )
+                      : Padding(padding: const EdgeInsets.all(5.0));
+                },
+              );
+            },
           ),
         ),
         Container(

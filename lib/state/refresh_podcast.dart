@@ -27,6 +27,7 @@ class RefreshWorker extends ChangeNotifier {
   bool get complete => _complete;
 
   bool _created = false;
+  bool get created => _created;
 
   Future<void> _createIsolate() async {
     receivePort = ReceivePort();
@@ -46,12 +47,12 @@ class RefreshWorker extends ChangeNotifier {
         notifyListeners();
       } else if (message is String && message == "done") {
         _currentRefreshItem = RefreshItem('', RefreshState.none);
-        _complete = true;
-        notifyListeners();
-        _complete = false;
         refreshIsolate?.kill();
         refreshIsolate = null;
         _created = false;
+        _complete = true;
+        notifyListeners();
+        _complete = false;
       }
     });
   }
