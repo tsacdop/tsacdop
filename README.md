@@ -20,7 +20,7 @@ The podcast search engine is powered by [ListenNotes](https://listennotes.com).
 ## Features
 
 * Podcast group management
-* Playlist support
+* Playlists support
 * Sleep timer / speed setting
 * OPML file export and import
 * Auto syncing in background

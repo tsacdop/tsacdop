@@ -1,5 +1,17 @@
 # Tsacdop Changelog
 
+## 0.5.4
+Release date 2021/1/9
+
+## New feature
+* Support podcastindex namespace podcast:funding, 
+
+## Minor change
+* Podcast detail page UI update. 
+
+## Bug fix
+* Custom rss link subscribe error.
+
 ## 0.5.3
 Release date 2021/1/7
 
