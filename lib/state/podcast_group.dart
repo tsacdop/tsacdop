@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:path/path.dart' as path;
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
@@ -655,11 +656,14 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
           }
         }
         var uuid = Uuid().v4();
-        File("${dir.path}/$uuid.png")
-          ..writeAsBytesSync(img.encodePng(thumbnail));
-
-        var imagePath = "${dir.path}/$uuid.png";
-        var primaryColor = await _getColor(File("${dir.path}/$uuid.png"));
+        var imagePath = path.join(dir.path, 'uuid.png');
+        try {
+          File(imagePath).writeAsBytesSync(img.encodePng(thumbnail));
+        } catch (e) {
+          print(e);
+        }
+        //var imagePath = "${dir.path}/$uuid.png";
+        var primaryColor = await _getColor(File(imagePath));
         var author = p.itunes.author ?? p.author ?? '';
         var provider = p.generator ?? '';
         var link = p.link ?? '';

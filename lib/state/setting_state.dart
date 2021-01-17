@@ -18,7 +18,6 @@ import '../type/settings_backup.dart';
 import 'download_state.dart';
 
 void callbackDispatcher() {
-  if (Platform.isAndroid) {
     Workmanager.executeTask((task, inputData) async {
       var dbHelper = DBHelper();
       var podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
@@ -56,7 +55,6 @@ void callbackDispatcher() {
       await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
       return Future.value(true);
     });
-  }
 }
 
 final showNotesFontStyles = <TextStyle>[
@@ -192,12 +190,14 @@ class SettingState extends ChangeNotifier {
       callbackDispatcher,
       isInDebugMode: false,
     );
-    Workmanager.registerPeriodicTask("1", "update_podcasts",
-        frequency: Duration(hours: hour),
-        initialDelay: Duration(seconds: 10),
-        constraints: Constraints(
-          networkType: NetworkType.connected,
-        ));
+    if (Platform.isAndroid) {
+      Workmanager.registerPeriodicTask("1", "update_podcasts",
+          frequency: Duration(hours: hour),
+          initialDelay: Duration(seconds: 10),
+          constraints: Constraints(
+            networkType: NetworkType.connected,
+          ));
+    }
     developer.log('work manager init done + ');
   }
 
