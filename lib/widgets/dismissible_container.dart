@@ -154,10 +154,9 @@ class EpisodeCard extends StatelessWidget {
               contentPadding: EdgeInsets.symmetric(vertical: 8),
               onTap: onTap,
               title: Container(
-                padding: EdgeInsets.fromLTRB(0, 5.0, 20.0, 5.0),
                 child: Text(
                   episode.title,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
