@@ -1450,3 +1450,31 @@ class _UpDownIndicatorState extends State<UpDownIndicator>
     );
   }
 }
+
+class CircleProgressIndicator extends CustomPainter {
+  final int progress;
+  Paint _paint;
+  CircleProgressIndicator(this.progress, {Color color}) {
+    _paint = Paint()
+      ..color = color
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.fill
+      ..strokeCap = StrokeCap.round;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var center = Offset(size.width / 2, size.height / 2);
+    canvas.drawArc(
+        Rect.fromCenter(center: center, height: size.height*2, width: size.width*2),
+        -math.pi / 2,
+        math.pi * 2 * (progress / 100),
+        true,
+        _paint);
+  }
+
+  @override
+  bool shouldRepaint(CircleProgressIndicator oldDelegate) {
+    return oldDelegate.progress != progress;
+  }
+}

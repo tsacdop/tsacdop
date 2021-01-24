@@ -196,11 +196,45 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                           data.item4 != null
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: SizedBox(
-                                      width: 80,
-                                      height: 80,
-                                      child:
-                                          Image(image: data.item4.avatarImage)),
+                                  child: Stack(
+                                    children: [
+                                      SizedBox(
+                                          width: 80,
+                                          height: 80,
+                                          child: Image(
+                                              image: data.item4.avatarImage)),
+                                      Selector<AudioPlayerNotifier, int>(
+                                        selector: (_, audio) {
+                                          if (!audio.playerRunning &&
+                                              audio.episode.duration != 0) {
+                                            return (audio.lastPosition ~/
+                                                (audio.episode.duration * 10));
+                                          } else if (audio.playerRunning &&
+                                              audio.backgroundAudioDuration !=
+                                                  0) {
+                                            return ((audio
+                                                        .backgroundAudioPosition *
+                                                    100) ~/
+                                                audio.backgroundAudioDuration);
+                                          } else {
+                                            return 0;
+                                          }
+                                        },
+                                        builder: (_, progress, __) {
+                                          return SizedBox(
+                                            height: 80,
+                                            width: 80,
+                                            child: CustomPaint(
+                                              painter: CircleProgressIndicator(
+                                                progress,
+                                                color: Colors.black38,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 )
                               : Container(
                                   decoration: BoxDecoration(
