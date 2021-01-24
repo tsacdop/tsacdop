@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/util/pageroute.dart';
 import 'package:tuple/tuple.dart';
 
 import '../home/home.dart';
@@ -16,6 +15,7 @@ import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/playlist.dart';
 import '../util/extension_helper.dart';
+import '../util/pageroute.dart';
 import '../widgets/custom_widget.dart';
 import '../widgets/dismissible_container.dart';
 import 'playlist_page.dart';
@@ -113,13 +113,14 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   IconButton(
+                                      splashRadius: 20,
                                       icon: Icon(Icons.fast_rewind),
                                       onPressed: () {
                                         if (running) {
                                           audio.rewind();
                                         }
                                       }),
-                                  SizedBox(width: 30),
+                                  SizedBox(width: 15),
                                   IconButton(
                                       padding: EdgeInsets.zero,
                                       icon: Icon(
@@ -138,69 +139,68 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                               .playFromLastPosition();
                                         }
                                       }),
-                                  SizedBox(width: 30),
+                                  SizedBox(width: 15),
                                   IconButton(
+                                      splashRadius: 20,
                                       icon: Icon(Icons.fast_forward),
                                       onPressed: () {
                                         if (running) {
                                           audio.fastForward();
                                         }
-                                      })
+                                      }),
+                                  IconButton(
+                                      splashRadius: 20,
+                                      icon: Icon(Icons.skip_next),
+                                      onPressed: () {
+                                        if (running) {
+                                          audio.playNext();
+                                        }
+                                      }),
                                 ],
                               ),
+                              SizedBox(height: 10),
                               if (data.item2)
                                 Selector<AudioPlayerNotifier,
-                                    Tuple3<bool, double, String>>(
-                                  selector: (_, audio) => Tuple3(
+                                    Tuple4<bool, int, String, int>>(
+                                  selector: (_, audio) => Tuple4(
                                       audio.buffering,
-                                      (audio.backgroundAudioDuration -
-                                              audio.backgroundAudioPosition) /
-                                          1000,
-                                      audio.remoteErrorMessage),
-                                  builder: (_, data, __) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: data.item3 != null
-                                          ? Text(data.item3,
-                                              style: const TextStyle(
-                                                  color: Color(0xFFFF0000)))
-                                          : data.item1
-                                              ? Text(
-                                                  s.buffering,
-                                                  style: TextStyle(
-                                                      color:
-                                                          context.accentColor),
-                                                )
-                                              : Text(
-                                                  s.timeLeft((data.item2)
-                                                          .toInt()
-                                                          .toTime ??
-                                                      ''),
-                                                  maxLines: 2,
-                                                ),
-                                    );
+                                      audio.backgroundAudioPosition,
+                                      audio.remoteErrorMessage,
+                                      audio.backgroundAudioDuration),
+                                  builder: (_, info, __) {
+                                    print(info.item2);
+                                    return info.item3 != null
+                                        ? Text(info.item3,
+                                            style: TextStyle(
+                                                color: Color(0xFFFF0000)))
+                                        : info.item1
+                                            ? Text(
+                                                s.buffering,
+                                                style: TextStyle(
+                                                    color: context.accentColor),
+                                              )
+                                            : Text(
+                                                '${(info.item2 ~/ 1000).toTime} / ${(info.item4 ~/ 1000).toTime}');
                                   },
-                                )
+                                ),
+                              if (!data.item2)
+                                Selector<AudioPlayerNotifier, int>(
+                                  selector: (_, audio) => audio.lastPosition,
+                                  builder: (_, position, __) {
+                                    return Text(
+                                        '${(position ~/ 1000).toTime} / ${data.item4.duration.toTime}');
+                                  },
+                                ),
                             ],
                           )),
                           data.item4 != null
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: InkWell(
-                                    onTap: () {
-                                      if (running) {
-                                        context
-                                            .read<AudioPlayerNotifier>()
-                                            .playNext();
-                                      }
-                                    },
-                                    child: SizedBox(
-                                        width: 80,
-                                        height: 80,
-                                        child: Image(
-                                            image: data.item4.avatarImage)),
-                                  ),
+                                  child: SizedBox(
+                                      width: 80,
+                                      height: 80,
+                                      child:
+                                          Image(image: data.item4.avatarImage)),
                                 )
                               : Container(
                                   decoration: BoxDecoration(
