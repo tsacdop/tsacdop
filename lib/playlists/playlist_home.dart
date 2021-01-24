@@ -273,71 +273,73 @@ class __QueueState extends State<_Queue> {
   @override
   Widget build(BuildContext context) {
     return Selector<AudioPlayerNotifier, Tuple3<Playlist, bool, EpisodeBrief>>(
-        selector: (_, audio) =>
-            Tuple3(audio.playlist, audio.playerRunning, audio.episode),
-        builder: (_, data, __) {
-          var episodes = data.item1?.episodes?.toSet()?.toList();
-          var queue = data.item1;
-          var running = data.item2;
-          return queue == null
-              ? Center()
-              : queue?.name == 'Queue'
-                  ? ReorderableListView(
-                      onReorder: (oldIndex, newIndex) {
-                        context
-                            .read<AudioPlayerNotifier>()
-                            .reorderPlaylist(oldIndex, newIndex);
-                        setState(() {});
-                      },
-                      scrollDirection: Axis.vertical,
-                      children: data.item2
-                          ? episodes.map<Widget>((episode) {
-                              if (episode.enclosureUrl !=
-                                  episodes.first.enclosureUrl) {
-                                return DismissibleContainer(
+      selector: (_, audio) =>
+          Tuple3(audio.playlist, audio.playerRunning, audio.episode),
+      builder: (_, data, __) {
+        var episodes = data.item1?.episodes?.toSet()?.toList();
+        var queue = data.item1;
+        var running = data.item2;
+        return queue == null
+            ? Center()
+            : queue.isQueue
+                ? ReorderableListView(
+                    onReorder: (oldIndex, newIndex) {
+                      context
+                          .read<AudioPlayerNotifier>()
+                          .reorderPlaylist(oldIndex, newIndex);
+                      setState(() {});
+                    },
+                    scrollDirection: Axis.vertical,
+                    children: data.item2
+                        ? episodes.map<Widget>((episode) {
+                            if (episode.enclosureUrl !=
+                                episodes.first.enclosureUrl) {
+                              return DismissibleContainer(
+                                episode: episode,
+                                onRemove: (value) => setState(() {}),
+                                key: ValueKey(episode.enclosureUrl),
+                              );
+                            } else {
+                              return EpisodeCard(episode,
+                                  key: ValueKey('playing'),
+                                  isPlaying: true,
+                                  canReorder: true,
+                                  tileColor: context.primaryColorDark);
+                            }
+                          }).toList()
+                        : episodes
+                            .map<Widget>((episode) => DismissibleContainer(
                                   episode: episode,
                                   onRemove: (value) => setState(() {}),
                                   key: ValueKey(episode.enclosureUrl),
-                                );
-                              } else {
-                                return EpisodeCard(episode,
-                                    key: ValueKey('playing'),
-                                    isPlaying: true,
-                                    canReorder: true,
-                                    tileColor: context.primaryColorDark);
-                              }
-                            }).toList()
-                          : episodes
-                              .map<Widget>((episode) => DismissibleContainer(
-                                    episode: episode,
-                                    onRemove: (value) => setState(() {}),
-                                    key: ValueKey(episode.enclosureUrl),
-                                  ))
-                              .toList())
-                  : ListView.builder(
-                      itemCount: queue?.length,
-                      itemBuilder: (context, index) {
-                        final episode =
-                            queue != null ? queue.episodes[index] : null;
-                        final isPlaying =
-                            data.item3 != null && data.item3 == episode;
-                        return episode == null
-                            ? Center()
-                            : EpisodeCard(
-                                episode,
-                                isPlaying: isPlaying && running,
-                                tileColor:
-                                    isPlaying ? context.primaryColorDark : null,
-                                onTap: () async {
-                                  if (!isPlaying) {
-                                    await context
-                                        .read<AudioPlayerNotifier>()
-                                        .loadEpisodeFromPlaylist(episode);
-                                  }
-                                },
-                              );
-                      });
-        });
+                                ))
+                            .toList())
+                : ListView.builder(
+                    itemCount: queue?.length,
+                    itemBuilder: (context, index) {
+                      final episode =
+                          queue != null ? queue.episodes[index] : null;
+                      final isPlaying =
+                          data.item3 != null && data.item3 == episode;
+                      return episode == null
+                          ? Center()
+                          : EpisodeCard(
+                              episode,
+                              isPlaying: isPlaying && running,
+                              tileColor:
+                                  isPlaying ? context.primaryColorDark : null,
+                              onTap: () async {
+                                if (!isPlaying) {
+                                  await context
+                                      .read<AudioPlayerNotifier>()
+                                      .loadEpisodeFromPlaylist(episode);
+                                }
+                              },
+                            );
+                    },
+                  );
+      },
+    );
   }
 }
 
