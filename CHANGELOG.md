@@ -1,5 +1,16 @@
 # Tsacdop Changelog
 
+## 0.5.5
+Release date 2021/1/25
+
+## Bugs fix
+* Position not saved after player stpoped.
+* Wrongly remove episodes from playlist when get back from playlist page.
+* Player crash on OP5T.
+
+## Minor change
+* Playlist page UI update.
+
 ## 0.5.4
 Release date 2021/1/9
 
