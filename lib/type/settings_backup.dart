@@ -31,6 +31,8 @@ class SettingsBackup {
   final bool hidePodcastDiscovery;
   final bool markListenedAfterSkip;
   final bool deleteAfterPlayed;
+  final bool openPlaylistDefault;
+  final bool openAllPodcastDefault;
 
   SettingsBackup(
       {this.theme,
@@ -64,7 +66,9 @@ class SettingsBackup {
       this.speedList,
       this.hidePodcastDiscovery,
       this.markListenedAfterSkip,
-      this.deleteAfterPlayed});
+      this.deleteAfterPlayed,
+      this.openPlaylistDefault,
+      this.openAllPodcastDefault});
 
   Map<String, Object> toJson() {
     return {
@@ -98,7 +102,9 @@ class SettingsBackup {
       'speedList': speedList,
       'hidePodcastDiscovery': hidePodcastDiscovery,
       'markListenedAfterSkip': markListenedAfterSkip,
-      'deleteAfterPlayed': deleteAfterPlayed
+      'deleteAfterPlayed': deleteAfterPlayed,
+      'openPlaylistDefault': openPlaylistDefault,
+      'openAllPodcastDefault': openAllPodcastDefault
     };
   }
 
@@ -136,6 +142,8 @@ class SettingsBackup {
         speedList: speedList,
         hidePodcastDiscovery: json['hidePodcastDiscovery'] as bool,
         markListenedAfterSkip: json['markListenedAfterSkip'] as bool,
-        deleteAfterPlayed: json['deleteAfterPlayed'] as bool);
+        deleteAfterPlayed: json['deleteAfterPlayed'] as bool,
+        openPlaylistDefault: json['openPlaylistDefaullt'] as bool,
+        openAllPodcastDefault: json['openAllPodcastDefault'] as bool);
   }
 }

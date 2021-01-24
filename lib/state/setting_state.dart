@@ -558,6 +558,8 @@ class SettingState extends ChangeNotifier {
             .getBool(defaultValue: false);
     final deleteAfterPlayed = await KeyValueStorage(deleteAfterPlayedKey)
         .getBool(defaultValue: false);
+    final openPlaylistDefault = await _openPlaylistDefaultStorage.getBool(defaultValue: false);
+    final openAllPodcastDefault = await _openAllPodcastDefaultStorage.getBool(defaultValue: false);
 
     return SettingsBackup(
         theme: theme,
@@ -591,7 +593,9 @@ class SettingState extends ChangeNotifier {
         speedList: speedList,
         hidePodcastDiscovery: hidePodcastDiscovery,
         markListenedAfterSkip: markListenedAfterSKip,
-        deleteAfterPlayed: deleteAfterPlayed);
+        deleteAfterPlayed: deleteAfterPlayed,
+        openPlaylistDefault: openPlaylistDefault,
+        openAllPodcastDefault: openAllPodcastDefault);
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -631,6 +635,8 @@ class SettingState extends ChangeNotifier {
         .saveBool(backup.markListenedAfterSkip);
     await KeyValueStorage(deleteAfterPlayedKey)
         .saveBool(backup.deleteAfterPlayed);
+    await _openPlaylistDefaultStorage.saveBool(backup.openPlaylistDefault);
+    await _openAllPodcastDefaultStorage.saveBool(backup.openAllPodcastDefault);
 
     if (backup.locale == '') {
       await _localeStorage.saveStringList([]);
