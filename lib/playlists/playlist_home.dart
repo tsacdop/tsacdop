@@ -125,7 +125,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                       padding: EdgeInsets.zero,
                                       icon: Icon(
                                           playing
-                                              ? LineIcons.pause_solid
+                                              ? LineIcons.pause_circle_solid
                                               : LineIcons.play_solid,
                                           size: 40),
                                       onPressed: () {
@@ -168,7 +168,6 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                       audio.remoteErrorMessage,
                                       audio.backgroundAudioDuration),
                                   builder: (_, info, __) {
-                                    print(info.item2);
                                     return info.item3 != null
                                         ? Text(info.item3,
                                             style: TextStyle(
