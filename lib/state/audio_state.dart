@@ -269,9 +269,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
       await _playlists.first.getPlaylist();
       await _getAutoPlay();
 
+      ///Get playerstate saved in storage.
       var state = await _playerStateStorage.getPlayerState();
       var idList = [for (var p in _playlists) p.id];
-      if (idList.contains(state[1])) {
+      if (idList.contains(state[0])) {
         _playlist = _playlists.firstWhere(
           (p) => p.id == state[0],
         );
@@ -281,9 +282,19 @@ class AudioPlayerNotifier extends ChangeNotifier {
           if ((!_playlist.isQueue && _playlist.contains(episode)) ||
               (_playlist.isQueue &&
                   _queue.isNotEmpty &&
-                  _queue.episodes.first == episode)) {
+                  _queue.episodes.first.title == episode.title)) {
             _episode = episode;
             _lastPosition = int.parse(state[2] ?? '0');
+            if (_lastPosition > 0) {
+              {
+                final duration = episode.duration * 1000;
+                final seekValue =
+                    duration != 0 ? _lastPosition / duration : 1.0;
+                final history = PlayHistory(episode.title, episode.enclosureUrl,
+                    _lastPosition ~/ 1000, seekValue);
+                await _dbHelper.saveHistory(history);
+              }
+            }
           } else {
             _episode = _playlist.isNotEmpty ? _playlist.episodes.first : null;
             _lastPosition = 0;
@@ -299,15 +310,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
       }
       notifyListeners();
 
-      /// Save plays history if app is closed accidentally.
-      /// if (_lastPostion > 0 && _queue.episodes.isNotEmpty) {
-      ///   final episode = _queue.episodes.first;
-      ///   final duration = episode.duration * 1000;
-      ///   final seekValue = duration != 0 ? _lastPostion / duration : 1.0;
-      ///   final history = PlayHistory(
-      ///       episode.title, episode.enclosureUrl, _lastPostion ~/ 1000, seekValue);
-      ///   await _dbHelper.saveHistory(history);
-      /// }
       await KeyValueStorage(lastWorkKey).saveInt(0);
     }
   }
@@ -384,6 +386,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     } else {
       await _queue.getPlaylist();
       _queue.addToPlayListAt(episodeNew, 0);
+      updatePlaylist(_queue, updateEpisodes: false);
       _backgroundAudioDuration = 0;
       _backgroundAudioPosition = 0;
       _seekSliderValue = 0;
@@ -587,7 +590,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
         if (_backgroundAudioPosition > 0 &&
             _backgroundAudioPosition < _backgroundAudioDuration) {
           _lastPosition = _backgroundAudioPosition;
-          // _positionStorage.saveInt(_lastPostion);
           _playerStateStorage.savePlayerState(
               _playlist.id, _episode.enclosureUrl, _lastPosition);
         }
