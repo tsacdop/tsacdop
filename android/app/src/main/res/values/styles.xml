@@ -9,4 +9,11 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">false</item>
     </style>
+    <style name="NormalTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/normal_background</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
 </resources>
