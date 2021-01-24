@@ -415,8 +415,6 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                     children: <Widget>[
                                       Text(
                                         (data.item3 ~/ 1000).toTime,
-                                        // style:
-                                        // TextStyle(color: Colors.white)
                                       ),
                                       Text(
                                         data.item2.title,
