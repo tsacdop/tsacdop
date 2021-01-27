@@ -9,6 +9,7 @@ import '../type/search_api/search_genre.dart';
 import '../type/search_api/searchpodcast.dart';
 import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
+import '../.env.dart';
 import 'search_podcast.dart';
 
 class DiscoveryPage extends StatefulWidget {
@@ -171,7 +172,8 @@ class DiscoveryPageState extends State<DiscoveryPage> {
     return FutureBuilder<bool>(
       future: _getHideDiscovery(),
       initialData: true,
-      builder: (context, snapshot) => snapshot.data
+      builder: (context, snapshot) => snapshot.data ||
+              environment['apiKey'] == ''
           ? ScrollConfiguration(
               behavior: NoGrowBehavior(),
               child: SingleChildScrollView(

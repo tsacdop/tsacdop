@@ -10,6 +10,7 @@ import '../util/extension_helper.dart';
 import '../widgets/custom_dropdown.dart';
 import '../widgets/custom_widget.dart';
 import '../widgets/episodegrid.dart';
+import '../.env.dart';
 import 'popup_menu.dart';
 
 class LayoutSetting extends StatefulWidget {
@@ -260,10 +261,13 @@ class _LayoutSettingState extends State<LayoutSetting> {
                             audio.setPlayerHeight = PlayerHeight.values[index]),
                   ),
                 ),
+                if(environment['apiKey'] != '')
                 Divider(height: 1),
+                if(environment['apiKey'] != '')
                 Padding(
                   padding: EdgeInsets.all(10.0),
                 ),
+                if(environment['apiKey'] != '')
                 Container(
                   height: 30.0,
                   padding: EdgeInsets.symmetric(horizontal: 70),
@@ -272,6 +276,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                       style: context.textTheme.bodyText1
                           .copyWith(color: context.accentColor)),
                 ),
+                if(environment['apiKey'] != '')
                 FutureBuilder<bool>(
                   future: _getHideDiscovery(),
                   initialData: false,
@@ -287,6 +292,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
                     ),
                   ),
                 ),
+                if(environment['apiKey'] != '')
                 FutureBuilder(
                   future: _getSearchEngine(),
                   initialData: SearchEngine.listenNotes,
