@@ -265,19 +265,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
         FutureBuilder(
             future: _getHosts(podcastLocal),
             builder: (context, snapshot) {
-              //if (snapshot.hasData) {
-              //var hosts = snapshot.data.item2;
-              //var backgroundImage = snapshot.data.item1;
-              // CachedNetworkImage(
-              //   imageUrl: backgroundImage,
-              //   errorWidget: (context, url, error) => Center(),
-              //   imageBuilder: (context, backgroundImageProvider) =>
-              //       Container(
-              //           // decoration: BoxDecoration(
-              //           //     image: DecorationImage(
-              //           //         image: backgroundImageProvider,
-              //           //         fit: BoxFit.cover)),
-              //           alignment: Alignment.centerRight,
               return Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,
@@ -398,97 +385,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
           onSelected: (value) => onSelected(value),
         ),
       );
-
-  Widget _rightTopMenu(BuildContext context) {
-    final s = context.s;
-    return _customPopupMenu(
-        tooltip: s.menu,
-        child: Padding(
-            padding: EdgeInsets.all(10),
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: widget.podcastLocal.primaryColor
-                    .colorizedark()
-                    .withOpacity(0.6),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.more_vert),
-            )),
-        onSelected: (value) {
-          switch (value) {
-            case 0:
-              widget.podcastLocal.link.launchUrl;
-              break;
-            case 1:
-              widget.podcastLocal.rssUrl.launchUrl;
-              break;
-            case 2:
-              generalSheet(
-                context,
-                title: widget.podcastLocal.title,
-                child: PodcastSetting(podcastLocal: widget.podcastLocal),
-              ).then((value) {
-                _checkPodcast();
-                setState(() {});
-              });
-              break;
-          }
-        },
-        itemBuilder: [
-          if (widget.podcastLocal.link != null)
-            PopupMenuItem(
-              value: 0,
-              child: Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Row(
-                  children: <Widget>[
-                    Icon(Icons.link, color: context.textColor),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    ),
-                    Text(s.menuVisitSite),
-                  ],
-                ),
-              ),
-            ),
-          PopupMenuItem(
-            value: 1,
-            child: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    LineIcons.rss_square_solid,
-                    color: context.textColor,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                  ),
-                  Text(s.menuViewRSS),
-                ],
-              ),
-            ),
-          ),
-          PopupMenuItem(
-            value: 2,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Icon(LineIcons.cog_solid, color: context.textColor),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                  ),
-                  Text(s.settings),
-                ],
-              ),
-            ),
-          )
-        ]);
-  }
 
   Widget _actionBar(BuildContext context) {
     final s = context.s;
@@ -846,13 +742,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       if (mounted) setState(() {});
                                     }),
                                   ),
-                                  //_rightTopMenu(context)
                                 ],
                                 elevation: 0,
                                 iconTheme: IconThemeData(
                                   color: Colors.white,
                                 ),
-                                expandedHeight: 130 + context.paddingTop,
+                                expandedHeight: math.max(130 + context.paddingTop, 180),
                                 backgroundColor: color,
                                 floating: true,
                                 pinned: true,
