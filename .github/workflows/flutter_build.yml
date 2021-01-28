@@ -23,13 +23,13 @@ jobs:
           API_KEY: ${{ secrets.API_KEY }}
           PI_API_SECRET: ${{ secrets.PI_API_SECRET}}
           PI_API_KEY: ${{ secrets.PI_API_KEY}}
-      - run: flutter build apk --split-per-abi  --obfuscate --split-debug-info=debug/ --flavor=fdroid
+      - run: flutter build apk --split-per-abi  --obfuscate --split-debug-info=debug/ --flavor=play
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
 
-      - run: flutter build appbundle  --obfuscate --split-debug-info=debug/ --flavor=fdroid
+      - run: flutter build appbundle  --obfuscate --split-debug-info=debug/ --flavor=play
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
