@@ -1,7 +1,7 @@
 name: tsacdop
 description: An open source podacasts player.
 
-version: 0.5.5+43
+version: 0.5.6+44
 
 environment:
   sdk: ">=2.6.0 <3.0.0"

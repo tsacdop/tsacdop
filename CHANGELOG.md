@@ -1,5 +1,11 @@
 # Tsacdop Changelog
 
+## 0.5.6
+Release date 2021/1.28
+
+## Bug fix
+* Image saved wrongly after subscribe new podcast.
+
 ## 0.5.5
 Release date 2021/1/25
 
