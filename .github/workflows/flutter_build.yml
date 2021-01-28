@@ -37,4 +37,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: release-file
-          path: build/app/outputs/**/release/*
+          path: |
+            build/app/outputs/**/release/*
+            build/app/outputs/bundle/playRelease/*
+          
