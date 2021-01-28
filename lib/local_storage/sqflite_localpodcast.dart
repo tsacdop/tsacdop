@@ -285,7 +285,8 @@ class DBHelper {
   }
 
   Future savePodcastLocal(PodcastLocal podcastLocal) async {
-    var _milliseconds = DateTime.now().millisecondsSinceEpoch;
+    var milliseconds = DateTime.now().millisecondsSinceEpoch;
+    print(podcastLocal.imagePath);
     var dbClient = await database;
     await dbClient.transaction((txn) async {
       await txn.rawInsert(
@@ -300,7 +301,7 @@ class DBHelper {
             podcastLocal.primaryColor,
             podcastLocal.author,
             podcastLocal.description,
-            _milliseconds,
+            milliseconds,
             podcastLocal.imagePath,
             podcastLocal.provider,
             podcastLocal.link,
@@ -312,9 +313,16 @@ class DBHelper {
             podcastLocal.id,
             podcastLocal.title,
             podcastLocal.rssUrl,
-            _milliseconds
+            milliseconds
           ]);
     });
+  }
+
+  Future<void> updatePodcastImage({String id ,String filePath}) async{
+    var dbClient = await database;
+    return await dbClient.rawUpdate(
+        "UPDATE PodcastLocal SET imagePath= ? WHERE id = ?",
+        [filePath, id]);
   }
 
   Future<int> saveFiresideData(List<String> list) async {
