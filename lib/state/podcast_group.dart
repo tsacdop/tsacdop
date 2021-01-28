@@ -656,13 +656,8 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
           }
         }
         var uuid = Uuid().v4();
-        var imagePath = path.join(dir.path, 'uuid.png');
-        try {
-          File(imagePath).writeAsBytesSync(img.encodePng(thumbnail));
-        } catch (e) {
-          print(e);
-        }
-        //var imagePath = "${dir.path}/$uuid.png";
+        File("${dir.path}/$uuid.png")..writeAsBytesSync(img.encodePng(thumbnail));
+        var imagePath = "${dir.path}/$uuid.png";
         var primaryColor = await _getColor(File(imagePath));
         var author = p.itunes.author ?? p.author ?? '';
         var provider = p.generator ?? '';
@@ -675,7 +670,9 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
             description: p.description);
 
         await dbHelper.savePodcastLocal(podcastLocal);
+
         sendPort.send([item.title, item.url, 2, uuid, item.group]);
+
         if (provider.contains('fireside')) {
           var data = FiresideData(uuid, link);
           try {
@@ -685,13 +682,6 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
           }
         }
         await dbHelper.savePodcastRss(p, uuid);
-
-        //   if (item.syncWithGpodder) {
-        //     final gpodder = Gpodder();
-        //     await gpodder.updateChange({
-        //       'add': [item.url]
-        //     });
-        //   }
 
         sendPort.send([item.title, item.url, 3, uuid]);
 

@@ -110,7 +110,8 @@ class _PodcastSettingState extends State<PodcastSetting> {
       connectTimeout: 30000,
       receiveTimeout: 90000,
     );
-
+    var dir = await getApplicationDocumentsDirectory();
+    var filePath = "${dir.path}/${widget.podcastLocal.id}.png";
     var dio = Dio(options);
     String imageUrl;
 
@@ -127,10 +128,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
       developer.log(e.toString());
       if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
     }
-    if (imageUrl != null &&
-        imageUrl.contains('http') &&
-        (imageUrl != widget.podcastLocal.imageUrl ||
-            !File(widget.podcastLocal.imageUrl).existsSync())) {
+    if (imageUrl != null && imageUrl.contains('http')) {
       try {
         img.Image thumbnail;
         var imageResponse = await dio.get<List<int>>(imageUrl,
@@ -140,9 +138,10 @@ class _PodcastSettingState extends State<PodcastSetting> {
         var image = img.decodeImage(imageResponse.data);
         thumbnail = img.copyResize(image, width: 300);
         if (thumbnail != null) {
-          var dir = await getApplicationDocumentsDirectory();
-          File("${dir.path}/${widget.podcastLocal.id}.png")
-            ..writeAsBytesSync(img.encodePng(thumbnail));
+          File(filePath)..writeAsBytesSync(img.encodePng(thumbnail));
+          _dbHelper.updatePodcastImage(
+              id: widget.podcastLocal.id, filePath: filePath);
+          print('saved image');
           if (mounted) {
             setState(() => _coverStatus = RefreshCoverStatus.complete);
           }
@@ -325,9 +324,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                   height: 18,
                   width: 18,
                   child: CustomPaint(
-                    painter: ListenedAllPainter(
-                        context.accentColor,
-                        stroke: 2),
+                    painter: ListenedAllPainter(context.accentColor, stroke: 2),
                   ),
                 ),
                 SizedBox(width: 20),
