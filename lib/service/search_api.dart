@@ -13,6 +13,11 @@ import '../type/search_api/search_top_podcast.dart';
 import '../type/search_api/searchepisodes.dart';
 import '../type/search_api/searchpodcast.dart';
 
+const podcastIndexApi = {
+  "podcastIndexApiKey": "XXWQEGULBJABVHZUM8NF",
+  "podcastIndexApiSecret": "KZ2uy4upvq4t3e\$m\$3r2TeFS2fEpFTAaF92xcNdX"
+};
+
 enum SearchEngine { podcastIndex, listenNotes }
 
 class ListenNotesSearch {
@@ -83,8 +88,8 @@ class PodcastsIndexSearch {
   Map<String, String> _initSearch() {
     final unixTime =
         (DateTime.now().millisecondsSinceEpoch / 1000).round().toString();
-    final apiKey = environment['podcastIndexApiKey'];
-    final apiSecret = environment['podcastIndexApiSecret'];
+    final apiKey = podcastIndexApi['podcastIndexApiKey'];
+    final apiSecret = podcastIndexApi['podcastIndexApiSecret'];
     final firstChunk = utf8.encode(apiKey);
     final secondChunk = utf8.encode(apiSecret);
     final thirdChunk = utf8.encode(unixTime);
