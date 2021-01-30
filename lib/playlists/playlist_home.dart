@@ -523,7 +523,6 @@ class __HistoryState extends State<_History> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
     final audio = context.watch<AudioPlayerNotifier>();
     return FutureBuilder<List<PlayHistory>>(
         future: _getData,

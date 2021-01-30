@@ -35,11 +35,11 @@ class HidePlayerRoute extends ModalRoute<void> {
                       ),
                     );
                   }
-                  final Animation<double> curvedAnimation = CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.fastOutSlowIn,
-                    reverseCurve: Curves.fastOutSlowIn.flipped,
-                  );
+                  // final Animation<double> curvedAnimation = CurvedAnimation(
+                  //   parent: animation,
+                  //   curve: Curves.fastOutSlowIn,
+                  //   reverseCurve: Curves.fastOutSlowIn.flipped,
+                  // );
                   final playerHeight = kMinPlayerHeight[data.item2.index];
                   final playerRunning = data.item1;
                   return SizedBox.expand(

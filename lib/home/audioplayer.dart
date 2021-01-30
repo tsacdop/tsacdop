@@ -7,12 +7,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/playlists/playlist_home.dart';
 import 'package:tuple/tuple.dart';
 
 import '../episodes/episode_detail.dart';
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
+import '../playlists/playlist_home.dart';
 import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
@@ -554,12 +554,13 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       return InkWell(
                         onTap: () async {
                           if (!isPlaying) {
-                            if (data.item1.name == 'Queue')
+                            if (data.item1.name == 'Queue') {
                               audio.episodeLoad(episodes[index]);
-                            else
+                            } else {
                               await context
                                   .read<AudioPlayerNotifier>()
                                   .loadEpisodeFromPlaylist(episodes[index]);
+                            }
                           }
                         },
                         child: Container(

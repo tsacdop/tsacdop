@@ -10,7 +10,6 @@ import 'package:focused_menu/modals.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/state/setting_state.dart';
 import 'package:tuple/tuple.dart' as tuple;
 
 import '../episodes/episode_detail.dart';
@@ -23,6 +22,7 @@ import '../state/audio_state.dart';
 import '../state/download_state.dart';
 import '../state/podcast_group.dart';
 import '../state/refresh_podcast.dart';
+import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';

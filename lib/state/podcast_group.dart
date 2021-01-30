@@ -16,7 +16,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:path/path.dart' as path;
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';

@@ -1012,7 +1012,6 @@ class AboutPodcast extends StatefulWidget {
 class _AboutPodcastState extends State<AboutPodcast> {
   String _description;
   bool _load;
-  bool _expand;
   void getDescription(String id) async {
     var dbHelper = DBHelper();
     var description = await dbHelper.getFeedDescription(id);
@@ -1029,7 +1028,6 @@ class _AboutPodcastState extends State<AboutPodcast> {
   void initState() {
     super.initState();
     _load = false;
-    _expand = false;
     getDescription(widget.podcastLocal.id);
   }
 
