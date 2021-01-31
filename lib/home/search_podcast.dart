@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
 
+import '../.env.dart';
 import '../local_storage/key_value_storage.dart';
 import '../service/search_api.dart';
 import '../state/podcast_group.dart';
@@ -18,13 +19,10 @@ import '../type/search_api/searchepisodes.dart';
 import '../type/search_api/searchpodcast.dart';
 import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
-import '../.env.dart';
 import 'pocast_discovery.dart';
 
 class MyHomePageDelegate extends SearchDelegate<int> {
   final String searchFieldLabel;
-  final GlobalKey<DiscoveryPageState> _discoveryKey =
-      GlobalKey<DiscoveryPageState>();
   MyHomePageDelegate({this.searchFieldLabel})
       : super(
           searchFieldLabel: searchFieldLabel,
@@ -43,15 +41,6 @@ class MyHomePageDelegate extends SearchDelegate<int> {
     }
   }
 
-  Future<SearchEngine> _getSearchEngine() async {
-    final storage = KeyValueStorage(searchEngineKey);
-    final index = await storage.getInt();
-    if (_searchEngine == null) {
-      _searchEngine = SearchEngine.values[index];
-    }
-    return _searchEngine;
-  }
-
   RegExp rssExp = RegExp(r'^(https?):\/\/(.*)');
 
   Widget _invalidRss(BuildContext context) => Container(
@@ -63,14 +52,15 @@ class MyHomePageDelegate extends SearchDelegate<int> {
 
   @override
   void close(BuildContext context, int result) {
-    final selectedPodcast = context.read<SearchState>().selectedPodcast;
+    final searchState = context.read<SearchState>();
+    final selectedPodcast = searchState.selectedPodcast;
     if (selectedPodcast != null) {
-      context.read<SearchState>().clearSelect();
+      searchState.clearSelect();
     } else {
-      if (_discoveryKey.currentState?.selectedGenre != null) {
-        _discoveryKey.currentState.backToHome();
+      if (searchState.genre != null) {
+        searchState.clearGenre();
       } else {
-        context.read<SearchState>().clearList();
+        searchState.clearList();
         super.close(context, result);
       }
     }
@@ -78,6 +68,9 @@ class MyHomePageDelegate extends SearchDelegate<int> {
 
   @override
   ThemeData appBarTheme(BuildContext context) => Theme.of(context);
+
+  @override
+  TextStyle get searchFieldStyle => TextStyle(fontSize: 20);
 
   @override
   Widget buildLeading(BuildContext context) {
@@ -103,7 +96,6 @@ class MyHomePageDelegate extends SearchDelegate<int> {
   @override
   Widget buildSuggestions(BuildContext context) {
     return DiscoveryPage(
-      key: _discoveryKey,
       onTap: (history) {
         query = history;
         showResults(context);
@@ -124,76 +116,25 @@ class MyHomePageDelegate extends SearchDelegate<int> {
             showResults(context);
           },
         ),
-      FutureBuilder<SearchEngine>(
-        future: _getSearchEngine(),
-        initialData: SearchEngine.podcastIndex,
-        builder: (context, snapshot) => PopupMenuButton<SearchEngine>(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 1,
-          icon: SizedBox(
-            height: 30,
-            width: 30,
-            child: CircleAvatar(
-              backgroundImage: snapshot.data == SearchEngine.podcastIndex
-                  ? AssetImage('assets/podcastindex_logo.png')
-                  : AssetImage('assets/listennotes_logo.png'),
-              maxRadius: 25,
-            ),
-          ),
-          onSelected: (value) {
-            _searchEngine = value;
-            showSuggestions(context);
-            if (query != '') {
-              showResults(context);
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: SearchEngine.podcastIndex,
-              child: Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Row(
-                  children: <Widget>[
-                    Text('Podcastindex'),
-                    Spacer(),
-                    if (_searchEngine == SearchEngine.podcastIndex)
-                      DotIndicator()
-                  ],
-                ),
-              ),
-            ),
-            if(environment['apiKey'] != '')
-            PopupMenuItem(
-              value: SearchEngine.listenNotes,
-              child: Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Row(
-                  children: <Widget>[
-                    Text('ListenNotes'),
-                    Spacer(),
-                    if (_searchEngine == SearchEngine.listenNotes)
-                      DotIndicator()
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+      _SearchPopupMenu(
+        onSelected: (searchEngine) {
+          _searchEngine = searchEngine;
+          showSuggestions(context);
+          if (query != '') {
+            showResults(context);
+          }
+        },
       ),
-      SizedBox(width: 10),
     ];
   }
 
   @override
   Widget buildResults(BuildContext context) {
     if (query.isEmpty) {
-      return DiscoveryPage(
-          key: _discoveryKey,
-          onTap: (history) {
-            query = history;
-            showResults(context);
-          });
+      return DiscoveryPage(onTap: (history) {
+        query = history;
+        showResults(context);
+      });
     } else if (rssExp.stringMatch(query) != null) {
       return FutureBuilder(
         future: _getRss(rssExp.stringMatch(query)),
@@ -397,6 +338,85 @@ class _RssResultState extends State<RssResult> {
           )
         ],
       ),
+    );
+  }
+}
+
+class _SearchPopupMenu extends StatefulWidget {
+  final ValueChanged<SearchEngine> onSelected;
+  _SearchPopupMenu({this.onSelected, Key key}) : super(key: key);
+
+  @override
+  __SearchPopupMenuState createState() => __SearchPopupMenuState();
+}
+
+class __SearchPopupMenuState extends State<_SearchPopupMenu> {
+  SearchEngine _searchEngine;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchEngine = SearchEngine.podcastIndex;
+    _getSearchEngine();
+  }
+
+  Future<void> _getSearchEngine() async {
+    final storage = KeyValueStorage(searchEngineKey);
+    final index = await storage.getInt();
+    setState(() => _searchEngine = SearchEngine.values[index]);
+    widget.onSelected(_searchEngine);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<SearchEngine>(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 1,
+      icon: SizedBox(
+        height: 20,
+        width: 20,
+        child: CircleAvatar(
+          backgroundImage: _searchEngine == SearchEngine.podcastIndex
+              ? AssetImage('assets/podcastindex_logo.png')
+              : AssetImage('assets/listennotes_logo.png'),
+          maxRadius: 25,
+        ),
+      ),
+      onSelected: (searchEngine) {
+        widget.onSelected(searchEngine);
+        setState(() {
+          _searchEngine = searchEngine;
+        });
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: SearchEngine.podcastIndex,
+          child: Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Text('Podcastindex'),
+                Spacer(),
+                if (_searchEngine == SearchEngine.podcastIndex) DotIndicator()
+              ],
+            ),
+          ),
+        ),
+        if (environment['apiKey'] != '')
+          PopupMenuItem(
+            value: SearchEngine.listenNotes,
+            child: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: <Widget>[
+                  Text('ListenNotes'),
+                  Spacer(),
+                  if (_searchEngine == SearchEngine.listenNotes) DotIndicator()
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -1058,103 +1078,107 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                   ),
                 ),
               Expanded(
-                child: TabBarView(children: [
-                  ListView(
-                    physics: _animation.value != widget.maxHeight
-                        ? NeverScrollableScrollPhysics()
-                        : null,
-                    children: [
-                      Html(
-                        onLinkTap: (url) {
-                          url.launchUrl;
-                        },
-                        linkStyle: TextStyle(
-                            color: context.accentColor,
-                            textBaseline: TextBaseline.ideographic),
-                        shrinkToFit: true,
-                        data: widget.onlinePodcast.description,
-                        padding: const EdgeInsets.only(
-                            left: 20.0, right: 20, bottom: 20),
-                        defaultTextStyle: TextStyle(
-                          height: 1.8,
+                child: Container(
+                  color: context.scaffoldBackgroundColor,
+                  child: TabBarView(children: [
+                    ListView(
+                      physics: _animation.value != widget.maxHeight
+                          ? NeverScrollableScrollPhysics()
+                          : null,
+                      children: [
+                        Html(
+                          onLinkTap: (url) {
+                            url.launchUrl;
+                          },
+                          linkStyle: TextStyle(
+                              color: context.accentColor,
+                              textBaseline: TextBaseline.ideographic),
+                          shrinkToFit: true,
+                          data: widget.onlinePodcast.description,
+                          padding: const EdgeInsets.only(
+                              left: 20.0, right: 20, bottom: 20),
+                          defaultTextStyle: TextStyle(
+                            height: 1.8,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  FutureBuilder<List<OnlineEpisode>>(
-                      future: _searchFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          var content = snapshot.data;
-                          return ListView.builder(
-                            physics: _animation.value != widget.maxHeight
-                                ? NeverScrollableScrollPhysics()
-                                : null,
-                            itemCount: content.length + 1,
-                            itemBuilder: (context, index) {
-                              if (index == content.length) {
-                                return Container(
-                                  padding: const EdgeInsets.only(
-                                      top: 10.0, bottom: 20.0),
-                                  alignment: Alignment.center,
-                                  child: SizedBox(
-                                    child: OutlineButton(
-                                        highlightedBorderColor:
-                                            context.accentColor,
-                                        splashColor: context.accentColor
-                                            .withOpacity(0.5),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(100))),
-                                        child: _loading
-                                            ? SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                ))
-                                            : Text(context.s.loadMore),
-                                        onPressed: () {
-                                          if (widget.searchEngine ==
-                                              SearchEngine.listenNotes) {
-                                            _loading
-                                                ? null
-                                                : setState(
-                                                    () {
-                                                      _loading = true;
-                                                      _searchFuture =
-                                                          _getListenNotesEpisodes(
-                                                              id: widget
-                                                                  .onlinePodcast
-                                                                  .id,
-                                                              nextEpisodeDate:
-                                                                  _nextEpisdoeDate);
-                                                    },
-                                                  );
-                                          }
-                                        }),
-                                  ),
+                      ],
+                    ),
+                    FutureBuilder<List<OnlineEpisode>>(
+                        future: _searchFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            var content = snapshot.data;
+                            return ListView.builder(
+                              physics: _animation.value != widget.maxHeight
+                                  ? NeverScrollableScrollPhysics()
+                                  : null,
+                              itemCount: content.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index == content.length) {
+                                  return Container(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0, bottom: 20.0),
+                                    alignment: Alignment.center,
+                                    child: SizedBox(
+                                      child: OutlineButton(
+                                          highlightedBorderColor:
+                                              context.accentColor,
+                                          splashColor: context.accentColor
+                                              .withOpacity(0.5),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(100))),
+                                          child: _loading
+                                              ? SizedBox(
+                                                  height: 20,
+                                                  width: 20,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                  ))
+                                              : Text(context.s.loadMore),
+                                          onPressed: () {
+                                            if (widget.searchEngine ==
+                                                SearchEngine.listenNotes) {
+                                              _loading
+                                                  ? null
+                                                  : setState(
+                                                      () {
+                                                        _loading = true;
+                                                        _searchFuture =
+                                                            _getListenNotesEpisodes(
+                                                                id: widget
+                                                                    .onlinePodcast
+                                                                    .id,
+                                                                nextEpisodeDate:
+                                                                    _nextEpisdoeDate);
+                                                      },
+                                                    );
+                                            }
+                                          }),
+                                    ),
+                                  );
+                                }
+                                return ListTile(
+                                  title: Text(content[index].title),
+                                  tileColor: Colors.transparent,
+                                  subtitle: Text(
+                                      content[index].length == 0
+                                          ? '${content[index].pubDate.toDate(context)}'
+                                          : '${content[index].length.toTime} | '
+                                              '${content[index].pubDate.toDate(context)}',
+                                      style: TextStyle(
+                                          color: context.accentColor)),
                                 );
-                              }
-                              return ListTile(
-                                title: Text(content[index].title),
-                                subtitle: Text(
-                                    content[index].length == 0
-                                        ? '${content[index].pubDate.toDate(context)}'
-                                        : '${content[index].length.toTime} | '
-                                            '${content[index].pubDate.toDate(context)}',
-                                    style:
-                                        TextStyle(color: context.accentColor)),
-                              );
-                            },
+                              },
+                            );
+                          }
+                          return Center(
+                            child: CircularProgressIndicator(),
                           );
-                        }
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      })
-                ]),
+                        })
+                  ]),
+                ),
               )
             ],
           ),

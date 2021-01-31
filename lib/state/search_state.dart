@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tsacdop/type/search_api/search_genre.dart';
 import '../type/search_api/searchpodcast.dart';
 
 class SearchState extends ChangeNotifier {
@@ -8,9 +9,16 @@ class SearchState extends ChangeNotifier {
   bool get update => _update;
   OnlinePodcast _selectedPodcast;
   OnlinePodcast get selectedPodcast => _selectedPodcast;
+  Genre _genre;
+  Genre get genre => _genre;
 
   set selectedPodcast(OnlinePodcast podcast) {
     _selectedPodcast = podcast;
+    notifyListeners();
+  }
+
+  set setGenre(Genre genre) {
+    _genre = genre;
     notifyListeners();
   }
 
@@ -23,6 +31,11 @@ class SearchState extends ChangeNotifier {
 
   void clearList() {
     _subscribedList.clear();
+  }
+
+  void clearGenre(){
+    _genre = null;
+    notifyListeners();
   }
 
   void addPodcast(OnlinePodcast podcast) {

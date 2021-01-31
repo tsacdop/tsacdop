@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
+import '../.env.dart';
 import '../local_storage/key_value_storage.dart';
 import '../service/search_api.dart';
 import '../state/search_state.dart';
@@ -9,7 +10,6 @@ import '../type/search_api/search_genre.dart';
 import '../type/search_api/searchpodcast.dart';
 import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
-import '../.env.dart';
 import 'search_podcast.dart';
 
 class DiscoveryPage extends StatefulWidget {
@@ -149,6 +149,51 @@ class DiscoveryPageState extends State<DiscoveryPage> {
         );
       });
 
+  Widget _podcastCard(OnlinePodcast podcast, {VoidCallback onTap}) {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), color: context.primaryColor),
+      width: 120,
+      margin: EdgeInsets.fromLTRB(10, 10, 0, 10),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+        clipBehavior: Clip.hardEdge,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Center(child: PodcastAvatar(podcast)),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    podcast.title,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.fade,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Center(
+                    child:
+                        SizedBox(height: 32, child: SubscribeButton(podcast)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<List<OnlinePodcast>> _getTopPodcasts({int page}) async {
     final searchEngine = ListenNotesSearch();
     var searchResult = await searchEngine.fetchBestPodcast(
@@ -168,7 +213,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final searchState = context.watch<SearchState>();
+    final searchState = context.read<SearchState>();
     return FutureBuilder<bool>(
       future: _getHideDiscovery(),
       initialData: true,
@@ -233,8 +278,12 @@ class DiscoveryPageState extends State<DiscoveryPage> {
             )
           : PodcastSlideup(
               searchEngine: SearchEngine.listenNotes,
-              child: _selectedGenre == null
-                  ? SingleChildScrollView(
+              child: Selector<SearchState, Genre>(
+                selector: (_, searchState) => searchState.genre,
+                builder: (_, genre, __) => IndexedStack(
+                  index: genre == null ? 0 : 1,
+                  children: [
+                    SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,75 +303,19 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                                   return ScrollConfiguration(
                                     behavior: NoGrowBehavior(),
                                     child: ListView(
+                                        addAutomaticKeepAlives: true,
                                         scrollDirection: Axis.horizontal,
                                         children: snapshot.hasData
                                             ? snapshot.data
                                                 .map<Widget>((podcast) {
-                                                return Container(
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color:
-                                                          context.primaryColor),
-                                                  width: 120,
-                                                  margin: EdgeInsets.fromLTRB(
-                                                      10, 10, 0, 10),
-                                                  child: Material(
-                                                    color: Colors.transparent,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    clipBehavior: Clip.hardEdge,
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        searchState
-                                                                .selectedPodcast =
-                                                            podcast;
-                                                        widget.onTap('');
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            EdgeInsets.all(4.0),
-                                                        child: Column(
-                                                          children: [
-                                                            Expanded(
-                                                              flex: 2,
-                                                              child: Center(
-                                                                  child: PodcastAvatar(
-                                                                      podcast)),
-                                                            ),
-                                                            Expanded(
-                                                              flex: 1,
-                                                              child: Text(
-                                                                podcast.title,
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                maxLines: 2,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .fade,
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              flex: 1,
-                                                              child: Center(
-                                                                child: SizedBox(
-                                                                    height: 32,
-                                                                    child: SubscribeButton(
-                                                                        podcast)),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
+                                                return _podcastCard(
+                                                  podcast,
+                                                  onTap: () {
+                                                    searchState
+                                                            .selectedPodcast =
+                                                        podcast;
+                                                    widget.onTap('');
+                                                  },
                                                 );
                                               }).toList()
                                             : [
@@ -349,7 +342,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                                           EdgeInsets.fromLTRB(20, 0, 20, 0),
                                       onTap: () {
                                         widget.onTap('');
-                                        setState(() => _selectedGenre = e);
+                                        searchState.setGenre = e;
                                       },
                                       title: Text(e.name),
                                     ))
@@ -369,8 +362,11 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                           )
                         ],
                       ),
-                    )
-                  : _TopPodcastList(genre: _selectedGenre),
+                    ),
+                    genre == null ? Center() : _TopPodcastList(genre: genre),
+                  ],
+                ),
+              ),
             ),
     );
   }
