@@ -1,5 +1,9 @@
 # Tsacdop Changelog
 
+## 0.5.7
+Release date 2021/1.31
+For frdoid
+
 ## 0.5.6
 Release date 2021/1.28
 
