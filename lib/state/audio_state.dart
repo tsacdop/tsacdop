@@ -800,11 +800,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
     return false;
   }
 
-  void _updateAllPlaylists() {
-    _playlists = [..._playlists];
-    notifyListeners();
-    _savePlaylists();
-  }
+  // void _updateAllPlaylists() {
+  //   _playlists = [..._playlists];
+  //   notifyListeners();
+  //   _savePlaylists();
+  // }
 
   Future<void> _savePlaylists() async {
     await _playlistsStorgae
