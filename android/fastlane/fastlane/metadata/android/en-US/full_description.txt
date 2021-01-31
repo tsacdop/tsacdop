@@ -1,0 +1,24 @@
+Tsacdop is a clean, simply beautiful and friendly podcast app. which is also free and open source.
+🎙️ Why Tsacdop?
+ <b>Unique Design</b> With Tsacdop, you will get a totally different experience with any other podcast players. Tsacdop has a unique layout and good-looking material design.
+ <b>Group management</b> You can manage your podcasts with groups easily.  
+ <b>Privacy Friendly</b> Tsacdop is a free and open sourced application,  which won't upload your data to the server.
+<b>Easy Search</b>The podcast  powered by ListenNotes, so you can search from more than 1 million podcasts.
+✔️ Features:
+* Podcasts group management
+* Playlist support
+* Sleep timer
+* OPML file export and import
+* Auto syncing in background
+* Listening and subscription history data
+* Dark theme / accent color
+* Download for offline play
+* Auto download / auto delete downloaded episodes
+* Change play speed
+* Skip silence
+* Boost volume
+More to come...
+📝 License
+All this for FREE, and NO ADS. Tsacdop is an open source project licensed under GPL v3.0,  you can star or fork it on GitHub: https://github.com/stonega/tsacdop 
+📧 Contact
+Tsacopd is still in the development stage, I am working hard on new features, if you have any issue or request any feature, please let me know by email  or visit GitHub page.
