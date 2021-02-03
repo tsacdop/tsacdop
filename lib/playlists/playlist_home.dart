@@ -187,7 +187,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                   selector: (_, audio) => audio.lastPosition,
                                   builder: (_, position, __) {
                                     return Text(
-                                        '${(position ~/ 1000).toTime} / ${data.item4.duration.toTime}');
+                                        '${(position ~/ 1000).toTime} / ${(data.item4?.duration??0).toTime}');
                                   },
                                 ),
                             ],

@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' hide SearchDelegate;
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,6 +21,7 @@ import '../type/search_api/searchepisodes.dart';
 import '../type/search_api/searchpodcast.dart';
 import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
+import '../widgets/custom_search_delegate.dart';
 import 'pocast_discovery.dart';
 
 class MyHomePageDelegate extends SearchDelegate<int> {
@@ -150,7 +153,9 @@ class MyHomePageDelegate extends SearchDelegate<int> {
             return Container(
               padding: EdgeInsets.only(top: 200),
               alignment: Alignment.topCenter,
-              child: CircularProgressIndicator(),
+              child: Platform.isIOS
+                  ? CupertinoActivityIndicator()
+                  : CircularProgressIndicator(),
             );
           }
         },
@@ -486,7 +491,9 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
             return Container(
               padding: EdgeInsets.only(top: 200),
               alignment: Alignment.topCenter,
-              child: CircularProgressIndicator(),
+              child: Platform.isIOS
+                  ? CupertinoActivityIndicator()
+                  : CircularProgressIndicator(),
             );
           }
           if (snapshot.data.isEmpty) {
@@ -535,9 +542,11 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
                             ? SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ))
+                                child: Platform.isIOS
+                                    ? CupertinoActivityIndicator()
+                                    : CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ))
                             : Text(context.s.loadMore),
                         onPressed: () => _loading
                             ? null
@@ -642,7 +651,9 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
               return Container(
                 padding: EdgeInsets.only(top: 200),
                 alignment: Alignment.topCenter,
-                child: CircularProgressIndicator(),
+                child: Platform.isIOS
+                    ? CupertinoActivityIndicator()
+                    : CircularProgressIndicator(),
               );
             }
             if (snapshot.data.isEmpty) {

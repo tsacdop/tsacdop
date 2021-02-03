@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:feature_discovery/feature_discovery.dart';
-import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter/material.dart' hide NestedScrollView, showSearch;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -27,6 +27,7 @@ import '../widgets/custom_widget.dart';
 import '../widgets/episodegrid.dart';
 import '../widgets/feature_discovery.dart';
 import '../widgets/muiliselect_bar.dart';
+import '../widgets/custom_search_delegate.dart';
 import 'audioplayer.dart';
 import 'download_list.dart';
 import 'home_groups.dart';
@@ -116,6 +117,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             }
           },
           child: SafeArea(
+            bottom: false,
             child: Stack(
               children: <Widget>[
                 Column(

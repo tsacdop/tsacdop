@@ -213,7 +213,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final searchState = context.read<SearchState>();
+    final searchState = context.watch<SearchState>();
     return FutureBuilder<bool>(
       future: _getHideDiscovery(),
       initialData: true,
