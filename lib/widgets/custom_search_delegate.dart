@@ -511,6 +511,7 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
           textTheme: theme.primaryTextTheme,
           brightness: theme.primaryColorBrightness,
           leading: widget.delegate.buildLeading(context),
+          elevation: 1,
           title: TextField(
             controller: widget.delegate._queryTextController,
             focusNode: focusNode,

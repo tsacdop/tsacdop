@@ -120,28 +120,26 @@ class DiscoveryPageState extends State<DiscoveryPage> {
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data.isNotEmpty) {
           final history = snapshot.data;
-          return SizedBox(
-            child: Wrap(
-              direction: Axis.horizontal,
-              children: history
-                  .map<Widget>((e) => Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 2, 0, 0),
-                        child: FlatButton.icon(
-                          color:
-                              Colors.accents[history.indexOf(e)].withAlpha(70),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100.0),
-                          ),
-                          onPressed: () => widget.onTap(e),
-                          label: Text(e),
-                          icon: Icon(
-                            Icons.search,
-                            size: 20,
-                          ),
+          return Wrap(
+            direction: Axis.horizontal,
+            children: history
+                .map<Widget>((e) => Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 2, 0, 0),
+                      child: FlatButton.icon(
+                        color:
+                            Colors.accents[history.indexOf(e)].withAlpha(70),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
                         ),
-                      ))
-                  .toList(),
-            ),
+                        onPressed: () => widget.onTap(e),
+                        label: Text(e),
+                        icon: Icon(
+                          Icons.search,
+                          size: 20,
+                        ),
+                      ),
+                    ))
+                .toList(),
           );
         }
         return SizedBox(
@@ -289,12 +287,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _historyList(),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
-                            child: Text('Popular',
-                                style: context.textTheme.headline6
-                                    .copyWith(color: context.accentColor)),
-                          ),
+                          SizedBox(height: 8), 
                           SizedBox(
                             height: 200,
                             child: FutureBuilder<List<OnlinePodcast>>(
@@ -344,7 +337,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                                         widget.onTap('');
                                         searchState.setGenre = e;
                                       },
-                                      title: Text(e.name),
+                                      title: Text(e.name, style: context.textTheme.headline6),
                                     ))
                                 .toList(),
                           ),

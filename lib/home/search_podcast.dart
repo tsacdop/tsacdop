@@ -85,9 +85,8 @@ class MyHomePageDelegate extends SearchDelegate<int> {
       child: IconButton(
         tooltip: context.s.back,
         splashRadius: 20,
-        icon: AnimatedIcon(
-          icon: AnimatedIcons.menu_arrow,
-          progress: transitionAnimation,
+        icon: Icon(
+          _getIconData(Theme.of(context).platform)
         ),
         onPressed: () {
           close(context, 1);
@@ -172,6 +171,21 @@ class MyHomePageDelegate extends SearchDelegate<int> {
           break;
       }
     }
+  }
+
+    static IconData _getIconData(TargetPlatform platform) {
+    switch (platform) {
+      case TargetPlatform.android:
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+        return Icons.arrow_back;
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        return Icons.arrow_back_ios;
+    }
+    assert(false);
+    return null;
   }
 }
 
@@ -378,8 +392,8 @@ class __SearchPopupMenuState extends State<_SearchPopupMenu> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 1,
       icon: SizedBox(
-        height: 20,
-        width: 20,
+        height: 25,
+        width: 25,
         child: CircleAvatar(
           backgroundImage: _searchEngine == SearchEngine.podcastIndex
               ? AssetImage('assets/podcastindex_logo.png')

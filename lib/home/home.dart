@@ -123,127 +123,131 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 Column(
                   children: <Widget>[
                     Expanded(
-                      child: NestedScrollView(
-                        innerScrollPositionKeyBuilder: () {
-                          return Key('tab${_controller.index}');
-                        },
-                        pinnedHeaderSliverHeightBuilder: () => 50,
-                        headerSliverBuilder: (context, innerBoxScrolled) {
-                          return <Widget>[
-                            SliverToBoxAdapter(
-                              child: Column(
-                                children: <Widget>[
-                                  SizedBox(
-                                    height: 50.0,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        featureDiscoveryOverlay(
-                                          context,
-                                          featureId: addFeature,
-                                          tapTarget:
-                                              Icon(Icons.add_circle_outline),
-                                          title: s.featureDiscoverySearch,
-                                          backgroundColor: Colors.cyan[600],
-                                          buttonColor: Colors.cyan[500],
-                                          description:
-                                              s.featureDiscoverySearchDes,
-                                          child: IconButton(
-                                            tooltip: s.add,
-                                            splashRadius: 20,
-                                            icon:
+                      child: ScrollConfiguration(
+                        behavior: NoGrowBehavior(),
+                        child: NestedScrollView(
+                          innerScrollPositionKeyBuilder: () {
+                            return Key('tab${_controller.index}');
+                          },
+                          pinnedHeaderSliverHeightBuilder: () => 50,
+                          headerSliverBuilder: (context, innerBoxScrolled) {
+                            return <Widget>[
+                              SliverToBoxAdapter(
+                                child: Column(
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height: 50.0,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          featureDiscoveryOverlay(
+                                            context,
+                                            featureId: addFeature,
+                                            tapTarget:
                                                 Icon(Icons.add_circle_outline),
-                                            onPressed: () async {
-                                              await showSearch<int>(
-                                                context: context,
-                                                delegate: MyHomePageDelegate(
-                                                    searchFieldLabel:
-                                                        s.searchPodcast),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () => {
-                                            Theme.of(context).brightness ==
-                                                    Brightness.light
-                                                ? settings.setTheme =
-                                                    ThemeMode.dark
-                                                : settings.setTheme =
-                                                    ThemeMode.light
-                                          },
-                                          child: Image(
-                                            image: Theme.of(context)
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? AssetImage('assets/text.png')
-                                                : AssetImage(
-                                                    'assets/text_light.png'),
-                                            height: 30,
-                                          ),
-                                        ),
-                                        featureDiscoveryOverlay(context,
-                                            featureId: menuFeature,
-                                            tapTarget: Icon(Icons.more_vert),
-                                            backgroundColor: Colors.cyan[500],
-                                            buttonColor: Colors.cyan[600],
-                                            title: s.featureDiscoveryOMPL,
+                                            title: s.featureDiscoverySearch,
+                                            backgroundColor: Colors.cyan[600],
+                                            buttonColor: Colors.cyan[500],
                                             description:
-                                                s.featureDiscoveryOMPLDes,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 5.0),
-                                              child: PopupMenu(),
-                                            )),
-                                      ],
+                                                s.featureDiscoverySearchDes,
+                                            child: IconButton(
+                                              tooltip: s.add,
+                                              splashRadius: 20,
+                                              icon: Icon(
+                                                  Icons.add_circle_outline),
+                                              onPressed: () async {
+                                                await showSearch<int>(
+                                                  context: context,
+                                                  delegate: MyHomePageDelegate(
+                                                      searchFieldLabel:
+                                                          s.searchPodcast),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () => {
+                                              Theme.of(context).brightness ==
+                                                      Brightness.light
+                                                  ? settings.setTheme =
+                                                      ThemeMode.dark
+                                                  : settings.setTheme =
+                                                      ThemeMode.light
+                                            },
+                                            child: Image(
+                                              image: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.light
+                                                  ? AssetImage(
+                                                      'assets/text.png')
+                                                  : AssetImage(
+                                                      'assets/text_light.png'),
+                                              height: 30,
+                                            ),
+                                          ),
+                                          featureDiscoveryOverlay(context,
+                                              featureId: menuFeature,
+                                              tapTarget: Icon(Icons.more_vert),
+                                              backgroundColor: Colors.cyan[500],
+                                              buttonColor: Colors.cyan[600],
+                                              title: s.featureDiscoveryOMPL,
+                                              description:
+                                                  s.featureDiscoveryOMPLDes,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 5.0),
+                                                child: PopupMenu(),
+                                              )),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  Import(),
-                                ],
-                              ),
-                            ),
-                            SliverToBoxAdapter(
-                              child: SizedBox(
-                                height: height,
-                                width: width,
-                                child: ScrollPodcasts(),
-                              ),
-                            ),
-                            SliverPersistentHeader(
-                              delegate: _SliverAppBarDelegate(
-                                TabBar(
-                                  indicator: _getIndicator(context),
-                                  isScrollable: true,
-                                  indicatorSize: TabBarIndicatorSize.tab,
-                                  controller: _controller,
-                                  tabs: <Widget>[
-                                    Tab(
-                                      child: Text(s.homeTabMenuRecent),
-                                    ),
-                                    Tab(
-                                      child: Text(s.homeTabMenuFavotite),
-                                    ),
-                                    Tab(
-                                      child: Text(s.download),
-                                    )
+                                    Import(),
                                   ],
                                 ),
                               ),
-                              pinned: true,
-                            ),
-                          ];
-                        },
-                        body: TabBarView(
-                          controller: _controller,
-                          children: <Widget>[
-                            NestedScrollViewInnerScrollPositionKeyWidget(
-                                Key('tab0'), _RecentUpdate()),
-                            NestedScrollViewInnerScrollPositionKeyWidget(
-                                Key('tab1'), _MyFavorite()),
-                            NestedScrollViewInnerScrollPositionKeyWidget(
-                                Key('tab2'), _MyDownload()),
-                          ],
+                              SliverToBoxAdapter(
+                                child: SizedBox(
+                                  height: height,
+                                  width: width,
+                                  child: ScrollPodcasts(),
+                                ),
+                              ),
+                              SliverPersistentHeader(
+                                delegate: _SliverAppBarDelegate(
+                                  TabBar(
+                                    indicator: _getIndicator(context),
+                                    isScrollable: true,
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    controller: _controller,
+                                    tabs: <Widget>[
+                                      Tab(
+                                        child: Text(s.homeTabMenuRecent),
+                                      ),
+                                      Tab(
+                                        child: Text(s.homeTabMenuFavotite),
+                                      ),
+                                      Tab(
+                                        child: Text(s.download),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                pinned: true,
+                              ),
+                            ];
+                          },
+                          body: TabBarView(
+                            controller: _controller,
+                            children: <Widget>[
+                              NestedScrollViewInnerScrollPositionKeyWidget(
+                                  Key('tab0'), _RecentUpdate()),
+                              NestedScrollViewInnerScrollPositionKeyWidget(
+                                  Key('tab1'), _MyFavorite()),
+                              NestedScrollViewInnerScrollPositionKeyWidget(
+                                  Key('tab2'), _MyDownload()),
+                            ],
+                          ),
                         ),
                       ),
                     ),
