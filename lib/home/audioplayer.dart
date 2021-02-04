@@ -229,24 +229,27 @@ class PlayerWidget extends StatelessWidget {
         if (!data.item1) {
           return Center();
         } else {
-          var minHeight = kMinPlayerHeight[data.item2.index];
-          var maxHeight = math.min(kMaxPlayerHeight[data.item2.index] as double,
+          final minHeight = kMinPlayerHeight[data.item2.index];
+          final maxHeight = math.min(
+              kMaxPlayerHeight[data.item2.index] as double,
               context.height - 20);
           return AudioPanel(
-              minHeight: minHeight,
+            minHeight: minHeight,
+            maxHeight: maxHeight,
+            expandHeight: context.height - 40,
+            key: playerKey,
+            miniPanel: _miniPanel(context),
+            expandedPanel: ControlPanel(
               maxHeight: maxHeight,
-              key: playerKey,
-              miniPanel: _miniPanel(context),
-              expandedPanel: ControlPanel(
-                maxHeight: maxHeight,
-                isPlayingPage: isPlayingPage,
-                onExpand: () {
-                  playerKey.currentState.scrollToTop();
-                },
-                onClose: () {
-                  playerKey.currentState.backToMini();
-                },
-              ));
+              isPlayingPage: isPlayingPage,
+              onExpand: () {
+                playerKey.currentState.scrollToTop();
+              },
+              onClose: () {
+                playerKey.currentState.backToMini();
+              },
+            ),
+          );
         }
       },
     );
@@ -408,7 +411,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       borderRadius: BorderRadius.circular(10),
       child: Container(
         alignment: Alignment.topLeft,
-        height: 300,
+        height: context.height - 340,
         width: double.infinity,
         decoration: BoxDecoration(
           color: context.accentColor.withAlpha(70),
@@ -421,132 +424,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             return Column(
               children: <Widget>[
                 Expanded(
-                  child:
-                      // data.item1.name == 'Queue'
-                      //     ? AnimatedList(
-                      //         key: miniPlaylistKey,
-                      //         shrinkWrap: true,
-                      //         scrollDirection: Axis.vertical,
-                      //         initialItemCount: episodes.length,
-                      //         itemBuilder: (context, index, animation) =>
-                      //             ScaleTransition(
-                      //           alignment: Alignment.center,
-                      //           scale: animation,
-                      //           child: Column(
-                      //             children: <Widget>[
-                      //               Row(
-                      //                 children: <Widget>[
-                      //                   Expanded(
-                      //                     child: Material(
-                      //                       color: Colors.transparent,
-                      //                       child: InkWell(
-                      //                         onTap: () {
-                      //                           audio.episodeLoad(episodes[index]);
-                      //                           miniPlaylistKey.currentState
-                      //                               .removeItem(
-                      //                                   index,
-                      //                                   (context, animation) =>
-                      //                                       Center());
-                      //                         },
-                      //                         child: Container(
-                      //                           height: 60,
-                      //                           padding: EdgeInsets.symmetric(
-                      //                               horizontal: 20),
-                      //                           alignment: Alignment.centerLeft,
-                      //                           child: Row(
-                      //                             mainAxisAlignment:
-                      //                                 MainAxisAlignment.center,
-                      //                             crossAxisAlignment:
-                      //                                 CrossAxisAlignment.center,
-                      //                             mainAxisSize: MainAxisSize.min,
-                      //                             children: <Widget>[
-                      //                               Container(
-                      //                                 padding: EdgeInsets.all(10.0),
-                      //                                 child: ClipRRect(
-                      //                                   borderRadius:
-                      //                                       BorderRadius.all(
-                      //                                           Radius.circular(
-                      //                                               15.0)),
-                      //                                   child: Container(
-                      //                                       height: 30.0,
-                      //                                       width: 30.0,
-                      //                                       child: Image.file(File(
-                      //                                           "${episodes[index].imagePath}"))),
-                      //                                 ),
-                      //                               ),
-                      //                               Expanded(
-                      //                                 child: Align(
-                      //                                   alignment:
-                      //                                       Alignment.centerLeft,
-                      //                                   child: Text(
-                      //                                     episodes[index].title,
-                      //                                     maxLines: 1,
-                      //                                     overflow:
-                      //                                         TextOverflow.ellipsis,
-                      //                                   ),
-                      //                                 ),
-                      //                               ),
-                      //                             ],
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                     ),
-                      //                   ),
-                      //                   Padding(
-                      //                     padding: const EdgeInsets.symmetric(
-                      //                         horizontal: 20.0),
-                      //                     child: Material(
-                      //                       borderRadius:
-                      //                           BorderRadius.circular(100),
-                      //                       clipBehavior: Clip.hardEdge,
-                      //                       color: context.primaryColor,
-                      //                       child: InkWell(
-                      //                         borderRadius: BorderRadius.all(
-                      //                             Radius.circular(15.0)),
-                      //                         onTap: () async {
-                      //                           var episdoe =
-                      //                               episodes.removeAt(index);
-                      //                           episodes.insert(0, episdoe);
-                      //                           miniPlaylistKey.currentState
-                      //                               .removeItem(
-                      //                             index,
-                      //                             (context, animation) {
-                      //                               return Center();
-                      //                             },
-                      //                             duration: Duration.zero,
-                      //                           );
-                      //                           miniPlaylistKey.currentState
-                      //                               .insertItem(
-                      //                                   0,
-                      //                                   duration: Duration(
-                      //                                       milliseconds: 100));
-                      //                           await Future.delayed(
-                      //                               Duration(milliseconds: 100));
-                      //                           await audio.moveToTop(
-                      //                               data.item1.episodes[index + 1]);
-                      //                         },
-                      //                         child: SizedBox(
-                      //                           height: 30.0,
-                      //                           width: 30.0,
-                      //                           child: Transform.rotate(
-                      //                             angle: math.pi,
-                      //                             child: Icon(
-                      //                               LineIcons.download_solid,
-                      //                               size: 20.0,
-                      //                             ),
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                     ),
-                      //                   ),
-                      //                 ],
-                      //               ),
-                      //               Divider(height: 1),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //       )
-                      ListView.builder(
+                  child: ListView.builder(
                     itemCount: episodes.length,
                     itemBuilder: (context, index) {
                       final isPlaying = episodes[index] != null &&
@@ -1375,7 +1253,7 @@ class _ControlPanelState extends State<ControlPanel>
                   child: SingleChildScrollView(
                       physics: NeverScrollableScrollPhysics(),
                       child: SizedBox(
-                          height: 300,
+                          height: context.height - 360,
                           child: ScrollConfiguration(
                             behavior: NoGrowBehavior(),
                             child: TabBarView(

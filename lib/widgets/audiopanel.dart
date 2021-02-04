@@ -12,6 +12,7 @@ class AudioPanel extends StatefulWidget {
   final Widget optionPanel;
   final double minHeight;
   final double maxHeight;
+  final double expandHeight;
 
   AudioPanel(
       {@required this.miniPanel,
@@ -19,6 +20,7 @@ class AudioPanel extends StatefulWidget {
       this.optionPanel,
       this.minHeight = 70,
       this.maxHeight = 300,
+      this.expandHeight,
       Key key})
       : super(key: key);
   @override
@@ -53,7 +55,8 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _controller.forward();
     _slideDirection = SlideDirection.up;
     super.initState();
-    _expandHeight = widget.maxHeight + 316;
+    _expandHeight =  widget.expandHeight;
+    // _expandHeight = widget.maxHeight + 316;
   }
 
   @override
@@ -67,7 +70,8 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   void didUpdateWidget(AudioPanel oldWidget) {
     if (oldWidget.maxHeight != widget.maxHeight) {
       setState(() {
-        _expandHeight = widget.maxHeight + 316;
+        //_expandHeight = widget.maxHeight + 316;
+        _expandHeight = widget.expandHeight;
       });
     }
     super.didUpdateWidget(oldWidget);
