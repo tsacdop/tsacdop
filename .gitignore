@@ -31,7 +31,6 @@
 /lib/.env.dart
 /build/
 pubspec.lock
-.vscode
 analysis_options.yaml
 
 # Web related
