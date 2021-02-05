@@ -111,7 +111,7 @@ class AutoDownloader {
           now.day.toString() +
           now.second.toString();
       var fileName =
-          '${episode.title}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
+          '${episode.title.replaceAll('/', '')}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
       if (fileName.length > 100) {
         fileName = fileName.substring(fileName.length - 100);
       }
@@ -161,6 +161,7 @@ class DownloadState extends ChangeNotifier {
               taskId: task.taskId, shouldDeleteContent: true);
         } else {
           if (task.status == DownloadTaskStatus.complete) {
+            final filname = task.filename.replaceAll('/', '');
             var exist =
                 await File(path.join(task.savedDir, task.filename)).exists();
             if (!exist) {
@@ -283,7 +284,7 @@ class DownloadState extends ChangeNotifier {
           now.day.toString() +
           now.second.toString();
       var fileName =
-          '${episode.title}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
+          '${episode.title.replaceAll('/', '')}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
       if (fileName.length > 100) {
         fileName = fileName.substring(fileName.length - 100);
       }
