@@ -25,6 +25,28 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  bool _showTitle;
+  ScrollController _controller;
+  _scrollListener() {
+    if (_controller.offset > context.textTheme.headline5.fontSize) {
+      if (!_showTitle) setState(() => _showTitle = true);
+    } else if (_showTitle) setState(() => _showTitle = false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _showTitle = false;
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Widget _feedbackItem(IconData icon, String name, String url) => ListTile(
         onTap: () {
           url.launchUrl;
@@ -58,12 +80,13 @@ class _SettingsState extends State<Settings> {
         appBar: AppBar(
           title: Text(s.settings),
           leading: CustomBackButton(),
-          elevation: 0,
+          elevation: _showTitle ? 1 : 0,
           backgroundColor: context.primaryColor,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
+            controller: _controller,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
