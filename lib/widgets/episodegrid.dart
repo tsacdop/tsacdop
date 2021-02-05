@@ -546,11 +546,12 @@ class EpisodeGrid extends StatelessWidget {
             opacity: Tween<double>(begin: index < initNum ? 0 : 1, end: 1)
                 .animate(animation),
             child: Selector<AudioPlayerNotifier,
-                Tuple3<EpisodeBrief, List<String>, bool>>(
-              selector: (_, audio) => Tuple3(
+                Tuple4<EpisodeBrief, List<String>, bool, bool>>(
+              selector: (_, audio) => Tuple4(
                   audio?.episode,
                   audio.queue.episodes.map((e) => e.enclosureUrl).toList(),
-                  audio.episodeState),
+                  audio.episodeState,
+                  audio.playerRunning),
               builder: (_, data, __) => OpenContainerWrapper(
                 avatarSize: layout == Layout.one
                     ? context.width / 8
@@ -654,9 +655,11 @@ class EpisodeGrid extends StatelessWidget {
                                           context.brightness == Brightness.light
                                               ? context.primaryColor
                                               : context.dialogBackgroundColor,
-                                      title: Text(data.item1 != episodes[index]
-                                          ? s.play
-                                          : s.playing),
+                                      title: Text(
+                                          data.item1 != episodes[index] ||
+                                                  !data.item4
+                                              ? s.play
+                                              : s.playing),
                                       trailingIcon: Icon(
                                         LineIcons.play_circle_solid,
                                         color: Theme.of(context).accentColor,

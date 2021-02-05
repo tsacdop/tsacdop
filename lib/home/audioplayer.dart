@@ -236,7 +236,7 @@ class PlayerWidget extends StatelessWidget {
           return AudioPanel(
             minHeight: minHeight,
             maxHeight: maxHeight,
-            expandHeight: context.height - 40,
+            expandHeight: context.height - context.paddingTop - 20,
             key: playerKey,
             miniPanel: _miniPanel(context),
             expandedPanel: ControlPanel(
@@ -411,7 +411,6 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       borderRadius: BorderRadius.circular(10),
       child: Container(
         alignment: Alignment.topLeft,
-        height: context.height - 340,
         width: double.infinity,
         decoration: BoxDecoration(
           color: context.accentColor.withAlpha(70),
@@ -422,6 +421,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           builder: (_, data, __) {
             var episodes = data.item1.episodes;
             return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Expanded(
                   child: ListView.builder(
@@ -450,12 +450,12 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              Container(
+                              Padding(
                                 padding: EdgeInsets.all(10.0),
                                 child: ClipRRect(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(15.0)),
-                                  child: Container(
+                                  child: SizedBox(
                                       height: 30.0,
                                       width: 30.0,
                                       child: Image.file(File(
@@ -1253,7 +1253,7 @@ class _ControlPanelState extends State<ControlPanel>
                   child: SingleChildScrollView(
                       physics: NeverScrollableScrollPhysics(),
                       child: SizedBox(
-                          height: context.height - 360,
+                          height: context.height - context.paddingTop - 340,
                           child: ScrollConfiguration(
                             behavior: NoGrowBehavior(),
                             child: TabBarView(
@@ -1286,7 +1286,7 @@ class _ControlPanelState extends State<ControlPanel>
                             audio.currentSpeed),
                         builder: (_, data, __) {
                           final currentSpeed = data.item4 ?? 1.0;
-                          return Container(
+                          return Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 20.0),
                             child: Row(
@@ -1448,7 +1448,10 @@ class _ControlPanelState extends State<ControlPanel>
                                         indicatorSize: 20,
                                         fraction:
                                             (height + 16 - widget.maxHeight) /
-                                                316,
+                                                (context.height -
+                                                    context.paddingTop -
+                                                    20 -
+                                                    widget.maxHeight),
                                         accentColor: context.accentColor,
                                         color: context.textColor)),
                               ),
@@ -1457,8 +1460,12 @@ class _ControlPanelState extends State<ControlPanel>
                       ),
                     if (_setSpeed == 0 && height > widget.maxHeight)
                       Transform.translate(
-                        offset:
-                            Offset(0, 5) * (height - widget.maxHeight) / 300,
+                        offset: Offset(0, 5) *
+                            (height - widget.maxHeight) /
+                            (context.height -
+                                context.paddingTop -
+                                20 -
+                                widget.maxHeight),
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: context.width / 2 - 80),

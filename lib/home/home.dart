@@ -23,11 +23,11 @@ import '../type/episodebrief.dart';
 import '../util/extension_helper.dart';
 import '../widgets/audiopanel.dart';
 import '../widgets/custom_popupmenu.dart';
+import '../widgets/custom_search_delegate.dart';
 import '../widgets/custom_widget.dart';
 import '../widgets/episodegrid.dart';
 import '../widgets/feature_discovery.dart';
 import '../widgets/muiliselect_bar.dart';
-import '../widgets/custom_search_delegate.dart';
 import 'audioplayer.dart';
 import 'download_list.dart';
 import 'home_groups.dart';
@@ -90,8 +90,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   double top = 0;
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = (width - 20) / 3 + 140;
+    var height = (context.width - 20) / 3 + 140;
     var settings = Provider.of<SettingState>(context, listen: false);
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -209,7 +208,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               SliverToBoxAdapter(
                                 child: SizedBox(
                                   height: height,
-                                  width: width,
+                                  width: context.width,
                                   child: ScrollPodcasts(),
                                 ),
                               ),

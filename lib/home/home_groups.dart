@@ -707,13 +707,13 @@ class ShowEpisode extends StatelessWidget {
               (context, index) {
                 final c = podcastLocal.backgroudColor(context);
                 return Selector<AudioPlayerNotifier,
-                        tuple.Tuple2<EpisodeBrief, List<String>>>(
-                    selector: (_, audio) => tuple.Tuple2(
-                          audio?.episode,
-                          audio.queue.episodes
-                              .map((e) => e.enclosureUrl)
-                              .toList(),
-                        ),
+                        tuple.Tuple3<EpisodeBrief, List<String>, bool>>(
+                    selector: (_, audio) => tuple.Tuple3(
+                        audio?.episode,
+                        audio.queue.episodes
+                            .map((e) => e.enclosureUrl)
+                            .toList(),
+                        audio.playerRunning),
                     builder: (_, data, __) => FutureBuilder<
                             tuple.Tuple5<int, bool, bool, bool, List<int>>>(
                         future: _initData(episodes[index]),
@@ -754,7 +754,8 @@ class ShowEpisode extends StatelessWidget {
                                         context.brightness == Brightness.light
                                             ? context.primaryColor
                                             : context.dialogBackgroundColor,
-                                    title: Text(data.item1 != episodes[index]
+                                    title: Text(data.item1 != episodes[index] ||
+                                            !data.item3
                                         ? s.play
                                         : s.playing),
                                     trailingIcon: Icon(

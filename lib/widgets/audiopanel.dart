@@ -55,8 +55,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     _controller.forward();
     _slideDirection = SlideDirection.up;
     super.initState();
-    _expandHeight =  widget.expandHeight;
-    // _expandHeight = widget.maxHeight + 316;
+    _expandHeight = widget.expandHeight;
   }
 
   @override
@@ -70,7 +69,6 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   void didUpdateWidget(AudioPanel oldWidget) {
     if (oldWidget.maxHeight != widget.maxHeight) {
       setState(() {
-        //_expandHeight = widget.maxHeight + 316;
         _expandHeight = widget.expandHeight;
       });
     }
@@ -96,8 +94,8 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                 child: GestureDetector(
                   onTap: backToMini,
                   child: Container(
-                    color: context.scaffoldBackgroundColor.withOpacity(
-                        0.9 * math.min(_animation.value / widget.maxHeight, 1)),
+                    color: context.scaffoldBackgroundColor.withOpacity(0.9 *
+                        math.min(_animation.value / widget.maxHeight, 1)),
                   ),
                 ),
               )
