@@ -763,7 +763,8 @@ class ShowEpisode extends StatelessWidget {
                                       color: context.accentColor,
                                     ),
                                     onPressed: () {
-                                      if (data.item1 != episodes[index]) {
+                                      if (data.item1 != episodes[index] ||
+                                          !data.item3) {
                                         audio.episodeLoad(episodes[index]);
                                       }
                                     }),

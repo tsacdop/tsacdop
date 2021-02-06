@@ -85,9 +85,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
       child: IconButton(
         tooltip: context.s.back,
         splashRadius: 20,
-        icon: Icon(
-          _getIconData(Theme.of(context).platform)
-        ),
+        icon: Icon(_getIconData(Theme.of(context).platform)),
         onPressed: () {
           close(context, 1);
         },
@@ -173,7 +171,7 @@ class MyHomePageDelegate extends SearchDelegate<int> {
     }
   }
 
-    static IconData _getIconData(TargetPlatform platform) {
+  static IconData _getIconData(TargetPlatform platform) {
     switch (platform) {
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
@@ -1322,6 +1320,7 @@ class PodcastAvatar extends StatelessWidget {
           fit: BoxFit.fitWidth,
           alignment: Alignment.center,
           imageUrl: podcast.image,
+          placeholderFadeInDuration: Duration.zero,
           progressIndicatorBuilder: (context, url, downloadProgress) =>
               Container(
             height: 50,

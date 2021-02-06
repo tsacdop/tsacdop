@@ -665,7 +665,8 @@ class EpisodeGrid extends StatelessWidget {
                                         color: Theme.of(context).accentColor,
                                       ),
                                       onPressed: () {
-                                        if (data.item1 != episodes[index]) {
+                                        if (data.item1 != episodes[index] ||
+                                            !data.item4) {
                                           audio.episodeLoad(episodes[index]);
                                         }
                                       }),

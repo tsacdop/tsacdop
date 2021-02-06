@@ -100,143 +100,136 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
       ),
-      child: Scaffold(
-        key: _scaffoldKey,
-        body: WillPopScope(
-          onWillPop: () async {
-            if (_playerKey.currentState != null &&
-                _playerKey.currentState.initSize > 100) {
-              _playerKey.currentState.backToMini();
-              return false;
-            } else if (Platform.isAndroid) {
-              _androidAppRetain.invokeMethod('sendToBackground');
-              return false;
-            } else {
-              return true;
-            }
-          },
-          child: SafeArea(
-            bottom: false,
-            child: Stack(
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Expanded(
-                      child: ScrollConfiguration(
-                        behavior: NoGrowBehavior(),
-                        child: NestedScrollView(
-                          innerScrollPositionKeyBuilder: () {
-                            return Key('tab${_controller.index}');
-                          },
-                          pinnedHeaderSliverHeightBuilder: () => 50,
-                          headerSliverBuilder: (context, innerBoxScrolled) {
-                            return <Widget>[
-                              SliverToBoxAdapter(
-                                child: Column(
+      child: WillPopScope(
+        onWillPop: () async {
+          if (_playerKey.currentState != null &&
+              _playerKey.currentState.initSize > 100) {
+            _playerKey.currentState.backToMini();
+            return false;
+          } else if (Platform.isAndroid) {
+            _androidAppRetain.invokeMethod('sendToBackground');
+            return false;
+          } else {
+            return true;
+          }
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          body: Stack(
+            children: <Widget>[
+              SafeArea(
+                bottom: false,
+                child: ScrollConfiguration(
+                  behavior: NoGrowBehavior(),
+                  child: NestedScrollView(
+                    innerScrollPositionKeyBuilder: () {
+                      return Key('tab${_controller.index}');
+                    },
+                    pinnedHeaderSliverHeightBuilder: () => 50,
+                    headerSliverBuilder: (context, innerBoxScrolled) {
+                      return <Widget>[
+                        SliverToBoxAdapter(
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 50.0,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
-                                    SizedBox(
-                                      height: 50.0,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          featureDiscoveryOverlay(
-                                            context,
-                                            featureId: addFeature,
-                                            tapTarget:
-                                                Icon(Icons.add_circle_outline),
-                                            title: s.featureDiscoverySearch,
-                                            backgroundColor: Colors.cyan[600],
-                                            buttonColor: Colors.cyan[500],
-                                            description:
-                                                s.featureDiscoverySearchDes,
-                                            child: IconButton(
-                                              tooltip: s.add,
-                                              splashRadius: 20,
-                                              icon: Icon(
-                                                  Icons.add_circle_outline),
-                                              onPressed: () async {
-                                                await showSearch<int>(
-                                                  context: context,
-                                                  delegate: MyHomePageDelegate(
-                                                      searchFieldLabel:
-                                                          s.searchPodcast),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () => {
-                                              Theme.of(context).brightness ==
-                                                      Brightness.light
-                                                  ? settings.setTheme =
-                                                      ThemeMode.dark
-                                                  : settings.setTheme =
-                                                      ThemeMode.light
-                                            },
-                                            child: Image(
-                                              image: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.light
-                                                  ? AssetImage(
-                                                      'assets/text.png')
-                                                  : AssetImage(
-                                                      'assets/text_light.png'),
-                                              height: 30,
-                                            ),
-                                          ),
-                                          featureDiscoveryOverlay(context,
-                                              featureId: menuFeature,
-                                              tapTarget: Icon(Icons.more_vert),
-                                              backgroundColor: Colors.cyan[500],
-                                              buttonColor: Colors.cyan[600],
-                                              title: s.featureDiscoveryOMPL,
-                                              description:
-                                                  s.featureDiscoveryOMPLDes,
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 5.0),
-                                                child: PopupMenu(),
-                                              )),
-                                        ],
+                                    featureDiscoveryOverlay(
+                                      context,
+                                      featureId: addFeature,
+                                      tapTarget: Icon(Icons.add_circle_outline),
+                                      title: s.featureDiscoverySearch,
+                                      backgroundColor: Colors.cyan[600],
+                                      buttonColor: Colors.cyan[500],
+                                      description: s.featureDiscoverySearchDes,
+                                      child: IconButton(
+                                        tooltip: s.add,
+                                        splashRadius: 20,
+                                        icon: Icon(Icons.add_circle_outline),
+                                        onPressed: () async {
+                                          await showSearch<int>(
+                                            context: context,
+                                            delegate: MyHomePageDelegate(
+                                                searchFieldLabel:
+                                                    s.searchPodcast),
+                                          );
+                                        },
                                       ),
                                     ),
-                                    Import(),
+                                    GestureDetector(
+                                      onTap: () => {
+                                        Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? settings.setTheme = ThemeMode.dark
+                                            : settings.setTheme =
+                                                ThemeMode.light
+                                      },
+                                      child: Image(
+                                        image: Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? AssetImage('assets/text.png')
+                                            : AssetImage(
+                                                'assets/text_light.png'),
+                                        height: 30,
+                                      ),
+                                    ),
+                                    featureDiscoveryOverlay(context,
+                                        featureId: menuFeature,
+                                        tapTarget: Icon(Icons.more_vert),
+                                        backgroundColor: Colors.cyan[500],
+                                        buttonColor: Colors.cyan[600],
+                                        title: s.featureDiscoveryOMPL,
+                                        description: s.featureDiscoveryOMPLDes,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 5.0),
+                                          child: PopupMenu(),
+                                        )),
                                   ],
                                 ),
                               ),
-                              SliverToBoxAdapter(
-                                child: SizedBox(
-                                  height: height,
-                                  width: context.width,
-                                  child: ScrollPodcasts(),
+                              Import(),
+                            ],
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: height,
+                            width: context.width,
+                            child: ScrollPodcasts(),
+                          ),
+                        ),
+                        SliverPersistentHeader(
+                          delegate: _SliverAppBarDelegate(
+                            TabBar(
+                              indicator: _getIndicator(context),
+                              isScrollable: true,
+                              indicatorSize: TabBarIndicatorSize.tab,
+                              controller: _controller,
+                              tabs: <Widget>[
+                                Tab(
+                                  child: Text(s.homeTabMenuRecent),
                                 ),
-                              ),
-                              SliverPersistentHeader(
-                                delegate: _SliverAppBarDelegate(
-                                  TabBar(
-                                    indicator: _getIndicator(context),
-                                    isScrollable: true,
-                                    indicatorSize: TabBarIndicatorSize.tab,
-                                    controller: _controller,
-                                    tabs: <Widget>[
-                                      Tab(
-                                        child: Text(s.homeTabMenuRecent),
-                                      ),
-                                      Tab(
-                                        child: Text(s.homeTabMenuFavotite),
-                                      ),
-                                      Tab(
-                                        child: Text(s.download),
-                                      )
-                                    ],
-                                  ),
+                                Tab(
+                                  child: Text(s.homeTabMenuFavotite),
                                 ),
-                                pinned: true,
-                              ),
-                            ];
-                          },
-                          body: TabBarView(
+                                Tab(
+                                  child: Text(s.download),
+                                )
+                              ],
+                            ),
+                          ),
+                          pinned: true,
+                        ),
+                      ];
+                    },
+                    body: Column(
+                      children: [
+                        Expanded(
+                          child: TabBarView(
                             controller: _controller,
                             children: <Widget>[
                               NestedScrollViewInnerScrollPositionKeyWidget(
@@ -248,22 +241,24 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             ],
                           ),
                         ),
-                      ),
+                        Selector<AudioPlayerNotifier, bool>(
+                            selector: (_, audio) =>
+                                audio?.playerRunning ?? false,
+                            builder: (_, data, __) {
+                              return Padding(
+                                padding:
+                                    EdgeInsets.only(bottom: data ? 60.0 : 0),
+                              );
+                            }),
+                      ],
                     ),
-                    Selector<AudioPlayerNotifier, bool>(
-                        selector: (_, audio) => audio?.playerRunning ?? false,
-                        builder: (_, data, __) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
-                          );
-                        }),
-                  ],
+                  ),
                 ),
+              ),
               Container(child: PlayerWidget(playerKey: _playerKey)),
             ],
           ),
         ),
-      ),
       ),
     );
   }
