@@ -259,11 +259,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         }),
                   ],
                 ),
-                Container(child: PlayerWidget(playerKey: _playerKey)),
-              ],
-            ),
+              Container(child: PlayerWidget(playerKey: _playerKey)),
+            ],
           ),
         ),
+      ),
       ),
     );
   }
