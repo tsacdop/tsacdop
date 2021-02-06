@@ -22,12 +22,14 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
+            splashRadius: 20,
             icon: Icon(
               Icons.pause_circle_filled,
             ),
             onPressed: () => downloader.pauseTask(task.episode),
           ),
           IconButton(
+            splashRadius: 20,
             icon: Icon(Icons.close),
             onPressed: () => downloader.delTask(task.episode),
           ),
@@ -38,10 +40,12 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           IconButton(
+            splashRadius: 20,
             icon: Icon(Icons.refresh, color: Colors.red),
             onPressed: () => downloader.retryTask(task.episode),
           ),
           IconButton(
+            splashRadius: 20,
             icon: Icon(Icons.close),
             onPressed: () => downloader.delTask(task.episode),
           ),
@@ -50,10 +54,12 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
     case 6:
       return Row(mainAxisSize: MainAxisSize.min, children: [
         IconButton(
+            splashRadius: 20,
           icon: Icon(Icons.play_circle_filled),
           onPressed: () => downloader.resumeTask(task.episode),
         ),
         IconButton(
+            splashRadius: 20,
           icon: Icon(Icons.close),
           onPressed: () => downloader.delTask(task.episode),
         ),
