@@ -1,19 +1,25 @@
+import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:audio_service/audio_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../episodes/episode_detail.dart';
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../playlists/playlist_home.dart';
 import '../state/audio_state.dart';
+import '../type/chapter.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/playlist.dart';
@@ -425,6 +431,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
               children: <Widget>[
                 Expanded(
                   child: ListView.builder(
+                    padding: EdgeInsets.zero,
                     itemCount: episodes.length,
                     itemBuilder: (context, index) {
                       final isPlaying = episodes[index] != null &&
@@ -886,6 +893,280 @@ class SleepModeState extends State<SleepMode>
   }
 }
 
+class ChaptersWidget extends StatefulWidget {
+  ChaptersWidget({Key key}) : super(key: key);
+
+  @override
+  _ChaptersWidgetState createState() => _ChaptersWidgetState();
+}
+
+class _ChaptersWidgetState extends State<ChaptersWidget> {
+  bool _showChapter;
+
+  @override
+  void initState() {
+    super.initState();
+    _showChapter = false;
+  }
+
+  Future<List<Chapters>> _getChapters(EpisodeBrief episode) async {
+    if (episode.chapterLink == '' || episode.chapterLink == null) {
+      return [];
+    }
+    try {
+      final file =
+          await DefaultCacheManager().getSingleFile(episode.chapterLink);
+      final response = file.readAsStringSync();
+      var chapterInfo = ChapterInfo.fromJson(jsonDecode(response));
+      return chapterInfo.chapters;
+    } catch (e) {
+      developer.log('Download cahpter error', error: e);
+      return [];
+    }
+  }
+
+  Widget _chapterDetailWidget(Chapters chapters) {
+    return Column(
+      children: [
+        Container(
+          height: 60,
+          width: double.infinity,
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: ButtonTheme(
+                  height: 28,
+                  padding: EdgeInsets.symmetric(horizontal: 0),
+                  child: OutlineButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100.0),
+                        side: BorderSide(color: context.accentColor)),
+                    highlightedBorderColor: Colors.green[700],
+                    onPressed: () {
+                      context
+                          .read<AudioPlayerNotifier>()
+                          .seekTo(chapters.startTime * 1000);
+                    },
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CustomPaint(
+                            painter:
+                                ListenedPainter(context.textColor, stroke: 2.0),
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          chapters.startTime.toTime,
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                  child: Text(chapters.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodyText1)),
+              if (chapters.url != '')
+                TextButton(
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(context.accentColor),
+                      overlayColor: MaterialStateProperty.all<Color>(
+                          context.primaryColor),
+                    ),
+                    onPressed: () => chapters.url.launchUrl,
+                    child: Text('Link')),
+              SizedBox(width: 8)
+            ],
+          ),
+        ),
+        if (chapters.img != '') _ChapterImage(chapters.img)
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        alignment: Alignment.topLeft,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: context.accentColor.withAlpha(70),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Selector<AudioPlayerNotifier, EpisodeBrief>(
+          selector: (_, audio) => audio.episode,
+          builder: (_, episode, __) => Scrollbar(
+            child: Column(
+              children: [
+                Expanded(
+                  child: _showChapter
+                      ? FutureBuilder<List<Chapters>>(
+                          future: _getChapters(episode),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final data = snapshot.data;
+                              return ListView.builder(
+                                  itemCount: data.length,
+                                  padding: EdgeInsets.zero,
+                                  itemBuilder: (context, index) {
+                                    return _chapterDetailWidget(data[index]);
+                                  });
+                            }
+                            return Center();
+                          })
+                      : ListView(
+                          padding: EdgeInsets.zero,
+                          children: <Widget>[
+                            if (episode.episodeImage != '')
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: CachedNetworkImage(
+                                    width: 100,
+                                    fit: BoxFit.fitWidth,
+                                    alignment: Alignment.center,
+                                    imageUrl: episode.episodeImage,
+                                    placeholderFadeInDuration: Duration.zero,
+                                    progressIndicatorBuilder: (context, url,
+                                            downloadProgress) =>
+                                        Container(
+                                          height: 50,
+                                          width: 50,
+                                          alignment: Alignment.center,
+                                          child: SizedBox(
+                                            width: 20,
+                                            height: 2,
+                                            child: LinearProgressIndicator(
+                                                value:
+                                                    downloadProgress.progress),
+                                          ),
+                                        ),
+                                    errorWidget: (context, url, error) =>
+                                        Center()),
+                              ),
+                            ShowNote(episode: episode)
+                          ],
+                        ),
+                ),
+                SizedBox(
+                  height: 60.0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          context.s.settingsInfo,
+                          overflow: TextOverflow.fade,
+                          style: TextStyle(
+                              color: context.accentColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16),
+                        ),
+                        Spacer(),
+                        SizedBox(width: 20),
+                        Material(
+                          borderRadius: BorderRadius.circular(100),
+                          color: context.primaryColor,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(15.0),
+                            onTap: () {
+                              setState(() {
+                                _showChapter = !_showChapter;
+                              });
+                            },
+                            child: SizedBox(
+                                height: 30.0,
+                                width: 30.0,
+                                child: !_showChapter
+                                    ? Icon(Icons.bookmark_border_outlined,
+                                        size: 18)
+                                    : Icon(Icons.chrome_reader_mode_outlined,
+                                        size: 18)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChapterImage extends StatefulWidget {
+  final String url;
+  _ChapterImage(this.url, {Key key}) : super(key: key);
+
+  @override
+  __ChapterImageState createState() => __ChapterImageState();
+}
+
+class __ChapterImageState extends State<_ChapterImage> {
+  bool _openFullImage;
+  @override
+  void initState() {
+    super.initState();
+    _openFullImage = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => setState(() => _openFullImage = !_openFullImage),
+      child: ClipRRect(
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            CachedNetworkImage(
+                width: double.infinity,
+                height: _openFullImage ? null : 50,
+                fit: BoxFit.fitWidth,
+                alignment: Alignment.center,
+                imageUrl: widget.url,
+                placeholderFadeInDuration: Duration.zero,
+                progressIndicatorBuilder: (contlext, url, downloadProgress) =>
+                    Container(
+                      height: 50,
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        width: 20,
+                        height: 2,
+                        child: LinearProgressIndicator(
+                            value: downloadProgress.progress),
+                      ),
+                    ),
+                errorWidget: (context, url, error) => Center()),
+            if (!_openFullImage)
+              Container(
+                decoration: BoxDecoration(boxShadow: [
+                  BoxShadow(
+                      color: Colors.black38,
+                      offset: Offset(0, -5),
+                      blurRadius: 20,
+                      spreadRadius: 10)
+                ]),
+              )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ControlPanel extends StatefulWidget {
   ControlPanel(
       {this.onExpand,
@@ -938,7 +1219,7 @@ class _ControlPanelState extends State<ControlPanel>
   @override
   void initState() {
     _setSpeed = 0;
-    _tabController = TabController(vsync: this, length: 2)
+    _tabController = TabController(vsync: this, length: 3)
       ..addListener(() {
         setState(() => _tabIndex = _tabController.index);
       });
@@ -1260,15 +1541,18 @@ class _ControlPanelState extends State<ControlPanel>
                                 controller: _tabController,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0),
-                                    child: PlaylistWidget(),
-                                  ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
+                                      child: PlaylistWidget()),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 20.0),
                                     child: SleepMode(),
-                                  )
+                                  ),
+                                  Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
+                                      child: ChaptersWidget()),
                                 ]),
                           ))),
                 ),
@@ -1438,14 +1722,14 @@ class _ControlPanelState extends State<ControlPanel>
                         child: InkWell(
                             child: SizedBox(
                               height: 50,
-                              width: 100,
+                              width: 115,
                               child: Align(
                                 alignment: Alignment.bottomCenter,
                                 child: CustomPaint(
-                                    size: Size(100, 5),
+                                    size: Size(120, 5),
                                     painter: TabIndicator(
                                         index: _tabIndex,
-                                        indicatorSize: 20,
+                                        indicatorSize: 10,
                                         fraction:
                                             (height + 16 - widget.maxHeight) /
                                                 (context.height -
@@ -1476,17 +1760,21 @@ class _ControlPanelState extends State<ControlPanel>
                             unselectedLabelColor: context.textColor,
                             indicator: BoxDecoration(),
                             tabs: [
-                              Container(
+                              SizedBox(
                                   height: 20,
                                   width: 20,
                                   child: Icon(Icons.playlist_play)),
-                              Container(
+                              SizedBox(
                                   height: 20,
                                   width: 20,
                                   child: Transform.rotate(
                                       angle: math.pi * 0.7,
                                       child:
                                           Icon(Icons.brightness_2, size: 18))),
+                              SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: Icon(Icons.library_books, size: 18)),
                             ],
                           ),
                         ),

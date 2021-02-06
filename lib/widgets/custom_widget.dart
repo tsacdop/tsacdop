@@ -1242,7 +1242,13 @@ class TabIndicator extends CustomPainter {
     canvas.drawLine(leftStart, leftEnd,
         index == 0 || fraction == 0 ? _accentPaint : _paint);
     canvas.drawLine(rightStart, rightEnd,
-        index == 1 || fraction == 0 ? _accentPaint : _paint);
+        index == 2 || fraction == 0 ? _accentPaint : _paint);
+    if (fraction == 1) {
+      canvas.drawLine(
+          Offset(size.width/2 - indicatorSize / 2, size.height),
+          Offset(size.width/2 + indicatorSize / 2, size.height),
+          index == 1 || fraction == 0 ? _accentPaint : _paint);
+    }
   }
 
   @override
@@ -1466,7 +1472,8 @@ class CircleProgressIndicator extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     var center = Offset(size.width / 2, size.height / 2);
     canvas.drawArc(
-        Rect.fromCenter(center: center, height: size.height*2, width: size.width*2),
+        Rect.fromCenter(
+            center: center, height: size.height * 2, width: size.width * 2),
         -math.pi / 2,
         math.pi * 2 * (progress / 100),
         true,

@@ -271,7 +271,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                               ],
                             ),
                           ),
-                          _ShowNote(episode: widget.episodeItem),
+                          ShowNote(episode: widget.episodeItem),
                           Selector<AudioPlayerNotifier,
                                   Tuple2<bool, PlayerHeight>>(
                               selector: (_, audio) => Tuple2(
@@ -580,9 +580,9 @@ class __MenuBarState extends State<_MenuBar> {
   }
 }
 
-class _ShowNote extends StatelessWidget {
+class ShowNote extends StatelessWidget {
   final EpisodeBrief episode;
-  const _ShowNote({this.episode, Key key}) : super(key: key);
+  const ShowNote({this.episode, Key key}) : super(key: key);
 
   int _getTimeStamp(String url) {
     final time = url.substring(3).trim();

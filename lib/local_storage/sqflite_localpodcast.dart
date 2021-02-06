@@ -28,7 +28,7 @@ class DBHelper {
     var documentsDirectory = await getDatabasesPath();
     var path = join(documentsDirectory, "podcasts.db");
     var theDb = await openDatabase(path,
-        version: 5, onCreate: _onCreate, onUpgrade: _onUpgrade);
+        version: 6, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -47,52 +47,83 @@ class DBHelper {
         description TEXT, feed_id TEXT, feed_link TEXT, milliseconds INTEGER, 
         duration INTEGER DEFAULT 0, explicit INTEGER DEFAULT 0, liked INTEGER DEFAULT 0, 
         liked_date INTEGER DEFAULT 0, downloaded TEXT DEFAULT 'ND', 
-        download_date INTEGER DEFAULT 0, media_id TEXT, is_new INTEGER DEFAULT 0)""");
+        download_date INTEGER DEFAULT 0, media_id TEXT, is_new INTEGER DEFAULT 0, 
+        chapter_link TEXT DEFAULT '', hosts TEXT DEFAULT '', episode_image TEXT DEFAULT '')""");
     await db.execute(
         """CREATE TABLE PlayHistory(id INTEGER PRIMARY KEY, title TEXT, enclosure_url TEXT,
         seconds REAL, seek_value REAL, add_date INTEGER, listen_time INTEGER DEFAULT 0)""");
     await db.execute(
         """CREATE TABLE SubscribeHistory(id TEXT PRIMARY KEY, title TEXT, rss_url TEXT UNIQUE, 
         add_date INTEGER, remove_date INTEGER DEFAULT 0, status INTEGER DEFAULT 0)""");
+    await db
+        .execute("""CREATE INDEX  podcast_search ON PodcastLocal (id, rssUrl);
+    """);
+    await db.execute(
+        """CREATE INDEX  episode_search ON Episodes (enclosure_url, feed_id);
+    """);
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
     switch (oldVersion) {
       case (1):
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD skip_seconds INTEGER DEFAULT 0 ");
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
-        await db
-            .execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+        await _v2Update(db);
+        await _v3Update(db);
+        await _v4Update(db);
+        await _v5Update(db);
+        await _v6Update(db);
         break;
       case (2):
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
-        await db
-            .execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+        await _v3Update(db);
+        await _v4Update(db);
+        await _v5Update(db);
+        await _v6Update(db);
         break;
       case (3):
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
-        await db.execute(
-            "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
-        await db
-            .execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+        await _v4Update(db);
+        await _v5Update(db);
+        await _v6Update(db);
         break;
       case (4):
-        await db
-            .execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+        await _v5Update(db);
+        await _v6Update(db);
+        break;
+      case (5):
+        await _v6Update(db);
         break;
     }
+  }
+
+  Future<void> _v2Update(Database db) async {
+    await db.execute(
+        "ALTER TABLE PodcastLocal ADD skip_seconds INTEGER DEFAULT 0 ");
+  }
+
+  Future<void> _v3Update(Database db) async {
+    await db.execute(
+        "ALTER TABLE PodcastLocal ADD auto_download INTEGER DEFAULT 0");
+  }
+
+  Future<void> _v4Update(Database db) async {
+    await db.execute(
+        "ALTER TABLE PodcastLocal ADD skip_seconds_end INTEGER DEFAULT 0 ");
+    await db.execute(
+        "ALTER TABLE PodcastLocal ADD never_update INTEGER DEFAULT 0 ");
+  }
+
+  Future<void> _v5Update(Database db) async {
+    await db.execute("ALTER TABLE PodcastLocal ADD funding TEXT DEFAULT '[]' ");
+  }
+
+  Future<void> _v6Update(Database db) async {
+    await db.execute("ALTER TABLE Episodes ADD chapter_link TEXT DEFAULT '' ");
+    await db.execute("ALTER TABLE Episodes ADD hosts TEXT DEFAULT '' ");
+    await db.execute("ALTER TABLE Episodes ADD episode_image TEXT DEFAULT '' ");
+    await db
+        .execute("""CREATE INDEX  podcast_search ON PodcastLocal (id, rssUrl)
+    """);
+    await db.execute(
+        """CREATE INDEX  episode_search ON Episodes (enclosure_url, feed_id)
+    """);
   }
 
   Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts,
@@ -318,11 +349,10 @@ class DBHelper {
     });
   }
 
-  Future<void> updatePodcastImage({String id ,String filePath}) async{
+  Future<void> updatePodcastImage({String id, String filePath}) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
-        "UPDATE PodcastLocal SET imagePath= ? WHERE id = ?",
-        [filePath, id]);
+        "UPDATE PodcastLocal SET imagePath= ? WHERE id = ?", [filePath, id]);
   }
 
   Future<int> saveFiresideData(List<String> list) async {
@@ -616,12 +646,14 @@ class DBHelper {
       final milliseconds = date.millisecondsSinceEpoch;
       final duration = feed.items[i].itunes.duration?.inSeconds ?? 0;
       final explicit = _getExplicit(feed.items[i].itunes.explicit);
-
+      final chapter = feed.items[i].podcastChapters?.url ?? '';
+      final image = feed.items[i].itunes.image.href ?? '';
       if (url != null) {
         await dbClient.transaction((txn) {
           return txn.rawInsert(
               """INSERT OR REPLACE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
-                description, feed_id, milliseconds, duration, explicit, media_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                description, feed_id, milliseconds, duration, explicit, media_id, chapter_link,
+                episode_image) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
               [
                 title,
                 url,
@@ -632,7 +664,9 @@ class DBHelper {
                 milliseconds,
                 duration,
                 explicit,
-                url
+                url,
+                chapter,
+                image
               ]);
         });
       }
@@ -686,12 +720,15 @@ class DBHelper {
           final milliseconds = date.millisecondsSinceEpoch;
           final duration = item.itunes.duration?.inSeconds ?? 0;
           final explicit = _getExplicit(item.itunes.explicit);
+          final chapter = item.podcastChapters?.url ?? '';
+          final image = item.itunes.image.href;
 
           if (url != null) {
             await dbClient.transaction((txn) async {
               await txn.rawInsert(
                   """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
-                description, feed_id, milliseconds, duration, explicit, media_id, is_new) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)""",
+                description, feed_id, milliseconds, duration, explicit, media_id, chapter_link,
+                episode_image, is_new) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)""",
                   [
                     title,
                     url,
@@ -703,6 +740,8 @@ class DBHelper {
                     duration,
                     explicit,
                     url,
+                    chapter,
+                    image
                   ]);
             });
           }
@@ -1611,13 +1650,30 @@ class DBHelper {
     return description;
   }
 
+  Future<String> getChapter(String url) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT chapter_link FROM Episodes WHERE enclosure_url = ?', [url]);
+    String chapter = list[0]['chapter_link'];
+    return chapter;
+  }
+
+  Future<String> getEpisodeImage(String url) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT episode_image FROM Episodes WHERE enclosure_url = ?', [url]);
+    String image = list[0]['episode_image'];
+    return image;
+  }
+
   Future<EpisodeBrief> getRssItemWithUrl(String url) async {
     var dbClient = await database;
     EpisodeBrief episode;
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, P.skip_seconds, P.skip_seconds_end, 
-        E.is_new, P.primaryColor, E.media_id FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
+        E.is_new, P.primaryColor, E.media_id, E.episode_image, E.chapter_link 
+        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
         WHERE E.enclosure_url = ?""", [url]);
     if (list.isEmpty) {
       return null;
@@ -1635,7 +1691,9 @@ class DBHelper {
           list.first['is_new'],
           mediaId: list.first['media_id'],
           skipSecondsStart: list.first['skip_seconds'],
-          skipSecondsEnd: list.first['skip_seconds_end']);
+          skipSecondsEnd: list.first['skip_seconds_end'],
+          episodeImage: list.first['episode_image'],
+          chapterLink: list.first['chapter_link']);
       return episode;
     }
   }
@@ -1646,8 +1704,9 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
         """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, P.skip_seconds, P.skip_seconds_end,
-        E.is_new, P.primaryColor, E.media_id FROM Episodes E INNER JOIN 
-        PodcastLocal P ON E.feed_id = P.id WHERE E.media_id = ?""", [id]);
+        E.is_new, P.primaryColor, E.media_id, E.episode_image, E.chapter_link 
+        FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
+        WHERE E.media_id = ?""", [id]);
     if (list.isEmpty) {
       return null;
     } else {
@@ -1664,7 +1723,9 @@ class DBHelper {
           list.first['is_new'],
           mediaId: list.first['media_id'],
           skipSecondsStart: list.first['skip_seconds'],
-          skipSecondsEnd: list.first['skip_seconds_end']);
+          skipSecondsEnd: list.first['skip_seconds_end'],
+          episodeImage: list.first['episode_image'],
+          chapterLink: list.first['chapter_link']);
       return episode;
     }
   }

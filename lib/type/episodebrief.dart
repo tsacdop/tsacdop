@@ -24,6 +24,8 @@ class EpisodeBrief extends Equatable {
   final int skipSecondsStart;
   final int skipSecondsEnd;
   final int downloadDate;
+  final String episodeImage;
+  final String chapterLink;
   EpisodeBrief(
       this.title,
       this.enclosureUrl,
@@ -41,7 +43,9 @@ class EpisodeBrief extends Equatable {
       this.skipSecondsStart,
       this.skipSecondsEnd,
       this.description = '',
-      this.downloadDate = 0})
+      this.downloadDate = 0,
+      this.chapterLink = '',
+      this.episodeImage = ''})
       : assert(enclosureUrl != null);
 
   MediaItem toMediaItem() {
