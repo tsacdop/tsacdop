@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/type/episodebrief.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../.env.dart';
@@ -969,6 +970,73 @@ class _SearchResultDetailState extends State<SearchResultDetail>
     }
   }
 
+  Widget _episodesList() {
+    return FutureBuilder<List<OnlineEpisode>>(
+        future: _searchFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var content = snapshot.data;
+            return ListView.builder(
+              physics: _animation.value != widget.maxHeight
+                  ? NeverScrollableScrollPhysics()
+                  : null,
+              itemCount: content.length + 1,
+              itemBuilder: (context, index) {
+                if (index == content.length) {
+                  return Container(
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      child: OutlineButton(
+                          highlightedBorderColor: context.accentColor,
+                          splashColor: context.accentColor.withOpacity(0.5),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100)),
+                          child: _loading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ))
+                              : Text(context.s.loadMore),
+                          onPressed: () {
+                            if (widget.searchEngine ==
+                                SearchEngine.listenNotes) {
+                              _loading
+                                  ? null
+                                  : setState(
+                                      () {
+                                        _loading = true;
+                                        _searchFuture = _getListenNotesEpisodes(
+                                            id: widget.onlinePodcast.id,
+                                            nextEpisodeDate: _nextEpisdoeDate);
+                                      },
+                                    );
+                            }
+                          }),
+                    ),
+                  );
+                }
+                return ListTile(
+                  title: Text(content[index].title),
+                  tileColor: Colors.transparent,
+                  subtitle: Text(
+                      content[index].length == 0
+                          ? '${content[index].pubDate.toDate(context)}'
+                          : '${content[index].length.toTime} | '
+                              '${content[index].pubDate.toDate(context)}',
+                      style: TextStyle(color: context.accentColor)),
+                );
+              },
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = context.s;
@@ -1126,80 +1194,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                         ),
                       ],
                     ),
-                    FutureBuilder<List<OnlineEpisode>>(
-                        future: _searchFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            var content = snapshot.data;
-                            return ListView.builder(
-                              physics: _animation.value != widget.maxHeight
-                                  ? NeverScrollableScrollPhysics()
-                                  : null,
-                              itemCount: content.length + 1,
-                              itemBuilder: (context, index) {
-                                if (index == content.length) {
-                                  return Container(
-                                    padding: const EdgeInsets.only(
-                                        top: 10.0, bottom: 20.0),
-                                    alignment: Alignment.center,
-                                    child: SizedBox(
-                                      child: OutlineButton(
-                                          highlightedBorderColor:
-                                              context.accentColor,
-                                          splashColor: context.accentColor
-                                              .withOpacity(0.5),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(100))),
-                                          child: _loading
-                                              ? SizedBox(
-                                                  height: 20,
-                                                  width: 20,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                  ))
-                                              : Text(context.s.loadMore),
-                                          onPressed: () {
-                                            if (widget.searchEngine ==
-                                                SearchEngine.listenNotes) {
-                                              _loading
-                                                  ? null
-                                                  : setState(
-                                                      () {
-                                                        _loading = true;
-                                                        _searchFuture =
-                                                            _getListenNotesEpisodes(
-                                                                id: widget
-                                                                    .onlinePodcast
-                                                                    .id,
-                                                                nextEpisodeDate:
-                                                                    _nextEpisdoeDate);
-                                                      },
-                                                    );
-                                            }
-                                          }),
-                                    ),
-                                  );
-                                }
-                                return ListTile(
-                                  title: Text(content[index].title),
-                                  tileColor: Colors.transparent,
-                                  subtitle: Text(
-                                      content[index].length == 0
-                                          ? '${content[index].pubDate.toDate(context)}'
-                                          : '${content[index].length.toTime} | '
-                                              '${content[index].pubDate.toDate(context)}',
-                                      style: TextStyle(
-                                          color: context.accentColor)),
-                                );
-                              },
-                            );
-                          }
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        })
+                    _episodesList()
                   ]),
                 ),
               )
