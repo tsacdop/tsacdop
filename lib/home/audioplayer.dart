@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
@@ -589,7 +590,7 @@ class SleepModeState extends State<SleepMode>
   Future _getDefaultTime() async {
     var defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
     var defaultTime = await defaultSleepTimerStorage.getInt(defaultValue: 30);
-    setState(() => _minSelected = defaultTime);
+    if(mounted) setState(() => _minSelected = defaultTime);
   }
 
   @override
@@ -929,9 +930,10 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
     return Column(
       children: [
         Container(
-          height: 60,
+          // height: 60,
           width: double.infinity,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -969,25 +971,44 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                 ),
               ),
               Expanded(
-                  child: Text(chapters.title,
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 15),
+                  Text(chapters.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.bodyText1)),
-              if (chapters.url != '')
-                TextButton(
-                    style: ButtonStyle(
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(context.accentColor),
-                      overlayColor: MaterialStateProperty.all<Color>(
-                          context.primaryColor),
+                      style: context.textTheme.bodyText1),
+                  if (chapters.url != '')
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text(chapters.url,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: context.accentColor))),
+                        TextButton(
+                            style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  context.accentColor),
+                              overlayColor: MaterialStateProperty.all<Color>(
+                                  context.primaryColor),
+                            ),
+                            onPressed: () => chapters.url.launchUrl,
+                            child: Text('Visit')),
+                      ],
                     ),
-                    onPressed: () => chapters.url.launchUrl,
-                    child: Text('Link')),
+                  if (chapters.img != '')
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: _ChapterImage(chapters.img),
+                    )
+                ],
+              )),
               SizedBox(width: 8)
             ],
           ),
         ),
-        if (chapters.img != '') _ChapterImage(chapters.img)
       ],
     );
   }
@@ -1022,7 +1043,15 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                                     return _chapterDetailWidget(data[index]);
                                   });
                             }
-                            return Center();
+                            return Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: Platform.isIOS
+                                    ? CupertinoActivityIndicator()
+                                    : CircularProgressIndicator(),
+                              ),
+                            );
                           })
                       : ListView(
                           padding: EdgeInsets.zero,
@@ -1073,26 +1102,27 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                         ),
                         Spacer(),
                         SizedBox(width: 20),
-                        Material(
-                          borderRadius: BorderRadius.circular(100),
-                          color: context.primaryColor,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(15.0),
-                            onTap: () {
-                              setState(() {
-                                _showChapter = !_showChapter;
-                              });
-                            },
-                            child: SizedBox(
-                                height: 30.0,
-                                width: 30.0,
-                                child: !_showChapter
-                                    ? Icon(Icons.bookmark_border_outlined,
-                                        size: 18)
-                                    : Icon(Icons.chrome_reader_mode_outlined,
-                                        size: 18)),
+                        if (episode.chapterLink != '')
+                          Material(
+                            borderRadius: BorderRadius.circular(100),
+                            color: context.primaryColor,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(15.0),
+                              onTap: () {
+                                setState(() {
+                                  _showChapter = !_showChapter;
+                                });
+                              },
+                              child: SizedBox(
+                                  height: 30.0,
+                                  width: 30.0,
+                                  child: !_showChapter
+                                      ? Icon(Icons.bookmark_border_outlined,
+                                          size: 18)
+                                      : Icon(Icons.chrome_reader_mode_outlined,
+                                          size: 18)),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -1127,6 +1157,7 @@ class __ChapterImageState extends State<_ChapterImage> {
     return InkWell(
       onTap: () => setState(() => _openFullImage = !_openFullImage),
       child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: [
