@@ -77,7 +77,6 @@ class _PodcastCard extends StatefulWidget {
 
 class __PodcastCardState extends State<_PodcastCard>
     with SingleTickerProviderStateMixin {
-  bool _loadMenu;
   bool _addGroup;
   List<PodcastGroup> _selectedGroups;
   List<PodcastGroup> _belongGroups;
@@ -129,7 +128,6 @@ class __PodcastCardState extends State<_PodcastCard>
   @override
   void initState() {
     super.initState();
-    _loadMenu = false;
     _addGroup = false;
     _selectedGroups = [widget.group];
     _value = 0;

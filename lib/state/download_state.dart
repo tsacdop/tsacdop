@@ -161,7 +161,6 @@ class DownloadState extends ChangeNotifier {
               taskId: task.taskId, shouldDeleteContent: true);
         } else {
           if (task.status == DownloadTaskStatus.complete) {
-            final filname = task.filename.replaceAll('/', '');
             var exist =
                 await File(path.join(task.savedDir, task.filename)).exists();
             if (!exist) {

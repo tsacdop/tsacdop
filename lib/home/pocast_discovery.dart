@@ -24,6 +24,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
   Genre get selectedGenre => _selectedGenre;
   final List<OnlinePodcast> _podcastList = [];
   Future _searchTopPodcast;
+  Future _getIfHideDiscovery;
   Future<List<String>> _getSearchHistory() {
     final storage = KeyValueStorage(searchHistoryKey);
     final history = storage.getStringList();
@@ -40,6 +41,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
   void initState() {
     super.initState();
     _searchTopPodcast = _getTopPodcasts(page: 1);
+    _getIfHideDiscovery = _getHideDiscovery();
   }
 
   Widget _loadTopPodcasts() => Container(
@@ -126,8 +128,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                 .map<Widget>((e) => Padding(
                       padding: const EdgeInsets.fromLTRB(8, 2, 0, 0),
                       child: FlatButton.icon(
-                        color:
-                            Colors.accents[history.indexOf(e)].withAlpha(70),
+                        color: Colors.accents[history.indexOf(e)].withAlpha(70),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100.0),
                         ),
@@ -150,9 +151,10 @@ class DiscoveryPageState extends State<DiscoveryPage> {
   Widget _podcastCard(OnlinePodcast podcast, {VoidCallback onTap}) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), color: context.primaryColor,
-          border: Border.all(color: context.textColor.withOpacity(0.1), width: 1)
-          ),
+          borderRadius: BorderRadius.circular(10),
+          color: context.primaryColor,
+          border:
+              Border.all(color: context.textColor.withOpacity(0.1), width: 1)),
       width: 120,
       margin: EdgeInsets.fromLTRB(10, 10, 0, 10),
       child: Material(
@@ -213,13 +215,13 @@ class DiscoveryPageState extends State<DiscoveryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final searchState = context.watch<SearchState>();
     return FutureBuilder<bool>(
-      future: _getHideDiscovery(),
-      initialData: true,
-      builder: (context, snapshot) => snapshot.data ||
-              environment['apiKey'] == ''
-          ? ScrollConfiguration(
+        future: _getIfHideDiscovery,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center();
+          } else if (snapshot.data || environment['apiKey'] == '') {
+            return ScrollConfiguration(
               behavior: NoGrowBehavior(),
               child: SingleChildScrollView(
                 child: Column(
@@ -275,8 +277,9 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                   ],
                 ),
               ),
-            )
-          : PodcastSlideup(
+            );
+          } else {
+            return PodcastSlideup(
               searchEngine: SearchEngine.listenNotes,
               child: Selector<SearchState, Genre>(
                 selector: (_, searchState) => searchState.genre,
@@ -289,7 +292,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _historyList(),
-                          SizedBox(height: 8), 
+                          SizedBox(height: 8),
                           SizedBox(
                             height: 200,
                             child: FutureBuilder<List<OnlinePodcast>>(
@@ -306,7 +309,8 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                                                 return _podcastCard(
                                                   podcast,
                                                   onTap: () {
-                                                    searchState
+                                                    context
+                                                            .read<SearchState>()
                                                             .selectedPodcast =
                                                         podcast;
                                                     widget.onTap('');
@@ -337,9 +341,11 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                                           EdgeInsets.fromLTRB(20, 0, 20, 0),
                                       onTap: () {
                                         widget.onTap('');
-                                        searchState.setGenre = e;
+                                        context.read<SearchState>().setGenre =
+                                            e;
                                       },
-                                      title: Text(e.name, style: context.textTheme.headline6),
+                                      title: Text(e.name,
+                                          style: context.textTheme.headline6),
                                     ))
                                 .toList(),
                           ),
@@ -362,8 +368,9 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                   ],
                 ),
               ),
-            ),
-    );
+            );
+          }
+        });
   }
 }
 
