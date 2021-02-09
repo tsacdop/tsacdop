@@ -51,7 +51,7 @@ class OnlineEpisode {
       0,
       pubDate,
       title,
-      jsonEncode([120,220,128]),
+      '',
       length ?? 0,
       0,
       '',

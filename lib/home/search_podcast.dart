@@ -11,6 +11,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tsacdop/state/audio_state.dart';
+import 'package:tsacdop/type/episodebrief.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../.env.dart';
@@ -1002,17 +1003,16 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                               : Text(context.s.loadMore),
                           onPressed: () {
                             if (widget.searchEngine ==
-                                SearchEngine.listenNotes) {
-                              _loading
-                                  ? null
-                                  : setState(
-                                      () {
-                                        _loading = true;
-                                        _searchFuture = _getListenNotesEpisodes(
-                                            id: widget.onlinePodcast.id,
-                                            nextEpisodeDate: _nextEpisdoeDate);
-                                      },
-                                    );
+                                    SearchEngine.listenNotes &&
+                                !_loading) {
+                              setState(
+                                () {
+                                  _loading = true;
+                                  _searchFuture = _getListenNotesEpisodes(
+                                      id: widget.onlinePodcast.id,
+                                      nextEpisodeDate: _nextEpisdoeDate);
+                                },
+                              );
                             }
                           }),
                     ),
@@ -1027,25 +1027,37 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                           : '${content[index].length.toTime} | '
                               '${content[index].pubDate.toDate(context)}',
                       style: TextStyle(color: context.accentColor)),
-                  trailing: TextButton(
-                    style: ButtonStyle(
-                        foregroundColor: MaterialStateProperty.all<Color>(
-                            context.accentColor),
-                        overlayColor: MaterialStateProperty.all<Color>(
-                            context.primaryColor.withOpacity(0.3)),
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.symmetric(horizontal: 2))),
-                    child: Text(context.s.play),
-                    onPressed: () {
-                      context.read<AudioPlayerNotifier>().episodeLoad(
-                          content[index].toEpisode,
-                          fromSearch: true);
-                      Fluttertoast.showToast(
-                        msg: 'Wait a moment',
-                        gravity: ToastGravity.BOTTOM,
-                      );
-                    },
-                  ),
+                  trailing: Selector<AudioPlayerNotifier, EpisodeBrief>(
+                      selector: (_, audio) => audio.episode,
+                      builder: (_, episode, __) {
+                        if (episode != null &&
+                            episode.enclosureUrl == content[index].audio) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: SizedBox(
+                              width: 20,
+                              height: 15,
+                              child: WaveLoader(color: context.accentColor),
+                            ),
+                          );
+                        }
+                        return TextButton(
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  context.accentColor),
+                              overlayColor: MaterialStateProperty.all<Color>(
+                                  context.scaffoldBackgroundColor.withOpacity(0.3)),
+                              padding:
+                                  MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                      EdgeInsets.symmetric(horizontal: 2))),
+                          child: Text(context.s.play.toUpperCase()),
+                          onPressed: () {
+                            context.read<AudioPlayerNotifier>().episodeLoad(
+                                content[index].toEpisode,
+                                fromSearch: true);
+                          },
+                        );
+                      }),
                 );
               },
             );

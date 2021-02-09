@@ -282,7 +282,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
         await _playlist.getPlaylist();
         if (state[1] != '') {
           var episode = await _dbHelper.getRssItemWithUrl(state[1]);
-          if ((!_playlist.isQueue && episode != null && _playlist.contains(episode)) ||
+          if ((!_playlist.isQueue &&
+                  episode != null &&
+                  _playlist.contains(episode)) ||
               (_playlist.isQueue &&
                   _queue.isNotEmpty &&
                   _queue.episodes.first.title == episode.title)) {
@@ -371,9 +373,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
     //TODO  load episode from last position when player running
     if (playerRunning) {
-      final history = PlayHistory(_episode.title, _episode.enclosureUrl,
-          backgroundAudioPosition ~/ 1000, seekSliderValue);
-      await _dbHelper.saveHistory(history);
+      if (_playFromSearchList.contains(_episode)) {
+        _queue.delFromPlaylist(_episode);
+      } else {
+        final history = PlayHistory(_episode.title, _episode.enclosureUrl,
+            backgroundAudioPosition ~/ 1000, seekSliderValue);
+        await _dbHelper.saveHistory(history);
+      }
       _queue.addToPlayListAt(episodeNew, 0);
       await updatePlaylist(_queue, updateEpisodes: !fromSearch);
       if (!_playlist.isQueue) {
@@ -495,8 +501,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
         .where((event) => event != null)
         .listen((item) async {
       var episode = await _dbHelper.getRssItemWithMediaId(item.id);
-      if(episode == null){
-          episode = _playFromSearchList.firstWhere((e) => e.mediaId == item.id, orElse: () => null);
+      if (episode == null) {
+        episode = _playFromSearchList.firstWhere((e) => e.mediaId == item.id,
+            orElse: () => null);
       }
       _backgroundAudioDuration = item.duration?.inMilliseconds ?? 0;
       if (episode != null) {

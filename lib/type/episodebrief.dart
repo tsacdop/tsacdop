@@ -72,6 +72,7 @@ class EpisodeBrief extends Equatable {
   }
 
   Color backgroudColor(BuildContext context) {
+    if (primaryColor == '') return context.accentColor;
     return context.brightness == Brightness.light
         ? primaryColor.colorizedark()
         : primaryColor.colorizeLight();

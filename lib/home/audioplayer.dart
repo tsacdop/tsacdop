@@ -62,13 +62,11 @@ class PlayerWidget extends StatelessWidget {
       height: 60,
       child:
           Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-        Selector<AudioPlayerNotifier, Tuple2<String, double>>(
+        Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, double>>(
           selector: (_, audio) =>
-              Tuple2(audio.episode?.primaryColor, audio.seekSliderValue),
+              Tuple2(audio.episode, audio.seekSliderValue),
           builder: (_, data, __) {
-            final c = context.brightness == Brightness.light
-                ? data.item1.colorizedark()
-                : data.item1.colorizeLight();
+            final c = data.item1.backgroudColor(context);
             return SizedBox(
               height: 2,
               child: LinearProgressIndicator(
