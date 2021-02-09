@@ -13,9 +13,9 @@ Enjoy podcasts with Tsacdop.
 
 Tsacdop is a podcast player developed with Flutter, a clean, simply beautiful and friendly app, which is also free and open source.
 
-Credit to Flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) and [Just_Audio](https://pub.dev/packages/just_audio).
+Credit to Flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) , [Just_Audio](https://pub.dev/packages/just_audio) and [Provider](https://pub.dev/packages/provider).
 
-The podcast search engine is powered by [ListenNotes](https://listennotes.com).
+The podcast search engine is powered by [ListenNotes](https://listennotes.com) & [PodcastIndex](https://podcastindex.org/).
 
 ## Features
 
@@ -72,12 +72,11 @@ git clone https://github.com/stonega/tsacdop.git
 3. Add api search api configure file.  
 
 Tsacdop uses ListenNotes API 1.0 pro to search for podcasts, which is not free, so I can not expose the API key in the repo.
-If you want to build the app, you need to create a new file named `.env.dart` in lib folder. Add the following code to `.env.dart` .
-You can get your own API key on [ListenNotes](https://www.listennotes.com/api/), remember that you need to get pro plan API, because basic plan dosen't provide rss link for serach result. If no api key is added, the search function in the app won't work. But you can still add podcasts by using an RSS link or importing an OMPL file.
+If you want to build the app, you need to create a new file named `.env.dart` in lib folder. Add the following code to `.env.dart`. If you don't have ListenNotes api key, just keep apiKey ''. Than the app will only support the PodcastIndex search.
+You can get your own ListenNotes API key on [ListenNotes](https://www.listennotes.com/api/), remember that you need to get pro plan API, because basic plan dosen't provide rss link for serach result. 
 
 ``` dart
-final environment = {"apiKey":"APIKEY", "podcastIndexApiKey": "PODCASTINDEXAPIKEY",
-  "podcastIndexApiSecret": "PODCASTINDEXAPISECRET"};
+final environment = {"apiKey":""};
 ```
 
 4. Run the app with Android Studio or Visual Studio. Or the command line.
