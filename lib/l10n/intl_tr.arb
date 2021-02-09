@@ -1,0 +1,779 @@
+{
+  "@@locale": "tr",
+  "add": "Ekle",
+  "@add": {
+    "description": "Subscribe new podcast"
+  },
+  "addEpisodeGroup": "{count, plural, zero{} one{{groupName} deki {count} bölüm çalma listesine eklendi} other{{groupName} deki {count} bölüm çalma listesine eklendi}}",
+  "@addEpisodeGroup": {
+    "placeholders": {
+      "groupName": {}
+    }
+  },
+  "addNewEpisodeAll": "{count, plural, zero{} one{{count} bölüm çalma listesine eklendi} other{{count} bölüm çalma listesine eklendi}}",
+  "@addNewEpisodeAll": {},
+  "addNewEpisodeTooltip": "Çalma listesine yeni bölüm ekle",
+  "@addNewEpisodeTooltip": {},
+  "addSomeGroups": "Liste eklel",
+  "@addSomeGroups": {
+    "description": "Please add new groups"
+  },
+  "all": "Hepsi",
+  "@all": {},
+  "autoDownload": "Otomatik indirme",
+  "@autoDownload": {},
+  "back": "Geri",
+  "@back": {},
+  "boostVolume": "Sesi yükselt",
+  "@boostVolume": {
+    "description": "Boost volume in player widget."
+  },
+  "buffering": "Yükleniyor",
+  "@buffering": {},
+  "cancel": "İPTAL",
+  "@cancel": {},
+  "cellularConfirm": "Hücresel veri uyarısı",
+  "@cellularConfirm": {},
+  "cellularConfirmDes": "İndirmek için hücresel veri kullanmak istediğinden emin misin?",
+  "@cellularConfirmDes": {},
+  "changeLayout": "Görünümü değiştir",
+  "@changeLayout": {},
+  "changelog": "Neler yeni?",
+  "@changelog": {},
+  "chooseA": "Seç",
+  "@chooseA": {},
+  "clear": "Temizle",
+  "@clear": {},
+  "clearAll": "Hepsini sil",
+  "@clearAll": {
+    "description": "Clear all episodes in playlist."
+  },
+  "color": "renk",
+  "@color": {},
+  "confirm": "ONAY",
+  "@confirm": {},
+  "createNewPlaylist": "Yeni çalma listesi",
+  "@createNewPlaylist": {},
+  "darkMode": "Karanlık mod",
+  "@darkMode": {},
+  "daysAgo": "{count, plural, zero{Bugün} one{{count} gün önce} other{{count} gün önce}}",
+  "@daysAgo": {},
+  "daysCount": "{count, plural, zero{Asla} one{{count} gün} other{{count} gün}}",
+  "@daysCount": {},
+  "defaultQueueReminder": "Varsayılan sıralama kaldırılamaz.",
+  "@defaultQueueReminder": {
+    "description": "Remind user that default queue can't be removed."
+  },
+  "defaultSearchEngine": "Varsayılan podcast arama motoru",
+  "@defaultSearchEngine": {},
+  "defaultSearchEngineDes": "Varsayılan podcast arama motorunu seçin",
+  "@defaultSearchEngineDes": {
+    "description": "Choose the default podcast search engine"
+  },
+  "delete": "Sil",
+  "@delete": {},
+  "developer": "Geliştirici",
+  "@developer": {
+    "description": "Can also translate to About me"
+  },
+  "dismiss": "Kaybol",
+  "@dismiss": {},
+  "done": "Bitti",
+  "@done": {},
+  "download": "İndirilen",
+  "@download": {},
+  "downloaded": "İndirilenler",
+  "@downloaded": {},
+  "downloadRemovedToast": "İndirme kaldırıldı",
+  "@downloadRemovedToast": {},
+  "downloadStart": "İndiriliyor",
+  "@downloadStart": {
+    "description": "Toast of downloading"
+  },
+  "editGroupName": "Liste adını değiştir",
+  "@editGroupName": {},
+  "endOfEpisode": "Bölüm sonu",
+  "@endOfEpisode": {},
+  "episode": "{count, plural, zero{} one{Bölüm} other{Bölümler}}",
+  "@episode": {},
+  "fastForward": "İleri sar",
+  "@fastForward": {},
+  "fastRewind": "Geri sar",
+  "@fastRewind": {},
+  "featureDiscoveryEditGroup": "Grupları düzenlemek için tıkla",
+  "@featureDiscoveryEditGroup": {},
+  "featureDiscoveryEditGroupDes": "Buradan liste ismini değiştirebilir ya da silebilirsin, ancak Başlangıç sayfası değiştirilemez.",
+  "@featureDiscoveryEditGroupDes": {},
+  "featureDiscoveryEpisode": "Bölüm görünümü",
+  "@featureDiscoveryEpisode": {},
+  "featureDiscoveryEpisodeDes": "Bölümü oynatmak için uzun dokun veya bir çalma listesine ekle. ",
+  "@featureDiscoveryEpisodeDes": {},
+  "featureDiscoveryEpisodeTitle": "Bölümü hemen oynatmak için uzun bas",
+  "@featureDiscoveryEpisodeTitle": {},
+  "featureDiscoveryGroup": "Listeyi düzenlemek için tıkla",
+  "@featureDiscoveryGroup": {},
+  "featureDiscoveryGroupDes": "Başlangıç sayfası yeni podcastler için ön tanımlı sayfadır. Yeni listeler oluşturabilir ve podcastleri içine koyabilirsin. Bir podcasti birden çok listeye koyabilirsin. ",
+  "@featureDiscoveryGroupDes": {},
+  "featureDiscoveryGroupPodcast": "Podcastleri sıralamak için uzun bas",
+  "@featureDiscoveryGroupPodcast": {},
+  "featureDiscoveryGroupPodcastDes": "Daha fazla seçenek için tıklayabilirsin ya da uzunca basarak listedeki podcastleri sıralayabilirsin.",
+  "@featureDiscoveryGroupPodcastDes": {},
+  "featureDiscoveryOMPL": "OPML dosyasını içe aktarmak için dokun",
+  "@featureDiscoveryOMPL": {},
+  "featureDiscoveryOMPLDes": "Buradan OPML dosyalarını içe aktarabilir, ayarları açabilir ya da tüm podcastleri aynı anda yenileyebilirsin.",
+  "@featureDiscoveryOMPLDes": {},
+  "featureDiscoveryPlaylist": "Çalma listesini açmak için dokun",
+  "@featureDiscoveryPlaylist": {},
+  "featureDiscoveryPlaylistDes": "Çalma listelerine bölüm ekleyebilirsin. Bölümler oynatıldığında çalma listelerinden otomatik olarak silinir. ",
+  "@featureDiscoveryPlaylistDes": {},
+  "featureDiscoveryPodcast": "Podcast görünümü",
+  "@featureDiscoveryPodcast": {},
+  "featureDiscoveryPodcastDes": "Liste eklemek için Hepsini Göster'e dokun ya da podcastleri düzenle.",
+  "@featureDiscoveryPodcastDes": {},
+  "featureDiscoveryPodcastTitle": "Listeler arasında dolaşmak için sağa sola kaydır",
+  "@featureDiscoveryPodcastTitle": {},
+  "featureDiscoverySearch": "Podcast aramak için buraya dokun",
+  "@featureDiscoverySearch": {},
+  "featureDiscoverySearchDes": "Podcast adı, RSS linki, veya bir kaç harf girerek yeni podcast arayabilirsin.",
+  "@featureDiscoverySearchDes": {},
+  "feedbackEmail": "İletişim",
+  "@feedbackEmail": {},
+  "feedbackGithub": "Sorun bildir",
+  "@feedbackGithub": {},
+  "feedbackPlay": "Play Store'da oyla",
+  "@feedbackPlay": {
+    "description": "Rate on Google Play Store.\nUser can tap to open play link."
+  },
+  "feedbackTelegram": "Telegram Grubu",
+  "@feedbackTelegram": {},
+  "filter": "Filtrele",
+  "@filter": {},
+  "fonts": "Yazı tipleri",
+  "@fonts": {},
+  "fontStyle": "Yazı tipi stili",
+  "@fontStyle": {},
+  "from": "{time} e kadar",
+  "@from": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "goodNight": "İyi Geceler",
+  "@goodNight": {},
+  "gpodderLoginDes": "Tebrikler! Gpodder.net hesabınızla bağlantı kuruldu.Tsacdop aboneliklerinizi gpodder.net  hesabınızla otomatik olarak eşitleyecek.",
+  "@gpodderLoginDes": {},
+  "groupExisted": "Liste zaten mevcut",
+  "@groupExisted": {
+    "description": "Group name validate in add group dialog. User can't add group with same name."
+  },
+  "groupFilter": "Listeleye göre filtrele",
+  "@groupFilter": {},
+  "groupRemoveConfirm": "Bu listeyi silmek istediğine emin misin? Podcastler Başlangıç sayfasına aktarılacaktır.",
+  "@groupRemoveConfirm": {},
+  "groups": "{count, plural, zero{Liste} one{Liste} other{Listeler}}",
+  "@groups": {},
+  "hideListenedSetting": "Oynatılanları gizle",
+  "@hideListenedSetting": {},
+  "hidePodcastDiscovery": "Podcast önerilerini gizle",
+  "@hidePodcastDiscovery": {
+    "description": "Hide podcast discovery"
+  },
+  "hidePodcastDiscoveryDes": "Podcast önerilerini arama sayfasında gösterme",
+  "@hidePodcastDiscoveryDes": {},
+  "homeGroupsSeeAll": "Hepsini gör",
+  "@homeGroupsSeeAll": {},
+  "homeMenuPlaylist": "Çalma listesi",
+  "@homeMenuPlaylist": {},
+  "homeSubMenuSortBy": "Sıralama",
+  "@homeSubMenuSortBy": {},
+  "homeTabMenuFavotite": "Favori",
+  "@homeTabMenuFavotite": {},
+  "homeTabMenuRecent": "Son çalınan",
+  "@homeTabMenuRecent": {},
+  "homeToprightMenuAbout": "Hakkında",
+  "@homeToprightMenuAbout": {},
+  "homeToprightMenuImportOMPL": "OPML içe aktar",
+  "@homeToprightMenuImportOMPL": {},
+  "homeToprightMenuRefreshAll": "Hepsini yenile",
+  "@homeToprightMenuRefreshAll": {},
+  "hostedOn": "{host} da depolanır",
+  "@hostedOn": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "hoursAgo": "{count, plural, zero{Bir saat içinde} one{{count} saat önce} other{{count} saat önce}}",
+  "@hoursAgo": {},
+  "hoursCount": "{count, plural, zero{0 saat} one{{count} saat} other{{count} saat}}",
+  "@hoursCount": {},
+  "import": "İçe aktar",
+  "@import": {},
+  "intergateWith": "{service} ile bağlantı kur",
+  "@intergateWith": {
+    "description": "Integrate with",
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "introFourthPage": "Bölüm resmine uzun basarak hızlı menüyü açabilirsin.",
+  "@introFourthPage": {},
+  "introSecondPage": "Arama yaparak ya da OPML dosyasını içe aktararak podcaste abone olabilirsin.",
+  "@introSecondPage": {},
+  "introThirdPage": "Podcastler için yeni bir grup oluşturabilirsin.",
+  "@introThirdPage": {},
+  "invalidName": "Geçersiz kullanıcı adı",
+  "@invalidName": {},
+  "lastUpdate": "Son güncelleme\n",
+  "@lastUpdate": {
+    "description": "gpodder.net update"
+  },
+  "later": "Sonra",
+  "@later": {},
+  "lightMode": "Aydınlık mod",
+  "@lightMode": {},
+  "like": "Beğen",
+  "@like": {},
+  "liked": "Beğenilen",
+  "@liked": {},
+  "likeDate": "Beğenilme tarihi",
+  "@likeDate": {
+    "description": "Favorite tab, sort by like date."
+  },
+  "listen": "Dinle",
+  "@listen": {},
+  "listened": "Oynatılan",
+  "@listened": {},
+  "loadMore": "Daha fazla göster",
+  "@loadMore": {},
+  "loggedInAs": "{userName} olarak giriş yapıldı ",
+  "@loggedInAs": {
+    "description": "gpodder.net",
+    "placeholders": {
+      "userName": {}
+    }
+  },
+  "login": "Giriş",
+  "@login": {
+    "description": "gpodder.net login"
+  },
+  "loginFailed": "Giriş başarısız ",
+  "@loginFailed": {},
+  "logout": "Çıkış yap",
+  "@logout": {
+    "description": "gpodder.net logout"
+  },
+  "mark": "İşaretle",
+  "@mark": {
+    "description": "In listen history page, if a episode is marked as listened."
+  },
+  "markConfirm": "Seçimi onayla",
+  "@markConfirm": {},
+  "markConfirmContent": "Tüm bölümler oynatıldı olarak işaretlensin mi?",
+  "@markConfirmContent": {},
+  "markListened": "Oynatıldı olarak işaretle",
+  "@markListened": {},
+  "markNotListened": "Oynatılmadı olarak işaretle",
+  "@markNotListened": {},
+  "menu": "Menü",
+  "@menu": {},
+  "menuAllPodcasts": "Tüm podcastler",
+  "@menuAllPodcasts": {},
+  "menuMarkAllListened": "Hepsini oynatıldı olarak işaretle",
+  "@menuMarkAllListened": {},
+  "menuViewRSS": "RSS akışını ziyaret et",
+  "@menuViewRSS": {},
+  "menuVisitSite": "Siteyi ziyaret et",
+  "@menuVisitSite": {},
+  "minsAgo": "{count, plural, zero{Şimdi} one{{count} dakika önce} other{{count} dakika önce}}",
+  "@minsAgo": {},
+  "minsCount": "{count, plural, zero{0 dk} one{{count} dk} other{{count} dk}}",
+  "@minsCount": {},
+  "network": "Bağlantı",
+  "@network": {},
+  "neverAutoUpdate": "Otomatik güncellemeyi kapat",
+  "@neverAutoUpdate": {
+    "description": "Never auto  update in podcast settings."
+  },
+  "newestFirst": "Önce yeniler",
+  "@newestFirst": {},
+  "newGroup": "Yeni liste oluştur",
+  "@newGroup": {},
+  "next": "Sonraki",
+  "@next": {},
+  "noEpisodeDownload": "Henüz hiç bir bölüm indirilmedi",
+  "@noEpisodeDownload": {},
+  "noEpisodeFavorite": "Henüz hiç bir bölüm toplanmadı",
+  "@noEpisodeFavorite": {},
+  "noEpisodeRecent": "Henüz hiç bir bölüm alınmadı",
+  "@noEpisodeRecent": {},
+  "noPodcastGroup": "Bu listede hiç podcast yok",
+  "@noPodcastGroup": {},
+  "noShownote": "Bu bölüm için her hangi bir not mevcut değil",
+  "@noShownote": {
+    "description": "Means this episode have no show notes."
+  },
+  "notificaitonFatch": "Bilgiler toplanıyor {title}",
+  "@notificaitonFatch": {},
+  "notificationNetworkError": "Abonelik başarısız oldu, bağlantı hatası {title}",
+  "@notificationNetworkError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSetting": "Bildirim paneli",
+  "@notificationSetting": {},
+  "notificationSubscribe": "Abone ol {title}",
+  "@notificationSubscribe": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSubscribeExisted": "Abonelik başarısız oldu, podcast zaten mevcut {title}",
+  "@notificationSubscribeExisted": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSuccess": "Başarıyla abone olundu",
+  "@notificationSuccess": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdate": "Güncelleme {title}",
+  "@notificationUpdate": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdateError": "Güncelleme hatası {title}",
+  "@notificationUpdateError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "oldestFirst": "Önce eskiler",
+  "@oldestFirst": {},
+  "passwdRequired": "Parola gerekli",
+  "@passwdRequired": {},
+  "password": "Şifre",
+  "@password": {},
+  "pause": "Duraklat",
+  "@pause": {},
+  "play": "Oynat",
+  "@play": {},
+  "playback": "Playback kontrol",
+  "@playback": {},
+  "player": "Player",
+  "@player": {},
+  "playerHeightMed": "Orta",
+  "@playerHeightMed": {},
+  "playerHeightShort": "Kısa",
+  "@playerHeightShort": {},
+  "playerHeightTall": "Uzun",
+  "@playerHeightTall": {},
+  "playing": "Oynatılıyor",
+  "@playing": {},
+  "playlistExisted": "Bu isimde bir çalma listesi mevcut.",
+  "@playlistExisted": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlistNameEmpty": "İsimsiz çalma listesi",
+  "@playlistNameEmpty": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlists": "Çalma listeleri",
+  "@playlists": {
+    "description": "Title for playlists tab."
+  },
+  "playNext": "Sonrakini çal",
+  "@playNext": {
+    "description": "Popup menu for episode."
+  },
+  "playNextDes": "Çalma listesinin başına ekle",
+  "@playNextDes": {
+    "description": "Description for next play."
+  },
+  "plugins": "Eklentiler",
+  "@plugins": {},
+  "podcast": "{count, plural, zero{} one{Bölüm} other{Bölümler}}",
+  "@podcast": {},
+  "podcastSubscribed": "Podcaste abone olundu",
+  "@podcastSubscribed": {},
+  "popupMenuDownloadDes": "Bölümü indir",
+  "@popupMenuDownloadDes": {},
+  "popupMenuLaterDes": "Bölümü çalma listesine ekle",
+  "@popupMenuLaterDes": {},
+  "popupMenuLikeDes": "Bölümü favorilere  ekle",
+  "@popupMenuLikeDes": {},
+  "popupMenuMarkDes": "Böümü oynatıdı olarak işaretle",
+  "@popupMenuMarkDes": {},
+  "popupMenuPlayDes": "Bölümü çal",
+  "@popupMenuPlayDes": {},
+  "privacyPolicy": "Gizlilik sözleşmesi",
+  "@privacyPolicy": {},
+  "published": "{date} tarihinde yayınlandı",
+  "@published": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "publishedDaily": "Günlük",
+  "@publishedDaily": {},
+  "publishedMonthly": "Aylık",
+  "@publishedMonthly": {},
+  "publishedWeekly": "Haftalık",
+  "@publishedWeekly": {
+    "description": "In search podcast detail page."
+  },
+  "publishedYearly": "Yıllık",
+  "@publishedYearly": {},
+  "queue": "Kuyruk",
+  "@queue": {
+    "description": "Queue"
+  },
+  "recoverSubscribe": "Aboneliği kurtar",
+  "@recoverSubscribe": {
+    "description": "User can recover subscribe podcast after remove it in subscribe history page."
+  },
+  "refresh": "Yenile",
+  "@refresh": {
+    "description": "Refresh"
+  },
+  "refreshArtwork": "Albüm kapağını güncelle",
+  "@refreshArtwork": {},
+  "refreshStarted": "Yenileniyor",
+  "@refreshStarted": {
+    "description": "Toast for refresh"
+  },
+  "remove": "Kaldır",
+  "@remove": {
+    "description": "Remove not \"removed\". \nRemove a podcast or a group."
+  },
+  "removeConfirm": "İptal teyidi",
+  "@removeConfirm": {
+    "description": "unsubscribe podcast dialog"
+  },
+  "removedAt": "{date} tarihinde kaldırıldı",
+  "@removedAt": {
+    "description": "For example ：Removed at 2020.10.10",
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "removeNewMark": "Yeni işaretini kaldır",
+  "@removeNewMark": {
+    "description": "Remove new mark for new episodes."
+  },
+  "removePodcastDes": "Aboneliği sonlandırmak istediğine emin misin?",
+  "@removePodcastDes": {},
+  "save": "Kaydet",
+  "@save": {},
+  "schedule": "Program",
+  "@schedule": {},
+  "search": "Ara",
+  "@search": {},
+  "searchEpisode": "Bölüm ara",
+  "@searchEpisode": {},
+  "searchHelper": "Bir podcast ismi, bir link ya da bir kaç kelime girin.",
+  "@searchHelper": {},
+  "searchInvalidRss": "Geçersiz RSS linki",
+  "@searchInvalidRss": {},
+  "searchPodcast": "Podcast ara",
+  "@searchPodcast": {},
+  "secCount": "{count, plural, zero{0 sn} one{{count} sn} other{{count} sn}}",
+  "@secCount": {},
+  "secondsAgo": "{count, plural, zero{Şimdi} one{{count} saniye önce} other{{count} saniye önce}}",
+  "@secondsAgo": {},
+  "selected": "{count} seçilen",
+  "@selected": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settings": "Ayarlar",
+  "@settings": {},
+  "settingsAccentColor": "Ara renk ",
+  "@settingsAccentColor": {},
+  "settingsAccentColorDes": "Katman rengini seç",
+  "@settingsAccentColorDes": {},
+  "settingsAppearance": "Görünüm",
+  "@settingsAppearance": {},
+  "settingsAppearanceDes": "Renkler ve temalar",
+  "@settingsAppearanceDes": {},
+  "settingsAppIntro": "Uygulama başlangıcı",
+  "@settingsAppIntro": {},
+  "settingsAudioCache": "Audio cache",
+  "@settingsAudioCache": {},
+  "settingsAudioCacheDes": "Maksimum audio cache boyutu",
+  "@settingsAudioCacheDes": {},
+  "settingsAutoDelete": "İndirilenleri otomatik sil",
+  "@settingsAutoDelete": {},
+  "settingsAutoDeleteDes": "Varsayılan 30 gün",
+  "@settingsAutoDeleteDes": {},
+  "settingsAutoPlayDes": "Çalma listesindeki sonraki bölümü otomatik oynat",
+  "@settingsAutoPlayDes": {},
+  "settingsBackup": "Yedekleme",
+  "@settingsBackup": {},
+  "settingsBackupDes": "Uygulama bilgilerini yedekle",
+  "@settingsBackupDes": {},
+  "settingsBoostVolume": "Ses yükseltici seviyesi",
+  "@settingsBoostVolume": {},
+  "settingsBoostVolumeDes": "Ses yükselticiyi belirle",
+  "@settingsBoostVolumeDes": {},
+  "settingsDefaultGrid": "Varsayılan ızgara görünümü",
+  "@settingsDefaultGrid": {},
+  "settingsDefaultGridDownload": "İndirilenler",
+  "@settingsDefaultGridDownload": {},
+  "settingsDefaultGridFavorite": "Favoriler",
+  "@settingsDefaultGridFavorite": {},
+  "settingsDefaultGridPodcast": "Podcastler",
+  "@settingsDefaultGridPodcast": {},
+  "settingsDefaultGridRecent": "En son oynatılanlar",
+  "@settingsDefaultGridRecent": {},
+  "settingsDiscovery": "Keşfet özelliğini yeniden aktifleştir",
+  "@settingsDiscovery": {
+    "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
+  },
+  "settingsDownloadPosition": "İndirme konumu",
+  "@settingsDownloadPosition": {
+    "description": "Choose folder for downloads."
+  },
+  "settingsEnableSyncing": "Senkronizasyonu aktive et",
+  "@settingsEnableSyncing": {},
+  "settingsEnableSyncingDes": "En son yayınlananları görüntülemek için tüm podcastleri arka planda güncelle",
+  "@settingsEnableSyncingDes": {},
+  "settingsExportDes": "Uygulama ayarlarıını içe ya da dışa aktar",
+  "@settingsExportDes": {},
+  "settingsFastForwardSec": "İleri sarma hızı",
+  "@settingsFastForwardSec": {},
+  "settingsFastForwardSecDes": "Oynatıcıda ileri sarma saniyesini belirle",
+  "@settingsFastForwardSecDes": {},
+  "settingsFeedback": "Geribildirim ",
+  "@settingsFeedback": {},
+  "settingsFeedbackDes": "Hata bildirimi ve istekler",
+  "@settingsFeedbackDes": {},
+  "settingsHistory": "Geçmiş",
+  "@settingsHistory": {},
+  "settingsHistoryDes": "Oynatma bilgileri",
+  "@settingsHistoryDes": {},
+  "settingsInfo": "Bilgi",
+  "@settingsInfo": {},
+  "settingsInterface": "Ara yüz",
+  "@settingsInterface": {},
+  "settingsLanguages": "Diller",
+  "@settingsLanguages": {},
+  "settingsLanguagesDes": "Dili değiştir",
+  "@settingsLanguagesDes": {},
+  "settingsLayout": "Stil",
+  "@settingsLayout": {},
+  "settingsLayoutDes": "Uygulama stili",
+  "@settingsLayoutDes": {},
+  "settingsLibraries": "Kütüphaneler",
+  "@settingsLibraries": {},
+  "settingsLibrariesDes": "Bu uygulamada kullanılann açık kaynak kütüphaneleri",
+  "@settingsLibrariesDes": {},
+  "settingsManageDownload": "İndirilenleri yönet",
+  "@settingsManageDownload": {},
+  "settingsManageDownloadDes": "İndirilen ses dosyalarını yönet",
+  "@settingsManageDownloadDes": {},
+  "settingsMarkListenedSkip": "Atladığında oynatıldı olarak işaretle.",
+  "@settingsMarkListenedSkip": {
+    "description": "Mark episode as listened when skipped to next."
+  },
+  "settingsMarkListenedSkipDes": "Sonrakine atladığımda bu bölümü oynatıldı olarak işaretle.",
+  "@settingsMarkListenedSkipDes": {},
+  "settingsMenuAutoPlay": "Sonrakini otomatik oynat",
+  "@settingsMenuAutoPlay": {},
+  "settingsNetworkCellular": "Hücresel veri kullanmadan önce sor",
+  "@settingsNetworkCellular": {},
+  "settingsNetworkCellularAuto": "Hücresel (mobil) veri kullanarak otomatik indir",
+  "@settingsNetworkCellularAuto": {},
+  "settingsNetworkCellularAutoDes": "Liste yönetimi sayfasında podcast otomatik indirme seçeneklerini ayarlayabilirsin",
+  "@settingsNetworkCellularAutoDes": {},
+  "settingsNetworkCellularDes": "Hücresel veri ile bölüm indirmek için sor",
+  "@settingsNetworkCellularDes": {},
+  "settingsPlayDes": "Çalma listesi ve oynatıcı",
+  "@settingsPlayDes": {},
+  "settingsPlayerHeight": "Oynatıcı yüksekliği",
+  "@settingsPlayerHeight": {},
+  "settingsPlayerHeightDes": "Oynatıcı widget yüksekliğini ayarla",
+  "@settingsPlayerHeightDes": {},
+  "settingsPopupMenu": "Bölümlerin açılır pencere menüsü",
+  "@settingsPopupMenu": {},
+  "settingsPopupMenuDes": "Bölümlerin açılır pencere menüsünü değiştir",
+  "@settingsPopupMenuDes": {},
+  "settingsPrefrence": "Tercihler",
+  "@settingsPrefrence": {},
+  "settingsRealDark": "Gerçek koyu mod",
+  "@settingsRealDark": {},
+  "settingsRealDarkDes": "Sadece koyu mod yeterli gelmediğinde...",
+  "@settingsRealDarkDes": {},
+  "settingsRewindSec": "Geri sarma hızı",
+  "@settingsRewindSec": {},
+  "settingsRewindSecDes": "Oynatıcıda geri sarma saniyesini belirle",
+  "@settingsRewindSecDes": {},
+  "settingsSpeeds": "Hız",
+  "@settingsSpeeds": {
+    "description": "Playback speeds setting."
+  },
+  "settingsSpeedsDes": "Mevcut hızı ayarla",
+  "@settingsSpeedsDes": {
+    "description": "Playback speed setting description"
+  },
+  "settingsSTAuto": "Otomatik uyku zamanlayıcısı",
+  "@settingsSTAuto": {},
+  "settingsSTAutoDes": "Uyku zamanlayıcısını programlanan zamanda otomatik başlat",
+  "@settingsSTAutoDes": {},
+  "settingsSTDefaultTime": "Varsayılan zaman",
+  "@settingsSTDefaultTime": {},
+  "settingsSTDefautTimeDes": "Uyku zamanlayıcısı için varsayılan zaman",
+  "@settingsSTDefautTimeDes": {},
+  "settingsSTMode": "Uyku zamanlayıcısı modu",
+  "@settingsSTMode": {},
+  "settingsStorageDes": "Cache ve indirme seçeneklerini yönet",
+  "@settingsStorageDes": {},
+  "settingsSyncing": "Senkronizasyon",
+  "@settingsSyncing": {},
+  "settingsSyncingDes": "Podcastleri arka planla güncelle",
+  "@settingsSyncingDes": {},
+  "settingsTapToOpenPopupMenu": "Menüyü açmak için tıkla",
+  "@settingsTapToOpenPopupMenu": {},
+  "settingsTapToOpenPopupMenuDes": "Bölüm sayfasını açmak için uzun basmalısın",
+  "@settingsTapToOpenPopupMenuDes": {},
+  "settingsTheme": "Tema",
+  "@settingsTheme": {},
+  "settingStorage": "Depolama",
+  "@settingStorage": {},
+  "settingsUpdateInterval": "Güncelleme aralığı",
+  "@settingsUpdateInterval": {},
+  "settingsUpdateIntervalDes": "Varsayılan 24 saat",
+  "@settingsUpdateIntervalDes": {},
+  "share": "Paylaş",
+  "@share": {},
+  "showNotesFonts": "Not yazı tipini göster",
+  "@showNotesFonts": {},
+  "size": "Boyut",
+  "@size": {},
+  "skipSecondsAtEnd": "Sondaki saniyeleri atla",
+  "@skipSecondsAtEnd": {},
+  "skipSecondsAtStart": "Başlangıçta saniyeleri atla",
+  "@skipSecondsAtStart": {},
+  "skipSilence": "Boşlukları atla",
+  "@skipSilence": {
+    "description": "Feature skip silence"
+  },
+  "skipToNext": "Sonrakine geç",
+  "@skipToNext": {},
+  "sleepTimer": "Uyku zamanlayıcısı",
+  "@sleepTimer": {},
+  "status": "Durum",
+  "@status": {
+    "description": "gpodder.net status"
+  },
+  "statusAuthError": "Doğrulama hatası",
+  "@statusAuthError": {
+    "description": "Sync error"
+  },
+  "statusFail": "Başarısız oldu",
+  "@statusFail": {
+    "description": "Sync fail"
+  },
+  "statusSuccess": "Başarılı",
+  "@statusSuccess": {
+    "description": "Sync status"
+  },
+  "stop": "Dur",
+  "@stop": {},
+  "subscribe": "Abone ol",
+  "@subscribe": {},
+  "subscribeExportDes": "Tüm podcastlerin bulunduğu OPML dosyasını içe aktar",
+  "@subscribeExportDes": {},
+  "syncNow": "Senkronize et",
+  "@syncNow": {},
+  "systemDefault": "Sistemi izle",
+  "@systemDefault": {},
+  "timeLastPlayed": "En son {time}",
+  "@timeLastPlayed": {
+    "description": "Show last time stop position  in player when a episode have been played.",
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "timeLeft": "{time} kaldı",
+  "@timeLeft": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "to": "{time} den",
+  "@to": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "toastAddPlaylist": "Çalma listesine eklendi",
+  "@toastAddPlaylist": {},
+  "toastDiscovery": "Keşfet seçeneği tekrar etkinleştirildi, lütfen uygulamayı baştan başlatın.",
+  "@toastDiscovery": {
+    "description": "Toast displayed when user tap Discovery Features Again in settings page."
+  },
+  "toastFileError": "Dosya hatası, abonelik başarısız",
+  "@toastFileError": {},
+  "toastFileNotValid": "Dosya geçersiz",
+  "@toastFileNotValid": {},
+  "toastHomeGroupNotSupport": "Başlangıç sayfası desteklenmemekte",
+  "@toastHomeGroupNotSupport": {},
+  "toastImportSettingsSuccess": "Ayarlar başarıyla aktarıldı",
+  "@toastImportSettingsSuccess": {},
+  "toastOneGroup": "En az bir liste seçin",
+  "@toastOneGroup": {},
+  "toastPodcastRecovering": "Kurtarılıyor, lütfen bekleyin",
+  "@toastPodcastRecovering": {
+    "description": "Resubscribe removed podcast"
+  },
+  "toastReadFile": "Dosya başarıyla okundu",
+  "@toastReadFile": {},
+  "toastRecoverFailed": "Podcast kurtarma başarısız oldu",
+  "@toastRecoverFailed": {
+    "description": "Resubscribe removed podast"
+  },
+  "toastRemovePlaylist": "Bölüm çalma listesinden kaldırıldı",
+  "@toastRemovePlaylist": {},
+  "toastSettingSaved": "Ayarlar kaydedildi",
+  "@toastSettingSaved": {},
+  "toastTimeEqualEnd": "Zaman bitiş zamanına eşit olmalıdır",
+  "@toastTimeEqualEnd": {
+    "description": "User can't choose the same time as schedule end time."
+  },
+  "toastTimeEqualStart": "Zaman başlangıç zamanına eşit olmalıdır",
+  "@toastTimeEqualStart": {
+    "description": "User can't choose the same time as schedule start time."
+  },
+  "translators": "Çevirmenler",
+  "@translators": {},
+  "understood": "Anlaşıldı",
+  "@understood": {},
+  "undo": "GERİ AL",
+  "@undo": {},
+  "unlike": "Beğenme",
+  "@unlike": {},
+  "unliked": "Bölüm favorilerden kaldırıldı",
+  "@unliked": {},
+  "updateDate": "Güncellenme tarihi",
+  "@updateDate": {},
+  "updateEpisodesCount": "{count, plural, zero{Güncelleme yok} one{{count} bölüm güncellendi} other{{count} bölüm güncellendi}}",
+  "@updateEpisodesCount": {},
+  "updateFailed": "Güncelleme başarısız, bağlantı hatası",
+  "@updateFailed": {},
+  "username": "Kullanıcı adı",
+  "@username": {},
+  "usernameRequired": "Kullanıcı adı gerekli",
+  "@usernameRequired": {},
+  "version": "Version: {version}",
+  "@version": {
+    "placeholders": {
+      "version": {}
+    }
+  }
+}

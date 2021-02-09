@@ -88,6 +88,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
         _langListTile('Español', locale: Locale('es')),
         _langListTile('Português', locale: Locale('pt')),
         _langListTile('Italiano', locale: Locale('it')),
+        _langListTile('Türkçe', locale: Locale('tr')),
         Divider(height: 1),
         ListTile(
           onTap: () =>

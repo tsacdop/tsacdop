@@ -52,7 +52,7 @@
   "@color": {},
   "confirm": "CONFERMA",
   "@confirm": {},
-  "createNewPlaylist": "New playlist",
+  "createNewPlaylist": "Nuova playlist",
   "@createNewPlaylist": {},
   "darkMode": "Tema scuro",
   "@darkMode": {},
@@ -60,7 +60,7 @@
   "@daysAgo": {},
   "daysCount": "{count, plural, zero{Mai} one{{count} giorno} other{{count} giorni}}",
   "@daysCount": {},
-  "defaultQueueReminder": "This is the default queue, can't be removed.",
+  "defaultQueueReminder": "Questa è la coda predefinita, non può essere rimossa.",
   "@defaultQueueReminder": {
     "description": "Remind user that default queue can't be removed."
   },
@@ -374,15 +374,15 @@
   "@playerHeightTall": {},
   "playing": "Riproducendo",
   "@playing": {},
-  "playlistExisted": "Playlist name existed",
+  "playlistExisted": "Nome playlist già esistente",
   "@playlistExisted": {
     "description": "Error string when creating new playlist."
   },
-  "playlistNameEmpty": "Playlist name is empty",
+  "playlistNameEmpty": "Nome playlist vuoto",
   "@playlistNameEmpty": {
     "description": "Error string when creating new playlist."
   },
-  "playlists": "Playlists",
+  "playlists": "Playlist",
   "@playlists": {
     "description": "Title for playlists tab."
   },
