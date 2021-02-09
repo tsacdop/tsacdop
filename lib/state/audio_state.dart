@@ -282,12 +282,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
         await _playlist.getPlaylist();
         if (state[1] != '') {
           var episode = await _dbHelper.getRssItemWithUrl(state[1]);
-          if ((!_playlist.isQueue &&
+          if (episode != null && ((!_playlist.isQueue &&
                   episode != null &&
                   _playlist.contains(episode)) ||
               (_playlist.isQueue &&
                   _queue.isNotEmpty &&
-                  _queue.episodes.first.title == episode.title)) {
+                  _queue.episodes.first.title == episode.title))) {
             _episode = episode;
             _lastPosition = int.parse(state[2] ?? '0');
             if (_lastPosition > 0) {
