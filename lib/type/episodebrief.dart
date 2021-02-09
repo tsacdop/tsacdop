@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:audio_service/audio_service.dart';
@@ -55,7 +56,7 @@ class EpisodeBrief extends Equatable {
         artist: feedTitle,
         album: feedTitle,
         duration: Duration.zero,
-        artUri: 'file://$imagePath',
+        artUri: imagePath == '' ? episodeImage : 'file://$imagePath',
         extras: {
           'skipSecondsStart': skipSecondsStart,
           'skipSecondsEnd': skipSecondsEnd
@@ -65,7 +66,9 @@ class EpisodeBrief extends Equatable {
   ImageProvider get avatarImage {
     return File(imagePath).existsSync()
         ? FileImage(File(imagePath))
-        : const AssetImage('assets/avatar_backup.png');
+        : episodeImage != ''
+            ? CachedNetworkImageProvider(episodeImage)
+            : AssetImage('assets/avatar_backup.png');
   }
 
   Color backgroudColor(BuildContext context) {

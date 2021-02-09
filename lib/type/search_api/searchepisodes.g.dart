@@ -25,6 +25,8 @@ OnlineEpisode _$OnlineEpisodeFromJson(Map<String, dynamic> json) {
     title: json['title'] as String,
     pubDate: json['pub_date_ms'] as int,
     length: json['audio_length_sec'] as int,
+    audio: json['audio'] as String,
+    thumbnail: json['thumbnail'] as String,
   );
 }
 
@@ -33,4 +35,6 @@ Map<String, dynamic> _$OnlineEpisodeToJson(OnlineEpisode instance) =>
       'title': instance.title,
       'pub_date_ms': instance.pubDate,
       'audio_length_sec': instance.length,
+      'audio': instance.audio,
+      'thumbnail': instance.thumbnail,
     };

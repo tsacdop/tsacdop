@@ -466,8 +466,11 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                   child: SizedBox(
                                       height: 30.0,
                                       width: 30.0,
-                                      child: Image.file(File(
-                                          "${episodes[index].imagePath}"))),
+                                      child: Image(
+                                          image: episodes[index].avatarImage)
+                                      // Image.file(File(
+                                      //     "${episodes[index].imagePath}"))
+                                      ),
                                 ),
                               ),
                               Expanded(
@@ -590,7 +593,7 @@ class SleepModeState extends State<SleepMode>
   Future _getDefaultTime() async {
     var defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
     var defaultTime = await defaultSleepTimerStorage.getInt(defaultValue: 30);
-    if(mounted) setState(() => _minSelected = defaultTime);
+    if (mounted) setState(() => _minSelected = defaultTime);
   }
 
   @override
@@ -992,7 +995,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                               foregroundColor: MaterialStateProperty.all<Color>(
                                   context.accentColor),
                               overlayColor: MaterialStateProperty.all<Color>(
-                                  context.primaryColor),
+                                  context.primaryColor.withOpacity(0.3)),
                             ),
                             onPressed: () => chapters.url.launchUrl,
                             child: Text('Visit')),
@@ -1093,7 +1096,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                     child: Row(
                       children: <Widget>[
                         Text(
-                          context.s.settingsInfo,
+                          context.s.homeToprightMenuAbout,
                           overflow: TextOverflow.fade,
                           style: TextStyle(
                               color: context.accentColor,

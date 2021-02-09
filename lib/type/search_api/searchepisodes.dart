@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
+import 'package:tsacdop/type/episodebrief.dart';
 part 'searchepisodes.g.dart';
 
 @JsonSerializable()
@@ -33,8 +36,31 @@ class OnlineEpisode {
   final int pubDate;
   @JsonKey(name: 'audio_length_sec')
   final int length;
-  OnlineEpisode({this.title, this.pubDate, this.length});
+  final String audio;
+  final String thumbnail;
+
+  OnlineEpisode({this.title, this.pubDate, this.length, this.audio, this.thumbnail});
   factory OnlineEpisode.fromJson(Map<String, dynamic> json) =>
       _$OnlineEpisodeFromJson(json);
   Map<String, dynamic> toJson() => _$OnlineEpisodeToJson(this);
+
+  EpisodeBrief get toEpisode {
+    return EpisodeBrief(
+      title,
+      audio,
+      0,
+      pubDate,
+      title,
+      jsonEncode([120,220,128]),
+      length ?? 0,
+      0,
+      '',
+      0,
+      mediaId: audio,
+      skipSecondsEnd: 0,
+      skipSecondsStart: 0,
+      chapterLink: '',
+      episodeImage: thumbnail
+    );
+  }
 }

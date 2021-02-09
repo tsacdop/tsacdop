@@ -30,6 +30,8 @@ IndexEpisode _$IndexEpisodeFromJson(Map<String, dynamic> json) {
     datePublished: json['datePublished'] as int,
     enclosureLength: json['enclosureLength'] as int,
     enclosureUrl: json['enclosureUrl'] as String,
+    duration: json['duration'] as int,
+    feedImage: json['feedImage'] as String,
   );
 }
 
@@ -40,4 +42,6 @@ Map<String, dynamic> _$IndexEpisodeToJson(IndexEpisode instance) =>
       'datePublished': instance.datePublished,
       'enclosureUrl': instance.enclosureUrl,
       'enclosureLength': instance.enclosureLength,
+      'duration': instance.duration,
+      'feedImage': instance.feedImage,
     };

@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/type/episodebrief.dart';
+import 'package:tsacdop/state/audio_state.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../.env.dart';
@@ -898,7 +898,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
     var searchResult = await searchEngine.fetchEpisode(rssUrl: id);
     var episodes = searchResult.items.cast();
     for (var episode in episodes) {
-      _episodeList.add(episode.toOnlineWEpisode);
+      _episodeList.add(episode.toOnlineEpisode);
     }
     _loading = false;
     return _episodeList;
@@ -1027,6 +1027,25 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                           : '${content[index].length.toTime} | '
                               '${content[index].pubDate.toDate(context)}',
                       style: TextStyle(color: context.accentColor)),
+                  trailing: TextButton(
+                    style: ButtonStyle(
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                            context.accentColor),
+                        overlayColor: MaterialStateProperty.all<Color>(
+                            context.primaryColor.withOpacity(0.3)),
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            EdgeInsets.symmetric(horizontal: 2))),
+                    child: Text(context.s.play),
+                    onPressed: () {
+                      context.read<AudioPlayerNotifier>().episodeLoad(
+                          content[index].toEpisode,
+                          fromSearch: true);
+                      Fluttertoast.showToast(
+                        msg: 'Wait a moment',
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                    },
+                  ),
                 );
               },
             );
@@ -1106,6 +1125,8 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                           fit: BoxFit.fitWidth,
                           alignment: Alignment.center,
                           imageUrl: widget.onlinePodcast.image,
+                          fadeInDuration: Duration.zero,
+                          placeholderFadeInDuration: Duration.zero,
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) => Container(
                             height: 120,
