@@ -1,5 +1,17 @@
 # Tsacdop Changelog
 
+## 0.5.8
+Release date 2021/2/9
+
+## New features
+
+* Artwork shownote and chapters in player panel.
+* Play without subscription, inside search result directly.
+
+## Bug fix
+
+* Episode download failed with '/' in title.
+
 ## 0.5.7
 Release date 2021/1.31
 For frdoid
