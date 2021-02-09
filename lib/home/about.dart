@@ -280,7 +280,7 @@ class _AboutAppState extends State<AboutApp> {
                           _translatorInfo(context,
                               name: 'Edoardo Maria Elidoro', flag: 'it'),
                            _translatorInfo(context,
-                              name: 'Murat', flag: 'tr'),
+                              name: 'Murat T. Akyuz', flag: 'tr'),
                         ],
                       ),
                     ),
