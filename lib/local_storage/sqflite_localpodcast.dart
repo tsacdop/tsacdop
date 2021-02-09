@@ -647,7 +647,7 @@ class DBHelper {
       final duration = feed.items[i].itunes.duration?.inSeconds ?? 0;
       final explicit = _getExplicit(feed.items[i].itunes.explicit);
       final chapter = feed.items[i].podcastChapters?.url ?? '';
-      final image = feed.items[i].itunes.image.href ?? '';
+      final image = feed.items[i].itunes.image?.href ?? '';
       if (url != null) {
         await dbClient.transaction((txn) {
           return txn.rawInsert(
@@ -721,7 +721,7 @@ class DBHelper {
           final duration = item.itunes.duration?.inSeconds ?? 0;
           final explicit = _getExplicit(item.itunes.explicit);
           final chapter = item.podcastChapters?.url ?? '';
-          final image = item.itunes.image.href;
+          final image = item.itunes.image?.href ?? '';
 
           if (url != null) {
             await dbClient.transaction((txn) async {
