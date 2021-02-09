@@ -539,7 +539,7 @@ class __MenuBarState extends State<_MenuBar> {
             selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
             builder: (_, data, __) {
               return (widget.episodeItem == data.item1 && data.item2)
-                  ? Container(
+                  ? Padding(
                       padding: EdgeInsets.only(right: 30),
                       child: SizedBox(
                           width: 20,
@@ -557,7 +557,7 @@ class __MenuBarState extends State<_MenuBar> {
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
                           child: Row(
                             children: <Widget>[
-                              Text(s.play,
+                              Text(s.play.toUpperCase(),
                                   style: TextStyle(
                                     color: Theme.of(context).accentColor,
                                     fontSize: 15,
