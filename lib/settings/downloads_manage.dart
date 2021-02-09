@@ -220,10 +220,10 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                           Icon(
                                             _mode == 0
                                                 ? LineIcons
-                                                    .hourglass_start_solid
+                                                    .hourglassStart
                                                 : _mode == 1
                                                     ? LineIcons
-                                                        .hourglass_half_solid
+                                                        .hourglassHalf
                                                     : LineIcons.save,
                                             size: 18,
                                           )
@@ -408,7 +408,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               Icon(
-                                LineIcons.trash_alt_solid,
+                                LineIcons.alternateTrash,
                                 color: Colors.white,
                               ),
                               Text('${sumSelected() ~/ 1000000}Mb',

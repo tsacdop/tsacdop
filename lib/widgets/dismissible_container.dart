@@ -56,7 +56,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                             padding: EdgeInsets.all(5),
                             alignment: Alignment.center,
                             child: Icon(
-                              LineIcons.trash_alt_solid,
+                              LineIcons.alternateTrash,
                               color: Colors.white,
                               size: 15,
                             ),
@@ -67,7 +67,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                             padding: EdgeInsets.all(5),
                             alignment: Alignment.center,
                             child: Icon(
-                              LineIcons.trash_alt_solid,
+                              LineIcons.alternateTrash,
                               color: Colors.white,
                               size: 15,
                             ),

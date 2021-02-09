@@ -165,7 +165,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                               case 0:
                                 return _popupMenuItem(menu, e,
                                     icon: Icon(
-                                      LineIcons.play_circle_solid,
+                                      LineIcons.playCircle,
                                       color: context.accentColor,
                                     ),
                                     text: s.play,
@@ -174,7 +174,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                               case 1:
                                 return _popupMenuItem(menu, e,
                                     icon: Icon(
-                                      LineIcons.clock_solid,
+                                      LineIcons.clock,
                                       color: Colors.cyan,
                                     ),
                                     text: s.later,
@@ -203,7 +203,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                               case 4:
                                 return _popupMenuItem(menu, e,
                                     icon: Icon(
-                                      LineIcons.download_solid,
+                                      LineIcons.download,
                                       color: Colors.green,
                                     ),
                                     text: s.download,
@@ -212,7 +212,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                               case 5:
                                 return _popupMenuItem(menu, e,
                                     icon: Icon(
-                                      LineIcons.bolt_solid,
+                                      LineIcons.lightningBolt,
                                       color: Colors.amber,
                                     ),
                                     text: s.playNext,

@@ -555,7 +555,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                               child: Transform.rotate(
                                 angle: math.pi,
                                 child: Icon(
-                                  LineIcons.database_solid,
+                                  LineIcons.database,
                                   size: 20.0,
                                 ),
                               ),
@@ -855,7 +855,7 @@ class SleepModeState extends State<SleepMode>
                                   width: 30.0,
                                   child: Icon(
                                     _openClock
-                                        ? LineIcons.stopwatch_solid
+                                        ? LineIcons.stopwatch
                                         : LineIcons.clock,
                                     size: 20.0,
                                   ),

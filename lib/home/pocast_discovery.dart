@@ -244,19 +244,19 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            LineIcons.microphone_solid,
+                            LineIcons.microphone,
                             size: 30,
                             color: Colors.lightBlue,
                           ),
                           SizedBox(width: 50),
                           Icon(
-                            LineIcons.broadcast_tower_solid,
+                            LineIcons.broadcastTower,
                             size: 30,
                             color: Colors.deepPurple,
                           ),
                           SizedBox(width: 50),
                           Icon(
-                            LineIcons.rss_square_solid,
+                            LineIcons.rssSquare,
                             size: 30,
                             color: Colors.blueGrey,
                           ),

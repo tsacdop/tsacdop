@@ -759,7 +759,7 @@ class ShowEpisode extends StatelessWidget {
                                         ? s.play
                                         : s.playing),
                                     trailingIcon: Icon(
-                                      LineIcons.play_circle_solid,
+                                      LineIcons.playCircle,
                                       color: context.accentColor,
                                     ),
                                     onPressed: () {
@@ -779,7 +779,7 @@ class ShowEpisode extends StatelessWidget {
                                           ? Text(s.remove)
                                           : Text(s.later),
                                       trailingIcon: Icon(
-                                        LineIcons.clock_solid,
+                                        LineIcons.clock,
                                         color: Colors.cyan,
                                       ),
                                       onPressed: () {
@@ -876,7 +876,7 @@ class ShowEpisode extends StatelessWidget {
                                                       .withOpacity(0.5)))
                                           : Text(s.download),
                                       trailingIcon: Icon(
-                                          LineIcons.download_solid,
+                                          LineIcons.download,
                                           color: Colors.green),
                                       onPressed: () {
                                         if (!isDownloaded) {
@@ -894,7 +894,7 @@ class ShowEpisode extends StatelessWidget {
                                               : context.dialogBackgroundColor,
                                       title: Text(s.playNext),
                                       trailingIcon: Icon(
-                                        LineIcons.bolt_solid,
+                                        LineIcons.lightningBolt,
                                         color: Colors.amber,
                                       ),
                                       onPressed: () {

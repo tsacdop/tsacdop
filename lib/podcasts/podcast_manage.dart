@@ -138,7 +138,7 @@ class _PodcastManageState extends State<PodcastManage>
                     ]),
                 alignment: Alignment.center,
                 child: _fraction > 0.5
-                    ? Icon(LineIcons.save_solid, color: Colors.white)
+                    ? Icon(LineIcons.save, color: Colors.white)
                     : AnimatedIcon(
                         color: Colors.white,
                         icon: AnimatedIcons.menu_close,

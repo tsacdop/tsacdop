@@ -110,7 +110,7 @@ class _PopupMenuState extends State<PopupMenu> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Icon(LineIcons.redo_alt_solid, size: 20),
+                    Icon(LineIcons.alternateRedo, size: 20),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
                     ),
@@ -145,7 +145,7 @@ class _PopupMenuState extends State<PopupMenu> {
                 padding: EdgeInsets.only(left: 10),
                 child: Row(
                   children: <Widget>[
-                    Icon(LineIcons.paperclip_solid),
+                    Icon(LineIcons.paperclip),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
                     ),
@@ -160,7 +160,7 @@ class _PopupMenuState extends State<PopupMenu> {
                 padding: EdgeInsets.only(left: 10),
                 child: Row(
                   children: <Widget>[
-                    Icon(LineIcons.cog_solid),
+                    Icon(LineIcons.cog),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
                     ),
@@ -175,7 +175,7 @@ class _PopupMenuState extends State<PopupMenu> {
                 padding: EdgeInsets.only(left: 10),
                 child: Row(
                   children: <Widget>[
-                    Icon(LineIcons.info_circle_solid),
+                    Icon(LineIcons.infoCircle),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
                     ),

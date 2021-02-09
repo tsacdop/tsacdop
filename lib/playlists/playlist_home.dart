@@ -125,8 +125,8 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                       padding: EdgeInsets.zero,
                                       icon: Icon(
                                           playing
-                                              ? LineIcons.pause_circle_solid
-                                              : LineIcons.play_solid,
+                                              ? LineIcons.pauseCircle
+                                              : LineIcons.play,
                                           size: 40),
                                       onPressed: () {
                                         if (running) {
@@ -767,7 +767,7 @@ class __PlaylistsState extends State<_Playlists> {
                           '${data[index].length} ${s.episode(data[index].length).toLowerCase()}'),
                       trailing: IconButton(
                         splashRadius: 20,
-                        icon: Icon(LineIcons.play_circle_solid, size: 30),
+                        icon: Icon(LineIcons.playCircle, size: 30),
                         onPressed: () {
                           context
                               .read<AudioPlayerNotifier>()

@@ -359,7 +359,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                             child: IconButton(
                                               tooltip: s.recoverSubscribe,
                                               icon: Icon(LineIcons
-                                                  .trash_restore_alt_solid),
+                                                  .alternativeTrashRestore),
                                               onPressed: () => recoverSub(
                                                   context,
                                                   snapshot.data[index].rssUrl),

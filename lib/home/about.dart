@@ -208,7 +208,7 @@ class _AboutAppState extends State<AboutApp> {
                         children: <Widget>[
                           _listItem(context, 'Twitter @tsacdop',
                               LineIcons.twitter, 'https://twitter.com/tsacdop'),
-                          _listItem(context, 'GitHub', LineIcons.github_alt,
+                          _listItem(context, 'GitHub', LineIcons.alternateGithub,
                               'https://github.com/stonega/tsacdop'),
                           _listItem(context, 'Telegram', LineIcons.telegram,
                               'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),

@@ -313,7 +313,7 @@ class _DataBackupState extends State<DataBackup> {
                               MaterialPageRoute(
                                   builder: (context) => _GpodderInfo()));
                         },
-                        icon: Icon(LineIcons.info_circle_solid),
+                        icon: Icon(LineIcons.infoCircle),
                       ),
                       subtitle: FutureBuilder<List<int>>(
                           future: _getSyncStatus(),
@@ -499,7 +499,7 @@ class _DataBackupState extends State<DataBackup> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          LineIcons.paperclip_solid,
+                          LineIcons.paperclip,
                           size: context.textTheme.headline6.fontSize,
                           color: Colors.red[700],
                         ),

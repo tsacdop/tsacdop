@@ -280,7 +280,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                             onTap: () => widget.podcastLocal.link.launchUrl),
                         _podcastLink(
                             title: 'Rss',
-                            child: Icon(LineIcons.rss_square_solid, size: 30),
+                            child: Icon(LineIcons.rssSquare, size: 30),
                             backgroundColor: Colors.blue[600],
                             onTap: () => widget.podcastLocal.rssUrl.launchUrl),
                         if (widget.podcastLocal.funding.isNotEmpty)
@@ -292,7 +292,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       'paypal',
                                     )
                                         ? LineIcons.paypal
-                                        : LineIcons.donate_solid,
+                                        : LineIcons.donate,
                                     size: 30),
                                 backgroundColor: Colors.red[600],
                                 onTap: () => funding.launchUrl),
@@ -407,7 +407,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                       Text(s.filter),
                       SizedBox(width: 5),
                       Icon(
-                        LineIcons.filter_solid,
+                        LineIcons.filter,
                         color:
                             _filter != Filter.all ? context.accentColor : null,
                         size: 18,
@@ -581,8 +581,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           tooltip: s.homeSubMenuSortBy,
                           icon: Icon(
                             _reverse
-                                ? LineIcons.hourglass_start_solid
-                                : LineIcons.hourglass_end_solid,
+                                ? LineIcons.hourglassStart
+                                : LineIcons.hourglassEnd,
                             color: _reverse ? context.accentColor : null,
                           ),
                           iconSize: 18,

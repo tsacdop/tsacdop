@@ -616,7 +616,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                   padding: EdgeInsets.symmetric(horizontal: 5),
                 ),
                 Icon(
-                  LineIcons.filter_solid,
+                  LineIcons.filter,
                   size: 18,
                 )
               ],
@@ -735,7 +735,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(LineIcons.cloud_download_alt_solid,
+                            Icon(LineIcons.alternateCloudDownload,
                                 size: 80, color: Colors.grey[500]),
                             Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10)),
@@ -819,7 +819,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                               child: IconButton(
                                                   tooltip: context.s.refresh,
                                                   icon: Icon(
-                                                      LineIcons.redo_alt_solid,
+                                                      LineIcons.alternateRedo,
                                                       size: 16),
                                                   onPressed: () {
                                                     _updateRssItem();
@@ -979,7 +979,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Icon(LineIcons.heartbeat_solid,
+                              Icon(LineIcons.heartbeat,
                                   size: 80, color: Colors.grey[500]),
                               Padding(
                                   padding: EdgeInsets.symmetric(vertical: 10)),
@@ -1070,7 +1070,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                                                       ),
                                                       Icon(
                                                         LineIcons
-                                                            .hourglass_start_solid,
+                                                            .hourglassStart,
                                                         size: 18,
                                                       )
                                                     ],
@@ -1276,7 +1276,7 @@ class _MyDownloadState extends State<_MyDownload>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Icon(LineIcons.download_solid,
+                                Icon(LineIcons.download,
                                     size: 80, color: Colors.grey[500]),
                                 Padding(
                                     padding:
