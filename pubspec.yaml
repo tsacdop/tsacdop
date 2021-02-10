@@ -1,5 +1,5 @@
 name: tsacdop
-description: An open source podacasts player.
+description: An open source podcast player.
 
 version: 0.5.8+46
 
@@ -37,6 +37,7 @@ dependencies:
   flutter_cache_manager: ^1.4.0
   flare_flutter: ^2.0.6
   fl_chart: ^0.12.2
+  line_icons: ^1.3.2
   marquee: ^1.6.1
   google_fonts: ^1.1.1
   image: ^2.1.19
@@ -65,9 +66,6 @@ dependencies:
   just_audio:
     git:
       url: https://github.com/stonega/just_audio.git
-  line_icons:
-    git:
-      url: https://github.com/galonsos/line_icons.git
   focused_menu:
     git:
       url: https://github.com/stonega/focused_menu.git
