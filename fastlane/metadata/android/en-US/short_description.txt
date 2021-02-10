@@ -1,1 +1,1 @@
-Enjoy podcasts with Tsacdop! An open source  podcast player built with flutter.
+Enjoy podcasts with Tsacdop! An open source podcast player built with flutter.

@@ -1,4 +1,4 @@
 Happy new year!
-🎙️ What's new in version 0.5.8
-Shownote with artwork and chapters in player panel (only work for podcasts support podcast:chapters namespace),
+What's new in version 0.5.8
+Shownotes with artwork and chapters in player panel (only work for podcasts support podcast:chapters namespace),
 Play without subscription, inside search result directly.
