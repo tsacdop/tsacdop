@@ -1,2 +1,0 @@
-Bug fix, Image saved wrongly after subscribe new podcast.
-If you have podcast image issue under 0.5.5, please update 0.5.6, you can refresh artwork in podcast settings to get back the right image, or you can resubscribe the podcast. sorry for the issue.
