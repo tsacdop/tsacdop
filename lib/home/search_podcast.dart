@@ -10,15 +10,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/state/audio_state.dart';
-import 'package:tsacdop/type/episodebrief.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../.env.dart';
 import '../local_storage/key_value_storage.dart';
 import '../service/search_api.dart';
+import '../state/audio_state.dart';
 import '../state/podcast_group.dart';
 import '../state/search_state.dart';
+import '../type/episodebrief.dart';
 import '../type/search_api/searchepisodes.dart';
 import '../type/search_api/searchpodcast.dart';
 import '../util/extension_helper.dart';
@@ -223,7 +223,8 @@ class _RssResultState extends State<RssResult> {
       length: 2,
       child: Column(
         children: [
-          SizedBox(
+          Container(
+            color: context.primaryColor,
             height: 140,
             child: Row(
               children: [
@@ -277,7 +278,7 @@ class _RssResultState extends State<RssResult> {
           ),
           Container(
             height: 50,
-            color: context.scaffoldBackgroundColor,
+            color: context.primaryColor,
             child: TabBar(
                 indicatorColor: context.accentColor,
                 labelColor: context.textColor,
@@ -1046,7 +1047,8 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                               foregroundColor: MaterialStateProperty.all<Color>(
                                   context.accentColor),
                               overlayColor: MaterialStateProperty.all<Color>(
-                                  context.scaffoldBackgroundColor.withOpacity(0.3)),
+                                  context.scaffoldBackgroundColor
+                                      .withOpacity(0.3)),
                               padding:
                                   MaterialStateProperty.all<EdgeInsetsGeometry>(
                                       EdgeInsets.symmetric(horizontal: 2))),
