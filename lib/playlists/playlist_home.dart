@@ -333,11 +333,14 @@ class __QueueState extends State<_Queue> {
                                 key: ValueKey(episode.enclosureUrl),
                               );
                             } else {
-                              return EpisodeCard(episode,
-                                  key: ValueKey('playing'),
-                                  isPlaying: true,
-                                  canReorder: true,
-                                  tileColor: context.primaryColorDark);
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                child: EpisodeCard(episode,
+                                    key: ValueKey('playing'),
+                                    isPlaying: true,
+                                    canReorder: true,
+                                    tileColor: context.primaryColorDark),
+                              );
                             }
                           }).toList()
                         : episodes

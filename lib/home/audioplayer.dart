@@ -63,8 +63,7 @@ class PlayerWidget extends StatelessWidget {
       child:
           Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
         Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, double>>(
-          selector: (_, audio) =>
-              Tuple2(audio.episode, audio.seekSliderValue),
+          selector: (_, audio) => Tuple2(audio.episode, audio.seekSliderValue),
           builder: (_, data, __) {
             final c = data.item1.backgroudColor(context);
             return SizedBox(
@@ -964,7 +963,6 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                         SizedBox(width: 5),
                         Text(
                           chapters.startTime.toTime,
-                          style: TextStyle(color: Colors.black),
                         ),
                       ],
                     ),

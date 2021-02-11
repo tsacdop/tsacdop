@@ -257,8 +257,6 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                                 SizedBox(width: 5),
                                                 Text(
                                                   snapshot.data.seconds.toTime,
-                                                  style: TextStyle(
-                                                      color: Colors.black),
                                                 ),
                                               ],
                                             ),
