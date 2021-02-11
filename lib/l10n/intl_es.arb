@@ -24,7 +24,7 @@
   "@autoDownload": {},
   "back": "Atras",
   "@back": {},
-  "boostVolume": "Boost volume",
+  "boostVolume": "Aumentar volumen",
   "@boostVolume": {
     "description": "Boost volume in player widget."
   },
@@ -44,7 +44,7 @@
   "@chooseA": {},
   "clear": "Limpiar",
   "@clear": {},
-  "clearAll": "Clear all",
+  "clearAll": "Limipar todo",
   "@clearAll": {
     "description": "Clear all episodes in playlist."
   },
@@ -52,7 +52,7 @@
   "@color": {},
   "confirm": "ACEPTAR",
   "@confirm": {},
-  "createNewPlaylist": "New playlist",
+  "createNewPlaylist": "Nueva playlist",
   "@createNewPlaylist": {},
   "darkMode": "Modo oscuro",
   "@darkMode": {},
@@ -60,13 +60,13 @@
   "@daysAgo": {},
   "daysCount": "{count, plural, zero{Nunca} one{{count} dia} other{{count} dias}}",
   "@daysCount": {},
-  "defaultQueueReminder": "This is the default queue, can't be removed.",
+  "defaultQueueReminder": "Esta es la cola por defecto, no puede removerse",
   "@defaultQueueReminder": {
     "description": "Remind user that default queue can't be removed."
   },
-  "defaultSearchEngine": "Default podcast search engine",
+  "defaultSearchEngine": "Motor de busqueda de podcasts por defecto",
   "@defaultSearchEngine": {},
-  "defaultSearchEngineDes": "Choose the default podcast search engine",
+  "defaultSearchEngineDes": "Escoge el motor de busqueda de podcasts por defecto ",
   "@defaultSearchEngineDes": {
     "description": "Choose the default podcast search engine"
   },
@@ -84,9 +84,9 @@
   "@download": {},
   "downloaded": "Descargados",
   "@downloaded": {},
-  "downloadRemovedToast": "Download removed",
+  "downloadRemovedToast": "Descarga removida",
   "@downloadRemovedToast": {},
-  "downloadStart": "Downloading",
+  "downloadStart": "Descargando",
   "@downloadStart": {
     "description": "Toast of downloading"
   },
@@ -96,9 +96,9 @@
   "@endOfEpisode": {},
   "episode": "{count, plural, zero{} one{Episodio} other{Episodios}}",
   "@episode": {},
-  "fastForward": "Fast forward",
+  "fastForward": "Avanzar",
   "@fastForward": {},
-  "fastRewind": "Fast rewind",
+  "fastRewind": "Retroceder",
   "@fastRewind": {},
   "featureDiscoveryEditGroup": "Toca para editar grupo",
   "@featureDiscoveryEditGroup": {},
@@ -150,7 +150,7 @@
   "@filter": {},
   "fonts": "Tipografías",
   "@fonts": {},
-  "fontStyle": "Font style",
+  "fontStyle": "Estilo de fuente",
   "@fontStyle": {},
   "from": "De {time}",
   "@from": {
@@ -160,7 +160,7 @@
   },
   "goodNight": "Buenas noches",
   "@goodNight": {},
-  "gpodderLoginDes": "Congratulations! You  have linked gpodder.net account successfully. Tsacdop will automatically sync subscriptions on your device with your gpodder.net account.",
+  "gpodderLoginDes": "Felicidades, has unido tu cuenta gpodder.net exitosamente. Tsacdop sincronizara tus subscripciones en tu dispositivo con tu cuenta gpodder.net.",
   "@gpodderLoginDes": {},
   "groupExisted": "El grupo ya existe",
   "@groupExisted": {
@@ -172,13 +172,13 @@
   "@groupRemoveConfirm": {},
   "groups": "{count, plural, zero{Grupo} one{Grupo} other{Grupos}}",
   "@groups": {},
-  "hideListenedSetting": "Hide listened",
+  "hideListenedSetting": "Ocultar escuchados",
   "@hideListenedSetting": {},
-  "hidePodcastDiscovery": "Hide podcast discovery",
+  "hidePodcastDiscovery": "Ocultar descubrimiento de podcasts",
   "@hidePodcastDiscovery": {
     "description": "Hide podcast discovery"
   },
-  "hidePodcastDiscoveryDes": "Hide podcast discovery in search page",
+  "hidePodcastDiscoveryDes": "Ocultar descubrimiento de pocasts en el motor de busqueda",
   "@hidePodcastDiscoveryDes": {},
   "homeGroupsSeeAll": "Ver todo",
   "@homeGroupsSeeAll": {},
@@ -208,7 +208,7 @@
   "@hoursCount": {},
   "import": "Importar",
   "@import": {},
-  "intergateWith": "Integrate with {service}",
+  "intergateWith": "Integrar con {service}",
   "@intergateWith": {
     "description": "Integrate with",
     "placeholders": {
@@ -221,9 +221,9 @@
   "@introSecondPage": {},
   "introThirdPage": "Puedes crear un nuevo grupo de podcasts",
   "@introThirdPage": {},
-  "invalidName": "Invalid username",
+  "invalidName": "Nombre de usuario invalido",
   "@invalidName": {},
-  "lastUpdate": "Last update",
+  "lastUpdate": "Ultima actualización",
   "@lastUpdate": {
     "description": "gpodder.net update"
   },
@@ -245,20 +245,20 @@
   "@listened": {},
   "loadMore": "Cargar mas",
   "@loadMore": {},
-  "loggedInAs": "Logged in as {userName}",
+  "loggedInAs": "Sesión iniciado como {userName}",
   "@loggedInAs": {
     "description": "gpodder.net",
     "placeholders": {
       "userName": {}
     }
   },
-  "login": "Loign",
+  "login": "Iniciar sesión",
   "@login": {
     "description": "gpodder.net login"
   },
-  "loginFailed": "Login failed",
+  "loginFailed": "Inicio de sesión fallido",
   "@loginFailed": {},
-  "logout": "Logout",
+  "logout": "Cerrar sesión",
   "@logout": {
     "description": "gpodder.net logout"
   },
@@ -272,7 +272,7 @@
   "@markConfirmContent": {},
   "markListened": "Marcar escuchados",
   "@markListened": {},
-  "markNotListened": "Mark not listened",
+  "markNotListened": "Marcar no escuchados",
   "@markNotListened": {},
   "menu": "Menú",
   "@menu": {},
@@ -290,7 +290,7 @@
   "@minsCount": {},
   "network": "Red",
   "@network": {},
-  "neverAutoUpdate": "Turn off auto update",
+  "neverAutoUpdate": "Desactivar actualizaciones automaticas ",
   "@neverAutoUpdate": {
     "description": "Never auto  update in podcast settings."
   },
@@ -320,7 +320,7 @@
       "title": {}
     }
   },
-  "notificationSetting": "Notification panel",
+  "notificationSetting": "Panel de notificaciones",
   "@notificationSetting": {},
   "notificationSubscribe": "Suscribir {title}",
   "@notificationSubscribe": {
@@ -354,11 +354,11 @@
   },
   "oldestFirst": "Mas antiguos primero",
   "@oldestFirst": {},
-  "passwdRequired": "Password required",
+  "passwdRequired": "Contraseña requerida",
   "@passwdRequired": {},
-  "password": "Password",
+  "password": "Contraseña",
   "@password": {},
-  "pause": "Pause",
+  "pause": "Pausa",
   "@pause": {},
   "play": "Reproducir",
   "@play": {},
@@ -374,11 +374,11 @@
   "@playerHeightTall": {},
   "playing": "Reproduciendo",
   "@playing": {},
-  "playlistExisted": "Playlist name existed",
+  "playlistExisted": "El nombre de la playlist ya esta en uso",
   "@playlistExisted": {
     "description": "Error string when creating new playlist."
   },
-  "playlistNameEmpty": "Playlist name is empty",
+  "playlistNameEmpty": "La playlist no tiene nombre",
   "@playlistNameEmpty": {
     "description": "Error string when creating new playlist."
   },
@@ -386,11 +386,11 @@
   "@playlists": {
     "description": "Title for playlists tab."
   },
-  "playNext": "Play next",
+  "playNext": "Reproducir siguiente",
   "@playNext": {
     "description": "Popup menu for episode."
   },
-  "playNextDes": "Add episode to top of the playlist",
+  "playNextDes": "Añadir episodio a la cima de la playlist",
   "@playNextDes": {
     "description": "Description for next play."
   },
@@ -428,7 +428,7 @@
   },
   "publishedYearly": "Publicado anualmente",
   "@publishedYearly": {},
-  "queue": "Queue",
+  "queue": "Cola",
   "@queue": {
     "description": "Queue"
   },
@@ -436,13 +436,13 @@
   "@recoverSubscribe": {
     "description": "User can recover subscribe podcast after remove it in subscribe history page."
   },
-  "refresh": "Refresh",
+  "refresh": "Refrescar",
   "@refresh": {
     "description": "Refresh"
   },
   "refreshArtwork": "Actualizar portada",
   "@refreshArtwork": {},
-  "refreshStarted": "Regreshing",
+  "refreshStarted": "Refrescando",
   "@refreshStarted": {
     "description": "Toast for refresh"
   },
@@ -461,7 +461,7 @@
       "date": {}
     }
   },
-  "removeNewMark": "Remove new mark",
+  "removeNewMark": "Remover marca",
   "@removeNewMark": {
     "description": "Remove new mark for new episodes."
   },
@@ -475,7 +475,7 @@
   "@search": {},
   "searchEpisode": "Buscar episodio",
   "@searchEpisode": {},
-  "searchHelper": "Type the podcast name, keywords or enter a feed url.",
+  "searchHelper": "Escribe el nombre del podcast, palabras clave o un feed url",
   "@searchHelper": {},
   "searchInvalidRss": "Enlace RSS invalido ",
   "@searchInvalidRss": {},
@@ -485,7 +485,7 @@
   "@secCount": {},
   "secondsAgo": "{count, plural, zero{Justo ahora} one{Hace {count} segundo } other{Hace {count} segundos}}",
   "@secondsAgo": {},
-  "selected": "{count} selected",
+  "selected": "{count} selecciones",
   "@selected": {
     "placeholders": {
       "count": {}
@@ -517,9 +517,9 @@
   "@settingsBackup": {},
   "settingsBackupDes": "Respaldar datos de la app",
   "@settingsBackupDes": {},
-  "settingsBoostVolume": "Volume boost level",
+  "settingsBoostVolume": "Nivel de aumento de volumen",
   "@settingsBoostVolume": {},
-  "settingsBoostVolumeDes": "Change volume boost level",
+  "settingsBoostVolumeDes": "Cambiar nivel de aumento de volumen",
   "@settingsBoostVolumeDes": {},
   "settingsDefaultGrid": "Vista de cuadricula por defecto",
   "@settingsDefaultGrid": {},
@@ -535,7 +535,7 @@
   "@settingsDiscovery": {
     "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
   },
-  "settingsDownloadPosition": "Download position",
+  "settingsDownloadPosition": "Posicion de descarga",
   "@settingsDownloadPosition": {
     "description": "Choose folder for downloads."
   },
@@ -577,11 +577,11 @@
   "@settingsManageDownload": {},
   "settingsManageDownloadDes": "Administrar archivos de audio descargados",
   "@settingsManageDownloadDes": {},
-  "settingsMarkListenedSkip": "Mark as listened when skipped",
+  "settingsMarkListenedSkip": "Marcar como escuchado al saltar episodio",
   "@settingsMarkListenedSkip": {
     "description": "Mark episode as listened when skipped to next."
   },
-  "settingsMarkListenedSkipDes": "Auto mark episode as listened when it was skipped to next",
+  "settingsMarkListenedSkipDes": "Marcar episodio como escuchado automaticamente al saltar al siguiente",
   "@settingsMarkListenedSkipDes": {},
   "settingsMenuAutoPlay": "Auto reproducir siguiente ",
   "@settingsMenuAutoPlay": {},
@@ -613,11 +613,11 @@
   "@settingsRewindSec": {},
   "settingsRewindSecDes": "Cambia los segundos de retroceso del reproductor",
   "@settingsRewindSecDes": {},
-  "settingsSpeeds": "Speeds",
+  "settingsSpeeds": "Velocidades",
   "@settingsSpeeds": {
     "description": "Playback speeds setting."
   },
-  "settingsSpeedsDes": "Customize the speeds available",
+  "settingsSpeedsDes": "Personalizar velocidades disponibles",
   "@settingsSpeedsDes": {
     "description": "Playback speed setting description"
   },
@@ -651,11 +651,11 @@
   "@settingsUpdateIntervalDes": {},
   "share": "Compartir",
   "@share": {},
-  "showNotesFonts": "Show notes font",
+  "showNotesFonts": "Fuente de las notas del show",
   "@showNotesFonts": {},
   "size": "Tamaño",
   "@size": {},
-  "skipSecondsAtEnd": "Skip seconds at end",
+  "skipSecondsAtEnd": "Saltar segundos al final",
   "@skipSecondsAtEnd": {},
   "skipSecondsAtStart": "Saltar segundos al inicio",
   "@skipSecondsAtStart": {},
@@ -663,33 +663,33 @@
   "@skipSilence": {
     "description": "Feature skip silence"
   },
-  "skipToNext": "Skip to next",
+  "skipToNext": "Saltar a la siguiente",
   "@skipToNext": {},
   "sleepTimer": "Temporizador de sueño",
   "@sleepTimer": {},
-  "status": "Status",
+  "status": "Estatus",
   "@status": {
     "description": "gpodder.net status"
   },
-  "statusAuthError": "Authentication error",
+  "statusAuthError": " Error de autenticación",
   "@statusAuthError": {
     "description": "Sync error"
   },
-  "statusFail": "Failed",
+  "statusFail": "Fallido",
   "@statusFail": {
     "description": "Sync fail"
   },
-  "statusSuccess": "Successful",
+  "statusSuccess": "Exitoso",
   "@statusSuccess": {
     "description": "Sync status"
   },
-  "stop": "Stop",
+  "stop": "Detener",
   "@stop": {},
   "subscribe": "Suscribir",
   "@subscribe": {},
   "subscribeExportDes": "Exportar OPML de todos los podcasts",
   "@subscribeExportDes": {},
-  "syncNow": "Sync now",
+  "syncNow": "Sincronizar ahora",
   "@syncNow": {},
   "systemDefault": "Acorde al sistema",
   "@systemDefault": {},
@@ -766,9 +766,9 @@
   "@updateEpisodesCount": {},
   "updateFailed": "Actualización fallida, error de red",
   "@updateFailed": {},
-  "username": "Username",
+  "username": "Nombre de usuario",
   "@username": {},
-  "usernameRequired": "Username required",
+  "usernameRequired": "Nombre de usuario requerido",
   "@usernameRequired": {},
   "version": "Versión: {version}",
   "@version": {
