@@ -588,6 +588,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       try {
         p = RssFeed.parse(response.data);
       } catch (e) {
+        developer.log('Parse error', error: e);
         sendPort.send([item.title, item.url, 6]);
         await Future.delayed(Duration(seconds: 2));
         sendPort.send([item.title, item.url, 4]);
