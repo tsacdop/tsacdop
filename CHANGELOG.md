@@ -1,14 +1,21 @@
 # Tsacdop Changelog
+## 0.5.9
+
+Release date 2021/2/11
+### Bug fix
+
+* Some podcasts subscribe failed.
+* Update fastlane screenshots.
 
 ## 0.5.8
 Release date 2021/2/9
 
-## New features
+### New features
 
-* Artwork shownote and chapters in player panel.
+* Artwork shownotes and chapters in player panel.
 * Play without subscription, inside search result directly.
 
-## Bug fix
+### Bug fix
 
 * Episode download failed with '/' in title.
 
@@ -19,36 +26,36 @@ For frdoid
 ## 0.5.6
 Release date 2021/1.28
 
-## Bug fix
+### Bug fix
 * Image saved wrongly after subscribe new podcast.
 
 ## 0.5.5
 Release date 2021/1/25
 
-## Bugs fix
+### Bugs fix
 * Position not saved after player stpoped.
 * Wrongly remove episodes from playlist when get back from playlist page.
 * Player crash on OP5T.
 
-## Minor change
+### Minor change
 * Playlist page UI update.
 
 ## 0.5.4
 Release date 2021/1/9
 
-## New feature
+### New feature
 * Support podcastindex namespace podcast:funding, 
 
-## Minor change
+### Minor change
 * Podcast detail page UI update. 
 
-## Bug fix
+### Bug fix
 * Custom rss link subscribe error.
 
 ## 0.5.3
 Release date 2021/1/7
 
-## Minor change
+### Minor change
 * Option to open playlist page by default.
 * Option to open podcast list page instead of group page.
 * Add remove new mark buttong in podcast page.
@@ -58,14 +65,14 @@ Release date 2021/1/7
 Release date 2021/1/3
 First release in 2021
 
-## New features
+### New features
 * Custom playlist support.
 * Playlist page redesign.
 * Podcast detail page and group management page UI update.
 * Add remove new mark button in recent tab antion bar.
 * Support time setting in sleep mode.
 
-## Minor change
+### Minor change
 * Remove add new to playlist button.
 * Groups management perfomance improved.
 * Podcast page opennning animation improved.
