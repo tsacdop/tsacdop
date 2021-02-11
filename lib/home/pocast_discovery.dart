@@ -197,6 +197,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
   }
 
   Future<List<OnlinePodcast>> _getTopPodcasts({int page}) async {
+    if(environment['apiKey'] == '') return [];
     final searchEngine = ListenNotesSearch();
     var searchResult = await searchEngine.fetchBestPodcast(
       genre: '',
