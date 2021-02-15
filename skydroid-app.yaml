@@ -1,0 +1,19 @@
+name: Tsacdop
+authorName: stonegate
+packageName: com.stonegate.tsacdop
+
+icon: https://raw.githubusercontent.com/stonega/tsacdop/master/assets/logo.png
+
+localized:
+  en-US:
+    description: |-
+      Tsacdop is a podcast player developed with Flutter, a clean, simply beautiful and friendly app, which is also free and open source.
+    summary: Enjoy podcasts with Tscadop
+
+builds: 
+
+currentVersionName: 0.5.9
+currentVersionCode: 47
+
+added: 1613359281221
+lastUpdated: 1613359281221

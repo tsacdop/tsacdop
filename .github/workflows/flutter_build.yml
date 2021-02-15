@@ -39,5 +39,6 @@ jobs:
           name: release-file
           path: |
             build/app/outputs/**/release/*
+            build/app/outputs/flutter-apk/app-play-release.apk
             build/app/outputs/bundle/playRelease/*
           
