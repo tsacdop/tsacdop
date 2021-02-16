@@ -1245,8 +1245,8 @@ class TabIndicator extends CustomPainter {
         index == 2 || fraction == 0 ? _accentPaint : _paint);
     if (fraction == 1) {
       canvas.drawLine(
-          Offset(size.width/2 - indicatorSize / 2, size.height),
-          Offset(size.width/2 + indicatorSize / 2, size.height),
+          Offset(size.width / 2 - indicatorSize / 2, size.height),
+          Offset(size.width / 2 + indicatorSize / 2, size.height),
           index == 1 || fraction == 0 ? _accentPaint : _paint);
     }
   }
