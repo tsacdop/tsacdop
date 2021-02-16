@@ -212,6 +212,8 @@ class _AboutAppState extends State<AboutApp> {
                               'https://github.com/stonega/tsacdop'),
                           _listItem(context, 'Telegram', LineIcons.telegram,
                               'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
+                          _listItem(context, 'Reddit', LineIcons.redditLogo,
+                              'https://www.reddit.com/r/Tsacdop'),
                           Center(
                             child: SizedBox(
                               width: 200,
