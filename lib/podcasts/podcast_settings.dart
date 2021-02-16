@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
+import 'package:line_icons/line_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -63,6 +64,11 @@ class _PodcastSettingState extends State<PodcastSetting> {
     if (mounted) setState(() {});
   }
 
+  Future<void> _setHideNewMark(bool boo) async {
+    await _dbHelper.saveHideNewMark(widget.podcastLocal.id, boo: boo);
+    if (mounted) setState(() {});
+  }
+
   Future<void> _saveSkipSecondsStart(int seconds) async {
     await _dbHelper.saveSkipSecondsStart(widget.podcastLocal.id, seconds);
   }
@@ -77,6 +83,10 @@ class _PodcastSettingState extends State<PodcastSetting> {
 
   Future<bool> _getNeverUpdate(String id) async {
     return await _dbHelper.getNeverUpdate(id);
+  }
+
+  Future<bool> _getHideNewMark(String id) async {
+    return await _dbHelper.getHideNewMark(id);
   }
 
   Future<int> _getSkipSecondStart(String id) async {
@@ -246,6 +256,27 @@ class _PodcastSettingState extends State<PodcastSetting> {
                   scale: 0.8,
                   child:
                       Switch(value: snapshot.data, onChanged: _setNeverUpdate),
+                ),
+              );
+            }),
+        FutureBuilder<bool>(
+            future: _getHideNewMark(widget.podcastLocal.id),
+            initialData: false,
+            builder: (context, snapshot) {
+              return ListTile(
+                dense: true,
+                onTap: () => _setHideNewMark(!snapshot.data),
+                title: Row(
+                  children: [
+                    Icon(LineIcons.eraser, size: 20),
+                    SizedBox(width: 20),
+                    Text('Always hide new mark', style: textStyle),
+                  ],
+                ),
+                trailing: Transform.scale(
+                  scale: 0.8,
+                  child:
+                      Switch(value: snapshot.data, onChanged: _setHideNewMark),
                 ),
               );
             }),

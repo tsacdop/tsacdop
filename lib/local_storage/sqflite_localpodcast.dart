@@ -28,7 +28,7 @@ class DBHelper {
     var documentsDirectory = await getDatabasesPath();
     var path = join(documentsDirectory, "podcasts.db");
     var theDb = await openDatabase(path,
-        version: 6, onCreate: _onCreate, onUpgrade: _onUpgrade);
+        version: 7, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -40,7 +40,8 @@ class DBHelper {
         background_image TEXT DEFAULT '', hosts TEXT DEFAULT '',update_count INTEGER DEFAULT 0,
         episode_count INTEGER DEFAULT 0, skip_seconds INTEGER DEFAULT 0, 
         auto_download INTEGER DEFAULT 0, skip_seconds_end INTEGER DEFAULT 0,
-        never_update INTEGER DEFAULT 0, funding TEXT DEFAULT '[]')""");
+        never_update INTEGER DEFAULT 0, funding TEXT DEFAULT '[]', 
+        hide_new_mark INTEGER DEFAULT 0 )""");
     await db
         .execute("""CREATE TABLE Episodes(id INTEGER PRIMARY KEY,title TEXT, 
         enclosure_url TEXT UNIQUE, enclosure_length INTEGER, pubDate TEXT, 
@@ -90,6 +91,8 @@ class DBHelper {
       case (5):
         await _v6Update(db);
         break;
+      case (6):
+        await _v7Update(db);
     }
   }
 
@@ -124,6 +127,10 @@ class DBHelper {
     await db.execute(
         """CREATE INDEX  episode_search ON Episodes (enclosure_url, feed_id)
     """);
+  }
+
+  Future<void> _v7Update(Database db) async {
+    await db.execute("ALTER TABLE PodcastLocal ADD hide_new_mark INTEGER DEFAULT 0");
   }
 
   Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts,
@@ -251,6 +258,21 @@ class DBHelper {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET never_update = ? WHERE id = ?",
+        [boo ? 1 : 0, id]);
+  }
+
+    Future<bool> getHideNewMark(String id) async {
+    var dbClient = await database;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT hide_new_mark FROM PodcastLocal WHERE id = ?', [id]);
+    if (list.isNotEmpty) return list.first['hide_new_mark'] == 1;
+    return false;
+  }
+
+  Future<int> saveHideNewMark(String id, {bool boo}) async {
+    var dbClient = await database;
+    return await dbClient.rawUpdate(
+        "UPDATE PodcastLocal SET hide_new_mark = ? WHERE id = ?",
         [boo ? 1 : 0, id]);
   }
 
@@ -682,10 +704,11 @@ class DBHelper {
 
   Future<int> updatePodcastRss(PodcastLocal podcastLocal,
       {int removeMark = 0}) async {
-    var options = BaseOptions(
+    final options = BaseOptions(
       connectTimeout: 20000,
       receiveTimeout: 20000,
     );
+    final hideNewMark = await getHideNewMark(podcastLocal.id);
     try {
       var response = await Dio(options).get(podcastLocal.rssUrl);
       if (response.statusCode == 200) {
@@ -728,7 +751,7 @@ class DBHelper {
               await txn.rawInsert(
                   """INSERT OR IGNORE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
                 description, feed_id, milliseconds, duration, explicit, media_id, chapter_link,
-                episode_image, is_new) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)""",
+                episode_image, is_new) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                   [
                     title,
                     url,
@@ -741,7 +764,8 @@ class DBHelper {
                     explicit,
                     url,
                     chapter,
-                    image
+                    image,
+                    hideNewMark ? 0 : 1
                   ]);
             });
           }
