@@ -3,7 +3,7 @@ Why Tsacdop?
  <b>Unique Design</b> With Tsacdop, you will get a totally different experience with any other podcast players. Tsacdop has a unique layout and good-looking material design.
  <b>Group management</b> You can manage your podcasts with groups easily.  
  <b>Privacy Friendly</b> Tsacdop is a free and open sourced application,  which won't upload your data to the server.
- <b>Easy Search</b>The podcast is powered by ListenNotes and PodcastIndex, so you can search from more than 1 million podcasts.
+ <b>Easy Search</b>The podcast is powered by ListenNotes(unavailable in fdroid version) and PodcastIndex, so you can search from more than 1 million podcasts.
 Features:
 * Podcasts group management
 * Playlist support
