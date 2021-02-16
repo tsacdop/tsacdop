@@ -1,4 +1,4 @@
-name: tsacdop.stonegate 
+name: tsacdop.stonegate.me
 metadataFile: skydroid-app.yaml
 skynetPortal: https://siasky.net
 
@@ -8,7 +8,7 @@ checkVersion:
   versionName: 'version:\s(.+)\+'
 
 uploadBuild:
-  file: build/app/outputs/flutter-apk/app-release.apk
+  file: build/app/outputs/flutter-apk/app-play-release.apk
 
 updateMetadataFile:
   updateWhatsNew: false
