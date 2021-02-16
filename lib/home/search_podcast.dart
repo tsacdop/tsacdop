@@ -9,6 +9,7 @@ import 'package:flutter/material.dart' hide SearchDelegate;
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
 
@@ -546,48 +547,50 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
-                      child: OutlineButton(
-                        highlightedBorderColor: context.accentColor,
-                        splashColor: context.accentColor.withOpacity(0.5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100)),
-                        child: _loading
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: Platform.isIOS
-                                    ? CupertinoActivityIndicator()
-                                    : CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ))
-                            : Text(context.s.loadMore),
-                        onPressed: () => _loading
-                            ? null
-                            : setState(
-                                () {
-                                  _loading = true;
-                                  _nextOffset = _offset;
-                                  _searchFuture = _getListenNotesList(
-                                      widget.query, _nextOffset);
-                                },
-                              ),
-                      ),
+                    OutlineButton(
+                      highlightedBorderColor: context.accentColor,
+                      splashColor: context.accentColor.withOpacity(0.5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100)),
+                      child: _loading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: Platform.isIOS
+                                  ? CupertinoActivityIndicator()
+                                  : CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ))
+                          : Text(context.s.loadMore),
+                      onPressed: () => _loading
+                          ? null
+                          : setState(
+                              () {
+                                _loading = true;
+                                _nextOffset = _offset;
+                                _searchFuture = _getListenNotesList(
+                                    widget.query, _nextOffset);
+                              },
+                            ),
                     )
                   ],
                 ),
               ),
               SliverToBoxAdapter(
-                  child: SizedBox(
-                height: 20,
+                  child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
                 child: Center(
-                  child: Image(
-                    image: context.brightness == Brightness.light
-                        ? AssetImage('assets/listennotes.png')
-                        : AssetImage('assets/listennotes_light.png'),
-                    height: 15,
+                  child: Text(
+                    'Powered by ListenNotes',
+                    style: GoogleFonts.quicksand(
+                        color: Colors.red, textStyle: TextStyle(fontSize: 15)),
                   ),
+                  //  Image(
+                  //   image: context.brightness == Brightness.light
+                  //       ? AssetImage('assets/listennotes.png')
+                  //       : AssetImage('assets/listennotes_light.png'),
+                  //   height: 15,
+                  // ),
                 ),
               ))
             ],
@@ -706,47 +709,50 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
-                        child: OutlineButton(
-                          highlightedBorderColor: context.accentColor,
-                          splashColor: context.accentColor.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100)),
-                          child: _loading
-                              ? SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ))
-                              : Text(context.s.loadMore),
-                          onPressed: () => _loading
-                              ? null
-                              : setState(
-                                  () {
-                                    _loading = true;
-                                    _limit += 10;
-                                    _searchFuture = _getPodcatsIndexList(
-                                        widget.query,
-                                        limit: _limit);
-                                  },
-                                ),
-                        ),
+                      OutlineButton(
+                        highlightedBorderColor: context.accentColor,
+                        splashColor: context.accentColor.withOpacity(0.5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100)),
+                        child: _loading
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ))
+                            : Text(context.s.loadMore),
+                        onPressed: () => _loading
+                            ? null
+                            : setState(
+                                () {
+                                  _loading = true;
+                                  _limit += 10;
+                                  _searchFuture = _getPodcatsIndexList(
+                                      widget.query,
+                                      limit: _limit);
+                                },
+                              ),
                       )
                     ],
                   ),
                 ),
                 SliverToBoxAdapter(
-                    child: SizedBox(
-                  height: 20,
-                  child: Center(
-                    child: Image(
-                      image: AssetImage('assets/podcastindex.png'),
-                      height: 15,
-                    ),
-                  ),
-                ))
+                    child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Center(
+                          child: Text(
+                            'Powered by PODCASTINDEX',
+                            style: GoogleFonts.quicksand(
+                                color: Colors.red,
+                                textStyle: TextStyle(fontSize: 15)),
+                          ),
+                        )
+                        // Image(
+                        //   image: AssetImage('assets/podcastindex.png'),
+                        //   height: 15,
+                        // ),
+                        ))
               ],
             );
           }),

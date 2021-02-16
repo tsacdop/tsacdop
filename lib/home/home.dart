@@ -7,6 +7,7 @@ import 'package:flutter/material.dart' hide NestedScrollView, showSearch;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -167,13 +168,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                             : settings.setTheme =
                                                 ThemeMode.light
                                       },
-                                      child: Image(
-                                        image: Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? AssetImage('assets/text.png')
-                                            : AssetImage(
-                                                'assets/text_light.png'),
-                                        height: 30,
+                                      child: Text(
+                                        'Tsacdop',
+                                        style: GoogleFonts.quicksand(
+                                            color: context.accentColor,
+                                            textStyle: TextStyle(fontSize: 25)),
                                       ),
                                     ),
                                     featureDiscoveryOverlay(context,
