@@ -15,6 +15,7 @@ import '../type/podcastlocal.dart';
 import '../type/sub_history.dart';
 
 enum Filter { downloaded, liked, search, all }
+const localFolderId = "46e48103-06c7-4fe1-a0b1-68aa7205b7f0";
 
 class DBHelper {
   static Database _db;
@@ -130,7 +131,8 @@ class DBHelper {
   }
 
   Future<void> _v7Update(Database db) async {
-    await db.execute("ALTER TABLE PodcastLocal ADD hide_new_mark INTEGER DEFAULT 0");
+    await db.execute(
+        "ALTER TABLE PodcastLocal ADD hide_new_mark INTEGER DEFAULT 0");
   }
 
   Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts,
@@ -189,18 +191,20 @@ class DBHelper {
     var podcastLocal = <PodcastLocal>[];
 
     for (var i in list) {
-      podcastLocal.add(PodcastLocal(
-        i['title'],
-        i['imageUrl'],
-        i['rssUrl'],
-        i['primaryColor'],
-        i['author'],
-        i['id'],
-        i['imagePath'],
-        i['provider'],
-        i['link'],
-        List<String>.from(jsonDecode(list.first['funding'])),
-      ));
+      if (i['id'] != localFolderId) {
+        podcastLocal.add(PodcastLocal(
+          i['title'],
+          i['imageUrl'],
+          i['rssUrl'],
+          i['primaryColor'],
+          i['author'],
+          i['id'],
+          i['imagePath'],
+          i['provider'],
+          i['link'],
+          List<String>.from(jsonDecode(list.first['funding'])),
+        ));
+      }
     }
     return podcastLocal;
   }
@@ -261,7 +265,7 @@ class DBHelper {
         [boo ? 1 : 0, id]);
   }
 
-    Future<bool> getHideNewMark(String id) async {
+  Future<bool> getHideNewMark(String id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT hide_new_mark FROM PodcastLocal WHERE id = ?', [id]);
@@ -339,7 +343,6 @@ class DBHelper {
 
   Future savePodcastLocal(PodcastLocal podcastLocal) async {
     var milliseconds = DateTime.now().millisecondsSinceEpoch;
-    print(podcastLocal.imagePath);
     var dbClient = await database;
     await dbClient.transaction((txn) async {
       await txn.rawInsert(
@@ -360,14 +363,16 @@ class DBHelper {
             podcastLocal.link,
             jsonEncode(podcastLocal.funding)
           ]);
-      await txn.rawInsert(
-          """REPLACE INTO SubscribeHistory(id, title, rss_url, add_date) VALUES (?, ?, ?, ?)""",
-          [
-            podcastLocal.id,
-            podcastLocal.title,
-            podcastLocal.rssUrl,
-            milliseconds
-          ]);
+      if (podcastLocal.id != localFolderId) {
+        await txn.rawInsert(
+            """REPLACE INTO SubscribeHistory(id, title, rss_url, add_date) VALUES (?, ?, ?, ?)""",
+            [
+              podcastLocal.id,
+              podcastLocal.title,
+              podcastLocal.rssUrl,
+              milliseconds
+            ]);
+      }
     });
   }
 
@@ -416,26 +421,28 @@ class DBHelper {
   }
 
   Future<void> saveHistory(PlayHistory history) async {
-    var dbClient = await database;
-    final milliseconds = DateTime.now().millisecondsSinceEpoch;
-    var recent = await getPlayHistory(1);
-    if (recent.isNotEmpty && recent.first.title == history.title) {
-      await dbClient.rawDelete("DELETE FROM PlayHistory WHERE add_date = ?",
-          [recent.first.playdate.millisecondsSinceEpoch]);
-    }
-    await dbClient.transaction((txn) async {
-      return await txn.rawInsert(
-          """INSERT INTO PlayHistory (title, enclosure_url, seconds, seek_value, add_date, listen_time)
+    if (history.url.substring(0, 7) != 'file://') {
+      var dbClient = await database;
+      final milliseconds = DateTime.now().millisecondsSinceEpoch;
+      var recent = await getPlayHistory(1);
+      if (recent.isNotEmpty && recent.first.title == history.title) {
+        await dbClient.rawDelete("DELETE FROM PlayHistory WHERE add_date = ?",
+            [recent.first.playdate.millisecondsSinceEpoch]);
+      }
+      await dbClient.transaction((txn) async {
+        return await txn.rawInsert(
+            """INSERT INTO PlayHistory (title, enclosure_url, seconds, seek_value, add_date, listen_time)
        VALUES (?, ?, ?, ?, ?, ?) """,
-          [
-            history.title,
-            history.url,
-            history.seconds,
-            history.seekValue,
-            milliseconds,
-            history.seekValue > 0.95 ? 1 : 0
-          ]);
-    });
+            [
+              history.title,
+              history.url,
+              history.seconds,
+              history.seekValue,
+              milliseconds,
+              history.seekValue > 0.95 ? 1 : 0
+            ]);
+      });
+    }
   }
 
   Future<List<PlayHistory>> getPlayHistory(int top) async {
@@ -784,6 +791,36 @@ class DBHelper {
       developer.log(e.toString(), name: 'Update podcast error');
       return -1;
     }
+  }
+
+  Future<void> saveLocalEpisode(EpisodeBrief episode) async {
+    var dbClient = await database;
+    await dbClient.transaction((txn) async {
+      await txn.rawInsert(
+          """INSERT OR REPLACE INTO Episodes(title, enclosure_url, enclosure_length, pubDate, 
+                description, feed_id, milliseconds, duration, explicit, media_id, episode_image) 
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+          [
+            episode.title,
+            episode.enclosureUrl,
+            episode.enclosureLength,
+            '',
+            '',
+            localFolderId,
+            episode.pubDate,
+            episode.duration,
+            0,
+            episode.enclosureUrl,
+            episode.episodeImage
+          ]);
+    });
+  }
+
+  Future<void> deleteLocalEpisodes(List<String> files) async {
+    var dbClient = await database;
+    var s = files.map<String>((e) => "'$e'").toList();
+    await dbClient.rawDelete(
+        'DELETE FROM Episodes WHERE enclosure_url in (${s.join(',')})');
   }
 
   Future<List<EpisodeBrief>> getRssItem(String id, int count,
@@ -1192,16 +1229,17 @@ class DBHelper {
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
-        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
+        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url WHERE p.id != ? 
         GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
         OR SUM(H.listen_time) = 0 ORDER BY E.milliseconds DESC LIMIT ? """,
-          [top]);
+          [localFolderId, top]);
     } else {
       list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        ORDER BY E.milliseconds DESC LIMIT ? """, [top]);
+        WHERE p.id != ? ORDER BY E.milliseconds DESC LIMIT ? """,
+          [localFolderId, top]);
     }
     if (list.isNotEmpty) {
       for (var i in list) {
@@ -1231,15 +1269,17 @@ class DBHelper {
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 
-        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url 
+        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url WHERE p.id != ?  
         GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null 
-        OR SUM(H.listen_time) = 0 ORDER BY RANDOM() LIMIT ? """, [random]);
+        OR SUM(H.listen_time) = 0 ORDER BY RANDOM() LIMIT ? """,
+          [localFolderId, random]);
     } else {
       list = await dbClient.rawQuery(
           """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
         P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        ORDER BY RANDOM() LIMIT ? """, [random]);
+        WHERE p.id != ?  ORDER BY RANDOM() LIMIT ? """,
+          [localFolderId, random]);
     }
     if (list.isNotEmpty) {
       for (var i in list) {

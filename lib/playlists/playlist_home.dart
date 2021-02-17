@@ -1,11 +1,20 @@
+import 'dart:developer' as developer;
+import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:color_thief_flutter/color_thief_flutter.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image/image.dart' as img;
 import 'package:line_icons/line_icons.dart';
+import 'package:media_metadata_retriever/media_metadata_retriever.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
+import 'package:uuid/uuid.dart';
 
 import '../home/home.dart';
 import '../local_storage/sqflite_localpodcast.dart';
@@ -14,6 +23,7 @@ import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
 import '../type/play_histroy.dart';
 import '../type/playlist.dart';
+import '../type/podcastlocal.dart';
 import '../util/extension_helper.dart';
 import '../util/pageroute.dart';
 import '../widgets/custom_widget.dart';
@@ -152,7 +162,9 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                       splashRadius: 20,
                                       icon: Icon(Icons.skip_next),
                                       onPressed: () {
-                                        if (running) {
+                                        if (running &&
+                                            !(data.item1.length == 1 &&
+                                                !data.item1.isQueue)) {
                                           audio.playNext();
                                         }
                                       }),
@@ -187,7 +199,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                   selector: (_, audio) => audio.lastPosition,
                                   builder: (_, position, __) {
                                     return Text(
-                                        '${(position ~/ 1000).toTime} / ${(data.item4?.duration??0).toTime}');
+                                        '${(position ~/ 1000).toTime} / ${(data.item4?.duration ?? 0).toTime}');
                                   },
                                 ),
                             ],
@@ -196,6 +208,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Stack(
+                                    alignment: Alignment.center,
                                     children: [
                                       SizedBox(
                                           width: 80,
@@ -225,9 +238,9 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                             width: 80,
                                             child: CustomPaint(
                                               painter: CircleProgressIndicator(
-                                                progress,
-                                                color: Colors.black38,
-                                              ),
+                                                  progress,
+                                                  color: context.primaryColor
+                                                      .withOpacity(0.9)),
                                             ),
                                           );
                                         },
@@ -333,14 +346,12 @@ class __QueueState extends State<_Queue> {
                                 key: ValueKey(episode.enclosureUrl),
                               );
                             } else {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                child: EpisodeCard(episode,
-                                    key: ValueKey('playing'),
-                                    isPlaying: true,
-                                    canReorder: true,
-                                    tileColor: context.primaryColorDark),
-                              );
+                              return EpisodeCard(episode,
+                                  key: ValueKey('playing'),
+                                  isPlaying: true,
+                                  canReorder: true,
+                                  havePadding: true,
+                                  tileColor: context.primaryColorDark);
                             }
                           }).toList()
                         : episodes
@@ -425,7 +436,7 @@ class __HistoryState extends State<_History> {
   }
 
   Size _getMaskStop(double seekValue, int seconds) {
-    final Size size = (TextPainter(
+    final size = (TextPainter(
             text: TextSpan(text: seconds.toTime),
             maxLines: 1,
             textScaleFactor: MediaQuery.of(context).textScaleFactor,
@@ -711,19 +722,31 @@ class __PlaylistsState extends State<_Playlists> {
                                 Text(
                                     '${queue.length} ${s.episode(queue.length).toLowerCase()}'),
                                 TextButton(
-                                    style: OutlinedButton.styleFrom(
-                                        side: BorderSide(
-                                            color: context.primaryColorDark),
-                                        primary: context.accentColor,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(100)))),
-                                    onPressed: () {
-                                      context
-                                          .read<AudioPlayerNotifier>()
-                                          .playlistLoad(queue);
-                                    },
-                                    child: Text(s.play))
+                                  style: TextButton.styleFrom(
+                                      primary: context.accentColor,
+                                      textStyle: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  onPressed: () {
+                                    context
+                                        .read<AudioPlayerNotifier>()
+                                        .playlistLoad(queue);
+                                  },
+                                  child: Row(
+                                    children: <Widget>[
+                                      Text(s.play.toUpperCase(),
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(context).accentColor,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          )),
+                                      Icon(
+                                        Icons.play_arrow,
+                                        color: Theme.of(context).accentColor,
+                                      ),
+                                    ],
+                                  ),
+                                )
                               ],
                             )
                           ],
@@ -768,9 +791,25 @@ class __PlaylistsState extends State<_Playlists> {
                       title: Text(data[index].name),
                       subtitle: Text(
                           '${data[index].length} ${s.episode(data[index].length).toLowerCase()}'),
-                      trailing: IconButton(
-                        splashRadius: 20,
-                        icon: Icon(LineIcons.playCircle, size: 30),
+                      trailing: TextButton(
+                        style: TextButton.styleFrom(
+                            primary: context.accentColor,
+                            textStyle: TextStyle(fontWeight: FontWeight.bold)),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(s.play.toUpperCase(),
+                                style: TextStyle(
+                                  color: Theme.of(context).accentColor,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                )),
+                            Icon(
+                              Icons.play_arrow,
+                              color: Theme.of(context).accentColor,
+                            ),
+                          ],
+                        ),
                         onPressed: () {
                           context
                               .read<AudioPlayerNotifier>()
@@ -806,7 +845,7 @@ class __PlaylistsState extends State<_Playlists> {
   }
 }
 
-enum NewPlaylistOption { blank, randon10, latest10 }
+enum NewPlaylistOption { blank, randon10, latest10, folder }
 
 class _NewPlaylist extends StatefulWidget {
   _NewPlaylist({Key key}) : super(key: key);
@@ -819,11 +858,15 @@ class __NewPlaylistState extends State<_NewPlaylist> {
   final _dbHelper = DBHelper();
   String _playlistName = '';
   NewPlaylistOption _option;
+  bool _loadFolder;
+  FocusNode _focusNode;
   int _error;
 
   @override
   void initState() {
     super.initState();
+    _loadFolder = false;
+    _focusNode = FocusNode();
     _option = NewPlaylistOption.blank;
   }
 
@@ -837,7 +880,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
 
   Widget _createOption(NewPlaylistOption option) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.fromLTRB(0, 8, 8, 8),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
@@ -845,19 +888,15 @@ class __NewPlaylistState extends State<_NewPlaylist> {
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: 300),
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               color: _option == option
                   ? context.accentColor
                   : context.primaryColorDark),
-          height: 32,
-          child: Center(
-              child: Text(_optionLabel(option).first,
-                  style: TextStyle(
-                      color: _option == option
-                          ? Colors.white
-                          : context.textColor))),
+          child: Text(_optionLabel(option).first,
+              style: TextStyle(
+                  color: _option == option ? Colors.white : context.textColor)),
         ),
       ),
     );
@@ -874,10 +913,82 @@ class __NewPlaylistState extends State<_NewPlaylist> {
       case NewPlaylistOption.latest10:
         return ['Latest 10', 'Add 10 latest updated episodes to playlist'];
         break;
+      case NewPlaylistOption.folder:
+        return ['Local folder', 'Choose a local folder'];
+        break;
       default:
         return ['', ''];
         break;
     }
+  }
+
+  Future<List<EpisodeBrief>> _loadLocalFolder() async {
+    var episodes = <EpisodeBrief>[];
+    var dirPath;
+    try {
+      dirPath = await FilePicker.platform.getDirectoryPath();
+    } catch (e) {
+      developer.log(e, name: 'Failed to load dir.');
+    }
+    final localFolder = await _dbHelper.getPodcastLocal([localFolderId]);
+    if (localFolder.isEmpty) {
+      final localPodcast = PodcastLocal('Local Folder', '', '', '',
+          'Local Folder', localFolderId, '', '', '', []);
+      await _dbHelper.savePodcastLocal(localPodcast);
+    }
+    if (dirPath != null) {
+      var dir = Directory(dirPath);
+      for (var file in dir.listSync()) {
+        if (file is File) {
+          if (file.path.split('.').last == 'mp3') {
+            final episode = await _getEpisodeFromFile(file.path);
+            episodes.add(episode);
+            await _dbHelper.saveLocalEpisode(episode);
+          }
+        }
+      }
+    }
+    return episodes;
+  }
+
+  Future<EpisodeBrief> _getEpisodeFromFile(String path) async {
+    var metadataRetriever = MediaMetadataRetriever();
+    final fileLength = File(path).statSync().size;
+    final pubDate = DateTime.now().millisecondsSinceEpoch;
+    var primaryColor;
+    var imagePath;
+    await metadataRetriever.setFile(File(path));
+    if (metadataRetriever.albumArt != null) {
+      final dir = await getApplicationDocumentsDirectory();
+      final image = img.decodeImage(metadataRetriever.albumArt);
+      final thumbnail = img.copyResize(image, width: 300);
+      var uuid = Uuid().v4();
+      File("${dir.path}/$uuid.png")..writeAsBytesSync(img.encodePng(thumbnail));
+      imagePath = "${dir.path}/$uuid.png";
+      primaryColor = await _getColor(File(imagePath));
+    }
+    final fileName = path.split('/').last;
+    final metadata = await metadataRetriever.metadata;
+    return EpisodeBrief(
+        fileName,
+        'file://$path',
+        fileLength,
+        pubDate,
+        metadata.albumName ?? '',
+        primaryColor ?? '',
+        metadata.trackDuration,
+        0,
+        '',
+        0,
+        episodeImage: imagePath ?? '');
+  }
+
+  Future<String> _getColor(File file) async {
+    final imageProvider = FileImage(file);
+    var colorImage = await getImageFromProvider(imageProvider);
+    var color = await getColorFromImage(colorImage);
+    var primaryColor = color.toString();
+    return primaryColor;
   }
 
   @override
@@ -939,10 +1050,32 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                     );
                     await playlist.getPlaylist();
                     break;
+                  case NewPlaylistOption.folder:
+                    _focusNode.unfocus();
+                    setState(() {
+                      _loadFolder = true;
+                    });
+                    final episodes = await _loadLocalFolder();
+                    if (episodes.isNotEmpty) {
+                      playlist = Playlist(
+                        _playlistName,
+                        isLocal: true,
+                        episodeList: [for (var e in episodes) e.enclosureUrl],
+                      );
+                      await playlist.getPlaylist();
+                    }
+                    if (mounted) {
+                      setState(() {
+                        _loadFolder = false;
+                      });
+                    }
+                    break;
                   default:
                     break;
                 }
-                context.read<AudioPlayerNotifier>().addPlaylist(playlist);
+                if (playlist != null) {
+                  context.read<AudioPlayerNotifier>().addPlaylist(playlist);
+                }
                 Navigator.of(context).pop();
               }
             },
@@ -952,52 +1085,63 @@ class __NewPlaylistState extends State<_NewPlaylist> {
         ],
         title: SizedBox(
             width: context.width - 160, child: Text(s.createNewPlaylist)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                hintText: s.createNewPlaylist,
-                hintStyle: TextStyle(fontSize: 18),
-                filled: true,
-                focusedBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: context.accentColor, width: 2.0),
+        content: _loadFolder
+            ? SizedBox(
+                height: 50,
+                child: Center(
+                  child: Platform.isIOS
+                      ? CupertinoActivityIndicator()
+                      : CircularProgressIndicator(),
                 ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: context.accentColor, width: 2.0),
-                ),
-              ),
-              cursorRadius: Radius.circular(2),
-              autofocus: true,
-              maxLines: 1,
-              onChanged: (value) {
-                _playlistName = value;
-              },
-            ),
-            Container(
-                alignment: Alignment.centerLeft,
-                child: _error != null
-                    ? Text(
-                        _error == 1 ? s.playlistExisted : s.playlistNameEmpty,
-                        style: TextStyle(color: Colors.red[400]),
-                      )
-                    : Center()),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  _createOption(NewPlaylistOption.blank),
-                  _createOption(NewPlaylistOption.randon10),
-                  _createOption(NewPlaylistOption.latest10),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  TextField(
+                    focusNode: _focusNode,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                      hintText: s.createNewPlaylist,
+                      hintStyle: TextStyle(fontSize: 18),
+                      filled: true,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: context.accentColor, width: 2.0),
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: context.accentColor, width: 2.0),
+                      ),
+                    ),
+                    cursorRadius: Radius.circular(2),
+                    autofocus: true,
+                    maxLines: 1,
+                    onChanged: (value) {
+                      _playlistName = value;
+                    },
+                  ),
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: _error != null
+                          ? Text(
+                              _error == 1
+                                  ? s.playlistExisted
+                                  : s.playlistNameEmpty,
+                              style: TextStyle(color: Colors.red[400]),
+                            )
+                          : Center()),
+                  SizedBox(height: 10),
+                  Wrap(
+                    children: [
+                      _createOption(NewPlaylistOption.blank),
+                      _createOption(NewPlaylistOption.randon10),
+                      _createOption(NewPlaylistOption.latest10),
+                      _createOption(NewPlaylistOption.folder)
+                    ],
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

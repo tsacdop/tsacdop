@@ -7,17 +7,24 @@ import 'episodebrief.dart';
 class PlaylistEntity {
   final String name;
   final String id;
+  final bool isLocal;
   final List<String> episodeList;
 
-  PlaylistEntity(this.name, this.id, this.episodeList);
+  PlaylistEntity(this.name, this.id, this.isLocal, this.episodeList);
 
   Map<String, Object> toJson() {
-    return {'name': name, 'id': id, 'episodeList': episodeList};
+    return {
+      'name': name,
+      'id': id,
+      'isLocal': isLocal,
+      'episodeList': episodeList
+    };
   }
 
   static PlaylistEntity fromJson(Map<String, Object> json) {
     var list = List<String>.from(json['episodeList']);
-    return PlaylistEntity(json['name'] as String, json['id'] as String, list);
+    return PlaylistEntity(json['name'] as String, json['id'] as String,
+        json['isLocal'] == null ? false : json['isLocal'] as bool, list);
   }
 }
 
@@ -27,6 +34,8 @@ class Playlist extends Equatable {
 
   /// Unique id for playlist.
   final String id;
+
+  final bool isLocal;
 
   /// Episode url list for playlist.
   final List<String> episodeList;
@@ -45,20 +54,24 @@ class Playlist extends Equatable {
   bool contains(EpisodeBrief episode) => episodes.contains(episode);
 
   Playlist(this.name,
-      {String id, List<String> episodeList, List<EpisodeBrief> episodes})
+      {String id,
+      this.isLocal = false,
+      List<String> episodeList,
+      List<EpisodeBrief> episodes})
       : id = id ?? Uuid().v4(),
         assert(name != ''),
         episodeList = episodeList ?? [],
         episodes = episodes ?? [];
 
   PlaylistEntity toEntity() {
-    return PlaylistEntity(name, id, episodeList.toSet().toList());
+    return PlaylistEntity(name, id, isLocal, episodeList.toSet().toList());
   }
 
   static Playlist fromEntity(PlaylistEntity entity) {
     return Playlist(
       entity.name,
       id: entity.id,
+      isLocal: entity.isLocal,
       episodeList: entity.episodeList,
     );
   }
@@ -119,6 +132,9 @@ class Playlist extends Equatable {
     episodes.removeWhere(
         (episode) => episode.enclosureUrl == episodeBrief.enclosureUrl);
     episodeList.removeWhere((url) => url == episodeBrief.enclosureUrl);
+    if (isLocal) {
+      _dbHelper.deleteLocalEpisodes([episodeBrief.enclosureUrl]);
+    }
     return index;
   }
 

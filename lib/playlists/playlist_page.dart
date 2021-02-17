@@ -2,12 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/widgets/general_dialog.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../state/audio_state.dart';
 import '../type/episodebrief.dart';
 import '../type/playlist.dart';
 import '../util/extension_helper.dart';
+import '../widgets/general_dialog.dart';
 
 class PlaylistDetail extends StatefulWidget {
   final Playlist playlist;
@@ -41,7 +42,9 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
           },
         ),
         title: Text(_selectedEpisodes.isEmpty
-            ? widget.playlist.isQueue ? s.queue :widget.playlist.name
+            ? widget.playlist.isQueue
+                ? s.queue
+                : widget.playlist.name
             : s.selected(_selectedEpisodes.length)),
         actions: [
           if (_selectedEpisodes.isNotEmpty)
@@ -85,8 +88,11 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
       body: Selector<AudioPlayerNotifier, List<Playlist>>(
           selector: (_, audio) => audio.playlists,
           builder: (_, data, __) {
-            final playlist = data.firstWhere((e) => e == widget.playlist);
-            final episodes = playlist.episodes;
+            final playlist = data.firstWhere(
+              (e) => e == widget.playlist,
+              orElse: () => null,
+            );
+            final episodes = playlist?.episodes ?? [];
             return ReorderableListView(
                 onReorder: (oldIndex, newIndex) {
                   if (widget.playlist.isQueue) {
@@ -193,95 +199,95 @@ class __PlaylistItemState extends State<_PlaylistItem>
     final episode = widget.episode;
     final c = episode.backgroudColor(context);
     return SizedBox(
-        height: 90.0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Expanded(
-              child: ListTile(
-                contentPadding: EdgeInsets.symmetric(vertical: 8),
-                onTap: () {
-                  if (_fraction == 0) {
-                    _controller.forward();
-                    widget.onSelect(episode);
-                  } else {
-                    _controller.reverse();
-                    widget.onRemove(episode);
-                  }
-                },
-                title: Container(
-                  padding: EdgeInsets.fromLTRB(0, 5.0, 20.0, 5.0),
-                  child: Text(
-                    episode.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+      height: 90.0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Expanded(
+            child: ListTile(
+              contentPadding: EdgeInsets.symmetric(vertical: 8),
+              onTap: () {
+                if (_fraction == 0) {
+                  _controller.forward();
+                  widget.onSelect(episode);
+                } else {
+                  _controller.reverse();
+                  widget.onRemove(episode);
+                }
+              },
+              title: Container(
+                padding: EdgeInsets.fromLTRB(0, 5.0, 20.0, 5.0),
+                child: Text(
+                  episode.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                leading: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.unfold_more, color: c),
-                    Transform(
-                      alignment: FractionalOffset.center,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.001)
-                        ..rotateY(math.pi * _fraction),
-                      child: _fraction < 0.5
-                          ? CircleAvatar(
-                              backgroundColor: c.withOpacity(0.5),
-                              backgroundImage: episode.avatarImage)
-                          : CircleAvatar(
-                              backgroundColor:
-                                  context.accentColor.withAlpha(70),
-                              child: Transform(
-                                  alignment: FractionalOffset.center,
-                                  transform: Matrix4.identity()
-                                    ..setEntry(3, 2, 0.001)
-                                    ..rotateY(math.pi),
-                                  child: Icon(Icons.done)),
-                            ),
-                    ),
+              ),
+              leading: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.unfold_more, color: c),
+                  Transform(
+                    alignment: FractionalOffset.center,
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.001)
+                      ..rotateY(math.pi * _fraction),
+                    child: _fraction < 0.5
+                        ? CircleAvatar(
+                            backgroundColor: c.withOpacity(0.5),
+                            backgroundImage: episode.avatarImage)
+                        : CircleAvatar(
+                            backgroundColor: context.accentColor.withAlpha(70),
+                            child: Transform(
+                                alignment: FractionalOffset.center,
+                                transform: Matrix4.identity()
+                                  ..setEntry(3, 2, 0.001)
+                                  ..rotateY(math.pi),
+                                child: Icon(Icons.done)),
+                          ),
+                  ),
+                ],
+              ),
+              subtitle: Container(
+                padding: EdgeInsets.only(top: 5, bottom: 5),
+                height: 35,
+                child: Row(
+                  children: <Widget>[
+                    if (episode.explicit == 1)
+                      Container(
+                          decoration: BoxDecoration(
+                              color: Colors.red[800], shape: BoxShape.circle),
+                          height: 25.0,
+                          width: 25.0,
+                          margin: EdgeInsets.only(right: 10.0),
+                          alignment: Alignment.center,
+                          child:
+                              Text('E', style: TextStyle(color: Colors.white))),
+                    if (episode.duration != 0)
+                      _episodeTag(
+                          episode.duration == 0
+                              ? ''
+                              : s.minsCount(episode.duration ~/ 60),
+                          Colors.cyan[300]),
+                    if (episode.enclosureLength != null)
+                      _episodeTag(
+                          episode.enclosureLength == 0
+                              ? ''
+                              : '${(episode.enclosureLength) ~/ 1000000}MB',
+                          Colors.lightBlue[300]),
                   ],
-                ),
-                subtitle: Container(
-                  padding: EdgeInsets.only(top: 5, bottom: 5),
-                  height: 35,
-                  child: Row(
-                    children: <Widget>[
-                      if (episode.explicit == 1)
-                        Container(
-                            decoration: BoxDecoration(
-                                color: Colors.red[800], shape: BoxShape.circle),
-                            height: 25.0,
-                            width: 25.0,
-                            margin: EdgeInsets.only(right: 10.0),
-                            alignment: Alignment.center,
-                            child: Text('E',
-                                style: TextStyle(color: Colors.white))),
-                      if (episode.duration != 0)
-                        _episodeTag(
-                            episode.duration == 0
-                                ? ''
-                                : s.minsCount(episode.duration ~/ 60),
-                            Colors.cyan[300]),
-                      if (episode.enclosureLength != null)
-                        _episodeTag(
-                            episode.enclosureLength == 0
-                                ? ''
-                                : '${(episode.enclosureLength) ~/ 1000000}MB',
-                            Colors.lightBlue[300]),
-                    ],
-                  ),
                 ),
               ),
             ),
-            Divider(
-              height: 2,
-            ),
-          ],
-        ));
+          ),
+          Divider(
+            height: 2,
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -311,19 +317,20 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(
-          onTap: () {
-            setState(() => _clearConfirm = true);
-          },
-          dense: true,
-          title: Row(
-            children: [
-              Icon(Icons.clear_all_outlined, size: 18),
-              SizedBox(width: 20),
-              Text(s.clearAll, style: textStyle),
-            ],
+        if (!widget.playlist.isLocal)
+          ListTile(
+            onTap: () {
+              setState(() => _clearConfirm = true);
+            },
+            dense: true,
+            title: Row(
+              children: [
+                Icon(Icons.clear_all_outlined, size: 18),
+                SizedBox(width: 20),
+                Text(s.clearAll, style: textStyle),
+              ],
+            ),
           ),
-        ),
         if (_clearConfirm)
           Container(
             width: double.infinity,

@@ -39,6 +39,9 @@ dependencies:
   fl_chart: ^0.12.2
   line_icons: ^1.3.2
   marquee: ^1.6.1
+  media_metadata_retriever:
+     git:
+      url: https://github.com/stonega/media_metadata_retriever.git
   google_fonts: ^1.1.1
   image: ^2.1.19
   intl: ^0.16.1

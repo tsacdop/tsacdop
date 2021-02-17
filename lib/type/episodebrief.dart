@@ -66,9 +66,11 @@ class EpisodeBrief extends Equatable {
   ImageProvider get avatarImage {
     return File(imagePath).existsSync()
         ? FileImage(File(imagePath))
-        : episodeImage != ''
-            ? CachedNetworkImageProvider(episodeImage)
-            : AssetImage('assets/avatar_backup.png');
+        : File(episodeImage).existsSync()
+            ? FileImage(File(episodeImage))
+            : (episodeImage != '')
+                ? CachedNetworkImageProvider(episodeImage)
+                : AssetImage('assets/avatar_backup.png');
   }
 
   Color backgroudColor(BuildContext context) {
