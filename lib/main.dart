@@ -5,12 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/playlists/playlist_home.dart';
 import 'package:tuple/tuple.dart';
 
 import 'generated/l10n.dart';
 import 'home/home.dart';
 import 'intro_slider/app_intro.dart';
+import 'playlists/playlist_home.dart';
 import 'state/audio_state.dart';
 import 'state/download_state.dart';
 import 'state/podcast_group.dart';

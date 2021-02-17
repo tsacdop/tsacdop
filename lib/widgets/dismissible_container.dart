@@ -39,8 +39,8 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
               color: Colors.transparent,
             )
           : Column(
-            children: [
-              Padding(
+              children: [
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Dismissible(
                     key: ValueKey('${widget.episode.enclosureUrl}dis'),
@@ -116,8 +116,8 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                   ),
                 ),
                 Divider(height: 1)
-            ],
-          ),
+              ],
+            ),
     );
   }
 }
@@ -129,12 +129,14 @@ class EpisodeCard extends StatelessWidget {
   final bool isPlaying;
   final bool canReorder;
   final bool showDivider;
+  final bool havePadding;
   const EpisodeCard(this.episode,
       {this.tileColor,
       this.onTap,
       this.isPlaying,
       this.canReorder = false,
       this.showDivider = true,
+      this.havePadding = false,
       Key key})
       : assert(episode != null),
         super(key: key);
@@ -165,8 +167,9 @@ class EpisodeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (canReorder) Icon(Icons.unfold_more, color: c),
-                  SizedBox(width: canReorder ? 0 : 24),
+                  if (canReorder && !havePadding)
+                    Icon(Icons.unfold_more, color: c),
+                  SizedBox(width: canReorder && !havePadding ? 0 : 24),
                   CircleAvatar(
                       backgroundColor: c.withOpacity(0.5),
                       backgroundImage: episode.avatarImage),

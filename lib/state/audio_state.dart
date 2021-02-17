@@ -282,12 +282,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
         await _playlist.getPlaylist();
         if (state[1] != '') {
           var episode = await _dbHelper.getRssItemWithUrl(state[1]);
-          if (episode != null && ((!_playlist.isQueue &&
-                  episode != null &&
-                  _playlist.contains(episode)) ||
-              (_playlist.isQueue &&
-                  _queue.isNotEmpty &&
-                  _queue.episodes.first.title == episode.title))) {
+          if (episode != null &&
+              ((!_playlist.isQueue &&
+                      episode != null &&
+                      _playlist.contains(episode)) ||
+                  (_playlist.isQueue &&
+                      _queue.isNotEmpty &&
+                      _queue.episodes.first.title == episode.title))) {
             _episode = episode;
             _lastPosition = int.parse(state[2] ?? '0');
             if (_lastPosition > 0) {
@@ -745,6 +746,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
     notifyListeners();
     _savePlaylists();
+    if (playlist.isLocal) {
+      _dbHelper.deleteLocalEpisodes(playlist.episodeList);
+    }
   }
 
   void addEpisodesToPlaylist(Playlist playlist, {List<EpisodeBrief> episodes}) {
@@ -1115,7 +1119,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
       }
       await AudioServiceBackground.setQueue(_queue);
     } else {
-      _index += 1;
+      if (_index == _queue.length - 1) {
+        _index = 0;
+      } else {
+        _index += 1;
+      }
     }
 
     if (_queue.length == 0 || _stopAtEnd) {
