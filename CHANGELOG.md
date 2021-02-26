@@ -1,4 +1,13 @@
 # Tsacdop Changelog
+## 0.6.0
+Release date 2021/2/27
+
+### New features
+* Load local folder as playlist
+* Option to always hide new mark for podcast.
+* Memory use reduced a lot
+* Add reddit link
+
 ## 0.5.9
 
 Release date 2021/2/11

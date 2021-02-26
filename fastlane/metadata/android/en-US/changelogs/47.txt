@@ -1,0 +1,5 @@
+New features
+* Load local folder as playlist
+* Option to always hide new mark for podcast.
+* Memory use reduced a lot
+* Add reddit link
