@@ -34,7 +34,6 @@ import 'download_list.dart';
 import 'home_groups.dart';
 import 'home_menu.dart';
 import 'import_opml.dart';
-import 'playlist.dart';
 import 'search_podcast.dart';
 
 class Home extends StatefulWidget {
@@ -477,15 +476,6 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
               context,
               MaterialPageRoute(
                 builder: (context) => PlaylistHome(),
-              ),
-            );
-          } else if (value == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PlaylistPage(
-                  initPage: InitPage.history,
-                ),
               ),
             );
           }

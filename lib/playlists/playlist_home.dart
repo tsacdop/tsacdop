@@ -7,10 +7,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as img;
 import 'package:line_icons/line_icons.dart';
-import 'package:media_metadata_retriever/media_metadata_retriever.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -952,7 +952,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
   }
 
   Future<EpisodeBrief> _getEpisodeFromFile(String path) async {
-    var metadataRetriever = MediaMetadataRetriever();
+    var metadataRetriever = MetadataRetriever();
     final fileLength = File(path).statSync().size;
     final pubDate = DateTime.now().millisecondsSinceEpoch;
     var primaryColor;

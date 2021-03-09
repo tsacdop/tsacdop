@@ -408,6 +408,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _seekSliderValue = 0;
       _episode = episodeNew;
       _playerRunning = true;
+      _playlist = _queue;
       notifyListeners();
       _startAudioService(_queue, position: startPosition);
     }
