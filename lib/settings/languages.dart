@@ -41,7 +41,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
       }
     } else {
       await localeStorage
-          .saveStringList([locale.languageCode, locale.countryCode]);
+          .saveStringList([locale.languageCode, locale.countryCode??'']);
       await S.load(locale);
       if (mounted) {
         setState(() {});
@@ -89,6 +89,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
         _langListTile('Português', locale: Locale('pt')),
         _langListTile('Italiano', locale: Locale('it')),
         _langListTile('Türkçe', locale: Locale('tr')),
+        _langListTile('Ελληνικά', locale: Locale('el')),
         Divider(height: 1),
         ListTile(
           onTap: () =>

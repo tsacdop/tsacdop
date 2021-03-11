@@ -1,0 +1,779 @@
+{
+  "@@locale": "el",
+  "add": "Προσθήκη",
+  "@add": {
+    "description": "Subscribe new podcast"
+  },
+  "addEpisodeGroup": "{count, plural, zero{} one{{count} επεισόδιο προστέθηκε στη λίστα {groupName}} other{{count} επεισόδια προστέθηκαν στη λίστα {groupName}\n}}",
+  "@addEpisodeGroup": {
+    "placeholders": {
+      "groupName": {}
+    }
+  },
+  "addNewEpisodeAll": "{count, plural, zero{} one{{count} επεισόδιο προστέθηκε στη λίστα} other{{count} επεισόδια προστέθηκαν στη λίστα}}",
+  "@addNewEpisodeAll": {},
+  "addNewEpisodeTooltip": "Προσθήκη νέων επεισοδίων σε λίστα",
+  "@addNewEpisodeTooltip": {},
+  "addSomeGroups": "Πρόσθεσε μερικές ομάδες",
+  "@addSomeGroups": {
+    "description": "Please add new groups"
+  },
+  "all": "Όλα",
+  "@all": {},
+  "autoDownload": "Αυτόματη λήψη",
+  "@autoDownload": {},
+  "back": "Πίσω",
+  "@back": {},
+  "boostVolume": "Ενίσχυση έντασης",
+  "@boostVolume": {
+    "description": "Boost volume in player widget."
+  },
+  "buffering": "Φόρτωση",
+  "@buffering": {},
+  "cancel": "ΑΚΥΡΩΣΗ",
+  "@cancel": {},
+  "cellularConfirm": "Προειδοποίηση χρήσης δεδομένων",
+  "@cellularConfirm": {},
+  "cellularConfirmDes": "Είσαι σίγουρος/η πως θες να κάνεις χρήση δεδομένων για τη λήψη;",
+  "@cellularConfirmDes": {},
+  "changeLayout": "Αλλαγή διάταξης",
+  "@changeLayout": {},
+  "changelog": "Αλλαγές",
+  "@changelog": {},
+  "chooseA": "Επέλεξε ένα",
+  "@chooseA": {},
+  "clear": "Εκάθαρση",
+  "@clear": {},
+  "clearAll": "Εκκαθάριση όλων",
+  "@clearAll": {
+    "description": "Clear all episodes in playlist."
+  },
+  "color": "Χρώμα",
+  "@color": {},
+  "confirm": "ΕΠΙΒΕΒΑΙΩΣΗ",
+  "@confirm": {},
+  "createNewPlaylist": "Νέα λίστα",
+  "@createNewPlaylist": {},
+  "darkMode": "Σκοτεινό θέμα",
+  "@darkMode": {},
+  "daysAgo": "{count, plural, zero{Σήμερα} one{{count} μέρα πριν} other{{count} μέρες πριν}}",
+  "@daysAgo": {},
+  "daysCount": "{count, plural, zero{Ποτέ} one{{count} μέρα} other{{count} μέρες}}",
+  "@daysCount": {},
+  "defaultQueueReminder": "Αυτή είναι η προκαθορισμένη ουρά, δεν μπορεί να αφαιρεθεί.",
+  "@defaultQueueReminder": {
+    "description": "Remind user that default queue can't be removed."
+  },
+  "defaultSearchEngine": "Προκαθορισμένη μηχανή αναζήτησης podcast",
+  "@defaultSearchEngine": {},
+  "defaultSearchEngineDes": "Επέλεξε την προκαθορισμένη μηχανή αναζήτησης podcast",
+  "@defaultSearchEngineDes": {
+    "description": "Choose the default podcast search engine"
+  },
+  "delete": "Διαγραφή",
+  "@delete": {},
+  "developer": "Προγραμματιστής",
+  "@developer": {
+    "description": "Can also translate to About me"
+  },
+  "dismiss": "Παράβλεψη",
+  "@dismiss": {},
+  "done": "Ολοκληρώθηκε",
+  "@done": {},
+  "download": "Λήψη",
+  "@download": {},
+  "downloaded": "Έγινε λήψη",
+  "@downloaded": {},
+  "downloadRemovedToast": "Η λήψη αφαιρέθηκε",
+  "@downloadRemovedToast": {},
+  "downloadStart": "Λήψη",
+  "@downloadStart": {
+    "description": "Toast of downloading"
+  },
+  "editGroupName": "Επεξεργασία ονόματος ομάδας",
+  "@editGroupName": {},
+  "endOfEpisode": "Τέλος επεισοδίου",
+  "@endOfEpisode": {},
+  "episode": "{count, plural, zero{} one{Επεισόδιο} other{Επεισόδια}}",
+  "@episode": {},
+  "fastForward": "Γρήγορο γύρισμα μπροστά",
+  "@fastForward": {},
+  "fastRewind": "Γρήγορο γύρισμα πίσω ",
+  "@fastRewind": {},
+  "featureDiscoveryEditGroup": "Πάτα για να επεξεργαστείς την ομάδα",
+  "@featureDiscoveryEditGroup": {},
+  "featureDiscoveryEditGroupDes": "Εδώ μπορείς να αλλάξεις το όνομα της ομάδας ή να τη διαγράψεις, αλλά η Home ομάδα δε μπορεί να επεξεργασθεί ή να διαγραφεί",
+  "@featureDiscoveryEditGroupDes": {},
+  "featureDiscoveryEpisode": "Προβολή επεισοδίου",
+  "@featureDiscoveryEpisode": {},
+  "featureDiscoveryEpisodeDes": "Πάτα παρατεταμένα για να παίξεις το επεισόδιο ή να το προσθέσεις σε λίστα.",
+  "@featureDiscoveryEpisodeDes": {},
+  "featureDiscoveryEpisodeTitle": "Πάτα παρατεταμένα για να παίξεις το επεισόδιο τώρα",
+  "@featureDiscoveryEpisodeTitle": {},
+  "featureDiscoveryGroup": "Πάτα για να προσθέσεις ομάδα",
+  "@featureDiscoveryGroup": {},
+  "featureDiscoveryGroupDes": "Η Home ομάδα είναι η προεπιλεγμένη ομάδα για νέα podcast. Μπορείς να φτιάξεις νέες ομάδες και να μετακινήσεις podcast σε αυτές, καθώς και να προσθέσεις podcast σε πολλαπλές ομάδες.",
+  "@featureDiscoveryGroupDes": {},
+  "featureDiscoveryGroupPodcast": "Πάτα παρατεταμένα για να ταξινομήσεις τα podcast",
+  "@featureDiscoveryGroupPodcast": {},
+  "featureDiscoveryGroupPodcastDes": "Πάτα για να δεις περισσότερες επιλογές, ή πάτα παρατεταμένα για να ταξινομήσεις τα podcast σε όμαδα.",
+  "@featureDiscoveryGroupPodcastDes": {},
+  "featureDiscoveryOMPL": "Πάτα για την εισαγωγή OPML",
+  "@featureDiscoveryOMPL": {},
+  "featureDiscoveryOMPLDes": "Εδώ μπορείς να εισάγεις αρχεία OPML, να ανοίξεις ρυθμίσεις ή να ανανεώσεις όλα τα podcast με τη μία.",
+  "@featureDiscoveryOMPLDes": {},
+  "featureDiscoveryPlaylist": "Πάτα για άνοιγμα λίστας",
+  "@featureDiscoveryPlaylist": {},
+  "featureDiscoveryPlaylistDes": "Μπορείς να προσθέσεις επεισόδια σε λίστες από μόνος σου. Τα επεισόδια θα αφαιρούνται αυτόματα από τις λίστες αφού παιχτούν.",
+  "@featureDiscoveryPlaylistDes": {},
+  "featureDiscoveryPodcast": "Προβολή podcast",
+  "@featureDiscoveryPodcast": {},
+  "featureDiscoveryPodcastDes": "Πάτα στο Προβολή Όλων για να προσθέσεις ομάδες ή να διαχειριστείς τα podcast.",
+  "@featureDiscoveryPodcastDes": {},
+  "featureDiscoveryPodcastTitle": "Σκρόλαρε κάθετα για εναλλαγή μεταξύ ομάδων",
+  "@featureDiscoveryPodcastTitle": {},
+  "featureDiscoverySearch": "Πάτα για αναζήτηση podcast",
+  "@featureDiscoverySearch": {},
+  "featureDiscoverySearchDes": "Μπορείς να αναζητήσεις με το τίτλο του podcast, λέξη κλειδί, ή να κάνεις χρήση ενός συνδέσμου RSS για να εγγραφείς σε ένα νέο podacast.",
+  "@featureDiscoverySearchDes": {},
+  "feedbackEmail": "Γράψε μου",
+  "@feedbackEmail": {},
+  "feedbackGithub": "GitHub",
+  "@feedbackGithub": {},
+  "feedbackPlay": "Βαθμολόγηση στο PlayStore",
+  "@feedbackPlay": {
+    "description": "Rate on Google Play Store.\nUser can tap to open play link."
+  },
+  "feedbackTelegram": "Συμμετοχή στην ομάδα",
+  "@feedbackTelegram": {},
+  "filter": "Φίλτρο",
+  "@filter": {},
+  "fonts": "Γραμματοσειρές",
+  "@fonts": {},
+  "fontStyle": "Στιλ γραμματοσειράς",
+  "@fontStyle": {},
+  "from": "Μέχρι {time}",
+  "@from": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "goodNight": "Καληνύχτα",
+  "@goodNight": {},
+  "gpodderLoginDes": "Συγχαρητήρια! Έχετε συνδέσει το gpodder.net λογαριασμό σας με επιτυχία. Το Tsacdop θα συγχρονίσει αυτόματα τις εγγραφές στη συσκευή σας με το gpodder.net λογαριασμό σας.",
+  "@gpodderLoginDes": {},
+  "groupExisted": "Η ομάδα υπάρχει ήδη",
+  "@groupExisted": {
+    "description": "Group name validate in add group dialog. User can't add group with same name."
+  },
+  "groupFilter": "Φίλτρο ομάδων",
+  "@groupFilter": {},
+  "groupRemoveConfirm": "Είσαι σίγουρος/η πως θες να διαγράψεις αυτή την ομάδα; Τα Podcast θα μεταφερθούν στη Home ομάδα.",
+  "@groupRemoveConfirm": {},
+  "groups": "{count, plural, zero{Ομάδα} one{Ομάδα} other{Ομάδες}}",
+  "@groups": {},
+  "hideListenedSetting": "Απόκρυψη ακουσμένων",
+  "@hideListenedSetting": {},
+  "hidePodcastDiscovery": "Απόκρυψη ανακάλυψης podcast",
+  "@hidePodcastDiscovery": {
+    "description": "Hide podcast discovery"
+  },
+  "hidePodcastDiscoveryDes": "Απόκρυψη ανακάλυψης podcast από τη σελίδα αναζήτησης",
+  "@hidePodcastDiscoveryDes": {},
+  "homeGroupsSeeAll": "Προβολή όλων",
+  "@homeGroupsSeeAll": {},
+  "homeMenuPlaylist": "Λίστα",
+  "@homeMenuPlaylist": {},
+  "homeSubMenuSortBy": "Ταξινόμηση κατά",
+  "@homeSubMenuSortBy": {},
+  "homeTabMenuFavotite": "Αγαπημένο",
+  "@homeTabMenuFavotite": {},
+  "homeTabMenuRecent": "Πρόσφατο",
+  "@homeTabMenuRecent": {},
+  "homeToprightMenuAbout": "Σχετικά με",
+  "@homeToprightMenuAbout": {},
+  "homeToprightMenuImportOMPL": "Εισαγωγή OPML",
+  "@homeToprightMenuImportOMPL": {},
+  "homeToprightMenuRefreshAll": "Ανανέωση όλων",
+  "@homeToprightMenuRefreshAll": {},
+  "hostedOn": "Φιλοξενούμενο στο {host}",
+  "@hostedOn": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "hoursAgo": "{count, plural, zero{Αυτή την ώρα} one{{count} ώρα πριν} other{{count} ώρες πριν}}",
+  "@hoursAgo": {},
+  "hoursCount": "{count, plural, zero{0 ώρες} one{{count} ώρα} other{{count} ώρες}}",
+  "@hoursCount": {},
+  "import": "Εισαγωγή",
+  "@import": {},
+  "intergateWith": "Ενσωμάτωση με {service}",
+  "@intergateWith": {
+    "description": "Integrate with",
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "introFourthPage": "Πάτα παρατεταμένα στη κάρτα επεισοδίου για γρήγορες ενέργειες.",
+  "@introFourthPage": {},
+  "introSecondPage": "Κάνε εγγραφή σε podcast μέσω αναζήτησης ή εισαγωγής αρχείου OPML.",
+  "@introSecondPage": {},
+  "introThirdPage": "Μπορείς να φτιάξεις μία νέα ομάδα για podcast.",
+  "@introThirdPage": {},
+  "invalidName": "Εσφαλμένο όνομα χρήστη",
+  "@invalidName": {},
+  "lastUpdate": "Τελευταία ενημέρωση",
+  "@lastUpdate": {
+    "description": "gpodder.net update"
+  },
+  "later": "Αργότερα",
+  "@later": {},
+  "lightMode": "Φωτεινό θέμα",
+  "@lightMode": {},
+  "like": "Μου Αρέσει",
+  "@like": {},
+  "liked": "Συνδεδεμένο",
+  "@liked": {},
+  "likeDate": "Ημερομηνία αγαπημένου",
+  "@likeDate": {
+    "description": "Favorite tab, sort by like date."
+  },
+  "listen": "Άκουσε",
+  "@listen": {},
+  "listened": "Ακουσμένο",
+  "@listened": {},
+  "loadMore": "Περισσότερα",
+  "@loadMore": {},
+  "loggedInAs": "Συνδεδεμένος/η ως {userName}",
+  "@loggedInAs": {
+    "description": "gpodder.net",
+    "placeholders": {
+      "userName": {}
+    }
+  },
+  "login": "Σύνδεση",
+  "@login": {
+    "description": "gpodder.net login"
+  },
+  "loginFailed": "Αποτυχία σύνδεσης",
+  "@loginFailed": {},
+  "logout": "Αποσύνδεση",
+  "@logout": {
+    "description": "gpodder.net logout"
+  },
+  "mark": "Επισήμανση",
+  "@mark": {
+    "description": "In listen history page, if a episode is marked as listened."
+  },
+  "markConfirm": "Επιβεβαίωση επισήμανσης",
+  "@markConfirm": {},
+  "markConfirmContent": "Επιβεβαίωση επισήμανσης όλων των επεισοδίων ως ακουσμένα;",
+  "@markConfirmContent": {},
+  "markListened": "Επισήμανση ως ακουσμένου",
+  "@markListened": {},
+  "markNotListened": "Επισήμανση ως μη ακουσμένου",
+  "@markNotListened": {},
+  "menu": "Μενού",
+  "@menu": {},
+  "menuAllPodcasts": "Όλα τα podcast",
+  "@menuAllPodcasts": {},
+  "menuMarkAllListened": "Επισήμανση όλων ως ακουσμένων",
+  "@menuMarkAllListened": {},
+  "menuViewRSS": "Επίσκεψη RSS feed",
+  "@menuViewRSS": {},
+  "menuVisitSite": "Επίσκεψη Ιστοτόπου",
+  "@menuVisitSite": {},
+  "minsAgo": "{count, plural, zero{Μόλις τώρα} one{{count} λεπτό πριν} other{{count} λεπτά πριν}}",
+  "@minsAgo": {},
+  "minsCount": "{count, plural, zero{0 λεπτά} one{{count} λεπτό} other{{count} λεπτά}}",
+  "@minsCount": {},
+  "network": "Δίκτυο",
+  "@network": {},
+  "neverAutoUpdate": "Απενεργοποίηση αυτόματων ενημερώσεων",
+  "@neverAutoUpdate": {
+    "description": "Never auto  update in podcast settings."
+  },
+  "newestFirst": "Νεότερα πρώτα",
+  "@newestFirst": {},
+  "newGroup": "Δημιουργία νέας ομάδας",
+  "@newGroup": {},
+  "next": "Επόμενο",
+  "@next": {},
+  "noEpisodeDownload": "Δεν έχουν ληφθεί επεισόδια ακόμα",
+  "@noEpisodeDownload": {},
+  "noEpisodeFavorite": "Κανένα επεισοδίο δεν έχει επισημανθεί ακόμη ως αγαπημένο",
+  "@noEpisodeFavorite": {},
+  "noEpisodeRecent": "Δεν έχουν βρεθεί επεισόδια ακόμα",
+  "@noEpisodeRecent": {},
+  "noPodcastGroup": "Κανένα podcast σε αυτή την ομάδα",
+  "@noPodcastGroup": {},
+  "noShownote": "Δεν υπάρχουν διαθέσιμες σημειώσεις σόου για αυτό το επεισόδιο.",
+  "@noShownote": {
+    "description": "Means this episode have no show notes."
+  },
+  "notificaitonFatch": "Λήψη δεδομένων {title}",
+  "@notificaitonFatch": {},
+  "notificationNetworkError": "Η εγγραφή επέτυχε, σφάλμα δικτύου {title}",
+  "@notificationNetworkError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSetting": "Πίνακας ειδοποιήσεων",
+  "@notificationSetting": {},
+  "notificationSubscribe": "Εγγραφή {title}",
+  "@notificationSubscribe": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSubscribeExisted": "Η εγγραφή επέτυχε, το podcast υπάρχει ήδη {title}",
+  "@notificationSubscribeExisted": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSuccess": "Επιτυχημένη εγγραφή {title}",
+  "@notificationSuccess": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdate": "Ενημέρωση {title} ",
+  "@notificationUpdate": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdateError": "Σφάλμα ενημέρωσης {title}",
+  "@notificationUpdateError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "oldestFirst": "Παλιότερα πρώτα",
+  "@oldestFirst": {},
+  "passwdRequired": "Ο κωδικός πρόσβασης είναι υποχρεωτικός",
+  "@passwdRequired": {},
+  "password": "Κωδικός πρόσβασης",
+  "@password": {},
+  "pause": "Παύση",
+  "@pause": {},
+  "play": "Αναπαραγωγή",
+  "@play": {},
+  "playback": "Έλεγχος αναπαραγωγής ",
+  "@playback": {},
+  "player": "Προβολή αναπαραγωγής",
+  "@player": {},
+  "playerHeightMed": "Μέτριο",
+  "@playerHeightMed": {},
+  "playerHeightShort": "Χαμηλό",
+  "@playerHeightShort": {},
+  "playerHeightTall": "Ψηλό",
+  "@playerHeightTall": {},
+  "playing": "Αναπαραγωγή σε εξέλιξη ",
+  "@playing": {},
+  "playlistExisted": "Το όνομα λίστας υπάρχει",
+  "@playlistExisted": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlistNameEmpty": "Το όνομα λίστας είναι κενό",
+  "@playlistNameEmpty": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlists": "Λίστες",
+  "@playlists": {
+    "description": "Title for playlists tab."
+  },
+  "playNext": "Επόμενο",
+  "@playNext": {
+    "description": "Popup menu for episode."
+  },
+  "playNextDes": "Προσθήκη επεισοδίου στη κορυφή της λίστας",
+  "@playNextDes": {
+    "description": "Description for next play."
+  },
+  "plugins": "Πρόσθετα",
+  "@plugins": {},
+  "podcast": "{count, plural, zero{} one{Podcast} other{Podcast}}",
+  "@podcast": {},
+  "podcastSubscribed": "Podcast εγγράφη",
+  "@podcastSubscribed": {},
+  "popupMenuDownloadDes": "Λήψη επεισοδίου ",
+  "@popupMenuDownloadDes": {},
+  "popupMenuLaterDes": "Προσθήκη επεισοδίου σε λίστα",
+  "@popupMenuLaterDes": {},
+  "popupMenuLikeDes": "Προσθήκη επεισοδίου στα αγαπημένα",
+  "@popupMenuLikeDes": {},
+  "popupMenuMarkDes": "Επισήμανση επεισοδίου ως ακουσμένο",
+  "@popupMenuMarkDes": {},
+  "popupMenuPlayDes": "Αναπαραγωγή επεισοδίου",
+  "@popupMenuPlayDes": {},
+  "privacyPolicy": "Πολιτική Απορρήτου ",
+  "@privacyPolicy": {},
+  "published": "Δημοσιεύτηκε στις {date}",
+  "@published": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "publishedDaily": "Δημοσίευεται καθημερινά",
+  "@publishedDaily": {},
+  "publishedMonthly": "Δημοσίευεται μηνιαία",
+  "@publishedMonthly": {},
+  "publishedWeekly": "Δημοσίευεται εβδομαδιαια",
+  "@publishedWeekly": {
+    "description": "In search podcast detail page."
+  },
+  "publishedYearly": "Δημοσίευεται ετήσια",
+  "@publishedYearly": {},
+  "queue": "Ουρά",
+  "@queue": {
+    "description": "Queue"
+  },
+  "recoverSubscribe": "Ανάκτηση συνδρομής",
+  "@recoverSubscribe": {
+    "description": "User can recover subscribe podcast after remove it in subscribe history page."
+  },
+  "refresh": "Ανανέωση",
+  "@refresh": {
+    "description": "Refresh"
+  },
+  "refreshArtwork": "Ενημέρωση γραφικών",
+  "@refreshArtwork": {},
+  "refreshStarted": "Ανανέωση",
+  "@refreshStarted": {
+    "description": "Toast for refresh"
+  },
+  "remove": "Αφαίρεση",
+  "@remove": {
+    "description": "Remove not \"removed\". \nRemove a podcast or a group."
+  },
+  "removeConfirm": "Επιβεβαίωση κατάργησης",
+  "@removeConfirm": {
+    "description": "unsubscribe podcast dialog"
+  },
+  "removedAt": "Αφαιρέθηκε  στις {date}",
+  "@removedAt": {
+    "description": "For example ：Removed at 2020.10.10",
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "removeNewMark": "Αφαίρεση επισήμανσης νέου",
+  "@removeNewMark": {
+    "description": "Remove new mark for new episodes."
+  },
+  "removePodcastDes": "Είσαι σίγουρος/η πως θες να καταργήσεις την εγγραφή σου; ",
+  "@removePodcastDes": {},
+  "save": "Αποθήκευση",
+  "@save": {},
+  "schedule": "Πρόγραμμα",
+  "@schedule": {},
+  "search": "Αναζήτηση",
+  "@search": {},
+  "searchEpisode": "Αναζήτηση επεισοδίου",
+  "@searchEpisode": {},
+  "searchHelper": "Πληκτρολόγησε το όνομα του podcast, λέξεις κλειδιά ή το URL ενός feed.",
+  "@searchHelper": {},
+  "searchInvalidRss": "Εσφαλμένος σύνδεσμος RSS",
+  "@searchInvalidRss": {},
+  "searchPodcast": "Αναζήτηση podcast",
+  "@searchPodcast": {},
+  "secCount": "{count, plural, zero{0 δευτ.} one{{count} δευτ.} other{{count} δευτ.}}",
+  "@secCount": {},
+  "secondsAgo": "{count, plural, zero{Μόλις τώρα} one{{count} δευτερόλεπτο πριν} other{{count} δευτερόλεπτα πριν}}",
+  "@secondsAgo": {},
+  "selected": "{count} επιλεγμένα",
+  "@selected": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settings": "Ρυθμίσεις",
+  "@settings": {},
+  "settingsAccentColor": "Χρώμα έμφασης",
+  "@settingsAccentColor": {},
+  "settingsAccentColorDes": "Συμπερίληψη χρώματος επικάλυψης",
+  "@settingsAccentColorDes": {},
+  "settingsAppearance": "Εμφάνιση",
+  "@settingsAppearance": {},
+  "settingsAppearanceDes": "Χρώματα και θέματα",
+  "@settingsAppearanceDes": {},
+  "settingsAppIntro": "Εισαγωγή εφαρμογής",
+  "@settingsAppIntro": {},
+  "settingsAudioCache": "Προσωρινή μνήμη ήχου",
+  "@settingsAudioCache": {},
+  "settingsAudioCacheDes": "Μέγιστο μέγεθος προσωρινής μνήμης ήχου",
+  "@settingsAudioCacheDes": {},
+  "settingsAutoDelete": "Αυτόματη διαγραφή λήψεων μετά από",
+  "@settingsAutoDelete": {},
+  "settingsAutoDeleteDes": "Προεπιλογή 30 ημέρες",
+  "@settingsAutoDeleteDes": {},
+  "settingsAutoPlayDes": "Αυτόματη αναπαραγωγή επόμενου επεισοδίου στη λίστα",
+  "@settingsAutoPlayDes": {},
+  "settingsBackup": "Αντίγραφο ασφαλείας",
+  "@settingsBackup": {},
+  "settingsBackupDes": "Αντίγραφο ασφαλείας δεδομένων εφαρμογής",
+  "@settingsBackupDes": {},
+  "settingsBoostVolume": "Επιπέδο ενίσχυσης έντασης",
+  "@settingsBoostVolume": {},
+  "settingsBoostVolumeDes": "Αλλαγή επιπέδου ενίσχυσης έντασης",
+  "@settingsBoostVolumeDes": {},
+  "settingsDefaultGrid": "Προεπιλεγμένη προβολή πλέγματος",
+  "@settingsDefaultGrid": {},
+  "settingsDefaultGridDownload": "Καρτέλα λήψεων",
+  "@settingsDefaultGridDownload": {},
+  "settingsDefaultGridFavorite": "Καρτέλα αγαπημένων",
+  "@settingsDefaultGridFavorite": {},
+  "settingsDefaultGridPodcast": "Σελίδα podcast",
+  "@settingsDefaultGridPodcast": {},
+  "settingsDefaultGridRecent": "Καρτέλα πρόσφατων",
+  "@settingsDefaultGridRecent": {},
+  "settingsDiscovery": "Ενεργοποίηση λειτουργιών ανακάλυψης",
+  "@settingsDiscovery": {
+    "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
+  },
+  "settingsDownloadPosition": "Λήψη θέσης",
+  "@settingsDownloadPosition": {
+    "description": "Choose folder for downloads."
+  },
+  "settingsEnableSyncing": "Ενεργοποίηση συγχρονισμού",
+  "@settingsEnableSyncing": {},
+  "settingsEnableSyncingDes": "Ανανέωση όλων των podcast στο παρασκήνιο για τη λήψη των τελευταίων επεισοδίων",
+  "@settingsEnableSyncingDes": {},
+  "settingsExportDes": "Ρυθμίσεις εξαγωγής και εισαγωγής",
+  "@settingsExportDes": {},
+  "settingsFastForwardSec": "Δευτερολέπτα γυρίσματος μπροστά",
+  "@settingsFastForwardSec": {},
+  "settingsFastForwardSecDes": "Αλλαγή δευτερολέπτων γυρίσματος μπροστά στη προβολή αναπαραγωγής",
+  "@settingsFastForwardSecDes": {},
+  "settingsFeedback": "Feedback",
+  "@settingsFeedback": {},
+  "settingsFeedbackDes": "Επαναφορά λειτουργίας εκμάθησης",
+  "@settingsFeedbackDes": {},
+  "settingsHistory": "Ιστορικό",
+  "@settingsHistory": {},
+  "settingsHistoryDes": "Εξαγωγή και εισαγωγή ρυθμίσεων",
+  "@settingsHistoryDes": {},
+  "settingsInfo": "Πληροφορίες",
+  "@settingsInfo": {},
+  "settingsInterface": "Διεπαφή",
+  "@settingsInterface": {},
+  "settingsLanguages": "Γλώσσες",
+  "@settingsLanguages": {},
+  "settingsLanguagesDes": "Αλλαγή γλώσσας",
+  "@settingsLanguagesDes": {},
+  "settingsLayout": "Διάταξη",
+  "@settingsLayout": {},
+  "settingsLayoutDes": "Διάταξη εφαρμογής",
+  "@settingsLayoutDes": {},
+  "settingsLibraries": "Βιβλιοθήκες",
+  "@settingsLibraries": {},
+  "settingsLibrariesDes": "Βιβλιοθήκες ανοιχτού κώδικα που χρησιμοποιούνται από την εφαρμογή",
+  "@settingsLibrariesDes": {},
+  "settingsManageDownload": "Διαχείριση λήψεων",
+  "@settingsManageDownload": {},
+  "settingsManageDownloadDes": "Διαχείριση ληφθέντων αρχείων ήχου",
+  "@settingsManageDownloadDes": {},
+  "settingsMarkListenedSkip": "Επισήμανση ως ακουσμένου όταν παραλείπεται",
+  "@settingsMarkListenedSkip": {
+    "description": "Mark episode as listened when skipped to next."
+  },
+  "settingsMarkListenedSkipDes": "Αυτόματη επισήμανση του επεισοδίου ως ακουσμένου κατά τη παράλειψή του",
+  "@settingsMarkListenedSkipDes": {},
+  "settingsMenuAutoPlay": "Αυτόματη αναπαραγωγή επομένου",
+  "@settingsMenuAutoPlay": {},
+  "settingsNetworkCellular": "Ερώτηση πριν τη χρήση δεδομένων",
+  "@settingsNetworkCellular": {},
+  "settingsNetworkCellularAuto": "Αυτόματη λήψη με χρήση δεδομένων",
+  "@settingsNetworkCellularAuto": {},
+  "settingsNetworkCellularAutoDes": "Μπορείς να ρυθμίσεις την αυτόματη λήψη podcast στη σελίδα διαχείρισης ομάδων",
+  "@settingsNetworkCellularAutoDes": {},
+  "settingsNetworkCellularDes": "Ερώτηση για επιβεβαίωση λήψης επεισοδίων κατά τη χρήση δεδομένων",
+  "@settingsNetworkCellularDes": {},
+  "settingsPlayDes": "Λίστα και προβολή αναπαραγωγής",
+  "@settingsPlayDes": {},
+  "settingsPlayerHeight": "Ύψος προβολής αναπαραγωγής",
+  "@settingsPlayerHeight": {},
+  "settingsPlayerHeightDes": "Προσάρμοσε το ύψος της προβολής αναπαραγωγής εκεί που θέλεις",
+  "@settingsPlayerHeightDes": {},
+  "settingsPopupMenu": "Αναδυόμενο μενού επεισοδίων",
+  "@settingsPopupMenu": {},
+  "settingsPopupMenuDes": "Αλλαγή αναδυόμενου μενού επεισοδίων",
+  "@settingsPopupMenuDes": {},
+  "settingsPrefrence": "Προτίμηση",
+  "@settingsPrefrence": {},
+  "settingsRealDark": "Μαύρο (AMOLED)",
+  "@settingsRealDark": {},
+  "settingsRealDarkDes": "Ενεργοποίησε αν νομίζεις ότι η νύχτα δεν είναι σκοτεινή αρκετά",
+  "@settingsRealDarkDes": {},
+  "settingsRewindSec": "Δευτερολέπτα γυρίσματος πίσω",
+  "@settingsRewindSec": {},
+  "settingsRewindSecDes": "Αλλαγή δευτερολέπτων γυρίσματος πίσω στη προβολή αναπαραγωγής",
+  "@settingsRewindSecDes": {},
+  "settingsSpeeds": "Ταχύτητες",
+  "@settingsSpeeds": {
+    "description": "Playback speeds setting."
+  },
+  "settingsSpeedsDes": "Επεξεργασία διαθέσιμων ταχυτήτων",
+  "@settingsSpeedsDes": {
+    "description": "Playback speed setting description"
+  },
+  "settingsSTAuto": "Αυτόματη ενεργοποίηση χρονοδιακόπτη",
+  "@settingsSTAuto": {},
+  "settingsSTAutoDes": "Αυτόματη έναρξη χρονοδιακόπτη την προγραμματισμένη ώρα",
+  "@settingsSTAutoDes": {},
+  "settingsSTDefaultTime": "Προεπιλεγμένος χρόνος",
+  "@settingsSTDefaultTime": {},
+  "settingsSTDefautTimeDes": "Προεπιλεγμένος χρόνος χρονοδιακόπτη",
+  "@settingsSTDefautTimeDes": {},
+  "settingsSTMode": "Λειτουργία αυτόματου χρονοδιακόπτη",
+  "@settingsSTMode": {},
+  "settingsStorageDes": "Διαχείριση χώρου αποθήκευσης λήψεων και προσωρινής μνήμης",
+  "@settingsStorageDes": {},
+  "settingsSyncing": "Συγχρονισμός",
+  "@settingsSyncing": {},
+  "settingsSyncingDes": "Ανανέωση podcast στο παρασκήνιο",
+  "@settingsSyncingDes": {},
+  "settingsTapToOpenPopupMenu": "Πάτησε για να ανοίξεις το αναδυόμενο μενού",
+  "@settingsTapToOpenPopupMenu": {},
+  "settingsTapToOpenPopupMenuDes": "Πρέπει να πατήσεις παρατεταμένα για το άνοιγμα της σελίδας επεισοδίου",
+  "@settingsTapToOpenPopupMenuDes": {},
+  "settingsTheme": "Θέμα",
+  "@settingsTheme": {},
+  "settingStorage": "Χώρος αποθήκευσης",
+  "@settingStorage": {},
+  "settingsUpdateInterval": "Χρόνος μεταξύ ενημερώσεων",
+  "@settingsUpdateInterval": {},
+  "settingsUpdateIntervalDes": "Προεπιλογή 24 ώρες ",
+  "@settingsUpdateIntervalDes": {},
+  "share": "Κοινοποίηση",
+  "@share": {},
+  "showNotesFonts": "Προβολή γραμματοσειράς σημειώσεων",
+  "@showNotesFonts": {},
+  "size": "Μέγεθος",
+  "@size": {},
+  "skipSecondsAtEnd": "Παράλειψη δευτερολέπτων στο τέλος",
+  "@skipSecondsAtEnd": {},
+  "skipSecondsAtStart": "Παράληψη αρχικών δευτερολέπτων",
+  "@skipSecondsAtStart": {},
+  "skipSilence": "Παράλειψη σιγής",
+  "@skipSilence": {
+    "description": "Feature skip silence"
+  },
+  "skipToNext": "Παράλειψη",
+  "@skipToNext": {},
+  "sleepTimer": "Χρονοδιακόπτης",
+  "@sleepTimer": {},
+  "status": "Κατάσταση",
+  "@status": {
+    "description": "gpodder.net status"
+  },
+  "statusAuthError": "Σφάλμα πιστοποίησης",
+  "@statusAuthError": {
+    "description": "Sync error"
+  },
+  "statusFail": "Αποτυχία",
+  "@statusFail": {
+    "description": "Sync fail"
+  },
+  "statusSuccess": "Επιτυχία",
+  "@statusSuccess": {
+    "description": "Sync status"
+  },
+  "stop": "Σταμάτημα",
+  "@stop": {},
+  "subscribe": "Εγγραφή",
+  "@subscribe": {},
+  "subscribeExportDes": "Εξαγωγή αρχείου OPML όλων των podcast",
+  "@subscribeExportDes": {},
+  "syncNow": "Συγχρονισμός τώρα",
+  "@syncNow": {},
+  "systemDefault": "Προεπιλογή συστήματος",
+  "@systemDefault": {},
+  "timeLastPlayed": "Τελευταίος χρόνος {time}",
+  "@timeLastPlayed": {
+    "description": "Show last time stop position  in player when a episode have been played.",
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "timeLeft": "{time} Απομένει",
+  "@timeLeft": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "to": "Από {time}",
+  "@to": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "toastAddPlaylist": "Προστέθηκε στη λίστα",
+  "@toastAddPlaylist": {},
+  "toastDiscovery": "Λειτουργία ανακάλυψης ενεργή, παρακαλώ ξανανοίξτε την εφαρμογή",
+  "@toastDiscovery": {
+    "description": "Toast displayed when user tap Discovery Features Again in settings page."
+  },
+  "toastFileError": "Σφάλμα αρχείου, η εγγραφή απέτυχε ",
+  "@toastFileError": {},
+  "toastFileNotValid": "Μη έγκυρο αρχείο",
+  "@toastFileNotValid": {},
+  "toastHomeGroupNotSupport": "Η Home ομάδα δεν υποστηρίζεται",
+  "@toastHomeGroupNotSupport": {},
+  "toastImportSettingsSuccess": "Εισαγωγή ρυθμίσεων επιτυχής",
+  "@toastImportSettingsSuccess": {},
+  "toastOneGroup": "Επέλεξε τουλάχιστον μία ομάδα",
+  "@toastOneGroup": {},
+  "toastPodcastRecovering": "Ανάκτηση, περίμενε λίγο",
+  "@toastPodcastRecovering": {
+    "description": "Resubscribe removed podcast"
+  },
+  "toastReadFile": "Διάβασμα αρχείου επιτυχές",
+  "@toastReadFile": {},
+  "toastRecoverFailed": "Η ανάκτηση του podcast απέτυχε",
+  "@toastRecoverFailed": {
+    "description": "Resubscribe removed podast"
+  },
+  "toastRemovePlaylist": "Τα επεισόδιο αφαιρέθηκε από τη λίστα",
+  "@toastRemovePlaylist": {},
+  "toastSettingSaved": "Οι ρυθμίσεις αποθηκεύτηκαν ",
+  "@toastSettingSaved": {},
+  "toastTimeEqualEnd": "Ο επιλεγμένος χρόνος είναι ίδιος με τον χρόνο λήξης",
+  "@toastTimeEqualEnd": {
+    "description": "User can't choose the same time as schedule end time."
+  },
+  "toastTimeEqualStart": "Ο επιλεγμένος χρόνος είναι ίδιος με τον χρόνο έναρξης",
+  "@toastTimeEqualStart": {
+    "description": "User can't choose the same time as schedule start time."
+  },
+  "translators": "Μεταφραστές",
+  "@translators": {},
+  "understood": "Κατανοητό",
+  "@understood": {},
+  "undo": "ΑΝΑΙΡΕΣΗ",
+  "@undo": {},
+  "unlike": "Δεν Μου Αρέσει",
+  "@unlike": {},
+  "unliked": "Τα επεισόδιο αφαιρέθηκε από τα αγαπημένα",
+  "@unliked": {},
+  "updateDate": "Ημερομηνία ενημέρωσης",
+  "@updateDate": {},
+  "updateEpisodesCount": "{count, plural, zero{Καμία ενημέρωση} one{Ενημερώθηκε {count} επεισόδιο} other{Ενημερώθηκαν {count} επεισόδια}}",
+  "@updateEpisodesCount": {},
+  "updateFailed": "Ενημέρωση ανεπιτυχείς, σφάλμα δικτύου",
+  "@updateFailed": {},
+  "username": "Όνομα χρήστη",
+  "@username": {},
+  "usernameRequired": "Το όνομα χρήστη είναι υποχρεωτικό",
+  "@usernameRequired": {},
+  "version": "Έκδοση: {version}",
+  "@version": {
+    "placeholders": {
+      "version": {}
+    }
+  }
+}

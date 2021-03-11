@@ -485,7 +485,7 @@
   "@secCount": {},
   "secondsAgo": "{count, plural, zero{Adesso} one{{count} secondo fa} other{{count} secondi fa}}",
   "@secondsAgo": {},
-  "selected": "{count} selected",
+  "selected": "{count} selezionati",
   "@selected": {
     "placeholders": {
       "count": {}

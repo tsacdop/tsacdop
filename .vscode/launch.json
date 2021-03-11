@@ -8,10 +8,10 @@
             "name": "Flutter",
             "request": "launch",
             "type": "dart",
-            "args": [
-                "--flavor",
-                "play"
-            ]
+            // "args": [
+            //     "--flavor",
+            //     "play"
+            // ]
         }
     ]
 }
