@@ -7,9 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tsacdop/state/setting_state.dart';
 
 import '../state/podcast_group.dart';
+import '../state/setting_state.dart';
 import '../util/extension_helper.dart';
 import '../util/pageroute.dart';
 import '../widgets/custom_widget.dart';
@@ -228,7 +228,7 @@ class _PodcastManageState extends State<PodcastManage>
                                       EdgeInsets.symmetric(horizontal: 10.0),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[600].withOpacity(0.3),
+                                    // color: Colors.grey[600].withOpacity(0.3),
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: Text(

@@ -71,7 +71,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m25(count) => "${Intl.plural(count, zero: 'Adesso', one: '${count} secondo fa', other: '${count} secondi fa')}";
 
-  static m26(count) => "${count} selected";
+  static m26(count) => "${count} selezionati";
 
   static m27(time) => "Ultima riproduzione ${time}";
 
