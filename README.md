@@ -6,6 +6,7 @@
 [![Localizely][]][localizely - website]
 [![style: effective dart][]][effective dart pub]
 [![License badge][]][license]
+[![fdroid install][]][fdroid link]
 
 ## About
 
@@ -172,6 +173,8 @@ For help getting started with Flutter, view our
 [github release]: https://img.shields.io/github/v/release/stonega/tsacdop
 [github release - recent]: https://github.com/stonega/tsacdop/releases
 [github downloads]: https://img.shields.io/github/downloads/stonega/tsacdop/total?color=%230000d&label=downloads
+[fdroid install]: https://img.shields.io/f-droid/v/com.stonegate.tsacdop?style=plastic
+[fdroid link]: https://f-droid.org/en/packages/com.stonegate.tsacdop/
 [localizely]: https://img.shields.io/badge/dynamic/json?color=%2326c6da&label=localizely&query=%24.languages.length&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
 [English]: https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=%2323CCC6&label=English&query=%24.languages%5B3%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus&suffix=%
 [Chinese Simplified]: https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=%2323CCC6&label=Chinese%20Simplified&query=%24.languages%5B2%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus&suffix=%
