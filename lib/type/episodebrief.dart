@@ -56,7 +56,7 @@ class EpisodeBrief extends Equatable {
         artist: feedTitle,
         album: feedTitle,
         duration: Duration.zero,
-        artUri: imagePath == '' ? episodeImage : 'file://$imagePath',
+        artUri: Uri.parse(imagePath == '' ? episodeImage : 'file://$imagePath'),
         extras: {
           'skipSecondsStart': skipSecondsStart,
           'skipSecondsEnd': skipSecondsEnd
