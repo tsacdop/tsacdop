@@ -303,8 +303,9 @@ class LastPosition extends StatelessWidget {
                                       .onSurface
                                       .withOpacity(0.12))),
                       textColor: data ? Colors.white : null,
-                      onPressed: () =>
-                          audio.setSkipSilence(skipSilence: !data))),
+                      onPressed: () => {}
+                      //audio.setSkipSilence(skipSilence: !data)
+                      )),
               SizedBox(width: 10),
               Selector<AudioPlayerNotifier, bool>(
                   selector: (_, audio) => audio.boostVolume,
@@ -328,8 +329,9 @@ class LastPosition extends StatelessWidget {
                                       .onSurface
                                       .withOpacity(0.12))),
                       textColor: data ? Colors.white : null,
-                      onPressed: () =>
-                          audio.setBoostVolume(boostVolume: !data))),
+                      onPressed: () => {}
+                      // audio.setBoostVolume(boostVolume: !data)
+                      )),
               SizedBox(width: 10),
               FutureBuilder<PlayHistory>(
                   future: getPosition(episode),
@@ -1336,13 +1338,7 @@ class _ControlPanelState extends State<ControlPanel>
                                                     AudioProcessingState
                                                         .buffering ||
                                                 data.audioState ==
-                                                    AudioProcessingState
-                                                        .connecting ||
-                                                data.audioState ==
-                                                    AudioProcessingState.none ||
-                                                data.audioState ==
-                                                    AudioProcessingState
-                                                        .skippingToNext
+                                                    AudioProcessingState.loading
                                             ? context.s.buffering
                                             : '',
                                         style: TextStyle(
