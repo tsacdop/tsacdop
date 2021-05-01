@@ -303,9 +303,8 @@ class LastPosition extends StatelessWidget {
                                       .onSurface
                                       .withOpacity(0.12))),
                       textColor: data ? Colors.white : null,
-                      onPressed: () => {}
-                      //audio.setSkipSilence(skipSilence: !data)
-                      )),
+                      onPressed: () =>
+                          audio.setSkipSilence(skipSilence: !data))),
               SizedBox(width: 10),
               Selector<AudioPlayerNotifier, bool>(
                   selector: (_, audio) => audio.boostVolume,
@@ -329,9 +328,8 @@ class LastPosition extends StatelessWidget {
                                       .onSurface
                                       .withOpacity(0.12))),
                       textColor: data ? Colors.white : null,
-                      onPressed: () => {}
-                      // audio.setBoostVolume(boostVolume: !data)
-                      )),
+                      onPressed: () =>
+                          audio.setBoostVolume(boostVolume: !data))),
               SizedBox(width: 10),
               FutureBuilder<PlayHistory>(
                   future: getPosition(episode),

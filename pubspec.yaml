@@ -49,7 +49,11 @@ dependencies:
   url_launcher: ^6.0.3
   workmanager: ^0.2.3
   wc_flutter_share: ^0.4.0
-  just_audio: ^0.7.3
+  just_audio:
+    git:
+      url: https://github.com/stonega/just_audio_origin.git
+      ref: update
+      path: just_audio
   audio_service:
     git: 
       url: https://github.com/ryanheise/audio_service.git

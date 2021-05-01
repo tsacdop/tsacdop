@@ -75,6 +75,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
       KeyValueStorage(markListenedAfterSkipKey);
   final _playlistsStorgae = KeyValueStorage(playlistsAllKey);
   final _playerStateStorage = KeyValueStorage(playerStateKey);
+  final cacheStorage = KeyValueStorage(cacheMaxKey);
 
   /// Playing episdoe.
   EpisodeBrief _episode;
@@ -175,13 +176,18 @@ class AudioPlayerNotifier extends ChangeNotifier {
   List<EpisodeBrief> _playFromSearchList = [];
 
   AudioHandler _audioHandler;
-  AudioSession _session;
+
+  StreamSubscription<MediaItem> _mediaitemSubscription;
+  StreamSubscription<PlaybackState> _playbackStateSubscription;
+  StreamSubscription<dynamic> _customEventSubscription;
 
   @override
   void addListener(VoidCallback listener) async {
     await _initAudioData();
-    final _audioHandler = await AudioService.init(
-      builder: () => CustomAudioHandler(),
+    final cacheMax =
+        await cacheStorage.getInt(defaultValue: (1024 * 1024 * 200).toInt());
+    _audioHandler = await AudioService.init(
+      builder: () => CustomAudioHandler(cacheMax),
       config: AudioServiceConfig(
           androidNotificationChannelName: 'Tsacdop',
           androidNotificationIcon: 'drawable/ic_notification',
@@ -192,6 +198,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
           rewindInterval: Duration(seconds: _rewindSeconds)),
     );
     super.addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    _mediaitemSubscription?.cancel();
+    _playbackStateSubscription?.cancel();
+    _customEventSubscription?.cancel();
+    super.dispose();
   }
 
   /// Audio playing state.
@@ -482,18 +496,20 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
     /// Set slipsilence.
     if (_skipSilence) {
-      // await _audioHandler.customAction('setSkipSilence', {'': skipSilence});
+      await _audioHandler
+          .customAction('setSkipSilence', {'skipSilence': skipSilence});
     }
 
     /// Set boostValome.
-    // if (_boostVolume) {
-    //   await _audioHandler.customAction(
-    //       'setBoostVolume', [_boostVolume, _volumeGain]);
-    // }
+    if (_boostVolume) {
+      await _audioHandler.customAction(
+          'setBoostVolume', {'boostVolume': _boostVolume, 'gain': _volumeGain});
+    }
 
     _audioHandler.play();
 
-    _audioHandler.mediaItem.where((event) => event != null).listen(
+    _mediaitemSubscription =
+        _audioHandler.mediaItem.where((event) => event != null).listen(
       (item) async {
         var episode = await _dbHelper.getRssItemWithMediaId(item.id);
         if (episode == null) {
@@ -502,7 +518,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         }
         if (episode != null) {
           _episode = episode;
-          _backgroundAudioDuration = item.duration.inMilliseconds ?? 0;
+          _backgroundAudioDuration = item.duration?.inMilliseconds ?? 0;
           if (position > 0 &&
               _backgroundAudioDuration > 0 &&
               _episode.enclosureUrl == _playlist.episodeList[index]) {
@@ -516,10 +532,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
       },
     );
 
-    _audioHandler.playbackState
+    _playbackStateSubscription = _audioHandler.playbackState
         .where((event) => event != null)
         .listen((event) async {
-      print(event.toString());
       _current = DateTime.now();
       _audioState = event.processingState;
       _playing = event?.playing;
@@ -541,11 +556,12 @@ class AudioPlayerNotifier extends ChangeNotifier {
       notifyListeners();
     });
 
-    _audioHandler.customEvent.distinct().listen((event) async {
-      if (event is String) {
+    _customEventSubscription =
+        _audioHandler.customEvent.distinct().listen((event) async {
+      if (event is Map && event['removePlayed'] != null) {
         if (_playlist.isQueue &&
             _queue.isNotEmpty &&
-            _queue.episodes.first.title == event) {
+            _queue.episodes.first.title == event['removePlayed']) {
           _queue.delFromPlaylist(_episode);
           updatePlaylist(_queue, updateEpisodes: false);
         }
@@ -574,10 +590,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
         }
         //_episode = null;
       }
-      if (event is Map && event['duration'] != null) {
-        _backgroundAudioDuration = event['duration'].inMilliseconds;
-        notifyListeners();
-      }
       if (event is Map && event['position'] != null) {
         _backgroundAudioPosition = event['position'].inMilliseconds;
         if (_backgroundAudioDuration != null &&
@@ -591,43 +603,6 @@ class AudioPlayerNotifier extends ChangeNotifier {
         notifyListeners();
       }
     });
-
-    //double s = _currentSpeed ?? 1.0;
-    // var getPosition = 0;
-    // Timer.periodic(Duration(milliseconds: 500), (timer) {
-    //   var s = _currentSpeed ?? 1.0;
-    //   if (_noSlide) {
-    //     if (_playing && !buffering) {
-    //       getPosition = _currentPosition +
-    //           ((DateTime.now().difference(_current).inMilliseconds) * s)
-    //               .toInt();
-    //       _backgroundAudioPosition =
-    //           math.min(getPosition, _backgroundAudioDuration);
-    //     } else {
-    //       _backgroundAudioPosition = _currentPosition ?? 0;
-    //     }
-
-    //     if (_backgroundAudioDuration != null &&
-    //         _backgroundAudioDuration != 0 &&
-    //         _backgroundAudioPosition != null) {
-    //       _seekSliderValue =
-    //           _backgroundAudioPosition / _backgroundAudioDuration ?? 0;
-    //     } else {
-    //       _seekSliderValue = 0;
-    //     }
-
-    //     if (_backgroundAudioPosition > 0 &&
-    //         _backgroundAudioPosition < _backgroundAudioDuration) {
-    //       _lastPosition = _backgroundAudioPosition;
-    //       _playerStateStorage.savePlayerState(
-    //           _playlist.id, _episode.enclosureUrl, _lastPosition);
-    //     }
-    //     notifyListeners();
-    //   }
-    //   if (_audioState == AudioProcessingState.completed) {
-    //     timer.cancel();
-    //   }
-    // });
   }
 
   /// Queue management.
@@ -904,30 +879,31 @@ class AudioPlayerNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Set skip silence.
-  // Future<void> setSkipSilence({@required bool skipSilence}) async {
-  //   await AudioService.customAction('setSkipSilence', skipSilence);
-  //   _skipSilence = skipSilence;
-  //   await _skipSilenceStorage.saveBool(_skipSilence);
-  //   notifyListeners();
-  // }
+  // Set skip silence.
+  Future<void> setSkipSilence({@required bool skipSilence}) async {
+    await _audioHandler
+        .customAction('setSkipSilence', {'skipSilence': skipSilence});
+    _skipSilence = skipSilence;
+    await _skipSilenceStorage.saveBool(_skipSilence);
+    notifyListeners();
+  }
 
   set setVolumeGain(int volumeGain) {
     _volumeGain = volumeGain;
     if (_playerRunning && _boostVolume) {
-      // setBoostVolume(boostVolume: _boostVolume, gain: _volumeGain);
+      setBoostVolume(boostVolume: _boostVolume, gain: _volumeGain);
     }
     notifyListeners();
     _volumeGainStorage.saveInt(volumeGain);
   }
 
-  // Future<void> setBoostVolume({@required bool boostVolume, int gain}) async {
-  //   await _audioHandler.customAction(
-  //       'setBoostVolume', [boostVolume, _volumeGain]);
-  //   _boostVolume = boostVolume;
-  //   notifyListeners();
-  //   await _boostVolumeStorage.saveBool(boostVolume);
-  // }
+  Future<void> setBoostVolume({@required bool boostVolume, int gain}) async {
+    await _audioHandler.customAction(
+        'setBoostVolume', {'boostVolume': boostVolume, 'gain': _volumeGain});
+    _boostVolume = boostVolume;
+    notifyListeners();
+    await _boostVolumeStorage.saveBool(boostVolume);
+  }
 
   //Set sleep timer
   void sleepTimer(int mins) {
@@ -994,24 +970,28 @@ class CustomAudioHandler extends BaseAudioHandler
   final AudioPlayer _player = AudioPlayer();
   bool _interrupted = false;
   int _layoutIndex;
-  bool _stopAtEnd;
-  int _cacheMax;
+  bool _stopAtEnd = false;
   bool _isQueue = false;
 
   bool get hasNext => queue.value.length > 0;
   MediaItem get currentMediaItem => mediaItem.value;
   bool get playing => playbackState.value.playing;
 
-  // MediaItem get _currentMediaItem => hasNext ? _queue[_index] : null;
   BehaviorSubject<Map<String, dynamic>> customEvent =
       BehaviorSubject.seeded({});
 
-  CustomAudioHandler() {
+  CustomAudioHandler(int cacheMax) {
+    _player.cacheMax = cacheMax;
     _handleInterruption();
     _player.currentIndexStream.listen(
       (index) {
+        log(index.toString());
         if (queue.value.isNotEmpty) {
           mediaItem.add(queue.value[index]);
+        }
+        if (_isQueue && index == 1) {
+          
+          customEvent.add({'removePlayed': queue.value.first.title});
         }
       },
     );
@@ -1036,6 +1016,7 @@ class CustomAudioHandler extends BaseAudioHandler
         }[_player.processingState],
         playing: _player.playing,
         updatePosition: _player.position,
+        queueIndex: _player.currentIndex,
         bufferedPosition: _player.bufferedPosition,
         speed: _player.speed,
       ));
@@ -1046,9 +1027,7 @@ class CustomAudioHandler extends BaseAudioHandler
     });
 
     _player.durationStream.listen((event) {
-      log(event.toString());
       mediaItem.add(mediaItem.value.copyWith(duration: _player.duration));
-      customEvent.add({'duration': event});
     });
   }
 
@@ -1059,7 +1038,11 @@ class CustomAudioHandler extends BaseAudioHandler
         useLazyPreparation: true,
         shuffleOrder: DefaultShuffleOrder(),
         children: [
-          for (var item in items) AudioSource.uri(Uri.parse(item.id)),
+          for (var item in items)
+            ClippingAudioSource(
+                start: Duration(seconds: item.extras['skipSecondsStart']),
+                // end: Duration(seconds: item.extras['skipSecondsEnd']),
+                child: AudioSource.uri(Uri.parse(item.id))),
         ],
       ),
     );
@@ -1113,16 +1096,6 @@ class CustomAudioHandler extends BaseAudioHandler
     });
   }
 
-  // void _handlePlaybackCompleted() async {
-  //   if (hasNext) {
-  //     skipToNext();
-  //   } else {
-  //     _player.stop();
-  //     removeQueueItemAt(0);
-  //     stop();
-  //   }
-  // }
-
   void playPause() {
     if (playbackState.value.playing) {
       pause();
@@ -1132,56 +1105,32 @@ class CustomAudioHandler extends BaseAudioHandler
   }
 
   Future<void> skipToNext() async {
-    if (_isQueue && queue.value.length > 0) {
-      removeQueueItemAt(0);
-    }
     if (queue.value.length == 0 || _stopAtEnd) {
       await Future.delayed(Duration(milliseconds: 200));
       await stop();
     } else {
       await super.skipToNext();
-      // _updateDuration();
+      _player.seekToNext();
+      if (_isQueue && queue.value.isNotEmpty) {
+        removeQueueItemAt(0);
+      }
     }
-  }
-
-  // _updateDuration() async {
-  //   var duration = await _player.durationFuture;
-  //   if (duration != null) {
-  //     mediaItem.add(currentMediaItem.copyWith(duration: duration));
-  //   }
-  // }
-
-  _setMediaItem(MediaItem item) {
-    mediaItem.add(item);
   }
 
   Future<void> play() async {
     if (playing == null) {
-      // _cacheMax = await cacheStorage.getInt(
-      //     defaultValue: (200 * 1024 * 1024).toInt());
-      // if (_cacheMax == 0) {
-      //   await cacheStorage.saveInt((200 * 1024 * 1024).toInt());
-      //   _cacheMax = 200 * 1024 * 1024;
-      // }
       await super.play();
       _player.play();
-      _playFromStart();
-      // _updateDuration();
     } else {
-      // _session.setActive(true);
       super.play();
       await _player.play();
       await _seekRelative(Duration(seconds: -3));
     }
   }
 
-  Future<void> _playFromStart() async {
-    // _session.setActive(true);
-    if (currentMediaItem.extras['skipSecondsStart'] > 0 ||
-        currentMediaItem.extras['skipSecondsEnd'] > 0) {
-      _player
-          .seek(Duration(seconds: mediaItem.value.extras['skipSecondsStart']));
-    }
+  Future<void> removeQueueItemAt(int index) async {
+    queue.add(queue.value..removeAt(index));
+    super.removeQueueItemAt(index);
   }
 
   Future<void> pause() async {
@@ -1240,15 +1189,9 @@ class CustomAudioHandler extends BaseAudioHandler
 
   Future<void> _addQueueItemAt(MediaItem item, int index) async {
     if (index == 0 && _isQueue) {
-      await _player.stop();
-      queue.add(queue.value..removeAt(0));
       queue.add(queue.value..removeWhere((i) => i.id == item.id));
       queue.add(queue.value..insert(index, item));
-      // await _player.setUrl(mediaItem.id, cacheMax: _cacheMax);
-      await _player.setUrl(item.id);
-      super.play();
-      // _updateDuration();
-      _playFromStart();
+      skipToNext();
     } else {
       queue.add(queue.value..insert(index, item));
     }
@@ -1266,10 +1209,10 @@ class CustomAudioHandler extends BaseAudioHandler
         await _player.setSpeed(argument['speed']);
         break;
       case 'setSkipSilence':
-        // await _skipSilence(argument);
+        await _setSkipSilence(argument['skipSilence']);
         break;
       case 'setBoostVolume':
-        // await _setBoostVolume(argument[0], argument[1]);
+        await _setBoostVolume(argument['boostVolume'], argument['gain']);
         break;
       case 'setIsQueue':
         _isQueue = argument['isQueue'];
@@ -1288,51 +1231,20 @@ class CustomAudioHandler extends BaseAudioHandler
   Future _changeQueue(List<MediaItem> newQueue) async {
     await _player.stop();
     queue.add(newQueue);
-    await super.play();
-    _playFromStart();
-    // _updateDuration();
+    play();
   }
 
   Future _changeIndex(int index) async {
     await super.skipToQueueItem(index);
-    _playFromStart();
-    // _updateDuration();
   }
 
-  // Future _setSkipSilence(bool boo) async {
-  //   await _audioPlayer.setSkipSilence(boo);
-  //   var duration = await _audioPlayer.durationFuture ?? Duration.zero;
-  //   AudioServiceBackground.setMediaItem(mediaItem.copyWith(duration: duration));
-  // }
+  Future _setSkipSilence(bool boo) async {
+    await _player.setSkipSilence(boo);
+  }
 
-  // Future _setBoostVolume(bool boo, int gain) async {
-  //   await _audioPlayer.setBoostVolume(boo, gain: gain);
-  // }
-
-  // Future<void> _setState({
-  //   AudioProcessingState processingState,
-  //   Duration position,
-  //   Duration bufferedPosition,
-  // }) async {
-  //   if (position == null) {
-  //     position = _player.playbackEvent.position;
-  //   }
-  //   final index = await layoutStorage.getInt(defaultValue: 0);
-  //   await playbackState.add(
-  //     controls: _getControls(index),
-  //     systemActions: [
-  //       MediaAction.seekTo,
-  //       MediaAction.seekForward,
-  //       MediaAction.seekBackward,
-  //     ],
-  //     processingState:
-  //         processingState ?? AudioServiceBackground.state.processingState,
-  //     playing: _playing ?? false,
-  //     position: position,
-  //     bufferedPosition: bufferedPosition ?? position,
-  //     speed: _audioPlayer.speed,
-  //   );
-  // }
+  Future _setBoostVolume(bool boo, int gain) async {
+    await _player.setBoostVolume(boo, gain);
+  }
 
   List<MediaControl> _getControls(int index) {
     switch (index) {
