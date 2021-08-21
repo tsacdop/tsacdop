@@ -197,16 +197,20 @@ class DiscoveryPageState extends State<DiscoveryPage> {
   }
 
   Future<List<OnlinePodcast>> _getTopPodcasts({int page}) async {
-    if(environment['apiKey'] == '') return [];
+    if (environment['apiKey'] == '') return [];
     final searchEngine = ListenNotesSearch();
-    var searchResult = await searchEngine.fetchBestPodcast(
-      genre: '',
-      page: page,
-    );
-    final podcastTopList =
-        searchResult.podcasts.map((e) => e?.toOnlinePodcast).toList();
-    _podcastList.addAll(podcastTopList.cast());
-    return _podcastList;
+    try {
+      var searchResult = await searchEngine.fetchBestPodcast(
+        genre: '',
+        page: page,
+      );
+      final podcastTopList =
+          searchResult.podcasts.map((e) => e?.toOnlinePodcast).toList();
+      _podcastList.addAll(podcastTopList.cast());
+      return _podcastList;
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<bool> _getHideDiscovery() async {

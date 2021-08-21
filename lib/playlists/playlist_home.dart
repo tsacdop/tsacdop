@@ -952,15 +952,14 @@ class __NewPlaylistState extends State<_NewPlaylist> {
   }
 
   Future<EpisodeBrief> _getEpisodeFromFile(String path) async {
-    var metadataRetriever = MetadataRetriever();
     final fileLength = File(path).statSync().size;
     final pubDate = DateTime.now().millisecondsSinceEpoch;
     var primaryColor;
     var imagePath;
-    await metadataRetriever.setFile(File(path));
-    if (metadataRetriever.albumArt != null) {
+    var metadata = await MetadataRetriever.fromFile(File(path));
+    if (metadata.albumArt != null) {
       final dir = await getApplicationDocumentsDirectory();
-      final image = img.decodeImage(metadataRetriever.albumArt);
+      final image = img.decodeImage(metadata.albumArt);
       final thumbnail = img.copyResize(image, width: 300);
       var uuid = Uuid().v4();
       File("${dir.path}/$uuid.png")..writeAsBytesSync(img.encodePng(thumbnail));
@@ -968,7 +967,6 @@ class __NewPlaylistState extends State<_NewPlaylist> {
       primaryColor = await _getColor(File(imagePath));
     }
     final fileName = path.split('/').last;
-    final metadata = await metadataRetriever.metadata;
     return EpisodeBrief(
         fileName,
         'file://$path',

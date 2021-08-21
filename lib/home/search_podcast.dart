@@ -11,6 +11,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/util/cache_manager.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../.env.dart';
@@ -251,6 +252,7 @@ class _RssResultState extends State<RssResult> {
                 CachedNetworkImage(
                   height: 120.0,
                   width: 120.0,
+                  cacheManager: CustomCacheManager(), 
                   fit: BoxFit.fitWidth,
                   alignment: Alignment.center,
                   imageUrl: _onlinePodcast.image,
@@ -1356,6 +1358,7 @@ class PodcastAvatar extends StatelessWidget {
           fit: BoxFit.fitWidth,
           alignment: Alignment.center,
           imageUrl: podcast.image,
+          cacheManager: CustomCacheManager(), 
           placeholderFadeInDuration: Duration.zero,
           progressIndicatorBuilder: (context, url, downloadProgress) =>
               Container(

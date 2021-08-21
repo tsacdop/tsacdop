@@ -977,8 +977,7 @@ class CustomAudioHandler extends BaseAudioHandler
   MediaItem get currentMediaItem => mediaItem.value;
   bool get playing => playbackState.value.playing;
 
-  BehaviorSubject<Map<String, dynamic>> customEvent =
-      BehaviorSubject.seeded({});
+  PublishSubject<Map<String, dynamic>> customEvent = PublishSubject()..add({});
 
   CustomAudioHandler(int cacheMax) {
     _player.cacheMax = cacheMax;
@@ -990,7 +989,6 @@ class CustomAudioHandler extends BaseAudioHandler
           mediaItem.add(queue.value[index]);
         }
         if (_isQueue && index == 1) {
-          
           customEvent.add({'removePlayed': queue.value.first.title});
         }
       },
@@ -1197,7 +1195,7 @@ class CustomAudioHandler extends BaseAudioHandler
     }
   }
 
-  Future customAction(funtion, argument) async {
+  Future<dynamic> customAction(funtion, [argument]) async {
     switch (funtion) {
       case 'stopAtEnd':
         _stopAtEnd = true;
