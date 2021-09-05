@@ -19,8 +19,31 @@ class CustomCacheManager extends CacheManager with ImageCacheManager {
     try {
       file = await super
           .downloadFile(url, key: key, authHeaders: authHeaders, force: force);
-    } catch (e) {}
+    } catch (e) {
+      rethrow;
+    }
     return file;
+  }
+
+  @override
+  Stream<FileResponse> getImageFile(
+    String url, {
+    String key,
+    Map<String, String> headers,
+    bool withProgress = false,
+    int maxHeight,
+    int maxWidth,
+  }) async* {
+    try {
+      super.getImageFile(url,
+          key: key,
+          headers: headers,
+          withProgress: withProgress,
+          maxHeight: maxHeight,
+          maxWidth: maxWidth);
+    } catch (e) {
+      
+    }
   }
 
   CustomCacheManager._() : super(Config(key));

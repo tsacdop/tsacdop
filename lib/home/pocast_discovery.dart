@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
@@ -408,7 +410,9 @@ class __TopPodcastListState extends State<_TopPodcastList> {
   @override
   void initState() {
     _page = 1;
-    _searchFuture = _getTopPodcasts(genre: widget.genre, page: _page);
+    try {
+      _searchFuture = _getTopPodcasts(genre: widget.genre, page: _page);
+    } catch (e) {}
     super.initState();
   }
 
