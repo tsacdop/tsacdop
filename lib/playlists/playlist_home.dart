@@ -75,8 +75,8 @@ class _PlaylistHomeState extends State<PlaylistHome> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+            Theme.of(context).colorScheme.brightness,
+        statusBarIconBrightness: Theme.of(context).colorScheme.brightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
       ),
       child: WillPopScope(
@@ -143,6 +143,9 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                           playing
                                               ? audio.pauseAduio()
                                               : audio.resumeAudio();
+                                        } else if (data.item1.isEmpty) {
+                                          Fluttertoast.showToast(
+                                              msg: 'Playlist is empty');
                                         } else {
                                           context
                                               .read<AudioPlayerNotifier>()
