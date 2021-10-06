@@ -457,18 +457,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                             children: <Widget>[
                               Padding(
                                 padding: EdgeInsets.all(10.0),
-                                child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15.0)),
-                                  child: SizedBox(
-                                      height: 30.0,
-                                      width: 30.0,
-                                      child: Image(
-                                          image: episodes[index].avatarImage)
-                                      // Image.file(File(
-                                      //     "${episodes[index].imagePath}"))
-                                      ),
-                                ),
+                                child: CircleAvatar(
+                                    radius: 15,
+                                    backgroundImage:
+                                        episodes[index].avatarImage),
                               ),
                               Expanded(
                                 child: Align(
@@ -522,9 +514,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                             onTap: () {
                               audio.playNext();
-                              miniPlaylistKey.currentState.removeItem(
-                                  0, (context, animation) => Container());
-                              miniPlaylistKey.currentState.insertItem(0);
+                              // miniPlaylistKey.currentState.removeItem(
+                              //     0, (context, animation) => Container());
+                              // miniPlaylistKey.currentState.insertItem(0);
                             },
                             child: SizedBox(
                               height: 30,
@@ -1336,13 +1328,7 @@ class _ControlPanelState extends State<ControlPanel>
                                                     AudioProcessingState
                                                         .buffering ||
                                                 data.audioState ==
-                                                    AudioProcessingState
-                                                        .connecting ||
-                                                data.audioState ==
-                                                    AudioProcessingState.none ||
-                                                data.audioState ==
-                                                    AudioProcessingState
-                                                        .skippingToNext
+                                                    AudioProcessingState.loading
                                             ? context.s.buffering
                                             : '',
                                         style: TextStyle(

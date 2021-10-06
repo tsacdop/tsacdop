@@ -441,7 +441,7 @@ class HistoryChart extends StatelessWidget {
           titlesData: FlTitlesData(
             show: true,
             bottomTitles: SideTitles(
-              getTextStyles: (i) => TextStyle(
+              getTextStyles: (_, i) => TextStyle(
                 color: const Color(0xff67727d),
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
@@ -456,7 +456,7 @@ class HistoryChart extends StatelessWidget {
             ),
             leftTitles: SideTitles(
               showTitles: true,
-              getTextStyles: (s) => TextStyle(
+              getTextStyles: (_, s) => TextStyle(
                 color: const Color(0xff67727d),
                 fontWeight: FontWeight.bold,
                 fontSize: 12,

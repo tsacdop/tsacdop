@@ -75,8 +75,8 @@ class _PlaylistHomeState extends State<PlaylistHome> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+            Theme.of(context).colorScheme.brightness,
+        statusBarIconBrightness: Theme.of(context).colorScheme.brightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
       ),
       child: WillPopScope(
@@ -143,6 +143,9 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                           playing
                                               ? audio.pauseAduio()
                                               : audio.resumeAudio();
+                                        } else if (data.item1.isEmpty) {
+                                          Fluttertoast.showToast(
+                                              msg: 'Playlist is empty');
                                         } else {
                                           context
                                               .read<AudioPlayerNotifier>()
@@ -952,15 +955,14 @@ class __NewPlaylistState extends State<_NewPlaylist> {
   }
 
   Future<EpisodeBrief> _getEpisodeFromFile(String path) async {
-    var metadataRetriever = MetadataRetriever();
     final fileLength = File(path).statSync().size;
     final pubDate = DateTime.now().millisecondsSinceEpoch;
     var primaryColor;
     var imagePath;
-    await metadataRetriever.setFile(File(path));
-    if (metadataRetriever.albumArt != null) {
+    var metadata = await MetadataRetriever.fromFile(File(path));
+    if (metadata.albumArt != null) {
       final dir = await getApplicationDocumentsDirectory();
-      final image = img.decodeImage(metadataRetriever.albumArt);
+      final image = img.decodeImage(metadata.albumArt);
       final thumbnail = img.copyResize(image, width: 300);
       var uuid = Uuid().v4();
       File("${dir.path}/$uuid.png")..writeAsBytesSync(img.encodePng(thumbnail));
@@ -968,7 +970,6 @@ class __NewPlaylistState extends State<_NewPlaylist> {
       primaryColor = await _getColor(File(imagePath));
     }
     final fileName = path.split('/').last;
-    final metadata = await metadataRetriever.metadata;
     return EpisodeBrief(
         fileName,
         'file://$path',

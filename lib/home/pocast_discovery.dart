@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
@@ -197,16 +199,20 @@ class DiscoveryPageState extends State<DiscoveryPage> {
   }
 
   Future<List<OnlinePodcast>> _getTopPodcasts({int page}) async {
-    if(environment['apiKey'] == '') return [];
+    if (environment['apiKey'] == '') return [];
     final searchEngine = ListenNotesSearch();
-    var searchResult = await searchEngine.fetchBestPodcast(
-      genre: '',
-      page: page,
-    );
-    final podcastTopList =
-        searchResult.podcasts.map((e) => e?.toOnlinePodcast).toList();
-    _podcastList.addAll(podcastTopList.cast());
-    return _podcastList;
+    try {
+      var searchResult = await searchEngine.fetchBestPodcast(
+        genre: '',
+        page: page,
+      );
+      final podcastTopList =
+          searchResult.podcasts.map((e) => e?.toOnlinePodcast).toList();
+      _podcastList.addAll(podcastTopList.cast());
+      return _podcastList;
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<bool> _getHideDiscovery() async {
@@ -404,7 +410,9 @@ class __TopPodcastListState extends State<_TopPodcastList> {
   @override
   void initState() {
     _page = 1;
-    _searchFuture = _getTopPodcasts(genre: widget.genre, page: _page);
+    try {
+      _searchFuture = _getTopPodcasts(genre: widget.genre, page: _page);
+    } catch (e) {}
     super.initState();
   }
 

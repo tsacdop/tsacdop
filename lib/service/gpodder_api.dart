@@ -31,13 +31,15 @@ class Gpodder {
 
   Future<void> _initDio() async {
     final dir = await getApplicationDocumentsDirectory();
-    var cookieJar = PersistCookieJar(dir: "${dir.path}/.cookies/");
+    var cookieJar =
+        PersistCookieJar(storage: FileStorage("${dir.path}/.cookies/"));
     _dio.interceptors.add(CookieManager(cookieJar));
   }
 
   Future<int> login({String username, String password}) async {
     final dir = await getApplicationDocumentsDirectory();
-    var cookieJar = PersistCookieJar(dir: "${dir.path}/.cookies/");
+    var cookieJar =
+        PersistCookieJar(storage: FileStorage("${dir.path}/.cookies/"));
     cookieJar.delete(Uri.parse(_baseUrl));
     _dio.interceptors.add(CookieManager(cookieJar));
     final basicAuth =
@@ -81,7 +83,8 @@ class Gpodder {
 
   Future<void> _initService() async {
     final dir = await getApplicationDocumentsDirectory();
-    var cookieJar = PersistCookieJar(dir: "${dir.path}/.cookies/");
+    var cookieJar =
+        PersistCookieJar(storage: FileStorage("${dir.path}/.cookies/"));
     cookieJar.delete(Uri.parse(_baseUrl));
     await _storage.clearList();
     await _addStorage.clearList();

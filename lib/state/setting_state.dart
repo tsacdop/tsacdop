@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -18,43 +19,43 @@ import '../type/settings_backup.dart';
 import 'download_state.dart';
 
 void callbackDispatcher() {
-    Workmanager.executeTask((task, inputData) async {
-      var dbHelper = DBHelper();
-      var podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
-      //lastWork is a indicator for if the app was opened since last backgroundwork
-      //if the app wes opend,then the old marked new episode would be marked not new.
-      var lastWorkStorage = KeyValueStorage(lastWorkKey);
-      var lastWork = await lastWorkStorage.getInt();
-      for (var podcastLocal in podcastList) {
-        await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
-        developer.log('Refresh ${podcastLocal.title}');
-      }
-      await FlutterDownloader.initialize();
-      var downloader = AutoDownloader();
+  Workmanager.executeTask((task, inputData) async {
+    var dbHelper = DBHelper();
+    var podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
+    //lastWork is a indicator for if the app was opened since last backgroundwork
+    //if the app wes opend,then the old marked new episode would be marked not new.
+    var lastWorkStorage = KeyValueStorage(lastWorkKey);
+    var lastWork = await lastWorkStorage.getInt();
+    for (var podcastLocal in podcastList) {
+      await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
+      developer.log('Refresh ${podcastLocal.title}');
+    }
+    await FlutterDownloader.initialize();
+    var downloader = AutoDownloader();
 
-      var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
-      var autoDownloadNetwork = await autoDownloadStorage.getInt();
-      var result = await Connectivity().checkConnectivity();
-      if (autoDownloadNetwork == 1) {
-        var episodes = await dbHelper.getNewEpisodes('all');
-        // For safety
-        if (episodes.length < 100 && episodes.length > 0) {
-          downloader.bindBackgroundIsolate();
-          await downloader.startTask(episodes);
-        }
-      } else if (result == ConnectivityResult.wifi) {
-        var episodes = await dbHelper.getNewEpisodes('all');
-        //For safety
-        if (episodes.length < 100 && episodes.length > 0) {
-          downloader.bindBackgroundIsolate();
-          await downloader.startTask(episodes);
-        }
+    var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+    var autoDownloadNetwork = await autoDownloadStorage.getInt();
+    var result = await Connectivity().checkConnectivity();
+    if (autoDownloadNetwork == 1) {
+      var episodes = await dbHelper.getNewEpisodes('all');
+      // For safety
+      if (episodes.length < 100 && episodes.length > 0) {
+        downloader.bindBackgroundIsolate();
+        await downloader.startTask(episodes);
       }
-      await lastWorkStorage.saveInt(1);
-      var refreshstorage = KeyValueStorage(refreshdateKey);
-      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
-      return Future.value(true);
-    });
+    } else if (result == ConnectivityResult.wifi) {
+      var episodes = await dbHelper.getNewEpisodes('all');
+      //For safety
+      if (episodes.length < 100 && episodes.length > 0) {
+        downloader.bindBackgroundIsolate();
+        await downloader.startTask(episodes);
+      }
+    }
+    await lastWorkStorage.saveInt(1);
+    var refreshstorage = KeyValueStorage(refreshdateKey);
+    await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+    return Future.value(true);
+  });
 }
 
 final showNotesFontStyles = <TextStyle>[
@@ -139,42 +140,51 @@ class SettingState extends ChangeNotifier {
   ThemeMode get theme => _theme;
 
   ThemeData get lightTheme => ThemeData(
-      accentColorBrightness: Brightness.dark,
-      primaryColor: Colors.grey[100],
-      primaryColorLight: Colors.white,
-      primaryColorDark: Colors.grey[300],
-      dialogBackgroundColor: Colors.white,
-      backgroundColor: Colors.grey[100],
-      appBarTheme: AppBarTheme(
-        color: Colors.grey[100],
-        elevation: 0,
-      ),
-      textTheme: TextTheme(
-        bodyText2: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
-      ),
-      tabBarTheme: TabBarTheme(
-        labelColor: Colors.black,
-        unselectedLabelColor: Colors.grey[400],
-      ),
-      accentColor: _accentSetColor,
-      cursorColor: _accentSetColor,
-      textSelectionHandleColor: _accentSetColor,
-      toggleableActiveColor: _accentSetColor,
-      buttonTheme: ButtonThemeData(
+        colorScheme: ColorScheme.fromSwatch()
+            .copyWith(brightness: Brightness.light, secondary: _accentSetColor),
+        primaryColor: Colors.grey[100],
+        primaryColorLight: Colors.white,
+        primaryColorDark: Colors.grey[300],
+        dialogBackgroundColor: Colors.white,
+        backgroundColor: Colors.grey[100],
+        appBarTheme: AppBarTheme(
+            color: Colors.grey[100],
+            elevation: 0,
+            titleTextStyle: TextStyle(color: Colors.black),
+            iconTheme: IconThemeData(color: Colors.black),
+            systemOverlayStyle: SystemUiOverlayStyle.dark),
+        textTheme: TextTheme(
+          bodyText2: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
+        ),
+        tabBarTheme: TabBarTheme(
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.grey[400],
+        ),
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: _accentSetColor,
+          selectionHandleColor: _accentSetColor,
+        ),
+        toggleableActiveColor: _accentSetColor,
+        buttonTheme: ButtonThemeData(
           height: 32,
           hoverColor: _accentSetColor.withAlpha(70),
-          splashColor: _accentSetColor.withAlpha(70)));
+          splashColor: _accentSetColor.withAlpha(70),
+        ),
+      );
+
   ThemeData get darkTheme => ThemeData.dark().copyWith(
-      accentColor: _accentSetColor,
-      primaryColorDark: Colors.grey[800],
-      scaffoldBackgroundColor: _realDark ? Colors.black87 : Color(0XFF212121),
-      primaryColor: _realDark ? Colors.black : Color(0XFF1B1B1B),
-      popupMenuTheme: PopupMenuThemeData()
-          .copyWith(color: _realDark ? Colors.grey[900] : null),
-      appBarTheme: AppBarTheme(elevation: 0),
-      buttonTheme: ButtonThemeData(height: 32),
-      dialogBackgroundColor: _realDark ? Colors.grey[900] : null,
-      cursorColor: _accentSetColor);
+        colorScheme: ColorScheme.fromSwatch()
+            .copyWith(brightness: Brightness.dark, secondary: _accentSetColor),
+        primaryColorDark: Colors.grey[800],
+        scaffoldBackgroundColor: _realDark ? Colors.black87 : Color(0XFF212121),
+        primaryColor: _realDark ? Colors.black : Color(0XFF1B1B1B),
+        popupMenuTheme: PopupMenuThemeData()
+            .copyWith(color: _realDark ? Colors.grey[900] : null),
+        appBarTheme: AppBarTheme(
+            elevation: 0, systemOverlayStyle: SystemUiOverlayStyle.light),
+        buttonTheme: ButtonThemeData(height: 32),
+        dialogBackgroundColor: _realDark ? Colors.grey[900] : null,
+      );
 
   set setTheme(ThemeMode mode) {
     _theme = mode;
@@ -558,8 +568,10 @@ class SettingState extends ChangeNotifier {
             .getBool(defaultValue: false);
     final deleteAfterPlayed = await KeyValueStorage(deleteAfterPlayedKey)
         .getBool(defaultValue: false);
-    final openPlaylistDefault = await _openPlaylistDefaultStorage.getBool(defaultValue: false);
-    final openAllPodcastDefault = await _openAllPodcastDefaultStorage.getBool(defaultValue: false);
+    final openPlaylistDefault =
+        await _openPlaylistDefaultStorage.getBool(defaultValue: false);
+    final openAllPodcastDefault =
+        await _openAllPodcastDefaultStorage.getBool(defaultValue: false);
 
     return SettingsBackup(
         theme: theme,
