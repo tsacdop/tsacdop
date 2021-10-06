@@ -51,16 +51,12 @@ dependencies:
   workmanager: ^0.2.3
   wc_flutter_share: ^0.4.0
   xml: ^5.2.0
+  audio_service: 0.18.0
   just_audio:
     git:
       url: https://github.com/stonega/just_audio_origin.git
       ref: update
       path: just_audio
-  audio_service:
-    git:
-      url: https://github.com/ryanheise/audio_service.git
-      ref: one-isolate
-      path: audio_service
   flutter_downloader:
     git:
       url: https://github.com/stonega/flutter_downloader.git

@@ -203,7 +203,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   AudioServiceConfig get _config => AudioServiceConfig(
         androidNotificationChannelName: 'Tsacdop',
         androidNotificationIcon: 'drawable/ic_notification',
-        androidEnableQueue: true,
+        // androidEnableQueue: true,
         androidStopForegroundOnPause: true,
         preloadArtwork: false,
         fastForwardInterval: Duration(seconds: _fastForwardSeconds),
@@ -357,6 +357,8 @@ class AudioPlayerNotifier extends ChangeNotifier {
       _startAudioService(_playlist,
           position: _lastPosition ?? 0,
           index: _playlist.episodes.indexOf(_episode));
+    } else {
+      log('Playlist is empty');
     }
   }
 
@@ -598,7 +600,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
               _lastPosition ~/ 1000, _seekSliderValue);
           await _dbHelper.saveHistory(history);
         }
-        //_episode = null;
+        if (_playlist.isEmpty) {
+          _episode = null;
+          _backgroundAudioDuration = 0;
+          _backgroundAudioPosition = 0;
+        }
       }
       if (event is Map && event['position'] != null) {
         _backgroundAudioPosition = event['position'].inMilliseconds;
@@ -1126,14 +1132,14 @@ class CustomAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> skipToNext() async {
-    if (queue.value.length == 0 || _stopAtEnd) {
+    if (queue.value.length == 1 || _stopAtEnd) {
       await Future.delayed(Duration(milliseconds: 200));
       await stop();
     } else {
       _autoSkip = false;
       await super.skipToNext();
       _player.seekToNext();
-      if (_isQueue && queue.value.isNotEmpty) {
+      if (_isQueue) {
         removeQueueItemAt(0);
       }
     }
@@ -1141,7 +1147,7 @@ class CustomAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> play() async {
-    if (playing == null) {
+    if (playing == null || playing == false) {
       log('playing');
       await super.play();
       await _player.play();
@@ -1209,9 +1215,8 @@ class CustomAudioHandler extends BaseAudioHandler
 
   Future<void> stop() async {
     await _player.stop();
-    await _player.dispose();
-    playbackState.add(playbackState.value
-        .copyWith(processingState: AudioProcessingState.loading));
+    // await _player.dispose();
+    _playlist.clear();
     customEvent.add({'playerRunning': false});
     await super.stop();
   }
