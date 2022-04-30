@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:color_thief_flutter/color_thief_flutter.dart';
+import 'package:color_thief_dart/color_thief_dart.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,21 +26,22 @@ import '../type/play_histroy.dart';
 import '../type/playlist.dart';
 import '../type/podcastlocal.dart';
 import '../util/extension_helper.dart';
+import '../util/helpers.dart';
 import '../util/pageroute.dart';
 import '../widgets/custom_widget.dart';
 import '../widgets/dismissible_container.dart';
 import 'playlist_page.dart';
 
 class PlaylistHome extends StatefulWidget {
-  PlaylistHome({Key key}) : super(key: key);
+  PlaylistHome({Key? key}) : super(key: key);
 
   @override
   _PlaylistHomeState createState() => _PlaylistHomeState();
 }
 
 class _PlaylistHomeState extends State<PlaylistHome> {
-  Widget _body;
-  String _selected;
+  Widget? _body;
+  String? _selected;
 
   @override
   void initState() {
@@ -51,11 +53,11 @@ class _PlaylistHomeState extends State<PlaylistHome> {
   }
 
   Widget _tabWidget(
-      {Widget icon,
-      String label,
-      Function onTap,
-      bool isSelected,
-      Color color}) {
+      {required Widget icon,
+      String? label,
+      Function? onTap,
+      required bool isSelected,
+      Color? color}) {
     return OutlinedButton.icon(
         style: OutlinedButton.styleFrom(
             side: BorderSide(color: context.scaffoldBackgroundColor),
@@ -65,13 +67,13 @@ class _PlaylistHomeState extends State<PlaylistHome> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(100)))),
         icon: icon,
-        label: isSelected ? Text(label) : Center(),
-        onPressed: onTap);
+        label: isSelected ? Text(label!) : Center(),
+        onPressed: onTap as void Function()?);
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         systemNavigationBarIconBrightness:
@@ -81,7 +83,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
       ),
       child: WillPopScope(
         onWillPop: () {
-          if (context.read<SettingState>().openPlaylistDefault) {
+          if (context.read<SettingState>().openPlaylistDefault!) {
             Navigator.push(context, SlideRightRoute(page: Home()));
             return Future.value(false);
           } else {
@@ -92,7 +94,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
             appBar: AppBar(
               leading: CustomBackButton(),
               centerTitle: true,
-              title: Selector<AudioPlayerNotifier, EpisodeBrief>(
+              title: Selector<AudioPlayerNotifier, EpisodeBrief?>(
                 selector: (_, audio) => audio.episode,
                 builder: (_, data, __) {
                   return Text(data?.title ?? '', maxLines: 1);
@@ -105,7 +107,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                 SizedBox(
                   height: 100,
                   child: Selector<AudioPlayerNotifier,
-                      Tuple4<Playlist, bool, bool, EpisodeBrief>>(
+                      Tuple4<Playlist?, bool, bool, EpisodeBrief?>>(
                     selector: (_, audio) => Tuple4(audio.playlist,
                         audio.playerRunning, audio.playing, audio.episode),
                     builder: (_, data, __) {
@@ -143,7 +145,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                           playing
                                               ? audio.pauseAduio()
                                               : audio.resumeAudio();
-                                        } else if (data.item1.isEmpty) {
+                                        } else if (data.item1!.isEmpty) {
                                           Fluttertoast.showToast(
                                               msg: 'Playlist is empty');
                                         } else {
@@ -166,8 +168,8 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                       icon: Icon(Icons.skip_next),
                                       onPressed: () {
                                         if (running &&
-                                            !(data.item1.length == 1 &&
-                                                !data.item1.isQueue)) {
+                                            !(data.item1!.length == 1 &&
+                                                !data.item1!.isQueue)) {
                                           audio.playNext();
                                         }
                                       }),
@@ -176,7 +178,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                               SizedBox(height: 10),
                               if (data.item2)
                                 Selector<AudioPlayerNotifier,
-                                    Tuple4<bool, int, String, int>>(
+                                    Tuple4<bool, int?, String?, int>>(
                                   selector: (_, audio) => Tuple4(
                                       audio.buffering,
                                       audio.backgroundAudioPosition,
@@ -184,7 +186,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                       audio.backgroundAudioDuration),
                                   builder: (_, info, __) {
                                     return info.item3 != null
-                                        ? Text(info.item3,
+                                        ? Text(info.item3!,
                                             style: TextStyle(
                                                 color: Color(0xFFFF0000)))
                                         : info.item1
@@ -194,7 +196,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                                     color: context.accentColor),
                                               )
                                             : Text(
-                                                '${(info.item2 ~/ 1000).toTime} / ${(info.item4 ~/ 1000).toTime}');
+                                                '${(info.item2! ~/ 1000).toTime} / ${(info.item4 ~/ 1000).toTime}');
                                   },
                                 ),
                               if (!data.item2)
@@ -217,18 +219,18 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                           width: 80,
                                           height: 80,
                                           child: Image(
-                                              image: data.item4.avatarImage)),
+                                              image: data.item4!.avatarImage)),
                                       Selector<AudioPlayerNotifier, int>(
                                         selector: (_, audio) {
                                           if (!audio.playerRunning &&
-                                              audio.episode.duration != 0) {
+                                              audio.episode!.duration != 0) {
                                             return (audio.lastPosition ~/
-                                                (audio.episode.duration * 10));
+                                                (audio.episode!.duration! * 10));
                                           } else if (audio.playerRunning &&
                                               audio.backgroundAudioDuration !=
                                                   0) {
                                             return ((audio
-                                                        .backgroundAudioPosition *
+                                                        .backgroundAudioPosition! *
                                                     100) ~/
                                                 audio.backgroundAudioDuration);
                                           } else {
@@ -312,7 +314,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
 }
 
 class _Queue extends StatefulWidget {
-  const _Queue({Key key}) : super(key: key);
+  const _Queue({Key? key}) : super(key: key);
 
   @override
   __QueueState createState() => __QueueState();
@@ -321,7 +323,7 @@ class _Queue extends StatefulWidget {
 class __QueueState extends State<_Queue> {
   @override
   Widget build(BuildContext context) {
-    return Selector<AudioPlayerNotifier, Tuple3<Playlist, bool, EpisodeBrief>>(
+    return Selector<AudioPlayerNotifier, Tuple3<Playlist?, bool, EpisodeBrief?>>(
       selector: (_, audio) =>
           Tuple3(audio.playlist, audio.playerRunning, audio.episode),
       builder: (_, data, __) {
@@ -340,9 +342,9 @@ class __QueueState extends State<_Queue> {
                     },
                     scrollDirection: Axis.vertical,
                     children: data.item2
-                        ? episodes.map<Widget>((episode) {
-                            if (episode.enclosureUrl !=
-                                episodes.first.enclosureUrl) {
+                        ? episodes!.map<Widget>((episode) {
+                            if (episode!.enclosureUrl !=
+                                episodes.first!.enclosureUrl) {
                               return DismissibleContainer(
                                 episode: episode,
                                 onRemove: (value) => setState(() {}),
@@ -357,11 +359,11 @@ class __QueueState extends State<_Queue> {
                                   tileColor: context.primaryColorDark);
                             }
                           }).toList()
-                        : episodes
+                        : episodes!
                             .map<Widget>((episode) => DismissibleContainer(
                                   episode: episode,
                                   onRemove: (value) => setState(() {}),
-                                  key: ValueKey(episode.enclosureUrl),
+                                  key: ValueKey(episode!.enclosureUrl),
                                 ))
                             .toList())
                 : ListView.builder(
@@ -394,7 +396,7 @@ class __QueueState extends State<_Queue> {
 }
 
 class _History extends StatefulWidget {
-  const _History({Key key}) : super(key: key);
+  const _History({Key? key}) : super(key: key);
 
   @override
   __HistoryState createState() => __HistoryState();
@@ -403,8 +405,8 @@ class _History extends StatefulWidget {
 class __HistoryState extends State<_History> {
   var dbHelper = DBHelper();
   bool _loadMore = false;
-  Future _getData;
-  int _top;
+  late Future _getData;
+  int? _top;
 
   @override
   void initState() {
@@ -413,7 +415,7 @@ class __HistoryState extends State<_History> {
     _getData = getPlayRecords(_top);
   }
 
-  Future<List<PlayHistory>> getPlayRecords(int top) async {
+  Future<List<PlayHistory>> getPlayRecords(int? top) async {
     List<PlayHistory> playHistory;
     playHistory = await dbHelper.getPlayRecords(top);
     for (var record in playHistory) {
@@ -429,7 +431,7 @@ class __HistoryState extends State<_History> {
       });
     }
     await Future.delayed(Duration(milliseconds: 500));
-    _top = _top + 20;
+    _top = _top! + 20;
     if (mounted) {
       setState(() {
         _getData = getPlayRecords(_top);
@@ -450,7 +452,7 @@ class __HistoryState extends State<_History> {
   }
 
   Widget _timeTag(BuildContext context,
-      {EpisodeBrief episode, int seconds, double seekValue}) {
+      {EpisodeBrief? episode, required int seconds, required double seekValue}) {
     final audio = context.watch<AudioPlayerNotifier>();
     final textWidth = _getMaskStop(seekValue, seconds).width;
     final stop = seekValue - 20 / textWidth + 40 * seekValue / textWidth;
@@ -506,11 +508,11 @@ class __HistoryState extends State<_History> {
     );
   }
 
-  Widget _playlistButton(BuildContext context, {EpisodeBrief episode}) {
+  Widget _playlistButton(BuildContext context, {EpisodeBrief? episode}) {
     final audio = context.watch<AudioPlayerNotifier>();
     final s = context.s;
     return SizedBox(
-      child: Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
+      child: Selector<AudioPlayerNotifier, List<EpisodeBrief?>>(
         selector: (_, audio) => audio.queue.episodes,
         builder: (_, data, __) {
           return data.contains(episode)
@@ -518,18 +520,18 @@ class __HistoryState extends State<_History> {
                   icon: Icon(Icons.playlist_add_check,
                       color: context.accentColor),
                   onPressed: () async {
-                    audio.delFromPlaylist(episode);
+                    audio.delFromPlaylist(episode!);
                     Fluttertoast.showToast(
-                      msg: s.toastRemovePlaylist,
+                      msg: s!.toastRemovePlaylist,
                       gravity: ToastGravity.BOTTOM,
                     );
                   })
               : IconButton(
                   icon: Icon(Icons.playlist_add, color: Colors.grey[700]),
                   onPressed: () async {
-                    audio.addToPlaylist(episode);
+                    audio.addToPlaylist(episode!);
                     Fluttertoast.showToast(
-                      msg: s.toastAddPlaylist,
+                      msg: s!.toastAddPlaylist,
                       gravity: ToastGravity.BOTTOM,
                     );
                   });
@@ -542,14 +544,14 @@ class __HistoryState extends State<_History> {
   Widget build(BuildContext context) {
     final audio = context.watch<AudioPlayerNotifier>();
     return FutureBuilder<List<PlayHistory>>(
-        future: _getData,
+        future: _getData.then((value) => value as List<PlayHistory>),
         builder: (context, snapshot) {
           return snapshot.hasData
               ? NotificationListener<ScrollNotification>(
                   onNotification: (scrollInfo) {
                     if (scrollInfo.metrics.pixels ==
                             scrollInfo.metrics.maxScrollExtent &&
-                        snapshot.data.length == _top) {
+                        snapshot.data!.length == _top) {
                       if (!_loadMore) {
                         _loadMoreData();
                       }
@@ -558,20 +560,20 @@ class __HistoryState extends State<_History> {
                   },
                   child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data.length + 1,
+                      itemCount: snapshot.data!.length + 1,
                       itemBuilder: (context, index) {
-                        if (index == snapshot.data.length) {
+                        if (index == snapshot.data!.length) {
                           return SizedBox(
                               height: 2,
                               child: _loadMore
                                   ? LinearProgressIndicator()
                                   : Center());
                         } else {
-                          final seekValue = snapshot.data[index].seekValue;
-                          final seconds = snapshot.data[index].seconds;
+                          final seekValue = snapshot.data![index].seekValue;
+                          final seconds = snapshot.data![index].seconds;
                           final date = snapshot
-                              .data[index].playdate.millisecondsSinceEpoch;
-                          final episode = snapshot.data[index].episode;
+                              .data![index].playdate!.millisecondsSinceEpoch;
+                          final episode = snapshot.data![index].episode;
                           final c = episode?.backgroudColor(context);
                           return episode == null
                               ? Center()
@@ -588,8 +590,8 @@ class __HistoryState extends State<_History> {
                                                 24, 8, 20, 8),
                                             onTap: () => audio.episodeLoad(
                                                 episode,
-                                                startPosition: seekValue < 0.9
-                                                    ? (seconds * 1000).toInt()
+                                                startPosition: seekValue! < 0.9
+                                                    ? (seconds! * 1000).toInt()
                                                     : 0),
                                             leading: CircleAvatar(
                                                 backgroundColor:
@@ -600,7 +602,7 @@ class __HistoryState extends State<_History> {
                                               padding: EdgeInsets.symmetric(
                                                   vertical: 5.0),
                                               child: Text(
-                                                snapshot.data[index].title,
+                                                snapshot.data![index].title!,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -613,11 +615,11 @@ class __HistoryState extends State<_History> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
                                                 children: <Widget>[
-                                                  if (seekValue < 0.9)
+                                                  if (seekValue! < 0.9)
                                                     _timeTag(context,
                                                         episode: episode,
                                                         seekValue: seekValue,
-                                                        seconds: seconds),
+                                                        seconds: seconds!),
                                                   _playlistButton(context,
                                                       episode: episode),
                                                   Spacer(),
@@ -651,14 +653,14 @@ class __HistoryState extends State<_History> {
 }
 
 class _Playlists extends StatefulWidget {
-  const _Playlists({Key key}) : super(key: key);
+  const _Playlists({Key? key}) : super(key: key);
 
   @override
   __PlaylistsState createState() => __PlaylistsState();
 }
 
 class __PlaylistsState extends State<_Playlists> {
-  Future<EpisodeBrief> _getEpisode(String url) async {
+  Future<EpisodeBrief?> _getEpisode(String url) async {
     var dbHelper = DBHelper();
     return await dbHelper.getRssItemWithUrl(url);
   }
@@ -707,7 +709,7 @@ class __PlaylistsState extends State<_Playlists> {
                                     if (index < queue.episodeList.length) {
                                       return Image(
                                         image:
-                                            queue.episodes[index].avatarImage,
+                                            queue.episodes[index]!.avatarImage,
                                       );
                                     }
                                     return Center();
@@ -719,7 +721,7 @@ class __PlaylistsState extends State<_Playlists> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  s.queue,
+                                  s!.queue,
                                   style: context.textTheme.headline6,
                                 ),
                                 Text(
@@ -778,7 +780,7 @@ class __PlaylistsState extends State<_Playlists> {
                         color: context.primaryColorDark,
                         child: episodeList.isEmpty
                             ? Center()
-                            : FutureBuilder<EpisodeBrief>(
+                            : FutureBuilder<EpisodeBrief?>(
                                 future: _getEpisode(episodeList.first),
                                 builder: (_, snapshot) {
                                   if (snapshot.data != null) {
@@ -786,14 +788,14 @@ class __PlaylistsState extends State<_Playlists> {
                                         height: 50,
                                         width: 50,
                                         child: Image(
-                                            image: snapshot.data.avatarImage));
+                                            image: snapshot.data!.avatarImage));
                                   }
                                   return Center();
                                 }),
                       ),
-                      title: Text(data[index].name),
+                      title: Text(data[index].name!),
                       subtitle: Text(
-                          '${data[index].length} ${s.episode(data[index].length).toLowerCase()}'),
+                          '${data[index].length} ${s!.episode(data[index].length).toLowerCase()}'),
                       trailing: TextButton(
                         style: TextButton.styleFrom(
                             primary: context.accentColor,
@@ -840,7 +842,7 @@ class __PlaylistsState extends State<_Playlists> {
                       color: context.primaryColorDark,
                       child: Center(child: Icon(Icons.add)),
                     ),
-                    title: Text(s.createNewPlaylist),
+                    title: Text(s!.createNewPlaylist),
                   );
                 }),
           );
@@ -851,7 +853,7 @@ class __PlaylistsState extends State<_Playlists> {
 enum NewPlaylistOption { blank, randon10, latest10, folder }
 
 class _NewPlaylist extends StatefulWidget {
-  _NewPlaylist({Key key}) : super(key: key);
+  _NewPlaylist({Key? key}) : super(key: key);
 
   @override
   __NewPlaylistState createState() => __NewPlaylistState();
@@ -860,10 +862,10 @@ class _NewPlaylist extends StatefulWidget {
 class __NewPlaylistState extends State<_NewPlaylist> {
   final _dbHelper = DBHelper();
   String _playlistName = '';
-  NewPlaylistOption _option;
-  bool _loadFolder;
-  FocusNode _focusNode;
-  int _error;
+  NewPlaylistOption? _option;
+  late bool _loadFolder;
+  FocusNode? _focusNode;
+  int? _error;
 
   @override
   void initState() {
@@ -909,19 +911,14 @@ class __NewPlaylistState extends State<_NewPlaylist> {
     switch (option) {
       case NewPlaylistOption.blank:
         return ['Empty', 'Add episodes later'];
-        break;
       case NewPlaylistOption.randon10:
         return ['Randon 10', 'Add 10 random episodes to playlists'];
-        break;
       case NewPlaylistOption.latest10:
         return ['Latest 10', 'Add 10 latest updated episodes to playlist'];
-        break;
       case NewPlaylistOption.folder:
         return ['Local folder', 'Choose a local folder'];
-        break;
       default:
         return ['', ''];
-        break;
     }
   }
 
@@ -931,7 +928,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
     try {
       dirPath = await FilePicker.platform.getDirectoryPath();
     } catch (e) {
-      developer.log(e, name: 'Failed to load dir.');
+      developer.log(e.toString(), name: 'Failed to load dir.');
     }
     final localFolder = await _dbHelper.getPodcastLocal([localFolderId]);
     if (localFolder.isEmpty) {
@@ -962,7 +959,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
     var metadata = await MetadataRetriever.fromFile(File(path));
     if (metadata.albumArt != null) {
       final dir = await getApplicationDocumentsDirectory();
-      final image = img.decodeImage(metadata.albumArt);
+      final image = img.decodeImage(metadata.albumArt!)!;
       final thumbnail = img.copyResize(image, width: 300);
       var uuid = Uuid().v4();
       File("${dir.path}/$uuid.png")..writeAsBytesSync(img.encodePng(thumbnail));
@@ -994,7 +991,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,
@@ -1052,7 +1049,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                     await playlist.getPlaylist();
                     break;
                   case NewPlaylistOption.folder:
-                    _focusNode.unfocus();
+                    _focusNode!.unfocus();
                     setState(() {
                       _loadFolder = true;
                     });

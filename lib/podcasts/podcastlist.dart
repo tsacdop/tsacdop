@@ -21,18 +21,18 @@ import 'podcast_manage.dart';
 import 'podcast_settings.dart';
 
 class AboutPodcast extends StatefulWidget {
-  final PodcastLocal podcastLocal;
-  AboutPodcast({this.podcastLocal, Key key}) : super(key: key);
+  final PodcastLocal? podcastLocal;
+  AboutPodcast({this.podcastLocal, Key? key}) : super(key: key);
 
   @override
   _AboutPodcastState createState() => _AboutPodcastState();
 }
 
 class _AboutPodcastState extends State<AboutPodcast> {
-  String _description;
-  bool _load;
+  String? _description;
+  late bool _load;
 
-  void getDescription(String id) async {
+  void getDescription(String? id) async {
     var dbHelper = DBHelper();
     var description = await dbHelper.getFeedDescription(id);
     _description = description;
@@ -45,13 +45,13 @@ class _AboutPodcastState extends State<AboutPodcast> {
   void initState() {
     super.initState();
     _load = false;
-    getDescription(widget.podcastLocal.id);
+    getDescription(widget.podcastLocal!.id);
   }
 
   @override
   Widget build(BuildContext context) {
     var _groupList = Provider.of<GroupList>(context, listen: false);
-    final s = context.s;
+    final s = context.s!;
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       titlePadding: EdgeInsets.only(
@@ -61,7 +61,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
           splashColor: context.accentColor.withAlpha(70),
           padding: EdgeInsets.all(10.0),
           onPressed: () {
-            _groupList.removePodcast(widget.podcastLocal);
+            _groupList.removePodcast(widget.podcastLocal!);
             Navigator.of(context).pop();
           },
           textColor: Colors.red,
@@ -70,7 +70,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
           ),
         ),
       ],
-      title: Text(widget.podcastLocal.title),
+      title: Text(widget.podcastLocal!.title!),
       content: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -82,8 +82,8 @@ class _AboutPodcastState extends State<AboutPodcast> {
                 : _description != null
                     ? Html(data: _description)
                     : Center(),
-            if (widget.podcastLocal.author != null)
-              Text(widget.podcastLocal.author,
+            if (widget.podcastLocal!.author != null)
+              Text(widget.podcastLocal!.author!,
                   style: TextStyle(color: Colors.blue))
           ],
         ),
@@ -116,13 +116,13 @@ class _PodcastListState extends State<PodcastList> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(context.s.podcast(2)),
+          title: Text(context.s!.podcast(2)),
           leading: CustomBackButton(),
           actions: [
-            Selector<SettingState, bool>(
+            Selector<SettingState, bool?>(
                 selector: (_, setting) => setting.openAllPodcastDefalt,
                 builder: (_, data, __) {
-                  return data
+                  return data!
                       ? IconButton(
                           splashRadius: 20,
                           icon: Icon(Icons.all_out),
@@ -157,16 +157,16 @@ class _PodcastListState extends State<PodcastList> {
                                     context,
                                     SlideLeftRoute(
                                         page: PodcastDetail(
-                                      podcastLocal: snapshot.data[index],
+                                      podcastLocal: snapshot.data![index],
                                     )),
                                   );
                                 },
                                 onLongPress: () async {
                                   generalSheet(
                                     context,
-                                    title: snapshot.data[index].title,
+                                    title: snapshot.data![index].title,
                                     child: PodcastSetting(
-                                        podcastLocal: snapshot.data[index]),
+                                        podcastLocal: snapshot.data![index]),
                                   ).then((value) {
                                     if (mounted) setState(() {});
                                   });
@@ -186,13 +186,13 @@ class _PodcastListState extends State<PodcastList> {
                                           height: width / 4,
                                           width: width / 4,
                                           child: Image.file(File(
-                                              "${snapshot.data[index].imagePath}")),
+                                              "${snapshot.data![index].imagePath}")),
                                         ),
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.all(4.0),
                                         child: Text(
-                                          snapshot.data[index].title,
+                                          snapshot.data![index].title!,
                                           textAlign: TextAlign.center,
                                           style: context.textTheme.bodyText1,
                                           maxLines: 2,
@@ -203,7 +203,7 @@ class _PodcastListState extends State<PodcastList> {
                                 ),
                               );
                             },
-                            childCount: snapshot.data.length,
+                            childCount: snapshot.data!.length,
                           ),
                         ),
                       ),

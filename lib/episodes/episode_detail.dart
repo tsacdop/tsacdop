@@ -22,11 +22,11 @@ import '../widgets/custom_widget.dart';
 import 'episode_download.dart';
 
 class EpisodeDetail extends StatefulWidget {
-  final EpisodeBrief episodeItem;
+  final EpisodeBrief? episodeItem;
   final String heroTag;
   final bool hide;
   EpisodeDetail(
-      {this.episodeItem, this.heroTag = '', this.hide = false, Key key})
+      {this.episodeItem, this.heroTag = '', this.hide = false, Key? key})
       : super(key: key);
 
   @override
@@ -36,35 +36,35 @@ class EpisodeDetail extends StatefulWidget {
 class _EpisodeDetailState extends State<EpisodeDetail> {
   final textstyle = TextStyle(fontSize: 15.0, color: Colors.black);
   final GlobalKey<AudioPanelState> _playerKey = GlobalKey<AudioPanelState>();
-  double downloadProgress;
+  double? downloadProgress;
 
   /// Show page title.
-  bool _showTitle;
-  bool _showMenu;
-  String path;
+  late bool _showTitle;
+  late bool _showMenu;
+  String? path;
 
   Future<PlayHistory> _getPosition(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
     return await dbHelper.getPosition(episode);
   }
 
-  ScrollController _controller;
+  ScrollController? _controller;
   _scrollListener() {
-    if (_controller.position.userScrollDirection == ScrollDirection.reverse) {
+    if (_controller!.position.userScrollDirection == ScrollDirection.reverse) {
       if (_showMenu && mounted) {
         setState(() {
           _showMenu = false;
         });
       }
     }
-    if (_controller.position.userScrollDirection == ScrollDirection.forward) {
+    if (_controller!.position.userScrollDirection == ScrollDirection.forward) {
       if (!_showMenu && mounted) {
         setState(() {
           _showMenu = true;
         });
       }
     }
-    if (_controller.offset > context.textTheme.headline5.fontSize) {
+    if (_controller!.offset > context.textTheme.headline5!.fontSize!) {
       if (!_showTitle) setState(() => _showTitle = true);
     } else if (_showTitle) setState(() => _showTitle = false);
   }
@@ -75,18 +75,18 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     _showMenu = true;
     _showTitle = false;
     _controller = ScrollController();
-    _controller.addListener(_scrollListener);
+    _controller!.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     final audio = context.watch<AudioPlayerNotifier>();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -98,8 +98,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
       child: WillPopScope(
         onWillPop: () async {
           if (_playerKey.currentState != null &&
-              _playerKey.currentState.initSize > 100) {
-            _playerKey.currentState.backToMini();
+              _playerKey.currentState!.initSize! > 100) {
+            _playerKey.currentState!.backToMini();
             return false;
           } else {
             return true;
@@ -122,17 +122,17 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                           pinned: true,
                           title: _showTitle
                               ? Text(
-                                  widget.episodeItem.title,
+                                  widget.episodeItem!.title!,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 )
                               : Text(
-                                  widget.episodeItem.feedTitle,
+                                  widget.episodeItem!.feedTitle!,
                                   maxLines: 1,
                                   style: TextStyle(
                                       fontSize: 15,
                                       color:
-                                          context.textColor.withOpacity(0.7)),
+                                          context.textColor!.withOpacity(0.7)),
                                 ),
                           leading: CustomBackButton(),
                           elevation: _showTitle ? 1 : 0,
@@ -148,7 +148,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                widget.episodeItem.title,
+                                widget.episodeItem!.title!,
                                 textAlign: TextAlign.left,
                                 style: Theme.of(context).textTheme.headline5,
                               ),
@@ -161,11 +161,11 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                 Text(
                                     s.published(DateFormat.yMMMd().format(
                                         DateTime.fromMillisecondsSinceEpoch(
-                                            widget.episodeItem.pubDate))),
+                                            widget.episodeItem!.pubDate!))),
                                     style:
                                         TextStyle(color: context.accentColor)),
                                 SizedBox(width: 10),
-                                if (widget.episodeItem.explicit == 1)
+                                if (widget.episodeItem!.explicit == 1)
                                   Text('E',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -179,7 +179,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                 horizontal: 20, vertical: 5),
                             child: Row(
                               children: <Widget>[
-                                if (widget.episodeItem.duration != 0)
+                                if (widget.episodeItem!.duration != 0)
                                   Container(
                                       decoration: BoxDecoration(
                                           color: Colors.cyan[300],
@@ -192,13 +192,13 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                       alignment: Alignment.center,
                                       child: Text(
                                         s.minsCount(
-                                          widget.episodeItem.duration ~/ 60,
+                                          widget.episodeItem!.duration! ~/ 60,
                                         ),
                                         style: TextStyle(color: Colors.black),
                                       )),
-                                if (widget.episodeItem.enclosureLength !=
+                                if (widget.episodeItem!.enclosureLength !=
                                         null &&
-                                    widget.episodeItem.enclosureLength != 0)
+                                    widget.episodeItem!.enclosureLength != 0)
                                   Container(
                                     decoration: BoxDecoration(
                                         color: Colors.lightBlue[300],
@@ -210,19 +210,19 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                         EdgeInsets.symmetric(horizontal: 10.0),
                                     alignment: Alignment.center,
                                     child: Text(
-                                      '${(widget.episodeItem.enclosureLength) ~/ 1000000}MB',
+                                      '${widget.episodeItem!.enclosureLength! ~/ 1000000}MB',
                                       style: TextStyle(color: Colors.black),
                                     ),
                                   ),
                                 FutureBuilder<PlayHistory>(
-                                    future: _getPosition(widget.episodeItem),
+                                    future: _getPosition(widget.episodeItem!),
                                     builder: (context, snapshot) {
                                       if (snapshot.hasError) {
-                                        developer.log(snapshot.error);
+                                        developer.log(snapshot.error as String);
                                       }
                                       if (snapshot.hasData &&
-                                          snapshot.data.seekValue < 0.9 &&
-                                          snapshot.data.seconds > 10) {
+                                          snapshot.data!.seekValue! < 0.9 &&
+                                          snapshot.data!.seconds! > 10) {
                                         return ButtonTheme(
                                           height: 28,
                                           padding: EdgeInsets.symmetric(
@@ -240,7 +240,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                             onPressed: () => audio.episodeLoad(
                                                 widget.episodeItem,
                                                 startPosition:
-                                                    (snapshot.data.seconds *
+                                                    (snapshot.data!.seconds! *
                                                             1000)
                                                         .toInt()),
                                             child: Row(
@@ -256,7 +256,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                                 ),
                                                 SizedBox(width: 5),
                                                 Text(
-                                                  snapshot.data.seconds.toTime,
+                                                  snapshot
+                                                      .data!.seconds!.toTime,
                                                 ),
                                               ],
                                             ),
@@ -271,11 +272,12 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                           ),
                           ShowNote(episode: widget.episodeItem),
                           Selector<AudioPlayerNotifier,
-                                  Tuple2<bool, PlayerHeight>>(
+                                  Tuple2<bool, PlayerHeight?>>(
                               selector: (_, audio) => Tuple2(
                                   audio.playerRunning, audio.playerHeight),
                               builder: (_, data, __) {
-                                var height = kMinPlayerHeight[data.item2.index];
+                                var height =
+                                    kMinPlayerHeight[data.item2!.index];
                                 return SizedBox(
                                   height: data.item1 ? height : 0,
                                 );
@@ -286,11 +288,11 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                   ),
                 ),
               ),
-              Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
+              Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight?>>(
                   selector: (_, audio) =>
                       Tuple2(audio.playerRunning, audio.playerHeight),
                   builder: (_, data, __) {
-                    var height = kMinPlayerHeight[data.item2.index];
+                    var height = kMinPlayerHeight[data.item2!.index];
                     return Container(
                       alignment: Alignment.bottomCenter,
                       padding: EdgeInsets.only(bottom: data.item1 ? height : 0),
@@ -307,7 +309,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                       ),
                     );
                   }),
-              Selector<AudioPlayerNotifier, EpisodeBrief>(
+              Selector<AudioPlayerNotifier, EpisodeBrief?>(
                   selector: (_, audio) => audio.episode,
                   builder: (_, data, __) => Container(
                       child: PlayerWidget(
@@ -322,10 +324,10 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 }
 
 class _MenuBar extends StatefulWidget {
-  final EpisodeBrief episodeItem;
-  final String heroTag;
-  final bool hide;
-  _MenuBar({this.episodeItem, this.heroTag, this.hide, Key key})
+  final EpisodeBrief? episodeItem;
+  final String? heroTag;
+  final bool? hide;
+  _MenuBar({this.episodeItem, this.heroTag, this.hide, Key? key})
       : super(key: key);
   @override
   __MenuBarState createState() => __MenuBarState();
@@ -367,7 +369,7 @@ class __MenuBarState extends State<_MenuBar> {
     return await dbHelper.isLiked(episode.enclosureUrl);
   }
 
-  Widget _buttonOnMenu({Widget child, VoidCallback onTap}) => Material(
+  Widget _buttonOnMenu({Widget? child, VoidCallback? onTap}) => Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
@@ -380,7 +382,7 @@ class __MenuBarState extends State<_MenuBar> {
       );
 
   OverlayEntry _createOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject();
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
     var offset = renderBox.localToGlobal(Offset.zero);
     return OverlayEntry(
       builder: (constext) => Positioned(
@@ -416,27 +418,27 @@ class __MenuBarState extends State<_MenuBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Hero(
-                    tag: widget.episodeItem.enclosureUrl + widget.heroTag,
+                    tag: widget.episodeItem!.enclosureUrl + widget.heroTag!,
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 10.0),
                       child: Container(
                         height: 30.0,
                         width: 30.0,
                         color: context.scaffoldBackgroundColor,
-                        child: widget.hide
+                        child: widget.hide!
                             ? Center()
                             : CircleAvatar(
                                 radius: 15,
                                 backgroundImage:
-                                    widget.episodeItem.avatarImage),
+                                    widget.episodeItem!.avatarImage),
                       ),
                     ),
                   ),
                   FutureBuilder<bool>(
-                    future: _isLiked(widget.episodeItem),
+                    future: _isLiked(widget.episodeItem!),
                     initialData: false,
                     builder: (context, snapshot) {
-                      return (!snapshot.data)
+                      return (!snapshot.data!)
                           ? _buttonOnMenu(
                               child: Icon(
                                 Icons.favorite_border,
@@ -444,10 +446,10 @@ class __MenuBarState extends State<_MenuBar> {
                               ),
                               onTap: () async {
                                 await _saveLiked(
-                                    widget.episodeItem.enclosureUrl);
+                                    widget.episodeItem!.enclosureUrl);
                                 OverlayEntry _overlayEntry;
                                 _overlayEntry = _createOverlayEntry();
-                                Overlay.of(context).insert(_overlayEntry);
+                                Overlay.of(context)!.insert(_overlayEntry);
                                 await Future.delayed(Duration(seconds: 2));
                                 _overlayEntry?.remove();
                               })
@@ -456,12 +458,12 @@ class __MenuBarState extends State<_MenuBar> {
                                 Icons.favorite,
                                 color: Colors.red,
                               ),
-                              onTap: () =>
-                                  _setUnliked(widget.episodeItem.enclosureUrl));
+                              onTap: () => _setUnliked(
+                                  widget.episodeItem!.enclosureUrl));
                     },
                   ),
                   DownloadButton(episode: widget.episodeItem),
-                  Selector<AudioPlayerNotifier, List<EpisodeBrief>>(
+                  Selector<AudioPlayerNotifier, List<EpisodeBrief?>>(
                     selector: (_, audio) => audio.queue.episodes,
                     builder: (_, data, __) {
                       final inPlaylist = data.contains(widget.episodeItem);
@@ -470,9 +472,9 @@ class __MenuBarState extends State<_MenuBar> {
                               child: Icon(Icons.playlist_add_check,
                                   color: context.accentColor),
                               onTap: () {
-                                audio.delFromPlaylist(widget.episodeItem);
+                                audio.delFromPlaylist(widget.episodeItem!);
                                 Fluttertoast.showToast(
-                                  msg: s.toastRemovePlaylist,
+                                  msg: s!.toastRemovePlaylist,
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               })
@@ -480,16 +482,16 @@ class __MenuBarState extends State<_MenuBar> {
                               child: Icon(Icons.playlist_add,
                                   color: Colors.grey[700]),
                               onTap: () {
-                                audio.addToPlaylist(widget.episodeItem);
+                                audio.addToPlaylist(widget.episodeItem!);
                                 Fluttertoast.showToast(
-                                  msg: s.toastAddPlaylist,
+                                  msg: s!.toastAddPlaylist,
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               });
                     },
                   ),
                   FutureBuilder<int>(
-                    future: _isListened(widget.episodeItem),
+                    future: _isListened(widget.episodeItem!),
                     initialData: 0,
                     builder: (context, snapshot) {
                       return snapshot.data == 0
@@ -503,9 +505,9 @@ class __MenuBarState extends State<_MenuBar> {
                                 ),
                               ),
                               onTap: () {
-                                _markListened(widget.episodeItem);
+                                _markListened(widget.episodeItem!);
                                 Fluttertoast.showToast(
-                                  msg: s.markListened,
+                                  msg: s!.markListened,
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               })
@@ -521,9 +523,9 @@ class __MenuBarState extends State<_MenuBar> {
                               ),
                               onTap: () {
                                 _markNotListened(
-                                    widget.episodeItem.enclosureUrl);
+                                    widget.episodeItem!.enclosureUrl);
                                 Fluttertoast.showToast(
-                                  msg: s.markNotListened,
+                                  msg: s!.markNotListened,
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               });
@@ -533,7 +535,7 @@ class __MenuBarState extends State<_MenuBar> {
               ),
             ),
           ),
-          Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, bool>>(
+          Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief?, bool>>(
             selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
             builder: (_, data, __) {
               return (widget.episodeItem == data.item1 && data.item2)
@@ -555,7 +557,7 @@ class __MenuBarState extends State<_MenuBar> {
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
                           child: Row(
                             children: <Widget>[
-                              Text(s.play.toUpperCase(),
+                              Text(s!.play.toUpperCase(),
                                   style: TextStyle(
                                     color: Theme.of(context).accentColor,
                                     fontSize: 15,
@@ -579,27 +581,27 @@ class __MenuBarState extends State<_MenuBar> {
 }
 
 class ShowNote extends StatelessWidget {
-  final EpisodeBrief episode;
-  const ShowNote({this.episode, Key key}) : super(key: key);
+  final EpisodeBrief? episode;
+  const ShowNote({this.episode, Key? key}) : super(key: key);
 
-  int _getTimeStamp(String url) {
+  int? _getTimeStamp(String url) {
     final time = url.substring(3).trim();
     final data = time.split(':');
     var seconds;
     if (data.length == 3) {
-      seconds = int.tryParse(data[0]) * 3600 +
-          int.tryParse(data[1]) * 60 +
-          int.tryParse(data[2]);
+      seconds = int.tryParse(data[0])! * 3600 +
+          int.tryParse(data[1])! * 60 +
+          int.tryParse(data[2])!;
     } else if (data.length == 2) {
-      seconds = int.tryParse(data[0]) * 60 + int.tryParse(data[1]);
+      seconds = int.tryParse(data[0])! * 60 + int.tryParse(data[1])!;
     }
     return seconds;
   }
 
-  Future<String> _getSDescription(String url) async {
+  Future<String?> _getSDescription(String url) async {
     var description;
     var dbHelper = DBHelper();
-    description = (await dbHelper.getDescription(url))
+    description = (await dbHelper.getDescription(url))!
         .replaceAll(RegExp(r'\s?<p>(<br>)?</p>\s?'), '')
         .replaceAll('\r', '')
         .trim();
@@ -627,24 +629,25 @@ class ShowNote extends StatelessWidget {
   Widget build(BuildContext context) {
     var audio = context.watch<AudioPlayerNotifier>();
     final s = context.s;
-    return FutureBuilder(
-      future: _getSDescription(episode.enclosureUrl),
+    return FutureBuilder<String?>(
+      future: _getSDescription(episode!.enclosureUrl),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var description = snapshot.data;
+          if (description == null) return Center();
           return description.length > 0
-              ? Selector<AudioPlayerNotifier, EpisodeBrief>(
+              ? Selector<AudioPlayerNotifier, EpisodeBrief?>(
                   selector: (_, audio) => audio.episode,
                   builder: (_, playEpisode, __) {
                     if (playEpisode == episode &&
-                        !description.contains('#t=')) {
+                        !description!.contains('#t=')) {
                       final linkList = linkify(description,
                           options: LinkifyOptions(humanize: false),
                           linkifiers: [TimeStampLinkifier()]);
                       for (var element in linkList) {
                         if (element is TimeStampElement) {
                           final time = element.timeStamp;
-                          description = description.replaceFirst(time,
+                          description = description!.replaceFirst(time!,
                               '<a rel="nofollow" href = "#t=$time">$time</a>');
                         }
                       }
@@ -652,24 +655,22 @@ class ShowNote extends StatelessWidget {
                     return Selector<SettingState, TextStyle>(
                       selector: (_, settings) => settings.showNoteFontStyle,
                       builder: (_, data, __) => Html(
-                        padding:
-                            EdgeInsets.only(left: 20.0, right: 20, bottom: 50),
-                        defaultTextStyle: data,
-                        data: description,
-                        linkStyle: TextStyle(
+                        style: {
+                          'a': Style(
                             color: context.accentColor,
-                            textBaseline: TextBaseline.ideographic),
-                        onLinkTap: (url) {
-                          if (url.substring(0, 3) == '#t=') {
+                          ),
+                        },
+                        data: description,
+                        onLinkTap: (url, _, __, ___) {
+                          if (url!.substring(0, 3) == '#t=') {
                             final seconds = _getTimeStamp(url);
                             if (playEpisode == episode) {
-                              audio.seekTo(seconds * 1000);
+                              audio.seekTo(seconds! * 1000);
                             }
                           } else {
                             url.launchUrl;
                           }
                         },
-                        useRichText: true,
                       ),
                     );
                   })
@@ -684,10 +685,10 @@ class ShowNote extends StatelessWidget {
                         height: 100.0,
                       ),
                       Padding(padding: EdgeInsets.all(5.0)),
-                      Text(s.noShownote,
+                      Text(s!.noShownote,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              color: context.textColor.withOpacity(0.5))),
+                              color: context.textColor!.withOpacity(0.5))),
                     ],
                   ),
                 );

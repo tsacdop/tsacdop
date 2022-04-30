@@ -17,9 +17,9 @@ class RefreshItem {
 }
 
 class RefreshWorker extends ChangeNotifier {
-  FlutterIsolate refreshIsolate;
-  ReceivePort receivePort;
-  SendPort refreshSendPort;
+  FlutterIsolate? refreshIsolate;
+  late ReceivePort receivePort;
+  late SendPort refreshSendPort;
 
   RefreshItem _currentRefreshItem = RefreshItem('', RefreshState.none);
   bool _complete = false;
@@ -35,7 +35,7 @@ class RefreshWorker extends ChangeNotifier {
         refreshIsolateEntryPoint, receivePort.sendPort);
   }
 
-  void _listen(List<String> podcasts) {
+  void _listen(List<String?>? podcasts) {
     receivePort.distinct().listen((message) {
       if (message is SendPort) {
         refreshSendPort = message;
@@ -57,9 +57,9 @@ class RefreshWorker extends ChangeNotifier {
     });
   }
 
-  Future<void> start(List<String> podcasts) async {
+  Future<void> start(List<String?>? podcasts) async {
     if (!_created) {
-      if (podcasts.isEmpty) {
+      if (podcasts!.isEmpty) {
         final refreshstorage = KeyValueStorage(refreshdateKey);
         await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
       }
@@ -99,7 +99,7 @@ Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
 
   refreshReceivePort.distinct().listen((message) {
     if (message is List<dynamic>) {
-      _refreshAll(message);
+      _refreshAll(message as List<String>);
     }
   });
 }

@@ -24,7 +24,7 @@ class PopupMenu extends StatefulWidget {
 
 class _PopupMenuState extends State<PopupMenu> {
   Future<String> _getRefreshDate(BuildContext context) async {
-    int refreshDate;
+    int? refreshDate;
     var refreshstorage = KeyValueStorage('refreshdate');
     var i = await refreshstorage.getInt();
     if (i == 0) {
@@ -34,7 +34,7 @@ class _PopupMenuState extends State<PopupMenu> {
     } else {
       refreshDate = i;
     }
-    return refreshDate.toDate(context);
+    return refreshDate!.toDate(context);
   }
 
   void _saveOmpl(String path) async {
@@ -49,7 +49,7 @@ class _PopupMenuState extends State<PopupMenu> {
         var title = entry.key;
         var list = entry.value.reversed;
         for (var rss in list) {
-          var rssLink = rssExp.stringMatch(rss.xmlUrl);
+          var rssLink = rssExp.stringMatch(rss.xmlUrl!);
           if (rssLink != null) {
             var item = SubscribeItem(rssLink, rss.text, group: title);
             await subscribeWorker.setSubscribeItem(item);
@@ -58,9 +58,9 @@ class _PopupMenuState extends State<PopupMenu> {
         }
       }
     } catch (e) {
-      developer.log(e, name: 'OMPL parse error');
+      developer.log(e.toString(), name: 'OMPL parse error');
       Fluttertoast.showToast(
-        msg: s.toastFileError,
+        msg: s!.toastFileError,
         gravity: ToastGravity.TOP,
       );
     }
@@ -75,10 +75,10 @@ class _PopupMenuState extends State<PopupMenu> {
         return;
       }
       Fluttertoast.showToast(
-        msg: s.toastReadFile,
+        msg: s!.toastReadFile,
         gravity: ToastGravity.TOP,
       );
-      final filePath = filePickResult.files.first.path;
+      final filePath = filePickResult.files.first.path!;
       _saveOmpl(filePath);
     } on PlatformException catch (e) {
       developer.log(e.toString(), name: 'Get OMPL file');
@@ -88,7 +88,7 @@ class _PopupMenuState extends State<PopupMenu> {
   @override
   Widget build(BuildContext context) {
     var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
-    final s = context.s;
+    final s = context.s!;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(100),
@@ -125,7 +125,7 @@ class _PopupMenuState extends State<PopupMenu> {
                             builder: (_, snapshot) {
                               if (snapshot.hasData) {
                                 return Text(
-                                  snapshot.data,
+                                  snapshot.data!,
                                   style:
                                       TextStyle(color: Colors.red, fontSize: 12),
                                 );

@@ -40,8 +40,8 @@ class ScrollPodcasts extends StatefulWidget {
 class _ScrollPodcastsState extends State<ScrollPodcasts>
     with SingleTickerProviderStateMixin {
   int _groupIndex = 0;
-  AnimationController _controller;
-  TweenSequence _slideTween;
+  late AnimationController _controller;
+  late TweenSequence _slideTween;
   TweenSequence<double> _getSlideTween(double value) => TweenSequence<double>([
         TweenSequenceItem(
             tween: Tween<double>(begin: 0.0, end: value), weight: 3 / 5),
@@ -71,7 +71,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
     super.dispose();
   }
 
-  Future<int> _getPodcastUpdateCounts(String id) async {
+  Future<int?> _getPodcastUpdateCounts(String? id) async {
     var dbHelper = DBHelper();
     return await dbHelper.getPodcastUpdateCounts(id);
   }
@@ -84,11 +84,11 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
             BoxDecoration(shape: BoxShape.circle, color: context.primaryColor),
       );
 
-  Widget _updateIndicator(PodcastLocal podcastLocal) => FutureBuilder<int>(
+  Widget _updateIndicator(PodcastLocal podcastLocal) => FutureBuilder<int?>(
       future: _getPodcastUpdateCounts(podcastLocal.id),
       initialData: 0,
       builder: (context, snapshot) {
-        return snapshot.data > 0
+        return snapshot.data! > 0
             ? Align(
                 alignment: Alignment.bottomRight,
                 child: Container(
@@ -109,7 +109,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
     final width = MediaQuery.of(context).size.width;
     final s = context.s;
     return Selector2<GroupList, RefreshWorker,
-        tuple.Tuple3<List<PodcastGroup>, bool, bool>>(
+        tuple.Tuple3<List<PodcastGroup?>, bool, bool>>(
       selector: (_, groupList, refreshWorker) => tuple.Tuple3(
           groupList.groups, groupList.created, refreshWorker.created),
       builder: (_, data, __) {
@@ -119,7 +119,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
             ? SizedBox(
                 height: (width - 20) / 3 + 140,
               )
-            : groups[_groupIndex].podcastList.length == 0
+            : groups[_groupIndex]!.podcastList.length == 0
                 ? SizedBox(
                     height: (width - 20) / 3 + 140,
                     child: Column(
@@ -128,10 +128,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                       children: <Widget>[
                         GestureDetector(
                             onVerticalDragEnd: (event) {
-                              if (event.primaryVelocity > 200) {
+                              if (event.primaryVelocity! > 200) {
                                 if (groups.length == 1) {
                                   Fluttertoast.showToast(
-                                    msg: s.addSomeGroups,
+                                    msg: s!.addSomeGroups,
                                     gravity: ToastGravity.BOTTOM,
                                   );
                                 } else {
@@ -143,10 +143,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                     });
                                   }
                                 }
-                              } else if (event.primaryVelocity < -200) {
+                              } else if (event.primaryVelocity! < -200) {
                                 if (groups.length == 1) {
                                   Fluttertoast.showToast(
-                                    msg: s.addSomeGroups,
+                                    msg: s!.addSomeGroups,
                                     gravity: ToastGravity.BOTTOM,
                                   );
                                 } else {
@@ -170,8 +170,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 15.0),
                                           child: Text(
-                                            groups[_groupIndex].name,
-                                            style: context.textTheme.bodyText1
+                                            groups[_groupIndex]!.name!,
+                                            style: context.textTheme.bodyText1!
                                                 .copyWith(
                                                     color: context.accentColor),
                                           )),
@@ -188,7 +188,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                                     page: context
                                                             .read<
                                                                 SettingState>()
-                                                            .openAllPodcastDefalt
+                                                            .openAllPodcastDefalt!
                                                         ? PodcastList()
                                                         : PodcastManage()),
                                               );
@@ -208,8 +208,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                           child: Padding(
                                             padding: const EdgeInsets.all(5.0),
                                             child: Text(
-                                              s.homeGroupsSeeAll,
-                                              style: context.textTheme.bodyText1
+                                              s!.homeGroupsSeeAll,
+                                              style: context
+                                                  .textTheme.bodyText1!
                                                   .copyWith(
                                                       color: import
                                                           ? context
@@ -242,18 +243,18 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                           child: Center(
                               child: _groupIndex == 0
                                   ? Text.rich(TextSpan(
-                                      style: context.textTheme.headline6
+                                      style: context.textTheme.headline6!
                                           .copyWith(height: 2),
                                       children: [
                                         TextSpan(
                                             text: 'Welcome to Tsacdop\n',
-                                            style: context.textTheme.headline6
+                                            style: context.textTheme.headline6!
                                                 .copyWith(
                                                     color:
                                                         context.accentColor)),
                                         TextSpan(
                                             text: 'Get started\n',
-                                            style: context.textTheme.headline6
+                                            style: context.textTheme.headline6!
                                                 .copyWith(
                                                     color:
                                                         context.accentColor)),
@@ -267,24 +268,24 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                   : Text(s.noPodcastGroup,
                                       style: TextStyle(
                                           color: context
-                                              .textTheme.bodyText2.color
+                                              .textTheme.bodyText2!.color!
                                               .withOpacity(0.5)))),
                         ),
                       ],
                     ),
                   )
                 : DefaultTabController(
-                    length: groups[_groupIndex].podcasts.length,
+                    length: groups[_groupIndex]!.podcasts.length,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         GestureDetector(
                           onVerticalDragEnd: (event) async {
-                            if (event.primaryVelocity > 200) {
+                            if (event.primaryVelocity! > 200) {
                               if (groups.length == 1) {
                                 Fluttertoast.showToast(
-                                  msg: s.addSomeGroups,
+                                  msg: s!.addSomeGroups,
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               } else {
@@ -303,10 +304,10 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                   }
                                 }
                               }
-                            } else if (event.primaryVelocity < -200) {
+                            } else if (event.primaryVelocity! < -200) {
                               if (groups.length == 1) {
                                 Fluttertoast.showToast(
-                                  msg: s.addSomeGroups,
+                                  msg: s!.addSomeGroups,
                                   gravity: ToastGravity.BOTTOM,
                                 );
                               } else {
@@ -335,8 +336,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 15.0),
                                         child: Text(
-                                          groups[_groupIndex].name,
-                                          style: context.textTheme.bodyText1
+                                          groups[_groupIndex]!.name!,
+                                          style: context.textTheme.bodyText1!
                                               .copyWith(
                                                   color: context.accentColor),
                                         )),
@@ -353,7 +354,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                                     page: context
                                                             .read<
                                                                 SettingState>()
-                                                            .openAllPodcastDefalt
+                                                            .openAllPodcastDefalt!
                                                         ? PodcastList()
                                                         : PodcastManage()),
                                               );
@@ -373,8 +374,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                           child: Padding(
                                             padding: const EdgeInsets.all(5.0),
                                             child: Text(
-                                              s.homeGroupsSeeAll,
-                                              style: context.textTheme.bodyText1
+                                              s!.homeGroupsSeeAll,
+                                              style: context
+                                                  .textTheme.bodyText1!
                                                   .copyWith(
                                                       color: import
                                                           ? context
@@ -398,7 +400,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                   indicator: CircleTabIndicator(
                                       color: context.accentColor, radius: 3),
                                   isScrollable: true,
-                                  tabs: groups[_groupIndex]
+                                  tabs: groups[_groupIndex]!
                                       .podcasts
                                       .map<Widget>((podcastLocal) {
                                     final color =
@@ -438,7 +440,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                           child: ScrollConfiguration(
                             behavior: NoGrowBehavior(),
                             child: TabBarView(
-                              children: groups[_groupIndex]
+                              children: groups[_groupIndex]!
                                   .podcasts
                                   .map<Widget>((podcastLocal) {
                                 return Container(
@@ -485,16 +487,16 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
 }
 
 class PodcastPreview extends StatefulWidget {
-  final PodcastLocal podcastLocal;
+  final PodcastLocal? podcastLocal;
 
-  PodcastPreview({this.podcastLocal, Key key}) : super(key: key);
+  PodcastPreview({this.podcastLocal, Key? key}) : super(key: key);
 
   @override
   _PodcastPreviewState createState() => _PodcastPreviewState();
 }
 
 class _PodcastPreviewState extends State<PodcastPreview> {
-  Future _getRssItem;
+  Future? _getRssItem;
 
   Future<List<EpisodeBrief>> _getRssItemTop(PodcastLocal podcastLocal) async {
     var dbHelper = DBHelper();
@@ -505,12 +507,12 @@ class _PodcastPreviewState extends State<PodcastPreview> {
   @override
   void initState() {
     super.initState();
-    _getRssItem = _getRssItemTop(widget.podcastLocal);
+    _getRssItem = _getRssItemTop(widget.podcastLocal!);
   }
 
   @override
   Widget build(BuildContext context) {
-    final c = widget.podcastLocal.backgroudColor(context);
+    final c = widget.podcastLocal!.backgroudColor(context);
     return Column(
       children: <Widget>[
         Expanded(
@@ -518,9 +520,10 @@ class _PodcastPreviewState extends State<PodcastPreview> {
             selector: (_, refreshWorker, groupWorker) =>
                 tuple.Tuple2(refreshWorker.created, groupWorker.created),
             builder: (_, data, __) {
-              _getRssItem = _getRssItemTop(widget.podcastLocal);
+              _getRssItem = _getRssItemTop(widget.podcastLocal!);
               return FutureBuilder<List<EpisodeBrief>>(
-                future: _getRssItem,
+                future:
+                    _getRssItem!.then((value) => value as List<EpisodeBrief>),
                 builder: (context, snapshot) {
                   return (snapshot.hasData)
                       ? ShowEpisode(
@@ -542,7 +545,7 @@ class _PodcastPreviewState extends State<PodcastPreview> {
             children: <Widget>[
               Expanded(
                 flex: 4,
-                child: Text(widget.podcastLocal.title,
+                child: Text(widget.podcastLocal!.title!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontWeight: FontWeight.bold, color: c)),
@@ -565,10 +568,10 @@ class _PodcastPreviewState extends State<PodcastPreview> {
 }
 
 class ShowEpisode extends StatelessWidget {
-  final List<EpisodeBrief> episodes;
-  final PodcastLocal podcastLocal;
+  final List<EpisodeBrief>? episodes;
+  final PodcastLocal? podcastLocal;
   final DBHelper _dbHelper = DBHelper();
-  ShowEpisode({Key key, this.episodes, this.podcastLocal}) : super(key: key);
+  ShowEpisode({Key? key, this.episodes, this.podcastLocal}) : super(key: key);
 
   Future<tuple.Tuple5<int, bool, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
@@ -622,7 +625,7 @@ class ShowEpisode extends StatelessWidget {
   }
 
   Future<void> _requestDownload(BuildContext context,
-      {EpisodeBrief episode}) async {
+      {EpisodeBrief? episode}) async {
     final permissionReady = await _checkPermmison();
     final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
         .getBool(defaultValue: true, reverse: true);
@@ -634,7 +637,7 @@ class ShowEpisode extends StatelessWidget {
         dataConfirm = await _useDataConfirm(context);
       }
       if (dataConfirm) {
-        Provider.of<DownloadState>(context, listen: false).startTask(episode);
+        Provider.of<DownloadState>(context, listen: false).startTask(episode!);
       }
     }
   }
@@ -655,7 +658,7 @@ class ShowEpisode extends StatelessWidget {
 
   Future<bool> _useDataConfirm(BuildContext context) async {
     var ifUseData = false;
-    final s = context.s;
+    final s = context.s!;
     await generalDialog(
       context,
       title: Text(s.cellularConfirm),
@@ -705,25 +708,25 @@ class ShowEpisode extends StatelessWidget {
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                final c = podcastLocal.backgroudColor(context);
+                final c = podcastLocal!.backgroudColor(context);
                 return Selector<AudioPlayerNotifier,
-                        tuple.Tuple3<EpisodeBrief, List<String>, bool>>(
+                        tuple.Tuple3<EpisodeBrief?, List<String>, bool>>(
                     selector: (_, audio) => tuple.Tuple3(
                         audio?.episode,
                         audio.queue.episodes
-                            .map((e) => e.enclosureUrl)
+                            .map((e) => e!.enclosureUrl)
                             .toList(),
                         audio.playerRunning),
                     builder: (_, data, __) => FutureBuilder<
                             tuple.Tuple5<int, bool, bool, bool, List<int>>>(
-                        future: _initData(episodes[index]),
+                        future: _initData(episodes![index]),
                         initialData: tuple.Tuple5(0, false, false, false, []),
                         builder: (context, snapshot) {
-                          final isListened = snapshot.data.item1;
-                          final isLiked = snapshot.data.item2;
-                          final isDownloaded = snapshot.data.item3;
-                          final tapToOpen = snapshot.data.item4;
-                          final menuList = snapshot.data.item5;
+                          final isListened = snapshot.data!.item1;
+                          final isLiked = snapshot.data!.item2;
+                          final isDownloaded = snapshot.data!.item3;
+                          final tapToOpen = snapshot.data!.item4;
+                          final menuList = snapshot.data!.item5;
                           return Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5.0),
@@ -754,18 +757,19 @@ class ShowEpisode extends StatelessWidget {
                                         context.brightness == Brightness.light
                                             ? context.primaryColor
                                             : context.dialogBackgroundColor,
-                                    title: Text(data.item1 != episodes[index] ||
-                                            !data.item3
-                                        ? s.play
-                                        : s.playing),
+                                    title: Text(
+                                        data.item1 != episodes![index] ||
+                                                !data.item3
+                                            ? s!.play
+                                            : s!.playing),
                                     trailingIcon: Icon(
                                       LineIcons.playCircle,
                                       color: context.accentColor,
                                     ),
                                     onPressed: () {
-                                      if (data.item1 != episodes[index] ||
+                                      if (data.item1 != episodes![index] ||
                                           !data.item3) {
-                                        audio.episodeLoad(episodes[index]);
+                                        audio.episodeLoad(episodes![index]);
                                       }
                                     }),
                                 if (menuList.contains(1))
@@ -775,7 +779,7 @@ class ShowEpisode extends StatelessWidget {
                                               ? context.primaryColor
                                               : context.dialogBackgroundColor,
                                       title: data.item2.contains(
-                                              episodes[index].enclosureUrl)
+                                              episodes![index].enclosureUrl)
                                           ? Text(s.remove)
                                           : Text(s.later),
                                       trailingIcon: Icon(
@@ -784,15 +788,15 @@ class ShowEpisode extends StatelessWidget {
                                       ),
                                       onPressed: () {
                                         if (!data.item2.contains(
-                                            episodes[index].enclosureUrl)) {
-                                          audio.addToPlaylist(episodes[index]);
+                                            episodes![index].enclosureUrl)) {
+                                          audio.addToPlaylist(episodes![index]);
                                           Fluttertoast.showToast(
                                             msg: s.toastAddPlaylist,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         } else {
-                                          audio
-                                              .delFromPlaylist(episodes[index]);
+                                          audio.delFromPlaylist(
+                                              episodes![index]);
                                           Fluttertoast.showToast(
                                             msg: s.toastRemovePlaylist,
                                             gravity: ToastGravity.BOTTOM,
@@ -813,7 +817,7 @@ class ShowEpisode extends StatelessWidget {
                                       onPressed: () async {
                                         if (isLiked) {
                                           await _setUnliked(
-                                              episodes[index].enclosureUrl);
+                                              episodes![index].enclosureUrl);
                                           audio.setEpisodeState = true;
                                           Fluttertoast.showToast(
                                             msg: s.unliked,
@@ -821,7 +825,7 @@ class ShowEpisode extends StatelessWidget {
                                           );
                                         } else {
                                           await _saveLiked(
-                                              episodes[index].enclosureUrl);
+                                              episodes![index].enclosureUrl);
                                           audio.setEpisodeState = true;
                                           Fluttertoast.showToast(
                                             msg: s.liked,
@@ -838,7 +842,7 @@ class ShowEpisode extends StatelessWidget {
                                       title: isListened > 0
                                           ? Text(s.listened,
                                               style: TextStyle(
-                                                  color: context.textColor
+                                                  color: context.textColor!
                                                       .withOpacity(0.5)))
                                           : Text(
                                               s.markListened,
@@ -855,7 +859,7 @@ class ShowEpisode extends StatelessWidget {
                                       ),
                                       onPressed: () async {
                                         if (isListened < 1) {
-                                          await _markListened(episodes[index]);
+                                          await _markListened(episodes![index]);
                                           audio.setEpisodeState = true;
                                           Fluttertoast.showToast(
                                             msg: s.markListened,
@@ -872,16 +876,15 @@ class ShowEpisode extends StatelessWidget {
                                       title: isDownloaded
                                           ? Text(s.downloaded,
                                               style: TextStyle(
-                                                  color: context.textColor
+                                                  color: context.textColor!
                                                       .withOpacity(0.5)))
                                           : Text(s.download),
-                                      trailingIcon: Icon(
-                                          LineIcons.download,
+                                      trailingIcon: Icon(LineIcons.download,
                                           color: Colors.green),
                                       onPressed: () {
                                         if (!isDownloaded) {
                                           _requestDownload(context,
-                                              episode: episodes[index]);
+                                              episode: episodes![index]);
                                           //   downloader
                                           //       .startTask(episodes[index]);
                                         }
@@ -898,18 +901,18 @@ class ShowEpisode extends StatelessWidget {
                                         color: Colors.amber,
                                       ),
                                       onPressed: () {
-                                        audio.moveToTop(episodes[index]);
+                                        audio.moveToTop(episodes![index]);
                                         Fluttertoast.showToast(
                                           msg: s.playNextDes,
                                           gravity: ToastGravity.BOTTOM,
                                         );
                                       }),
                               ],
-                              action: () => Navigator.push(
+                              onPressed: () => Navigator.push(
                                 context,
                                 ScaleRoute(
                                     page: EpisodeDetail(
-                                  episodeItem: episodes[index],
+                                  episodeItem: episodes![index],
                                   heroTag: 'scroll',
                                   //unique hero tag
                                 )),
@@ -927,26 +930,26 @@ class ShowEpisode extends StatelessWidget {
                                         children: <Widget>[
                                           Hero(
                                             tag:
-                                                '${episodes[index].enclosureUrl}scroll',
+                                                '${episodes![index].enclosureUrl}scroll',
                                             child: Container(
                                               height: width / 18,
                                               width: width / 18,
                                               child: CircleAvatar(
                                                 backgroundImage:
-                                                    podcastLocal.avatarImage,
+                                                    podcastLocal!.avatarImage,
                                               ),
                                             ),
                                           ),
                                           Spacer(),
                                           Selector<
                                                   AudioPlayerNotifier,
-                                                  tuple.Tuple2<EpisodeBrief,
+                                                  tuple.Tuple2<EpisodeBrief?,
                                                       bool>>(
                                               selector: (_, audio) =>
                                                   tuple.Tuple2(audio.episode,
                                                       audio.playerRunning),
                                               builder: (_, data, __) {
-                                                return (episodes[index]
+                                                return (episodes![index]
                                                                 .enclosureUrl ==
                                                             data.item1
                                                                 ?.enclosureUrl &&
@@ -967,7 +970,7 @@ class ShowEpisode extends StatelessWidget {
                                                                 .accentColor))
                                                     : Center();
                                               }),
-                                          episodes[index].isNew == 1
+                                          episodes![index].isNew == 1
                                               ? Text(
                                                   'New',
                                                   style: TextStyle(
@@ -985,7 +988,7 @@ class ShowEpisode extends StatelessWidget {
                                         padding: EdgeInsets.only(top: 2.0),
                                         alignment: Alignment.topLeft,
                                         child: Text(
-                                          episodes[index].title,
+                                          episodes![index].title!,
                                           style: TextStyle(
                                               //fontSize: _width / 32,
                                               ),
@@ -1001,8 +1004,8 @@ class ShowEpisode extends StatelessWidget {
                                               CrossAxisAlignment.center,
                                           children: <Widget>[
                                             Text(
-                                              episodes[index]
-                                                  .pubDate
+                                              episodes![index]
+                                                  .pubDate!
                                                   .toDate(context),
                                               overflow: TextOverflow.visible,
                                               style: TextStyle(
@@ -1013,12 +1016,12 @@ class ShowEpisode extends StatelessWidget {
                                               ),
                                             ),
                                             Spacer(),
-                                            if (episodes[index].duration != 0)
+                                            if (episodes![index].duration != 0)
                                               Align(
                                                 alignment: Alignment.center,
                                                 child: Text(
-                                                  episodes[index]
-                                                      .duration
+                                                  episodes![index]
+                                                      .duration!
                                                       .toTime,
                                                   style: TextStyle(
                                                     fontSize: width / 35,
@@ -1027,11 +1030,11 @@ class ShowEpisode extends StatelessWidget {
                                                   ),
                                                 ),
                                               ),
-                                            episodes[index].duration == 0 ||
-                                                    episodes[index]
+                                            episodes![index].duration == 0 ||
+                                                    episodes![index]
                                                             .enclosureLength ==
                                                         null ||
-                                                    episodes[index]
+                                                    episodes![index]
                                                             .enclosureLength ==
                                                         0
                                                 ? Center()
@@ -1041,16 +1044,16 @@ class ShowEpisode extends StatelessWidget {
                                                       fontSize: width / 35,
                                                     ),
                                                   ),
-                                            if (episodes[index]
+                                            if (episodes![index]
                                                         .enclosureLength !=
                                                     null &&
-                                                episodes[index]
+                                                episodes![index]
                                                         .enclosureLength !=
                                                     0)
                                               Container(
                                                 alignment: Alignment.center,
                                                 child: Text(
-                                                  '${(episodes[index].enclosureLength) ~/ 1000000}MB',
+                                                  '${episodes![index].enclosureLength! ~/ 1000000}MB',
                                                   style: TextStyle(
                                                       fontSize: width / 35),
                                                 ),
@@ -1064,7 +1067,7 @@ class ShowEpisode extends StatelessWidget {
                           );
                         }));
               },
-              childCount: math.min(episodes.length, 2),
+              childCount: math.min(episodes!.length, 2),
             ),
           ),
         ),
@@ -1076,10 +1079,12 @@ class ShowEpisode extends StatelessWidget {
 //Circle Indicator
 class CircleTabIndicator extends Decoration {
   final BoxPainter _painter;
-  CircleTabIndicator({@required Color color, @required double radius})
+  CircleTabIndicator({required Color color, required double radius})
       : _painter = _CirclePainter(color, radius);
+  static _returnNull() => null;
   @override
-  BoxPainter createBoxPainter([onChanged]) => _painter;
+  BoxPainter createBoxPainter([VoidCallback onChanged = _returnNull]) =>
+      _painter;
 }
 
 class _CirclePainter extends BoxPainter {
@@ -1094,7 +1099,7 @@ class _CirclePainter extends BoxPainter {
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration cfg) {
     final circleOffset =
-        offset + Offset(cfg.size.width / 2, cfg.size.height - radius);
+        offset + Offset(cfg.size!.width / 2, cfg.size!.height - radius);
     canvas.drawCircle(circleOffset, radius, _paint);
   }
 }

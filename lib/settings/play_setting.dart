@@ -40,14 +40,14 @@ class PlaySetting extends StatefulWidget {
 }
 
 class _PlaySettingState extends State<PlaySetting> {
-  String _volumeEffect(BuildContext context, int i) {
+  String _volumeEffect(BuildContext context, int? i) {
     final s = context.s;
     if (i == 2000) {
-      return s.playerHeightShort;
+      return s!.playerHeightShort;
     } else if (i == 3000) {
-      return s.playerHeightMed;
+      return s!.playerHeightMed;
     }
-    return s.playerHeightTall;
+    return s!.playerHeightTall;
   }
 
   Future<bool> _getMarkListenedSkip() async {
@@ -63,7 +63,7 @@ class _PlaySettingState extends State<PlaySetting> {
 
   Widget _modeWidget(BuildContext context) {
     var settings = Provider.of<SettingState>(context, listen: false);
-    return Selector<SettingState, Tuple2<int, int>>(
+    return Selector<SettingState, Tuple2<int?, int?>>(
       selector: (_, settings) =>
           Tuple2(settings.autoSleepTimerMode, settings.defaultSleepTimer),
       builder: (_, data, __) => Padding(
@@ -89,7 +89,7 @@ class _PlaySettingState extends State<PlaySetting> {
                         topLeft: Radius.circular(5)),
                   ),
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(context.s.endOfEpisode,
+                  child: Text(context.s!.endOfEpisode,
                       style: TextStyle(
                           color: data.item1 == 0 ? Colors.white : null)),
                 ),
@@ -113,7 +113,7 @@ class _PlaySettingState extends State<PlaySetting> {
                         topRight: Radius.circular(5)),
                   ),
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(context.s.minsCount(data.item2),
+                  child: Text(context.s!.minsCount(data.item2!),
                       style: TextStyle(
                           color: data.item1 == 1 ? Colors.white : null)),
                 ),
@@ -128,7 +128,7 @@ class _PlaySettingState extends State<PlaySetting> {
   Widget _scheduleWidget(BuildContext context) {
     var settings = Provider.of<SettingState>(context, listen: false);
     final s = context.s;
-    return Selector<SettingState, Tuple2<int, int>>(
+    return Selector<SettingState, Tuple2<int?, int?>>(
       selector: (_, settings) =>
           Tuple2(settings.autoSleepTimerStart, settings.autoSleepTimerEnd),
       builder: (_, data, __) => Padding(
@@ -139,10 +139,10 @@ class _PlaySettingState extends State<PlaySetting> {
           children: [
             InkWell(
               onTap: () async {
-                var startTime = data.item1;
+                var startTime = data.item1!;
                 final timeOfDay = await showCustomTimePicker(
                     context: context,
-                    cancelText: s.cancel,
+                    cancelText: s!.cancel,
                     confirmText: s.confirm,
                     helpText: '',
                     initialTime: TimeOfDay(
@@ -171,13 +171,13 @@ class _PlaySettingState extends State<PlaySetting> {
                         topLeft: Radius.circular(5)),
                   ),
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(s.from(data.item1.toTime)),
+                  child: Text(s!.from(data.item1!.toTime)),
                 ),
               ),
             ),
             InkWell(
               onTap: () async {
-                var endTime = data.item2;
+                var endTime = data.item2!;
                 final timeOfDay = await showCustomTimePicker(
                     context: context,
                     cancelText: s.cancel,
@@ -209,7 +209,7 @@ class _PlaySettingState extends State<PlaySetting> {
                       borderRadius: BorderRadius.only(
                           bottomRight: Radius.circular(5),
                           topRight: Radius.circular(5))),
-                  child: Text(s.to(data.item2.toTime),
+                  child: Text(s.to(data.item2!.toTime),
                       style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -224,7 +224,7 @@ class _PlaySettingState extends State<PlaySetting> {
   Widget build(BuildContext context) {
     var settings = context.watch<SettingState>();
     var audio = context.watch<AudioPlayerNotifier>();
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -250,7 +250,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 padding: EdgeInsets.symmetric(horizontal: 40),
                 alignment: Alignment.center,
                 child: Text(s.notificationSetting,
-                    style: context.textTheme.bodyText1
+                    style: context.textTheme.bodyText1!
                         .copyWith(color: context.accentColor)),
               ),
               _NotificationLayout(),
@@ -267,13 +267,13 @@ class _PlaySettingState extends State<PlaySetting> {
                 child: Text(s.homeMenuPlaylist,
                     style: Theme.of(context)
                         .textTheme
-                        .bodyText1
+                        .bodyText1!
                         .copyWith(color: Theme.of(context).accentColor)),
               ),
-              Selector<SettingState, bool>(
+              Selector<SettingState, bool?>(
                 selector: (_, settings) => settings.autoPlay,
                 builder: (_, data, __) => ListTile(
-                  onTap: () => settings.setAutoPlay = !data,
+                  onTap: () => settings.setAutoPlay = !data!,
                   contentPadding:
                       EdgeInsets.only(left: 70.0, right: 20, bottom: 10),
                   title: Text(s.settingsMenuAutoPlay),
@@ -281,7 +281,7 @@ class _PlaySettingState extends State<PlaySetting> {
                   trailing: Transform.scale(
                     scale: 0.9,
                     child: Switch(
-                        value: data,
+                        value: data!,
                         onChanged: (boo) => settings.setAutoPlay = boo),
                   ),
                 ),
@@ -290,7 +290,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 initialData: false,
                 future: _getMarkListenedSkip(),
                 builder: (context, snapshot) => ListTile(
-                  onTap: () => _saveMarkListenedSkip(!snapshot.data),
+                  onTap: () => _saveMarkListenedSkip(!snapshot.data!),
                   contentPadding:
                       EdgeInsets.only(left: 70.0, right: 20, bottom: 10),
                   title: Text(s.settingsMarkListenedSkip),
@@ -298,7 +298,7 @@ class _PlaySettingState extends State<PlaySetting> {
                   trailing: Transform.scale(
                     scale: 0.9,
                     child: Switch(
-                        value: snapshot.data, onChanged: _saveMarkListenedSkip),
+                        value: snapshot.data!, onChanged: _saveMarkListenedSkip),
                   ),
                 ),
               ),
@@ -311,7 +311,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 padding: EdgeInsets.symmetric(horizontal: 70),
                 alignment: Alignment.centerLeft,
                 child: Text(s.playback,
-                    style: context.textTheme.bodyText1
+                    style: context.textTheme.bodyText1!
                         .copyWith(color: context.accentColor)),
               ),
               ListTile(
@@ -319,16 +319,16 @@ class _PlaySettingState extends State<PlaySetting> {
                     EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
                 title: Text(s.settingsFastForwardSec),
                 subtitle: Text(s.settingsFastForwardSecDes),
-                trailing: Selector<SettingState, int>(
+                trailing: Selector<SettingState, int?>(
                   selector: (_, settings) => settings.fastForwardSeconds,
                   builder: (_, data, __) => MyDropdownButton(
-                      hint: Text(s.secCount(data)),
+                      hint: Text(s.secCount(data!)),
                       underline: Center(),
                       elevation: 1,
                       displayItemCount: 5,
                       isDense: true,
                       value: data,
-                      onChanged: (value) =>
+                      onChanged: (dynamic value) =>
                           settings.setFastForwardSeconds = value,
                       items: kSecondsToSelect.map<DropdownMenuItem<int>>((e) {
                         return DropdownMenuItem<int>(
@@ -341,16 +341,16 @@ class _PlaySettingState extends State<PlaySetting> {
                     EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
                 title: Text(s.settingsRewindSec),
                 subtitle: Text(s.settingsRewindSecDes),
-                trailing: Selector<SettingState, int>(
+                trailing: Selector<SettingState, int?>(
                   selector: (_, settings) => settings.rewindSeconds,
                   builder: (_, data, __) => MyDropdownButton(
-                      hint: Text(s.secCount(data)),
+                      hint: Text(s.secCount(data!)),
                       underline: Center(),
                       elevation: 1,
                       displayItemCount: 5,
                       isDense: true,
                       value: data,
-                      onChanged: (value) => settings.setRewindSeconds = value,
+                      onChanged: (dynamic value) => settings.setRewindSeconds = value,
                       items: kSecondsToSelect.map<DropdownMenuItem<int>>((e) {
                         return DropdownMenuItem<int>(
                             value: e, child: Text(s.secCount(e)));
@@ -362,7 +362,7 @@ class _PlaySettingState extends State<PlaySetting> {
                     EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
                 title: Text(s.settingsBoostVolume),
                 subtitle: Text(s.settingsBoostVolumeDes),
-                trailing: Selector<AudioPlayerNotifier, int>(
+                trailing: Selector<AudioPlayerNotifier, int?>(
                   selector: (_, audio) => audio.volumeGain,
                   builder: (_, volumeGain, __) => MyDropdownButton(
                       hint: Text(_volumeEffect(context, volumeGain)),
@@ -371,7 +371,7 @@ class _PlaySettingState extends State<PlaySetting> {
                       displayItemCount: 5,
                       isDense: true,
                       value: volumeGain,
-                      onChanged: (value) => audio.setVolumeGain = value,
+                      onChanged: (dynamic value) => audio.setVolumeGain = value,
                       items: [2000, 3000, 4000].map<DropdownMenuItem<int>>((e) {
                         return DropdownMenuItem<int>(
                             value: e, child: Text(_volumeEffect(context, e)));
@@ -388,7 +388,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 padding: EdgeInsets.symmetric(horizontal: 70),
                 alignment: Alignment.centerLeft,
                 child: Text(s.sleepTimer,
-                    style: context.textTheme.bodyText1
+                    style: context.textTheme.bodyText1!
                         .copyWith(color: Theme.of(context).accentColor)),
               ),
               ListView(
@@ -400,16 +400,16 @@ class _PlaySettingState extends State<PlaySetting> {
                     contentPadding: EdgeInsets.only(left: 70.0, right: 20),
                     title: Text(s.settingsSTDefaultTime),
                     subtitle: Text(s.settingsSTDefautTimeDes),
-                    trailing: Selector<SettingState, int>(
+                    trailing: Selector<SettingState, int?>(
                       selector: (_, settings) => settings.defaultSleepTimer,
                       builder: (_, data, __) => MyDropdownButton(
-                          hint: Text(s.minsCount(data)),
+                          hint: Text(s.minsCount(data!)),
                           underline: Center(),
                           elevation: 1,
                           displayItemCount: 5,
                           isDense: true,
                           value: data,
-                          onChanged: (value) =>
+                          onChanged: (dynamic value) =>
                               settings.setDefaultSleepTimer = value,
                           items: kMinsToSelect.map<DropdownMenuItem<int>>((e) {
                             return DropdownMenuItem<int>(
@@ -417,10 +417,10 @@ class _PlaySettingState extends State<PlaySetting> {
                           }).toList()),
                     ),
                   ),
-                  Selector<SettingState, bool>(
+                  Selector<SettingState, bool?>(
                     selector: (_, settings) => settings.autoSleepTimer,
                     builder: (_, data, __) => ListTile(
-                      onTap: () => settings.setAutoSleepTimer = !data,
+                      onTap: () => settings.setAutoSleepTimer = !data!,
                       contentPadding: const EdgeInsets.only(
                           left: 70.0, right: 20.0, bottom: 10.0, top: 10.0),
                       title: Text(s.settingsSTAuto),
@@ -428,7 +428,7 @@ class _PlaySettingState extends State<PlaySetting> {
                       trailing: Transform.scale(
                         scale: 0.9,
                         child: Switch(
-                            value: data,
+                            value: data!,
                             onChanged: (boo) =>
                                 settings.setAutoSleepTimer = boo),
                       ),
@@ -463,14 +463,14 @@ class _PlaySettingState extends State<PlaySetting> {
 }
 
 class _NotificationLayout extends StatefulWidget {
-  _NotificationLayout({Key key}) : super(key: key);
+  _NotificationLayout({Key? key}) : super(key: key);
 
   @override
   __NotificationLayoutState createState() => __NotificationLayoutState();
 }
 
 class __NotificationLayoutState extends State<_NotificationLayout> {
-  Future<int> _getNotificationLayout() async {
+  Future<int?> _getNotificationLayout() async {
     final storage = KeyValueStorage(notificationLayoutKey);
     var index = await storage.getInt(defaultValue: 0);
     return index;
@@ -492,7 +492,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
           SizedBox(height: 8),
           Text(des,
               style: TextStyle(
-                  fontSize: 12, color: context.textColor.withOpacity(0.5)),
+                  fontSize: 12, color: context.textColor!.withOpacity(0.5)),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.clip),
@@ -501,7 +501,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
     );
   }
 
-  Widget _notificationOptions(int index, {int selected}) {
+  Widget _notificationOptions(int index, {int? selected}) {
     final s = context.s;
     return InkWell(
       borderRadius: BorderRadius.circular(10.0),
@@ -525,7 +525,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _notificationIcon(
-                      Icon(Icons.pause_circle_filled), '${s.play}| ${s.pause}'),
+                      Icon(Icons.pause_circle_filled), '${s!.play}| ${s.pause}'),
                   _notificationIcon(Icon(Icons.fast_forward), s.fastForward),
                   _notificationIcon(Icon(Icons.skip_next), s.skipToNext),
                   _notificationIcon(Icon(Icons.close), s.stop),
@@ -537,7 +537,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                         _notificationIcon(Icon(Icons.pause_circle_filled),
-                            '${s.play}| ${s.pause}'),
+                            '${s!.play}| ${s.pause}'),
                         _notificationIcon(
                             Icon(Icons.fast_rewind), s.fastRewind),
                         _notificationIcon(Icon(Icons.skip_next), s.skipToNext),
@@ -547,7 +547,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _notificationIcon(Icon(Icons.fast_rewind), s.fastRewind),
+                      _notificationIcon(Icon(Icons.fast_rewind), s!.fastRewind),
                       _notificationIcon(Icon(Icons.pause_circle_filled),
                           '${s.play}| ${s.pause}'),
                       _notificationIcon(
@@ -563,7 +563,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.fromLTRB(40, 0, 40, 30),
-      child: FutureBuilder<int>(
+      child: FutureBuilder<int?>(
         future: _getNotificationLayout(),
         initialData: 0,
         builder: (context, snapshot) => Column(
@@ -581,7 +581,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
 }
 
 class _SpeedList extends StatefulWidget {
-  _SpeedList({Key key}) : super(key: key);
+  _SpeedList({Key? key}) : super(key: key);
 
   @override
   __SpeedListState createState() => __SpeedListState();
@@ -600,7 +600,7 @@ class __SpeedListState extends State<_SpeedList> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return ListTile(
       contentPadding:
           EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
@@ -623,17 +623,17 @@ class __SpeedListState extends State<_SpeedList> {
                                 label: Text('X ${e.toStringAsFixed(1)}'),
                                 selectedColor: context.accentColor,
                                 labelStyle: TextStyle(
-                                    color: snapshot.data.contains(e)
+                                    color: snapshot.data!.contains(e)
                                         ? Colors.white
                                         : context.textColor),
                                 elevation: 0,
                                 showCheckmark: false,
-                                selected: snapshot.data.contains(e),
+                                selected: snapshot.data!.contains(e),
                                 onSelected: (value) async {
                                   if (!value) {
-                                    speedSelected.remove(e);
+                                    speedSelected!.remove(e);
                                   } else {
-                                    speedSelected.add(e);
+                                    speedSelected!.add(e);
                                   }
                                   await _saveSpeedList(speedSelected);
                                   setState(() {});

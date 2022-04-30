@@ -26,23 +26,23 @@ class ListenNotesSearch {
   final _apiKey = environment['apiKey'];
   bool get _validApi => _apiKey != '';
 
-  Future<SearchPodcast<dynamic>> searchPodcasts(
-      {String searchText, int nextOffset}) async {
+  Future<SearchPodcast<dynamic>?> searchPodcasts(
+      {String? searchText, int? nextOffset}) async {
     if(!_validApi) return null;
     var url = "${_baseUrl}search?q="
-        "${Uri.encodeComponent(searchText)}${"&sort_by_date=0&type=podcast&offset=$nextOffset"}";
+        "${Uri.encodeComponent(searchText!)}${"&sort_by_date=0&type=podcast&offset=$nextOffset"}";
     var response = await _dio.get(url,
         options: Options(headers: {
           'X-ListenAPI-Key': "$_apiKey",
           'Accept': "application/json"
         }));
     Map searchResultMap = jsonDecode(response.toString());
-    var searchResult = SearchPodcast.fromJson(searchResultMap);
+    var searchResult = SearchPodcast.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 
-  Future<SearchEpisodes<dynamic>> fetchEpisode(
-      {String id, int nextEpisodeDate}) async {
+  Future<SearchEpisodes<dynamic>?> fetchEpisode(
+      {String? id, int? nextEpisodeDate}) async {
     if(!_validApi) return null;
     var url =
         "${_baseUrl}podcasts/$id?next_episode_pub_date=$nextEpisodeDate";
@@ -52,12 +52,12 @@ class ListenNotesSearch {
           'Accept': "application/json"
         }));
     Map searchResultMap = jsonDecode(response.toString());
-    var searchResult = SearchEpisodes.fromJson(searchResultMap);
+    var searchResult = SearchEpisodes.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 
-  Future<SearchTopPodcast<dynamic>> fetchBestPodcast(
-      {String genre, int page, String region = 'us'}) async {
+  Future<SearchTopPodcast<dynamic>?> fetchBestPodcast(
+      {String? genre, int? page, String region = 'us'}) async {
     if(!_validApi) return null;
     var url =
         "${_baseUrl}best_podcasts?genre_id=$genre&page=$page&region=$region";
@@ -67,21 +67,21 @@ class ListenNotesSearch {
           'Accept': "application/json"
         }));
     Map searchResultMap = jsonDecode(response.toString());
-    var searchResult = SearchTopPodcast.fromJson(searchResultMap);
+    var searchResult = SearchTopPodcast.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 }
 
 class ItunesSearch {
   Future<ItunesSearchResult<dynamic>> searchPodcasts(
-      {String searchText, int limit}) async {
+      {required String searchText, int? limit}) async {
     final url = "https://itunes.apple.com/search?term="
         "${Uri.encodeComponent(searchText)}&media=podcast&entity=podcast&limit=$limit";
     final response = await Dio()
         .get(url, options: Options(headers: {'Accept': "application/json"}));
     print(response.toString());
     Map searchResultMap = jsonDecode(response.toString());
-    final searchResult = ItunesSearchResult.fromJson(searchResultMap);
+    final searchResult = ItunesSearchResult.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 }
@@ -92,8 +92,8 @@ class PodcastsIndexSearch {
   Map<String, String> _initSearch() {
     final unixTime =
         (DateTime.now().millisecondsSinceEpoch / 1000).round().toString();
-    final apiKey = podcastIndexApi['podcastIndexApiKey'];
-    final apiSecret = podcastIndexApi['podcastIndexApiSecret'];
+    final apiKey = podcastIndexApi['podcastIndexApiKey']!;
+    final apiSecret = podcastIndexApi['podcastIndexApiSecret']!;
     final firstChunk = utf8.encode(apiKey);
     final secondChunk = utf8.encode(apiSecret);
     final thirdChunk = utf8.encode(unixTime);
@@ -115,22 +115,22 @@ class PodcastsIndexSearch {
   }
 
   Future<PodcastIndexSearchResult<dynamic>> searchPodcasts(
-      {String searchText, int limit = 99}) async {
+      {required String searchText, int? limit = 99}) async {
     final url = "$_baseUrl/api/1.0/search/byterm"
         "?q=${Uri.encodeComponent(searchText)}&max=$limit&fulltext=true";
     final headers = _initSearch();
     final response = await _dio.get(url, options: Options(headers: headers));
     Map searchResultMap = jsonDecode(response.toString());
-    final searchResult = PodcastIndexSearchResult.fromJson(searchResultMap);
+    final searchResult = PodcastIndexSearchResult.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 
-  Future<IndexEpisodeResult<dynamic>> fetchEpisode({String rssUrl}) async {
+  Future<IndexEpisodeResult<dynamic>> fetchEpisode({String? rssUrl}) async {
     final url = "$_baseUrl/api/1.0/episodes/byfeedurl?url=$rssUrl";
     final headers = _initSearch();
     final response = await _dio.get(url, options: Options(headers: headers));
     Map searchResultMap = jsonDecode(response.toString());
-    final searchResult = IndexEpisodeResult.fromJson(searchResultMap);
+    final searchResult = IndexEpisodeResult.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 }

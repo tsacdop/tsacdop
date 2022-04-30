@@ -7,9 +7,9 @@ part 'index_podcast.g.dart';
 @JsonSerializable()
 class PodcastIndexSearchResult<P> {
   @_ConvertP()
-  final List<P> feeds;
-  final String status;
-  final int count;
+  final List<P>? feeds;
+  final String? status;
+  final int? count;
   PodcastIndexSearchResult({this.feeds, this.status, this.count});
 
   factory PodcastIndexSearchResult.fromJson(Map<String, dynamic> json) =>
@@ -17,30 +17,30 @@ class PodcastIndexSearchResult<P> {
   Map<String, dynamic> toJson() => _$PodcastIndexSearchResultToJson(this);
 }
 
-class _ConvertP<P> implements JsonConverter<P, Object> {
+class _ConvertP<P> implements JsonConverter<P, Object?> {
   const _ConvertP();
   @override
-  P fromJson(Object json) {
-    return IndexPodcast.fromJson(json) as P;
+  P fromJson(Object? json) {
+    return IndexPodcast.fromJson(json as Map<String, dynamic>) as P;
   }
 
   @override
-  Object toJson(P object) {
+  Object? toJson(P object) {
     return object;
   }
 }
 
 @JsonSerializable()
 class IndexPodcast {
-  final int id;
-  final String title;
-  final String url;
-  final String link;
-  final String description;
-  final String author;
-  final String image;
-  final int lastUpdateTime;
-  final int itunesId;
+  final int? id;
+  final String? title;
+  final String? url;
+  final String? link;
+  final String? description;
+  final String? author;
+  final String? image;
+  final int? lastUpdateTime;
+  final int? itunesId;
   IndexPodcast(
       {this.id,
       this.title,
@@ -61,7 +61,7 @@ class IndexPodcast {
       count: 0,
       description: description,
       image: image,
-      latestPubDate: lastUpdateTime * 1000,
+      latestPubDate: lastUpdateTime! * 1000,
       rss: url,
       publisher: author,
       id: itunesId.toString());

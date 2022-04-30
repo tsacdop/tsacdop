@@ -4,7 +4,6 @@ import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -34,9 +33,9 @@ const String kDefaultAvatar = """http://xuanmei.us/assets/default/avatar_small-
 170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg""";
 
 class PodcastDetail extends StatefulWidget {
-  PodcastDetail({Key key, @required this.podcastLocal, this.hide = false})
+  PodcastDetail({Key? key, required this.podcastLocal, this.hide = false})
       : super(key: key);
-  final PodcastLocal podcastLocal;
+  final PodcastLocal? podcastLocal;
   final bool hide;
   @override
   _PodcastDetailState createState() => _PodcastDetailState();
@@ -50,17 +49,17 @@ class _PodcastDetailState extends State<PodcastDetail> {
   final _dbHelper = DBHelper();
 
   /// Episodes total count.
-  int _episodeCount;
+  int? _episodeCount;
 
   /// Default layout.
-  Layout _layout;
+  Layout? _layout;
 
   /// If true, stop grid load animation.
   bool _scroll = false;
 
   double _topHeight = 0;
 
-  ScrollController _controller;
+  late ScrollController _controller;
 
   /// Episodes num load first time.
   int _top = 96;
@@ -79,19 +78,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
   String _query = '';
 
   ///Hide listened.
-  bool _hideListened;
+  bool? _hideListened;
 
   ///Selected episode list.
-  List<EpisodeBrief> _selectedEpisodes;
+  List<EpisodeBrief>? _selectedEpisodes;
 
   ///Toggle for multi-select.
-  bool _multiSelect;
-  bool _selectAll;
-  bool _selectBefore;
-  bool _selectAfter;
+  bool? _multiSelect;
+  bool? _selectAll;
+  late bool _selectBefore;
+  late bool _selectAfter;
 
   ///Show podcast info.
-  bool _showInfo;
+  bool? _showInfo;
 
   @override
   void initState() {
@@ -109,7 +108,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -118,7 +117,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     final result = await _dbHelper.updatePodcastRss(podcastLocal);
     if (result >= 0) {
       Fluttertoast.showToast(
-        msg: context.s.updateEpisodesCount(result),
+        msg: context.s!.updateEpisodesCount(result),
         gravity: ToastGravity.TOP,
       );
     }
@@ -149,7 +148,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       }
     } else if (result != 0) {
       Fluttertoast.showToast(
-        msg: context.s.updateFailed,
+        msg: context.s!.updateFailed,
         gravity: ToastGravity.TOP,
       );
     }
@@ -157,13 +156,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
   }
 
   Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal,
-      {int count, bool reverse, Filter filter, String query}) async {
+      {int? count, bool? reverse, Filter? filter, String? query}) async {
     var episodes = <EpisodeBrief>[];
     _episodeCount = await _dbHelper.getPodcastCounts(podcastLocal.id);
     final layoutStorage = KeyValueStorage(podcastLayoutKey);
     final hideListenedStorage = KeyValueStorage(hideListenedKey);
     final index = await layoutStorage.getInt(defaultValue: 1);
-    if (_layout == null) _layout = Layout.values[index];
+    if (_layout == null) _layout = Layout.values[index!];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
@@ -171,14 +170,14 @@ class _PodcastDetailState extends State<PodcastDetail> {
         reverse: reverse,
         filter: filter,
         query: query,
-        hideListened: _hideListened);
+        hideListened: _hideListened!);
     _dataCount = episodes.length;
     return episodes;
   }
 
-  Future<Tuple2<String, List<PodcastHost>>> _getHosts(
+  Future<Tuple2<String?, List<PodcastHost>?>> _getHosts(
       PodcastLocal podcastLocal) async {
-    if (!podcastLocal.provider.contains('fireside')) return Tuple2('', []);
+    if (!podcastLocal.provider!.contains('fireside')) return Tuple2('', []);
     var data = FiresideData(podcastLocal.id, podcastLocal.link);
     await data.getData();
     var backgroundImage = data.background;
@@ -186,7 +185,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     return Tuple2(backgroundImage, hosts);
   }
 
-  Future<int> _getLayout() async {
+  Future<int?> _getLayout() async {
     var storage = KeyValueStorage(podcastLayoutKey);
     var index = await storage.getInt(defaultValue: 1);
     return index;
@@ -199,18 +198,18 @@ class _PodcastDetailState extends State<PodcastDetail> {
   }
 
   Future<void> _checkPodcast() async {
-    final exist = await _dbHelper.checkPodcast(widget.podcastLocal.rssUrl);
+    final exist = await _dbHelper.checkPodcast(widget.podcastLocal!.rssUrl);
     if (exist == '') {
       Navigator.of(context).pop();
     }
   }
 
-  Future<int> _getNewCount() async {
-    return await _dbHelper.getPodcastUpdateCounts(widget.podcastLocal.id);
+  Future<int?> _getNewCount() async {
+    return await _dbHelper.getPodcastUpdateCounts(widget.podcastLocal!.id);
   }
 
   Future<void> _removePodcastNewMark() async {
-    await _dbHelper.removePodcastNewMark(widget.podcastLocal.id);
+    await _dbHelper.removePodcastNewMark(widget.podcastLocal!.id);
   }
 
   Widget _podcastInfo(BuildContext context) {
@@ -219,16 +218,19 @@ class _PodcastDetailState extends State<PodcastDetail> {
       padding: EdgeInsets.only(top: 50, left: 80, right: 130),
       alignment: Alignment.topLeft,
       child: Text(
-        widget.podcastLocal.title,
+        widget.podcastLocal!.title!,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: context.textTheme.headline5.copyWith(color: Colors.white),
+        style: context.textTheme.headline5!.copyWith(color: Colors.white),
       ),
     );
   }
 
   Widget _podcastLink(
-      {String title, Widget child, VoidCallback onTap, Color backgroundColor}) {
+      {required String title,
+      Widget? child,
+      VoidCallback? onTap,
+      required Color backgroundColor}) {
     return Container(
         padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
         width: 60.0,
@@ -262,7 +264,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        FutureBuilder(
+        FutureBuilder<Tuple2<String?, List<PodcastHost>?>>(
             future: _getHosts(podcastLocal),
             builder: (context, snapshot) {
               return Container(
@@ -276,15 +278,15 @@ class _PodcastDetailState extends State<PodcastDetail> {
                         _podcastLink(
                             title: 'Link',
                             child: Icon(Icons.link, size: 30),
-                            backgroundColor: Colors.green[600],
-                            onTap: () => widget.podcastLocal.link.launchUrl),
+                            backgroundColor: Colors.green[600]!,
+                            onTap: () => widget.podcastLocal!.link!.launchUrl),
                         _podcastLink(
                             title: 'Rss',
                             child: Icon(LineIcons.rssSquare, size: 30),
-                            backgroundColor: Colors.blue[600],
-                            onTap: () => widget.podcastLocal.rssUrl.launchUrl),
-                        if (widget.podcastLocal.funding.isNotEmpty)
-                          for (var funding in widget.podcastLocal.funding)
+                            backgroundColor: Colors.blue[600]!,
+                            onTap: () => widget.podcastLocal!.rssUrl.launchUrl),
+                        if (widget.podcastLocal!.funding.isNotEmpty)
+                          for (var funding in widget.podcastLocal!.funding)
                             _podcastLink(
                                 title: 'Donate',
                                 child: Icon(
@@ -294,10 +296,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         ? LineIcons.paypal
                                         : LineIcons.donate,
                                     size: 30),
-                                backgroundColor: Colors.red[600],
+                                backgroundColor: Colors.red[600]!,
                                 onTap: () => funding.launchUrl),
                         if (snapshot.hasData)
-                          ...snapshot.data.item2
+                          ...snapshot.data!.item2!
                               .map<Widget>((host) {
                                 final image = host.image == kDefaultAvatar
                                     ? kDefaultAvatar
@@ -310,12 +312,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
                                       CachedNetworkImage(
-                                        imageUrl: image,
+                                        imageUrl: image!,
                                         progressIndicatorBuilder:
                                             (context, url, downloadProgress) =>
                                                 CircleAvatar(
-                                          backgroundColor:
-                                              Colors.cyan[600].withOpacity(0.5),
+                                          backgroundColor: Colors.cyan[600]!
+                                              .withOpacity(0.5),
                                           child: SizedBox(
                                             width: 30,
                                             height: 2,
@@ -338,7 +340,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       ),
                                       SizedBox(height: 4),
                                       Text(
-                                        host.name,
+                                        host.name!,
                                         style: context.textTheme.subtitle2,
                                         textAlign: TextAlign.center,
                                         maxLines: 2,
@@ -365,10 +367,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
   }
 
   Widget _customPopupMenu({
-    Widget child,
-    String tooltip,
-    List<PopupMenuEntry<int>> itemBuilder,
-    Function(int) onSelected,
+    Widget? child,
+    String? tooltip,
+    List<PopupMenuEntry<int>>? itemBuilder,
+    Function(int)? onSelected,
   }) =>
       Material(
         key: UniqueKey(),
@@ -381,13 +383,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
           elevation: 1,
           tooltip: tooltip,
           child: child,
-          itemBuilder: (context) => itemBuilder,
-          onSelected: (value) => onSelected(value),
+          itemBuilder: (context) => itemBuilder!,
+          onSelected: (value) => onSelected!(value),
         ),
       );
 
   Widget _actionBar(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return SizedBox(
         height: 30,
         child: Row(
@@ -455,13 +457,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           borderRadius: BorderRadius.circular(5),
                           border: Border.all(
                               width: 2,
-                              color: context.textColor.withOpacity(0.2))),
+                              color: context.textColor!.withOpacity(0.2))),
                       child: _query == ''
                           ? Row(
                               children: [
                                 Text(s.search,
                                     style: TextStyle(
-                                        color: context.textColor
+                                        color: context.textColor!
                                             .withOpacity(0.4))),
                                 Spacer()
                               ],
@@ -519,8 +521,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   SearchEpisode(
                                     onSearch: (query) {
                                       setState(() {
-                                        _query = query;
-                                        _filter = Filter.search;
+                                        if (query != null && query != '') {
+                                          _query = query;
+                                          _filter = Filter.search;
+                                        }
                                       });
                                     },
                                   ));
@@ -529,7 +533,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                   }
                 }),
             Spacer(),
-            FutureBuilder<int>(
+            FutureBuilder<int?>(
                 future: _getNewCount(),
                 initialData: 0,
                 builder: (context, snapshot) {
@@ -550,7 +554,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                       width: 18,
                                       child: CustomPaint(
                                           painter: RemoveNewFlagPainter(
-                                              context.textTheme.bodyText1.color,
+                                              context
+                                                  .textTheme.bodyText1!.color,
                                               Colors.red))),
                                   onPressed: () async {
                                     await _removePodcastNewMark();
@@ -572,7 +577,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                     duration: Duration(milliseconds: 500),
                     curve: Curves.easeInOutQuart,
                     tween: Tween<double>(begin: 0.0, end: 1.0),
-                    builder: (context, angle, child) => Transform.rotate(
+                    builder: (context, dynamic angle, child) =>
+                        Transform.rotate(
                       angle: math.pi * 2 * angle,
                       child: SizedBox(
                         width: 30,
@@ -612,15 +618,15 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           ),
                         ),
                         onPressed: () {
-                          setState(() => _hideListened = !_hideListened);
+                          setState(() => _hideListened = !_hideListened!);
                         },
                       ));
                 }),
-            FutureBuilder<int>(
+            FutureBuilder<int?>(
                 future: _getLayout(),
                 builder: (context, snapshot) {
                   if (_layout == null && snapshot.data != null) {
-                    _layout = Layout.values[snapshot.data];
+                    _layout = Layout.values[snapshot.data!];
                   }
                   return Material(
                     color: Colors.transparent,
@@ -661,8 +667,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.podcastLocal.primaryColor.colorizedark();
-    final s = context.s;
+    final color = widget.podcastLocal!.primaryColor!.colorizedark();
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.dark,
@@ -673,8 +679,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
       child: WillPopScope(
         onWillPop: () {
           if (_playerKey.currentState != null &&
-              _playerKey.currentState.initSize > 100) {
-            _playerKey.currentState.backToMini();
+              _playerKey.currentState!.initSize! > 100) {
+            _playerKey.currentState!.backToMini();
             return Future.value(false);
           } else {
             return Future.value(true);
@@ -688,7 +694,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
               displacement: context.paddingTop + 40,
               color: context.accentColor,
               onRefresh: () async {
-                await _updateRssItem(context, widget.podcastLocal);
+                await _updateRssItem(context, widget.podcastLocal!);
               },
               child: Stack(
                 children: <Widget>[
@@ -703,8 +709,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           child: CustomScrollView(
                             controller: _controller
                               ..addListener(() async {
-                                if (_controller.offset ==
-                                        _controller.position.maxScrollExtent &&
+                                if (_controller!.offset ==
+                                        _controller!.position.maxScrollExtent &&
                                     _dataCount == _top) {
                                   if (mounted) {
                                     setState(() => _loadMore = true);
@@ -717,7 +723,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     });
                                   }
                                 }
-                                if (_controller.offset > 0 &&
+                                if (_controller!.offset > 0 &&
                                     mounted &&
                                     !_scroll) {
                                   setState(() => _scroll = true);
@@ -734,7 +740,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     tooltip: s.menu,
                                     onPressed: () => generalSheet(
                                       context,
-                                      title: widget.podcastLocal.title,
+                                      title: widget.podcastLocal!.title,
                                       child: PodcastSetting(
                                           podcastLocal: widget.podcastLocal),
                                     ).then((value) {
@@ -747,7 +753,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                 iconTheme: IconThemeData(
                                   color: Colors.white,
                                 ),
-                                expandedHeight: math.max(130 + context.paddingTop, 180),
+                                expandedHeight:
+                                    math.max(130 + context.paddingTop, 180),
                                 backgroundColor: color,
                                 floating: true,
                                 pinned: true,
@@ -763,7 +770,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                               top: 120 + context.paddingTop),
                                           child: InkWell(
                                             onTap: () => setState(
-                                                () => _showInfo = !_showInfo),
+                                                () => _showInfo = !_showInfo!),
                                             child: Container(
                                               padding: EdgeInsets.only(
                                                   left: 80, right: 130),
@@ -783,7 +790,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                               .start,
                                                       children: <Widget>[
                                                         Text(
-                                                            widget.podcastLocal
+                                                            widget.podcastLocal!
                                                                     .author ??
                                                                 '',
                                                             maxLines: 1,
@@ -794,13 +801,13 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                                 color: Colors
                                                                     .white)),
                                                         if (widget
-                                                            .podcastLocal
-                                                            .provider
+                                                            .podcastLocal!
+                                                            .provider!
                                                             .isNotEmpty)
                                                           Text(
                                                             s.hostedOn(widget
-                                                                .podcastLocal
-                                                                .provider),
+                                                                .podcastLocal!
+                                                                .provider!),
                                                             maxLines: 1,
                                                             style: TextStyle(
                                                                 color: Colors
@@ -831,7 +838,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                             ),
                                             child: Image.file(
                                               File(
-                                                  "${widget.podcastLocal.imagePath}"),
+                                                  "${widget.podcastLocal!.imagePath}"),
                                               errorBuilder: (context, _, __) {
                                                 return ColoredBox(
                                                     color: color,
@@ -850,7 +857,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                         ? SizedBox(
                                             width: context.width * 4 / 5,
                                             child: Text(
-                                                widget.podcastLocal.title,
+                                                widget.podcastLocal!.title!,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.clip,
                                                 style: TextStyle(
@@ -861,45 +868,45 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                 }),
                               ),
                               SliverToBoxAdapter(
-                                child: _showInfo
-                                    ? _hostsList(context, widget.podcastLocal)
+                                child: _showInfo!
+                                    ? _hostsList(context, widget.podcastLocal!)
                                     : SizedBox(height: 10),
                               ),
                               SliverToBoxAdapter(
-                                  child: _multiSelect
+                                  child: _multiSelect!
                                       ? Center()
                                       : _actionBar(context)),
                               if (!widget.hide)
                                 FutureBuilder<List<EpisodeBrief>>(
-                                    future: _getRssItem(widget.podcastLocal,
+                                    future: _getRssItem(widget.podcastLocal!,
                                         count: _top,
                                         reverse: _reverse,
                                         filter: _filter,
                                         query: _query),
                                     builder: (context, snapshot) {
                                       if (snapshot.hasData) {
-                                        if (_selectAll) {
+                                        if (_selectAll!) {
                                           _selectedEpisodes = snapshot.data;
                                         }
                                         if (_selectBefore) {
-                                          final index = snapshot.data
-                                              .indexOf(_selectedEpisodes.first);
+                                          final index = snapshot.data!.indexOf(
+                                              _selectedEpisodes!.first);
                                           if (index != 0) {
-                                            _selectedEpisodes = snapshot.data
+                                            _selectedEpisodes = snapshot.data!
                                                 .sublist(0, index + 1);
                                           }
                                         }
                                         if (_selectAfter) {
-                                          final index = snapshot.data
-                                              .indexOf(_selectedEpisodes.first);
+                                          final index = snapshot.data!.indexOf(
+                                              _selectedEpisodes!.first);
                                           _selectedEpisodes =
-                                              snapshot.data.sublist(index);
+                                              snapshot.data!.sublist(index);
                                         }
                                         return EpisodeGrid(
                                           episodes: snapshot.data,
                                           showFavorite: true,
                                           showNumber: _filter == Filter.all &&
-                                                  !_hideListened
+                                                  !_hideListened!
                                               ? true
                                               : false,
                                           layout: _layout,
@@ -935,14 +942,15 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           ),
                         ),
                       ),
-                      Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
+                      Selector<AudioPlayerNotifier,
+                              Tuple2<bool, PlayerHeight?>>(
                           selector: (_, audio) =>
                               Tuple2(audio.playerRunning, audio.playerHeight),
                           builder: (_, data, __) {
-                            var height = kMinPlayerHeight[data.item2.index];
+                            var height = kMinPlayerHeight[data.item2!.index];
                             return Column(
                               children: [
-                                if (_multiSelect)
+                                if (_multiSelect!)
                                   MultiSelectMenuBar(
                                     selectedList: _selectedEpisodes,
                                     selectAll: _selectAll,
@@ -1002,24 +1010,24 @@ class _PodcastDetailState extends State<PodcastDetail> {
 }
 
 class AboutPodcast extends StatefulWidget {
-  final PodcastLocal podcastLocal;
-  AboutPodcast({this.podcastLocal, Key key}) : super(key: key);
+  final PodcastLocal? podcastLocal;
+  AboutPodcast({this.podcastLocal, Key? key}) : super(key: key);
 
   @override
   _AboutPodcastState createState() => _AboutPodcastState();
 }
 
 class _AboutPodcastState extends State<AboutPodcast> {
-  String _description;
-  bool _load;
-  void getDescription(String id) async {
+  late String _description;
+  late bool _load;
+  void getDescription(String? id) async {
     var dbHelper = DBHelper();
     var description = await dbHelper.getFeedDescription(id);
     if (description == null || description.isEmpty) {
       _description = '';
     } else {
       var doc = parse(description);
-      _description = parse(doc.body.text).documentElement.text;
+      _description = parse(doc.body!.text).documentElement!.text;
     }
     if (mounted) setState(() => _load = true);
   }
@@ -1028,7 +1036,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
   void initState() {
     super.initState();
     _load = false;
-    getDescription(widget.podcastLocal.id);
+    getDescription(widget.podcastLocal!.id);
   }
 
   @override
@@ -1038,7 +1046,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
         : Linkify(
             text: _description,
             onOpen: (link) {
-              link.url.launchUrl;
+              link.url!.launchUrl;
             },
             linkStyle: TextStyle(
                 color: Theme.of(context).accentColor,
@@ -1106,15 +1114,15 @@ class _AboutPodcastState extends State<AboutPodcast> {
 }
 
 class SearchEpisode extends StatefulWidget {
-  SearchEpisode({this.onSearch, Key key}) : super(key: key);
-  final ValueChanged<String> onSearch;
+  SearchEpisode({this.onSearch, Key? key}) : super(key: key);
+  final ValueChanged<String?>? onSearch;
   @override
   _SearchEpisodeState createState() => _SearchEpisodeState();
 }
 
 class _SearchEpisodeState extends State<SearchEpisode> {
-  TextEditingController _controller;
-  String _query;
+  TextEditingController? _controller;
+  String? _query;
 
   @override
   void initState() {
@@ -1124,13 +1132,13 @@ class _SearchEpisodeState extends State<SearchEpisode> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,
@@ -1160,7 +1168,7 @@ class _SearchEpisodeState extends State<SearchEpisode> {
             splashColor: context.accentColor.withAlpha(70),
             onPressed: () {
               if ((_query ?? '').isNotEmpty) {
-                widget.onSearch(_query);
+                widget.onSearch!(_query);
                 Navigator.of(context).pop();
               }
             },

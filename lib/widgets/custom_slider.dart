@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class MyRectangularTrackShape extends RectangularSliderTrackShape {
   Rect getPreferredRect({
-    @required RenderBox parentBox,
+    required RenderBox parentBox,
     Offset offset = Offset.zero,
-    @required SliderThemeData sliderTheme,
+    required SliderThemeData sliderTheme,
     bool isEnabled = false,
     bool isDiscrete = false,
   }) {
-    final trackHeight = sliderTheme.trackHeight;
+    final trackHeight = sliderTheme.trackHeight!;
     final trackLeft = offset.dx;
     final trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2;
     final trackWidth = parentBox.size.width;
@@ -22,9 +22,9 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
     this.disabledThumbRadius,
     this.thumbCenterColor,
   });
-  final Color thumbCenterColor;
+  final Color? thumbCenterColor;
   final double enabledThumbRadius;
-  final double disabledThumbRadius;
+  final double? disabledThumbRadius;
   double get _disabledThumbRadius => disabledThumbRadius ?? enabledThumbRadius;
 
   @override
@@ -37,16 +37,16 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
   void paint(
     PaintingContext context,
     Offset center, {
-    Animation<double> activationAnimation,
-    @required Animation<double> enableAnimation,
-    bool isDiscrete,
-    TextPainter labelPainter,
-    RenderBox parentBox,
-    @required SliderThemeData sliderTheme,
-    TextDirection textDirection,
-    double value,
-    double textScaleFactor,
-    Size sizeWithOverflow,
+    Animation<double>? activationAnimation,
+    required Animation<double> enableAnimation,
+    bool? isDiscrete,
+    TextPainter? labelPainter,
+    RenderBox? parentBox,
+    required SliderThemeData sliderTheme,
+    TextDirection? textDirection,
+    double? value,
+    double? textScaleFactor,
+    Size? sizeWithOverflow,
   }) {
     final canvas = context.canvas;
     final radiusTween = Tween<double>(
@@ -62,7 +62,7 @@ class MyRoundSliderThumpShape extends SliderComponentShape {
       center,
       radiusTween.evaluate(enableAnimation),
       Paint()
-        ..color = thumbCenterColor
+        ..color = thumbCenterColor!
         ..style = PaintingStyle.fill
         ..strokeWidth = 2,
     );

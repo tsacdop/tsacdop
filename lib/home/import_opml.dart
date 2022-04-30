@@ -65,17 +65,17 @@ class Import extends StatelessWidget {
             switch (item.subscribeState) {
               case SubscribeState.start:
                 return importColumn(
-                    s.notificationSubscribe(item.title), context);
+                    s!.notificationSubscribe(item.title!), context);
               case SubscribeState.subscribe:
-                return importColumn(s.notificaitonFatch(item.title), context);
+                return importColumn(s!.notificaitonFatch(item.title!), context);
               case SubscribeState.fetch:
-                return importColumn(s.notificationSuccess(item.title), context);
+                return importColumn(s!.notificationSuccess(item.title!), context);
               case SubscribeState.exist:
                 return importColumn(
-                    s.notificationSubscribeExisted(item.title), context);
+                    s!.notificationSubscribeExisted(item.title!), context);
               case SubscribeState.error:
                 return importColumn(
-                    s.notificationNetworkError(item.title), context);
+                    s!.notificationNetworkError(item.title!), context);
               default:
                 return Center();
             }
@@ -90,10 +90,10 @@ class Import extends StatelessWidget {
             }
             switch (item.refreshState) {
               case RefreshState.fetch:
-                return importColumn(s.notificationUpdate(item.title), context);
+                return importColumn(s!.notificationUpdate(item.title), context);
               case RefreshState.error:
                 return importColumn(
-                    s.notificationUpdateError(item.title), context);
+                    s!.notificationUpdateError(item.title), context);
               default:
                 return Center();
             }

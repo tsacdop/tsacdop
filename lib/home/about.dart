@@ -13,18 +13,18 @@ class AboutApp extends StatefulWidget {
 }
 
 class _AboutAppState extends State<AboutApp> {
-  ScrollController _scrollController;
-  bool _scroll;
+  ScrollController? _scrollController;
+  late bool _scroll;
   @override
   void initState() {
     super.initState();
     _scroll = false;
     _scrollController = ScrollController()
       ..addListener(() {
-        if (_scrollController.offset > 0 && !_scroll && mounted) {
+        if (_scrollController!.offset > 0 && !_scroll && mounted) {
           setState(() => _scroll = true);
         }
-        if (_scrollController.offset <= 0 && _scroll && mounted) {
+        if (_scrollController!.offset <= 0 && _scroll && mounted) {
           setState(() => _scroll = false);
         }
       });
@@ -57,7 +57,7 @@ class _AboutAppState extends State<AboutApp> {
         ),
       );
 
-  Widget _translatorInfo(BuildContext context, {String name, String flag}) =>
+  Widget _translatorInfo(BuildContext context, {required String name, String? flag}) =>
       Container(
         height: 50.0,
         padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -114,7 +114,7 @@ class _AboutAppState extends State<AboutApp> {
       );
     }
 
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -297,7 +297,7 @@ class _AboutAppState extends State<AboutApp> {
                         onTapDown: (detail) async {
                           OverlayEntry _overlayEntry;
                           _overlayEntry = _createOverlayEntry(detail);
-                          Overlay.of(context).insert(_overlayEntry);
+                          Overlay.of(context)!.insert(_overlayEntry);
                           await Future.delayed(Duration(seconds: 2));
                           _overlayEntry?.remove();
                         },

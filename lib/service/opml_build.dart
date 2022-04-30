@@ -4,12 +4,11 @@ import 'package:xml/xml.dart' as xml;
 import '../state/podcast_group.dart';
 
 class OmplOutline {
-  final String text;
-  final String xmlUrl;
+  final String? text;
+  final String? xmlUrl;
   OmplOutline({this.text, this.xmlUrl});
 
   factory OmplOutline.parse(xml.XmlElement element) {
-    if (element == null) return null;
     return OmplOutline(
       text: element.getAttribute("text")?.trim(),
       xmlUrl: element.getAttribute("xmlUrl")?.trim(),
@@ -19,7 +18,7 @@ class OmplOutline {
 
 class PodcastsBackup {
   ///Group list for backup.
-  final List<PodcastGroup> groups;
+  final List<PodcastGroup?> groups;
   PodcastsBackup(this.groups) : assert(groups.isNotEmpty);
 
   xml.XmlNode omplBuilder() {
@@ -33,7 +32,7 @@ class PodcastsBackup {
       builder.element('body', nest: () {
         for (var group in groups) {
           builder.element('outline', nest: () {
-            builder.attribute('text', '${group.name}');
+            builder.attribute('text', '${group!.name}');
             builder.attribute('title', '${group.name}');
             for (var e in group.podcasts) {
               builder.element(
@@ -55,7 +54,7 @@ class PodcastsBackup {
   }
 
   static parseOPML(String opml) {
-    var data = <String, List<OmplOutline>>{};
+    var data = <String?, List<OmplOutline>>{};
     // var opml = file.readAsStringSync();
     var content = xml.XmlDocument.parse(opml);
     var title =

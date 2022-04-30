@@ -26,14 +26,14 @@ class PodcastManage extends StatefulWidget {
 
 class _PodcastManageState extends State<PodcastManage>
     with TickerProviderStateMixin {
-  bool _showSetting;
-  double _menuValue;
-  AnimationController _controller;
-  AnimationController _menuController;
-  Animation _animation;
-  Animation _menuAnimation;
-  double _fraction;
-  int _index;
+  late bool _showSetting;
+  late double _menuValue;
+  late AnimationController _controller;
+  late AnimationController _menuController;
+  late Animation _animation;
+  late Animation _menuAnimation;
+  double? _fraction;
+  int? _index;
 
   @override
   void initState() {
@@ -65,7 +65,7 @@ class _PodcastManageState extends State<PodcastManage>
         _controller.stop();
       }
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       FeatureDiscovery.discoverFeatures(context,
           const <String>{addGroupFeature, configureGroup, configurePodcast});
     });
@@ -82,16 +82,16 @@ class _PodcastManageState extends State<PodcastManage>
     final s = context.s;
     return Consumer<GroupList>(
       builder: (_, groupList, __) {
-        if (groupList.orderChanged.contains(groupList.groups[_index])) {
+        if (groupList.orderChanged.contains(groupList.groups[_index!])) {
           _controller.forward();
-        } else if (_fraction > 0) {
+        } else if (_fraction! > 0) {
           _controller.reverse();
         }
         return featureDiscoveryOverlay(
           context,
           featureId: configureGroup,
           tapTarget: Icon(Icons.menu),
-          title: s.featureDiscoveryEditGroup,
+          title: s!.featureDiscoveryEditGroup,
           backgroundColor: Colors.cyan[600],
           description: s.featureDiscoveryEditGroupDes,
           buttonColor: Colors.cyan[500],
@@ -99,7 +99,7 @@ class _PodcastManageState extends State<PodcastManage>
             alignment: FractionalOffset.center,
             transform: Matrix4.identity()
               ..setEntry(3, 2, 0.001)
-              ..rotateY(math.pi * _fraction),
+              ..rotateY(math.pi * _fraction!),
             child: InkWell(
               onTap: () async {
                 if (_fraction == 0) {
@@ -112,10 +112,10 @@ class _PodcastManageState extends State<PodcastManage>
                     });
                   }
                 } else {
-                  groupList.saveOrder(groupList.groups[_index]);
-                  groupList.drlFromOrderChanged(groupList.groups[_index].name);
+                  groupList.saveOrder(groupList.groups[_index!]);
+                  groupList.drlFromOrderChanged(groupList.groups[_index!]!.name);
                   Fluttertoast.showToast(
-                    msg: context.s.toastSettingSaved,
+                    msg: context.s!.toastSettingSaved,
                     gravity: ToastGravity.BOTTOM,
                   );
                   _controller.reverse();
@@ -125,19 +125,19 @@ class _PodcastManageState extends State<PodcastManage>
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                    color: _fraction > 0.5
+                    color: _fraction! > 0.5
                         ? Colors.red
                         : Theme.of(context).accentColor,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey[700].withOpacity(0.5),
+                        color: Colors.grey[700]!.withOpacity(0.5),
                         blurRadius: 1,
                         offset: Offset(1, 1),
                       ),
                     ]),
                 alignment: Alignment.center,
-                child: _fraction > 0.5
+                child: _fraction! > 0.5
                     ? Icon(LineIcons.save, color: Colors.white)
                     : AnimatedIcon(
                         color: Colors.white,
@@ -155,7 +155,7 @@ class _PodcastManageState extends State<PodcastManage>
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -166,7 +166,7 @@ class _PodcastManageState extends State<PodcastManage>
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(context.s.groups(2)),
+          title: Text(context.s!.groups(2)),
           leading: CustomBackButton(),
           actions: <Widget>[
             featureDiscoveryOverlay(
@@ -190,10 +190,10 @@ class _PodcastManageState extends State<PodcastManage>
                           AddGroup()),
                   icon: Icon(Icons.add_circle_outline)),
             ),
-            Selector<SettingState, bool>(
+            Selector<SettingState, bool?>(
                 selector: (_, setting) => setting.openAllPodcastDefalt,
                 builder: (_, data, __) {
-                  return !data
+                  return !data!
                       ? IconButton(
                           splashRadius: 20,
                           onPressed: () => Navigator.push(
@@ -232,7 +232,7 @@ class _PodcastManageState extends State<PodcastManage>
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: Text(
-                                    _groups[index].name,
+                                    _groups[index]!.name!,
                                   )),
                             ),
                             pageBuilder: (context, index) =>
@@ -246,7 +246,7 @@ class _PodcastManageState extends State<PodcastManage>
                               description: s.featureDiscoveryGroupPodcastDes,
                               child: PodcastGroupList(
                                 group: _groups[index],
-                                key: ValueKey<String>(_groups[index].name),
+                                key: ValueKey<String?>(_groups[index]!.name),
                               ),
                             ),
                             onPositionChange: (value) =>
@@ -310,7 +310,7 @@ class _PodcastManageState extends State<PodcastManage>
                                               pageBuilder: (context, animaiton,
                                                       secondaryAnimation) =>
                                                   RenameGroup(
-                                                    group: _groups[_index],
+                                                    group: _groups[_index!],
                                                   ));
                                     },
                                     child: Container(
@@ -332,7 +332,7 @@ class _PodcastManageState extends State<PodcastManage>
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 5.0),
                                           ),
-                                          Text(context.s.editGroupName,
+                                          Text(context.s!.editGroupName,
                                               style: TextStyle(
                                                   color: Colors.white)),
                                         ],
@@ -366,7 +366,7 @@ class _PodcastManageState extends State<PodcastManage>
                                                       Navigator.of(context)
                                                           .pop(),
                                                   child: Text(
-                                                    context.s.cancel,
+                                                    context.s!.cancel,
                                                     style: TextStyle(
                                                         color:
                                                             Colors.grey[600]),
@@ -382,18 +382,18 @@ class _PodcastManageState extends State<PodcastManage>
                                                                 .groups.length -
                                                             1) {
                                                       setState(() {
-                                                        _index = _index - 1;
+                                                        _index = _index! - 1;
                                                       });
                                                       groupList.delGroup(
-                                                          _groups[_index + 1]);
+                                                          _groups[_index! + 1]!);
                                                     } else {
                                                       groupList.delGroup(
-                                                          _groups[_index]);
+                                                          _groups[_index!]!);
                                                     }
                                                     Navigator.of(context).pop();
                                                   },
                                                   child: Text(
-                                                    context.s.confirm,
+                                                    context.s!.confirm,
                                                     style: TextStyle(
                                                         color: Colors.red),
                                                   ),
@@ -441,7 +441,7 @@ class _PodcastManageState extends State<PodcastManage>
 class _OrderMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return PopupMenuButton(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 1,
@@ -460,7 +460,7 @@ class _OrderMenu extends StatelessWidget {
           ),
         ),
       ],
-      onSelected: (value) {
+      onSelected: (dynamic value) {
         if (value == 1) {
           Navigator.push(context, ScaleRoute(page: PodcastList()));
         }
@@ -475,9 +475,9 @@ class AddGroup extends StatefulWidget {
 }
 
 class _AddGroupState extends State<AddGroup> {
-  TextEditingController _controller;
-  String _newGroup;
-  int _error;
+  TextEditingController? _controller;
+  String? _newGroup;
+  int? _error;
 
   @override
   void initState() {
@@ -488,15 +488,15 @@ class _AddGroupState extends State<AddGroup> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     var groupList = Provider.of<GroupList>(context, listen: false);
-    List list = groupList.groups.map((e) => e.name).toList();
+    List list = groupList.groups.map((e) => e!.name).toList();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,

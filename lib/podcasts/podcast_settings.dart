@@ -22,8 +22,8 @@ enum MarkStatus { start, complete, none }
 enum RefreshCoverStatus { start, complete, error, none }
 
 class PodcastSetting extends StatefulWidget {
-  const PodcastSetting({this.podcastLocal, Key key}) : super(key: key);
-  final PodcastLocal podcastLocal;
+  const PodcastSetting({this.podcastLocal, Key? key}) : super(key: key);
+  final PodcastLocal? podcastLocal;
 
   @override
   _PodcastSettingState createState() => _PodcastSettingState();
@@ -33,12 +33,12 @@ class _PodcastSettingState extends State<PodcastSetting> {
   final _dbHelper = DBHelper();
   MarkStatus _markStatus = MarkStatus.none;
   RefreshCoverStatus _coverStatus = RefreshCoverStatus.none;
-  int _secondsStart;
-  int _secondsEnd;
-  bool _markConfirm;
-  bool _removeConfirm;
-  bool _showStartTimePicker;
-  bool _showEndTimePicker;
+  int? _secondsStart;
+  int? _secondsEnd;
+  late bool _markConfirm;
+  late bool _removeConfirm;
+  late bool _showStartTimePicker;
+  bool? _showEndTimePicker;
 
   @override
   void initState() {
@@ -54,50 +54,50 @@ class _PodcastSettingState extends State<PodcastSetting> {
   Future<void> _setAutoDownload(bool boo) async {
     var permission = await _checkPermmison();
     if (permission) {
-      await _dbHelper.saveAutoDownload(widget.podcastLocal.id, boo: boo);
+      await _dbHelper.saveAutoDownload(widget.podcastLocal!.id, boo: boo);
     }
     if (mounted) setState(() {});
   }
 
   Future<void> _setNeverUpdate(bool boo) async {
-    await _dbHelper.saveNeverUpdate(widget.podcastLocal.id, boo: boo);
+    await _dbHelper.saveNeverUpdate(widget.podcastLocal!.id, boo: boo);
     if (mounted) setState(() {});
   }
 
   Future<void> _setHideNewMark(bool boo) async {
-    await _dbHelper.saveHideNewMark(widget.podcastLocal.id, boo: boo);
+    await _dbHelper.saveHideNewMark(widget.podcastLocal!.id, boo: boo);
     if (mounted) setState(() {});
   }
 
-  Future<void> _saveSkipSecondsStart(int seconds) async {
-    await _dbHelper.saveSkipSecondsStart(widget.podcastLocal.id, seconds);
+  Future<void> _saveSkipSecondsStart(int? seconds) async {
+    await _dbHelper.saveSkipSecondsStart(widget.podcastLocal!.id, seconds);
   }
 
   Future<void> _saveSkipSecondsEnd(int seconds) async {
-    await _dbHelper.saveSkipSecondsEnd(widget.podcastLocal.id, seconds);
+    await _dbHelper.saveSkipSecondsEnd(widget.podcastLocal!.id, seconds);
   }
 
-  Future<bool> _getAutoDownload(String id) async {
+  Future<bool> _getAutoDownload(String? id) async {
     return await _dbHelper.getAutoDownload(id);
   }
 
-  Future<bool> _getNeverUpdate(String id) async {
+  Future<bool> _getNeverUpdate(String? id) async {
     return await _dbHelper.getNeverUpdate(id);
   }
 
-  Future<bool> _getHideNewMark(String id) async {
+  Future<bool> _getHideNewMark(String? id) async {
     return await _dbHelper.getHideNewMark(id);
   }
 
-  Future<int> _getSkipSecondStart(String id) async {
+  Future<int?> _getSkipSecondStart(String? id) async {
     return await _dbHelper.getSkipSecondsStart(id);
   }
 
-  Future<int> _getSkipSecondEnd(String id) async {
+  Future<int?> _getSkipSecondEnd(String id) async {
     return await _dbHelper.getSkipSecondsEnd(id);
   }
 
-  Future<void> _markListened(String podcastId) async {
+  Future<void> _markListened(String? podcastId) async {
     setState(() {
       _markStatus = MarkStatus.start;
     });
@@ -121,15 +121,15 @@ class _PodcastSettingState extends State<PodcastSetting> {
       receiveTimeout: 90000,
     );
     var dir = await getApplicationDocumentsDirectory();
-    var filePath = "${dir.path}/${widget.podcastLocal.id}.png";
+    var filePath = "${dir.path}/${widget.podcastLocal!.id}.png";
     var dio = Dio(options);
-    String imageUrl;
+    String? imageUrl;
 
     try {
-      var response = await dio.get(widget.podcastLocal.rssUrl);
+      var response = await dio.get(widget.podcastLocal!.rssUrl);
       try {
         var p = RssFeed.parse(response.data);
-        imageUrl = p.itunes.image.href ?? p.image.url;
+        imageUrl = p.itunes!.image!.href ?? p.image!.url;
       } catch (e) {
         developer.log(e.toString());
         if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
@@ -145,12 +145,12 @@ class _PodcastSettingState extends State<PodcastSetting> {
             options: Options(
               responseType: ResponseType.bytes,
             ));
-        var image = img.decodeImage(imageResponse.data);
+        var image = img.decodeImage(imageResponse.data!)!;
         thumbnail = img.copyResize(image, width: 300);
         if (thumbnail != null) {
           File(filePath)..writeAsBytesSync(img.encodePng(thumbnail));
           _dbHelper.updatePodcastImage(
-              id: widget.podcastLocal.id, filePath: filePath);
+              id: widget.podcastLocal!.id, filePath: filePath);
           print('saved image');
           if (mounted) {
             setState(() => _coverStatus = RefreshCoverStatus.complete);
@@ -200,19 +200,19 @@ class _PodcastSettingState extends State<PodcastSetting> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     final groupList = context.watch<GroupList>();
-    final textStyle = context.textTheme.bodyText2;
+    final textStyle = context.textTheme.bodyText2!;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         FutureBuilder<bool>(
-            future: _getAutoDownload(widget.podcastLocal.id),
+            future: _getAutoDownload(widget.podcastLocal!.id),
             initialData: false,
             builder: (context, snapshot) {
               return ListTile(
-                onTap: () => _setAutoDownload(!snapshot.data),
+                onTap: () => _setAutoDownload(!snapshot.data!),
                 dense: true,
                 title: Row(
                   children: [
@@ -234,17 +234,17 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 trailing: Transform.scale(
                   scale: 0.8,
                   child:
-                      Switch(value: snapshot.data, onChanged: _setAutoDownload),
+                      Switch(value: snapshot.data!, onChanged: _setAutoDownload),
                 ),
               );
             }),
         FutureBuilder<bool>(
-            future: _getNeverUpdate(widget.podcastLocal.id),
+            future: _getNeverUpdate(widget.podcastLocal!.id),
             initialData: false,
             builder: (context, snapshot) {
               return ListTile(
                 dense: true,
-                onTap: () => _setNeverUpdate(!snapshot.data),
+                onTap: () => _setNeverUpdate(!snapshot.data!),
                 title: Row(
                   children: [
                     Icon(Icons.lock_outlined, size: 18),
@@ -255,17 +255,17 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 trailing: Transform.scale(
                   scale: 0.8,
                   child:
-                      Switch(value: snapshot.data, onChanged: _setNeverUpdate),
+                      Switch(value: snapshot.data!, onChanged: _setNeverUpdate),
                 ),
               );
             }),
         FutureBuilder<bool>(
-            future: _getHideNewMark(widget.podcastLocal.id),
+            future: _getHideNewMark(widget.podcastLocal!.id),
             initialData: false,
             builder: (context, snapshot) {
               return ListTile(
                 dense: true,
-                onTap: () => _setHideNewMark(!snapshot.data),
+                onTap: () => _setHideNewMark(!snapshot.data!),
                 title: Row(
                   children: [
                     Icon(LineIcons.eraser, size: 20),
@@ -276,12 +276,12 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 trailing: Transform.scale(
                   scale: 0.8,
                   child:
-                      Switch(value: snapshot.data, onChanged: _setHideNewMark),
+                      Switch(value: snapshot.data!, onChanged: _setHideNewMark),
                 ),
               );
             }),
-        FutureBuilder<int>(
-          future: _getSkipSecondStart(widget.podcastLocal.id),
+        FutureBuilder<int?>(
+          future: _getSkipSecondStart(widget.podcastLocal!.id),
           initialData: 0,
           builder: (context, snapshot) => ListTile(
             onTap: () {
@@ -303,7 +303,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
             ),
             trailing: Padding(
               padding: const EdgeInsets.only(right: 10.0),
-              child: Text(snapshot.data.toTime),
+              child: Text(snapshot.data!.toTime),
             ),
           ),
         ),
@@ -394,7 +394,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 FlatButton(
                     onPressed: () {
                       if (_markStatus != MarkStatus.start) {
-                        _markListened(widget.podcastLocal.id);
+                        _markListened(widget.podcastLocal!.id);
                       }
                       setState(() {
                         _markConfirm = false;
@@ -442,7 +442,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 FlatButton(
                     splashColor: Colors.red.withAlpha(70),
                     onPressed: () async {
-                      await groupList.removePodcast(widget.podcastLocal);
+                      await groupList.removePodcast(widget.podcastLocal!);
                       Navigator.of(context).pop();
                     },
                     child:
@@ -456,15 +456,15 @@ class _PodcastSettingState extends State<PodcastSetting> {
 }
 
 class _TimePicker extends StatelessWidget {
-  const _TimePicker({this.onConfirm, this.onCancel, this.onChange, Key key})
+  const _TimePicker({this.onConfirm, this.onCancel, this.onChange, Key? key})
       : super(key: key);
-  final VoidCallback onConfirm;
-  final VoidCallback onCancel;
-  final ValueChanged<Duration> onChange;
+  final VoidCallback? onConfirm;
+  final VoidCallback? onCancel;
+  final ValueChanged<Duration>? onChange;
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return Container(
       color: context.primaryColorDark,
       child: Column(

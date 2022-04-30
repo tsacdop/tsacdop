@@ -11,7 +11,7 @@ import '../widgets/custom_widget.dart';
 class SyncingSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -28,7 +28,7 @@ class SyncingSetting extends StatelessWidget {
           backgroundColor: Theme.of(context).primaryColor,
         ),
         body: SingleChildScrollView(
-          child: Selector<SettingState, Tuple2<bool, int>>(
+          child: Selector<SettingState, Tuple2<bool?, int?>>(
             selector: (_, settings) =>
                 Tuple2(settings.autoUpdate, settings.updateInterval),
             builder: (_, data, __) => Column(
@@ -39,12 +39,12 @@ class SyncingSetting extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(70, 20, 70, 10),
                   child: Text(s.settingsSyncing,
-                      style: context.textTheme.bodyText1
+                      style: context.textTheme.bodyText1!
                           .copyWith(color: context.accentColor)),
                 ),
                 ListTile(
                   onTap: () {
-                    if (settings.autoUpdate) {
+                    if (settings.autoUpdate!) {
                       settings.autoUpdate = false;
                       settings.cancelWork();
                     } else {
@@ -59,7 +59,7 @@ class SyncingSetting extends StatelessWidget {
                   trailing: Transform.scale(
                     scale: 0.9,
                     child: Switch(
-                        value: data.item1,
+                        value: data.item1!,
                         onChanged: (boo) async {
                           settings.autoUpdate = boo;
                           if (boo) {
@@ -75,13 +75,13 @@ class SyncingSetting extends StatelessWidget {
                   title: Text(s.settingsUpdateInterval),
                   subtitle: Text(s.settingsUpdateIntervalDes),
                   trailing: MyDropdownButton(
-                      hint: Text(s.hoursCount(data.item2)),
+                      hint: Text(s.hoursCount(data.item2!)),
                       underline: Center(),
                       elevation: 1,
                       displayItemCount: 5,
                       value: data.item2,
-                      onChanged: data.item1
-                          ? (value) async {
+                      onChanged: data.item1!
+                          ? (dynamic value) async {
                               await settings.cancelWork();
                               settings.setWorkManager(value);
                             }

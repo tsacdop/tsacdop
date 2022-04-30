@@ -9,11 +9,11 @@ part of 'search_top_podcast.dart';
 SearchTopPodcast<T> _$SearchTopPodcastFromJson<T>(Map<String, dynamic> json) {
   return SearchTopPodcast<T>(
     podcasts:
-        (json['podcasts'] as List)?.map(_ConvertT<T>().fromJson)?.toList(),
-    id: json['id'] as int,
-    total: json['total'] as int,
-    hasNext: json['has_next'] as bool,
-    page: json['page'] as int,
+        (json['podcasts'] as List?)?.map(_ConvertT<T>().fromJson)?.toList(),
+    id: json['id'] as int?,
+    total: json['total'] as int?,
+    hasNext: json['has_next'] as bool?,
+    page: json['page'] as int?,
   );
 }
 
@@ -29,15 +29,15 @@ Map<String, dynamic> _$SearchTopPodcastToJson<T>(
 
 OnlineTopPodcast _$OnlineTopPodcastFromJson(Map<String, dynamic> json) {
   return OnlineTopPodcast(
-    earliestPubDate: json['earliest_pub_date_ms'] as int,
-    title: json['title'] as String,
-    count: json['total_episodes'] as int,
-    description: json['description'] as String,
-    image: json['image'] as String,
-    latestPubDate: json['latest_pub_date_ms'] as int,
-    rss: json['rss'] as String,
-    publisher: json['publisher'] as String,
-    id: json['id'] as String,
+    earliestPubDate: json['earliest_pub_date_ms'] as int?,
+    title: json['title'] as String?,
+    count: json['total_episodes'] as int?,
+    description: json['description'] as String?,
+    image: json['image'] as String?,
+    latestPubDate: json['latest_pub_date_ms'] as int?,
+    rss: json['rss'] as String?,
+    publisher: json['publisher'] as String?,
+    id: json['id'] as String?,
   );
 }
 

@@ -21,19 +21,19 @@ class MultiSelectMenuBar extends StatefulWidget {
       {this.selectedList,
       this.selectAll,
       this.onSelectAll,
-      this.onClose,
+      required this.onClose,
       this.onSelectAfter,
       this.onSelectBefore,
       this.hideFavorite = false,
-      Key key})
+      Key? key})
       : assert(onClose != null),
         super(key: key);
-  final List<EpisodeBrief> selectedList;
-  final bool selectAll;
-  final ValueChanged<bool> onSelectAll;
+  final List<EpisodeBrief>? selectedList;
+  final bool? selectAll;
+  final ValueChanged<bool>? onSelectAll;
   final ValueChanged<bool> onClose;
-  final ValueChanged<bool> onSelectBefore;
-  final ValueChanged<bool> onSelectAfter;
+  final ValueChanged<bool>? onSelectBefore;
+  final ValueChanged<bool>? onSelectAfter;
   final bool hideFavorite;
 
   @override
@@ -42,11 +42,11 @@ class MultiSelectMenuBar extends StatefulWidget {
 
 ///Multi select menu bar.
 class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
-  bool _liked;
-  bool _marked;
-  bool _inPlaylist;
-  bool _downloaded;
-  bool _showPlaylists;
+  late bool _liked;
+  late bool _marked;
+  late bool _inPlaylist;
+  late bool _downloaded;
+  late bool _showPlaylists;
   final _dbHelper = DBHelper();
 
   @override
@@ -74,7 +74,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
   }
 
   Future<void> _saveLiked() async {
-    for (var episode in widget.selectedList) {
+    for (var episode in widget.selectedList!) {
       await _dbHelper.setLiked(episode.enclosureUrl);
     }
     if (mounted) {
@@ -84,7 +84,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
   }
 
   Future<void> _setUnliked() async {
-    for (var episode in widget.selectedList) {
+    for (var episode in widget.selectedList!) {
       await _dbHelper.setUniked(episode.enclosureUrl);
     }
     if (mounted) {
@@ -94,7 +94,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
   }
 
   Future<void> _markListened() async {
-    for (var episode in widget.selectedList) {
+    for (var episode in widget.selectedList!) {
       final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
       await _dbHelper.saveHistory(history);
     }
@@ -105,7 +105,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
   }
 
   Future<void> _markNotListened() async {
-    for (var episode in widget.selectedList) {
+    for (var episode in widget.selectedList!) {
       await _dbHelper.markNotListened(episode.enclosureUrl);
     }
     if (mounted) {
@@ -126,7 +126,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
         dataConfirm = await _useDataConfirm();
       }
       if (dataConfirm) {
-        for (var episode in widget.selectedList) {
+        for (var episode in widget.selectedList!) {
           Provider.of<DownloadState>(context, listen: false).startTask(episode);
         }
         if (mounted) {
@@ -140,7 +140,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
 
   Future<bool> _useDataConfirm() async {
     var ifUseData = false;
-    final s = context.s;
+    final s = context.s!;
     await generalDialog(
       context,
       title: Text(s.cellularConfirm),
@@ -184,12 +184,12 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
     }
   }
 
-  Future<EpisodeBrief> _getEpisode(String url) async {
+  Future<EpisodeBrief?> _getEpisode(String url) async {
     var dbHelper = DBHelper();
     return await dbHelper.getRssItemWithUrl(url);
   }
 
-  Widget _buttonOnMenu({Widget child, VoidCallback onTap}) => Material(
+  Widget _buttonOnMenu({Widget? child, VoidCallback? onTap}) => Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
@@ -257,7 +257,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                             context
                                 .read<AudioPlayerNotifier>()
                                 .addEpisodesToPlaylist(p,
-                                    episodes: widget.selectedList);
+                                    episodes: widget.selectedList!);
                             setState(() {
                               _showPlaylists = false;
                             });
@@ -272,7 +272,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                                   color: context.primaryColorDark,
                                   child: p.episodeList.isEmpty
                                       ? Center()
-                                      : FutureBuilder<EpisodeBrief>(
+                                      : FutureBuilder<EpisodeBrief?>(
                                           future:
                                               _getEpisode(p.episodeList.first),
                                           builder: (_, snapshot) {
@@ -282,13 +282,13 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                                                   width: 30,
                                                   child: Image(
                                                       image: snapshot
-                                                          .data.avatarImage));
+                                                          .data!.avatarImage));
                                             }
                                             return Center();
                                           }),
                                 ),
                                 SizedBox(width: 10),
-                                Text(p.name),
+                                Text(p.name!),
                               ],
                             ),
                           ),
@@ -308,7 +308,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
     return TweenAnimationBuilder(
       tween: Tween<double>(begin: 0, end: 1),
       duration: Duration(milliseconds: 500),
-      builder: (context, value, child) => Container(
+      builder: (context, dynamic value, child) => Container(
         height: widget.selectAll == null
             ? _showPlaylists
                 ? 90
@@ -331,13 +331,13 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                         child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20.0),
                             child: Text(
-                                '${widget.selectedList.length} selected',
-                                style: context.textTheme.headline6
+                                '${widget.selectedList!.length} selected',
+                                style: context.textTheme.headline6!
                                     .copyWith(color: context.accentColor))),
                       ),
                     ),
                     Spacer(),
-                    if (widget.selectedList.length == 1)
+                    if (widget.selectedList!.length == 1)
                       SizedBox(
                         height: 25,
                         child: Padding(
@@ -350,12 +350,12 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(100)))),
                               onPressed: () {
-                                widget.onSelectBefore(true);
+                                widget.onSelectBefore!(true);
                               },
                               child: Text('Before')),
                         ),
                       ),
-                    if (widget.selectedList.length == 1)
+                    if (widget.selectedList!.length == 1)
                       SizedBox(
                         height: 25,
                         child: Padding(
@@ -368,7 +368,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(100)))),
                               onPressed: () {
-                                widget.onSelectAfter(true);
+                                widget.onSelectAfter!(true);
                               },
                               child: Text('After')),
                         ),
@@ -380,17 +380,17 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                         child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                                 side: BorderSide(color: context.accentColor),
-                                backgroundColor: widget.selectAll
+                                backgroundColor: widget.selectAll!
                                     ? context.accentColor
                                     : null,
-                                primary: widget.selectAll
+                                primary: widget.selectAll!
                                     ? Colors.white
                                     : context.textColor,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(100)))),
                             onPressed: () {
-                              widget.onSelectAll(!widget.selectAll);
+                              widget.onSelectAll!(!widget.selectAll!);
                             },
                             child: Text('All')),
                       ),
@@ -409,17 +409,17 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                                 color: Colors.grey[700],
                               ),
                         onTap: () async {
-                          if (widget.selectedList.isNotEmpty) {
+                          if (widget.selectedList!.isNotEmpty) {
                             if (!_liked) {
                               await _saveLiked();
                               Fluttertoast.showToast(
-                                msg: s.liked,
+                                msg: s!.liked,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             } else {
                               await _setUnliked();
                               Fluttertoast.showToast(
-                                msg: s.unliked,
+                                msg: s!.unliked,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             }
@@ -460,7 +460,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                             ),
                           ),
                     onTap: () {
-                      if (widget.selectedList.isNotEmpty) {
+                      if (widget.selectedList!.isNotEmpty) {
                         if (!_downloaded) _requestDownload();
                       }
                     },
@@ -474,21 +474,21 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                               color: Colors.grey[700],
                             ),
                       onTap: () async {
-                        if (widget.selectedList.isNotEmpty) {
+                        if (widget.selectedList!.isNotEmpty) {
                           if (!_inPlaylist) {
-                            for (var episode in widget.selectedList) {
+                            for (var episode in widget.selectedList!) {
                               audio.addToPlaylist(episode);
                               Fluttertoast.showToast(
-                                msg: s.toastAddPlaylist,
+                                msg: s!.toastAddPlaylist,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             }
                             setState(() => _inPlaylist = true);
                           } else {
-                            for (var episode in widget.selectedList) {
+                            for (var episode in widget.selectedList!) {
                               audio.delFromPlaylist(episode);
                               Fluttertoast.showToast(
-                                msg: s.toastRemovePlaylist,
+                                msg: s!.toastRemovePlaylist,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             }
@@ -507,17 +507,17 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                         ),
                       ),
                       onTap: () async {
-                        if (widget.selectedList.isNotEmpty) {
+                        if (widget.selectedList!.isNotEmpty) {
                           if (!_marked) {
                             await _markListened();
                             Fluttertoast.showToast(
-                              msg: s.markListened,
+                              msg: s!.markListened,
                               gravity: ToastGravity.BOTTOM,
                             );
                           } else {
                             await _markNotListened();
                             Fluttertoast.showToast(
-                              msg: s.markNotListened,
+                              msg: s!.markNotListened,
                               gravity: ToastGravity.BOTTOM,
                             );
                           }
@@ -529,7 +529,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                         color: Colors.grey[700],
                       ),
                       onTap: () {
-                        if (widget.selectedList.isNotEmpty) {
+                        if (widget.selectedList!.isNotEmpty) {
                           setState(() {
                             _showPlaylists = !_showPlaylists;
                           });
@@ -543,8 +543,8 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                         child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 10.0),
                             child: Text(
-                                '${widget.selectedList.length} selected',
-                                style: context.textTheme.headline6
+                                '${widget.selectedList!.length} selected',
+                                style: context.textTheme.headline6!
                                     .copyWith(color: context.accentColor))),
                       ),
                     ),
@@ -562,20 +562,20 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
 }
 
 class _NewPlaylist extends StatefulWidget {
-  final List<EpisodeBrief> episodes;
-  _NewPlaylist(this.episodes, {Key key}) : super(key: key);
+  final List<EpisodeBrief>? episodes;
+  _NewPlaylist(this.episodes, {Key? key}) : super(key: key);
 
   @override
   __NewPlaylistState createState() => __NewPlaylistState();
 }
 
 class __NewPlaylistState extends State<_NewPlaylist> {
-  String _playlistName;
-  int _error;
+  String? _playlistName;
+  int? _error;
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,
@@ -608,7 +608,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                 setState(() => _error = 1);
               } else {
                 final episodesList =
-                    widget.episodes.map((e) => e.enclosureUrl).toList();
+                    widget.episodes!.map((e) => e.enclosureUrl).toList();
                 final playlist = Playlist(_playlistName,
                     episodeList: episodesList, episodes: widget.episodes);
                 context.read<AudioPlayerNotifier>().addPlaylist(playlist);

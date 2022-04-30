@@ -25,10 +25,10 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  bool _showTitle;
-  ScrollController _controller;
+  late bool _showTitle;
+  ScrollController? _controller;
   _scrollListener() {
-    if (_controller.offset > context.textTheme.headline5.fontSize) {
+    if (_controller!.offset > context.textTheme.headline5!.fontSize!) {
       if (!_showTitle) setState(() => _showTitle = true);
     } else if (_showTitle) setState(() => _showTitle = false);
   }
@@ -38,12 +38,12 @@ class _SettingsState extends State<Settings> {
     super.initState();
     _showTitle = false;
     _controller = ScrollController();
-    _controller.addListener(_scrollListener);
+    _controller!.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -68,7 +68,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -100,7 +100,7 @@ class _SettingsState extends State<Settings> {
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text(s.settingsPrefrence,
-                      style: context.textTheme.bodyText1
+                      style: context.textTheme.bodyText1!
                           .copyWith(color: context.accentColor)),
                 ),
                 ListTile(
@@ -197,7 +197,7 @@ class _SettingsState extends State<Settings> {
                   child: Text(s.settingsInfo,
                       style: Theme.of(context)
                           .textTheme
-                          .bodyText1
+                          .bodyText1!
                           .copyWith(color: Theme.of(context).accentColor)),
                 ),
                 ListTile(

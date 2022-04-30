@@ -1,9 +1,7 @@
 import 'dart:developer' as developer;
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -19,7 +17,7 @@ import '../type/settings_backup.dart';
 import 'download_state.dart';
 
 void callbackDispatcher() {
-  Workmanager.executeTask((task, inputData) async {
+  Workmanager().executeTask((task, inputData) async {
     var dbHelper = DBHelper();
     var podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
     //lastWork is a indicator for if the app was opened since last backgroundwork
@@ -122,7 +120,7 @@ class SettingState extends ChangeNotifier {
     _getUpdateInterval().then((value) async {
       if (_initUpdateTag == 0) {
         setWorkManager(24);
-      } else if (_autoUpdate && _initialShowIntor < 3) {
+      } else if (_autoUpdate! && _initialShowIntor! < 3) {
         await cancelWork();
         setWorkManager(_initUpdateTag);
         await saveShowIntro(3);
@@ -130,14 +128,14 @@ class SettingState extends ChangeNotifier {
     });
   }
 
-  Locale _locale;
+  Locale? _locale;
 
   /// Load locale.
-  Locale get locale => _locale;
+  Locale? get locale => _locale;
 
   /// Spp thememode. default auto.
-  ThemeMode _theme;
-  ThemeMode get theme => _theme;
+  ThemeMode? _theme;
+  ThemeMode? get theme => _theme;
 
   ThemeData get lightTheme => ThemeData(
         colorScheme: ColorScheme.fromSwatch()
@@ -167,8 +165,8 @@ class SettingState extends ChangeNotifier {
         toggleableActiveColor: _accentSetColor,
         buttonTheme: ButtonThemeData(
           height: 32,
-          hoverColor: _accentSetColor.withAlpha(70),
-          splashColor: _accentSetColor.withAlpha(70),
+          hoverColor: _accentSetColor!.withAlpha(70),
+          splashColor: _accentSetColor!.withAlpha(70),
         ),
       );
 
@@ -176,33 +174,33 @@ class SettingState extends ChangeNotifier {
         colorScheme: ColorScheme.fromSwatch()
             .copyWith(brightness: Brightness.dark, secondary: _accentSetColor),
         primaryColorDark: Colors.grey[800],
-        scaffoldBackgroundColor: _realDark ? Colors.black87 : Color(0XFF212121),
-        primaryColor: _realDark ? Colors.black : Color(0XFF1B1B1B),
+        scaffoldBackgroundColor: _realDark! ? Colors.black87 : Color(0XFF212121),
+        primaryColor: _realDark! ? Colors.black : Color(0XFF1B1B1B),
         popupMenuTheme: PopupMenuThemeData()
-            .copyWith(color: _realDark ? Colors.grey[900] : null),
+            .copyWith(color: _realDark! ? Colors.grey[900] : null),
         appBarTheme: AppBarTheme(
             elevation: 0, systemOverlayStyle: SystemUiOverlayStyle.light),
         buttonTheme: ButtonThemeData(height: 32),
-        dialogBackgroundColor: _realDark ? Colors.grey[900] : null,
+        dialogBackgroundColor: _realDark! ? Colors.grey[900] : null,
       );
 
-  set setTheme(ThemeMode mode) {
+  set setTheme(ThemeMode? mode) {
     _theme = mode;
     _saveTheme();
     notifyListeners();
   }
 
-  void setWorkManager(int hour) {
+  void setWorkManager(int? hour) {
     _updateInterval = hour;
     notifyListeners();
     _saveUpdateInterval();
-    Workmanager.initialize(
+    Workmanager().initialize(
       callbackDispatcher,
       isInDebugMode: false,
     );
     if (Platform.isAndroid) {
-      Workmanager.registerPeriodicTask("1", "update_podcasts",
-          frequency: Duration(hours: hour),
+      Workmanager().registerPeriodicTask("1", "update_podcasts",
+          frequency: Duration(hours: hour!),
           initialDelay: Duration(seconds: 10),
           constraints: Constraints(
             networkType: NetworkType.connected,
@@ -212,12 +210,12 @@ class SettingState extends ChangeNotifier {
   }
 
   Future cancelWork() async {
-    await Workmanager.cancelByUniqueName('1');
+    await Workmanager().cancelByUniqueName('1');
     developer.log('work job cancelled');
   }
 
-  Color _accentSetColor;
-  Color get accentSetColor => _accentSetColor;
+  Color? _accentSetColor;
+  Color? get accentSetColor => _accentSetColor;
 
   set setAccentColor(Color color) {
     _accentSetColor = color;
@@ -225,36 +223,36 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
-  int _updateInterval;
-  int get updateInterval => _updateInterval;
+  int? _updateInterval;
+  int? get updateInterval => _updateInterval;
 
-  int _initUpdateTag;
+  int? _initUpdateTag;
 
   /// Auto syncing podcasts in background, default true.
-  bool _autoUpdate;
-  bool get autoUpdate => _autoUpdate;
-  set autoUpdate(bool boo) {
+  bool? _autoUpdate;
+  bool? get autoUpdate => _autoUpdate;
+  set autoUpdate(bool? boo) {
     _autoUpdate = boo;
     _saveAutoUpdate();
     notifyListeners();
   }
 
   /// Confirem before using data to download episode, default true(reverse).
-  bool _downloadUsingData;
-  bool get downloadUsingData => _downloadUsingData;
-  set downloadUsingData(bool boo) {
+  bool? _downloadUsingData;
+  bool? get downloadUsingData => _downloadUsingData;
+  set downloadUsingData(bool? boo) {
     _downloadUsingData = boo;
     _saveDownloadUsingData();
     notifyListeners();
   }
 
-  int _initialShowIntor;
-  bool _showIntro;
-  bool get showIntro => _showIntro;
+  int? _initialShowIntor;
+  bool? _showIntro;
+  bool? get showIntro => _showIntro;
 
   /// Real dark theme, default false.
-  bool _realDark;
-  bool get realDark => _realDark;
+  bool? _realDark;
+  bool? get realDark => _realDark;
   set setRealDark(bool boo) {
     _realDark = boo;
     _setRealDark();
@@ -262,33 +260,33 @@ class SettingState extends ChangeNotifier {
   }
 
   /// Open playlist page default
-  bool _openPlaylistDefault;
-  bool get openPlaylistDefault => _openPlaylistDefault;
-  set openPlaylistDefault(bool boo) {
+  bool? _openPlaylistDefault;
+  bool? get openPlaylistDefault => _openPlaylistDefault;
+  set openPlaylistDefault(bool? boo) {
     _openPlaylistDefault = boo;
     _setOpenPlaylistDefault();
     notifyListeners();
   }
 
   /// Open all podcasts page default
-  bool _openAllPodcastDefault;
-  bool get openAllPodcastDefalt => _openAllPodcastDefault;
+  bool? _openAllPodcastDefault;
+  bool? get openAllPodcastDefalt => _openAllPodcastDefault;
   set openAllPodcastDefault(boo) {
     _openAllPodcastDefault = boo;
     _setOpenAllPodcastDefault();
     notifyListeners();
   }
 
-  int _defaultSleepTimer;
-  int get defaultSleepTimer => _defaultSleepTimer;
+  int? _defaultSleepTimer;
+  int? get defaultSleepTimer => _defaultSleepTimer;
   set setDefaultSleepTimer(int i) {
     _defaultSleepTimer = i;
     _setDefaultSleepTimer();
     notifyListeners();
   }
 
-  bool _autoPlay;
-  bool get autoPlay => _autoPlay;
+  bool? _autoPlay;
+  bool? get autoPlay => _autoPlay;
   set setAutoPlay(bool boo) {
     _autoPlay = boo;
     notifyListeners();
@@ -296,57 +294,57 @@ class SettingState extends ChangeNotifier {
   }
 
   /// Auto start sleep timer at night. Defualt false.
-  bool _autoSleepTimer;
-  bool get autoSleepTimer => _autoSleepTimer;
+  bool? _autoSleepTimer;
+  bool? get autoSleepTimer => _autoSleepTimer;
   set setAutoSleepTimer(bool boo) {
     _autoSleepTimer = boo;
     notifyListeners();
     _saveAutoSleepTimer();
   }
 
-  int _autoSleepTimerMode;
-  int get autoSleepTimerMode => _autoSleepTimerMode;
+  int? _autoSleepTimerMode;
+  int? get autoSleepTimerMode => _autoSleepTimerMode;
   set setAutoSleepTimerMode(int mode) {
     _autoSleepTimerMode = mode;
     notifyListeners();
     _saveAutoSleepTimerMode();
   }
 
-  int _autoSleepTimerStart;
-  int get autoSleepTimerStart => _autoSleepTimerStart;
+  int? _autoSleepTimerStart;
+  int? get autoSleepTimerStart => _autoSleepTimerStart;
   set setAutoSleepTimerStart(int start) {
     _autoSleepTimerStart = start;
     notifyListeners();
     _saveAutoSleepTimerStart();
   }
 
-  int _autoSleepTimerEnd;
-  int get autoSleepTimerEnd => _autoSleepTimerEnd;
+  int? _autoSleepTimerEnd;
+  int? get autoSleepTimerEnd => _autoSleepTimerEnd;
   set setAutoSleepTimerEnd(int end) {
     _autoSleepTimerEnd = end;
     notifyListeners();
     _saveAutoSleepTimerEnd();
   }
 
-  int _fastForwardSeconds;
-  int get fastForwardSeconds => _fastForwardSeconds;
+  int? _fastForwardSeconds;
+  int? get fastForwardSeconds => _fastForwardSeconds;
   set setFastForwardSeconds(int sec) {
     _fastForwardSeconds = sec;
     notifyListeners();
     _saveFastForwardSeconds();
   }
 
-  int _rewindSeconds;
-  int get rewindSeconds => _rewindSeconds;
+  int? _rewindSeconds;
+  int? get rewindSeconds => _rewindSeconds;
   set setRewindSeconds(int sec) {
     _rewindSeconds = sec;
     notifyListeners();
     _saveRewindSeconds();
   }
 
-  int _showNotesFontIndex;
-  int get showNotesFontIndex => _showNotesFontIndex;
-  TextStyle get showNoteFontStyle => showNotesFontStyles[_showNotesFontIndex];
+  int? _showNotesFontIndex;
+  int? get showNotesFontIndex => _showNotesFontIndex;
+  TextStyle get showNoteFontStyle => showNotesFontStyles[_showNotesFontIndex!];
   set setShowNoteFontStyle(int index) {
     _showNotesFontIndex = index;
     notifyListeners();
@@ -355,7 +353,7 @@ class SettingState extends ChangeNotifier {
 
   Future _getTheme() async {
     var mode = await _themeStorage.getInt();
-    _theme = ThemeMode.values[mode];
+    _theme = ThemeMode.values[mode!];
   }
 
   Future _getAccentSetColor() async {
@@ -441,9 +439,9 @@ class SettingState extends ChangeNotifier {
       }
       _locale = Locale(systemLanCode);
     } else {
-      _locale = Locale(localeString.first, localeString[1]);
+      _locale = Locale(localeString.first!, localeString[1]);
     }
-    await S.load(_locale);
+    await S.load(_locale!);
   }
 
   Future<void> _getShowNotesFonts() async {
@@ -472,11 +470,11 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<void> _saveUpdateInterval() async {
-    await _intervalStorage.saveInt(_updateInterval);
+    await _intervalStorage.saveInt(_updateInterval!);
   }
 
   Future<void> _saveTheme() async {
-    await _themeStorage.saveInt(_theme.index);
+    await _themeStorage.saveInt(_theme!.index);
   }
 
   Future<void> _saveAutoUpdate() async {
@@ -488,7 +486,7 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<void> _setDefaultSleepTimer() async {
-    await _defaultSleepTimerStorage.saveInt(_defaultSleepTimer);
+    await _defaultSleepTimerStorage.saveInt(_defaultSleepTimer!);
   }
 
   Future<void> _saveAutoSleepTimer() async {
@@ -496,27 +494,27 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<void> _saveAutoSleepTimerMode() async {
-    await _autoSleepTimerModeStorage.saveInt(_autoSleepTimerMode);
+    await _autoSleepTimerModeStorage.saveInt(_autoSleepTimerMode!);
   }
 
   Future<void> _saveAutoSleepTimerStart() async {
-    await _autoSleepTimerStartStorage.saveInt(_autoSleepTimerStart);
+    await _autoSleepTimerStartStorage.saveInt(_autoSleepTimerStart!);
   }
 
   Future<void> _saveAutoSleepTimerEnd() async {
-    await _autoSleepTimerEndStorage.saveInt(_autoSleepTimerEnd);
+    await _autoSleepTimerEndStorage.saveInt(_autoSleepTimerEnd!);
   }
 
   Future<void> _saveFastForwardSeconds() async {
-    await _fastForwardSecondsStorage.saveInt(_fastForwardSeconds);
+    await _fastForwardSecondsStorage.saveInt(_fastForwardSeconds!);
   }
 
   Future<void> _saveRewindSeconds() async {
-    await _rewindSecondsStorage.saveInt(_rewindSeconds);
+    await _rewindSecondsStorage.saveInt(_rewindSeconds!);
   }
 
   Future<void> _saveShowNotesFonts() async {
-    await _showNotesFontStorage.saveInt(_showNotesFontIndex);
+    await _showNotesFontStorage.saveInt(_showNotesFontIndex!);
   }
 
   Future<SettingsBackup> backup() async {
@@ -611,38 +609,38 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<void> restore(SettingsBackup backup) async {
-    await _themeStorage.saveInt(backup.theme);
-    await _accentStorage.saveString(backup.accentColor);
+    await _themeStorage.saveInt(backup.theme!);
+    await _accentStorage.saveString(backup.accentColor!);
     await _realDarkStorage.saveBool(backup.realDark);
     await _autoPlayStorage.saveBool(backup.autoPlay, reverse: true);
     await _autoupdateStorage.saveBool(backup.autoUpdate, reverse: true);
-    await _intervalStorage.saveInt(backup.updateInterval);
+    await _intervalStorage.saveInt(backup.updateInterval!);
     await _downloadUsingDataStorage.saveBool(backup.downloadUsingData,
         reverse: true);
-    await _cacheStorage.saveInt(backup.cacheMax);
-    await _podcastLayoutStorage.saveInt(backup.podcastLayout);
-    await _recentLayoutStorage.saveInt(backup.recentLayout);
-    await _favLayoutStorage.saveInt(backup.favLayout);
-    await _downloadLayoutStorage.saveInt(backup.downloadLayout);
+    await _cacheStorage.saveInt(backup.cacheMax!);
+    await _podcastLayoutStorage.saveInt(backup.podcastLayout!);
+    await _recentLayoutStorage.saveInt(backup.recentLayout!);
+    await _favLayoutStorage.saveInt(backup.favLayout!);
+    await _downloadLayoutStorage.saveInt(backup.downloadLayout!);
     await _autoDownloadStorage.saveBool(backup.autoDownloadNetwork);
     await KeyValueStorage(episodePopupMenuKey)
-        .saveStringList(backup.episodePopupMenu);
-    await _autoDeleteStorage.saveInt(backup.autoDelete);
+        .saveStringList(backup.episodePopupMenu!);
+    await _autoDeleteStorage.saveInt(backup.autoDelete!);
     await _autoSleepTimerStorage.saveBool(backup.autoSleepTimer);
-    await _autoSleepTimerStartStorage.saveInt(backup.autoSleepTimerStart);
-    await _autoSleepTimerEndStorage.saveInt(backup.autoSleepTimerEnd);
-    await _autoSleepTimerModeStorage.saveInt(backup.autoSleepTimerMode);
-    await _defaultSleepTimerStorage.saveInt(backup.defaultSleepTime);
-    await _fastForwardSecondsStorage.saveInt(backup.fastForwardSeconds);
-    await _rewindSecondsStorage.saveInt(backup.rewindSeconds);
-    await KeyValueStorage(playerHeightKey).saveInt(backup.playerHeight);
+    await _autoSleepTimerStartStorage.saveInt(backup.autoSleepTimerStart!);
+    await _autoSleepTimerEndStorage.saveInt(backup.autoSleepTimerEnd!);
+    await _autoSleepTimerModeStorage.saveInt(backup.autoSleepTimerMode!);
+    await _defaultSleepTimerStorage.saveInt(backup.defaultSleepTime!);
+    await _fastForwardSecondsStorage.saveInt(backup.fastForwardSeconds!);
+    await _rewindSecondsStorage.saveInt(backup.rewindSeconds!);
+    await KeyValueStorage(playerHeightKey).saveInt(backup.playerHeight!);
     await KeyValueStorage(tapToOpenPopupMenuKey)
         .saveBool(backup.tapToOpenPopupMenu);
     await KeyValueStorage(hideListenedKey).saveBool(backup.hideListened);
     await KeyValueStorage(notificationLayoutKey)
-        .saveInt(backup.notificationLayout);
-    await _showNotesFontStorage.saveInt(backup.showNotesFont);
-    await KeyValueStorage(speedListKey).saveStringList(backup.speedList);
+        .saveInt(backup.notificationLayout!);
+    await _showNotesFontStorage.saveInt(backup.showNotesFont!);
+    await KeyValueStorage(speedListKey).saveStringList(backup.speedList!);
     await KeyValueStorage(markListenedAfterSkipKey)
         .saveBool(backup.markListenedAfterSkip);
     await KeyValueStorage(deleteAfterPlayedKey)
@@ -654,7 +652,7 @@ class SettingState extends ChangeNotifier {
       await _localeStorage.saveStringList([]);
       await S.load(Locale(Intl.systemLocale));
     } else {
-      var localeList = backup.locale.split('-');
+      var localeList = backup.locale!.split('-');
       var backupLocale;
       if (localeList[1] == 'null') {
         backupLocale = Locale(localeList.first);
@@ -671,7 +669,7 @@ class SettingState extends ChangeNotifier {
     await _getSleepTimerData();
     await _getShowNotesFonts();
     await _getUpdateInterval().then((value) async {
-      if (_autoUpdate) {
+      if (_autoUpdate!) {
         await cancelWork();
         setWorkManager(_initUpdateTag);
         await saveShowIntro(3);

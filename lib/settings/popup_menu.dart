@@ -8,7 +8,7 @@ import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
 
 class PopupMenuSetting extends StatefulWidget {
-  const PopupMenuSetting({Key key}) : super(key: key);
+  const PopupMenuSetting({Key? key}) : super(key: key);
 
   @override
   _PopupMenuSettingState createState() => _PopupMenuSettingState();
@@ -42,8 +42,8 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
   Widget _popupMenuItem(
     List<int> menu,
     int e, {
-    Widget icon,
-    String text,
+    Widget? icon,
+    required String text,
     String description = '',
   }) {
     return Padding(
@@ -74,7 +74,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
               onChanged: e == 0
                   ? null
                   : (boo) {
-                      if (boo && e >= 10) {
+                      if (boo! && e >= 10) {
                         var index = menu.indexOf(e);
                         menu.remove(e);
                         menu.insert(index, e - 10);
@@ -122,7 +122,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                   future: _getEpisodeMenu(),
                   initialData: [0, 1, 12, 13, 14, 15],
                   builder: (context, snapshot) {
-                    var menu = snapshot.data;
+                    var menu = snapshot.data!;
                     return Expanded(
                       child: ListView(
                         shrinkWrap: true,
@@ -134,10 +134,10 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                             height: 30.0,
                             padding: EdgeInsets.symmetric(horizontal: 80),
                             alignment: Alignment.centerLeft,
-                            child: Text(s.settingsPopupMenu,
+                            child: Text(s!.settingsPopupMenu,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .bodyText1
+                                    .bodyText1!
                                     .copyWith(
                                         color: Theme.of(context).accentColor)),
                           ),
@@ -148,13 +148,13 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                               contentPadding: EdgeInsets.only(
                                   left: 80, top: 10, bottom: 10, right: 30),
                               onTap: () =>
-                                  _saveTapToOpenPopupMenu(!snapshot.data),
+                                  _saveTapToOpenPopupMenu(!snapshot.data!),
                               title: Text(s.settingsTapToOpenPopupMenu),
                               subtitle: Text(s.settingsTapToOpenPopupMenuDes),
                               trailing: Transform.scale(
                                 scale: 0.9,
                                 child: Switch(
-                                    value: snapshot.data,
+                                    value: snapshot.data!,
                                     onChanged: _saveTapToOpenPopupMenu),
                               ),
                             ),

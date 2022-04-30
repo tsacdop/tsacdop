@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import '../util/extension_helper.dart';
 
 class SettingsSheet extends StatefulWidget {
-  SettingsSheet({this.height, Key key}) : super(key: key);
-  final double height;
+  SettingsSheet({this.height, Key? key}) : super(key: key);
+  final double? height;
   @override
   _SettingsSheetState createState() => _SettingsSheetState();
 }
 
 class _SettingsSheetState extends State<SettingsSheet>
     with TickerProviderStateMixin {
-  Animation _animation;
-  AnimationController _controller;
-  AnimationController _slowController;
-  double _initSize;
-  double _startdy;
+  late Animation _animation;
+  late AnimationController _controller;
+  late AnimationController _slowController;
+  double? _initSize;
+  late double _startdy;
   double _move = 0;
 
   @override
@@ -68,7 +68,7 @@ class _SettingsSheetState extends State<SettingsSheet>
             onVerticalDragUpdate: _update,
             onVerticalDragEnd: (event) => _end(),
             child: Container(
-              height: math.min(_animation.value, widget.height),
+              height: math.min(_animation.value, widget.height!),
               color: Colors.white,
             ),
           )
@@ -98,7 +98,7 @@ class _SettingsSheetState extends State<SettingsSheet>
   _update(DragUpdateDetails event) {
     setState(() {
       _move = _startdy - event.localPosition.dy;
-      _animation = Tween<double>(begin: _initSize, end: _initSize + _move)
+      _animation = Tween<double>(begin: _initSize, end: _initSize! + _move)
           .animate(_controller);
     });
     _controller.forward();

@@ -60,7 +60,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
     return await dbHelper.getSubHistory();
   }
 
-  TabController _controller;
+  TabController? _controller;
   List<int> list = const [0, 1, 2, 3, 4, 5, 6];
 
   Future<List<FlSpot>> getData() async {
@@ -76,7 +76,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
 
   Future recoverSub(BuildContext context, String url) async {
     Fluttertoast.showToast(
-      msg: context.s.toastPodcastRecovering,
+      msg: context.s!.toastPodcastRecovering,
       gravity: ToastGravity.BOTTOM,
     );
     var subscribeWorker = context.watch<GroupList>();
@@ -92,14 +92,14 @@ class _PlayedHistoryState extends State<PlayedHistory>
           title: p.title,
           publisher: p.author,
           description: p.description,
-          image: p.itunes.image.href);
+          image: p.itunes!.image!.href);
       var item = SubscribeItem(podcast.rss, podcast.title,
           imgUrl: podcast.image, group: 'Home');
       subscribeWorker.setSubscribeItem(item);
     } catch (e) {
       developer.log(e.toString(), name: 'Recover podcast error');
       Fluttertoast.showToast(
-        msg: context.s.toastRecoverFailed,
+        msg: context.s!.toastRecoverFailed,
         gravity: ToastGravity.BOTTOM,
       );
     }
@@ -113,7 +113,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -147,7 +147,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                       return FlexibleSpaceBar(
                         title: top < 70 + MediaQuery.of(context).padding.top
                             ? Text(
-                                s.settingsHistory,
+                                s!.settingsHistory,
                               )
                             : Center(),
                         background: Padding(
@@ -174,7 +174,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                         labelStyle: context.textTheme.headline6,
                         tabs: <Widget>[
                           Tab(
-                            child: Text(s.listen),
+                            child: Text(s!.listen),
                           ),
                           Tab(
                             child: Text(s.subscribe),
@@ -196,7 +196,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                           onNotification: (scrollInfo) {
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data.length == _top) {
+                                snapshot.data!.length == _top) {
                               if (!_loadMore) {
                                 _loadMoreData();
                               }
@@ -205,9 +205,9 @@ class _PlayedHistoryState extends State<PlayedHistory>
                           },
                           child: ListView.builder(
                               scrollDirection: Axis.vertical,
-                              itemCount: snapshot.data.length + 1,
+                              itemCount: snapshot.data!.length + 1,
                               itemBuilder: (context, index) {
-                                if (index == snapshot.data.length) {
+                                if (index == snapshot.data!.length) {
                                   return SizedBox(
                                       height: 2,
                                       child: _loadMore
@@ -215,8 +215,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                           : Center());
                                 } else {
                                   var seekValue =
-                                      snapshot.data[index].seekValue;
-                                  var seconds = snapshot.data[index].seconds;
+                                      snapshot.data![index].seekValue!;
+                                  var seconds = snapshot.data![index].seconds;
                                   return Container(
                                     padding:
                                         const EdgeInsets.symmetric(vertical: 5),
@@ -234,16 +234,16 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                 DateFormat.yMd()
                                                     .add_jm()
                                                     .format(snapshot
-                                                        .data[index].playdate),
+                                                        .data![index].playdate!),
                                                 style: TextStyle(
-                                                    color: context.textColor
+                                                    color: context.textColor!
                                                         .withOpacity(0.8),
                                                     fontSize: 15,
                                                     fontStyle:
                                                         FontStyle.italic),
                                               ),
                                               Text(
-                                                snapshot.data[index].title,
+                                                snapshot.data![index].title!,
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -261,7 +261,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                     border: Border(
                                                         bottom: BorderSide(
                                                             color: Colors
-                                                                .grey[400],
+                                                                .grey[400]!,
                                                             width: 2.0))),
                                                 width: width * seekValue <
                                                         (width - 120)
@@ -284,8 +284,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                 padding: EdgeInsets.all(2),
                                                 child: Text(
                                                   seconds == 0 && seekValue == 1
-                                                      ? s.mark
-                                                      : seconds.toInt().toTime,
+                                                      ? s!.mark
+                                                      : seconds!.toInt().toTime,
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),
@@ -314,9 +314,9 @@ class _PlayedHistoryState extends State<PlayedHistory>
                       ? ListView.builder(
                           // shrinkWrap: true,
                           scrollDirection: Axis.vertical,
-                          itemCount: snapshot.data.length,
+                          itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
-                            var _status = snapshot.data[index].status;
+                            var _status = snapshot.data![index].status;
                             return Container(
                               color: context.scaffoldBackgroundColor,
                               child: Column(
@@ -331,26 +331,26 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                       children: <Widget>[
                                         Text(
                                           DateFormat.yMd().add_jm().format(
-                                              snapshot.data[index].subDate),
+                                              snapshot.data![index].subDate),
                                           style: TextStyle(
-                                              color: context.textColor
+                                              color: context.textColor!
                                                   .withOpacity(0.8),
                                               fontSize: 15,
                                               fontStyle: FontStyle.italic),
                                         ),
-                                        Text(snapshot.data[index].title),
+                                        Text(snapshot.data![index].title!),
                                       ],
                                     ),
                                     subtitle: _status
-                                        ? Text(s.daysAgo(DateTime.now()
+                                        ? Text(s!.daysAgo(DateTime.now()
                                             .difference(
-                                                snapshot.data[index].subDate)
+                                                snapshot.data![index].subDate)
                                             .inDays))
                                         : Text(
-                                            s.removedAt(DateFormat.yMd()
+                                            s!.removedAt(DateFormat.yMd()
                                                 .add_jm()
                                                 .format(snapshot
-                                                    .data[index].delDate)),
+                                                    .data![index].delDate)),
                                             style: TextStyle(color: Colors.red),
                                           ),
                                     trailing: !_status
@@ -362,7 +362,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                   .alternativeTrashRestore),
                                               onPressed: () => recoverSub(
                                                   context,
-                                                  snapshot.data[index].rssUrl),
+                                                  snapshot.data![index].rssUrl!),
                                             ),
                                           )
                                         : null,
@@ -416,7 +416,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class HistoryChart extends StatelessWidget {
-  final List<FlSpot> stats;
+  final List<FlSpot>? stats;
   HistoryChart(this.stats);
   @override
   Widget build(BuildContext context) {
@@ -480,8 +480,8 @@ class HistoryChart extends StatelessWidget {
               fitInsideHorizontally: true,
               getTooltipItems: (touchedBarSpots) {
                 return touchedBarSpots.map((barSpot) {
-                  return LineTooltipItem(context.s.minsCount(barSpot.y.toInt()),
-                      context.textTheme.subtitle1);
+                  return LineTooltipItem(context.s!.minsCount(barSpot.y.toInt()),
+                      context.textTheme.subtitle1!);
                 }).toList();
               },
             ),

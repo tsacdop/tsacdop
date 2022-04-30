@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../state/podcast_group.dart';
@@ -66,7 +65,7 @@ const String openAllPodcastDefaultKey = 'openAllPodcastDefaultKey';
 class KeyValueStorage {
   final String key;
   KeyValueStorage(this.key);
-  Future<List<GroupEntity>> getGroups() async {
+  Future<List<GroupEntity>?> getGroups() async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getString(key) == null) {
       var home = PodcastGroup('Home');
@@ -77,7 +76,7 @@ class KeyValueStorage {
           }));
     }
     return json
-        .decode(prefs.getString(key))['groups']
+        .decode(prefs.getString(key)!)['groups']
         .cast<Map<String, Object>>()
         .map<GroupEntity>(GroupEntity.fromJson)
         .toList(growable: false);
@@ -91,7 +90,7 @@ class KeyValueStorage {
             {'groups': groupList.map((group) => group.toJson()).toList()}));
   }
 
-  Future<List<PlaylistEntity>> getPlaylists() async {
+  Future<List<PlaylistEntity>?> getPlaylists() async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getString(key) == null) {
       var episodeList = prefs.getStringList(playlistKey);
@@ -104,7 +103,7 @@ class KeyValueStorage {
     }
     print(prefs.getString(key));
     return json
-        .decode(prefs.getString(key))['playlists']
+        .decode(prefs.getString(key)!)['playlists']
         .cast<Map<String, Object>>()
         .map<PlaylistEntity>(PlaylistEntity.fromJson)
         .toList(growable: false);
@@ -125,7 +124,7 @@ class KeyValueStorage {
     return prefs.setStringList(key, [playlist, episode, position.toString()]);
   }
 
-  Future<List<String>> getPlayerState() async {
+  Future<List<String>?> getPlayerState() async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getStringList(key) == null) {
       final position = prefs.getInt(audioPositionKey) ?? 0;
@@ -142,12 +141,12 @@ class KeyValueStorage {
   Future<int> getInt({int defaultValue = 0}) async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getInt(key) == null) await prefs.setInt(key, defaultValue);
-    return prefs.getInt(key);
+    return prefs.getInt(key)!;
   }
 
-  Future<bool> saveStringList(List<String> playList) async {
+  Future<bool> saveStringList(List<String?> playList) async {
     var prefs = await SharedPreferences.getInstance();
-    return prefs.setStringList(key, playList);
+    return prefs.setStringList(key, playList as List<String>);
   }
 
   Future<List<String>> getStringList() async {
@@ -155,7 +154,7 @@ class KeyValueStorage {
     if (prefs.getStringList(key) == null) {
       await prefs.setStringList(key, []);
     }
-    return prefs.getStringList(key);
+    return prefs.getStringList(key) ?? [];
   }
 
   Future<bool> saveString(String string) async {
@@ -168,7 +167,7 @@ class KeyValueStorage {
     if (prefs.getString(key) == null) {
       await prefs.setString(key, '');
     }
-    return prefs.getString(key);
+    return prefs.getString(key)!;
   }
 
   Future<bool> saveMenu(List<int> list) async {
@@ -179,10 +178,10 @@ class KeyValueStorage {
 
   Future<List<int>> getMenu() async {
     var prefs = await SharedPreferences.getInstance();
-    if (prefs.getStringList(key) == null || prefs.getStringList(key).isEmpty) {
+    if (prefs.getStringList(key) == null || prefs.getStringList(key)!.isEmpty) {
       await prefs.setStringList(key, ['0', '1', '2', '13', '14', '15']);
     }
-    var list = prefs.getStringList(key);
+    var list = prefs.getStringList(key)!;
     if (list.length == 5) list = [...list, '15'];
     return list.map(int.parse).toList();
   }
@@ -197,17 +196,17 @@ class KeyValueStorage {
 
   Future<List<double>> getSpeedList() async {
     var prefs = await SharedPreferences.getInstance();
-    if (prefs.getStringList(key) == null || prefs.getStringList(key).isEmpty) {
+    if (prefs.getStringList(key) == null || prefs.getStringList(key)!.isEmpty) {
       await prefs.setStringList(
           key, ['0.5', '0.6', '0.8', '1.0', '1.1', '1.2', '1.5', '2.0']);
     }
-    var list = prefs.getStringList(key);
+    var list = prefs.getStringList(key)!;
     return list.map(double.parse).toList();
   }
 
   /// Rreverse is used for compatite bool value save before which set true = 0, false = 1
   Future<bool> getBool(
-      {@required bool defaultValue, bool reverse = false}) async {
+      {required bool defaultValue, bool reverse = false}) async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getInt(key) == null) {
       reverse
@@ -231,7 +230,7 @@ class KeyValueStorage {
     return prefs.setDouble(key, data);
   }
 
-  Future<double> getDouble({double defaultValue = 0.0}) async {
+  Future<double?> getDouble({double defaultValue = 0.0}) async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getDouble(key) == null) {
       await prefs.setDouble(key, defaultValue);
@@ -239,9 +238,9 @@ class KeyValueStorage {
     return prefs.getDouble(key);
   }
 
-  Future<void> addList(List<String> addList) async {
+  Future<void> addList(List<String?> addList) async {
     final list = await getStringList();
-    await saveStringList(list..addAll(addList));
+    await saveStringList([...list ?? [], ...addList]);
   }
 
   Future<void> clearList() async {

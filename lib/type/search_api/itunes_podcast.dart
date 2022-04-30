@@ -8,8 +8,8 @@ part 'itunes_podcast.g.dart';
 @JsonSerializable()
 class ItunesSearchResult<P> {
   @_ConvertP()
-  final List<P> results;
-  final int resultCount;
+  final List<P>? results;
+  final int? resultCount;
   ItunesSearchResult({this.resultCount, this.results});
 
   factory ItunesSearchResult.fromJson(Map<String, dynamic> json) =>
@@ -17,27 +17,27 @@ class ItunesSearchResult<P> {
   Map<String, dynamic> toJson() => _$ItunesSearchResultToJson(this);
 }
 
-class _ConvertP<P> implements JsonConverter<P, Object> {
+class _ConvertP<P> implements JsonConverter<P, Object?> {
   const _ConvertP();
   @override
-  P fromJson(Object json) {
-    return ItunesPodcast.fromJson(json) as P;
+  P fromJson(Object? json) {
+    return ItunesPodcast.fromJson(json as Map<String, dynamic>) as P;
   }
 
   @override
-  Object toJson(P object) {
+  Object? toJson(P object) {
     return object;
   }
 }
 
 @JsonSerializable()
 class ItunesPodcast {
-  final String artistName;
-  final String collectionName;
-  final String feedUrl;
-  final String artworkUrl600;
-  final String releaseDate;
-  final int collectionId;
+  final String? artistName;
+  final String? collectionName;
+  final String? feedUrl;
+  final String? artworkUrl600;
+  final String? releaseDate;
+  final int? collectionId;
 
   ItunesPodcast(
       {this.artistName,
@@ -52,7 +52,7 @@ class ItunesPodcast {
   Map<String, dynamic> toJson() => _$ItunesPodcastToJson(this);
 
   int get latestPubDate => DateFormat('yyyy-MM-DDTHH:MM:SSZ', 'en_US')
-      .parse(releaseDate)
+      .parse(releaseDate!)
       .millisecondsSinceEpoch;
   OnlinePodcast get toOnlinePodcast => OnlinePodcast(
       earliestPubDate: 0,

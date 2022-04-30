@@ -36,7 +36,7 @@ class Gpodder {
     _dio.interceptors.add(CookieManager(cookieJar));
   }
 
-  Future<int> login({String username, String password}) async {
+  Future<int?> login({String? username, String? password}) async {
     final dir = await getApplicationDocumentsDirectory();
     var cookieJar =
         PersistCookieJar(storage: FileStorage("${dir.path}/.cookies/"));
@@ -58,8 +58,9 @@ class Gpodder {
     return status;
   }
 
-  Future<int> logout() async {
+  Future<int?> logout() async {
     final loginInfo = await _storage.getStringList();
+    if (loginInfo == null) return null;
     final username = loginInfo[0];
     await _initDio();
     var status;
@@ -95,7 +96,7 @@ class Gpodder {
     await _dateTimeStorage.saveInt(0);
   }
 
-  Future<int> checkLogin(String username) async {
+  Future<int?> checkLogin(String username) async {
     await _initDio();
     var response = await _dio.post(
       '$_baseUrl/api/2/auth/$username/login.json',
@@ -104,11 +105,11 @@ class Gpodder {
     return status;
   }
 
-  Future<int> updateDevice(String username) async {
+  Future<int?> updateDevice(String? username) async {
     await _initDio();
     final deviceId = Uuid().v1();
     final androidInfo = await DeviceInfoPlugin().androidInfo;
-    var status = 0;
+    int? status = 0;
     try {
       var response = await _dio
           .post("$_baseUrl/api/2/devices/$username/$deviceId.json", data: {
@@ -126,8 +127,9 @@ class Gpodder {
     return status;
   }
 
-  Future<String> getAllPodcast() async {
+  Future<String?> getAllPodcast() async {
     final loginInfo = await _storage.getStringList();
+    if (loginInfo == null) return null;
     final username = loginInfo[0];
     Response response;
     await _initDio();
@@ -142,10 +144,11 @@ class Gpodder {
     return response.data;
   }
 
-  Future<int> uploadSubscriptions() async {
+  Future<int?> uploadSubscriptions() async {
     final syncDataTime = DateTime.now().millisecondsSinceEpoch;
     await _dateTimeStorage.saveInt(syncDataTime);
     final loginInfo = await _storage.getStringList();
+    if (loginInfo == null) return null;
     final username = loginInfo[0];
     final deviceId = loginInfo[1];
     await _initDio();
@@ -168,13 +171,14 @@ class Gpodder {
     return status;
   }
 
-  Future<int> getChanges() async {
+  Future<int?> getChanges() async {
     final loginInfo = await _storage.getStringList();
+    if (loginInfo == null) return null;
     final username = loginInfo[0];
     final deviceId = loginInfo[1];
     final syncDataTime = DateTime.now().millisecondsSinceEpoch;
     await _dateTimeStorage.saveInt(syncDataTime);
-    final timeStamp = loginInfo.length == 3 ? int.parse(loginInfo[2]) : 0;
+    final timeStamp = loginInfo.length == 3 ? int.parse(loginInfo[2]!) : 0;
     var status;
     Response response;
     await _initDio();
@@ -204,8 +208,9 @@ class Gpodder {
     return status;
   }
 
-  Future<int> updateChange() async {
+  Future<int?> updateChange() async {
     final loginInfo = await _storage.getStringList();
+    if (loginInfo == null) return null;
     final addList = await _addStorage.getStringList();
     final removeList = await _removeStorage.getStringList();
     final username = loginInfo[0];

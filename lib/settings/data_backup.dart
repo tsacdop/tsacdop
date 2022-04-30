@@ -79,7 +79,7 @@ class _DataBackupState extends State<DataBackup> {
   }
 
   Future<void> _importSetting(String path, BuildContext context) async {
-    final s = context.s;
+    final s = context.s!;
     var settings = context.read<SettingState>();
     var file = File(path);
     try {
@@ -91,7 +91,7 @@ class _DataBackupState extends State<DataBackup> {
         gravity: ToastGravity.BOTTOM,
       );
     } catch (e) {
-      developer.log(e, name: 'Import settings');
+      developer.log(e.toString(), name: 'Import settings');
       Fluttertoast.showToast(
         msg: s.toastFileError,
         gravity: ToastGravity.BOTTOM,
@@ -99,20 +99,16 @@ class _DataBackupState extends State<DataBackup> {
     }
   }
 
-  Widget _syncStauts(int index) {
+  Widget _syncStauts(int? index) {
     switch (index) {
       case 1:
         return Text('Successed', style: TextStyle(color: Colors.green));
-        break;
       case 2:
         return Text('Failed', style: TextStyle(color: Colors.red));
-        break;
       case 3:
         return Text('Unauthorized', style: TextStyle(color: Colors.red));
-        break;
       default:
         return Text('Unknown');
-        break;
     }
   }
 
@@ -125,10 +121,10 @@ class _DataBackupState extends State<DataBackup> {
         return;
       }
       Fluttertoast.showToast(
-        msg: s.toastReadFile,
+        msg: s!.toastReadFile,
         gravity: ToastGravity.BOTTOM,
       );
-      final filePath = filePickResult.files.first.path;
+      final filePath = filePickResult.files.first.path!;
       _importSetting(filePath, context);
     } on PlatformException catch (e) {
       developer.log(e.toString(), name: 'Get file path');
@@ -146,7 +142,7 @@ class _DataBackupState extends State<DataBackup> {
     if (mounted) setState(() {});
   }
 
-  Future<List<String>> _getLoginInfo() async {
+  Future<List<String?>?> _getLoginInfo() async {
     final storage = KeyValueStorage(gpodderApiKey);
     return await storage.getStringList();
   }
@@ -172,7 +168,7 @@ class _DataBackupState extends State<DataBackup> {
     }
   }
 
-  Future<List<int>> _getSyncStatus() async {
+  Future<List<int?>> _getSyncStatus() async {
     var dateTimeStorage = KeyValueStorage(gpodderSyncDateTimeKey);
     var statusStorage = KeyValueStorage(gpodderSyncStatusKey);
     final syncDateTime = await dateTimeStorage.getInt();
@@ -182,7 +178,7 @@ class _DataBackupState extends State<DataBackup> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -204,11 +200,11 @@ class _DataBackupState extends State<DataBackup> {
             Padding(
               padding: EdgeInsets.all(10.0),
             ),
-            FutureBuilder<List<String>>(
+            FutureBuilder<List<String?>?>(
                 future: _getLoginInfo(),
                 initialData: [],
                 builder: (context, snapshot) {
-                  final loginInfo = snapshot.data;
+                  final loginInfo = snapshot.data!;
                   return Container(
                     height: 160,
                     width: double.infinity,
@@ -255,14 +251,14 @@ class _DataBackupState extends State<DataBackup> {
                         Text(
                             loginInfo.isEmpty
                                 ? s.intergateWith('gpodder.net')
-                                : s.loggedInAs(loginInfo.first),
+                                : s.loggedInAs(loginInfo.first!),
                             style: TextStyle(color: Colors.purple[700])),
                         ButtonTheme(
                           height: 32,
                           child: OutlineButton(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(100.0),
-                                side: BorderSide(color: Colors.purple[700])),
+                                side: BorderSide(color: Colors.purple[700]!)),
                             highlightedBorderColor: Colors.purple[700],
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -270,7 +266,7 @@ class _DataBackupState extends State<DataBackup> {
                                 Icon(
                                   LineIcons.user,
                                   color: Colors.purple[700],
-                                  size: context.textTheme.headline6.fontSize,
+                                  size: context.textTheme.headline6!.fontSize,
                                 ),
                                 SizedBox(width: 10),
                                 Text(loginInfo.isEmpty ? s.login : s.logout,
@@ -295,11 +291,11 @@ class _DataBackupState extends State<DataBackup> {
                     ),
                   );
                 }),
-            FutureBuilder<List<String>>(
+            FutureBuilder<List<String?>?>(
                 future: _getLoginInfo(),
                 initialData: [],
                 builder: (context, snapshot) {
-                  final loginInfo = snapshot.data;
+                  final loginInfo = snapshot.data!;
                   if (loginInfo.isNotEmpty) {
                     return ListTile(
                       contentPadding: const EdgeInsets.only(
@@ -315,12 +311,12 @@ class _DataBackupState extends State<DataBackup> {
                         },
                         icon: Icon(LineIcons.infoCircle),
                       ),
-                      subtitle: FutureBuilder<List<int>>(
+                      subtitle: FutureBuilder<List<int?>>(
                           future: _getSyncStatus(),
                           initialData: [0, 0],
                           builder: (context, snapshot) {
-                            final dateTime = snapshot.data[0];
-                            final status = snapshot.data[1];
+                            final dateTime = snapshot.data![0]!;
+                            final status = snapshot.data![1];
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -354,7 +350,7 @@ class _DataBackupState extends State<DataBackup> {
               padding: EdgeInsets.fromLTRB(70, 0, 70, 0),
               alignment: Alignment.centerLeft,
               child: Text(s.subscribe,
-                  style: context.textTheme.bodyText1
+                  style: context.textTheme.bodyText1!
                       .copyWith(color: context.accentColor)),
             ),
             Padding(
@@ -372,14 +368,14 @@ class _DataBackupState extends State<DataBackup> {
                     child: OutlineButton(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(100.0),
-                            side: BorderSide(color: Colors.green[700])),
+                            side: BorderSide(color: Colors.green[700]!)),
                         highlightedBorderColor: Colors.green[700],
                         child: Row(
                           children: [
                             Icon(
                               LineIcons.save,
                               color: Colors.green[700],
-                              size: context.textTheme.headline6.fontSize,
+                              size: context.textTheme.headline6!.fontSize,
                             ),
                             SizedBox(width: 10),
                             Text(s.save,
@@ -397,13 +393,13 @@ class _DataBackupState extends State<DataBackup> {
                     child: OutlineButton(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(100.0),
-                            side: BorderSide(color: Colors.blue[700])),
+                            side: BorderSide(color: Colors.blue[700]!)),
                         highlightedBorderColor: Colors.blue[700],
                         child: Row(
                           children: [
                             Icon(
                               Icons.share,
-                              size: context.textTheme.headline6.fontSize,
+                              size: context.textTheme.headline6!.fontSize,
                               color: Colors.blue[700],
                             ),
                             SizedBox(width: 10),
@@ -425,7 +421,7 @@ class _DataBackupState extends State<DataBackup> {
               padding: EdgeInsets.symmetric(horizontal: 70),
               alignment: Alignment.centerLeft,
               child: Text(s.settings,
-                  style: context.textTheme.bodyText1
+                  style: context.textTheme.bodyText1!
                       .copyWith(color: Theme.of(context).accentColor)),
             ),
             Padding(
@@ -441,7 +437,7 @@ class _DataBackupState extends State<DataBackup> {
                   child: OutlineButton(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(color: Colors.green[700])),
+                          side: BorderSide(color: Colors.green[700]!)),
                       highlightedBorderColor: Colors.green[700],
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -449,7 +445,7 @@ class _DataBackupState extends State<DataBackup> {
                           Icon(
                             LineIcons.save,
                             color: Colors.green[700],
-                            size: context.textTheme.headline6.fontSize,
+                            size: context.textTheme.headline6!.fontSize,
                           ),
                           SizedBox(width: 10),
                           Text(s.save,
@@ -467,14 +463,14 @@ class _DataBackupState extends State<DataBackup> {
                   child: OutlineButton(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(color: Colors.blue[700])),
+                          side: BorderSide(color: Colors.blue[700]!)),
                       highlightedBorderColor: Colors.blue[700],
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             Icons.share,
-                            size: context.textTheme.headline6.fontSize,
+                            size: context.textTheme.headline6!.fontSize,
                             color: Colors.blue[700],
                           ),
                           SizedBox(width: 10),
@@ -494,13 +490,13 @@ class _DataBackupState extends State<DataBackup> {
                     highlightedBorderColor: Colors.red[700],
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(color: Colors.red[700])),
+                        side: BorderSide(color: Colors.red[700]!)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           LineIcons.paperclip,
-                          size: context.textTheme.headline6.fontSize,
+                          size: context.textTheme.headline6!.fontSize,
                           color: Colors.red[700],
                         ),
                         SizedBox(width: 10),
@@ -524,7 +520,7 @@ class _DataBackupState extends State<DataBackup> {
 }
 
 class _OpenEye extends StatefulWidget {
-  _OpenEye({Key key}) : super(key: key);
+  _OpenEye({Key? key}) : super(key: key);
 
   @override
   __OpenEyeState createState() => __OpenEyeState();
@@ -533,8 +529,8 @@ class _OpenEye extends StatefulWidget {
 class __OpenEyeState extends State<_OpenEye>
     with SingleTickerProviderStateMixin {
   double _radius = 0.0;
-  Animation _animation;
-  AnimationController _controller;
+  late Animation _animation;
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -575,17 +571,17 @@ class __OpenEyeState extends State<_OpenEye>
 enum LoginStatus { none, error, start, syncing, complete }
 
 class _LoginGpodder extends StatefulWidget {
-  _LoginGpodder({Key key}) : super(key: key);
+  _LoginGpodder({Key? key}) : super(key: key);
 
   @override
   __LoginGpodderState createState() => __LoginGpodderState();
 }
 
 class __LoginGpodderState extends State<_LoginGpodder> {
-  var _username = '';
+  String? _username = '';
   var _password = '';
-  LoginStatus _loginStatus;
-  ConfettiController _controller;
+  LoginStatus? _loginStatus;
+  late ConfettiController _controller;
 
   @override
   void initState() {
@@ -607,7 +603,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
 
   Future<void> _handleLogin() async {
     setState(() => _loginStatus = LoginStatus.start);
-    final form = _formKey.currentState;
+    final form = _formKey.currentState!;
     if (form.validate()) {
       form.save();
       final status =
@@ -633,14 +629,14 @@ class __LoginGpodderState extends State<_LoginGpodder> {
         } else {
           if (mounted) setState(() => _loginStatus = LoginStatus.error);
           Fluttertoast.showToast(
-            msg: context.s.loginFailed,
+            msg: context.s!.loginFailed,
             gravity: ToastGravity.BOTTOM,
           );
         }
       } else {
         if (mounted) setState(() => _loginStatus = LoginStatus.error);
         Fluttertoast.showToast(
-          msg: context.s.loginFailed,
+          msg: context.s!.loginFailed,
           gravity: ToastGravity.BOTTOM,
         );
       }
@@ -654,11 +650,11 @@ class __LoginGpodderState extends State<_LoginGpodder> {
     var rssExp = RegExp(r'^(https?):\/\/(.*)');
     final opml = await gpodder.getAllPodcast();
     if (opml != '') {
-      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml);
+      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml!);
       for (var entry in data.entries) {
         var list = entry.value.reversed;
         for (var rss in list) {
-          var rssLink = rssExp.stringMatch(rss.xmlUrl);
+          var rssLink = rssExp.stringMatch(rss.xmlUrl!);
           if (rssLink != null) {
             final dbHelper = DBHelper();
             final exist = await dbHelper.checkPodcast(rssLink);
@@ -677,21 +673,21 @@ class __LoginGpodderState extends State<_LoginGpodder> {
     subscribeWorker.setWorkManager();
   }
 
-  String _validateName(String value) {
-    if (value.isEmpty) {
-      return context.s.usernameRequired;
+  String? _validateName(String? value) {
+    if (value!.isEmpty) {
+      return context.s!.usernameRequired;
     }
     final nameExp = RegExp(r'^[A-Za-z ]+$');
     if (!nameExp.hasMatch(value)) {
-      return context.s.invalidName;
+      return context.s!.invalidName;
     }
     return null;
   }
 
-  String _validatePassword(String value) {
-    final passwordField = _passwordFieldKey.currentState;
-    if (passwordField.value == null || passwordField.value.isEmpty) {
-      return context.s.passwdRequired;
+  String? _validatePassword(String? value) {
+    final passwordField = _passwordFieldKey.currentState!;
+    if (passwordField.value == null || passwordField.value!.isEmpty) {
+      return context.s!.passwdRequired;
     }
     return null;
   }
@@ -700,13 +696,13 @@ class __LoginGpodderState extends State<_LoginGpodder> {
     switch (_loginStatus) {
       case LoginStatus.none:
         return Text(
-          context.s.login,
+          context.s!.login,
           style: TextStyle(color: Colors.white),
         );
         break;
       case LoginStatus.syncing:
         return Text(
-          context.s.settingsSyncing,
+          context.s!.settingsSyncing,
           style: TextStyle(color: Colors.white),
         );
         break;
@@ -721,7 +717,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
         );
       default:
         return Text(
-          context.s.login,
+          context.s!.login,
           style: TextStyle(color: Colors.white),
         );
         break;
@@ -730,7 +726,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.dark,
@@ -794,7 +790,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
                               child: Text(
                                 s.gpodderLoginDes,
                                 textAlign: TextAlign.center,
-                                style: context.textTheme.subtitle1
+                                style: context.textTheme.subtitle1!
                                     .copyWith(height: 2),
                               ),
                             ),
@@ -869,9 +865,10 @@ class __LoginGpodderState extends State<_LoginGpodder> {
                                   labelText: s.password,
                                   validator: _validatePassword,
                                   onSaved: (value) {
-                                    setState(() {
-                                      _password = value;
-                                    });
+                                    if (value == null)
+                                      return setState(() {
+                                        _password = value!;
+                                      });
                                   },
                                 ),
                               ),
@@ -922,13 +919,13 @@ class PasswordField extends StatefulWidget {
     this.onFieldSubmitted,
   });
 
-  final Key fieldKey;
-  final String hintText;
-  final String labelText;
-  final String helperText;
-  final FormFieldSetter<String> onSaved;
-  final FormFieldValidator<String> validator;
-  final ValueChanged<String> onFieldSubmitted;
+  final Key? fieldKey;
+  final String? hintText;
+  final String? labelText;
+  final String? helperText;
+  final FormFieldSetter<String>? onSaved;
+  final FormFieldValidator<String>? validator;
+  final ValueChanged<String>? onFieldSubmitted;
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
@@ -976,7 +973,7 @@ class _PasswordFieldState extends State<PasswordField> {
 }
 
 class _GpodderInfo extends StatefulWidget {
-  _GpodderInfo({Key key}) : super(key: key);
+  _GpodderInfo({Key? key}) : super(key: key);
 
   @override
   __GpodderInfoState createState() => __GpodderInfoState();
@@ -987,10 +984,11 @@ class __GpodderInfoState extends State<_GpodderInfo> {
   var _syncing = false;
   final _gpodderUrl = "https://gpodder.net";
 
-  Future<List<String>> _getLoginInfo() async {
+  Future<List<String>?> _getLoginInfo() async {
     final storage = KeyValueStorage(gpodderApiKey);
     final androidInfo = await DeviceInfoPlugin().androidInfo;
-    final deviceInfo = await storage.getStringList();
+    final deviceInfo =
+        await storage.getStringList();
     deviceInfo.add("Tsacdop on ${androidInfo.model}");
     return deviceInfo;
   }
@@ -1007,11 +1005,11 @@ class __GpodderInfoState extends State<_GpodderInfo> {
       var rssExp = RegExp(r'^(https?):\/\/(.*)');
       final opml = await _gpodder.getAllPodcast();
       if (opml != '') {
-        Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml);
+        Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml!);
         for (var entry in data.entries) {
           var list = entry.value.reversed;
           for (var rss in list) {
-            var rssLink = rssExp.stringMatch(rss.xmlUrl);
+            var rssLink = rssExp.stringMatch(rss.xmlUrl!);
             if (rssLink != null) {
               final dbHelper = DBHelper();
               final exist = await dbHelper.checkPodcast(rssLink);
@@ -1088,14 +1086,14 @@ class __GpodderInfoState extends State<_GpodderInfo> {
               ),
               SliverList(
                 delegate: SliverChildListDelegate([
-                  FutureBuilder<List<String>>(
+                  FutureBuilder<List<String>?>(
                       future: _getLoginInfo(),
                       initialData: [],
                       builder: (context, snapshot) {
                         final deviceId =
-                            snapshot.data.isNotEmpty ? snapshot.data[1] : '';
+                            snapshot.data!.isNotEmpty ? snapshot.data![1]! : '';
                         final deviceName =
-                            snapshot.data.isNotEmpty ? snapshot.data[3] : '';
+                            snapshot.data!.isNotEmpty ? snapshot.data![3]! : '';
                         return Column(
                           children: [
                             ListTile(

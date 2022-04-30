@@ -21,15 +21,15 @@ class DownloadsManage extends StatefulWidget {
 
 class _DownloadsManageState extends State<DownloadsManage> {
   //Downloaded size
-  int _size;
-  int _mode;
+  late int _size;
+  int? _mode;
   //Downloaded files
-  int _fileNum;
-  bool _clearing;
-  bool _onlyListened;
-  List<EpisodeBrief> _selectedList;
+  late int _fileNum;
+  late bool _clearing;
+  bool? _onlyListened;
+  late List<EpisodeBrief> _selectedList;
 
-  Future<List<EpisodeBrief>> _getDownloadedEpisode(int mode) async {
+  Future<List<EpisodeBrief>> _getDownloadedEpisode(int? mode) async {
     var episodes = <EpisodeBrief>[];
     var dbHelper = DBHelper();
     episodes = await dbHelper.getDownloadedEpisode(mode);
@@ -45,7 +45,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
     _size = 0;
     _fileNum = 0;
     final dirs = await getExternalStorageDirectories();
-    for (var dir in dirs) {
+    for (var dir in dirs!) {
       dir.list().forEach((d) {
         var fileDir = Directory(d.path);
         fileDir.list().forEach((file) async {
@@ -79,17 +79,17 @@ class _DownloadsManageState extends State<DownloadsManage> {
   }
 
   String _downloadDateToString(BuildContext context,
-      {int downloadDate, int pubDate}) {
+      {required int downloadDate, int? pubDate}) {
     final s = context.s;
     var date = DateTime.fromMillisecondsSinceEpoch(downloadDate);
     var diffrence = DateTime.now().toUtc().difference(date);
     if (diffrence.inHours < 24) {
-      return s.hoursAgo(diffrence.inHours);
+      return s!.hoursAgo(diffrence.inHours);
     } else if (diffrence.inDays < 7) {
-      return s.daysAgo(diffrence.inDays);
+      return s!.daysAgo(diffrence.inDays);
     } else {
       return DateFormat.yMMMd().format(
-          DateTime.fromMillisecondsSinceEpoch(pubDate, isUtc: true).toLocal());
+          DateTime.fromMillisecondsSinceEpoch(pubDate!, isUtc: true).toLocal());
     }
   }
 
@@ -99,7 +99,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
       return sum;
     } else {
       for (var episode in _selectedList) {
-        sum += episode.enclosureLength;
+        sum += episode.enclosureLength!;
       }
       return sum;
     }
@@ -117,7 +117,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -260,7 +260,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   onTap: () => setState(() {
-                                    _onlyListened = !_onlyListened;
+                                    _onlyListened = !_onlyListened!;
                                   }),
                                   child: Row(
                                     children: [
@@ -294,7 +294,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                       future: _getDownloadedEpisode(_mode),
                       initialData: [],
                       builder: (context, snapshot) {
-                        var _episodes = snapshot.data;
+                        var _episodes = snapshot.data!;
                         return ListView.builder(
                             itemCount: _episodes.length,
                             shrinkWrap: true,
@@ -304,7 +304,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   future: _isListened(_episodes[index]),
                                   initialData: 0,
                                   builder: (context, snapshot) {
-                                    return (_onlyListened && snapshot.data == 0)
+                                    return (_onlyListened! && snapshot.data == 0)
                                         ? Center()
                                         : Column(
                                             children: <Widget>[
@@ -328,7 +328,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                                         _episodes[index]
                                                             .avatarImage),
                                                 title: Text(
-                                                  _episodes[index].title,
+                                                  _episodes[index].title!,
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
@@ -339,7 +339,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                                         context,
                                                         downloadDate:
                                                             _episodes[index]
-                                                                .downloadDate,
+                                                                .downloadDate!,
                                                         pubDate:
                                                             _episodes[index]
                                                                 .pubDate)),
@@ -348,14 +348,14 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                                             .enclosureLength !=
                                                         0)
                                                       Text(
-                                                          '${(_episodes[index].enclosureLength) ~/ 1000000} Mb'),
+                                                          '${_episodes[index].enclosureLength! ~/ 1000000} Mb'),
                                                   ],
                                                 ),
                                                 trailing: Checkbox(
                                                   value: _selectedList.contains(
                                                       _episodes[index]),
                                                   onChanged: (boo) {
-                                                    if (boo) {
+                                                    if (boo!) {
                                                       setState(() =>
                                                           _selectedList.add(
                                                               _episodes[

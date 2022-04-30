@@ -44,7 +44,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<AudioPanelState> _playerKey = GlobalKey<AudioPanelState>();
-  TabController _controller;
+  TabController? _controller;
   Decoration _getIndicator(BuildContext context) {
     return UnderlineTabIndicator(
         borderSide: BorderSide(color: Theme.of(context).accentColor, width: 3),
@@ -64,7 +64,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     _controller = TabController(length: 3, vsync: this);
     //  FeatureDiscovery.hasPreviouslyCompleted(context, addFeature).then((value) {
     //   if (!value) {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
       FeatureDiscovery.discoverFeatures(
         context,
         const <String>{
@@ -83,7 +83,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -103,8 +103,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       child: WillPopScope(
         onWillPop: () async {
           if (_playerKey.currentState != null &&
-              _playerKey.currentState.initSize > 100) {
-            _playerKey.currentState.backToMini();
+              _playerKey.currentState!.initSize! > 100) {
+            _playerKey.currentState!.backToMini();
             return false;
           } else if (Platform.isAndroid) {
             _androidAppRetain.invokeMethod('sendToBackground');
@@ -123,7 +123,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   behavior: NoGrowBehavior(),
                   child: NestedScrollView(
                     innerScrollPositionKeyBuilder: () {
-                      return Key('tab${_controller.index}');
+                      return Key('tab${_controller!.index}');
                     },
                     pinnedHeaderSliverHeightBuilder: () => 50,
                     headerSliverBuilder: (context, innerBoxScrolled) {
@@ -141,7 +141,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                       context,
                                       featureId: addFeature,
                                       tapTarget: Icon(Icons.add_circle_outline),
-                                      title: s.featureDiscoverySearch,
+                                      title: s!.featureDiscoverySearch,
                                       backgroundColor: Colors.cyan[600],
                                       buttonColor: Colors.cyan[500],
                                       description: s.featureDiscoverySearchDes,
@@ -150,7 +150,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         splashRadius: 20,
                                         icon: Icon(Icons.add_circle_outline),
                                         onPressed: () async {
-                                          await showSearch<int>(
+                                          await showSearch<int?>(
                                             context: context,
                                             delegate: MyHomePageDelegate(
                                                 searchFieldLabel:
@@ -274,7 +274,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final s = context.s;
+    final s = context.s!;
     return Container(
       color: context.scaffoldBackgroundColor,
       child: Column(
@@ -308,14 +308,14 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class _PlaylistButton extends StatefulWidget {
-  _PlaylistButton({Key key}) : super(key: key);
+  _PlaylistButton({Key? key}) : super(key: key);
 
   @override
   __PlaylistButtonState createState() => __PlaylistButtonState();
 }
 
 class __PlaylistButtonState extends State<_PlaylistButton> {
-  bool _loadPlay;
+  late bool _loadPlay;
 
   Future<void> _getPlaylist() async {
     await context.read<AudioPlayerNotifier>().initPlaylist();
@@ -335,7 +335,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(100),
@@ -357,7 +357,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                     topRight: Radius.circular(10.0)),
               ),
               child: Selector<AudioPlayerNotifier,
-                  Tuple3<bool, EpisodeBrief, int>>(
+                  Tuple3<bool, EpisodeBrief?, int>>(
                 selector: (_, audio) => Tuple3(
                     audio.playerRunning, audio.episode, audio.lastPosition),
                 builder: (_, data, __) => !_loadPlay
@@ -389,7 +389,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                     CircleAvatar(
                                         radius: 20,
                                         backgroundImage:
-                                            data.item2.avatarImage),
+                                            data.item2!.avatarImage),
                                     Container(
                                       height: 40.0,
                                       width: 40.0,
@@ -415,7 +415,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                         (data.item3 ~/ 1000).toTime,
                                       ),
                                       Text(
-                                        data.item2.title,
+                                        data.item2!.title!,
                                         maxLines: 2,
                                         textAlign: TextAlign.center,
                                         overflow: TextOverflow.fade,
@@ -500,20 +500,20 @@ class _RecentUpdateState extends State<_RecentUpdate>
   int _top = 90;
 
   /// Load more episodes when scroll to bottom.
-  bool _loadMore;
+  late bool _loadMore;
 
   /// For group fliter.
-  String _groupName;
-  List<String> _group;
-  Layout _layout;
-  bool _hideListened;
-  bool _scroll;
+  String? _groupName;
+  List<String?>? _group;
+  Layout? _layout;
+  bool? _hideListened;
+  late bool _scroll;
 
   ///Selected episode list.
-  List<EpisodeBrief> _selectedEpisodes;
+  List<EpisodeBrief>? _selectedEpisodes;
 
   ///Toggle for multi-select.
-  bool _multiSelect;
+  bool? _multiSelect;
 
   @override
   void initState() {
@@ -530,17 +530,17 @@ class _RecentUpdateState extends State<_RecentUpdate>
     refreshWorker.start(_group);
     await Future.delayed(Duration(seconds: 1));
     Fluttertoast.showToast(
-      msg: context.s.refreshStarted,
+      msg: context.s!.refreshStarted,
       gravity: ToastGravity.BOTTOM,
     );
   }
 
-  Future<List<EpisodeBrief>> _getRssItem(int top, List<String> group,
-      {bool hideListened}) async {
+  Future<List<EpisodeBrief>> _getRssItem(int top, List<String?> group,
+      {bool? hideListened}) async {
     var storage = KeyValueStorage(recentLayoutKey);
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
     var index = await storage.getInt(defaultValue: 1);
-    if (_layout == null) _layout = Layout.values[index];
+    if (_layout == null) _layout = Layout.values[index!];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
@@ -548,7 +548,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     List<EpisodeBrief> episodes;
     if (group.isEmpty) {
       episodes =
-          await _dbHelper.getRecentRssItem(top, hideListened: _hideListened);
+          await _dbHelper.getRecentRssItem(top, hideListened: _hideListened!);
     } else {
       episodes = await _dbHelper.getGroupRssItem(top, group,
           hideListened: _hideListened);
@@ -556,7 +556,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     return episodes;
   }
 
-  Future<int> _getUpdateCounts(List<String> group) async {
+  Future<int> _getUpdateCounts(List<String?> group) async {
     var episodes = <EpisodeBrief>[];
 
     if (group.isEmpty) {
@@ -580,7 +580,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
   }
 
   /// Remove new mark.
-  Future<void> _removeNewMark(List<String> group) async {
+  Future<void> _removeNewMark(List<String?> group) async {
     if (group.isEmpty) {
       _dbHelper.removeAllNewMark();
     } else {
@@ -593,14 +593,14 @@ class _RecentUpdateState extends State<_RecentUpdate>
       builder: (context, groupList, child) => PopupMenuButton<String>(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 1,
-        tooltip: context.s.groupFilter,
+        tooltip: context.s!.groupFilter,
         child: Container(
             padding: EdgeInsets.symmetric(horizontal: 20),
             height: 50,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(_groupName == 'All' ? context.s.all : _groupName),
+                Text(_groupName == 'All' ? context.s!.all : _groupName!),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5),
                 ),
@@ -613,17 +613,17 @@ class _RecentUpdateState extends State<_RecentUpdate>
         itemBuilder: (context) => [
           PopupMenuItem(
               child: Row(children: [
-                Text(context.s.all),
+                Text(context.s!.all),
                 Spacer(),
                 if (_groupName == 'All') DotIndicator()
               ]),
               value: 'All')
         ]..addAll(groupList.groups
             .map<PopupMenuEntry<String>>((e) => PopupMenuItem(
-                value: e.name,
+                value: e!.name,
                 child: Row(
                   children: [
-                    Text(e.name),
+                    Text(e.name!),
                     Spacer(),
                     if (e.name == _groupName) DotIndicator()
                   ],
@@ -637,7 +637,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
             });
           } else {
             for (var group in groupList.groups) {
-              if (group.name == value) {
+              if (group!.name == value) {
                 setState(() {
                   _groupName = value;
                   _group = group.podcastList;
@@ -654,7 +654,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     //  final audio = context.read<AudioPlayerNotifier>();
     final s = context.s;
     return FutureBuilder<int>(
-        future: _getUpdateCounts(_group),
+        future: _getUpdateCounts(_group!),
         initialData: 0,
         builder: (context, snapshot) {
           return snapshot.data != 0
@@ -663,16 +663,16 @@ class _RecentUpdateState extends State<_RecentUpdate>
                   child: Row(
                     children: [
                       IconButton(
-                          tooltip: s.removeNewMark,
+                          tooltip: s!.removeNewMark,
                           icon: SizedBox(
                               height: 20,
                               width: 20,
                               child: CustomPaint(
                                   painter: RemoveNewFlagPainter(
-                                      context.textTheme.bodyText1.color,
+                                      context.textTheme.bodyText1!.color,
                                       Colors.red))),
                           onPressed: () async {
-                            _removeNewMark(_group);
+                            _removeNewMark(_group!);
                             if (mounted) {
                               setState(() {});
                             }
@@ -715,10 +715,10 @@ class _RecentUpdateState extends State<_RecentUpdate>
           Tuple2(refreshWorkder.created, groupWorker.created),
       builder: (_, data, __) {
         return FutureBuilder<List<EpisodeBrief>>(
-          future: _getRssItem(_top, _group, hideListened: _hideListened),
+          future: _getRssItem(_top, _group!, hideListened: _hideListened),
           builder: (context, snapshot) {
             return (snapshot.hasData)
-                ? snapshot.data.length == 0
+                ? snapshot.data!.length == 0
                     ? Padding(
                         padding: EdgeInsets.only(top: 150),
                         child: Column(
@@ -729,7 +729,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                             Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10)),
                             Text(
-                              s.noEpisodeRecent,
+                              s!.noEpisodeRecent,
                               style: TextStyle(color: Colors.grey[500]),
                             )
                           ],
@@ -744,7 +744,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                           }
                           if (scrollInfo.metrics.pixels ==
                                   scrollInfo.metrics.maxScrollExtent &&
-                              snapshot.data.length == _top) {
+                              snapshot.data!.length == _top) {
                             if (!_loadMore) {
                               _loadMoreEpisode();
                             }
@@ -793,7 +793,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                             ),
                             Column(
                               children: [
-                                if (!_multiSelect)
+                                if (!_multiSelect!)
                                   Container(
                                       height: 40,
                                       color: context.primaryColor,
@@ -806,14 +806,14 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                             Material(
                                               color: Colors.transparent,
                                               child: IconButton(
-                                                  tooltip: context.s.refresh,
+                                                  tooltip: context.s!.refresh,
                                                   icon: Icon(
                                                       LineIcons.alternateRedo,
                                                       size: 16),
                                                   onPressed: () {
                                                     _updateRssItem();
                                                     Fluttertoast.showToast(
-                                                      msg: s.refreshStarted,
+                                                      msg: s!.refreshStarted,
                                                       gravity:
                                                           ToastGravity.BOTTOM,
                                                     );
@@ -823,7 +823,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                             Material(
                                               color: Colors.transparent,
                                               child: IconButton(
-                                                tooltip: s.hideListenedSetting,
+                                                tooltip: s!.hideListenedSetting,
                                                 icon: SizedBox(
                                                   width: 30,
                                                   height: 15,
@@ -834,7 +834,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                 ),
                                                 onPressed: () {
                                                   setState(() => _hideListened =
-                                                      !_hideListened);
+                                                      !_hideListened!);
                                                 },
                                               ),
                                             ),
@@ -870,7 +870,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                           ],
                                         ),
                                       )),
-                                if (_multiSelect)
+                                if (_multiSelect!)
                                   MultiSelectMenuBar(
                                     selectedList: _selectedEpisodes,
                                     onClose: (value) {
@@ -904,18 +904,18 @@ class _MyFavorite extends StatefulWidget {
 
 class _MyFavoriteState extends State<_MyFavorite>
     with AutomaticKeepAliveClientMixin {
-  Future<List<EpisodeBrief>> _getLikedRssItem(int top, int sortBy,
-      {bool hideListened}) async {
+  Future<List<EpisodeBrief>> _getLikedRssItem(int top, int? sortBy,
+      {bool? hideListened}) async {
     var storage = KeyValueStorage(favLayoutKey);
     var index = await storage.getInt(defaultValue: 1);
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
-    if (_layout == null) _layout = Layout.values[index];
+    if (_layout == null) _layout = Layout.values[index!];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
     var dbHelper = DBHelper();
     var episodes = await dbHelper.getLikedRssItem(top, sortBy,
-        hideListened: _hideListened);
+        hideListened: _hideListened!);
     return episodes;
   }
 
@@ -931,16 +931,16 @@ class _MyFavoriteState extends State<_MyFavorite>
   }
 
   int _top = 90;
-  bool _loadMore;
-  Layout _layout;
-  int _sortBy;
-  bool _hideListened;
+  late bool _loadMore;
+  Layout? _layout;
+  int? _sortBy;
+  bool? _hideListened;
 
   ///Selected episode list.
-  List<EpisodeBrief> _selectedEpisodes;
+  List<EpisodeBrief>? _selectedEpisodes;
 
   ///Toggle for multi-select.
-  bool _multiSelect;
+  bool? _multiSelect;
 
   @override
   void initState() {
@@ -962,7 +962,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                 _getLikedRssItem(_top, _sortBy, hideListened: _hideListened),
             builder: (context, snapshot) {
               return (snapshot.hasData)
-                  ? snapshot.data.length == 0
+                  ? snapshot.data!.length == 0
                       ? Padding(
                           padding: EdgeInsets.only(top: 150),
                           child: Column(
@@ -973,7 +973,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                               Padding(
                                   padding: EdgeInsets.symmetric(vertical: 10)),
                               Text(
-                                s.noEpisodeFavorite,
+                                s!.noEpisodeFavorite,
                                 style: TextStyle(color: Colors.grey[500]),
                               )
                             ],
@@ -983,7 +983,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                           onNotification: (scrollInfo) {
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data.length == _top) {
+                                snapshot.data!.length == _top) {
                               if (!_loadMore) {
                                 _loadMoreEpisode();
                               }
@@ -1028,7 +1028,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                               ),
                               Column(
                                 children: [
-                                  if (!_multiSelect)
+                                  if (!_multiSelect!)
                                     Container(
                                       height: 40,
                                       color: context.primaryColor,
@@ -1042,7 +1042,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                                                       BorderRadius.all(
                                                           Radius.circular(10))),
                                               elevation: 1,
-                                              tooltip: s.homeSubMenuSortBy,
+                                              tooltip: s!.homeSubMenuSortBy,
                                               child: Container(
                                                   height: 50,
                                                   padding: EdgeInsets.symmetric(
@@ -1111,7 +1111,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                                               ),
                                               onPressed: () {
                                                 setState(() => _hideListened =
-                                                    !_hideListened);
+                                                    !_hideListened!);
                                               },
                                             ),
                                           ),
@@ -1147,7 +1147,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                                         ],
                                       ),
                                     ),
-                                  if (_multiSelect)
+                                  if (_multiSelect!)
                                     MultiSelectMenuBar(
                                       selectedList: _selectedEpisodes,
                                       hideFavorite: true,
@@ -1181,21 +1181,21 @@ class _MyDownload extends StatefulWidget {
 
 class _MyDownloadState extends State<_MyDownload>
     with AutomaticKeepAliveClientMixin {
-  Layout _layout;
-  int _sortBy;
-  bool _hideListened;
-  Future<List<EpisodeBrief>> _getDownloadedEpisodes(int sortBy,
-      {bool hideListened}) async {
+  Layout? _layout;
+  int? _sortBy;
+  bool? _hideListened;
+  Future<List<EpisodeBrief>> _getDownloadedEpisodes(int? sortBy,
+      {bool? hideListened}) async {
     var storage = KeyValueStorage(downloadLayoutKey);
     var index = await storage.getInt(defaultValue: 1);
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
-    if (_layout == null) _layout = Layout.values[index];
+    if (_layout == null) _layout = Layout.values[index!];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
     var dbHelper = DBHelper();
     var episodes = await dbHelper.getDownloadedEpisode(sortBy,
-        hideListened: _hideListened);
+        hideListened: _hideListened!);
     return episodes;
   }
 
@@ -1228,7 +1228,7 @@ class _MyDownloadState extends State<_MyDownload>
                           children: <Widget>[
                             Container(
                                 padding: EdgeInsets.symmetric(horizontal: 20),
-                                child: Text(s.downloaded)),
+                                child: Text(s!.downloaded)),
                             Spacer(),
                             Material(
                               color: Colors.transparent,
@@ -1242,7 +1242,7 @@ class _MyDownloadState extends State<_MyDownload>
                                 ),
                                 onPressed: () {
                                   setState(
-                                      () => _hideListened = !_hideListened);
+                                      () => _hideListened = !_hideListened!);
                                 },
                               ),
                             ),

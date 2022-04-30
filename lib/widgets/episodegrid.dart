@@ -32,24 +32,24 @@ enum Layout { three, two, one }
 
 // ignore: must_be_immutable
 class EpisodeGrid extends StatelessWidget {
-  final List<EpisodeBrief> episodes;
+  final List<EpisodeBrief>? episodes;
   final bool showFavorite;
   final bool showDownload;
   final bool showNumber;
-  final int episodeCount;
-  final Layout layout;
-  final bool reverse;
-  final bool multiSelect;
-  final ValueChanged<List<EpisodeBrief>> onSelect;
+  final int? episodeCount;
+  final Layout? layout;
+  final bool? reverse;
+  final bool? multiSelect;
+  final ValueChanged<List<EpisodeBrief>?>? onSelect;
   final bool openPodcast;
-  final List<EpisodeBrief> selectedList;
+  final List<EpisodeBrief>? selectedList;
 
   /// Count of animation items.
   final int initNum;
 
   EpisodeGrid(
-      {Key key,
-      @required this.episodes,
+      {Key? key,
+      required this.episodes,
       this.initNum = 12,
       this.showDownload = false,
       this.showFavorite = false,
@@ -63,7 +63,7 @@ class EpisodeGrid extends StatelessWidget {
       this.selectedList})
       : super(key: key);
 
-  List<EpisodeBrief> _selectedList = [];
+  List<EpisodeBrief>? _selectedList = [];
   final _dbHelper = DBHelper();
 
   Future<int> _isListened(EpisodeBrief episode) async {
@@ -118,7 +118,7 @@ class EpisodeGrid extends StatelessWidget {
   }
 
   Future<void> _requestDownload(BuildContext context,
-      {EpisodeBrief episode}) async {
+      {EpisodeBrief? episode}) async {
     final permissionReady = await _checkPermmison();
     final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
         .getBool(defaultValue: true, reverse: true);
@@ -130,9 +130,9 @@ class EpisodeGrid extends StatelessWidget {
         dataConfirm = await _useDataConfirm(context);
       }
       if (dataConfirm) {
-        context.read<DownloadState>().startTask(episode);
+        context.read<DownloadState>().startTask(episode!);
         Fluttertoast.showToast(
-          msg: context.s.downloadStart,
+          msg: context.s!.downloadStart,
           gravity: ToastGravity.BOTTOM,
         );
       }
@@ -155,7 +155,7 @@ class EpisodeGrid extends StatelessWidget {
 
   Future<bool> _useDataConfirm(BuildContext context) async {
     var ifUseData = false;
-    final s = context.s;
+    final s = context.s!;
     await generalDialog(
       context,
       title: Text(s.cellularConfirm),
@@ -185,7 +185,7 @@ class EpisodeGrid extends StatelessWidget {
     return ifUseData;
   }
 
-  Future<PodcastLocal> _getPodcast(String url) async {
+  Future<PodcastLocal?> _getPodcast(String url) async {
     var podcasts = await _dbHelper.getPodcastWithUrl(url);
     return podcasts;
   }
@@ -196,7 +196,7 @@ class EpisodeGrid extends StatelessWidget {
             layout == Layout.one ? Alignment.centerLeft : Alignment.topLeft,
         padding: EdgeInsets.only(top: 2.0),
         child: Text(
-          episode.title,
+          episode.title!,
           maxLines: layout == Layout.one ? 1 : 4,
           overflow:
               layout == Layout.one ? TextOverflow.ellipsis : TextOverflow.fade,
@@ -205,11 +205,11 @@ class EpisodeGrid extends StatelessWidget {
 
   /// Circel avatar widget.
   Widget _circleImage(BuildContext context,
-          {EpisodeBrief episode, Color color, bool boo, double radius}) =>
+          {EpisodeBrief? episode, Color? color, required bool boo, double? radius}) =>
       InkWell(
         onTap: () async {
           if (openPodcast) {
-            final podcast = await _getPodcast(episode.enclosureUrl);
+            final podcast = await _getPodcast(episode!.enclosureUrl);
             Navigator.push(
               context,
               SlideLeftRoute(
@@ -225,15 +225,15 @@ class EpisodeGrid extends StatelessWidget {
           child: boo
               ? Center()
               : CircleAvatar(
-                  backgroundColor: color.withOpacity(0.5),
-                  backgroundImage: episode.avatarImage),
+                  backgroundColor: color!.withOpacity(0.5),
+                  backgroundImage: episode!.avatarImage),
         ),
       );
 
   Widget _downloadIndicater(BuildContext context,
-          {EpisodeBrief episode, bool isDownloaded}) =>
+          {EpisodeBrief? episode, bool? isDownloaded}) =>
       showDownload || layout != Layout.three
-          ? isDownloaded
+          ? isDownloaded!
               ? Container(
                   height: 20,
                   width: 20,
@@ -268,14 +268,14 @@ class EpisodeGrid extends StatelessWidget {
       : Center();
 
   /// Count indicator widget.
-  Widget _numberIndicater(BuildContext context, {int index, Color color}) =>
+  Widget _numberIndicater(BuildContext context, {int? index, Color? color}) =>
       showNumber
           ? Container(
               alignment: Alignment.topRight,
               child: Text(
-                reverse
-                    ? (index + 1).toString()
-                    : (episodeCount - index).toString(),
+                reverse!
+                    ? (index! + 1).toString()
+                    : (episodeCount! - index!).toString(),
                 style: GoogleFonts.teko(
                   textStyle: TextStyle(
                     fontSize: context.width / 24,
@@ -287,9 +287,9 @@ class EpisodeGrid extends StatelessWidget {
           : Center();
 
   /// Pubdate widget
-  Widget _pubDate(BuildContext context, {EpisodeBrief episode, Color color}) =>
+  Widget _pubDate(BuildContext context, {required EpisodeBrief episode, Color? color}) =>
       Text(
-        episode.pubDate.toDate(context),
+        episode.pubDate!.toDate(context),
         overflow: TextOverflow.visible,
         textAlign: TextAlign.center,
         style: TextStyle(
@@ -299,15 +299,15 @@ class EpisodeGrid extends StatelessWidget {
             fontStyle: FontStyle.italic),
       );
   Widget _episodeCard(BuildContext context,
-      {int index, Color color, bool isLiked, bool isDownloaded, bool boo}) {
+      {int? index, Color? color, bool? isLiked, bool? isDownloaded, bool? boo}) {
     var width = context.width;
     if (layout == Layout.one) {
       return _layoutOneCard(context,
-          index: index,
+          index: index!,
           color: color,
-          isLiked: isLiked,
+          isLiked: isLiked!,
           isDownloaded: isDownloaded,
-          boo: boo);
+          boo: boo!);
     }
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -322,12 +322,12 @@ class EpisodeGrid extends StatelessWidget {
               children: <Widget>[
                 layout != Layout.one
                     ? _circleImage(context,
-                        episode: episodes[index], color: color, boo: boo)
-                    : _pubDate(context, episode: episodes[index], color: color),
+                        episode: episodes![index!], color: color, boo: boo!)
+                    : _pubDate(context, episode: episodes![index!], color: color),
                 Spacer(),
-                _isNewIndicator(episodes[index]),
+                _isNewIndicator(episodes![index]),
                 _downloadIndicater(context,
-                    episode: episodes[index], isDownloaded: isDownloaded),
+                    episode: episodes![index], isDownloaded: isDownloaded),
                 _numberIndicater(context, index: index, color: color)
               ],
             ),
@@ -335,16 +335,16 @@ class EpisodeGrid extends StatelessWidget {
           Expanded(
             flex: layout == Layout.one ? 3 : 5,
             child: layout != Layout.one
-                ? _title(episodes[index])
+                ? _title(episodes![index])
                 : Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _circleImage(context,
-                          episode: episodes[index], color: color, boo: boo),
+                          episode: episodes![index], color: color, boo: boo!),
                       SizedBox(
                         width: 5,
                       ),
-                      Expanded(child: _title(episodes[index]))
+                      Expanded(child: _title(episodes![index]))
                     ],
                   ),
           ),
@@ -355,19 +355,19 @@ class EpisodeGrid extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 if (layout != Layout.one)
-                  _pubDate(context, episode: episodes[index], color: color),
+                  _pubDate(context, episode: episodes![index], color: color),
                 Spacer(),
-                if (layout != Layout.three && episodes[index].duration != 0)
+                if (layout != Layout.three && episodes![index].duration != 0)
                   Align(
                     alignment: Alignment.center,
                     child: Text(
-                      episodes[index].duration.toTime,
+                      episodes![index].duration!.toTime,
                       style: TextStyle(fontSize: width / 35),
                     ),
                   ),
-                if (episodes[index].duration != 0 &&
-                    episodes[index].enclosureLength != null &&
-                    episodes[index].enclosureLength != 0 &&
+                if (episodes![index].duration != 0 &&
+                    episodes![index].enclosureLength != null &&
+                    episodes![index].enclosureLength != 0 &&
                     layout != Layout.three)
                   Text(
                     '|',
@@ -376,19 +376,19 @@ class EpisodeGrid extends StatelessWidget {
                     ),
                   ),
                 if (layout != Layout.three &&
-                    episodes[index].enclosureLength != null &&
-                    episodes[index].enclosureLength != 0)
+                    episodes![index].enclosureLength != null &&
+                    episodes![index].enclosureLength != 0)
                   Align(
                     alignment: Alignment.center,
                     child: Text(
-                      '${(episodes[index].enclosureLength) ~/ 1000000}MB',
+                      '${episodes![index].enclosureLength! ~/ 1000000}MB',
                       style: TextStyle(fontSize: width / 35),
                     ),
                   ),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
-                if ((showFavorite || layout != Layout.three) && isLiked)
+                if ((showFavorite || layout != Layout.three) && isLiked!)
                   Icon(
                     Icons.favorite,
                     color: Colors.red,
@@ -403,7 +403,7 @@ class EpisodeGrid extends StatelessWidget {
   }
 
   Widget _layoutOneCard(BuildContext context,
-      {int index, Color color, bool isLiked, bool isDownloaded, bool boo}) {
+      {required int index, Color? color, required bool isLiked, bool? isDownloaded, required bool boo}) {
     var width = context.width;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
@@ -416,7 +416,7 @@ class EpisodeGrid extends StatelessWidget {
             flex: 1,
             child: Center(
               child: _circleImage(context,
-                  episode: episodes[index],
+                  episode: episodes![index],
                   color: color,
                   boo: boo,
                   radius: context.width / 8),
@@ -435,15 +435,15 @@ class EpisodeGrid extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Expanded(
-                        child: Text(episodes[index].feedTitle,
+                        child: Text(episodes![index].feedTitle!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, color: color)),
                       ),
-                      _isNewIndicator(episodes[index]),
+                      _isNewIndicator(episodes![index]),
                       _downloadIndicater(context,
-                          episode: episodes[index], isDownloaded: isDownloaded),
+                          episode: episodes![index], isDownloaded: isDownloaded),
                       _numberIndicater(context, index: index, color: color)
                     ],
                   ),
@@ -452,24 +452,24 @@ class EpisodeGrid extends StatelessWidget {
                     flex: 2,
                     child: Align(
                         alignment: Alignment.topLeft,
-                        child: _title(episodes[index]))),
+                        child: _title(episodes![index]))),
                 Expanded(
                   flex: 1,
                   child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        if (episodes[index].duration != 0)
+                        if (episodes![index].duration != 0)
                           Align(
                             alignment: Alignment.center,
                             child: Text(
-                              episodes[index].duration.toTime,
+                              episodes![index].duration!.toTime,
                               style: TextStyle(fontSize: width / 35),
                             ),
                           ),
-                        if (episodes[index].duration != 0 &&
-                            episodes[index].enclosureLength != null &&
-                            episodes[index].enclosureLength != 0 &&
+                        if (episodes![index].duration != 0 &&
+                            episodes![index].enclosureLength != null &&
+                            episodes![index].enclosureLength != 0 &&
                             layout != Layout.three)
                           Text(
                             '|',
@@ -477,12 +477,12 @@ class EpisodeGrid extends StatelessWidget {
                               fontSize: width / 35,
                             ),
                           ),
-                        if (episodes[index].enclosureLength != null &&
-                            episodes[index].enclosureLength != 0)
+                        if (episodes![index].enclosureLength != null &&
+                            episodes![index].enclosureLength != 0)
                           Align(
                             alignment: Alignment.center,
                             child: Text(
-                              '${(episodes[index].enclosureLength) ~/ 1000000}MB',
+                              '${episodes![index].enclosureLength! ~/ 1000000}MB',
                               style: TextStyle(fontSize: width / 35),
                             ),
                           ),
@@ -495,7 +495,7 @@ class EpisodeGrid extends StatelessWidget {
                           ),
                         Spacer(),
                         _pubDate(context,
-                            episode: episodes[index], color: color),
+                            episode: episodes![index], color: color),
                       ]),
                 )
               ],
@@ -523,7 +523,7 @@ class EpisodeGrid extends StatelessWidget {
       sliver: LiveSliverGrid.options(
         controller: scrollController,
         options: options,
-        itemCount: episodes.length,
+        itemCount: episodes!.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           childAspectRatio: layout == Layout.three
               ? 1
@@ -539,34 +539,34 @@ class EpisodeGrid extends StatelessWidget {
           crossAxisSpacing: 6.0,
         ),
         itemBuilder: (context, index, animation) {
-          final c = episodes[index].backgroudColor(context);
+          final c = episodes![index].backgroudColor(context);
           scrollController.addListener(() {});
 
           return FadeTransition(
             opacity: Tween<double>(begin: index < initNum ? 0 : 1, end: 1)
                 .animate(animation),
             child: Selector<AudioPlayerNotifier,
-                Tuple4<EpisodeBrief, List<String>, bool, bool>>(
+                Tuple4<EpisodeBrief?, List<String>, bool, bool>>(
               selector: (_, audio) => Tuple4(
                   audio?.episode,
-                  audio.queue.episodes.map((e) => e.enclosureUrl).toList(),
+                  audio.queue.episodes.map((e) => e!.enclosureUrl).toList(),
                   audio.episodeState,
                   audio.playerRunning),
               builder: (_, data, __) => OpenContainerWrapper(
                 avatarSize: layout == Layout.one
                     ? context.width / 8
                     : context.width / 16,
-                episode: episodes[index],
+                episode: episodes![index],
                 closedBuilder: (context, action, boo) =>
                     FutureBuilder<Tuple5<int, bool, bool, bool, List<int>>>(
-                  future: _initData(episodes[index]),
+                  future: _initData(episodes![index]),
                   initialData: Tuple5(0, false, false, false, []),
                   builder: (context, snapshot) {
-                    var isListened = snapshot.data.item1;
-                    var isLiked = snapshot.data.item2;
-                    var isDownloaded = snapshot.data.item3;
-                    var tapToOpen = snapshot.data.item4;
-                    var menuList = snapshot.data.item5;
+                    var isListened = snapshot.data!.item1;
+                    var isLiked = snapshot.data!.item2;
+                    var isDownloaded = snapshot.data!.item3;
+                    var tapToOpen = snapshot.data!.item4;
+                    var menuList = snapshot.data!.item5;
                     return Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -585,26 +585,26 @@ class EpisodeGrid extends StatelessWidget {
                             ),
                           ]),
                       alignment: Alignment.center,
-                      child: multiSelect
+                      child: multiSelect!
                           ? Material(
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap: () {
-                                  if (!selectedList.contains(episodes[index])) {
+                                  if (!selectedList!.contains(episodes![index])) {
                                     _selectedList = selectedList;
-                                    _selectedList.add(episodes[index]);
+                                    _selectedList!.add(episodes![index]);
                                   } else {
                                     _selectedList = selectedList;
-                                    _selectedList.remove(episodes[index]);
+                                    _selectedList!.remove(episodes![index]);
                                   }
-                                  onSelect(_selectedList);
+                                  onSelect!(_selectedList);
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5.0),
                                     border: Border.all(
-                                      color: selectedList
-                                              .contains(episodes[index])
+                                      color: selectedList!
+                                              .contains(episodes![index])
                                           ? context.accentColor
                                           : context.brightness ==
                                                   Brightness.light
@@ -656,18 +656,18 @@ class EpisodeGrid extends StatelessWidget {
                                               ? context.primaryColor
                                               : context.dialogBackgroundColor,
                                       title: Text(
-                                          data.item1 != episodes[index] ||
+                                          data.item1 != episodes![index] ||
                                                   !data.item4
-                                              ? s.play
-                                              : s.playing),
+                                              ? s!.play
+                                              : s!.playing),
                                       trailingIcon: Icon(
                                         LineIcons.playCircle,
                                         color: Theme.of(context).accentColor,
                                       ),
                                       onPressed: () {
-                                        if (data.item1 != episodes[index] ||
+                                        if (data.item1 != episodes![index] ||
                                             !data.item4) {
-                                          audio.episodeLoad(episodes[index]);
+                                          audio.episodeLoad(episodes![index]);
                                         }
                                       }),
                                   if (menuList.contains(1))
@@ -677,7 +677,7 @@ class EpisodeGrid extends StatelessWidget {
                                             ? context.primaryColor
                                             : context.dialogBackgroundColor,
                                         title: data.item2.contains(
-                                                episodes[index].enclosureUrl)
+                                                episodes![index].enclosureUrl)
                                             ? Text(s.remove)
                                             : Text(s.later),
                                         trailingIcon: Icon(
@@ -686,16 +686,16 @@ class EpisodeGrid extends StatelessWidget {
                                         ),
                                         onPressed: () {
                                           if (!data.item2.contains(
-                                              episodes[index].enclosureUrl)) {
+                                              episodes![index].enclosureUrl)) {
                                             audio
-                                                .addToPlaylist(episodes[index]);
+                                                .addToPlaylist(episodes![index]);
                                             Fluttertoast.showToast(
                                               msg: s.toastAddPlaylist,
                                               gravity: ToastGravity.BOTTOM,
                                             );
                                           } else {
                                             audio.delFromPlaylist(
-                                                episodes[index]);
+                                                episodes![index]);
                                             Fluttertoast.showToast(
                                               msg: s.toastRemovePlaylist,
                                               gravity: ToastGravity.BOTTOM,
@@ -716,7 +716,7 @@ class EpisodeGrid extends StatelessWidget {
                                         onPressed: () async {
                                           if (isLiked) {
                                             await _setUnliked(
-                                                episodes[index].enclosureUrl);
+                                                episodes![index].enclosureUrl);
                                             audio.setEpisodeState = true;
                                             Fluttertoast.showToast(
                                               msg: s.unliked,
@@ -724,7 +724,7 @@ class EpisodeGrid extends StatelessWidget {
                                             );
                                           } else {
                                             await _saveLiked(
-                                                episodes[index].enclosureUrl);
+                                                episodes![index].enclosureUrl);
                                             audio.setEpisodeState = true;
                                             Fluttertoast.showToast(
                                               msg: s.liked,
@@ -741,7 +741,7 @@ class EpisodeGrid extends StatelessWidget {
                                         title: isListened > 0
                                             ? Text(s.markNotListened,
                                                 style: TextStyle(
-                                                    color: context.textColor
+                                                    color: context.textColor!
                                                         .withOpacity(0.5)))
                                             : Text(
                                                 s.markListened,
@@ -759,7 +759,7 @@ class EpisodeGrid extends StatelessWidget {
                                         onPressed: () async {
                                           if (isListened < 1) {
                                             await _markListened(
-                                                episodes[index]);
+                                                episodes![index]);
                                             audio.setEpisodeState = true;
                                             Fluttertoast.showToast(
                                               msg: s.markListened,
@@ -767,7 +767,7 @@ class EpisodeGrid extends StatelessWidget {
                                             );
                                           } else {
                                             await _markNotListened(
-                                                episodes[index].enclosureUrl);
+                                                episodes![index].enclosureUrl);
                                             audio.setEpisodeState = true;
                                             Fluttertoast.showToast(
                                               msg: s.markNotListened,
@@ -784,7 +784,7 @@ class EpisodeGrid extends StatelessWidget {
                                         title: isDownloaded
                                             ? Text(s.downloaded,
                                                 style: TextStyle(
-                                                    color: context.textColor
+                                                    color: context.textColor!
                                                         .withOpacity(0.5)))
                                             : Text(s.download),
                                         trailingIcon: Icon(
@@ -793,7 +793,7 @@ class EpisodeGrid extends StatelessWidget {
                                         onPressed: () async {
                                           if (!isDownloaded) {
                                             await _requestDownload(context,
-                                                episode: episodes[index]);
+                                                episode: episodes![index]);
                                           }
                                         }),
                                   if (menuList.contains(5))
@@ -808,14 +808,14 @@ class EpisodeGrid extends StatelessWidget {
                                           color: Colors.amber,
                                         ),
                                         onPressed: () {
-                                          audio.moveToTop(episodes[index]);
+                                          audio.moveToTop(episodes![index]);
                                           Fluttertoast.showToast(
                                             msg: s.playNextDes,
                                             gravity: ToastGravity.BOTTOM,
                                           );
                                         }),
                                 ],
-                                action: action,
+                                onPressed: action,
                                 child: _episodeCard(context,
                                     index: index,
                                     isLiked: isLiked,
@@ -840,19 +840,19 @@ class OpenContainerWrapper extends StatelessWidget {
   const OpenContainerWrapper(
       {this.closedBuilder, this.episode, this.playerRunning, this.avatarSize});
 
-  final OpenContainerBuilder closedBuilder;
-  final EpisodeBrief episode;
-  final bool playerRunning;
-  final double avatarSize;
+  final OpenContainerBuilder? closedBuilder;
+  final EpisodeBrief? episode;
+  final bool? playerRunning;
+  final double? avatarSize;
 
   @override
   Widget build(BuildContext context) {
-    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
+    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight?>>(
       selector: (_, audio) => Tuple2(audio.playerRunning, audio.playerHeight),
       builder: (_, data, __) => OpenContainer(
         playerRunning: data.item1,
-        playerHeight: kMinPlayerHeight[data.item2.index],
-        flightWidget: CircleAvatar(backgroundImage: episode.avatarImage),
+        playerHeight: kMinPlayerHeight[data.item2!.index],
+        flightWidget: CircleAvatar(backgroundImage: episode!.avatarImage),
         flightWidgetSize: avatarSize,
         transitionDuration: Duration(milliseconds: 400),
         beginColor: Theme.of(context).primaryColor,
@@ -875,7 +875,7 @@ class OpenContainerWrapper extends StatelessWidget {
           );
         },
         tappable: true,
-        closedBuilder: closedBuilder,
+        closedBuilder: closedBuilder!,
       ),
     );
   }

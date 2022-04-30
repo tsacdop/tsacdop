@@ -3,7 +3,7 @@ import 'package:flare_flutter/flare_actor.dart';
 import '../util/extension_helper.dart';
 
 class SecondPage extends StatefulWidget {
-  SecondPage({Key key}) : super(key: key);
+  SecondPage({Key? key}) : super(key: key);
 
   @override
   _SecondPageState createState() => _SecondPageState();
@@ -24,7 +24,7 @@ class _SecondPageState extends State<SecondPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.fromLTRB(40, context.paddingTop + 20, 40, 20),
               child: Text(
-                context.s.introSecondPage,
+                context.s!.introSecondPage,
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),

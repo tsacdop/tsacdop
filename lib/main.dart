@@ -54,7 +54,7 @@ Future main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Selector<SettingState, Tuple3<ThemeMode, ThemeData, ThemeData>>(
+    return Selector<SettingState, Tuple3<ThemeMode?, ThemeData, ThemeData>>(
       selector: (_, setting) =>
           Tuple3(setting.theme, setting.lightTheme, setting.darkTheme),
       builder: (_, data, child) {
@@ -72,9 +72,9 @@ class MyApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: S.delegate.supportedLocales,
-            home: context.read<SettingState>().showIntro
+            home: context.read<SettingState>().showIntro!
                 ? SlideIntro(goto: Goto.home)
-                : context.read<SettingState>().openPlaylistDefault
+                : context.read<SettingState>().openPlaylistDefault!
                     ? PlaylistHome()
                     : Home(),
           ),

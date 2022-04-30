@@ -9,8 +9,8 @@ part of 'itunes_podcast.dart';
 ItunesSearchResult<P> _$ItunesSearchResultFromJson<P>(
     Map<String, dynamic> json) {
   return ItunesSearchResult<P>(
-    resultCount: json['resultCount'] as int,
-    results: (json['results'] as List)?.map(_ConvertP<P>().fromJson)?.toList(),
+    resultCount: json['resultCount'] as int?,
+    results: (json['results'] as List?)?.map(_ConvertP<P>().fromJson)?.toList(),
   );
 }
 
@@ -23,12 +23,12 @@ Map<String, dynamic> _$ItunesSearchResultToJson<P>(
 
 ItunesPodcast _$ItunesPodcastFromJson(Map<String, dynamic> json) {
   return ItunesPodcast(
-    artistName: json['artistName'] as String,
-    collectionName: json['collectionName'] as String,
-    feedUrl: json['feedUrl'] as String,
-    artworkUrl600: json['artworkUrl600'] as String,
-    releaseDate: json['releaseDate'] as String,
-    collectionId: json['collectionId'] as int,
+    artistName: json['artistName'] as String?,
+    collectionName: json['collectionName'] as String?,
+    feedUrl: json['feedUrl'] as String?,
+    artworkUrl600: json['artworkUrl600'] as String?,
+    releaseDate: json['releaseDate'] as String?,
+    collectionId: json['collectionId'] as int?,
   );
 }
 

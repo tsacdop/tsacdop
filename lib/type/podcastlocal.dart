@@ -6,21 +6,21 @@ import 'package:flutter/material.dart';
 import '../util/extension_helper.dart';
 
 class PodcastLocal extends Equatable {
-  final String title;
-  final String imageUrl;
+  final String? title;
+  final String? imageUrl;
   final String rssUrl;
-  final String author;
+  final String? author;
 
-  final String primaryColor;
-  final String id;
-  final String imagePath;
-  final String provider;
-  final String link;
+  final String? primaryColor;
+  final String? id;
+  final String? imagePath;
+  final String? provider;
+  final String? link;
 
-  final String description;
+  final String? description;
 
-  final int updateCount;
-  final int episodeCount;
+  final int? updateCount;
+  final int? episodeCount;
 
   final List<String> funding;
 
@@ -45,18 +45,18 @@ class PodcastLocal extends Equatable {
   }) : assert(rssUrl != null);
 
   ImageProvider get avatarImage {
-    return File(imagePath).existsSync()
-        ? FileImage(File(imagePath))
-        : const AssetImage('assets/avatar_backup.png');
+    return (File(imagePath!).existsSync()
+        ? FileImage(File(imagePath!))
+        : const AssetImage('assets/avatar_backup.png')) as ImageProvider<Object>;
   }
 
   Color backgroudColor(BuildContext context) {
     return context.brightness == Brightness.light
-        ? primaryColor.colorizedark()
-        : primaryColor.colorizeLight();
+        ? primaryColor!.colorizedark()
+        : primaryColor!.colorizeLight();
   }
 
-  PodcastLocal copyWith({int updateCount, int episodeCount}) {
+  PodcastLocal copyWith({int? updateCount, int? episodeCount}) {
     return PodcastLocal(title, imageUrl, rssUrl, primaryColor, author, id, 
         imagePath, provider, link, funding,
         description: description,
@@ -66,5 +66,5 @@ class PodcastLocal extends Equatable {
   }
 
   @override
-  List<Object> get props => [id, rssUrl];
+  List<Object?> get props => [id, rssUrl];
 }

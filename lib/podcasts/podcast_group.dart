@@ -14,14 +14,14 @@ import '../widgets/general_dialog.dart';
 import 'podcast_settings.dart';
 
 class PodcastGroupList extends StatefulWidget {
-  final PodcastGroup group;
-  PodcastGroupList({this.group, Key key}) : super(key: key);
+  final PodcastGroup? group;
+  PodcastGroupList({this.group, Key? key}) : super(key: key);
   @override
   _PodcastGroupListState createState() => _PodcastGroupListState();
 }
 
 class _PodcastGroupListState extends State<PodcastGroupList> {
-  PodcastGroup _group;
+  PodcastGroup? _group;
   @override
   void initState() {
     super.initState();
@@ -36,7 +36,7 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
 
   @override
   Widget build(BuildContext context) {
-    return _group.podcastList.isEmpty
+    return _group!.podcastList.isEmpty
         ? Container(
             color: context.primaryColor,
           )
@@ -45,11 +45,11 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
             child: ReorderableListView(
               onReorder: (oldIndex, newIndex) {
                 setState(() {
-                  _group.reorderGroup(oldIndex, newIndex);
+                  _group!.reorderGroup(oldIndex, newIndex);
                 });
                 context.read<GroupList>().addToOrderChanged(_group);
               },
-              children: _group.podcasts.map<Widget>(
+              children: _group!.podcasts.map<Widget>(
                 (podcastLocal) {
                   return Container(
                     decoration:
@@ -68,37 +68,37 @@ class _PodcastGroupListState extends State<PodcastGroupList> {
 }
 
 class _PodcastCard extends StatefulWidget {
-  final PodcastLocal podcastLocal;
-  final PodcastGroup group;
-  _PodcastCard({this.podcastLocal, this.group, Key key}) : super(key: key);
+  final PodcastLocal? podcastLocal;
+  final PodcastGroup? group;
+  _PodcastCard({this.podcastLocal, this.group, Key? key}) : super(key: key);
   @override
   __PodcastCardState createState() => __PodcastCardState();
 }
 
 class __PodcastCardState extends State<_PodcastCard>
     with SingleTickerProviderStateMixin {
-  bool _addGroup;
-  List<PodcastGroup> _selectedGroups;
-  List<PodcastGroup> _belongGroups;
-  AnimationController _controller;
-  Animation _animation;
-  double _value;
-  int _seconds;
-  int _skipSeconds;
+  late bool _addGroup;
+  late List<PodcastGroup?> _selectedGroups;
+  late List<PodcastGroup?> _belongGroups;
+  late AnimationController _controller;
+  late Animation _animation;
+  double? _value;
+  int? _seconds;
+  int? _skipSeconds;
 
-  Future<int> _getSkipSecond(String id) async {
+  Future<int?> _getSkipSecond(String? id) async {
     var dbHelper = DBHelper();
     var seconds = await dbHelper.getSkipSecondsStart(id);
     _skipSeconds = seconds;
     return seconds;
   }
 
-  _saveSkipSeconds(String id, int seconds) async {
+  _saveSkipSeconds(String? id, int? seconds) async {
     var dbHelper = DBHelper();
     await dbHelper.saveSkipSecondsStart(id, seconds);
   }
 
-  _setAutoDownload(String id, bool boo) async {
+  _setAutoDownload(String? id, bool boo) async {
     var permission = await _checkPermmison();
     if (permission) {
       var dbHelper = DBHelper();
@@ -106,7 +106,7 @@ class __PodcastCardState extends State<_PodcastCard>
     }
   }
 
-  Future<bool> _getAutoDownload(String id) async {
+  Future<bool> _getAutoDownload(String? id) async {
     var dbHelper = DBHelper();
     return await dbHelper.getAutoDownload(id);
   }
@@ -142,7 +142,7 @@ class __PodcastCardState extends State<_PodcastCard>
       });
   }
 
-  Widget _buttonOnMenu({Widget icon, VoidCallback onTap, String tooltip}) =>
+  Widget _buttonOnMenu({required Widget icon, VoidCallback? onTap, required String tooltip}) =>
       Material(
         color: Colors.transparent,
         child: InkWell(
@@ -166,10 +166,10 @@ class __PodcastCardState extends State<_PodcastCard>
 
   @override
   Widget build(BuildContext context) {
-    final c = widget.podcastLocal.backgroudColor(context);
-    final s = context.s;
+    final c = widget.podcastLocal!.backgroudColor(context);
+    final s = context.s!;
     var groupList = context.watch<GroupList>();
-    _belongGroups = groupList.getPodcastGroup(widget.podcastLocal.id);
+    _belongGroups = groupList.getPodcastGroup(widget.podcastLocal!.id);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -191,7 +191,7 @@ class __PodcastCardState extends State<_PodcastCard>
                     SizedBox(width: 5),
                     CircleAvatar(
                       radius: 25,
-                      backgroundImage: widget.podcastLocal.avatarImage,
+                      backgroundImage: widget.podcastLocal!.avatarImage,
                     ),
                     SizedBox(width: 10),
                     Expanded(
@@ -201,7 +201,7 @@ class __PodcastCardState extends State<_PodcastCard>
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Text(
-                            widget.podcastLocal.title,
+                            widget.podcastLocal!.title!,
                             maxLines: 2,
                             overflow: TextOverflow.fade,
                             style: TextStyle(
@@ -211,7 +211,7 @@ class __PodcastCardState extends State<_PodcastCard>
                             children: _belongGroups.map((group) {
                               return Container(
                                   padding: EdgeInsets.only(right: 5.0),
-                                  child: Text(group.name));
+                                  child: Text(group!.name!));
                             }).toList(),
                           ),
                         ],
@@ -229,7 +229,7 @@ class __PodcastCardState extends State<_PodcastCard>
                         tooltip: s.menu,
                         onPressed: () => generalSheet(
                               context,
-                              title: widget.podcastLocal.title,
+                              title: widget.podcastLocal!.title,
                               child: PodcastSetting(
                                   podcastLocal: widget.podcastLocal),
                             ).then((value) {
@@ -265,8 +265,8 @@ class __PodcastCardState extends State<_PodcastCard>
                                   return Container(
                                     padding: EdgeInsets.only(left: 5.0),
                                     child: FilterChip(
-                                      key: ValueKey<String>(group.id),
-                                      label: Text(group.name),
+                                      key: ValueKey<String>(group!.id),
+                                      label: Text(group.name!),
                                       selected: _selectedGroups.contains(group),
                                       onSelected: (value) {
                                         setState(() {
@@ -304,7 +304,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                           _addGroup = false;
                                         });
                                         await groupList.changeGroup(
-                                          widget.podcastLocal,
+                                          widget.podcastLocal!,
                                           _selectedGroups,
                                         );
                                         Fluttertoast.showToast(
@@ -329,7 +329,7 @@ class __PodcastCardState extends State<_PodcastCard>
                           children: <Widget>[
                             _buttonOnMenu(
                                 icon: Icon(Icons.add,
-                                    size: _value == 0 ? 1 : 20 * _value),
+                                    size: _value == 0 ? 1 : 20 * _value!),
                                 onTap: () {
                                   setState(() {
                                     _addGroup = true;
@@ -337,52 +337,52 @@ class __PodcastCardState extends State<_PodcastCard>
                                 },
                                 tooltip: s.groups(0)),
                             FutureBuilder<bool>(
-                              future: _getAutoDownload(widget.podcastLocal.id),
+                              future: _getAutoDownload(widget.podcastLocal!.id),
                               initialData: false,
                               builder: (context, snapshot) {
                                 return _buttonOnMenu(
                                   icon: Container(
                                     child: Icon(Icons.file_download,
-                                        size: _value * 15,
-                                        color: snapshot.data
+                                        size: _value! * 15,
+                                        color: snapshot.data!
                                             ? Colors.white
                                             : null),
-                                    height: _value == 0 ? 1 : 20 * _value,
-                                    width: _value == 0 ? 1 : 20 * _value,
+                                    height: _value == 0 ? 1 : 20 * _value!,
+                                    width: _value == 0 ? 1 : 20 * _value!,
                                     decoration: BoxDecoration(
-                                        border: snapshot.data
+                                        border: snapshot.data!
                                             ? Border.all(
                                                 width: 1,
-                                                color: snapshot.data
+                                                color: snapshot.data!
                                                     ? context.accentColor
                                                     : context.textTheme
-                                                        .subtitle1.color)
+                                                        .subtitle1!.color!)
                                             : null,
                                         shape: BoxShape.circle,
-                                        color: snapshot.data
+                                        color: snapshot.data!
                                             ? context.accentColor
                                             : null),
                                   ),
                                   tooltip: s.autoDownload,
                                   onTap: () async {
                                     await _setAutoDownload(
-                                        widget.podcastLocal.id, !snapshot.data);
+                                        widget.podcastLocal!.id, !snapshot.data!);
                                     setState(() {});
                                   },
                                 );
                               },
                             ),
-                            FutureBuilder<int>(
-                                future: _getSkipSecond(widget.podcastLocal.id),
+                            FutureBuilder<int?>(
+                                future: _getSkipSecond(widget.podcastLocal!.id),
                                 initialData: 0,
                                 builder: (context, snapshot) {
                                   return _buttonOnMenu(
                                       icon: Icon(
                                         Icons.fast_forward,
-                                        size: _value == 0 ? 1 : 20 * (_value),
+                                        size: _value == 0 ? 1 : 20 * _value!,
                                       ),
                                       tooltip:
-                                          'Skip${snapshot.data == 0 ? '' : snapshot.data.toTime}',
+                                          'Skip${snapshot.data == 0 ? '' : snapshot.data!.toTime}',
                                       onTap: () {
                                         generalDialog(
                                           context,
@@ -414,7 +414,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                                 _saveSkipSeconds(
-                                                    widget.podcastLocal.id,
+                                                    widget.podcastLocal!.id,
                                                     _seconds);
                                               },
                                               child: Text(
@@ -431,7 +431,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                 icon: Icon(
                                   Icons.delete,
                                   color: Colors.red,
-                                  size: _value == 0 ? 1 : 20 * _value,
+                                  size: _value == 0 ? 1 : 20 * _value!,
                                 ),
                                 tooltip: s.remove,
                                 onTap: () {
@@ -455,7 +455,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                         splashColor: Colors.red.withAlpha(70),
                                         onPressed: () {
                                           groupList.removePodcast(
-                                              widget.podcastLocal);
+                                              widget.podcastLocal!);
                                           Navigator.of(context).pop();
                                         },
                                         child: Text(
@@ -477,35 +477,35 @@ class __PodcastCardState extends State<_PodcastCard>
 }
 
 class RenameGroup extends StatefulWidget {
-  final PodcastGroup group;
-  RenameGroup({this.group, Key key}) : super(key: key);
+  final PodcastGroup? group;
+  RenameGroup({this.group, Key? key}) : super(key: key);
   @override
   _RenameGroupState createState() => _RenameGroupState();
 }
 
 class _RenameGroupState extends State<RenameGroup> {
-  TextEditingController _controller;
-  String _newName;
-  int _error;
+  TextEditingController? _controller;
+  String? _newName;
+  int? _error;
 
   @override
   void initState() {
     super.initState();
     _error = 0;
-    _controller = TextEditingController(text: widget.group.name);
+    _controller = TextEditingController(text: widget.group!.name);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var groupList = Provider.of<GroupList>(context, listen: false);
-    List list = groupList.groups.map((e) => e.name).toList();
-    final s = context.s;
+    List list = groupList.groups.map((e) => e!.name).toList();
+    final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,
@@ -537,9 +537,9 @@ class _RenameGroupState extends State<RenameGroup> {
                 setState(() => _error = 1);
               } else {
                 var newGroup = PodcastGroup(_newName,
-                    color: widget.group.color,
-                    id: widget.group.id,
-                    podcastList: widget.group.podcastList);
+                    color: widget.group!.color,
+                    id: widget.group!.id,
+                    podcastList: widget.group!.podcastList);
                 groupList.updateGroup(newGroup);
                 Navigator.of(context).pop();
               }

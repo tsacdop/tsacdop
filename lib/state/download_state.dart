@@ -17,14 +17,14 @@ import '../type/episodebrief.dart';
 
 void downloadCallback(String id, DownloadTaskStatus status, int progress) {
   developer.log('Homepage callback task in $id  status ($status) $progress');
-  final send = IsolateNameServer.lookupPortByName('downloader_send_port');
+  final send = IsolateNameServer.lookupPortByName('downloader_send_port')!;
   send.send([id, status, progress]);
 }
 
 void autoDownloadCallback(String id, DownloadTaskStatus status, int progress) {
   developer
       .log('Autodownload callback task in $id  status ($status) $progress');
-  final send = IsolateNameServer.lookupPortByName('auto_downloader_send_port');
+  final send = IsolateNameServer.lookupPortByName('auto_downloader_send_port')!;
   send.send([id, status, progress]);
 }
 
@@ -47,9 +47,9 @@ class AutoDownloader {
       return;
     }
     _port.listen((dynamic data) {
-      String id = data[0];
-      DownloadTaskStatus status = data[1];
-      int progress = data[2];
+      String? id = data[0];
+      DownloadTaskStatus? status = data[1];
+      int? progress = data[2];
 
       for (var episodeTask in _episodeTasks) {
         if (episodeTask.taskId == id) {
@@ -59,8 +59,8 @@ class AutoDownloader {
             _saveMediaId(episodeTask);
           } else if (status == DownloadTaskStatus.failed) {
             _episodeTasks.removeWhere((element) =>
-                element.episode.enclosureUrl ==
-                episodeTask.episode.enclosureUrl);
+                element.episode!.enclosureUrl ==
+                episodeTask.episode!.enclosureUrl);
             if (_episodeTasks.length == 0) _unbindBackgroundIsolate();
           }
         }
@@ -75,23 +75,23 @@ class AutoDownloader {
 
   Future<Directory> _getDownloadDirectory() async {
     final storage = KeyValueStorage(downloadPositionKey);
-    final index = await storage.getInt();
-    final externalDirs = await getExternalStorageDirectories();
+    final index = await (storage.getInt() as FutureOr<int>);
+    final externalDirs = await (getExternalStorageDirectories() as FutureOr<List<Directory>>);
     return externalDirs[index];
   }
 
   Future _saveMediaId(EpisodeTask episodeTask) async {
-    final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
+    final completeTask = await (FlutterDownloader.loadTasksWithRawQuery(
+        query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'") as FutureOr<List<DownloadTask>>);
     var filePath =
-        'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename))}';
+        'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename!))}';
     var fileStat = await File(
             path.join(completeTask.first.savedDir, completeTask.first.filename))
         .stat();
-    await _dbHelper.saveMediaId(episodeTask.episode.enclosureUrl, filePath,
+    await _dbHelper.saveMediaId(episodeTask.episode!.enclosureUrl, filePath,
         episodeTask.taskId, fileStat.size);
     _episodeTasks.removeWhere((element) =>
-        element.episode.enclosureUrl == episodeTask.episode.enclosureUrl);
+        element.episode!.enclosureUrl == episodeTask.episode!.enclosureUrl);
     if (_episodeTasks.length == 0) _unbindBackgroundIsolate();
   }
 
@@ -111,7 +111,7 @@ class AutoDownloader {
           now.day.toString() +
           now.second.toString();
       var fileName =
-          '${episode.title.replaceAll('/', '')}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
+          '${episode.title!.replaceAll('/', '')}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
       if (fileName.length > 100) {
         fileName = fileName.substring(fileName.length - 100);
       }
@@ -152,7 +152,7 @@ class DownloadState extends ChangeNotifier {
   Future<void> _loadTasks() async {
     _episodeTasks = [];
     var dbHelper = DBHelper();
-    var tasks = await FlutterDownloader.loadTasks();
+    var tasks = await (FlutterDownloader.loadTasks() as FutureOr<List<DownloadTask>>);
     if (tasks.isNotEmpty) {
       for (var task in tasks) {
         var episode = await dbHelper.getRssItemWithUrl(task.url);
@@ -170,7 +170,7 @@ class DownloadState extends ChangeNotifier {
             } else {
               if (episode.enclosureUrl == episode.mediaId) {
                 var filePath =
-                    'file://${path.join(task.savedDir, Uri.encodeComponent(task.filename))}';
+                    'file://${path.join(task.savedDir, Uri.encodeComponent(task.filename!))}';
                 var fileStat =
                     await File(path.join(task.savedDir, task.filename)).stat();
                 await dbHelper.saveMediaId(
@@ -191,8 +191,8 @@ class DownloadState extends ChangeNotifier {
 
   Future<Directory> _getDownloadDirectory() async {
     final storage = KeyValueStorage(downloadPositionKey);
-    final index = await storage.getInt();
-    final externalDirs = await getExternalStorageDirectories();
+    final index = await (storage.getInt() as FutureOr<int>);
+    final externalDirs = await (getExternalStorageDirectories() as FutureOr<List<Directory>>);
     return externalDirs[index];
   }
 
@@ -207,9 +207,9 @@ class DownloadState extends ChangeNotifier {
     }
 
     _port.listen((dynamic data) {
-      String id = data[0];
-      DownloadTaskStatus status = data[1];
-      int progress = data[2];
+      String? id = data[0];
+      DownloadTaskStatus? status = data[1];
+      int? progress = data[2];
 
       for (var episodeTask in _episodeTasks) {
         if (episodeTask.taskId == id) {
@@ -229,17 +229,17 @@ class DownloadState extends ChangeNotifier {
 
   Future _saveMediaId(EpisodeTask episodeTask) async {
     episodeTask.status = DownloadTaskStatus.complete;
-    final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
+    final completeTask = await (FlutterDownloader.loadTasksWithRawQuery(
+        query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'") as FutureOr<List<DownloadTask>>);
     var filePath =
-        'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename))}';
+        'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename!))}';
     var fileStat = await File(
             path.join(completeTask.first.savedDir, completeTask.first.filename))
         .stat();
-    _dbHelper.saveMediaId(episodeTask.episode.enclosureUrl, filePath,
+    _dbHelper.saveMediaId(episodeTask.episode!.enclosureUrl, filePath,
         episodeTask.taskId, fileStat.size);
     var episode =
-        await _dbHelper.getRssItemWithUrl(episodeTask.episode.enclosureUrl);
+        await _dbHelper.getRssItemWithUrl(episodeTask.episode!.enclosureUrl);
     _removeTask(episodeTask.episode);
     _episodeTasks.add(EpisodeTask(episode, episodeTask.taskId,
         progress: 100, status: DownloadTaskStatus.complete));
@@ -249,9 +249,9 @@ class DownloadState extends ChangeNotifier {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
   }
 
-  EpisodeTask episodeToTask(EpisodeBrief episode) {
+  EpisodeTask episodeToTask(EpisodeBrief? episode) {
     return _episodeTasks
-        .firstWhere((task) => task.episode.enclosureUrl == episode.enclosureUrl,
+        .firstWhere((task) => task.episode!.enclosureUrl == episode!.enclosureUrl,
             orElse: () {
       return EpisodeTask(
         episode,
@@ -283,7 +283,7 @@ class DownloadState extends ChangeNotifier {
           now.day.toString() +
           now.second.toString();
       var fileName =
-          '${episode.title.replaceAll('/', '')}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
+          '${episode.title!.replaceAll('/', '')}$datePlus.${episode.enclosureUrl.split('/').last.split('.').last}';
       if (fileName.length > 100) {
         fileName = fileName.substring(fileName.length - 100);
       }
@@ -300,18 +300,18 @@ class DownloadState extends ChangeNotifier {
     }
   }
 
-  Future pauseTask(EpisodeBrief episode) async {
+  Future pauseTask(EpisodeBrief? episode) async {
     var task = episodeToTask(episode);
-    if (task.progress > 0) {
-      await FlutterDownloader.pause(taskId: task.taskId);
+    if (task.progress! > 0) {
+      await FlutterDownloader.pause(taskId: task.taskId!);
     }
     notifyListeners();
   }
 
   Future resumeTask(EpisodeBrief episode) async {
     var task = episodeToTask(episode);
-    var newTaskId = await FlutterDownloader.resume(taskId: task.taskId);
-    await FlutterDownloader.remove(taskId: task.taskId);
+    var newTaskId = await FlutterDownloader.resume(taskId: task.taskId!);
+    await FlutterDownloader.remove(taskId: task.taskId!);
     var index = _episodeTasks.indexOf(task);
     _episodeTasks[index] = task.copyWith(taskId: newTaskId);
     notifyListeners();
@@ -320,8 +320,8 @@ class DownloadState extends ChangeNotifier {
 
   Future retryTask(EpisodeBrief episode) async {
     var task = episodeToTask(episode);
-    var newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
-    await FlutterDownloader.remove(taskId: task.taskId);
+    var newTaskId = await FlutterDownloader.retry(taskId: task.taskId!);
+    await FlutterDownloader.remove(taskId: task.taskId!);
     var index = _episodeTasks.indexOf(task);
     _episodeTasks[index] = task.copyWith(taskId: newTaskId);
     notifyListeners();
@@ -331,13 +331,13 @@ class DownloadState extends ChangeNotifier {
   Future removeTask(EpisodeBrief episode) async {
     var task = episodeToTask(episode);
     await FlutterDownloader.remove(
-        taskId: task.taskId, shouldDeleteContent: false);
+        taskId: task.taskId!, shouldDeleteContent: false);
   }
 
   Future<void> delTask(EpisodeBrief episode) async {
     var task = episodeToTask(episode);
     await FlutterDownloader.remove(
-        taskId: task.taskId, shouldDeleteContent: true);
+        taskId: task.taskId!, shouldDeleteContent: true);
     await _dbHelper.delDownloaded(episode.enclosureUrl);
 
     for (var episodeTask in _episodeTasks) {
@@ -349,7 +349,7 @@ class DownloadState extends ChangeNotifier {
     _removeTask(episode);
   }
 
-  void _removeTask(EpisodeBrief episode) {
+  void _removeTask(EpisodeBrief? episode) {
     _episodeTasks.removeWhere((element) => element.episode == episode);
     notifyListeners();
   }
@@ -362,7 +362,7 @@ class DownloadState extends ChangeNotifier {
     final deletePlayed = await deletePlayedStorage.getBool(defaultValue: false);
     if (autoDelete == 0) {
       await autoDeleteStorage.saveInt(30);
-    } else if (autoDelete > 0) {
+    } else if (autoDelete! > 0) {
       var deadline = DateTime.now()
           .subtract(Duration(days: autoDelete))
           .millisecondsSinceEpoch;
@@ -373,9 +373,9 @@ class DownloadState extends ChangeNotifier {
           await delTask(episode);
         }
       }
-      final tasks = await FlutterDownloader.loadTasksWithRawQuery(
+      final tasks = await (FlutterDownloader.loadTasksWithRawQuery(
           query:
-              'SELECT * FROM task WHERE time_created < $deadline AND status = 3');
+              'SELECT * FROM task WHERE time_created < $deadline AND status = 3') as FutureOr<List<DownloadTask>>);
       for (var task in tasks) {
         FlutterDownloader.remove(
             taskId: task.taskId, shouldDeleteContent: true);

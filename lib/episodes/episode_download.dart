@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -19,14 +18,14 @@ import '../widgets/custom_widget.dart';
 import '../widgets/general_dialog.dart';
 
 class DownloadButton extends StatefulWidget {
-  final EpisodeBrief episode;
-  DownloadButton({this.episode, Key key}) : super(key: key);
+  final EpisodeBrief? episode;
+  DownloadButton({this.episode, Key? key}) : super(key: key);
   @override
   _DownloadButtonState createState() => _DownloadButtonState();
 }
 
 class _DownloadButtonState extends State<DownloadButton> {
-  Future<void> _requestDownload(EpisodeBrief episode) async {
+  Future<void> _requestDownload(EpisodeBrief? episode) async {
     final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
         .getBool(defaultValue: true, reverse: true);
     final permissionReady = await _checkPermmison();
@@ -38,7 +37,7 @@ class _DownloadButtonState extends State<DownloadButton> {
         dataConfirm = await _useDataConfirm();
       }
       if (dataConfirm) {
-        Provider.of<DownloadState>(context, listen: false).startTask(episode);
+        Provider.of<DownloadState>(context, listen: false).startTask(episode!);
       }
     }
   }
@@ -46,12 +45,12 @@ class _DownloadButtonState extends State<DownloadButton> {
   void _deleteDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).delTask(episode);
     Fluttertoast.showToast(
-      msg: context.s.downloadRemovedToast,
+      msg: context.s!.downloadRemovedToast,
       gravity: ToastGravity.BOTTOM,
     );
   }
 
-  Future<void> _pauseDownload(EpisodeBrief episode) async {
+  Future<void> _pauseDownload(EpisodeBrief? episode) async {
     Provider.of<DownloadState>(context, listen: false).pauseTask(episode);
   }
 
@@ -79,7 +78,7 @@ class _DownloadButtonState extends State<DownloadButton> {
 
   Future<bool> _useDataConfirm() async {
     var ifUseData = false;
-    final s = context.s;
+    final s = context.s!;
     await generalDialog(
       context,
       title: Text(s.cellularConfirm),
@@ -138,7 +137,7 @@ class _DownloadButtonState extends State<DownloadButton> {
               alignment: Alignment.center,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Text('${math.max(_task.progress, 0)}%',
+                child: Text('${math.max<int>(_task.progress!, 0)}%',
                     style: TextStyle(color: Colors.white)),
               )),
         ],
@@ -147,7 +146,7 @@ class _DownloadButtonState extends State<DownloadButton> {
   }
 
   Widget _downloadButton(EpisodeTask task, BuildContext context) {
-    switch (task.status.value) {
+    switch (task.status!.value) {
       case 0:
         return _buttonOnMenu(
             Center(
@@ -170,7 +169,7 @@ class _DownloadButtonState extends State<DownloadButton> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              if (task.progress > 0) _pauseDownload(task.episode);
+              if (task.progress! > 0) _pauseDownload(task.episode);
             },
             child: Container(
               height: 50.0,
@@ -179,7 +178,7 @@ class _DownloadButtonState extends State<DownloadButton> {
               child: TweenAnimationBuilder(
                 duration: Duration(milliseconds: 1000),
                 tween: Tween(begin: 0.0, end: 1.0),
-                builder: (context, fraction, child) => SizedBox(
+                builder: (context, dynamic fraction, child) => SizedBox(
                   height: 20,
                   width: 20,
                   child: CustomPaint(
@@ -187,7 +186,7 @@ class _DownloadButtonState extends State<DownloadButton> {
                         color: context.accentColor,
                         fraction: fraction,
                         progressColor: context.accentColor,
-                        progress: task.progress / 100),
+                        progress: task.progress! / 100),
                   ),
                 ),
               ),
@@ -200,7 +199,7 @@ class _DownloadButtonState extends State<DownloadButton> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              _resumeDownload(task.episode);
+              _resumeDownload(task.episode!);
             },
             child: Container(
               height: 50.0,
@@ -209,7 +208,7 @@ class _DownloadButtonState extends State<DownloadButton> {
               child: TweenAnimationBuilder(
                 duration: Duration(milliseconds: 500),
                 tween: Tween(begin: 0.0, end: 1.0),
-                builder: (context, fraction, child) => SizedBox(
+                builder: (context, dynamic fraction, child) => SizedBox(
                   height: 20,
                   width: 20,
                   child: CustomPaint(
@@ -217,7 +216,7 @@ class _DownloadButtonState extends State<DownloadButton> {
                         color: context.accentColor,
                         fraction: 1,
                         progressColor: context.accentColor,
-                        progress: task.progress / 100,
+                        progress: task.progress! / 100,
                         pauseProgress: fraction),
                   ),
                 ),
@@ -228,12 +227,12 @@ class _DownloadButtonState extends State<DownloadButton> {
         break;
       case 3:
         Provider.of<AudioPlayerNotifier>(context, listen: false)
-            .updateMediaItem(task.episode);
+            .updateMediaItem(task.episode!);
         return Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              _deleteDownload(task.episode);
+              _deleteDownload(task.episode!);
             },
             child: Container(
               height: 50.0,
@@ -257,7 +256,7 @@ class _DownloadButtonState extends State<DownloadButton> {
         break;
       case 4:
         return _buttonOnMenu(Icon(Icons.refresh, color: Colors.red),
-            () => _retryDownload(task.episode));
+            () => _retryDownload(task.episode!));
         break;
       default:
         return Center();

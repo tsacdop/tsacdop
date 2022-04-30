@@ -10,7 +10,7 @@ import '../widgets/general_dialog.dart';
 class ThemeSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final s = context.s;
+    final s = context.s!;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -40,7 +40,7 @@ class ThemeSetting extends StatelessWidget {
               child: Text(s.settingsInterface,
                   style: Theme.of(context)
                       .textTheme
-                      .bodyText1
+                      .bodyText1!
                       .copyWith(color: Theme.of(context).accentColor)),
             ),
             ListTile(
@@ -86,7 +86,7 @@ class ThemeSetting extends StatelessWidget {
                                         title: Text(s.systemDefault),
                                         value: ThemeMode.system,
                                         groupValue: settings.theme,
-                                        onChanged: (value) {
+                                        onChanged: (dynamic value) {
                                           settings.setTheme = value;
                                           Navigator.of(context).pop();
                                         }),
@@ -101,7 +101,7 @@ class ThemeSetting extends StatelessWidget {
                                         title: Text(s.darkMode),
                                         value: ThemeMode.dark,
                                         groupValue: settings.theme,
-                                        onChanged: (value) {
+                                        onChanged: (dynamic value) {
                                           settings.setTheme = value;
                                           Navigator.of(context).pop();
                                         }),
@@ -116,7 +116,7 @@ class ThemeSetting extends StatelessWidget {
                                         title: Text(s.lightMode),
                                         value: ThemeMode.light,
                                         groupValue: settings.theme,
-                                        onChanged: (value) {
+                                        onChanged: (dynamic value) {
                                           settings.setTheme = value;
                                           Navigator.of(context).pop();
                                         }),
@@ -132,10 +132,10 @@ class ThemeSetting extends StatelessWidget {
               title: Text(s.settingsTheme),
               subtitle: Text(s.systemDefault),
             ),
-            Selector<SettingState, bool>(
+            Selector<SettingState, bool?>(
               selector: (_, setting) => setting.realDark,
               builder: (_, data, __) => ListTile(
-                onTap: () => settings.setRealDark = !data,
+                onTap: () => settings.setRealDark = !data!,
                 contentPadding: const EdgeInsets.only(
                     left: 70.0, right: 20, bottom: 10, top: 10),
                 //  leading: Icon(Icons.colorize),
@@ -146,7 +146,7 @@ class ThemeSetting extends StatelessWidget {
                 trailing: Transform.scale(
                   scale: 0.9,
                   child: Switch(
-                      value: data,
+                      value: data!,
                       onChanged: (boo) async {
                         settings.setRealDark = boo;
                       }),
@@ -186,10 +186,10 @@ class ThemeSetting extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 70),
               alignment: Alignment.centerLeft,
               child: Text(s.fontStyle,
-                  style: context.textTheme.bodyText1
+                  style: context.textTheme.bodyText1!
                       .copyWith(color: context.accentColor)),
             ),
-            Selector<SettingState, int>(
+            Selector<SettingState, int?>(
               selector: (_, setting) => setting.showNotesFontIndex,
               builder: (_, data, __) => ListTile(
                 contentPadding: const EdgeInsets.only(
@@ -238,23 +238,23 @@ class ThemeSetting extends StatelessWidget {
 }
 
 class _ColorPicker extends StatefulWidget {
-  final ValueChanged<Color> onColorChanged;
-  _ColorPicker({Key key, this.onColorChanged}) : super(key: key);
+  final ValueChanged<Color>? onColorChanged;
+  _ColorPicker({Key? key, this.onColorChanged}) : super(key: key);
   @override
   __ColorPickerState createState() => __ColorPickerState();
 }
 
 class __ColorPickerState extends State<_ColorPicker>
     with SingleTickerProviderStateMixin {
-  TabController _controller;
-  int _index;
+  TabController? _controller;
+  int? _index;
   @override
   void initState() {
     super.initState();
     _index = 0;
     _controller = TabController(length: Colors.primaries.length, vsync: this)
       ..addListener(() {
-        setState(() => _index = _controller.index);
+        setState(() => _index = _controller!.index);
       });
   }
 
@@ -262,11 +262,11 @@ class __ColorPickerState extends State<_ColorPicker>
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.all(Radius.circular(10)),
-          onTap: () => widget.onColorChanged(color),
+          onTap: () => widget.onColorChanged!(color),
           child: Container(
             decoration: BoxDecoration(
                 border: color == context.accentColor
-                    ? Border.all(color: Colors.grey[400], width: 4)
+                    ? Border.all(color: Colors.grey[400]!, width: 4)
                     : null,
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 color: color),
@@ -308,7 +308,7 @@ class __ColorPickerState extends State<_ColorPicker>
                           decoration: BoxDecoration(
                               border: Colors.primaries.indexOf(color) == _index
                                   ? Border.all(
-                                      color: Colors.grey[400], width: 2)
+                                      color: Colors.grey[400]!, width: 2)
                                   : null,
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),

@@ -8,7 +8,7 @@ import '../type/episode_task.dart';
 import '../util/pageroute.dart';
 
 class DownloadList extends StatefulWidget {
-  DownloadList({Key key}) : super(key: key);
+  DownloadList({Key? key}) : super(key: key);
 
   @override
   _DownloadListState createState() => _DownloadListState();
@@ -16,7 +16,7 @@ class DownloadList extends StatefulWidget {
 
 Widget _downloadButton(EpisodeTask task, BuildContext context) {
   var downloader = Provider.of<DownloadState>(context, listen: false);
-  switch (task.status.value) {
+  switch (task.status!.value) {
     case 2:
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -31,7 +31,7 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
           IconButton(
             splashRadius: 20,
             icon: Icon(Icons.close),
-            onPressed: () => downloader.delTask(task.episode),
+            onPressed: () => downloader.delTask(task.episode!),
           ),
         ],
       );
@@ -42,12 +42,12 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
           IconButton(
             splashRadius: 20,
             icon: Icon(Icons.refresh, color: Colors.red),
-            onPressed: () => downloader.retryTask(task.episode),
+            onPressed: () => downloader.retryTask(task.episode!),
           ),
           IconButton(
             splashRadius: 20,
             icon: Icon(Icons.close),
-            onPressed: () => downloader.delTask(task.episode),
+            onPressed: () => downloader.delTask(task.episode!),
           ),
         ],
       );
@@ -56,12 +56,12 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
         IconButton(
             splashRadius: 20,
           icon: Icon(Icons.play_circle_filled),
-          onPressed: () => downloader.resumeTask(task.episode),
+          onPressed: () => downloader.resumeTask(task.episode!),
         ),
         IconButton(
             splashRadius: 20,
           icon: Icon(Icons.close),
-          onPressed: () => downloader.delTask(task.episode),
+          onPressed: () => downloader.delTask(task.episode!),
         ),
       ]);
       break;
@@ -78,7 +78,7 @@ class _DownloadListState extends State<DownloadList> {
   Widget build(BuildContext context) {
     return Consumer<DownloadState>(builder: (_, downloader, __) {
       final tasks = downloader.episodeTasks
-          .where((task) => task.status.value != 3)
+          .where((task) => task.status!.value != 3)
           .toList();
       return tasks.length > 0
           ? SliverPadding(
@@ -103,14 +103,14 @@ class _DownloadListState extends State<DownloadList> {
                             Expanded(
                               flex: 5,
                               child: Text(
-                                tasks[index].episode.title,
+                                tasks[index].episode!.title!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             Expanded(
                               flex: 1,
-                              child: tasks[index].progress >= 0 &&
+                              child: tasks[index].progress! >= 0 &&
                                       tasks[index].status !=
                                           DownloadTaskStatus.failed
                                   ? Container(
@@ -139,12 +139,12 @@ class _DownloadListState extends State<DownloadList> {
                       subtitle: SizedBox(
                         height: 2,
                         child: LinearProgressIndicator(
-                          value: tasks[index].progress / 100,
+                          value: tasks[index].progress! / 100,
                         ),
                       ),
                       leading: CircleAvatar(
                           radius: 20,
-                          backgroundImage: tasks[index].episode.avatarImage),
+                          backgroundImage: tasks[index].episode!.avatarImage),
                       trailing: _downloadButton(tasks[index], context),
                     );
                   },

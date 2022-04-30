@@ -7,7 +7,7 @@ import '../state/audio_state.dart';
 import '../util/extension_helper.dart';
 
 class HidePlayerRoute extends ModalRoute<void> {
-  HidePlayerRoute(this.openPage, this.transitionPage, {Duration duration})
+  HidePlayerRoute(this.openPage, this.transitionPage, {required Duration duration})
       : transitionDuration = duration;
   final openPage;
   final transitionPage;
@@ -15,7 +15,7 @@ class HidePlayerRoute extends ModalRoute<void> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    return Selector<AudioPlayerNotifier, tuple.Tuple2<bool, PlayerHeight>>(
+    return Selector<AudioPlayerNotifier, tuple.Tuple2<bool, PlayerHeight?>>(
         selector: (_, audio) =>
             tuple.Tuple2(audio.playerRunning, audio.playerHeight),
         builder: (_, data, __) => Align(
@@ -40,7 +40,7 @@ class HidePlayerRoute extends ModalRoute<void> {
                   //   curve: Curves.fastOutSlowIn,
                   //   reverseCurve: Curves.fastOutSlowIn.flipped,
                   // );
-                  final playerHeight = kMinPlayerHeight[data.item2.index];
+                  final playerHeight = kMinPlayerHeight[data.item2!.index];
                   final playerRunning = data.item1;
                   return SizedBox.expand(
                     child: Container(
@@ -86,7 +86,7 @@ class HidePlayerRoute extends ModalRoute<void> {
   bool get maintainState => true;
 
   @override
-  Color get barrierColor => null;
+  Color? get barrierColor => null;
 
   @override
   bool get opaque => true;
@@ -95,7 +95,7 @@ class HidePlayerRoute extends ModalRoute<void> {
   bool get barrierDismissible => false;
 
   @override
-  String get barrierLabel => null;
+  String? get barrierLabel => null;
 
   @override
   final Duration transitionDuration;

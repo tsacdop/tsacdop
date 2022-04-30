@@ -15,14 +15,14 @@ const String configureGroup = 'configureFeature';
 const String configurePodcast = 'configurePodcast';
 
 Widget featureDiscoveryOverlay(BuildContext context,
-    {String featureId,
-    Color buttonColor,
-    Color backgroundColor,
-    Widget child,
-    Widget tapTarget,
-    String title,
-    String description}) {
-  final s = context.s;
+    {required String featureId,
+    Color? buttonColor,
+    Color? backgroundColor,
+    required Widget child,
+    required Widget tapTarget,
+    required String title,
+    required String description}) {
+  final s = context.s!;
   return DescribedFeatureOverlay(
       featureId: featureId,
       tapTarget: tapTarget,
@@ -40,7 +40,7 @@ Widget featureDiscoveryOverlay(BuildContext context,
             color: buttonColor,
             padding: EdgeInsets.zero,
             child: Text(s.understood,
-                style: context.textTheme.button.copyWith(color: Colors.white)),
+                style: context.textTheme.button!.copyWith(color: Colors.white)),
             onPressed: () async =>
                 FeatureDiscovery.completeCurrentStep(context),
           ),
@@ -48,7 +48,7 @@ Widget featureDiscoveryOverlay(BuildContext context,
             color: buttonColor,
             padding: EdgeInsets.zero,
             child: Text(s.dismiss,
-                style: context.textTheme.button.copyWith(color: Colors.white)),
+                style: context.textTheme.button!.copyWith(color: Colors.white)),
             onPressed: () => FeatureDiscovery.dismissAll(context),
           ),
         ],
