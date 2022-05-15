@@ -85,7 +85,7 @@ class SyncingSetting extends StatelessWidget {
                               await settings.cancelWork();
                               settings.setWorkManager(value);
                             }
-                          : null,
+                          : (int i) {},
                       items: <int>[1, 2, 4, 8, 24, 48]
                           .map<DropdownMenuItem<int>>((e) {
                         return DropdownMenuItem<int>(

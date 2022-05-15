@@ -548,7 +548,7 @@ class EpisodeGrid extends StatelessWidget {
             child: Selector<AudioPlayerNotifier,
                 Tuple4<EpisodeBrief?, List<String>, bool, bool>>(
               selector: (_, audio) => Tuple4(
-                  audio?.episode,
+                  audio.episode,
                   audio.queue.episodes.map((e) => e!.enclosureUrl).toList(),
                   audio.episodeState,
                   audio.playerRunning),

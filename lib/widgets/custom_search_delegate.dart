@@ -1,114 +1,22 @@
-// Copyright 2014 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 
-/// Shows a full screen search page and returns the search result selected by
-/// the user when the page is closed.
-///
-/// The search page consists of an app bar with a search field and a body which
-/// can either show suggested search queries or the search results.
-///
-/// The appearance of the search page is determined by the provided
-/// `delegate`. The initial query string is given by `query`, which defaults
-/// to the empty string. When `query` is set to null, `delegate.query` will
-/// be used as the initial query.
-///
-/// This method returns the selected search result, which can be set in the
-/// [SearchDelegate.close] call. If the search page is closed with the system
-/// back button, it returns null.
-///
-/// A given [SearchDelegate] can only be associated with one active [showSearch]
-/// call. Call [SearchDelegate.close] before re-using the same delegate instance
-/// for another [showSearch] call.
-///
-/// The transition to the search page triggered by this method looks best if the
-/// screen triggering the transition contains an [AppBar] at the top and the
-/// transition is called from an [IconButton] that's part of [AppBar.actions].
-/// The animation provided by [SearchDelegate.transitionAnimation] can be used
-/// to trigger additional animations in the underlying page while the search
-/// page fades in or out. This is commonly used to animate an [AnimatedIcon] in
-/// the [AppBar.leading] position e.g. from the hamburger menu to the back arrow
-/// used to exit the search page.
-///
-/// See also:
-///
-///  * [SearchDelegate] to define the content of the search page.
 Future<T?> showSearch<T>({
   required BuildContext context,
   required SearchDelegate<T> delegate,
   String query = '',
 }) {
-  assert(delegate != null);
-  assert(context != null);
-  delegate.query = query ?? delegate.query;
+  delegate.query = query;
   delegate._currentBody = _SearchBody.suggestions;
   return Navigator.of(context).push(_SearchPageRoute<T>(
     delegate: delegate,
   ));
 }
 
-/// Delegate for [showSearch] to define the content of the search page.
-///
-/// The search page always shows an [AppBar] at the top where users can
-/// enter their search queries. The buttons shown before and after the search
-/// query text field can be customized via [SearchDelegate.buildLeading] and
-/// [SearchDelegate.buildActions].
-///
-/// The body below the [AppBar] can either show suggested queries (returned by
-/// [SearchDelegate.buildSuggestions]) or - once the user submits a search  - the
-/// results of the search as returned by [SearchDelegate.buildResults].
-///
-/// [SearchDelegate.query] always contains the current query entered by the user
-/// and should be used to build the suggestions and results.
-///
-/// The results can be brought on screen by calling [SearchDelegate.showResults]
-/// and you can go back to showing the suggestions by calling
-/// [SearchDelegate.showSuggestions].
-///
-/// Once the user has selected a search result, [SearchDelegate.close] should be
-/// called to remove the search page from the top of the navigation stack and
-/// to notify the caller of [showSearch] about the selected search result.
-///
-/// A given [SearchDelegate] can only be associated with one active [showSearch]
-/// call. Call [SearchDelegate.close] before re-using the same delegate instance
-/// for another [showSearch] call.
 abstract class SearchDelegate<T> {
-  /// Constructor to be called by subclasses which may specify [searchFieldLabel], [keyboardType] and/or
-  /// [textInputAction].
-  ///
-  /// {@tool snippet}
-  /// ```dart
-  /// class CustomSearchHintDelegate extends SearchDelegate {
-  ///   CustomSearchHintDelegate({
-  ///     String hintText,
-  ///   }) : super(
-  ///     searchFieldLabel: hintText,
-  ///     keyboardType: TextInputType.text,
-  ///     textInputAction: TextInputAction.search,
-  ///   );
-  ///
-  ///   @override
-  ///   Widget buildLeading(BuildContext context) => Text("leading");
-  ///
-  ///   @override
-  ///   Widget buildSuggestions(BuildContext context) => Text("suggestions");
-  ///
-  ///   @override
-  ///   Widget buildResults(BuildContext context) => Text('results');
-  ///
-  ///   @override
-  ///   List<Widget> buildActions(BuildContext context) => [];
-  /// }
-  /// ```
-  /// {@end-tool}
   SearchDelegate({
     this.searchFieldLabel,
     this.searchFieldStyle,
@@ -116,76 +24,15 @@ abstract class SearchDelegate<T> {
     this.textInputAction = TextInputAction.search,
   });
 
-  /// Suggestions shown in the body of the search page while the user types a
-  /// query into the search field.
-  ///
-  /// The delegate method is called whenever the content of [query] changes.
-  /// The suggestions should be based on the current [query] string. If the query
-  /// string is empty, it is good practice to show suggested queries based on
-  /// past queries or the current context.
-  ///
-  /// Usually, this method will return a [ListView] with one [ListTile] per
-  /// suggestion. When [ListTile.onTap] is called, [query] should be updated
-  /// with the corresponding suggestion and the results page should be shown
-  /// by calling [showResults].
   Widget buildSuggestions(BuildContext context);
-
-  /// The results shown after the user submits a search from the search page.
-  ///
-  /// The current value of [query] can be used to determine what the user
-  /// searched for.
-  ///
-  /// This method might be applied more than once to the same query.
-  /// If your [buildResults] method is computationally expensive, you may want
-  /// to cache the search results for one or more queries.
-  ///
-  /// Typically, this method returns a [ListView] with the search results.
-  /// When the user taps on a particular search result, [close] should be called
-  /// with the selected result as argument. This will close the search page and
-  /// communicate the result back to the initial caller of [showSearch].
   Widget buildResults(BuildContext context);
 
-  /// A widget to display before the current query in the [AppBar].
-  ///
-  /// Typically an [IconButton] configured with a [BackButtonIcon] that exits
-  /// the search with [close]. One can also use an [AnimatedIcon] driven by
-  /// [transitionAnimation], which animates from e.g. a hamburger menu to the
-  /// back button as the search overlay fades in.
-  ///
-  /// Returns null if no widget should be shown.
-  ///
-  /// See also:
-  ///
-  ///  * [AppBar.leading], the intended use for the return value of this method.
   Widget buildLeading(BuildContext context);
 
-  /// Widgets to display after the search query in the [AppBar].
-  ///
-  /// If the [query] is not empty, this should typically contain a button to
-  /// clear the query and show the suggestions again (via [showSuggestions]) if
-  /// the results are currently shown.
-  ///
-  /// Returns null if no widget should be shown.
-  ///
-  /// See also:
-  ///
-  ///  * [AppBar.actions], the intended use for the return value of this method.
   List<Widget> buildActions(BuildContext context);
 
-  /// The theme used to style the [AppBar].
-  ///
-  /// By default, a white theme is used.
-  ///
-  /// See also:
-  ///
-  ///  * [AppBar.backgroundColor], which is set to [ThemeData.primaryColor].
-  ///  * [AppBar.iconTheme], which is set to [ThemeData.primaryIconTheme].
-  ///  * [AppBar.textTheme], which is set to [ThemeData.primaryTextTheme].
-  ///  * [AppBar.brightness], which is set to [ThemeData.primaryColorBrightness].
   ThemeData appBarTheme(BuildContext context) {
-    assert(context != null);
     final ThemeData theme = Theme.of(context);
-    assert(theme != null);
     return theme.copyWith(
       primaryColor: Colors.white,
       primaryIconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
@@ -194,46 +41,16 @@ abstract class SearchDelegate<T> {
     );
   }
 
-  /// The current query string shown in the [AppBar].
-  ///
-  /// The user manipulates this string via the keyboard.
-  ///
-  /// If the user taps on a suggestion provided by [buildSuggestions] this
-  /// string should be updated to that suggestion via the setter.
   String get query => _queryTextController.text;
   set query(String value) {
-    assert(query != null);
     _queryTextController.text = value;
   }
 
-  /// Transition from the suggestions returned by [buildSuggestions] to the
-  /// [query] results returned by [buildResults].
-  ///
-  /// If the user taps on a suggestion provided by [buildSuggestions] the
-  /// screen should typically transition to the page showing the search
-  /// results for the suggested query. This transition can be triggered
-  /// by calling this method.
-  ///
-  /// See also:
-  ///
-  ///  * [showSuggestions] to show the search suggestions again.
   void showResults(BuildContext context) {
     _focusNode?.unfocus();
     _currentBody = _SearchBody.results;
   }
 
-  /// Transition from showing the results returned by [buildResults] to showing
-  /// the suggestions returned by [buildSuggestions].
-  ///
-  /// Calling this method will also put the input focus back into the search
-  /// field of the [AppBar].
-  ///
-  /// If the results are currently shown this method can be used to go back
-  /// to showing the search suggestions.
-  ///
-  /// See also:
-  ///
-  ///  * [showResults] to show the search results.
   void showSuggestions(BuildContext context) {
     assert(_focusNode != null,
         '_focusNode must be set by route before showSuggestions is called.');
@@ -241,10 +58,6 @@ abstract class SearchDelegate<T> {
     _currentBody = _SearchBody.suggestions;
   }
 
-  /// Closes the search page and returns to the underlying route.
-  ///
-  /// The value provided for `result` is used as the return value of the call
-  /// to [showSearch] that launched the search initially.
   void close(BuildContext context, T result) {
     _currentBody = null;
     _focusNode?.unfocus();
@@ -253,39 +66,16 @@ abstract class SearchDelegate<T> {
       ..pop(result);
   }
 
-  /// The hint text that is shown in the search field when it is empty.
-  ///
-  /// If this value is set to null, the value of
-  /// `MaterialLocalizations.of(context).searchFieldLabel` will be used instead.
   final String? searchFieldLabel;
 
-  /// The style of the [searchFieldLabel].
-  ///
-  /// If this value is set to null, the value of the ambient [Theme]'s
-  /// [InputDecorationTheme.hintStyle] will be used instead.
   final TextStyle? searchFieldStyle;
 
-  /// The type of action button to use for the keyboard.
-  ///
-  /// Defaults to the default value specified in [TextField].
   final TextInputType? keyboardType;
 
-  /// The text input action configuring the soft keyboard to a particular action
-  /// button.
-  ///
-  /// Defaults to [TextInputAction.search].
   final TextInputAction textInputAction;
 
-  /// [Animation] triggered when the search pages fades in or out.
-  ///
-  /// This animation is commonly used to animate [AnimatedIcon]s of
-  /// [IconButton]s returned by [buildLeading] or [buildActions]. It can also be
-  /// used to animate [IconButton]s contained within the route below the search
-  /// page.
   Animation<double> get transitionAnimation => _proxyAnimation;
 
-  // The focus node to use for manipulating focus on the search page. This is
-  // managed, owned, and set by the _SearchPageRoute using this delegate.
   FocusNode? _focusNode;
 
   final TextEditingController _queryTextController = TextEditingController();
@@ -304,8 +94,6 @@ abstract class SearchDelegate<T> {
   _SearchPageRoute<T>? _route;
 }
 
-/// Describes the body that is currently shown under the [AppBar] in the
-/// search page.
 enum _SearchBody {
   /// Suggested queries are shown in the body.
   ///
@@ -321,7 +109,7 @@ enum _SearchBody {
 class _SearchPageRoute<T> extends PageRoute<T> {
   _SearchPageRoute({
     required this.delegate,
-  }) : assert(delegate != null) {
+  }) {
     assert(
       delegate._route == null,
       'The ${delegate.runtimeType} instance is currently used by another active '

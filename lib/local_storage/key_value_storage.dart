@@ -66,28 +66,26 @@ class KeyValueStorage {
   final String key;
   KeyValueStorage(this.key);
   Future<List<GroupEntity>?> getGroups() async {
-    var prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     if (prefs.getString(key) == null) {
-      var home = PodcastGroup('Home');
+      final home = PodcastGroup('Home');
       await prefs.setString(
           key,
           json.encode({
             'groups': [home.toEntity().toJson()]
           }));
     }
-    return json
-        .decode(prefs.getString(key)!)['groups']
-        .cast<Map<String, Object>>()
-        .map<GroupEntity>(GroupEntity.fromJson)
-        .toList(growable: false);
+    final groups = json.decode(prefs.getString(key)!)['groups'];
+    return [for (final g in groups) GroupEntity.fromJson(g)];
   }
 
   Future<bool> saveGroup(List<GroupEntity> groupList) async {
-    var prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     return prefs.setString(
         key,
-        json.encode(
-            {'groups': groupList.map((group) => group.toJson()).toList()}));
+        json.encode({
+          'groups': [for (var g in groupList) g.toJson()]
+        }));
   }
 
   Future<List<PlaylistEntity>?> getPlaylists() async {
@@ -102,11 +100,8 @@ class KeyValueStorage {
           }));
     }
     print(prefs.getString(key));
-    return json
-        .decode(prefs.getString(key)!)['playlists']
-        .cast<Map<String, Object>>()
-        .map<PlaylistEntity>(PlaylistEntity.fromJson)
-        .toList(growable: false);
+    final playlist = json.decode(prefs.getString(key)!)['playlists'];
+    return [for (final p in playlist) PlaylistEntity.fromJson(p)];
   }
 
   Future<bool> savePlaylists(List<PlaylistEntity> playlists) async {
@@ -114,7 +109,7 @@ class KeyValueStorage {
     return prefs.setString(
         key,
         json.encode({
-          'playlists': playlists.map((playlist) => playlist.toJson()).toList()
+          'playlists': [for (var p in playlists) p.toJson()]
         }));
   }
 
@@ -124,13 +119,13 @@ class KeyValueStorage {
     return prefs.setStringList(key, [playlist, episode, position.toString()]);
   }
 
-  Future<List<String>?> getPlayerState() async {
+  Future<List<String>> getPlayerState() async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getStringList(key) == null) {
       final position = prefs.getInt(audioPositionKey) ?? 0;
       await savePlayerState('', '', position);
     }
-    return prefs.getStringList(key);
+    return prefs.getStringList(key)!;
   }
 
   Future<bool> saveInt(int setting) async {
@@ -240,7 +235,7 @@ class KeyValueStorage {
 
   Future<void> addList(List<String?> addList) async {
     final list = await getStringList();
-    await saveStringList([...list ?? [], ...addList]);
+    await saveStringList([...list, ...addList]);
   }
 
   Future<void> clearList() async {

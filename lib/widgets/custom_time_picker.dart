@@ -916,9 +916,9 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
       duration: _kDialAnimateDuration,
     );
     _thetaTween = Tween<double>(begin: _getThetaForTime(widget.selectedTime));
-    _theta = _thetaController!
+    _theta = _thetaController
         .drive(CurveTween(curve: Curves.easeInSine))
-        .drive(_thetaTween!)
+        .drive(_thetaTween)
       ..addListener(() => setState(() {/* _theta.value has changed */}));
   }
 
@@ -948,7 +948,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    _thetaController!.dispose();
+    _thetaController.dispose();
     super.dispose();
   }
 

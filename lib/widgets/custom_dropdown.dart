@@ -399,8 +399,7 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
     this.itemHeight,
     this.dropdownColor,
     this.displayItemCount,
-  })  : assert(style != null),
-        itemHeights = List<double>.filled(
+  }) : itemHeights = List<double>.filled(
             items.length, itemHeight ?? kMinInteractiveDimension);
 
   final List<_MenuItem<T>?> items;
@@ -456,7 +455,7 @@ class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
   double getItemOffset(int? index) {
     var offset = kMaterialListPadding.top;
     if (items.isNotEmpty && index! > 0) {
-      assert(items.length == itemHeights?.length);
+      assert(items.length == itemHeights.length);
       if (displayItemCount == null) {
         offset += itemHeights
             .sublist(0, index)
@@ -719,8 +718,7 @@ class DropdownButtonHideUnderline extends InheritedWidget {
   const DropdownButtonHideUnderline({
     Key? key,
     required Widget child,
-  })  : assert(child != null),
-        super(key: key, child: child);
+  }) : super(key: key, child: child);
 
   /// Returns whether the underline of [DropdownButton] widgets should
   /// be hidden.
@@ -850,8 +848,7 @@ class MyDropdownButton<T> extends StatefulWidget {
     this.dropdownColor,
     this.displayItemCount,
   })  : assert(
-          items == null ||
-              items.isEmpty ||
+          items.isEmpty ||
               value == null ||
               items.where((item) {
                     return item.value == value;
@@ -862,12 +859,7 @@ class MyDropdownButton<T> extends StatefulWidget {
           'Either zero or 2 or more [DropdownMenuItem]s were detected '
           'with the same value',
         ),
-        assert(elevation != null),
-        assert(iconSize != null),
-        assert(isDense != null),
-        assert(isExpanded != null),
-        assert(autofocus != null),
-        assert(itemHeight == null || itemHeight >= kMinInteractiveDimension),
+        assert(itemHeight >= kMinInteractiveDimension),
         assert(displayItemCount == null || displayItemCount > 0),
         super(key: key);
 
@@ -910,7 +902,7 @@ class MyDropdownButton<T> extends StatefulWidget {
   /// [disabledHint] is also null but [hint] is non-null, [hint] will instead
   /// be displayed.
   /// {@endtemplate}
-  final ValueChanged<T>? onChanged;
+  final ValueChanged<T> onChanged;
 
   /// Called when the dropdown button is tapped.
   ///
@@ -1253,7 +1245,7 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
     Navigator.push(context, _dropdownRoute!).then<void>((newValue) {
       _removeDropdownRoute();
       if (!mounted || newValue == null) return;
-      if (widget.onChanged != null) widget.onChanged!(newValue.result);
+      widget.onChanged(newValue.result);
     });
 
     if (widget.onTap != null) {
@@ -1306,15 +1298,15 @@ class _MyDropdownButtonState<T> extends State<MyDropdownButton<T>>
   bool get _enabled => widget.items.isNotEmpty && widget.onChanged != null;
 
   Orientation _getOrientation(BuildContext context) {
-    var result = MediaQuery.of(context)?.orientation;
-    if (result == null) {
-      // If there's no MediaQuery, then use the window aspect to determine
-      // orientation.
-      final size = window.physicalSize;
-      result = size.width > size.height
-          ? Orientation.landscape
-          : Orientation.portrait;
-    }
+    var result = MediaQuery.of(context).orientation;
+    // if (result == null) {
+    //   // If there's no MediaQuery, then use the window aspect to determine
+    //   // orientation.
+    //   final size = window.physicalSize;
+    //   result = size.width > size.height
+    //       ? Orientation.landscape
+    //       : Orientation.portrait;
+    // }
     return result;
   }
 
@@ -1501,8 +1493,7 @@ class DropdownButtonFormField<T> extends FormField<T?> {
     bool isExpanded = false,
     double? itemHeight,
   })  : assert(
-          items == null ||
-              items.isEmpty ||
+          items.isEmpty ||
               value == null ||
               items.where((item) {
                     return item.value == value;
@@ -1513,11 +1504,6 @@ class DropdownButtonFormField<T> extends FormField<T?> {
           'Either zero or 2 or more [DropdownMenuItem]s were detected '
           'with the same value',
         ),
-        assert(decoration != null),
-        assert(elevation != null),
-        assert(iconSize != null),
-        assert(isDense != null),
-        assert(isExpanded != null),
         assert(itemHeight == null || itemHeight > 0),
         super(
           key: key,
@@ -1582,7 +1568,6 @@ class _DropdownButtonFormFieldState<T> extends FormFieldState<T?> {
   @override
   void didChange(T? value) {
     super.didChange(value);
-    assert(widget.onChanged != null);
     widget.onChanged(value);
   }
 

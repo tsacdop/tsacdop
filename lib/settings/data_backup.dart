@@ -1091,9 +1091,9 @@ class __GpodderInfoState extends State<_GpodderInfo> {
                       initialData: [],
                       builder: (context, snapshot) {
                         final deviceId =
-                            snapshot.data!.isNotEmpty ? snapshot.data![1]! : '';
+                            snapshot.data!.isNotEmpty ? snapshot.data![1] : '';
                         final deviceName =
-                            snapshot.data!.isNotEmpty ? snapshot.data![3]! : '';
+                            snapshot.data!.isNotEmpty ? snapshot.data![3] : '';
                         return Column(
                           children: [
                             ListTile(

@@ -206,10 +206,10 @@ class _RssResultState extends State<RssResult> {
     _loadItems = 10;
     _onlinePodcast = OnlinePodcast(
         rss: widget.url,
-        title: p?.title ?? widget.url,
-        publisher: p?.author ?? "",
-        description: p?.description ?? "No description for this podcast",
-        image: p?.itunes?.image?.href ?? p?.image?.url ?? "",
+        title: p.title ?? widget.url,
+        publisher: p.author ?? "",
+        description: p.description ?? "No description for this podcast",
+        image: p.itunes?.image?.href ?? p.image?.url ?? "",
         count: p.items!.length);
     super.initState();
   }
@@ -325,7 +325,7 @@ class _RssResultState extends State<RssResult> {
                 ],
               ),
               ListView.builder(
-                  itemCount: math.min(_loadItems! + 1, items.length),
+                  itemCount: math.min(_loadItems + 1, items.length),
                   itemBuilder: (context, index) {
                     if (index == _loadItems) {
                       return Container(
@@ -379,7 +379,7 @@ class __SearchPopupMenuState extends State<_SearchPopupMenu> {
   Future<void> _getSearchEngine() async {
     final storage = KeyValueStorage(searchEngineKey);
     final index = await storage.getInt();
-    setState(() => _searchEngine = SearchEngine.values[index!]);
+    setState(() => _searchEngine = SearchEngine.values[index]);
     widget.onSelected!(_searchEngine);
   }
 

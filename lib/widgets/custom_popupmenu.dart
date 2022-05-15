@@ -341,8 +341,7 @@ Future<T?> _showMenu<T>({
     case TargetPlatform.fuchsia:
     case TargetPlatform.linux:
     case TargetPlatform.windows:
-      label =
-          semanticLabel ?? MaterialLocalizations.of(context)?.popupMenuLabel;
+      label = semanticLabel ?? MaterialLocalizations.of(context).popupMenuLabel;
   }
 
   return Navigator.of(context, rootNavigator: useRootNavigator)
@@ -505,9 +504,7 @@ class MyPopupMenuItem<int> extends PopupMenuEntry<int> {
     this.height = kMinInteractiveDimension,
     this.textStyle,
     required this.child,
-  })  : assert(enabled != null),
-        assert(height != null),
-        super(key: key);
+  }) : super(key: key);
 
   final int? value;
 

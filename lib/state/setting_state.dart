@@ -137,9 +137,11 @@ class SettingState extends ChangeNotifier {
   ThemeMode? _theme;
   ThemeMode? get theme => _theme;
 
-  ThemeData get lightTheme => ThemeData(
-        colorScheme: ColorScheme.fromSwatch()
+  ThemeData get lightTheme => ThemeData().copyWith(
+        colorScheme: ThemeData()
+            .colorScheme
             .copyWith(brightness: Brightness.light, secondary: _accentSetColor),
+        brightness: Brightness.dark,
         primaryColor: Colors.grey[100],
         primaryColorLight: Colors.white,
         primaryColorDark: Colors.grey[300],
@@ -171,15 +173,20 @@ class SettingState extends ChangeNotifier {
       );
 
   ThemeData get darkTheme => ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSwatch()
+        colorScheme: ThemeData.dark()
+            .colorScheme
             .copyWith(brightness: Brightness.dark, secondary: _accentSetColor),
+        brightness: Brightness.light,
         primaryColorDark: Colors.grey[800],
-        scaffoldBackgroundColor: _realDark! ? Colors.black87 : Color(0XFF212121),
+        scaffoldBackgroundColor:
+            _realDark! ? Colors.black87 : Color(0XFF212121),
         primaryColor: _realDark! ? Colors.black : Color(0XFF1B1B1B),
         popupMenuTheme: PopupMenuThemeData()
             .copyWith(color: _realDark! ? Colors.grey[900] : null),
         appBarTheme: AppBarTheme(
-            elevation: 0, systemOverlayStyle: SystemUiOverlayStyle.light),
+            color: Colors.grey[900],
+            elevation: 0,
+            systemOverlayStyle: SystemUiOverlayStyle.light),
         buttonTheme: ButtonThemeData(height: 32),
         dialogBackgroundColor: _realDark! ? Colors.grey[900] : null,
       );
@@ -353,7 +360,7 @@ class SettingState extends ChangeNotifier {
 
   Future _getTheme() async {
     var mode = await _themeStorage.getInt();
-    _theme = ThemeMode.values[mode!];
+    _theme = ThemeMode.values[mode];
   }
 
   Future _getAccentSetColor() async {
@@ -439,7 +446,7 @@ class SettingState extends ChangeNotifier {
       }
       _locale = Locale(systemLanCode);
     } else {
-      _locale = Locale(localeString.first!, localeString[1]);
+      _locale = Locale(localeString.first, localeString[1]);
     }
     await S.load(_locale!);
   }

@@ -30,7 +30,7 @@ class _StorageSettingState extends State<StorageSetting>
       await cacheStorage.saveInt((200 * 1024 * 1024).toInt());
       cache = 200 * 1024 * 1024;
     }
-    var value = cache! ~/ (1024 * 1024);
+    var value = cache ~/ (1024 * 1024);
     if (value > 100) {
       _controller = AnimationController(
           vsync: this, duration: Duration(milliseconds: value * 2));

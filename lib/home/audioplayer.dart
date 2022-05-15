@@ -120,8 +120,7 @@ class PlayerWidget extends StatelessWidget {
                                         TextStyle(color: context.accentColor),
                                   )
                                 : Text(
-                                    s!.timeLeft(
-                                        (data.item2).toInt().toTime ?? ''),
+                                    s!.timeLeft((data.item2).toInt().toTime),
                                     maxLines: 2,
                                   ),
                       );
@@ -227,7 +226,7 @@ class PlayerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight?>>(
-      selector: (_, audio) => Tuple2(audio.playerRunning, audio?.playerHeight),
+      selector: (_, audio) => Tuple2(audio.playerRunning, audio.playerHeight),
       builder: (_, data, __) {
         if (!data.item1) {
           return Center();
@@ -358,7 +357,8 @@ class LastPosition extends StatelessWidget {
                                             color: context.accentColor)),
                                     highlightedBorderColor: Colors.green[700],
                                     onPressed: () => audio.seekTo(
-                                        (snapshot.data!.seconds! * 1000).toInt()),
+                                        (snapshot.data!.seconds! * 1000)
+                                            .toInt()),
                                     child: Row(
                                       children: [
                                         SizedBox(
@@ -1311,8 +1311,7 @@ class _ControlPanelState extends State<ControlPanel>
                         child: Row(
                           children: <Widget>[
                             Text(
-                              (data.backgroundAudioPosition! ~/ 1000).toTime ??
-                                  '',
+                              (data.backgroundAudioPosition! ~/ 1000).toTime,
                               style: TextStyle(fontSize: 10),
                             ),
                             Expanded(
@@ -1336,8 +1335,7 @@ class _ControlPanelState extends State<ControlPanel>
                               ),
                             ),
                             Text(
-                              (data.backgroundAudioDuration ~/ 1000).toTime ??
-                                  '',
+                              (data.backgroundAudioDuration ~/ 1000).toTime,
                               style: TextStyle(fontSize: 10),
                             ),
                           ],

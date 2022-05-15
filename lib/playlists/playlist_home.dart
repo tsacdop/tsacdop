@@ -225,7 +225,8 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                           if (!audio.playerRunning &&
                                               audio.episode!.duration != 0) {
                                             return (audio.lastPosition ~/
-                                                (audio.episode!.duration! * 10));
+                                                (audio.episode!.duration! *
+                                                    10));
                                           } else if (audio.playerRunning &&
                                               audio.backgroundAudioDuration !=
                                                   0) {
@@ -323,11 +324,12 @@ class _Queue extends StatefulWidget {
 class __QueueState extends State<_Queue> {
   @override
   Widget build(BuildContext context) {
-    return Selector<AudioPlayerNotifier, Tuple3<Playlist?, bool, EpisodeBrief?>>(
+    return Selector<AudioPlayerNotifier,
+        Tuple3<Playlist?, bool, EpisodeBrief?>>(
       selector: (_, audio) =>
           Tuple3(audio.playlist, audio.playerRunning, audio.episode),
       builder: (_, data, __) {
-        var episodes = data.item1?.episodes?.toSet()?.toList();
+        var episodes = data.item1?.episodes.toSet().toList();
         var queue = data.item1;
         var running = data.item2;
         return queue == null
@@ -367,10 +369,9 @@ class __QueueState extends State<_Queue> {
                                 ))
                             .toList())
                 : ListView.builder(
-                    itemCount: queue?.length,
+                    itemCount: queue.length,
                     itemBuilder: (context, index) {
-                      final episode =
-                          queue != null ? queue.episodes[index] : null;
+                      final episode = queue.episodes[index];
                       final isPlaying =
                           data.item3 != null && data.item3 == episode;
                       return episode == null
@@ -452,7 +453,9 @@ class __HistoryState extends State<_History> {
   }
 
   Widget _timeTag(BuildContext context,
-      {EpisodeBrief? episode, required int seconds, required double seekValue}) {
+      {EpisodeBrief? episode,
+      required int seconds,
+      required double seekValue}) {
     final audio = context.watch<AudioPlayerNotifier>();
     final textWidth = _getMaskStop(seekValue, seconds).width;
     final stop = seekValue - 20 / textWidth + 40 * seekValue / textWidth;

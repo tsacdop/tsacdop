@@ -241,7 +241,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         ),
                         Selector<AudioPlayerNotifier, bool>(
                             selector: (_, audio) =>
-                                audio?.playerRunning ?? false,
+                                audio.playerRunning,
                             builder: (_, data, __) {
                               return Padding(
                                 padding:
@@ -540,7 +540,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     var storage = KeyValueStorage(recentLayoutKey);
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
     var index = await storage.getInt(defaultValue: 1);
-    if (_layout == null) _layout = Layout.values[index!];
+    if (_layout == null) _layout = Layout.values[index];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
@@ -909,7 +909,7 @@ class _MyFavoriteState extends State<_MyFavorite>
     var storage = KeyValueStorage(favLayoutKey);
     var index = await storage.getInt(defaultValue: 1);
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
-    if (_layout == null) _layout = Layout.values[index!];
+    if (_layout == null) _layout = Layout.values[index];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
@@ -1189,7 +1189,7 @@ class _MyDownloadState extends State<_MyDownload>
     var storage = KeyValueStorage(downloadLayoutKey);
     var index = await storage.getInt(defaultValue: 1);
     var hideListenedStorage = KeyValueStorage(hideListenedKey);
-    if (_layout == null) _layout = Layout.values[index!];
+    if (_layout == null) _layout = Layout.values[index];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }

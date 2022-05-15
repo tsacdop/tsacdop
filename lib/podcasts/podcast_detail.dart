@@ -108,7 +108,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
   @override
   void dispose() {
-    _controller!.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -162,7 +162,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     final layoutStorage = KeyValueStorage(podcastLayoutKey);
     final hideListenedStorage = KeyValueStorage(hideListenedKey);
     final index = await layoutStorage.getInt(defaultValue: 1);
-    if (_layout == null) _layout = Layout.values[index!];
+    if (_layout == null) _layout = Layout.values[index];
     if (_hideListened == null) {
       _hideListened = await hideListenedStorage.getBool(defaultValue: false);
     }
@@ -709,8 +709,8 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           child: CustomScrollView(
                             controller: _controller
                               ..addListener(() async {
-                                if (_controller!.offset ==
-                                        _controller!.position.maxScrollExtent &&
+                                if (_controller.offset ==
+                                        _controller.position.maxScrollExtent &&
                                     _dataCount == _top) {
                                   if (mounted) {
                                     setState(() => _loadMore = true);
@@ -723,7 +723,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     });
                                   }
                                 }
-                                if (_controller!.offset > 0 &&
+                                if (_controller.offset > 0 &&
                                     mounted &&
                                     !_scroll) {
                                   setState(() => _scroll = true);

@@ -34,7 +34,7 @@ class _PopupMenuState extends State<PopupMenu> {
     } else {
       refreshDate = i;
     }
-    return refreshDate!.toDate(context);
+    return refreshDate.toDate(context);
   }
 
   void _saveOmpl(String path) async {

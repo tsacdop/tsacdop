@@ -299,7 +299,7 @@ class _AboutAppState extends State<AboutApp> {
                           _overlayEntry = _createOverlayEntry(detail);
                           Overlay.of(context)!.insert(_overlayEntry);
                           await Future.delayed(Duration(seconds: 2));
-                          _overlayEntry?.remove();
+                          _overlayEntry.remove();
                         },
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,

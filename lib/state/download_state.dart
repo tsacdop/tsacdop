@@ -5,7 +5,6 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -70,19 +69,20 @@ class AutoDownloader {
 
   void _unbindBackgroundIsolate() {
     IsolateNameServer.removePortNameMapping('auto_downloader_send_port');
-    _completer?.complete();
+    _completer.complete();
   }
 
   Future<Directory> _getDownloadDirectory() async {
     final storage = KeyValueStorage(downloadPositionKey);
-    final index = await (storage.getInt() as FutureOr<int>);
-    final externalDirs = await (getExternalStorageDirectories() as FutureOr<List<Directory>>);
-    return externalDirs[index];
+    final index = await storage.getInt();
+    final externalDirs = await getExternalStorageDirectories();
+    return externalDirs![index];
   }
 
   Future _saveMediaId(EpisodeTask episodeTask) async {
     final completeTask = await (FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'") as FutureOr<List<DownloadTask>>);
+            query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'")
+        as FutureOr<List<DownloadTask>>);
     var filePath =
         'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename!))}';
     var fileStat = await File(
@@ -152,8 +152,8 @@ class DownloadState extends ChangeNotifier {
   Future<void> _loadTasks() async {
     _episodeTasks = [];
     var dbHelper = DBHelper();
-    var tasks = await (FlutterDownloader.loadTasks() as FutureOr<List<DownloadTask>>);
-    if (tasks.isNotEmpty) {
+    var tasks = await FlutterDownloader.loadTasks();
+    if (tasks != null && tasks.isNotEmpty) {
       for (var task in tasks) {
         var episode = await dbHelper.getRssItemWithUrl(task.url);
         if (episode == null) {
@@ -192,7 +192,8 @@ class DownloadState extends ChangeNotifier {
   Future<Directory> _getDownloadDirectory() async {
     final storage = KeyValueStorage(downloadPositionKey);
     final index = await (storage.getInt() as FutureOr<int>);
-    final externalDirs = await (getExternalStorageDirectories() as FutureOr<List<Directory>>);
+    final externalDirs =
+        await (getExternalStorageDirectories() as FutureOr<List<Directory>>);
     return externalDirs[index];
   }
 
@@ -230,7 +231,8 @@ class DownloadState extends ChangeNotifier {
   Future _saveMediaId(EpisodeTask episodeTask) async {
     episodeTask.status = DownloadTaskStatus.complete;
     final completeTask = await (FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'") as FutureOr<List<DownloadTask>>);
+            query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'")
+        as FutureOr<List<DownloadTask>>);
     var filePath =
         'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename!))}';
     var fileStat = await File(
@@ -250,9 +252,9 @@ class DownloadState extends ChangeNotifier {
   }
 
   EpisodeTask episodeToTask(EpisodeBrief? episode) {
-    return _episodeTasks
-        .firstWhere((task) => task.episode!.enclosureUrl == episode!.enclosureUrl,
-            orElse: () {
+    return _episodeTasks.firstWhere(
+        (task) => task.episode!.enclosureUrl == episode!.enclosureUrl,
+        orElse: () {
       return EpisodeTask(
         episode,
         '',
@@ -362,7 +364,7 @@ class DownloadState extends ChangeNotifier {
     final deletePlayed = await deletePlayedStorage.getBool(defaultValue: false);
     if (autoDelete == 0) {
       await autoDeleteStorage.saveInt(30);
-    } else if (autoDelete! > 0) {
+    } else if (autoDelete > 0) {
       var deadline = DateTime.now()
           .subtract(Duration(days: autoDelete))
           .millisecondsSinceEpoch;
@@ -373,10 +375,10 @@ class DownloadState extends ChangeNotifier {
           await delTask(episode);
         }
       }
-      final tasks = await (FlutterDownloader.loadTasksWithRawQuery(
+      final tasks = await FlutterDownloader.loadTasksWithRawQuery(
           query:
-              'SELECT * FROM task WHERE time_created < $deadline AND status = 3') as FutureOr<List<DownloadTask>>);
-      for (var task in tasks) {
+              'SELECT * FROM task WHERE time_created < $deadline AND status = 3');
+      for (var task in tasks ?? []) {
         FlutterDownloader.remove(
             taskId: task.taskId, shouldDeleteContent: true);
       }

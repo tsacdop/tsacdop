@@ -44,7 +44,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
   String? path;
 
   Future<PlayHistory> _getPosition(EpisodeBrief episode) async {
-    var dbHelper = DBHelper();
+    final dbHelper = DBHelper();
     return await dbHelper.getPosition(episode);
   }
 
@@ -86,204 +86,205 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarContrastEnforced: false,
+          systemNavigationBarIconBrightness: context.iconBrightness,
+          statusBarBrightness: context.brightness,
+          statusBarIconBrightness: context.iconBrightness),
+    );
     final s = context.s!;
     final audio = context.watch<AudioPlayerNotifier>();
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-      ),
-      child: WillPopScope(
-        onWillPop: () async {
-          if (_playerKey.currentState != null &&
-              _playerKey.currentState!.initSize! > 100) {
-            _playerKey.currentState!.backToMini();
-            return false;
-          } else {
-            return true;
-          }
-        },
-        child: Scaffold(
-          backgroundColor: Theme.of(context).primaryColor,
-          body: Stack(
+    return WillPopScope(
+      onWillPop: () async {
+        if (_playerKey.currentState != null &&
+            _playerKey.currentState!.initSize! > 100) {
+          _playerKey.currentState!.backToMini();
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child: Stack(
             children: <Widget>[
-              SafeArea(
-                child: ScrollConfiguration(
-                  behavior: NoGrowBehavior(),
-                  child: NestedScrollView(
-                    scrollDirection: Axis.vertical,
-                    controller: _controller,
-                    headerSliverBuilder: (context, innerBoxScrolled) {
-                      return <Widget>[
-                        SliverAppBar(
-                          floating: true,
-                          pinned: true,
-                          title: _showTitle
-                              ? Text(
-                                  widget.episodeItem!.title!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )
-                              : Text(
-                                  widget.episodeItem!.feedTitle!,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      color:
-                                          context.textColor!.withOpacity(0.7)),
-                                ),
-                          leading: CustomBackButton(),
-                          elevation: _showTitle ? 1 : 0,
-                        ),
-                      ];
-                    },
-                    body: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.0),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
+              ScrollConfiguration(
+                behavior: NoGrowBehavior(),
+                child: NestedScrollView(
+                  scrollDirection: Axis.vertical,
+                  controller: _controller,
+                  headerSliverBuilder: (context, innerBoxScrolled) {
+                    return <Widget>[
+                      SliverAppBar(
+                        floating: true,
+                        pinned: true,
+                        title: _showTitle
+                            ? Text(
                                 widget.episodeItem!.title!,
-                                textAlign: TextAlign.left,
-                                style: Theme.of(context).textTheme.headline5,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            : Text(
+                                widget.episodeItem!.feedTitle!,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    color:
+                                        context.textColor!.withOpacity(0.7)),
                               ),
+                        leading: CustomBackButton(),
+                        elevation: _showTitle ? 1 : 0,
+                      ),
+                    ];
+                  },
+                  body: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              widget.episodeItem!.title!,
+                              textAlign: TextAlign.left,
+                              style: Theme.of(context).textTheme.headline5,
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            child: Row(
-                              children: [
-                                Text(
-                                    s.published(DateFormat.yMMMd().format(
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                            widget.episodeItem!.pubDate!))),
-                                    style:
-                                        TextStyle(color: context.accentColor)),
-                                SizedBox(width: 10),
-                                if (widget.episodeItem!.explicit == 1)
-                                  Text('E',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.red)),
-                                Spacer(),
-                              ],
-                            ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          child: Row(
+                            children: [
+                              Text(
+                                  s.published(DateFormat.yMMMd().format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          widget.episodeItem!.pubDate!))),
+                                  style:
+                                      TextStyle(color: context.accentColor)),
+                              SizedBox(width: 10),
+                              if (widget.episodeItem!.explicit == 1)
+                                Text('E',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red)),
+                              Spacer(),
+                            ],
                           ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: Row(
-                              children: <Widget>[
-                                if (widget.episodeItem!.duration != 0)
-                                  Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.cyan[300],
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(16.0))),
-                                      height: 28.0,
-                                      margin: EdgeInsets.only(right: 10.0),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.0),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        s.minsCount(
-                                          widget.episodeItem!.duration! ~/ 60,
-                                        ),
-                                        style: TextStyle(color: Colors.black),
-                                      )),
-                                if (widget.episodeItem!.enclosureLength !=
-                                        null &&
-                                    widget.episodeItem!.enclosureLength != 0)
-                                  Container(
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 5),
+                          child: Row(
+                            children: <Widget>[
+                              if (widget.episodeItem!.duration != 0)
+                                Container(
                                     decoration: BoxDecoration(
-                                        color: Colors.lightBlue[300],
+                                        color: Colors.cyan[300],
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(16.0))),
                                     height: 28.0,
                                     margin: EdgeInsets.only(right: 10.0),
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 10.0),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10.0),
                                     alignment: Alignment.center,
                                     child: Text(
-                                      '${widget.episodeItem!.enclosureLength! ~/ 1000000}MB',
+                                      s.minsCount(
+                                        widget.episodeItem!.duration! ~/ 60,
+                                      ),
                                       style: TextStyle(color: Colors.black),
-                                    ),
+                                    )),
+                              if (widget.episodeItem!.enclosureLength !=
+                                      null &&
+                                  widget.episodeItem!.enclosureLength != 0)
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.lightBlue[300],
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(16.0))),
+                                  height: 28.0,
+                                  margin: EdgeInsets.only(right: 10.0),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.0),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    '${widget.episodeItem!.enclosureLength! ~/ 1000000}MB',
+                                    style: TextStyle(color: Colors.black),
                                   ),
-                                FutureBuilder<PlayHistory>(
-                                    future: _getPosition(widget.episodeItem!),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasError) {
-                                        developer.log(snapshot.error as String);
-                                      }
-                                      if (snapshot.hasData &&
-                                          snapshot.data!.seekValue! < 0.9 &&
-                                          snapshot.data!.seconds! > 10) {
-                                        return ButtonTheme(
-                                          height: 28,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 0),
-                                          child: OutlineButton(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        100.0),
-                                                side: BorderSide(
-                                                    color:
-                                                        context.accentColor)),
-                                            highlightedBorderColor:
-                                                Colors.green[700],
-                                            onPressed: () => audio.episodeLoad(
-                                                widget.episodeItem,
-                                                startPosition:
-                                                    (snapshot.data!.seconds! *
-                                                            1000)
-                                                        .toInt()),
-                                            child: Row(
-                                              children: [
-                                                SizedBox(
-                                                  width: 20,
-                                                  height: 20,
-                                                  child: CustomPaint(
-                                                    painter: ListenedPainter(
-                                                        context.textColor,
-                                                        stroke: 2.0),
-                                                  ),
+                                ),
+                              FutureBuilder<PlayHistory>(
+                                  future: _getPosition(widget.episodeItem!),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasError) {
+                                      developer.log(snapshot.error as String);
+                                    }
+                                    if (snapshot.hasData &&
+                                        snapshot.data!.seekValue! < 0.9 &&
+                                        snapshot.data!.seconds! > 10) {
+                                      return ButtonTheme(
+                                        height: 28,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 0),
+                                        child: OutlineButton(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      100.0),
+                                              side: BorderSide(
+                                                  color:
+                                                      context.accentColor)),
+                                          highlightedBorderColor:
+                                              Colors.green[700],
+                                          onPressed: () => audio.episodeLoad(
+                                              widget.episodeItem,
+                                              startPosition:
+                                                  (snapshot.data!.seconds! *
+                                                          1000)
+                                                      .toInt()),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child: CustomPaint(
+                                                  painter: ListenedPainter(
+                                                      context.textColor,
+                                                      stroke: 2.0),
                                                 ),
-                                                SizedBox(width: 5),
-                                                Text(
-                                                  snapshot
-                                                      .data!.seconds!.toTime,
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                snapshot
+                                                    .data!.seconds!.toTime,
+                                              ),
+                                            ],
                                           ),
-                                        );
-                                      } else {
-                                        return Center();
-                                      }
-                                    }),
-                              ],
-                            ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Center();
+                                    }
+                                  }),
+                            ],
                           ),
-                          ShowNote(episode: widget.episodeItem),
-                          Selector<AudioPlayerNotifier,
-                                  Tuple2<bool, PlayerHeight?>>(
-                              selector: (_, audio) => Tuple2(
-                                  audio.playerRunning, audio.playerHeight),
-                              builder: (_, data, __) {
-                                var height =
-                                    kMinPlayerHeight[data.item2!.index];
-                                return SizedBox(
-                                  height: data.item1 ? height : 0,
-                                );
-                              }),
-                        ],
-                      ),
+                        ),
+                        ShowNote(episode: widget.episodeItem),
+                        Selector<AudioPlayerNotifier,
+                                Tuple2<bool, PlayerHeight?>>(
+                            selector: (_, audio) => Tuple2(
+                                audio.playerRunning, audio.playerHeight),
+                            builder: (_, data, __) {
+                              var height =
+                                  kMinPlayerHeight[data.item2!.index];
+                              return SizedBox(
+                                height: data.item1 ? height : 0,
+                              );
+                            }),
+                      ],
                     ),
                   ),
                 ),
@@ -451,7 +452,7 @@ class __MenuBarState extends State<_MenuBar> {
                                 _overlayEntry = _createOverlayEntry();
                                 Overlay.of(context)!.insert(_overlayEntry);
                                 await Future.delayed(Duration(seconds: 2));
-                                _overlayEntry?.remove();
+                                _overlayEntry.remove();
                               })
                           : _buttonOnMenu(
                               child: Icon(

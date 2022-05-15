@@ -21,7 +21,7 @@ class PlaylistEntity {
     };
   }
 
-  static PlaylistEntity fromJson(Map<String, Object> json) {
+  static PlaylistEntity fromJson(Map<String, dynamic> json) {
     var list = List<String>.from(json['episodeList'] as Iterable<dynamic>);
     return PlaylistEntity(json['name'] as String?, json['id'] as String?,
         json['isLocal'] == null ? false : json['isLocal'] as bool?, list);

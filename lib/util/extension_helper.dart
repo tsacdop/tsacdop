@@ -15,6 +15,7 @@ extension ContextExtension on BuildContext {
   Color? get textColor => Theme.of(this).textTheme.bodyText1!.color;
   Color get dialogBackgroundColor => Theme.of(this).dialogBackgroundColor;
   Brightness get brightness => Theme.of(this).brightness;
+  Brightness get iconBrightness => Theme.of(this).colorScheme.brightness;
   double get width => MediaQuery.of(this).size.width;
   double get height => MediaQuery.of(this).size.height;
   double get paddingTop => MediaQuery.of(this).padding.top;
@@ -24,7 +25,6 @@ extension ContextExtension on BuildContext {
 
 extension IntExtension on int {
   String toDate(BuildContext context) {
-    if (this == null) return '';
     final s = context.s;
     var date = DateTime.fromMillisecondsSinceEpoch(this, isUtc: true);
     var difference = DateTime.now().toUtc().difference(date);
@@ -46,7 +46,7 @@ extension IntExtension on int {
       '${(this ~/ 60).toString().padLeft(2, '0')}:${(truncate() % 60).toString().padLeft(2, '0')}';
 
   String toInterval(BuildContext context) {
-    if (this == null || isNegative) return '';
+    if (isNegative) return '';
     final s = context.s;
     var interval = Duration(milliseconds: this);
     if (interval.inHours <= 48) {
@@ -78,7 +78,8 @@ extension StringExtension on String {
     Color c;
     var color = json.decode(this);
     if (color[0] > 200 && color[1] > 200 && color[2] > 200) {
-      c = Color.fromRGBO(255 - color[0] as int, 255 - color[1] as int, 255 - color[2] as int, 1.0);
+      c = Color.fromRGBO(255 - color[0] as int, 255 - color[1] as int,
+          255 - color[2] as int, 1.0);
     } else {
       c = Color.fromRGBO(color[0], color[1] > 200 ? 190 : color[1],
           color[2] > 200 ? 190 : color[2], 1);
@@ -90,7 +91,8 @@ extension StringExtension on String {
     Color c;
     var color = json.decode(this);
     if (color[0] < 50 && color[1] < 50 && color[2] < 50) {
-      c = Color.fromRGBO(255 - color[0] as int, 255 - color[1] as int, 255 - color[2] as int, 1.0);
+      c = Color.fromRGBO(255 - color[0] as int, 255 - color[1] as int,
+          255 - color[2] as int, 1.0);
     } else {
       c = Color.fromRGBO(color[0] < 50 ? 100 : color[0],
           color[1] < 50 ? 100 : color[1], color[2] < 50 ? 100 : color[2], 1.0);

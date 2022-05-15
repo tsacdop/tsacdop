@@ -163,7 +163,6 @@ class _DownloadButtonState extends State<DownloadButton> {
               ),
             ),
             () => _requestDownload(task.episode));
-        break;
       case 2:
         return Material(
           color: Colors.transparent,
@@ -193,7 +192,6 @@ class _DownloadButtonState extends State<DownloadButton> {
             ),
           ),
         );
-        break;
       case 6:
         return Material(
           color: Colors.transparent,

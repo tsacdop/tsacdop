@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
+import 'package:path_provider_android/path_provider_android.dart';
+import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:uuid/uuid.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:workmanager/workmanager.dart';
@@ -48,7 +50,7 @@ class GroupEntity {
     return {'name': name, 'id': id, 'color': color, 'podcastList': podcastList};
   }
 
-  static GroupEntity fromJson(Map<String, Object> json) {
+  static GroupEntity fromJson(Map<String, dynamic> json) {
     var list = List<String>.from(json['podcastList'] as Iterable<dynamic>);
     return GroupEntity(json['name'] as String?, json['id'] as String?,
         json['color'] as String?, list);
@@ -537,7 +539,7 @@ class GroupList extends ChangeNotifier {
   ) async {
     _syncRemove(podcast.rssUrl);
     await _unsubscribe(podcast);
-    await File(podcast.imagePath!)?.delete();
+    await File(podcast.imagePath!).delete();
   }
 
   Future<void> saveOrder(PodcastGroup? group) async {
@@ -553,6 +555,8 @@ class GroupList extends ChangeNotifier {
 }
 
 Future<void> subIsolateEntryPoint(SendPort sendPort) async {
+  if (Platform.isAndroid) SharedPreferencesAndroid.registerWith();
+  if (Platform.isAndroid) PathProviderAndroid.registerWith();
   var items = <SubscribeItem>[];
   var _running = false;
   final listColor = <String>[
@@ -598,13 +602,13 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
           sendPort.send("done");
         }
       }
+      developer.log('get dir');
+      final dir = await getApplicationDocumentsDirectory();
 
-      var dir = await getApplicationDocumentsDirectory();
-
-      var realUrl =
+      final realUrl =
           response.redirects.isEmpty ? rss : response.realUri.toString();
 
-      var checkUrl = await dbHelper.checkPodcast(realUrl);
+      final checkUrl = await dbHelper.checkPodcast(realUrl);
 
       /// If url not existe in database.
       if (checkUrl == '') {

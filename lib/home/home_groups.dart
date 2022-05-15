@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:focused_menu/focused_menu.dart';
@@ -712,7 +711,7 @@ class ShowEpisode extends StatelessWidget {
                 return Selector<AudioPlayerNotifier,
                         tuple.Tuple3<EpisodeBrief?, List<String>, bool>>(
                     selector: (_, audio) => tuple.Tuple3(
-                        audio?.episode,
+                        audio.episode,
                         audio.queue.episodes
                             .map((e) => e!.enclosureUrl)
                             .toList(),
