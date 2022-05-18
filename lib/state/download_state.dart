@@ -191,15 +191,14 @@ class DownloadState extends ChangeNotifier {
 
   Future<Directory> _getDownloadDirectory() async {
     final storage = KeyValueStorage(downloadPositionKey);
-    final index = await (storage.getInt() as FutureOr<int>);
-    final externalDirs =
-        await (getExternalStorageDirectories() as FutureOr<List<Directory>>);
-    return externalDirs[index];
+    final index = await storage.getInt();
+    final externalDirs = await getExternalStorageDirectories();
+    return externalDirs![index];
   }
 
   void _bindBackgroundIsolate() {
-    var _port = ReceivePort();
-    var isSuccess = IsolateNameServer.registerPortWithName(
+    final _port = ReceivePort();
+    final isSuccess = IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     if (!isSuccess) {
       _unbindBackgroundIsolate();
@@ -230,17 +229,16 @@ class DownloadState extends ChangeNotifier {
 
   Future _saveMediaId(EpisodeTask episodeTask) async {
     episodeTask.status = DownloadTaskStatus.complete;
-    final completeTask = await (FlutterDownloader.loadTasksWithRawQuery(
-            query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'")
-        as FutureOr<List<DownloadTask>>);
-    var filePath =
-        'file://${path.join(completeTask.first.savedDir, Uri.encodeComponent(completeTask.first.filename!))}';
-    var fileStat = await File(
+    final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
+        query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
+    final filePath =
+        'file://${path.join(completeTask!.first.savedDir, Uri.encodeComponent(completeTask.first.filename!))}';
+    final fileStat = await File(
             path.join(completeTask.first.savedDir, completeTask.first.filename))
         .stat();
     _dbHelper.saveMediaId(episodeTask.episode!.enclosureUrl, filePath,
         episodeTask.taskId, fileStat.size);
-    var episode =
+    final episode =
         await _dbHelper.getRssItemWithUrl(episodeTask.episode!.enclosureUrl);
     _removeTask(episodeTask.episode);
     _episodeTasks.add(EpisodeTask(episode, episodeTask.taskId,

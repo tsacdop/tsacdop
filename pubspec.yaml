@@ -51,7 +51,7 @@ dependencies:
   workmanager: ^0.4.1
   wc_flutter_share: ^0.4.0
   xml: ^5.2.0
-  audio_service: 0.18.0
+  audio_service: ^0.18.0
   just_audio:
     git:
       url: https://github.com/stonega/just_audio_origin.git

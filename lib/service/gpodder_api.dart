@@ -129,7 +129,6 @@ class Gpodder {
 
   Future<String?> getAllPodcast() async {
     final loginInfo = await _storage.getStringList();
-    if (loginInfo == null) return null;
     final username = loginInfo[0];
     Response response;
     await _initDio();
@@ -173,12 +172,11 @@ class Gpodder {
 
   Future<int?> getChanges() async {
     final loginInfo = await _storage.getStringList();
-    if (loginInfo == null) return null;
     final username = loginInfo[0];
     final deviceId = loginInfo[1];
     final syncDataTime = DateTime.now().millisecondsSinceEpoch;
     await _dateTimeStorage.saveInt(syncDataTime);
-    final timeStamp = loginInfo.length == 3 ? int.parse(loginInfo[2]!) : 0;
+    final timeStamp = loginInfo.length == 3 ? int.parse(loginInfo[2]) : 0;
     var status;
     Response response;
     await _initDio();
@@ -210,7 +208,6 @@ class Gpodder {
 
   Future<int?> updateChange() async {
     final loginInfo = await _storage.getStringList();
-    if (loginInfo == null) return null;
     final addList = await _addStorage.getStringList();
     final removeList = await _removeStorage.getStringList();
     final username = loginInfo[0];

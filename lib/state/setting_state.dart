@@ -18,22 +18,22 @@ import 'download_state.dart';
 
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    var dbHelper = DBHelper();
-    var podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
+    final dbHelper = DBHelper();
+    final podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
     //lastWork is a indicator for if the app was opened since last backgroundwork
     //if the app wes opend,then the old marked new episode would be marked not new.
-    var lastWorkStorage = KeyValueStorage(lastWorkKey);
-    var lastWork = await lastWorkStorage.getInt();
+    final lastWorkStorage = KeyValueStorage(lastWorkKey);
+    final lastWork = await lastWorkStorage.getInt();
     for (var podcastLocal in podcastList) {
       await dbHelper.updatePodcastRss(podcastLocal, removeMark: lastWork);
       developer.log('Refresh ${podcastLocal.title}');
     }
     await FlutterDownloader.initialize();
-    var downloader = AutoDownloader();
+    final downloader = AutoDownloader();
 
-    var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
-    var autoDownloadNetwork = await autoDownloadStorage.getInt();
-    var result = await Connectivity().checkConnectivity();
+    final autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+    final autoDownloadNetwork = await autoDownloadStorage.getInt();
+    final result = await Connectivity().checkConnectivity();
     if (autoDownloadNetwork == 1) {
       var episodes = await dbHelper.getNewEpisodes('all');
       // For safety

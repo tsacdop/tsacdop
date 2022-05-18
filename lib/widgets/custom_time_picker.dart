@@ -1,16 +1,9 @@
-// Copyright 2014 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-
-// Examples can assume:
-// BuildContext context;
 
 const Duration _kDialogSizeAnimationDuration = Duration(milliseconds: 200);
 const Duration _kDialAnimateDuration = Duration(milliseconds: 200);
@@ -37,21 +30,11 @@ const BorderRadius _kDefaultBorderRadius =
 const ShapeBorder _kDefaultShape =
     RoundedRectangleBorder(borderRadius: _kDefaultBorderRadius);
 
-/// Interactive input mode of the time picker dialog.
-///
-/// In [TimePickerEntryMode.dial] mode, a clock dial is displayed and
-/// the user taps or drags the time they wish to select. In
-/// TimePickerEntryMode.input] mode, [TextField]s are displayed and the user
-/// types in the time they wish to select.
 enum TimePickerEntryMode {
-  /// Tapping/dragging on a clock dial.
   dial,
-
-  /// Text input.
   input,
 }
 
-/// Provides properties for rendering time picker header fragments.
 @immutable
 class _TimePickerFragmentContext {
   const _TimePickerFragmentContext({
@@ -60,11 +43,7 @@ class _TimePickerFragmentContext {
     required this.onTimeChange,
     required this.onModeChange,
     required this.use24HourDials,
-  })  : assert(selectedTime != null),
-        assert(mode != null),
-        assert(onTimeChange != null),
-        assert(onModeChange != null),
-        assert(use24HourDials != null);
+  });
 
   final TimeOfDay selectedTime;
   final _TimePickerMode mode;
@@ -82,10 +61,7 @@ class _TimePickerHeader extends StatelessWidget {
     required this.onChanged,
     required this.use24HourDials,
     required this.helpText,
-  })  : assert(selectedTime != null),
-        assert(mode != null),
-        assert(orientation != null),
-        assert(use24HourDials != null);
+  });
 
   final TimeOfDay selectedTime;
   final _TimePickerMode mode;
@@ -242,13 +218,13 @@ class _HourMinuteControl extends StatelessWidget {
     final textColor = timePickerTheme.hourMinuteTextColor ??
         MaterialStateColor.resolveWith((states) {
           return states.contains(MaterialState.selected)
-              ? themeData.accentColor
+              ? themeData.colorScheme.secondary
               : themeData.colorScheme.onSurface;
         });
     final backgroundColor = timePickerTheme.hourMinuteColor ??
         MaterialStateColor.resolveWith((states) {
           return states.contains(MaterialState.selected)
-              ? themeData.accentColor.withOpacity(isDark ? 0.24 : 0.12)
+              ? themeData.colorScheme.secondary.withOpacity(isDark ? 0.24 : 0.12)
               : themeData.colorScheme.onSurface.withOpacity(0.12);
         });
     final style =

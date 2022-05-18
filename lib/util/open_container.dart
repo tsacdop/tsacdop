@@ -1,62 +1,19 @@
-// Copyright 2019 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'extension_helper.dart';
 
-/// Signature for a function that creates a [Widget] to be used within an
-/// [OpenContainer].
-///
-/// The `action` callback provided to [OpenContainer.openBuilder] can be used
-/// to open the container. The `action` callback provided to
-/// [OpenContainer.closedBuilder] can be used to close the container again.
 typedef OpenContainerBuilder = Widget Function(
   BuildContext context,
   VoidCallback action,
   bool hide,
 );
 
-/// The [OpenContainer] widget's fade transition type.
-///
-/// This determines the type of fade transition that the incoming and outgoing
-/// contents will use.
 enum ContainerTransitionType {
-  /// Fades the incoming element in over the outgoing element.
   fade,
-
-  /// First fades the outgoing element out, and starts fading the incoming
-  /// element in once the outgoing element has completely faded out.
   fadeThrough,
 }
 
-/// A container that grows to fill the screen to reveal new content when tapped.
-///
-/// While the container is closed, it shows the [Widget] returned by
-/// [closedBuilder]. When the container is tapped it grows to fill the entire
-/// size of the surrounding [Navigator] while fading out the widget returned by
-/// [closedBuilder] and fading in the widget returned by [openBuilder]. When the
-/// container is closed again via the callback provided to [openBuilder] or via
-/// Android's back button, the animation is reversed: The container shrinks back
-/// to its original size while the widget returned by [openBuilder] is faded out
-/// and the widget returned by [openBuilder] is faded back in.
-///
-/// By default, the container is in the closed state. During the transition from
-/// closed to open and vice versa the widgets returned by the [openBuilder] and
-/// [closedBuilder] exist in the tree at the same time. Therefore, the widgets
-/// returned by these builders cannot include the same global key.
-///
-///
-/// See also:
-///
-///  * [Transitions with animated containers](https://material.io/design/motion/choreography.html#transformation)
-///    in the Material spec.
 class OpenContainer extends StatefulWidget {
-  /// Creates an [OpenContainer].
-  ///
-  /// All arguments except for [key] must not be null. The arguments
-  /// [closedBuilder] and [closedBuilder] are required.
   const OpenContainer({
     Key? key,
     this.closedColor = Colors.white,
@@ -80,19 +37,6 @@ class OpenContainer extends StatefulWidget {
     this.transitionType = ContainerTransitionType.fade,
   }) : super(key: key);
 
-  /// Background color of the container while it is closed.
-  ///
-  /// When the container is opened, it will first transition from this color
-  /// to [Colors.white] and then transition from there to [openColor] in one
-  /// smooth animation. When the container is closed, it will transition back to
-  /// this color from [openColor] via [Colors.white].
-  ///
-  /// Defaults to [Colors.white].
-  ///
-  /// See also:
-  ///
-  ///  * [Material.color], which is used to implement this property.
-  ///
   final Color beginColor;
   final Color endColor;
   final Color closedColor;
@@ -101,110 +45,24 @@ class OpenContainer extends StatefulWidget {
   final bool? playerRunning;
   final double? playerHeight;
 
-  /// Background color of the container while it is open.
-  ///
-  /// When the container is closed, it will first transition from [closedColor]
-  /// to [Colors.white] and then transition from there to this color in one
-  /// smooth animation. When the container is closed, it will transition back to
-  /// [closedColor] from this color via [Colors.white].
-  ///
-  /// Defaults to [Colors.white].
-  ///
-  /// See also:
-  ///
-  ///  * [Material.color], which is used to implement this property.
   final Color openColor;
 
-  /// Elevation of the container while it is closed.
-  ///
-  /// When the container is opened, it will transition from this elevation to
-  /// [openElevation]. When the container is closed, it will transition back
-  /// from [openElevation] to this elevation.
-  ///
-  /// Defaults to 1.0.
-  ///
-  /// See also:
-  ///
-  ///  * [Material.elevation], which is used to implement this property.
   final double closedElevation;
 
-  /// Elevation of the container while it is open.
-  ///
-  /// When the container is opened, it will transition to this elevation from
-  /// [closedElevation]. When the container is closed, it will transition back
-  /// from this elevation to [closedElevation].
-  ///
-  /// Defaults to 4.0.
-  ///
-  /// See also:
-  ///
-  ///  * [Material.elevation], which is used to implement this property.
   final double openElevation;
 
-  /// Shape of the container while it is closed.
-  ///
-  /// When the container is opened it will transition from this shape to
-  /// [openShape]. When the container is closed, it will transition back to this
-  /// shape.
-  ///
-  /// Defaults to a [RoundedRectangleBorder] with a [Radius.circular] of 4.0.
-  ///
-  /// See also:
-  ///
-  ///  * [Material.shape], which is used to implement this property.
   final ShapeBorder closedShape;
 
-  /// Shape of the container while it is open.
-  ///
-  /// When the container is opened it will transition from [closedShape] to
-  /// this shape. When the container is closed, it will transition from this
-  /// shape back to [closedShape].
-  ///
-  /// Defaults to a rectangular.
-  ///
-  /// See also:
-  ///
-  ///  * [Material.shape], which is used to implement this property.
   final ShapeBorder openShape;
 
-  /// Called to obtain the child for the container in the closed state.
-  ///
-  /// The [Widget] returned by this builder is faded out when the container
-  /// opens and at the same time the widget returned by [openBuilder] is faded
-  /// in while the container grows to fill the surrounding [Navigator].
-  ///
-  /// The `action` callback provided to the builder can be called to open the
-  /// container.
   final OpenContainerBuilder closedBuilder;
 
-  /// Called to obtain the child for the container in the open state.
-  ///
-  /// The [Widget] returned by this builder is faded in when the container
-  /// opens and at the same time the widget returned by [closedBuilder] is
-  /// faded out while the container grows to fill the surrounding [Navigator].
-  ///
-  /// The `action` callback provided to the builder can be called to close the
-  /// container.
   final OpenContainerBuilder openBuilder;
 
-  /// Whether the entire closed container can be tapped to open it.
-  ///
-  /// Defaults to true.
-  ///
-  /// When this is set to false the container can only be opened by calling the
-  /// `action` callback that is provided to the [closedBuilder].
   final bool tappable;
 
-  /// The time it will take to animate the container from its closed to its
-  /// open state and vice versa.
-  ///
-  /// Defaults to 300ms.
   final Duration transitionDuration;
 
-  /// The type of fade transition that the container will use for its
-  /// incoming and outgoing widgets.
-  ///
-  /// Defaults to [ContainerTransitionType.fade].
   final ContainerTransitionType transitionType;
 
   @override
@@ -212,16 +70,8 @@ class OpenContainer extends StatefulWidget {
 }
 
 class _OpenContainerState extends State<OpenContainer> {
-  // Key used in [_OpenContainerRoute] to hide the widget returned by
-  // [OpenContainer.openBuilder] in the source route while the container is
-  // opening/open. A copy of that widget is included in the
-  // [_OpenContainerRoute] where it fades out. To avoid issues with double
-  // shadows and transparency, we hide it in the source route.
   final GlobalKey<_HideableState> _hideableKey = GlobalKey<_HideableState>();
 
-  // Key used to steal the state of the widget returned by
-  // [OpenContainer.openBuilder] from the source route and attach it to the
-  // same widget included in the [_OpenContainerRoute] where it fades out.
   final GlobalKey _closedBuilderKey = GlobalKey();
 
   void openContainer() {
@@ -271,17 +121,6 @@ class _OpenContainerState extends State<OpenContainer> {
   }
 }
 
-/// Controls the visibility of its child.
-///
-/// The child can be in one of three states:
-///
-///  * It is included in the tree and fully visible. (The `placeholderSize` is
-///    null and `isVisible` is true.)
-///  * It is included in the tree, but not visible; its size is maintained.
-///    (The `placeholderSize` is null and `isVisible` is false.)
-///  * It is not included in the tree. Instead a [SizedBox] of dimensions
-///    specified by `placeholderSize` is included in the tree. (The value of
-///    `isVisible` is ignored).
 class _Hideable extends StatefulWidget {
   const _Hideable({
     Key? key,
@@ -314,7 +153,6 @@ class _HideableState extends State<_Hideable> {
   bool get isVisible => _visible;
   bool _visible = true;
   set isVisible(bool value) {
-    assert(value != null);
     if (_visible == value) {
       return;
     }
