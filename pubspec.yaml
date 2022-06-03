@@ -68,6 +68,8 @@ dependencies:
   collection: ^1.15.0-nullsafety.4
   shared_preferences_android: ^2.0.12
   path_provider_android: ^2.0.14
+  material_color_utilities: ^0.1.4
+  dynamic_color: ^1.4.0
 
 dependency_overrides:
   linkify:

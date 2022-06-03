@@ -94,8 +94,8 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                 child: GestureDetector(
                   onTap: backToMini,
                   child: Container(
-                    color: context.scaffoldBackgroundColor.withOpacity(0.9 *
-                        math.min(_animation.value / widget.maxHeight, 1)),
+                    color: context.background.withOpacity(
+                        0.9 * math.min(_animation.value / widget.maxHeight, 1)),
                   ),
                 ),
               )
@@ -314,7 +314,7 @@ class __AudioPanelRouteState extends State<_AudioPanelRoute> {
                 // child:
                 // Container(
                 //   color: Theme.of(context)
-                //       .scaffoldBackgroundColor
+                //       .background
                 //       .withOpacity(0.8),
                 //
                 //),

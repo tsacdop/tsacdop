@@ -22,7 +22,7 @@ Widget featureDiscoveryOverlay(BuildContext context,
     required Widget tapTarget,
     required String title,
     required String description}) {
-  final s = context.s!;
+  final s = context.s;
   return DescribedFeatureOverlay(
       featureId: featureId,
       tapTarget: tapTarget,

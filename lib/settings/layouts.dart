@@ -184,7 +184,7 @@ class _LayoutSettingState extends State<LayoutSetting> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(

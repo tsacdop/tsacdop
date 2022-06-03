@@ -79,7 +79,7 @@ class _DataBackupState extends State<DataBackup> {
   }
 
   Future<void> _importSetting(String path, BuildContext context) async {
-    final s = context.s!;
+    final s = context.s;
     var settings = context.read<SettingState>();
     var file = File(path);
     try {
@@ -178,7 +178,7 @@ class _DataBackupState extends State<DataBackup> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: context.iconBrightness,
@@ -634,14 +634,14 @@ class __LoginGpodderState extends State<_LoginGpodder> {
         } else {
           if (mounted) setState(() => _loginStatus = LoginStatus.error);
           Fluttertoast.showToast(
-            msg: context.s!.loginFailed,
+            msg: context.s.loginFailed,
             gravity: ToastGravity.BOTTOM,
           );
         }
       } else {
         if (mounted) setState(() => _loginStatus = LoginStatus.error);
         Fluttertoast.showToast(
-          msg: context.s!.loginFailed,
+          msg: context.s.loginFailed,
           gravity: ToastGravity.BOTTOM,
         );
       }
@@ -680,11 +680,11 @@ class __LoginGpodderState extends State<_LoginGpodder> {
 
   String? _validateName(String? value) {
     if (value!.isEmpty) {
-      return context.s!.usernameRequired;
+      return context.s.usernameRequired;
     }
     final nameExp = RegExp(r'^[A-Za-z ]+$');
     if (!nameExp.hasMatch(value)) {
-      return context.s!.invalidName;
+      return context.s.invalidName;
     }
     return null;
   }
@@ -692,7 +692,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
   String? _validatePassword(String? value) {
     final passwordField = _passwordFieldKey.currentState!;
     if (passwordField.value == null || passwordField.value!.isEmpty) {
-      return context.s!.passwdRequired;
+      return context.s.passwdRequired;
     }
     return null;
   }
@@ -701,13 +701,13 @@ class __LoginGpodderState extends State<_LoginGpodder> {
     switch (_loginStatus) {
       case LoginStatus.none:
         return Text(
-          context.s!.login,
+          context.s.login,
           style: TextStyle(color: Colors.white),
         );
         break;
       case LoginStatus.syncing:
         return Text(
-          context.s!.settingsSyncing,
+          context.s.settingsSyncing,
           style: TextStyle(color: Colors.white),
         );
         break;
@@ -722,7 +722,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
         );
       default:
         return Text(
-          context.s!.login,
+          context.s.login,
           style: TextStyle(color: Colors.white),
         );
         break;
@@ -731,7 +731,7 @@ class __LoginGpodderState extends State<_LoginGpodder> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.dark,

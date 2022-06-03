@@ -19,6 +19,7 @@ import '../widgets/custom_widget.dart';
 import '../widgets/duraiton_picker.dart';
 
 enum MarkStatus { start, complete, none }
+
 enum RefreshCoverStatus { start, complete, error, none }
 
 class PodcastSetting extends StatefulWidget {
@@ -200,7 +201,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     final groupList = context.watch<GroupList>();
     final textStyle = context.textTheme.bodyText2!;
     return Column(
@@ -233,8 +234,8 @@ class _PodcastSettingState extends State<PodcastSetting> {
                 ),
                 trailing: Transform.scale(
                   scale: 0.8,
-                  child:
-                      Switch(value: snapshot.data!, onChanged: _setAutoDownload),
+                  child: Switch(
+                      value: snapshot.data!, onChanged: _setAutoDownload),
                 ),
               );
             }),
@@ -464,7 +465,7 @@ class _TimePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return Container(
       color: context.primaryColorDark,
       child: Column(

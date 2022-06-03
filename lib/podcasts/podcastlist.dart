@@ -51,7 +51,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
   @override
   Widget build(BuildContext context) {
     var _groupList = Provider.of<GroupList>(context, listen: false);
-    final s = context.s!;
+    final s = context.s;
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       titlePadding: EdgeInsets.only(
@@ -116,7 +116,7 @@ class _PodcastListState extends State<PodcastList> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(context.s!.podcast(2)),
+          title: Text(context.s.podcast(2)),
           leading: CustomBackButton(),
           actions: [
             Selector<SettingState, bool?>(

@@ -65,9 +65,10 @@ final showNotesFontStyles = <TextStyle>[
     height: 1.8,
   )),
   GoogleFonts.bitter(
-      textStyle: TextStyle(
-    height: 1.8,
-  )),
+    textStyle: TextStyle(
+      height: 1.8,
+    ),
+  ),
 ];
 
 class SettingState extends ChangeNotifier {
@@ -133,15 +134,13 @@ class SettingState extends ChangeNotifier {
   /// Load locale.
   Locale? get locale => _locale;
 
-  /// Spp thememode. default auto.
+  /// Set thememode. default auto.
   ThemeMode? _theme;
   ThemeMode? get theme => _theme;
 
-  ThemeData get lightTheme => ThemeData().copyWith(
-        colorScheme: ThemeData()
-            .colorScheme
-            .copyWith(brightness: Brightness.light, secondary: _accentSetColor),
-        brightness: Brightness.dark,
+  ThemeData get lightTheme => ThemeData.light().copyWith(
+        colorScheme: _colors(Brightness.light, _accentSetColor!),
+        brightness: Brightness.light,
         primaryColor: Colors.grey[100],
         primaryColorLight: Colors.white,
         primaryColorDark: Colors.grey[300],
@@ -154,12 +153,44 @@ class SettingState extends ChangeNotifier {
             iconTheme: IconThemeData(color: Colors.black),
             systemOverlayStyle: SystemUiOverlayStyle.dark),
         textTheme: TextTheme(
+          headlineSmall: TextStyle(
+              fontSize: 20.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
           bodyLarge: TextStyle(
               fontSize: 17.0,
               color: Colors.black,
               fontWeight: FontWeight.normal),
           bodyMedium: TextStyle(
               fontSize: 15.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
+          bodySmall: TextStyle(
+              fontSize: 14.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
+          labelLarge: TextStyle(
+              fontSize: 16.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
+          labelMedium: TextStyle(
+              fontSize: 14.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
+          labelSmall: TextStyle(
+              fontSize: 12.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
+          titleLarge: TextStyle(
+              fontSize: 16.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
+          titleMedium: TextStyle(
+              fontSize: 14.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
+          titleSmall: TextStyle(
+              fontSize: 12.0,
               color: Colors.black,
               fontWeight: FontWeight.normal),
         ),
@@ -177,15 +208,18 @@ class SettingState extends ChangeNotifier {
           hoverColor: _accentSetColor!.withAlpha(70),
           splashColor: _accentSetColor!.withAlpha(70),
         ),
+        useMaterial3: true,
       );
 
   ThemeData get darkTheme => ThemeData.dark().copyWith(
-        colorScheme: ThemeData.dark()
-            .colorScheme
-            .copyWith(brightness: Brightness.dark, secondary: _accentSetColor),
-        brightness: Brightness.light,
+        colorScheme: _colors(Brightness.dark, _accentSetColor!),
+        brightness: Brightness.dark,
         primaryColorDark: Colors.grey[800],
         textTheme: TextTheme(
+          headlineSmall: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
           bodyLarge: TextStyle(
               fontSize: 17.0,
               color: Colors.white,
@@ -194,9 +228,31 @@ class SettingState extends ChangeNotifier {
               fontSize: 15.0,
               color: Colors.white,
               fontWeight: FontWeight.normal),
+          labelLarge: TextStyle(
+              fontSize: 16.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
+          labelMedium: TextStyle(
+              fontSize: 14.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
+          labelSmall: TextStyle(
+              fontSize: 12.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
+          titleLarge: TextStyle(
+              fontSize: 16.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
+          titleMedium: TextStyle(
+              fontSize: 14.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
+          titleSmall: TextStyle(
+              fontSize: 12.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
         ),
-        scaffoldBackgroundColor:
-            _realDark! ? Colors.black87 : Color(0XFF212121),
         primaryColor: _realDark! ? Colors.black : Color(0XFF1B1B1B),
         popupMenuTheme: PopupMenuThemeData()
             .copyWith(color: _realDark! ? Colors.grey[900] : null),
@@ -206,12 +262,20 @@ class SettingState extends ChangeNotifier {
             systemOverlayStyle: SystemUiOverlayStyle.light),
         buttonTheme: ButtonThemeData(height: 32),
         dialogBackgroundColor: _realDark! ? Colors.grey[900] : null,
+        useMaterial3: true,
       );
 
   set setTheme(ThemeMode? mode) {
     _theme = mode;
     _saveTheme();
     notifyListeners();
+  }
+
+  ColorScheme _colors(Brightness brightness, Color targetColor) {
+    return ColorScheme.fromSeed(
+      seedColor: targetColor,
+      brightness: brightness,
+    );
   }
 
   void setWorkManager(int? hour) {
@@ -366,9 +430,9 @@ class SettingState extends ChangeNotifier {
     _saveRewindSeconds();
   }
 
-  int? _showNotesFontIndex;
-  int? get showNotesFontIndex => _showNotesFontIndex;
-  TextStyle get showNoteFontStyle => showNotesFontStyles[_showNotesFontIndex!];
+  late int _showNotesFontIndex;
+  int get showNotesFontIndex => _showNotesFontIndex;
+  TextStyle get showNoteFontStyle => showNotesFontStyles[_showNotesFontIndex];
   set setShowNoteFontStyle(int index) {
     _showNotesFontIndex = index;
     notifyListeners();

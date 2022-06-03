@@ -112,7 +112,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                       // disabledTextColor: Colors.grey[500],
                       // disabledBorderColor: Colors.grey[500],
                     ),
-                    child: Text(context.s!.subscribe),
+                    child: Text(context.s.subscribe),
                     onPressed: () {}),
               ),
             ),
@@ -277,7 +277,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                       padding: EdgeInsets.fromLTRB(50, 20, 50, 20),
                       child: Center(
                         child: Text(
-                          context.s!.searchHelper,
+                          context.s.searchHelper,
                           textAlign: TextAlign.center,
                           style: context.textTheme.headline6!
                               .copyWith(color: Colors.grey[400]),
@@ -477,7 +477,7 @@ class __TopPodcastListState extends State<_TopPodcastList> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                               ))
-                          : Text(context.s!.loadMore),
+                          : Text(context.s.loadMore),
                       onPressed: () => _loading
                           ? null
                           : setState(

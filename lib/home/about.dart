@@ -57,7 +57,8 @@ class _AboutAppState extends State<AboutApp> {
         ),
       );
 
-  Widget _translatorInfo(BuildContext context, {required String name, String? flag}) =>
+  Widget _translatorInfo(BuildContext context,
+          {required String name, String? flag}) =>
       Container(
         height: 50.0,
         padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -114,7 +115,7 @@ class _AboutAppState extends State<AboutApp> {
       );
     }
 
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -208,7 +209,10 @@ class _AboutAppState extends State<AboutApp> {
                         children: <Widget>[
                           _listItem(context, 'Twitter @tsacdop',
                               LineIcons.twitter, 'https://twitter.com/tsacdop'),
-                          _listItem(context, 'GitHub', LineIcons.alternateGithub,
+                          _listItem(
+                              context,
+                              'GitHub',
+                              LineIcons.alternateGithub,
                               'https://github.com/stonega/tsacdop'),
                           _listItem(context, 'Telegram', LineIcons.telegram,
                               'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
@@ -281,7 +285,7 @@ class _AboutAppState extends State<AboutApp> {
                               name: 'Bruno Pinheiro', flag: 'pt'),
                           _translatorInfo(context,
                               name: 'Edoardo Maria Elidoro', flag: 'it'),
-                           _translatorInfo(context,
+                          _translatorInfo(context,
                               name: 'Murat T. Akyuz', flag: 'tr'),
                         ],
                       ),

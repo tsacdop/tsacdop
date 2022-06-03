@@ -45,7 +45,7 @@ class _DownloadButtonState extends State<DownloadButton> {
   void _deleteDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).delTask(episode);
     Fluttertoast.showToast(
-      msg: context.s!.downloadRemovedToast,
+      msg: context.s.downloadRemovedToast,
       gravity: ToastGravity.BOTTOM,
     );
   }
@@ -78,22 +78,20 @@ class _DownloadButtonState extends State<DownloadButton> {
 
   Future<bool> _useDataConfirm() async {
     var ifUseData = false;
-    final s = context.s!;
+    final s = context.s;
     await generalDialog(
       context,
       title: Text(s.cellularConfirm),
       content: Text(s.cellularConfirmDes),
       actions: <Widget>[
-        FlatButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+        TextButton(
+          onPressed: Navigator.of(context).pop,
           child: Text(
             s.cancel,
             style: TextStyle(color: Colors.grey[600]),
           ),
         ),
-        FlatButton(
+        TextButton(
           onPressed: () {
             ifUseData = true;
             Navigator.of(context).pop();
@@ -130,7 +128,7 @@ class _DownloadButtonState extends State<DownloadButton> {
           AnimatedContainer(
               duration: Duration(seconds: 1),
               decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
+                  color: context.accentColor,
                   borderRadius: BorderRadius.all(Radius.circular(15.0))),
               height: 20.0,
               width: (_task.status == DownloadTaskStatus.running) ? 50.0 : 0,
@@ -222,7 +220,6 @@ class _DownloadButtonState extends State<DownloadButton> {
             ),
           ),
         );
-        break;
       case 3:
         Provider.of<AudioPlayerNotifier>(context, listen: false)
             .updateMediaItem(task.episode!);
@@ -251,11 +248,9 @@ class _DownloadButtonState extends State<DownloadButton> {
             ),
           ),
         );
-        break;
       case 4:
         return _buttonOnMenu(Icon(Icons.refresh, color: Colors.red),
             () => _retryDownload(task.episode!));
-        break;
       default:
         return Center();
     }

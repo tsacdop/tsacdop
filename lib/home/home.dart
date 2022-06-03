@@ -64,7 +64,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     _controller = TabController(length: 3, vsync: this);
     //  FeatureDiscovery.hasPreviouslyCompleted(context, addFeature).then((value) {
     //   if (!value) {
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       FeatureDiscovery.discoverFeatures(
         context,
         const <String>{
@@ -90,15 +90,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   double top = 0;
   @override
   Widget build(BuildContext context) {
-    var height = (context.width - 20) / 3 + 140;
-    var settings = Provider.of<SettingState>(context, listen: false);
+    final height = (context.width - 20) / 3 + 140;
+    final settings = Provider.of<SettingState>(context, listen: false);
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        systemNavigationBarIconBrightness:
-            context.brightness,
+        systemNavigationBarIconBrightness: context.brightness,
         statusBarIconBrightness: context.iconBrightness,
-        systemNavigationBarColor: context.primaryColor,
+        systemNavigationBarColor: context.onPrimary,
+        statusBarColor: context.onPrimary,
       ),
       child: WillPopScope(
         onWillPop: () async {
@@ -115,12 +115,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         },
         child: Scaffold(
           key: _scaffoldKey,
+          backgroundColor: context.onPrimary,
           body: Stack(
             children: <Widget>[
               SafeArea(
                 bottom: false,
-                child: ScrollConfiguration(
-                  behavior: NoGrowBehavior(),
+                child: StretchingOverscrollIndicator(
+                  axisDirection: AxisDirection.down,
                   child: NestedScrollView(
                     innerScrollPositionKeyBuilder: () {
                       return Key('tab${_controller!.index}');
@@ -141,7 +142,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                       context,
                                       featureId: addFeature,
                                       tapTarget: Icon(Icons.add_circle_outline),
-                                      title: s!.featureDiscoverySearch,
+                                      title: s.featureDiscoverySearch,
                                       backgroundColor: Colors.cyan[600],
                                       buttonColor: Colors.cyan[500],
                                       description: s.featureDiscoverySearchDes,
@@ -240,14 +241,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ),
                         ),
                         Selector<AudioPlayerNotifier, bool>(
-                            selector: (_, audio) =>
-                                audio.playerRunning,
-                            builder: (_, data, __) {
-                              return Padding(
-                                padding:
-                                    EdgeInsets.only(bottom: data ? 60.0 : 0),
-                              );
-                            }),
+                          selector: (_, audio) => audio.playerRunning,
+                          builder: (_, data, __) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -274,9 +274,9 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final s = context.s!;
+    final s = context.s;
     return Container(
-      color: context.scaffoldBackgroundColor,
+      color: context.background,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -335,7 +335,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(100),
@@ -406,19 +406,23 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                                 Padding(
                                   padding: EdgeInsets.symmetric(vertical: 2),
                                 ),
-                                Container(
+                                SizedBox(
                                   height: 70,
                                   width: 140,
                                   child: Column(
                                     children: <Widget>[
                                       Text(
                                         (data.item3 ~/ 1000).toTime,
+                                        style:
+                                            TextStyle(color: context.textColor),
                                       ),
                                       Text(
                                         data.item2!.title!,
                                         maxLines: 2,
                                         textAlign: TextAlign.center,
                                         overflow: TextOverflow.fade,
+                                        style:
+                                            TextStyle(color: context.textColor),
                                         // style: TextStyle(color: Colors.white),
                                       ),
                                     ],
@@ -443,7 +447,10 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 5.0),
                   ),
-                  Text(s.homeMenuPlaylist),
+                  Text(
+                    s.homeMenuPlaylist,
+                    style: TextStyle(color: context.textColor),
+                  ),
                 ],
               ),
             ),
@@ -475,7 +482,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PlaylistHome(),
+                builder: (_) => PlaylistHome(),
               ),
             );
           }
@@ -530,7 +537,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
     refreshWorker.start(_group);
     await Future.delayed(Duration(seconds: 1));
     Fluttertoast.showToast(
-      msg: context.s!.refreshStarted,
+      msg: context.s.refreshStarted,
       gravity: ToastGravity.BOTTOM,
     );
   }
@@ -593,14 +600,14 @@ class _RecentUpdateState extends State<_RecentUpdate>
       builder: (context, groupList, child) => PopupMenuButton<String>(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 1,
-        tooltip: context.s!.groupFilter,
+        tooltip: context.s.groupFilter,
         child: Container(
             padding: EdgeInsets.symmetric(horizontal: 20),
             height: 50,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(_groupName == 'All' ? context.s!.all : _groupName!),
+                Text(_groupName == 'All' ? context.s.all : _groupName!),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5),
                 ),
@@ -613,7 +620,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
         itemBuilder: (context) => [
           PopupMenuItem(
               child: Row(children: [
-                Text(context.s!.all),
+                Text(context.s.all),
                 Spacer(),
                 if (_groupName == 'All') DotIndicator()
               ]),
@@ -806,7 +813,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                             Material(
                                               color: Colors.transparent,
                                               child: IconButton(
-                                                  tooltip: context.s!.refresh,
+                                                  tooltip: context.s.refresh,
                                                   icon: Icon(
                                                       LineIcons.alternateRedo,
                                                       size: 16),

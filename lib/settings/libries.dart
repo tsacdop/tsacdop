@@ -26,7 +26,7 @@ class Libries extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(context.s!.settingsLibraries),
+          title: Text(context.s.settingsLibraries),
           leading: CustomBackButton(),
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
@@ -68,7 +68,7 @@ class Libries extends StatelessWidget {
                     height: 30.0,
                     padding: EdgeInsets.symmetric(horizontal: 70),
                     alignment: Alignment.centerLeft,
-                    child: Text(context.s!.fonts,
+                    child: Text(context.s.fonts,
                         style: Theme.of(context)
                             .textTheme
                             .bodyText1!
@@ -90,7 +90,7 @@ class Libries extends StatelessWidget {
                     height: 30.0,
                     padding: EdgeInsets.symmetric(horizontal: 70),
                     alignment: Alignment.centerLeft,
-                    child: Text(context.s!.plugins,
+                    child: Text(context.s.plugins,
                         style: Theme.of(context)
                             .textTheme
                             .bodyText1!

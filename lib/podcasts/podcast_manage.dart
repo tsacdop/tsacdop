@@ -113,9 +113,10 @@ class _PodcastManageState extends State<PodcastManage>
                   }
                 } else {
                   groupList.saveOrder(groupList.groups[_index!]);
-                  groupList.drlFromOrderChanged(groupList.groups[_index!]!.name);
+                  groupList
+                      .drlFromOrderChanged(groupList.groups[_index!]!.name);
                   Fluttertoast.showToast(
-                    msg: context.s!.toastSettingSaved,
+                    msg: context.s.toastSettingSaved,
                     gravity: ToastGravity.BOTTOM,
                   );
                   _controller.reverse();
@@ -155,7 +156,7 @@ class _PodcastManageState extends State<PodcastManage>
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -166,7 +167,7 @@ class _PodcastManageState extends State<PodcastManage>
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(context.s!.groups(2)),
+          title: Text(context.s.groups(2)),
           leading: CustomBackButton(),
           actions: <Widget>[
             featureDiscoveryOverlay(
@@ -218,7 +219,7 @@ class _PodcastManageState extends State<PodcastManage>
                   : Stack(
                       children: <Widget>[
                         Container(
-                          color: context.scaffoldBackgroundColor,
+                          color: context.background,
                           child: CustomTabView(
                             itemCount: _groups.length,
                             tabBuilder: (context, index) => Tab(
@@ -265,10 +266,8 @@ class _PodcastManageState extends State<PodcastManage>
                                 }
                               },
                               child: Container(
-                                color: context.scaffoldBackgroundColor
-                                    .withOpacity(0.8 *
-                                        math.min(
-                                            _menuController.value * 2, 1.0)),
+                                color: context.background.withOpacity(0.8 *
+                                    math.min(_menuController.value * 2, 1.0)),
                               ),
                             ),
                           ),
@@ -332,7 +331,7 @@ class _PodcastManageState extends State<PodcastManage>
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 5.0),
                                           ),
-                                          Text(context.s!.editGroupName,
+                                          Text(context.s.editGroupName,
                                               style: TextStyle(
                                                   color: Colors.white)),
                                         ],
@@ -366,7 +365,7 @@ class _PodcastManageState extends State<PodcastManage>
                                                       Navigator.of(context)
                                                           .pop(),
                                                   child: Text(
-                                                    context.s!.cancel,
+                                                    context.s.cancel,
                                                     style: TextStyle(
                                                         color:
                                                             Colors.grey[600]),
@@ -385,7 +384,8 @@ class _PodcastManageState extends State<PodcastManage>
                                                         _index = _index! - 1;
                                                       });
                                                       groupList.delGroup(
-                                                          _groups[_index! + 1]!);
+                                                          _groups[
+                                                              _index! + 1]!);
                                                     } else {
                                                       groupList.delGroup(
                                                           _groups[_index!]!);
@@ -393,7 +393,7 @@ class _PodcastManageState extends State<PodcastManage>
                                                     Navigator.of(context).pop();
                                                   },
                                                   child: Text(
-                                                    context.s!.confirm,
+                                                    context.s.confirm,
                                                     style: TextStyle(
                                                         color: Colors.red),
                                                   ),
@@ -441,7 +441,7 @@ class _PodcastManageState extends State<PodcastManage>
 class _OrderMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return PopupMenuButton(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 1,
@@ -494,7 +494,7 @@ class _AddGroupState extends State<AddGroup> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     var groupList = Provider.of<GroupList>(context, listen: false);
     List list = groupList.groups.map((e) => e!.name).toList();
     return AnnotatedRegion<SystemUiOverlayStyle>(

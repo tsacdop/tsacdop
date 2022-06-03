@@ -41,7 +41,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
       }
     } else {
       await localeStorage
-          .saveStringList([locale!.languageCode, locale.countryCode??'']);
+          .saveStringList([locale!.languageCode, locale.countryCode ?? '']);
       await S.load(locale);
       if (mounted) {
         setState(() {});
@@ -66,7 +66,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
   @override
   Widget build(BuildContext context) {
     final textStyle = context.textTheme.bodyText2!;
-    final s = context.s!;
+    final s = context.s;
     return Column(
       children: [
         ListTile(

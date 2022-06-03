@@ -141,7 +141,10 @@ class __PodcastCardState extends State<_PodcastCard>
       });
   }
 
-  Widget _buttonOnMenu({required Widget icon, VoidCallback? onTap, required String tooltip}) =>
+  Widget _buttonOnMenu(
+          {required Widget icon,
+          VoidCallback? onTap,
+          required String tooltip}) =>
       Material(
         color: Colors.transparent,
         child: InkWell(
@@ -166,7 +169,7 @@ class __PodcastCardState extends State<_PodcastCard>
   @override
   Widget build(BuildContext context) {
     final c = widget.podcastLocal!.backgroudColor(context);
-    final s = context.s!;
+    final s = context.s;
     var groupList = context.watch<GroupList>();
     _belongGroups = groupList.getPodcastGroup(widget.podcastLocal!.id);
     return Column(
@@ -243,7 +246,7 @@ class __PodcastCardState extends State<_PodcastCard>
             : Container(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: context.scaffoldBackgroundColor,
+                    color: context.background,
                   ),
                   // border: Border(
                   //     bottom: BorderSide(
@@ -365,7 +368,8 @@ class __PodcastCardState extends State<_PodcastCard>
                                   tooltip: s.autoDownload,
                                   onTap: () async {
                                     await _setAutoDownload(
-                                        widget.podcastLocal!.id, !snapshot.data!);
+                                        widget.podcastLocal!.id,
+                                        !snapshot.data!);
                                     setState(() {});
                                   },
                                 );
@@ -504,7 +508,7 @@ class _RenameGroupState extends State<RenameGroup> {
   Widget build(BuildContext context) {
     var groupList = Provider.of<GroupList>(context, listen: false);
     List list = groupList.groups.map((e) => e!.name).toList();
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,

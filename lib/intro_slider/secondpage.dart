@@ -24,7 +24,7 @@ class _SecondPageState extends State<SecondPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.fromLTRB(40, context.paddingTop + 20, 40, 20),
               child: Text(
-                context.s!.introSecondPage,
+                context.s.introSecondPage,
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),

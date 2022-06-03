@@ -132,7 +132,7 @@ class EpisodeGrid extends StatelessWidget {
       if (dataConfirm) {
         context.read<DownloadState>().startTask(episode!);
         Fluttertoast.showToast(
-          msg: context.s!.downloadStart,
+          msg: context.s.downloadStart,
           gravity: ToastGravity.BOTTOM,
         );
       }
@@ -155,7 +155,7 @@ class EpisodeGrid extends StatelessWidget {
 
   Future<bool> _useDataConfirm(BuildContext context) async {
     var ifUseData = false;
-    final s = context.s!;
+    final s = context.s;
     await generalDialog(
       context,
       title: Text(s.cellularConfirm),
@@ -205,7 +205,10 @@ class EpisodeGrid extends StatelessWidget {
 
   /// Circel avatar widget.
   Widget _circleImage(BuildContext context,
-          {EpisodeBrief? episode, Color? color, required bool boo, double? radius}) =>
+          {EpisodeBrief? episode,
+          Color? color,
+          required bool boo,
+          double? radius}) =>
       InkWell(
         onTap: () async {
           if (openPodcast) {
@@ -287,7 +290,8 @@ class EpisodeGrid extends StatelessWidget {
           : Center();
 
   /// Pubdate widget
-  Widget _pubDate(BuildContext context, {required EpisodeBrief episode, Color? color}) =>
+  Widget _pubDate(BuildContext context,
+          {required EpisodeBrief episode, Color? color}) =>
       Text(
         episode.pubDate!.toDate(context),
         overflow: TextOverflow.visible,
@@ -299,7 +303,11 @@ class EpisodeGrid extends StatelessWidget {
             fontStyle: FontStyle.italic),
       );
   Widget _episodeCard(BuildContext context,
-      {int? index, Color? color, bool? isLiked, bool? isDownloaded, bool? boo}) {
+      {int? index,
+      Color? color,
+      bool? isLiked,
+      bool? isDownloaded,
+      bool? boo}) {
     var width = context.width;
     if (layout == Layout.one) {
       return _layoutOneCard(context,
@@ -323,7 +331,8 @@ class EpisodeGrid extends StatelessWidget {
                 layout != Layout.one
                     ? _circleImage(context,
                         episode: episodes![index!], color: color, boo: boo!)
-                    : _pubDate(context, episode: episodes![index!], color: color),
+                    : _pubDate(context,
+                        episode: episodes![index!], color: color),
                 Spacer(),
                 _isNewIndicator(episodes![index]),
                 _downloadIndicater(context,
@@ -403,7 +412,11 @@ class EpisodeGrid extends StatelessWidget {
   }
 
   Widget _layoutOneCard(BuildContext context,
-      {required int index, Color? color, required bool isLiked, bool? isDownloaded, required bool boo}) {
+      {required int index,
+      Color? color,
+      required bool isLiked,
+      bool? isDownloaded,
+      required bool boo}) {
     var width = context.width;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
@@ -443,7 +456,8 @@ class EpisodeGrid extends StatelessWidget {
                       ),
                       _isNewIndicator(episodes![index]),
                       _downloadIndicater(context,
-                          episode: episodes![index], isDownloaded: isDownloaded),
+                          episode: episodes![index],
+                          isDownloaded: isDownloaded),
                       _numberIndicater(context, index: index, color: color)
                     ],
                   ),
@@ -574,7 +588,7 @@ class EpisodeGrid extends StatelessWidget {
                               ? context.brightness == Brightness.light
                                   ? Colors.grey[200]
                                   : Color.fromRGBO(50, 50, 50, 1)
-                              : context.scaffoldBackgroundColor,
+                              : context.background,
                           boxShadow: [
                             BoxShadow(
                               color: context.brightness == Brightness.light
@@ -590,7 +604,8 @@ class EpisodeGrid extends StatelessWidget {
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap: () {
-                                  if (!selectedList!.contains(episodes![index])) {
+                                  if (!selectedList!
+                                      .contains(episodes![index])) {
                                     _selectedList = selectedList;
                                     _selectedList!.add(episodes![index]);
                                   } else {
@@ -609,7 +624,7 @@ class EpisodeGrid extends StatelessWidget {
                                           : context.brightness ==
                                                   Brightness.light
                                               ? context.primaryColor
-                                              : context.scaffoldBackgroundColor,
+                                              : context.background,
                                       width: 1.0,
                                     ),
                                   ),
@@ -628,7 +643,7 @@ class EpisodeGrid extends StatelessWidget {
                                 border: Border.all(
                                   color: context.brightness == Brightness.light
                                       ? context.primaryColor
-                                      : context.scaffoldBackgroundColor,
+                                      : context.background,
                                   width: 1.0,
                                 ),
                               ),
@@ -687,8 +702,8 @@ class EpisodeGrid extends StatelessWidget {
                                         onPressed: () {
                                           if (!data.item2.contains(
                                               episodes![index].enclosureUrl)) {
-                                            audio
-                                                .addToPlaylist(episodes![index]);
+                                            audio.addToPlaylist(
+                                                episodes![index]);
                                             Fluttertoast.showToast(
                                               msg: s.toastAddPlaylist,
                                               gravity: ToastGravity.BOTTOM,
@@ -787,8 +802,7 @@ class EpisodeGrid extends StatelessWidget {
                                                     color: context.textColor!
                                                         .withOpacity(0.5)))
                                             : Text(s.download),
-                                        trailingIcon: Icon(
-                                            LineIcons.download,
+                                        trailingIcon: Icon(LineIcons.download,
                                             color: Colors.green),
                                         onPressed: () async {
                                           if (!isDownloaded) {
@@ -858,9 +872,9 @@ class OpenContainerWrapper extends StatelessWidget {
         beginColor: Theme.of(context).primaryColor,
         endColor: Theme.of(context).primaryColor,
         closedColor: Theme.of(context).brightness == Brightness.light
-            ? Theme.of(context).primaryColor
-            : Theme.of(context).scaffoldBackgroundColor,
-        openColor: Theme.of(context).scaffoldBackgroundColor,
+            ? context.primaryColor
+            : context.background,
+        openColor: context.background,
         openElevation: 0,
         closedElevation: 0,
         openShape:

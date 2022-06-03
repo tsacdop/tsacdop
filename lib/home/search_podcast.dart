@@ -52,7 +52,7 @@ class MyHomePageDelegate extends SearchDelegate<int?> {
   Widget _invalidRss(BuildContext context) => Container(
         padding: EdgeInsets.only(top: 200),
         alignment: Alignment.topCenter,
-        child: Text(context.s!.searchInvalidRss,
+        child: Text(context.s.searchInvalidRss,
             style: context.textTheme.headline6!.copyWith(color: Colors.red)),
       );
 
@@ -86,7 +86,7 @@ class MyHomePageDelegate extends SearchDelegate<int?> {
         return false;
       },
       child: IconButton(
-        tooltip: context.s!.back,
+        tooltip: context.s.back,
         splashRadius: 20,
         icon: Icon(_getIconData(Theme.of(context).platform)),
         onPressed: () {
@@ -111,7 +111,7 @@ class MyHomePageDelegate extends SearchDelegate<int?> {
     return <Widget>[
       if (query.isNotEmpty)
         IconButton(
-          tooltip: context.s!.clear,
+          tooltip: context.s.clear,
           splashRadius: 20,
           icon: const Icon(Icons.clear),
           onPressed: () {
@@ -216,7 +216,7 @@ class _RssResultState extends State<RssResult> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     var items = widget.rssFeed!.items!;
     return DefaultTabController(
       length: 2,
@@ -339,7 +339,7 @@ class _RssResultState extends State<RssResult> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(100))),
                           ),
-                          child: Text(context.s!.loadMore),
+                          child: Text(context.s.loadMore),
                           onPressed: () => setState(
                             () => _loadItems += 10,
                           ),
@@ -560,7 +560,7 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
                                   : CircularProgressIndicator(
                                       strokeWidth: 2,
                                     ))
-                          : Text(context.s!.loadMore),
+                          : Text(context.s.loadMore),
                       onPressed: () => _loading
                           ? null
                           : setState(
@@ -722,7 +722,7 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                 ))
-                            : Text(context.s!.loadMore),
+                            : Text(context.s.loadMore),
                         onPressed: () => _loading
                             ? null
                             : setState(
@@ -1011,7 +1011,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                   ))
-                              : Text(context.s!.loadMore),
+                              : Text(context.s.loadMore),
                           onPressed: () {
                             if (widget.searchEngine ==
                                     SearchEngine.listenNotes &&
@@ -1057,12 +1057,11 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                               foregroundColor: MaterialStateProperty.all<Color>(
                                   context.accentColor),
                               overlayColor: MaterialStateProperty.all<Color>(
-                                  context.scaffoldBackgroundColor
-                                      .withOpacity(0.3)),
+                                  context.background.withOpacity(0.3)),
                               padding:
                                   MaterialStateProperty.all<EdgeInsetsGeometry>(
                                       EdgeInsets.symmetric(horizontal: 2))),
-                          child: Text(context.s!.play.toUpperCase()),
+                          child: Text(context.s.play.toUpperCase()),
                           onPressed: () {
                             context.read<AudioPlayerNotifier>().episodeLoad(
                                 content[index].toEpisode,
@@ -1215,7 +1214,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                 ),
               Expanded(
                 child: Container(
-                  color: context.scaffoldBackgroundColor,
+                  color: context.background,
                   child: TabBarView(children: [
                     ListView(
                       physics: _animation.value != widget.maxHeight
@@ -1327,7 +1326,7 @@ class PodcastSlideup extends StatelessWidget {
               child: GestureDetector(
                 onTap: searchState.clearSelect,
                 child: Container(
-                  color: context.scaffoldBackgroundColor.withOpacity(0.9),
+                  color: context.background.withOpacity(0.9),
                 ),
               ),
             ),

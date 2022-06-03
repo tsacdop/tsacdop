@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/episodes/shownote.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
@@ -499,8 +500,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       children: <Widget>[
                         Text(
                           data.item1!.name == 'Queue'
-                              ? context.s!.queue
-                              : '${context.s!.homeMenuPlaylist}${'-${data.item1!.name}'}',
+                              ? context.s.queue
+                              : '${context.s.homeMenuPlaylist}${'-${data.item1!.name}'}',
                           overflow: TextOverflow.fade,
                           style: TextStyle(
                               color: context.accentColor,
@@ -826,7 +827,7 @@ class SleepModeState extends State<SleepMode>
                         padding: EdgeInsets.symmetric(horizontal: 20.0),
                         child: Row(
                           children: [
-                            Text(context.s!.sleepTimer,
+                            Text(context.s.sleepTimer,
                                 style: TextStyle(
                                     color: context.accentColor,
                                     fontWeight: FontWeight.bold,
@@ -935,10 +936,9 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                   padding: EdgeInsets.symmetric(horizontal: 0),
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(color: context.accentColor)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(color: context.accentColor)),
                     ),
                     // highlightedBorderColor: Colors.green[700],
                     onPressed: () {
@@ -1088,7 +1088,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                     child: Row(
                       children: <Widget>[
                         Text(
-                          context.s!.homeToprightMenuAbout,
+                          context.s.homeToprightMenuAbout,
                           overflow: TextOverflow.fade,
                           style: TextStyle(
                               color: context.accentColor,
@@ -1332,7 +1332,7 @@ class _ControlPanelState extends State<ControlPanel>
                                                         .buffering ||
                                                 data.audioState ==
                                                     AudioProcessingState.loading
-                                            ? context.s!.buffering
+                                            ? context.s.buffering
                                             : '',
                                         style: TextStyle(
                                             color: context.accentColor),

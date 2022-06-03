@@ -36,7 +36,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
         leading: IconButton(
           splashRadius: 20,
           icon: Icon(Icons.close),
-          tooltip: context.s!.back,
+          tooltip: context.s.back,
           onPressed: () {
             Navigator.maybePop(context);
           },
@@ -110,7 +110,8 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                 scrollDirection: Axis.vertical,
                 children: episodes.map<Widget>((episode) {
                   return _PlaylistItem(episode,
-                      key: ValueKey(episode!.enclosureUrl), onSelect: (episode) {
+                      key: ValueKey(episode!.enclosureUrl),
+                      onSelect: (episode) {
                     _selectedEpisodes.add(episode);
                     setState(() {});
                   }, onRemove: (episode) {
@@ -341,8 +342,8 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
                   onPressed: () => setState(() {
                     _clearConfirm = false;
                   }),
-                  child:
-                      Text(s!.cancel, style: TextStyle(color: Colors.grey[600])),
+                  child: Text(s!.cancel,
+                      style: TextStyle(color: Colors.grey[600])),
                 ),
                 FlatButton(
                     splashColor: Colors.red.withAlpha(70),
@@ -384,8 +385,8 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
                   onPressed: () => setState(() {
                     _removeConfirm = false;
                   }),
-                  child:
-                      Text(s!.cancel, style: TextStyle(color: Colors.grey[600])),
+                  child: Text(s!.cancel,
+                      style: TextStyle(color: Colors.grey[600])),
                 ),
                 FlatButton(
                     splashColor: Colors.red.withAlpha(70),

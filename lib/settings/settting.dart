@@ -68,7 +68,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -107,8 +107,7 @@ class _SettingsState extends State<Settings> {
                   onTap: () => Navigator.push(context,
                       MaterialPageRoute(builder: (context) => ThemeSetting())),
                   contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading:
-                      Icon(LineIcons.adjust, color: context.accentColor),
+                  leading: Icon(LineIcons.adjust, color: context.accentColor),
                   title: Text(s.settingsAppearance),
                   subtitle: Text(s.settingsAppearanceDes),
                 ),
@@ -117,8 +116,7 @@ class _SettingsState extends State<Settings> {
                   onTap: () => Navigator.push(context,
                       MaterialPageRoute(builder: (context) => LayoutSetting())),
                   contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading: Icon(LineIcons.stopCircle,
-                      color: Colors.blueAccent),
+                  leading: Icon(LineIcons.stopCircle, color: Colors.blueAccent),
                   title: Text(s.settingsLayout),
                   subtitle: Text(s.settingsLayoutDes),
                 ),
@@ -168,8 +166,7 @@ class _SettingsState extends State<Settings> {
                           title: s.settingsLanguages, child: LanguagesSetting())
                       .then((value) => setState(() {})),
                   contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading: Icon(LineIcons.language,
-                      color: Colors.purpleAccent),
+                  leading: Icon(LineIcons.language, color: Colors.purpleAccent),
                   title: Text(s.settingsLanguages),
                   subtitle: Text(s.settingsLanguagesDes),
                 ),
@@ -181,8 +178,8 @@ class _SettingsState extends State<Settings> {
                         MaterialPageRoute(builder: (context) => DataBackup()));
                   },
                   contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading: Icon(LineIcons.codeFile,
-                      color: Colors.lightGreen[700]),
+                  leading:
+                      Icon(LineIcons.codeFile, color: Colors.lightGreen[700]),
                   title: Text(s.settingsBackup),
                   subtitle: Text(s.settingsBackupDes),
                 ),
@@ -204,8 +201,7 @@ class _SettingsState extends State<Settings> {
                   onTap: () => Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Libries())),
                   contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading: Icon(LineIcons.bookOpen,
-                      color: Colors.purple[700]),
+                  leading: Icon(LineIcons.bookOpen, color: Colors.purple[700]),
                   title: Text(s.settingsLibraries),
                   subtitle: Text(s.settingsLibrariesDes),
                 ),
@@ -257,8 +253,7 @@ class _SettingsState extends State<Settings> {
                     );
                   },
                   contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading:
-                      Icon(LineIcons.capsules, color: Colors.pinkAccent),
+                  leading: Icon(LineIcons.capsules, color: Colors.pinkAccent),
                   title: Text(s.settingsDiscovery),
                 ),
                 Divider(height: 1),
@@ -269,8 +264,7 @@ class _SettingsState extends State<Settings> {
                           builder: (context) =>
                               SlideIntro(goto: Goto.settings))),
                   contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading:
-                      Icon(LineIcons.columns, color: Colors.blueGrey),
+                  leading: Icon(LineIcons.columns, color: Colors.blueGrey),
                   title: Text(s.settingsAppIntro),
                 ),
                 Divider(height: 1),

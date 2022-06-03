@@ -23,72 +23,10 @@ class PopupMenu extends StatefulWidget {
 }
 
 class _PopupMenuState extends State<PopupMenu> {
-  Future<String> _getRefreshDate(BuildContext context) async {
-    int? refreshDate;
-    var refreshstorage = KeyValueStorage('refreshdate');
-    var i = await refreshstorage.getInt();
-    if (i == 0) {
-      var refreshstorage = KeyValueStorage('refreshdate');
-      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
-      refreshDate = DateTime.now().millisecondsSinceEpoch;
-    } else {
-      refreshDate = i;
-    }
-    return refreshDate.toDate(context);
-  }
-
-  void _saveOmpl(String path) async {
-    var subscribeWorker = Provider.of<GroupList>(context, listen: false);
-    var rssExp = RegExp(r'^(https?):\/\/(.*)');
-    final s = context.s;
-    var file = File(path);
-    try {
-      final opml = file.readAsStringSync();
-      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml);
-      for (var entry in data.entries) {
-        var title = entry.key;
-        var list = entry.value.reversed;
-        for (var rss in list) {
-          var rssLink = rssExp.stringMatch(rss.xmlUrl!);
-          if (rssLink != null) {
-            var item = SubscribeItem(rssLink, rss.text, group: title);
-            await subscribeWorker.setSubscribeItem(item);
-            await Future.delayed(Duration(milliseconds: 200));
-          }
-        }
-      }
-    } catch (e) {
-      developer.log(e.toString(), name: 'OMPL parse error');
-      Fluttertoast.showToast(
-        msg: s!.toastFileError,
-        gravity: ToastGravity.TOP,
-      );
-    }
-  }
-
-  void _getFilePath() async {
-    final s = context.s;
-    try {
-      var filePickResult =
-          await FilePicker.platform.pickFiles(type: FileType.any);
-      if (filePickResult == null) {
-        return;
-      }
-      Fluttertoast.showToast(
-        msg: s!.toastReadFile,
-        gravity: ToastGravity.TOP,
-      );
-      final filePath = filePickResult.files.first.path!;
-      _saveOmpl(filePath);
-    } on PlatformException catch (e) {
-      developer.log(e.toString(), name: 'Get OMPL file');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var refreshWorker = Provider.of<RefreshWorker>(context, listen: false);
-    final s = context.s!;
+    final s = context.s;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(100),
@@ -98,10 +36,11 @@ class _PopupMenuState extends State<PopupMenu> {
         width: 40,
         child: PopupMenuButton<int>(
           icon: Icon(Icons.more_vert),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 1,
           tooltip: s.menu,
+          color: context.priamryContainer,
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 1,
@@ -126,8 +65,8 @@ class _PopupMenuState extends State<PopupMenu> {
                               if (snapshot.hasData) {
                                 return Text(
                                   snapshot.data!,
-                                  style:
-                                      TextStyle(color: Colors.red, fontSize: 12),
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
                                 );
                               } else {
                                 return Center();
@@ -141,7 +80,7 @@ class _PopupMenuState extends State<PopupMenu> {
             ),
             PopupMenuItem(
               value: 2,
-              child: Container(
+              child: Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Row(
                   children: <Widget>[
@@ -203,5 +142,67 @@ class _PopupMenuState extends State<PopupMenu> {
         ),
       ),
     );
+  }
+
+  Future<String> _getRefreshDate(BuildContext context) async {
+    int? refreshDate;
+    final refreshstorage = KeyValueStorage('refreshdate');
+    final i = await refreshstorage.getInt();
+    if (i == 0) {
+      final refreshstorage = KeyValueStorage('refreshdate');
+      await refreshstorage.saveInt(DateTime.now().millisecondsSinceEpoch);
+      refreshDate = DateTime.now().millisecondsSinceEpoch;
+    } else {
+      refreshDate = i;
+    }
+    return refreshDate.toDate(context);
+  }
+
+  void _saveOmpl(String path) async {
+    final subscribeWorker = Provider.of<GroupList>(context, listen: false);
+    final rssExp = RegExp(r'^(https?):\/\/(.*)');
+    final s = context.s;
+    final file = File(path);
+    try {
+      final opml = file.readAsStringSync();
+      Map<String, List<OmplOutline>> data = PodcastsBackup.parseOPML(opml);
+      for (final entry in data.entries) {
+        var title = entry.key;
+        var list = entry.value.reversed;
+        for (var rss in list) {
+          var rssLink = rssExp.stringMatch(rss.xmlUrl!);
+          if (rssLink != null) {
+            var item = SubscribeItem(rssLink, rss.text, group: title);
+            await subscribeWorker.setSubscribeItem(item);
+            await Future.delayed(Duration(milliseconds: 200));
+          }
+        }
+      }
+    } catch (e) {
+      developer.log(e.toString(), name: 'OMPL parse error');
+      Fluttertoast.showToast(
+        msg: s.toastFileError,
+        gravity: ToastGravity.TOP,
+      );
+    }
+  }
+
+  void _getFilePath() async {
+    final s = context.s;
+    try {
+      var filePickResult =
+          await FilePicker.platform.pickFiles(type: FileType.any);
+      if (filePickResult == null) {
+        return;
+      }
+      Fluttertoast.showToast(
+        msg: s.toastReadFile,
+        gravity: ToastGravity.TOP,
+      );
+      final filePath = filePickResult.files.first.path!;
+      _saveOmpl(filePath);
+    } on PlatformException catch (e) {
+      developer.log(e.toString(), name: 'Get OMPL file');
+    }
   }
 }

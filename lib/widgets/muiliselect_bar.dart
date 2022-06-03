@@ -140,7 +140,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
 
   Future<bool> _useDataConfirm() async {
     var ifUseData = false;
-    final s = context.s!;
+    final s = context.s;
     await generalDialog(
       context,
       title: Text(s.cellularConfirm),
@@ -575,7 +575,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,

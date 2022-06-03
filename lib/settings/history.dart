@@ -76,7 +76,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
 
   Future recoverSub(BuildContext context, String url) async {
     Fluttertoast.showToast(
-      msg: context.s!.toastPodcastRecovering,
+      msg: context.s.toastPodcastRecovering,
       gravity: ToastGravity.BOTTOM,
     );
     var subscribeWorker = context.watch<GroupList>();
@@ -99,7 +99,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
     } catch (e) {
       developer.log(e.toString(), name: 'Recover podcast error');
       Fluttertoast.showToast(
-        msg: context.s!.toastRecoverFailed,
+        msg: context.s.toastRecoverFailed,
         gravity: ToastGravity.BOTTOM,
       );
     }
@@ -220,7 +220,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                   return Container(
                                     padding:
                                         const EdgeInsets.symmetric(vertical: 5),
-                                    color: context.scaffoldBackgroundColor,
+                                    color: context.background,
                                     child: Column(
                                       children: <Widget>[
                                         ListTile(
@@ -234,7 +234,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                 DateFormat.yMd()
                                                     .add_jm()
                                                     .format(snapshot
-                                                        .data![index].playdate!),
+                                                        .data![index]
+                                                        .playdate!),
                                                 style: TextStyle(
                                                     color: context.textColor!
                                                         .withOpacity(0.8),
@@ -318,7 +319,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                           itemBuilder: (context, index) {
                             var _status = snapshot.data![index].status;
                             return Container(
-                              color: context.scaffoldBackgroundColor,
+                              color: context.background,
                               child: Column(
                                 children: <Widget>[
                                   ListTile(
@@ -362,7 +363,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                   .alternativeTrashRestore),
                                               onPressed: () => recoverSub(
                                                   context,
-                                                  snapshot.data![index].rssUrl!),
+                                                  snapshot
+                                                      .data![index].rssUrl!),
                                             ),
                                           )
                                         : null,
@@ -476,11 +478,11 @@ class HistoryChart extends StatelessWidget {
           lineTouchData: LineTouchData(
             enabled: true,
             touchTooltipData: LineTouchTooltipData(
-              tooltipBgColor: context.scaffoldBackgroundColor,
+              tooltipBgColor: context.background,
               fitInsideHorizontally: true,
               getTooltipItems: (touchedBarSpots) {
                 return touchedBarSpots.map((barSpot) {
-                  return LineTooltipItem(context.s!.minsCount(barSpot.y.toInt()),
+                  return LineTooltipItem(context.s.minsCount(barSpot.y.toInt()),
                       context.textTheme.subtitle1!);
                 }).toList();
               },

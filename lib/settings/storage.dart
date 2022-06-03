@@ -110,7 +110,7 @@ class _StorageSettingState extends State<StorageSetting>
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(

@@ -10,7 +10,7 @@ import '../widgets/general_dialog.dart';
 class ThemeSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(

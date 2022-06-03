@@ -89,7 +89,7 @@ class _PlaySettingState extends State<PlaySetting> {
                         topLeft: Radius.circular(5)),
                   ),
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(context.s!.endOfEpisode,
+                  child: Text(context.s.endOfEpisode,
                       style: TextStyle(
                           color: data.item1 == 0 ? Colors.white : null)),
                 ),
@@ -113,7 +113,7 @@ class _PlaySettingState extends State<PlaySetting> {
                         topRight: Radius.circular(5)),
                   ),
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(context.s!.minsCount(data.item2!),
+                  child: Text(context.s.minsCount(data.item2!),
                       style: TextStyle(
                           color: data.item1 == 1 ? Colors.white : null)),
                 ),
@@ -224,7 +224,7 @@ class _PlaySettingState extends State<PlaySetting> {
   Widget build(BuildContext context) {
     var settings = context.watch<SettingState>();
     var audio = context.watch<AudioPlayerNotifier>();
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -298,7 +298,8 @@ class _PlaySettingState extends State<PlaySetting> {
                   trailing: Transform.scale(
                     scale: 0.9,
                     child: Switch(
-                        value: snapshot.data!, onChanged: _saveMarkListenedSkip),
+                        value: snapshot.data!,
+                        onChanged: _saveMarkListenedSkip),
                   ),
                 ),
               ),
@@ -350,7 +351,8 @@ class _PlaySettingState extends State<PlaySetting> {
                       displayItemCount: 5,
                       isDense: true,
                       value: data,
-                      onChanged: (dynamic value) => settings.setRewindSeconds = value,
+                      onChanged: (dynamic value) =>
+                          settings.setRewindSeconds = value,
                       items: kSecondsToSelect.map<DropdownMenuItem<int>>((e) {
                         return DropdownMenuItem<int>(
                             value: e, child: Text(s.secCount(e)));
@@ -524,8 +526,8 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _notificationIcon(
-                      Icon(Icons.pause_circle_filled), '${s!.play}| ${s.pause}'),
+                  _notificationIcon(Icon(Icons.pause_circle_filled),
+                      '${s!.play}| ${s.pause}'),
                   _notificationIcon(Icon(Icons.fast_forward), s.fastForward),
                   _notificationIcon(Icon(Icons.skip_next), s.skipToNext),
                   _notificationIcon(Icon(Icons.close), s.stop),
@@ -600,7 +602,7 @@ class __SpeedListState extends State<_SpeedList> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return ListTile(
       contentPadding:
           EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),

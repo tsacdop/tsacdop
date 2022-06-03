@@ -24,7 +24,7 @@ class _FourthPageState extends State<FourthPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.fromLTRB(40, context.paddingTop + 20, 40, 20),
               child: Text(
-                context.s!.introFourthPage,
+                context.s.introFourthPage,
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),

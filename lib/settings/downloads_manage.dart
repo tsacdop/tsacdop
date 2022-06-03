@@ -117,7 +117,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).accentColorBrightness,
@@ -219,11 +219,9 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                           ),
                                           Icon(
                                             _mode == 0
-                                                ? LineIcons
-                                                    .hourglassStart
+                                                ? LineIcons.hourglassStart
                                                 : _mode == 1
-                                                    ? LineIcons
-                                                        .hourglassHalf
+                                                    ? LineIcons.hourglassHalf
                                                     : LineIcons.save,
                                             size: 18,
                                           )
@@ -304,7 +302,8 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   future: _isListened(_episodes[index]),
                                   initialData: 0,
                                   builder: (context, snapshot) {
-                                    return (_onlyListened! && snapshot.data == 0)
+                                    return (_onlyListened! &&
+                                            snapshot.data == 0)
                                         ? Center()
                                         : Column(
                                             children: <Widget>[

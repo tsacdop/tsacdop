@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 Future<ui.Image> getImageFromProvider(ImageProvider imageProvider) async {
   final ImageStream stream = imageProvider.resolve(
@@ -16,4 +17,10 @@ Future<ui.Image> getImageFromProvider(ImageProvider imageProvider) async {
   stream.addListener(listener);
   final image = await imageCompleter.future;
   return image;
+}
+
+String formateDate(int timeStamp) {
+  return DateFormat.yMMMd().format(
+    DateTime.fromMillisecondsSinceEpoch(timeStamp),
+  );
 }

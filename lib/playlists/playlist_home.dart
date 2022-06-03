@@ -60,7 +60,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
       Color? color}) {
     return OutlinedButton.icon(
         style: OutlinedButton.styleFrom(
-            side: BorderSide(color: context.scaffoldBackgroundColor),
+            side: BorderSide(color: context.background),
             primary: color,
             backgroundColor:
                 isSelected ? context.primaryColorDark : Colors.transparent,
@@ -73,7 +73,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         systemNavigationBarIconBrightness:
@@ -100,7 +100,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                   return Text(data?.title ?? '', maxLines: 1);
                 },
               ),
-              backgroundColor: context.scaffoldBackgroundColor,
+              backgroundColor: context.background,
             ),
             body: Column(
               children: [
@@ -994,7 +994,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,

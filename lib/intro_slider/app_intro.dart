@@ -142,7 +142,7 @@ class _SlideIntroState extends State<SlideIntro> {
                                       height: 40,
                                       width: 80,
                                       child: Center(
-                                          child: Text(context.s!.next,
+                                          child: Text(context.s.next,
                                               style: TextStyle(
                                                   color: Colors.black,
                                                   fontWeight:
@@ -164,7 +164,7 @@ class _SlideIntroState extends State<SlideIntro> {
                                       height: 40,
                                       width: 80,
                                       child: Center(
-                                          child: Text(context.s!.done,
+                                          child: Text(context.s.done,
                                               style: TextStyle(
                                                   color: Colors.black,
                                                   fontWeight:

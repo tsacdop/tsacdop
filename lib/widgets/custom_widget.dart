@@ -651,8 +651,7 @@ class _LineLoaderState extends State<LineLoader>
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-        painter: LinePainter(_fraction, context.accentColor));
+    return CustomPaint(painter: LinePainter(_fraction, context.accentColor));
   }
 }
 
@@ -1115,8 +1114,7 @@ class LayoutButton extends StatelessWidget {
                   height: 10,
                   width: 30,
                   child: CustomPaint(
-                    painter:
-                        LayoutPainter(4, context.textColor),
+                    painter: LayoutPainter(4, context.textColor),
                   ),
                 ),
     );
@@ -1265,7 +1263,7 @@ class CustomBackButton extends StatelessWidget {
     return IconButton(
       splashRadius: 20,
       icon: const BackButtonIcon(),
-      tooltip: context.s!.back,
+      tooltip: context.s.back,
       onPressed: () {
         Navigator.maybePop(context);
       },

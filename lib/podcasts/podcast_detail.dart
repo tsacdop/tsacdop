@@ -117,7 +117,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     final result = await _dbHelper.updatePodcastRss(podcastLocal);
     if (result >= 0) {
       Fluttertoast.showToast(
-        msg: context.s!.updateEpisodesCount(result),
+        msg: context.s.updateEpisodesCount(result),
         gravity: ToastGravity.TOP,
       );
     }
@@ -148,7 +148,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       }
     } else if (result != 0) {
       Fluttertoast.showToast(
-        msg: context.s!.updateFailed,
+        msg: context.s.updateFailed,
         gravity: ToastGravity.TOP,
       );
     }
@@ -359,7 +359,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
         Container(
           padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
           alignment: Alignment.topLeft,
-          color: context.scaffoldBackgroundColor,
+          color: context.background,
           child: AboutPodcast(podcastLocal: widget.podcastLocal),
         ),
       ],
@@ -389,7 +389,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       );
 
   Widget _actionBar(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return SizedBox(
         height: 30,
         child: Row(
@@ -668,7 +668,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
   @override
   Widget build(BuildContext context) {
     final color = widget.podcastLocal!.primaryColor!.colorizedark();
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.dark,
@@ -1138,7 +1138,7 @@ class _SearchEpisodeState extends State<SearchEpisode> {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.s!;
+    final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,
