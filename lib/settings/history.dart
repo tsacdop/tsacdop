@@ -25,86 +25,6 @@ class PlayedHistory extends StatefulWidget {
 
 class _PlayedHistoryState extends State<PlayedHistory>
     with SingleTickerProviderStateMixin {
-  /// Get play history.
-  Future<List<PlayHistory>> _getPlayHistory(int top) async {
-    var dbHelper = DBHelper();
-    List<PlayHistory> playHistory;
-    playHistory = await dbHelper.getPlayHistory(top);
-    for (var record in playHistory) {
-      await record.getEpisode();
-    }
-    return playHistory;
-  }
-
-  bool _loadMore = false;
-
-  Future<void> _loadMoreData() async {
-    if (mounted) {
-      setState(() {
-        _loadMore = true;
-      });
-    }
-    await Future.delayed(Duration(milliseconds: 500));
-    if (mounted) {
-      setState(() {
-        _top = _top + 10;
-        _loadMore = false;
-      });
-    }
-  }
-
-  int _top = 10;
-
-  Future<List<SubHistory>> getSubHistory() async {
-    var dbHelper = DBHelper();
-    return await dbHelper.getSubHistory();
-  }
-
-  TabController? _controller;
-  List<int> list = const [0, 1, 2, 3, 4, 5, 6];
-
-  Future<List<FlSpot>> getData() async {
-    var dbHelper = DBHelper();
-    var stats = <FlSpot>[];
-
-    for (var day in list) {
-      var mins = await dbHelper.listenMins(7 - day);
-      stats.add(FlSpot(day.toDouble(), mins));
-    }
-    return stats;
-  }
-
-  Future recoverSub(BuildContext context, String url) async {
-    Fluttertoast.showToast(
-      msg: context.s.toastPodcastRecovering,
-      gravity: ToastGravity.BOTTOM,
-    );
-    var subscribeWorker = context.watch<GroupList>();
-    try {
-      var options = BaseOptions(
-        connectTimeout: 10000,
-        receiveTimeout: 10000,
-      );
-      var response = await Dio(options).get(url);
-      var p = RssFeed.parse(response.data);
-      var podcast = OnlinePodcast(
-          rss: url,
-          title: p.title,
-          publisher: p.author,
-          description: p.description,
-          image: p.itunes!.image!.href);
-      var item = SubscribeItem(podcast.rss, podcast.title,
-          imgUrl: podcast.image, group: 'Home');
-      subscribeWorker.setSubscribeItem(item);
-    } catch (e) {
-      developer.log(e.toString(), name: 'Recover podcast error');
-      Fluttertoast.showToast(
-        msg: context.s.toastRecoverFailed,
-        gravity: ToastGravity.BOTTOM,
-      );
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -122,13 +42,9 @@ class _PlayedHistoryState extends State<PlayedHistory>
   Widget build(BuildContext context) {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: context.brightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness: context.iconBrightness,
-      ),
+      value: context.overlay,
       child: Scaffold(
-        backgroundColor: context.primaryColor,
+        backgroundColor: context.onPrimary,
         body: SafeArea(
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxScrolled) {
@@ -388,6 +304,86 @@ class _PlayedHistoryState extends State<PlayedHistory>
         ),
       ),
     );
+  }
+
+  /// Get play history.
+  Future<List<PlayHistory>> _getPlayHistory(int top) async {
+    var dbHelper = DBHelper();
+    List<PlayHistory> playHistory;
+    playHistory = await dbHelper.getPlayHistory(top);
+    for (var record in playHistory) {
+      await record.getEpisode();
+    }
+    return playHistory;
+  }
+
+  bool _loadMore = false;
+
+  Future<void> _loadMoreData() async {
+    if (mounted) {
+      setState(() {
+        _loadMore = true;
+      });
+    }
+    await Future.delayed(Duration(milliseconds: 500));
+    if (mounted) {
+      setState(() {
+        _top = _top + 10;
+        _loadMore = false;
+      });
+    }
+  }
+
+  int _top = 10;
+
+  Future<List<SubHistory>> getSubHistory() async {
+    var dbHelper = DBHelper();
+    return await dbHelper.getSubHistory();
+  }
+
+  TabController? _controller;
+  List<int> list = const [0, 1, 2, 3, 4, 5, 6];
+
+  Future<List<FlSpot>> getData() async {
+    var dbHelper = DBHelper();
+    var stats = <FlSpot>[];
+
+    for (var day in list) {
+      var mins = await dbHelper.listenMins(7 - day);
+      stats.add(FlSpot(day.toDouble(), mins));
+    }
+    return stats;
+  }
+
+  Future recoverSub(BuildContext context, String url) async {
+    Fluttertoast.showToast(
+      msg: context.s.toastPodcastRecovering,
+      gravity: ToastGravity.BOTTOM,
+    );
+    var subscribeWorker = context.watch<GroupList>();
+    try {
+      var options = BaseOptions(
+        connectTimeout: 10000,
+        receiveTimeout: 10000,
+      );
+      var response = await Dio(options).get(url);
+      var p = RssFeed.parse(response.data);
+      var podcast = OnlinePodcast(
+          rss: url,
+          title: p.title,
+          publisher: p.author,
+          description: p.description,
+          image: p.itunes!.image!.href);
+      var item = SubscribeItem(podcast.rss, podcast.title,
+          imgUrl: podcast.image, group: 'Home');
+      subscribeWorker.setSubscribeItem(item);
+    } catch (e) {
+      developer.log(e.toString(), name: 'Recover podcast error');
+      Fluttertoast.showToast(
+        msg: context.s.toastRecoverFailed,
+        gravity: ToastGravity.BOTTOM,
+      );
+    }
   }
 }
 

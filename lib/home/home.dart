@@ -120,140 +120,147 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             children: <Widget>[
               SafeArea(
                 bottom: false,
-                child: StretchingOverscrollIndicator(
-                  axisDirection: AxisDirection.down,
-                  child: NestedScrollView(
-                    innerScrollPositionKeyBuilder: () {
-                      return Key('tab${_controller!.index}');
-                    },
-                    pinnedHeaderSliverHeightBuilder: () => 50,
-                    headerSliverBuilder: (context, innerBoxScrolled) {
-                      return <Widget>[
-                        SliverToBoxAdapter(
-                          child: Column(
-                            children: <Widget>[
-                              SizedBox(
-                                height: 50.0,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    featureDiscoveryOverlay(
-                                      context,
-                                      featureId: addFeature,
-                                      tapTarget: Icon(Icons.add_circle_outline),
-                                      title: s.featureDiscoverySearch,
-                                      backgroundColor: Colors.cyan[600],
-                                      buttonColor: Colors.cyan[500],
-                                      description: s.featureDiscoverySearchDes,
-                                      child: IconButton(
-                                        tooltip: s.add,
-                                        splashRadius: 20,
-                                        icon: Icon(Icons.add_circle_outline),
-                                        onPressed: () async {
-                                          await showSearch<int?>(
-                                            context: context,
-                                            delegate: MyHomePageDelegate(
-                                                searchFieldLabel:
-                                                    s.searchPodcast),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () => {
-                                        Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? settings.setTheme = ThemeMode.dark
-                                            : settings.setTheme =
-                                                ThemeMode.light
+                child: NestedScrollView(
+                  innerScrollPositionKeyBuilder: () {
+                    return Key('tab${_controller!.index}');
+                  },
+                  pinnedHeaderSliverHeightBuilder: () => 50,
+                  headerSliverBuilder: (context, innerBoxScrolled) {
+                    return <Widget>[
+                      SliverToBoxAdapter(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: 50.0,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  featureDiscoveryOverlay(
+                                    context,
+                                    featureId: addFeature,
+                                    tapTarget: Icon(Icons.add_circle_outline),
+                                    title: s.featureDiscoverySearch,
+                                    backgroundColor: Colors.cyan[600],
+                                    buttonColor: Colors.cyan[500],
+                                    description: s.featureDiscoverySearchDes,
+                                    child: IconButton(
+                                      tooltip: s.add,
+                                      splashRadius: 20,
+                                      icon: Icon(Icons.add_circle_outline),
+                                      onPressed: () async {
+                                        await showSearch<int?>(
+                                          context: context,
+                                          delegate: MyHomePageDelegate(
+                                              searchFieldLabel:
+                                                  s.searchPodcast),
+                                        );
                                       },
-                                      child: Text(
-                                        'Tsacdop',
-                                        style: GoogleFonts.quicksand(
-                                            color: context.accentColor,
-                                            textStyle: TextStyle(fontSize: 25)),
-                                      ),
                                     ),
-                                    featureDiscoveryOverlay(context,
-                                        featureId: menuFeature,
-                                        tapTarget: Icon(Icons.more_vert),
-                                        backgroundColor: Colors.cyan[500],
-                                        buttonColor: Colors.cyan[600],
-                                        title: s.featureDiscoveryOMPL,
-                                        description: s.featureDiscoveryOMPLDes,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 5.0),
-                                          child: PopupMenu(),
-                                        )),
-                                  ],
-                                ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => {
+                                      Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? settings.setTheme = ThemeMode.dark
+                                          : settings.setTheme =
+                                              ThemeMode.light
+                                    },
+                                    child: Text(
+                                      'Tsacdop',
+                                      style: GoogleFonts.quicksand(
+                                          color: context.accentColor,
+                                          textStyle: TextStyle(fontSize: 25)),
+                                    ),
+                                  ),
+                                  featureDiscoveryOverlay(
+                                    context,
+                                    featureId: menuFeature,
+                                    tapTarget: Icon(Icons.more_vert),
+                                    backgroundColor: Colors.cyan[500],
+                                    buttonColor: Colors.cyan[600],
+                                    title: s.featureDiscoveryOMPL,
+                                    description: s.featureDiscoveryOMPLDes,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 5.0),
+                                      child: PopupMenu(),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Import(),
-                            ],
-                          ),
-                        ),
-                        SliverToBoxAdapter(
-                          child: SizedBox(
-                            height: height,
-                            width: context.width,
-                            child: ScrollPodcasts(),
-                          ),
-                        ),
-                        SliverPersistentHeader(
-                          delegate: _SliverAppBarDelegate(
-                            TabBar(
-                              indicator: _getIndicator(context),
-                              isScrollable: true,
-                              indicatorSize: TabBarIndicatorSize.tab,
-                              controller: _controller,
-                              tabs: <Widget>[
-                                Tab(
-                                  child: Text(s.homeTabMenuRecent),
-                                ),
-                                Tab(
-                                  child: Text(s.homeTabMenuFavotite),
-                                ),
-                                Tab(
-                                  child: Text(s.download),
-                                )
-                              ],
                             ),
-                          ),
-                          pinned: true,
+                            Import(),
+                          ],
                         ),
-                      ];
-                    },
-                    body: Column(
-                      children: [
-                        Expanded(
-                          child: TabBarView(
+                      ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: height,
+                          width: context.width,
+                          child: ScrollPodcasts(),
+                        ),
+                      ),
+                      SliverPersistentHeader(
+                        delegate: _SliverAppBarDelegate(
+                          TabBar(
+                            indicator: _getIndicator(context),
+                            isScrollable: true,
+                            indicatorSize: TabBarIndicatorSize.tab,
                             controller: _controller,
-                            children: <Widget>[
-                              NestedScrollViewInnerScrollPositionKeyWidget(
-                                  Key('tab0'), _RecentUpdate()),
-                              NestedScrollViewInnerScrollPositionKeyWidget(
-                                  Key('tab1'), _MyFavorite()),
-                              NestedScrollViewInnerScrollPositionKeyWidget(
-                                  Key('tab2'), _MyDownload()),
+                            tabs: <Widget>[
+                              Tab(
+                                child: Text(s.homeTabMenuRecent),
+                              ),
+                              Tab(
+                                child: Text(s.homeTabMenuFavotite),
+                              ),
+                              Tab(
+                                child: Text(s.download),
+                              )
                             ],
                           ),
                         ),
-                        Selector<AudioPlayerNotifier, bool>(
-                          selector: (_, audio) => audio.playerRunning,
-                          builder: (_, data, __) {
-                            return Padding(
-                              padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
-                            );
-                          },
+                        pinned: true,
+                      ),
+                    ];
+                  },
+                  body: Column(
+                    children: [
+                      Expanded(
+                        child: TabBarView(
+                          controller: _controller,
+                          children: <Widget>[
+                            NestedScrollViewInnerScrollPositionKeyWidget(
+                              Key('tab0'),
+                              _RecentUpdate(),
+                            ),
+                            NestedScrollViewInnerScrollPositionKeyWidget(
+                              Key('tab1'),
+                              _MyFavorite(),
+                            ),
+                            NestedScrollViewInnerScrollPositionKeyWidget(
+                              Key('tab2'),
+                              _MyDownload(),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Selector<AudioPlayerNotifier, bool>(
+                        selector: (_, audio) => audio.playerRunning,
+                        builder: (_, data, __) {
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
-              Container(child: PlayerWidget(playerKey: _playerKey)),
+              Container(
+                child: PlayerWidget(playerKey: _playerKey),
+              ),
             ],
           ),
         ),
@@ -345,6 +352,7 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         elevation: 1,
         icon: Icon(Icons.playlist_play),
+        color: context.priamryContainer,
         tooltip: s.menu,
         itemBuilder: (context) => [
           MyPopupMenuItem(
@@ -1219,83 +1227,82 @@ class _MyDownloadState extends State<_MyDownload>
     final s = context.s;
     return Consumer<DownloadState>(
       builder: (_, data, __) => FutureBuilder<List<EpisodeBrief>>(
-          future: _getDownloadedEpisodes(_sortBy, hideListened: _hideListened),
-          builder: (context, snapshot) {
-            var episodes = snapshot.data ?? [];
-            return ScrollConfiguration(
-              behavior: NoGrowBehavior(),
-              child: CustomScrollView(
-                key: PageStorageKey<String>('download_list'),
-                slivers: <Widget>[
-                  DownloadList(),
-                  SliverToBoxAdapter(
-                    child: Container(
-                        height: 40,
-                        color: context.primaryColor,
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                child: Text(s.downloaded)),
-                            Spacer(),
-                            Material(
-                              color: Colors.transparent,
-                              child: IconButton(
-                                icon: SizedBox(
-                                  width: 30,
-                                  height: 15,
-                                  child: HideListened(
-                                    hideListened: _hideListened ?? false,
-                                  ),
+        future: _getDownloadedEpisodes(_sortBy, hideListened: _hideListened),
+        builder: (context, snapshot) {
+          var episodes = snapshot.data ?? [];
+          return ScrollConfiguration(
+            behavior: NoGrowBehavior(),
+            child: CustomScrollView(
+              key: PageStorageKey<String>('download_list'),
+              slivers: <Widget>[
+                DownloadList(),
+                SliverToBoxAdapter(
+                  child: Container(
+                      height: 40,
+                      color: context.primaryColor,
+                      child: Row(
+                        children: <Widget>[
+                          Container(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(s.downloaded)),
+                          Spacer(),
+                          Material(
+                            color: Colors.transparent,
+                            child: IconButton(
+                              icon: SizedBox(
+                                width: 30,
+                                height: 15,
+                                child: HideListened(
+                                  hideListened: _hideListened ?? false,
                                 ),
-                                onPressed: () {
-                                  setState(
-                                      () => _hideListened = !_hideListened!);
-                                },
                               ),
-                            ),
-                            Material(
-                              color: Colors.transparent,
-                              child: LayoutButton(
-                                layout: _layout ?? Layout.one,
-                                onPressed: (layout) => setState(() {
-                                  _layout = layout;
-                                }),
-                              ),
-                            ),
-                          ],
-                        )),
-                  ),
-                  episodes.length == 0
-                      ? SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 110),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(LineIcons.download,
-                                    size: 80, color: Colors.grey[500]),
-                                Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 10)),
-                                Text(
-                                  s.noEpisodeDownload,
-                                  style: TextStyle(color: Colors.grey[500]),
-                                )
-                              ],
+                              onPressed: () {
+                                setState(() => _hideListened = !_hideListened!);
+                              },
                             ),
                           ),
-                        )
-                      : EpisodeGrid(
-                          episodes: episodes,
-                          layout: _layout,
-                          openPodcast: true,
-                          initNum: 0,
+                          Material(
+                            color: Colors.transparent,
+                            child: LayoutButton(
+                              layout: _layout ?? Layout.one,
+                              onPressed: (layout) => setState(() {
+                                _layout = layout;
+                              }),
+                            ),
+                          ),
+                        ],
+                      )),
+                ),
+                episodes.length == 0
+                    ? SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 110),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(LineIcons.download,
+                                  size: 80, color: Colors.grey[500]),
+                              Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10)),
+                              Text(
+                                s.noEpisodeDownload,
+                                style: TextStyle(color: Colors.grey[500]),
+                              )
+                            ],
+                          ),
                         ),
-                ],
-              ),
-            );
-          }),
+                      )
+                    : EpisodeGrid(
+                        episodes: episodes,
+                        layout: _layout,
+                        openPodcast: true,
+                        initNum: 0,
+                      ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 

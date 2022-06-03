@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../generated/l10n.dart';
@@ -16,6 +16,7 @@ extension ContextExtension on BuildContext {
   Color get onPrimary => Theme.of(this).colorScheme.onPrimary;
   Color get background => Theme.of(this).colorScheme.background;
   Color get tertiary => colorScheme.tertiary;
+  Color get tertiaryContainer => colorScheme.tertiaryContainer;
   Color get onTertiary => colorScheme.onTertiary;
   Color get secondary => colorScheme.secondary;
   Color get onsecondary => colorScheme.onSecondary;
@@ -30,6 +31,12 @@ extension ContextExtension on BuildContext {
   double get height => MediaQuery.of(this).size.height;
   double get paddingTop => MediaQuery.of(this).padding.top;
   TextTheme get textTheme => Theme.of(this).textTheme;
+  SystemUiOverlayStyle get overlay => SystemUiOverlayStyle(
+        statusBarColor: onPrimary,
+        statusBarIconBrightness: iconBrightness,
+        systemNavigationBarColor: onPrimary,
+        systemNavigationBarIconBrightness: iconBrightness,
+      );
   S get s => S.of(this)!;
 }
 

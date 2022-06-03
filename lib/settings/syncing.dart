@@ -14,12 +14,7 @@ class SyncingSetting extends StatelessWidget {
     final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-      ),
+      value: context.overlay,
       child: Scaffold(
         appBar: AppBar(
           title: Text(s.settingsSyncing),

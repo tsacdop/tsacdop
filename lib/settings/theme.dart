@@ -13,18 +13,14 @@ class ThemeSetting extends StatelessWidget {
     final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-      ),
+      value: context.overlay,
       child: Scaffold(
+        backgroundColor: context.onPrimary,
         appBar: AppBar(
           title: Text(s.settingsAppearance),
           leading: CustomBackButton(),
           elevation: 0,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: context.onPrimary,
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -37,96 +33,95 @@ class ThemeSetting extends StatelessWidget {
               height: 30.0,
               padding: EdgeInsets.symmetric(horizontal: 70),
               alignment: Alignment.centerLeft,
-              child: Text(s.settingsInterface,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText1!
-                      .copyWith(color: Theme.of(context).accentColor)),
+              child: Text(
+                s.settingsInterface,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1!
+                    .copyWith(color: context.accentColor),
+              ),
             ),
             ListTile(
               onTap: () => showGeneralDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  barrierLabel: MaterialLocalizations.of(context)
-                      .modalBarrierDismissLabel,
-                  barrierColor: Colors.black54,
-                  transitionDuration: const Duration(milliseconds: 200),
-                  pageBuilder: (context, animaiton, secondaryAnimation) =>
-                      AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: SystemUiOverlayStyle(
-                          statusBarIconBrightness: Brightness.light,
-                          systemNavigationBarColor:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? Color.fromRGBO(113, 113, 113, 1)
-                                  : Color.fromRGBO(15, 15, 15, 1),
-                        ),
-                        child: AlertDialog(
-                          titlePadding: EdgeInsets.only(
-                            top: 20,
-                            left: 40,
-                            right: context.width / 3,
-                          ),
-                          elevation: 1,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                          title: Text(s.settingsTheme),
-                          content: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: RadioListTile(
-                                        title: Text(s.systemDefault),
-                                        value: ThemeMode.system,
-                                        groupValue: settings.theme,
-                                        onChanged: (dynamic value) {
-                                          settings.setTheme = value;
-                                          Navigator.of(context).pop();
-                                        }),
-                                  ),
-                                ),
-                                ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: RadioListTile(
-                                        title: Text(s.darkMode),
-                                        value: ThemeMode.dark,
-                                        groupValue: settings.theme,
-                                        onChanged: (dynamic value) {
-                                          settings.setTheme = value;
-                                          Navigator.of(context).pop();
-                                        }),
-                                  ),
-                                ),
-                                ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: RadioListTile(
-                                        title: Text(s.lightMode),
-                                        value: ThemeMode.light,
-                                        groupValue: settings.theme,
-                                        onChanged: (dynamic value) {
-                                          settings.setTheme = value;
-                                          Navigator.of(context).pop();
-                                        }),
-                                  ),
-                                ),
-                              ],
+                context: context,
+                barrierDismissible: true,
+                barrierLabel:
+                    MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                barrierColor: Colors.black54,
+                transitionDuration: const Duration(milliseconds: 200),
+                pageBuilder: (context, animaiton, secondaryAnimation) =>
+                    AnnotatedRegion<SystemUiOverlayStyle>(
+                  value: SystemUiOverlayStyle(
+                    statusBarIconBrightness: Brightness.light,
+                    systemNavigationBarColor:
+                        Theme.of(context).brightness == Brightness.light
+                            ? Color.fromRGBO(113, 113, 113, 1)
+                            : Color.fromRGBO(15, 15, 15, 1),
+                  ),
+                  child: AlertDialog(
+                    titlePadding: EdgeInsets.only(
+                      top: 20,
+                      left: 40,
+                      right: context.width / 3,
+                    ),
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                    title: Text(s.settingsTheme),
+                    content: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: RadioListTile(
+                                  title: Text(s.systemDefault),
+                                  value: ThemeMode.system,
+                                  groupValue: settings.theme,
+                                  onChanged: (dynamic value) {
+                                    settings.setTheme = value;
+                                    Navigator.of(context).pop();
+                                  }),
                             ),
                           ),
-                        ),
-                      )),
+                          ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: RadioListTile(
+                                  title: Text(s.darkMode),
+                                  value: ThemeMode.dark,
+                                  groupValue: settings.theme,
+                                  onChanged: (dynamic value) {
+                                    settings.setTheme = value;
+                                    Navigator.of(context).pop();
+                                  }),
+                            ),
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: RadioListTile(
+                                  title: Text(s.lightMode),
+                                  value: ThemeMode.light,
+                                  groupValue: settings.theme,
+                                  onChanged: (dynamic value) {
+                                    settings.setTheme = value;
+                                    Navigator.of(context).pop();
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               contentPadding: EdgeInsets.symmetric(horizontal: 70.0),
               //  leading: Icon(Icons.colorize),
               title: Text(s.settingsTheme),
@@ -324,76 +319,77 @@ class __ColorPickerState extends State<_ColorPicker>
               key: UniqueKey(),
               controller: _controller,
               children: Colors.primaries
-                  .map<Widget>((color) => ScrollConfiguration(
-                        behavior: NoGrowBehavior(),
-                        child: GridView.count(
-                          primary: false,
-                          padding: const EdgeInsets.fromLTRB(2, 10, 2, 10),
-                          crossAxisSpacing: 4,
-                          mainAxisSpacing: 4,
-                          crossAxisCount: 3,
-                          children: <Widget>[
-                            _colorCircle(color.shade100),
-                            _colorCircle(color.shade200),
-                            _colorCircle(color.shade300),
-                            _colorCircle(color.shade400),
-                            _colorCircle(color.shade500),
-                            _colorCircle(color.shade600),
-                            _colorCircle(color.shade700),
-                            _colorCircle(color.shade800),
-                            _colorCircle(color.shade900),
-                            ...color == Colors.red
-                                ? _accentList(Colors.redAccent)
-                                : color == Colors.pink
-                                    ? _accentList(Colors.pinkAccent)
-                                    : color == Colors.deepOrange
-                                        ? _accentList(Colors.deepOrangeAccent)
-                                        : color == Colors.orange
-                                            ? _accentList(Colors.orangeAccent)
-                                            : color == Colors.amber
-                                                ? _accentList(
-                                                    Colors.amberAccent)
-                                                : color == Colors.yellow
-                                                    ? _accentList(
-                                                        Colors.yellowAccent)
-                                                    : color == Colors.lime
-                                                        ? _accentList(
-                                                            Colors.limeAccent)
-                                                        : color ==
-                                                                Colors
-                                                                    .lightGreen
-                                                            ? _accentList(Colors
-                                                                .lightGreenAccent)
-                                                            : color ==
-                                                                    Colors.green
-                                                                ? _accentList(Colors
-                                                                    .greenAccent)
-                                                                : color ==
-                                                                        Colors
-                                                                            .teal
-                                                                    ? _accentList(
-                                                                        Colors
-                                                                            .tealAccent)
-                                                                    : color ==
-                                                                            Colors
-                                                                                .cyan
-                                                                        ? _accentList(Colors
-                                                                            .cyanAccent)
-                                                                        : color ==
-                                                                                Colors.lightBlue
-                                                                            ? _accentList(Colors.lightBlueAccent)
-                                                                            : color == Colors.blue
-                                                                                ? _accentList(Colors.blueAccent)
-                                                                                : color == Colors.indigo
-                                                                                    ? _accentList(Colors.indigoAccent)
-                                                                                    : color == Colors.purple
-                                                                                        ? _accentList(Colors.purpleAccent)
-                                                                                        : color == Colors.deepPurple
-                                                                                            ? _accentList(Colors.deepPurpleAccent)
-                                                                                            : []
-                          ],
-                        ),
-                      ))
+                  .map<Widget>(
+                    (color) => ScrollConfiguration(
+                      behavior: NoGrowBehavior(),
+                      child: GridView.count(
+                        primary: false,
+                        padding: const EdgeInsets.fromLTRB(2, 10, 2, 10),
+                        crossAxisSpacing: 4,
+                        mainAxisSpacing: 4,
+                        crossAxisCount: 3,
+                        children: <Widget>[
+                          _colorCircle(color.shade100),
+                          _colorCircle(color.shade200),
+                          _colorCircle(color.shade300),
+                          _colorCircle(color.shade400),
+                          _colorCircle(color.shade500),
+                          _colorCircle(color.shade600),
+                          _colorCircle(color.shade700),
+                          _colorCircle(color.shade800),
+                          _colorCircle(color.shade900),
+                          ...color == Colors.red
+                              ? _accentList(Colors.redAccent)
+                              : color == Colors.pink
+                                  ? _accentList(Colors.pinkAccent)
+                                  : color == Colors.deepOrange
+                                      ? _accentList(Colors.deepOrangeAccent)
+                                      : color == Colors.orange
+                                          ? _accentList(Colors.orangeAccent)
+                                          : color == Colors.amber
+                                              ? _accentList(Colors.amberAccent)
+                                              : color == Colors.yellow
+                                                  ? _accentList(
+                                                      Colors.yellowAccent)
+                                                  : color == Colors.lime
+                                                      ? _accentList(
+                                                          Colors.limeAccent)
+                                                      : color ==
+                                                              Colors.lightGreen
+                                                          ? _accentList(Colors
+                                                              .lightGreenAccent)
+                                                          : color ==
+                                                                  Colors.green
+                                                              ? _accentList(Colors
+                                                                  .greenAccent)
+                                                              : color ==
+                                                                      Colors
+                                                                          .teal
+                                                                  ? _accentList(
+                                                                      Colors
+                                                                          .tealAccent)
+                                                                  : color ==
+                                                                          Colors
+                                                                              .cyan
+                                                                      ? _accentList(
+                                                                          Colors
+                                                                              .cyanAccent)
+                                                                      : color ==
+                                                                              Colors.lightBlue
+                                                                          ? _accentList(Colors.lightBlueAccent)
+                                                                          : color == Colors.blue
+                                                                              ? _accentList(Colors.blueAccent)
+                                                                              : color == Colors.indigo
+                                                                                  ? _accentList(Colors.indigoAccent)
+                                                                                  : color == Colors.purple
+                                                                                      ? _accentList(Colors.purpleAccent)
+                                                                                      : color == Colors.deepPurple
+                                                                                          ? _accentList(Colors.deepPurpleAccent)
+                                                                                          : []
+                        ],
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
           ),

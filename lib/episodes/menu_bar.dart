@@ -28,7 +28,7 @@ class MenuBarState extends State<MenuBar> {
     return Container(
       height: 50.0,
       decoration: BoxDecoration(
-        color: context.priamryContainer,
+        color: widget.episodeItem!.cardColor(context),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -48,7 +48,6 @@ class MenuBarState extends State<MenuBar> {
                       child: Container(
                         height: 30.0,
                         width: 30.0,
-                        color: context.priamryContainer,
                         child: widget.hide!
                             ? Center()
                             : CircleAvatar(

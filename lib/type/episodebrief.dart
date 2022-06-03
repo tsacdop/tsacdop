@@ -79,6 +79,14 @@ class EpisodeBrief extends Equatable {
         ? primaryColor!.colorizedark()
         : primaryColor!.colorizeLight();
   }
+  
+  Color cardColor(BuildContext context) {
+    final schema = ColorScheme.fromSeed(
+      seedColor: primaryColor!.colorizedark(),
+      brightness: context.brightness,
+    );
+    return schema.primaryContainer;
+  }
 
   EpisodeBrief copyWith({
     String? mediaId,

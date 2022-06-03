@@ -23,75 +23,6 @@ class _StorageSettingState extends State<StorageSetting>
   AnimationController? _controller;
   late Animation<double> _animation;
   List<String>? _dirs;
-  Future<void> _getCacheMax() async {
-    var cache =
-        await cacheStorage.getInt(defaultValue: (200 * 1024 * 1024).toInt());
-    if (cache == 0) {
-      await cacheStorage.saveInt((200 * 1024 * 1024).toInt());
-      cache = 200 * 1024 * 1024;
-    }
-    var value = cache ~/ (1024 * 1024);
-    if (value > 100) {
-      _controller = AnimationController(
-          vsync: this, duration: Duration(milliseconds: value * 2));
-      _animation = Tween<double>(begin: 100, end: value.toDouble()).animate(
-          CurvedAnimation(curve: Curves.easeOutQuart, parent: _controller!))
-        ..addListener(() {
-          setState(() => _value = _animation.value);
-        });
-      _controller!.forward();
-    }
-  }
-
-  Future<bool> _getAutoDownloadNetwork() async {
-    var storage = KeyValueStorage(autoDownloadNetworkKey);
-    var value = await storage.getBool(defaultValue: false);
-    return value;
-  }
-
-  Future<int?> _getAutoDeleteDays() async {
-    var storage = KeyValueStorage(autoDeleteKey);
-    var days = await storage.getInt();
-    if (days == 0) {
-      storage.saveInt(30);
-      return 30;
-    }
-    return days;
-  }
-
-  Future<int?> _getDownloadPasition() async {
-    final storage = KeyValueStorage(downloadPositionKey);
-    final index = await storage.getInt();
-    final externalDirs = await getExternalStorageDirectories();
-    _dirs = [for (var dir in externalDirs!) dir.path];
-    return index;
-  }
-
-  Future<bool> _getDelteAfterPlayed() async {
-    final storage = KeyValueStorage(deleteAfterPlayedKey);
-    return await storage.getBool(defaultValue: false);
-  }
-
-  Future<void> _setAutoDeleteDays(int days) async {
-    var storage = KeyValueStorage(autoDeleteKey);
-    await storage.saveInt(days);
-    setState(() {});
-  }
-
-  Future<void> _setAudtDownloadNetwork(bool boo) async {
-    var storage = KeyValueStorage(autoDownloadNetworkKey);
-    await storage.saveBool(boo);
-  }
-
-  Future<void> _setDownloadPosition(int? index) async {
-    final storage = KeyValueStorage(downloadPositionKey);
-    await storage.saveInt(index!);
-  }
-
-  Future<void> _setDeleteAfterPlayed(bool? boo) async {
-    final storage = KeyValueStorage(deleteAfterPlayedKey);
-    await storage.saveBool(boo);
-  }
 
   late double _value;
 
@@ -113,13 +44,9 @@ class _StorageSettingState extends State<StorageSetting>
     final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-      ),
+      value: context.overlay,
       child: Scaffold(
+        backgroundColor: context.onPrimary,
         appBar: AppBar(
           title: Text(s.settingStorage),
           leading: CustomBackButton(),
@@ -344,5 +271,75 @@ class _StorageSettingState extends State<StorageSetting>
         ),
       ),
     );
+  }
+
+  Future<void> _getCacheMax() async {
+    var cache =
+        await cacheStorage.getInt(defaultValue: (200 * 1024 * 1024).toInt());
+    if (cache == 0) {
+      await cacheStorage.saveInt((200 * 1024 * 1024).toInt());
+      cache = 200 * 1024 * 1024;
+    }
+    var value = cache ~/ (1024 * 1024);
+    if (value > 100) {
+      _controller = AnimationController(
+          vsync: this, duration: Duration(milliseconds: value * 2));
+      _animation = Tween<double>(begin: 100, end: value.toDouble()).animate(
+          CurvedAnimation(curve: Curves.easeOutQuart, parent: _controller!))
+        ..addListener(() {
+          setState(() => _value = _animation.value);
+        });
+      _controller!.forward();
+    }
+  }
+
+  Future<bool> _getAutoDownloadNetwork() async {
+    var storage = KeyValueStorage(autoDownloadNetworkKey);
+    var value = await storage.getBool(defaultValue: false);
+    return value;
+  }
+
+  Future<int?> _getAutoDeleteDays() async {
+    var storage = KeyValueStorage(autoDeleteKey);
+    var days = await storage.getInt();
+    if (days == 0) {
+      storage.saveInt(30);
+      return 30;
+    }
+    return days;
+  }
+
+  Future<int?> _getDownloadPasition() async {
+    final storage = KeyValueStorage(downloadPositionKey);
+    final index = await storage.getInt();
+    final externalDirs = await getExternalStorageDirectories();
+    _dirs = [for (var dir in externalDirs!) dir.path];
+    return index;
+  }
+
+  Future<bool> _getDelteAfterPlayed() async {
+    final storage = KeyValueStorage(deleteAfterPlayedKey);
+    return await storage.getBool(defaultValue: false);
+  }
+
+  Future<void> _setAutoDeleteDays(int days) async {
+    var storage = KeyValueStorage(autoDeleteKey);
+    await storage.saveInt(days);
+    setState(() {});
+  }
+
+  Future<void> _setAudtDownloadNetwork(bool boo) async {
+    var storage = KeyValueStorage(autoDownloadNetworkKey);
+    await storage.saveBool(boo);
+  }
+
+  Future<void> _setDownloadPosition(int? index) async {
+    final storage = KeyValueStorage(downloadPositionKey);
+    await storage.saveInt(index!);
+  }
+
+  Future<void> _setDeleteAfterPlayed(bool? boo) async {
+    final storage = KeyValueStorage(deleteAfterPlayedKey);
+    await storage.saveBool(boo);
   }
 }

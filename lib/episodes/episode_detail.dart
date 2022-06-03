@@ -87,8 +87,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
     final audio = context.watch<AudioPlayerNotifier>();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-          statusBarColor: context.priamryContainer,
-          systemNavigationBarColor: context.priamryContainer,
+          statusBarColor: widget.episodeItem!.cardColor(context),
+          systemNavigationBarColor: widget.episodeItem!.cardColor(context),
           systemNavigationBarContrastEnforced: false,
           systemNavigationBarIconBrightness: context.iconBrightness,
           statusBarBrightness: context.brightness,
@@ -104,7 +104,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
           }
         },
         child: Scaffold(
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: context.onPrimary,
           body: SafeArea(
             child: Stack(
               children: <Widget>[
@@ -116,7 +116,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                     headerSliverBuilder: (context, innerBoxScrolled) {
                       return <Widget>[
                         SliverAppBar(
-                          backgroundColor: context.priamryContainer,
+                          backgroundColor:
+                              widget.episodeItem!.cardColor(context),
                           floating: true,
                           pinned: true,
                           title: _showTitle
@@ -290,33 +291,35 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                   ),
                 ),
                 Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight?>>(
-                    selector: (_, audio) =>
-                        Tuple2(audio.playerRunning, audio.playerHeight),
-                    builder: (_, data, __) {
-                      final height = kMinPlayerHeight[data.item2!.index];
-                      return Container(
-                        alignment: Alignment.bottomCenter,
-                        padding:
-                            EdgeInsets.only(bottom: data.item1 ? height : 0),
-                        child: AnimatedContainer(
-                          duration: Duration(milliseconds: 400),
-                          height: _showMenu ? 50 : 0,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: MenuBar(
-                                episodeItem: widget.episodeItem,
-                                heroTag: widget.heroTag,
-                                hide: widget.hide),
-                          ),
+                  selector: (_, audio) =>
+                      Tuple2(audio.playerRunning, audio.playerHeight),
+                  builder: (_, data, __) {
+                    final height = kMinPlayerHeight[data.item2!.index];
+                    return Container(
+                      alignment: Alignment.bottomCenter,
+                      padding: EdgeInsets.only(bottom: data.item1 ? height : 0),
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 400),
+                        height: _showMenu ? 50 : 0,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: MenuBar(
+                              episodeItem: widget.episodeItem,
+                              heroTag: widget.heroTag,
+                              hide: widget.hide),
                         ),
-                      );
-                    }),
+                      ),
+                    );
+                  },
+                ),
                 Selector<AudioPlayerNotifier, EpisodeBrief?>(
-                    selector: (_, audio) => audio.episode,
-                    builder: (_, data, __) => Container(
-                        child: PlayerWidget(
-                            playerKey: _playerKey,
-                            isPlayingPage: data == widget.episodeItem))),
+                  selector: (_, audio) => audio.episode,
+                  builder: (_, data, __) => Container(
+                    child: PlayerWidget(
+                        playerKey: _playerKey,
+                        isPlayingPage: data == widget.episodeItem),
+                  ),
+                ),
               ],
             ),
           ),

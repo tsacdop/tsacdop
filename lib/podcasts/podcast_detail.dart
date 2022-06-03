@@ -673,10 +673,10 @@ class _PodcastDetailState extends State<PodcastDetail> {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
+        statusBarColor: color,
         statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
+        systemNavigationBarColor: context.primaryColor,
+        systemNavigationBarIconBrightness: context.iconBrightness,
       ),
       child: WillPopScope(
         onWillPop: () {

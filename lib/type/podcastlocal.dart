@@ -42,12 +42,13 @@ class PodcastLocal extends Equatable {
     this.description = '',
     this.updateCount = 0,
     this.episodeCount = 0,
-  }) : assert(rssUrl != null);
+  });
 
   ImageProvider get avatarImage {
     return (File(imagePath!).existsSync()
-        ? FileImage(File(imagePath!))
-        : const AssetImage('assets/avatar_backup.png')) as ImageProvider<Object>;
+            ? FileImage(File(imagePath!))
+            : const AssetImage('assets/avatar_backup.png'))
+        as ImageProvider<Object>;
   }
 
   Color backgroudColor(BuildContext context) {
@@ -56,13 +57,30 @@ class PodcastLocal extends Equatable {
         : primaryColor!.colorizeLight();
   }
 
+  Color cardColor(BuildContext context) {
+    final schema = ColorScheme.fromSeed(
+      seedColor: primaryColor!.colorizedark(),
+      brightness: context.brightness,
+    );
+    return schema.primaryContainer;
+  }
+
   PodcastLocal copyWith({int? updateCount, int? episodeCount}) {
-    return PodcastLocal(title, imageUrl, rssUrl, primaryColor, author, id, 
-        imagePath, provider, link, funding,
-        description: description,
-        updateCount: updateCount ?? 0,
-        episodeCount: episodeCount ?? 0,
-       );
+    return PodcastLocal(
+      title,
+      imageUrl,
+      rssUrl,
+      primaryColor,
+      author,
+      id,
+      imagePath,
+      provider,
+      link,
+      funding,
+      description: description,
+      updateCount: updateCount ?? 0,
+      episodeCount: episodeCount ?? 0,
+    );
   }
 
   @override

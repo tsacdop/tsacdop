@@ -150,6 +150,7 @@ class SettingState extends ChangeNotifier {
             color: Colors.grey[100],
             elevation: 0,
             titleTextStyle: TextStyle(color: Colors.black),
+            scrolledUnderElevation: 1,
             iconTheme: IconThemeData(color: Colors.black),
             systemOverlayStyle: SystemUiOverlayStyle.dark),
         textTheme: TextTheme(
@@ -259,6 +260,7 @@ class SettingState extends ChangeNotifier {
         appBarTheme: AppBarTheme(
             color: Colors.grey[900],
             elevation: 0,
+            scrolledUnderElevation: 0,
             systemOverlayStyle: SystemUiOverlayStyle.light),
         buttonTheme: ButtonThemeData(height: 32),
         dialogBackgroundColor: _realDark! ? Colors.grey[900] : null,

@@ -36,17 +36,15 @@ Widget featureDiscoveryOverlay(BuildContext context,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(description),
-          FlatButton(
-            color: buttonColor,
-            padding: EdgeInsets.zero,
+          TextButton(
+            style: TextButton.styleFrom(primary: buttonColor),
             child: Text(s.understood,
                 style: context.textTheme.button!.copyWith(color: Colors.white)),
             onPressed: () async =>
                 FeatureDiscovery.completeCurrentStep(context),
           ),
-          FlatButton(
-            color: buttonColor,
-            padding: EdgeInsets.zero,
+          TextButton(
+            style: TextButton.styleFrom(primary: buttonColor),
             child: Text(s.dismiss,
                 style: context.textTheme.button!.copyWith(color: Colors.white)),
             onPressed: () => FeatureDiscovery.dismissAll(context),

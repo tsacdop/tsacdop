@@ -4,7 +4,7 @@ description: An open source podcast player.
 version: 0.6.0+48
 publish_to: "none"
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -55,13 +55,13 @@ dependencies:
   just_audio: ^0.9.23
   flutter_downloader:
     git:
-      url: https://github.com/stonega/flutter_downloader.git
+      url: https://github.com/tsacdop/flutter_downloader.git
   focused_menu:
     git:
-      url: https://github.com/stonega/focused_menu.git
+      url: https://github.com/tsacdop/focused_menu.git
   webfeed:
     git:
-      url: https://github.com/stonega/webfeed.git
+      url: https://github.com/tsacdop/webfeed.git
   equatable: ^2.0.0
   path_provider: ^2.0.1
   http_parser: ^4.0.0
@@ -74,7 +74,7 @@ dependencies:
 dependency_overrides:
   linkify:
     git:
-      url: https://github.com/stonega/linkify.git
+      url: https://github.com/tsacdop/linkify.git
 
 dev_dependencies:
   flutter_test:
