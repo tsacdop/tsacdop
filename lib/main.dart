@@ -43,10 +43,7 @@ Future main() async {
       child: MyApp(),
     ),
   );
-  var systemUiOverlayStyle = SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.transparent);
-  SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 }
@@ -80,7 +77,6 @@ class MyApp extends StatelessWidget {
           ),
         );
       },
-      //child: FeatureDiscovery(child: Home()),
     );
   }
 }

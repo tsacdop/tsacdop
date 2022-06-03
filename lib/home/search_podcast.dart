@@ -1188,7 +1188,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                           indicatorWeight: 3,
                           indicatorSize: TabBarIndicatorSize.label,
                           tabs: [
-                            Text(s!.homeToprightMenuAbout),
+                            Text(s.homeToprightMenuAbout),
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -1273,7 +1273,7 @@ class SubscribeButton extends StatelessWidget {
                           side: BorderSide(color: context.accentColor)),
                       onSurface: context.accentColor.withOpacity(0.5),
                     ),
-                    child: Text(s!.subscribe,
+                    child: Text(s.subscribe,
                         style: TextStyle(color: context.accentColor)),
                     onPressed: () {
                       Fluttertoast.showToast(
@@ -1298,7 +1298,7 @@ class SubscribeButton extends StatelessWidget {
                       // disabledTextColor: Colors.grey[500],
                       // disabledBorderColor: Colors.grey[500],
                     ),
-                    child: Text(s!.subscribe),
+                    child: Text(s.subscribe),
                     onPressed: () {}),
               );
       },

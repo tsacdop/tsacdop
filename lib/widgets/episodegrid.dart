@@ -161,7 +161,7 @@ class EpisodeGrid extends StatelessWidget {
       title: Text(s.cellularConfirm),
       content: Text(s.cellularConfirmDes),
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -170,7 +170,7 @@ class EpisodeGrid extends StatelessWidget {
             style: TextStyle(color: Colors.grey[600]),
           ),
         ),
-        FlatButton(
+        TextButton(
           onPressed: () {
             ifUseData = true;
             Navigator.of(context).pop();
@@ -673,11 +673,11 @@ class EpisodeGrid extends StatelessWidget {
                                       title: Text(
                                           data.item1 != episodes![index] ||
                                                   !data.item4
-                                              ? s!.play
-                                              : s!.playing),
+                                              ? s.play
+                                              : s.playing),
                                       trailingIcon: Icon(
                                         LineIcons.playCircle,
-                                        color: Theme.of(context).accentColor,
+                                        color: context.accentColor,
                                       ),
                                       onPressed: () {
                                         if (data.item1 != episodes![index] ||
@@ -756,7 +756,7 @@ class EpisodeGrid extends StatelessWidget {
                                         title: isListened > 0
                                             ? Text(s.markNotListened,
                                                 style: TextStyle(
-                                                    color: context.textColor!
+                                                    color: context.textColor
                                                         .withOpacity(0.5)))
                                             : Text(
                                                 s.markListened,
@@ -799,7 +799,7 @@ class EpisodeGrid extends StatelessWidget {
                                         title: isDownloaded
                                             ? Text(s.downloaded,
                                                 style: TextStyle(
-                                                    color: context.textColor!
+                                                    color: context.textColor
                                                         .withOpacity(0.5)))
                                             : Text(s.download),
                                         trailingIcon: Icon(LineIcons.download,

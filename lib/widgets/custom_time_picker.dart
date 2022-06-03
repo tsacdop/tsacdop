@@ -224,7 +224,8 @@ class _HourMinuteControl extends StatelessWidget {
     final backgroundColor = timePickerTheme.hourMinuteColor ??
         MaterialStateColor.resolveWith((states) {
           return states.contains(MaterialState.selected)
-              ? themeData.colorScheme.secondary.withOpacity(isDark ? 0.24 : 0.12)
+              ? themeData.colorScheme.secondary
+                  .withOpacity(isDark ? 0.24 : 0.12)
               : themeData.colorScheme.onSurface.withOpacity(0.12);
         });
     final style =
@@ -743,6 +744,8 @@ class _RenderInputPadding extends RenderShiftedBox {
           newPosition += const Offset(-1.0, 0.0);
         }
         break;
+      default:
+        break;
     }
 
     return result.addWithRawTransform(
@@ -783,7 +786,7 @@ class _DialPainter extends CustomPainter {
     required this.theta,
     required this.textDirection,
     required this.selectedValue,
-  }) : super(repaint: PaintingBinding.instance!.systemFonts);
+  }) : super(repaint: PaintingBinding.instance.systemFonts);
 
   final List<_TappableLabel>? primaryLabels;
   final List<_TappableLabel>? secondaryLabels;
@@ -1734,6 +1737,8 @@ class _TimePickerDialogState extends State<_TimePickerDialog> {
           _formKey.currentState!.save();
           _entryMode = TimePickerEntryMode.dial;
           break;
+        default:
+          break;
       }
     });
   }
@@ -1836,6 +1841,8 @@ class _TimePickerDialogState extends State<_TimePickerDialog> {
       case TimePickerEntryMode.input:
         timePickerWidth = _kTimePickerWidthPortrait;
         timePickerHeight = _kTimePickerHeightInput;
+        break;
+      default:
         break;
     }
     return Size(timePickerWidth, timePickerHeight * textScaleFactor);
@@ -1979,6 +1986,8 @@ class _TimePickerDialogState extends State<_TimePickerDialog> {
             ),
           ),
         );
+        break;
+      default:
         break;
     }
 

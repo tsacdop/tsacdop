@@ -134,7 +134,7 @@ class _PopupMenuSettingState extends State<PopupMenuSetting> {
                             height: 30.0,
                             padding: EdgeInsets.symmetric(horizontal: 80),
                             alignment: Alignment.centerLeft,
-                            child: Text(s!.settingsPopupMenu,
+                            child: Text(s.settingsPopupMenu,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyText1!

@@ -327,7 +327,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
               children: [
                 Icon(Icons.clear_all_outlined, size: 18),
                 SizedBox(width: 20),
-                Text(s!.clearAll, style: textStyle),
+                Text(s.clearAll, style: textStyle),
               ],
             ),
           ),
@@ -342,8 +342,8 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
                   onPressed: () => setState(() {
                     _clearConfirm = false;
                   }),
-                  child: Text(s!.cancel,
-                      style: TextStyle(color: Colors.grey[600])),
+                  child:
+                      Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
                 ),
                 FlatButton(
                     splashColor: Colors.red.withAlpha(70),
@@ -368,7 +368,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
               children: [
                 Icon(Icons.delete, color: Colors.red, size: 18),
                 SizedBox(width: 20),
-                Text(s!.remove,
+                Text(s.remove,
                     style: textStyle!.copyWith(
                         color: Colors.red, fontWeight: FontWeight.bold)),
               ],
@@ -385,8 +385,8 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
                   onPressed: () => setState(() {
                     _removeConfirm = false;
                   }),
-                  child: Text(s!.cancel,
-                      style: TextStyle(color: Colors.grey[600])),
+                  child:
+                      Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
                 ),
                 FlatButton(
                     splashColor: Colors.red.withAlpha(70),
@@ -408,7 +408,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
               children: [
                 Icon(Icons.info_outline,
                     size: 16, color: context.textColor!.withAlpha(90)),
-                Text(s!.defaultQueueReminder,
+                Text(s.defaultQueueReminder,
                     style: TextStyle(color: context.textColor!.withAlpha(90))),
               ],
             ),

@@ -845,7 +845,7 @@ class __PlaylistsState extends State<_Playlists> {
                       color: context.primaryColorDark,
                       child: Center(child: Icon(Icons.add)),
                     ),
-                    title: Text(s!.createNewPlaylist),
+                    title: Text(s.createNewPlaylist),
                   );
                 }),
           );

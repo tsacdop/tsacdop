@@ -413,13 +413,13 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                             if (!_liked) {
                               await _saveLiked();
                               Fluttertoast.showToast(
-                                msg: s!.liked,
+                                msg: s.liked,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             } else {
                               await _setUnliked();
                               Fluttertoast.showToast(
-                                msg: s!.unliked,
+                                msg: s.unliked,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             }
@@ -479,7 +479,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                             for (var episode in widget.selectedList!) {
                               audio.addToPlaylist(episode);
                               Fluttertoast.showToast(
-                                msg: s!.toastAddPlaylist,
+                                msg: s.toastAddPlaylist,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             }
@@ -488,7 +488,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                             for (var episode in widget.selectedList!) {
                               audio.delFromPlaylist(episode);
                               Fluttertoast.showToast(
-                                msg: s!.toastRemovePlaylist,
+                                msg: s.toastRemovePlaylist,
                                 gravity: ToastGravity.BOTTOM,
                               );
                             }
@@ -511,13 +511,13 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                           if (!_marked) {
                             await _markListened();
                             Fluttertoast.showToast(
-                              msg: s!.markListened,
+                              msg: s.markListened,
                               gravity: ToastGravity.BOTTOM,
                             );
                           } else {
                             await _markNotListened();
                             Fluttertoast.showToast(
-                              msg: s!.markNotListened,
+                              msg: s.markNotListened,
                               gravity: ToastGravity.BOTTOM,
                             );
                           }

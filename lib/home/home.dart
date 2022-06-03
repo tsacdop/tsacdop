@@ -661,56 +661,57 @@ class _RecentUpdateState extends State<_RecentUpdate>
     //  final audio = context.read<AudioPlayerNotifier>();
     final s = context.s;
     return FutureBuilder<int>(
-        future: _getUpdateCounts(_group!),
-        initialData: 0,
-        builder: (context, snapshot) {
-          return snapshot.data != 0
-              ? Material(
-                  color: Colors.transparent,
-                  child: Row(
-                    children: [
-                      IconButton(
-                          tooltip: s!.removeNewMark,
-                          icon: SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CustomPaint(
-                                  painter: RemoveNewFlagPainter(
-                                      context.textTheme.bodyText1!.color,
-                                      Colors.red))),
-                          onPressed: () async {
-                            _removeNewMark(_group!);
-                            if (mounted) {
-                              setState(() {});
-                            }
-                          }),
-                      //  IconButton(
-                      //      tooltip: s.addNewEpisodeTooltip,
-                      //      icon: SizedBox(
-                      //          height: 15,
-                      //          width: 20,
-                      //          child: CustomPaint(
-                      //              painter: AddToPlaylistPainter(
-                      //                  context.textTheme.bodyText1.color,
-                      //                  Colors.red))),
-                      //      onPressed: () async {
-                      //        await audio.addNewEpisode(_group);
-                      //        if (mounted) {
-                      //          setState(() {});
-                      //        }
-                      //        Fluttertoast.showToast(
-                      //          msg: _groupName == 'All'
-                      //              ? s.addNewEpisodeAll(snapshot.data)
-                      //              : s.addEpisodeGroup(
-                      //                  _groupName, snapshot.data),
-                      //          gravity: ToastGravity.BOTTOM,
-                      //        );
-                      //      }),
-                    ],
-                  ),
-                )
-              : Center();
-        });
+      future: _getUpdateCounts(_group!),
+      initialData: 0,
+      builder: (context, snapshot) {
+        return snapshot.data != 0
+            ? Material(
+                color: Colors.transparent,
+                child: Row(
+                  children: [
+                    IconButton(
+                        tooltip: s.removeNewMark,
+                        icon: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CustomPaint(
+                                painter: RemoveNewFlagPainter(
+                                    context.textTheme.bodyText1!.color,
+                                    Colors.red))),
+                        onPressed: () async {
+                          _removeNewMark(_group!);
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        }),
+                    //  IconButton(
+                    //      tooltip: s.addNewEpisodeTooltip,
+                    //      icon: SizedBox(
+                    //          height: 15,
+                    //          width: 20,
+                    //          child: CustomPaint(
+                    //              painter: AddToPlaylistPainter(
+                    //                  context.textTheme.bodyText1.color,
+                    //                  Colors.red))),
+                    //      onPressed: () async {
+                    //        await audio.addNewEpisode(_group);
+                    //        if (mounted) {
+                    //          setState(() {});
+                    //        }
+                    //        Fluttertoast.showToast(
+                    //          msg: _groupName == 'All'
+                    //              ? s.addNewEpisodeAll(snapshot.data)
+                    //              : s.addEpisodeGroup(
+                    //                  _groupName, snapshot.data),
+                    //          gravity: ToastGravity.BOTTOM,
+                    //        );
+                    //      }),
+                  ],
+                ),
+              )
+            : Center();
+      },
+    );
   }
 
   @override
@@ -736,7 +737,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                             Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10)),
                             Text(
-                              s!.noEpisodeRecent,
+                              s.noEpisodeRecent,
                               style: TextStyle(color: Colors.grey[500]),
                             )
                           ],
@@ -820,7 +821,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                                   onPressed: () {
                                                     _updateRssItem();
                                                     Fluttertoast.showToast(
-                                                      msg: s!.refreshStarted,
+                                                      msg: s.refreshStarted,
                                                       gravity:
                                                           ToastGravity.BOTTOM,
                                                     );
@@ -830,7 +831,7 @@ class _RecentUpdateState extends State<_RecentUpdate>
                                             Material(
                                               color: Colors.transparent,
                                               child: IconButton(
-                                                tooltip: s!.hideListenedSetting,
+                                                tooltip: s.hideListenedSetting,
                                                 icon: SizedBox(
                                                   width: 30,
                                                   height: 15,
@@ -980,7 +981,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                               Padding(
                                   padding: EdgeInsets.symmetric(vertical: 10)),
                               Text(
-                                s!.noEpisodeFavorite,
+                                s.noEpisodeFavorite,
                                 style: TextStyle(color: Colors.grey[500]),
                               )
                             ],
@@ -1049,7 +1050,7 @@ class _MyFavoriteState extends State<_MyFavorite>
                                                       BorderRadius.all(
                                                           Radius.circular(10))),
                                               elevation: 1,
-                                              tooltip: s!.homeSubMenuSortBy,
+                                              tooltip: s.homeSubMenuSortBy,
                                               child: Container(
                                                   height: 50,
                                                   padding: EdgeInsets.symmetric(
@@ -1235,7 +1236,7 @@ class _MyDownloadState extends State<_MyDownload>
                           children: <Widget>[
                             Container(
                                 padding: EdgeInsets.symmetric(horizontal: 20),
-                                child: Text(s!.downloaded)),
+                                child: Text(s.downloaded)),
                             Spacer(),
                             Material(
                               color: Colors.transparent,

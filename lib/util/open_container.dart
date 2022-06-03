@@ -258,7 +258,6 @@ class _OpenContainerRoute extends ModalRoute<void> {
           ],
         );
     }
-    return null; // unreachable
   }
 
   static _FlippableTweenSequence<double>? _getClosedOpacityTween(
@@ -273,7 +272,6 @@ class _OpenContainerRoute extends ModalRoute<void> {
             ),
           ],
         );
-        break;
       case ContainerTransitionType.fadeThrough:
         return _FlippableTweenSequence<double>(
           <TweenSequenceItem<double>>[
@@ -287,9 +285,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
             ),
           ],
         );
-        break;
     }
-    return null; // unreachable
   }
 
   static _FlippableTweenSequence<double>? _getOpenOpacityTween(
@@ -421,7 +417,7 @@ class _OpenContainerRoute extends ModalRoute<void> {
     }
 
     if (delayForSourceRoute) {
-      SchedulerBinding.instance!
+      SchedulerBinding.instance
           .addPostFrameCallback(takeMeasurementsInSourceRoute);
     } else {
       takeMeasurementsInSourceRoute();
@@ -460,6 +456,8 @@ class _OpenContainerRoute extends ModalRoute<void> {
       case AnimationStatus.reverse:
         isInProgress = true;
         break;
+      default:
+        break;
     }
     switch (_lastAnimationStatus) {
       case AnimationStatus.completed:
@@ -469,6 +467,8 @@ class _OpenContainerRoute extends ModalRoute<void> {
       case AnimationStatus.forward:
       case AnimationStatus.reverse:
         wasInProgress = true;
+        break;
+      default:
         break;
     }
     return wasInProgress && isInProgress;

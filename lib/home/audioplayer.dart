@@ -116,12 +116,12 @@ class PlayerWidget extends StatelessWidget {
                                     const TextStyle(color: Color(0xFFFF0000)))
                             : data.item1
                                 ? Text(
-                                    s!.buffering,
+                                    s.buffering,
                                     style:
                                         TextStyle(color: context.accentColor),
                                   )
                                 : Text(
-                                    s!.timeLeft((data.item2).toInt().toTime),
+                                    s.timeLeft((data.item2).toInt().toTime),
                                     maxLines: 2,
                                   ),
                       );
@@ -282,26 +282,27 @@ class LastPosition extends StatelessWidget {
             children: [
               Selector<AudioPlayerNotifier, bool?>(
                   selector: (_, audio) => audio.skipSilence,
-                  builder: (_, data, __) => FlatButton(
+                  builder: (_, data, __) => TextButton(
                       child: Row(
                         children: [
                           Icon(Icons.flash_on, size: 18),
                           SizedBox(width: 5),
-                          Text(s!.skipSilence),
+                          Text(s.skipSilence),
                         ],
                       ),
-                      color: data! ? context.accentColor : Colors.transparent,
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(
-                              color: data
-                                  ? context.accentColor
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.12))),
-                      textColor: data ? Colors.white : null,
+                      style: TextButton.styleFrom(
+                        primary:
+                            data! ? context.accentColor : Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100.0),
+                            side: BorderSide(
+                                color: data
+                                    ? context.accentColor
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.12))),
+                      ),
                       onPressed: () =>
                           audio.setSkipSilence(skipSilence: !data))),
               SizedBox(width: 10),
@@ -312,7 +313,7 @@ class LastPosition extends StatelessWidget {
                         children: [
                           Icon(Icons.volume_up, size: 18),
                           SizedBox(width: 5),
-                          Text(s!.boostVolume),
+                          Text(s.boostVolume),
                         ],
                       ),
                       color: data! ? context.accentColor : Colors.transparent,
@@ -757,7 +758,7 @@ class SleepModeState extends State<SleepMode>
                                         width: 120,
                                         child: Center(
                                           child: Text(
-                                            s!.endOfEpisode,
+                                            s.endOfEpisode,
                                             style: TextStyle(
                                                 color: (move > 0
                                                     ? Colors.white

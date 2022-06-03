@@ -88,7 +88,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                       Scaffold.of(context).showSnackBar(SnackBar(
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: Colors.grey[800],
-                        content: Text(s!.toastRemovePlaylist,
+                        content: Text(s.toastRemovePlaylist,
                             style: TextStyle(color: Colors.white)),
                         action: SnackBarAction(
                             textColor: context.accentColor,
@@ -194,7 +194,7 @@ class EpisodeCard extends StatelessWidget {
                       episodeTag(
                           episode.duration == 0
                               ? ''
-                              : s!.minsCount(episode.duration! ~/ 60),
+                              : s.minsCount(episode.duration! ~/ 60),
                           Colors.cyan[300]),
                     if (episode.enclosureLength != null)
                       episodeTag(

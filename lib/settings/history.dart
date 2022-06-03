@@ -174,7 +174,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                         labelStyle: context.textTheme.headline6,
                         tabs: <Widget>[
                           Tab(
-                            child: Text(s!.listen),
+                            child: Text(s.listen),
                           ),
                           Tab(
                             child: Text(s.subscribe),
@@ -343,7 +343,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                       ],
                                     ),
                                     subtitle: _status
-                                        ? Text(s!.daysAgo(DateTime.now()
+                                        ? Text(s.daysAgo(DateTime.now()
                                             .difference(
                                                 snapshot.data![index].subDate)
                                             .inDays))

@@ -9,7 +9,7 @@ part of 'index_podcast.dart';
 PodcastIndexSearchResult<P> _$PodcastIndexSearchResultFromJson<P>(
     Map<String, dynamic> json) {
   return PodcastIndexSearchResult<P>(
-    feeds: (json['feeds'] as List?)?.map(_ConvertP<P>().fromJson)?.toList(),
+    feeds: (json['feeds'] as List?)?.map(_ConvertP<P>().fromJson).toList(),
     status: json['status'] as String?,
     count: json['count'] as int?,
   );
@@ -18,7 +18,7 @@ PodcastIndexSearchResult<P> _$PodcastIndexSearchResultFromJson<P>(
 Map<String, dynamic> _$PodcastIndexSearchResultToJson<P>(
         PodcastIndexSearchResult<P> instance) =>
     <String, dynamic>{
-      'feeds': instance.feeds?.map(_ConvertP<P>().toJson)?.toList(),
+      'feeds': instance.feeds?.map(_ConvertP<P>().toJson).toList(),
       'status': instance.status,
       'count': instance.count,
     };

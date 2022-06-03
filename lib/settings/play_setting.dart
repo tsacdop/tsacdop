@@ -171,7 +171,7 @@ class _PlaySettingState extends State<PlaySetting> {
                         topLeft: Radius.circular(5)),
                   ),
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(s!.from(data.item1!.toTime)),
+                  child: Text(s.from(data.item1!.toTime)),
                 ),
               ),
             ),

@@ -158,7 +158,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
           borderRadius: BorderRadius.circular(10),
           color: context.primaryColor,
           border:
-              Border.all(color: context.textColor!.withOpacity(0.1), width: 1)),
+              Border.all(color: context.textColor.withOpacity(0.1), width: 1)),
       width: 120,
       margin: EdgeInsets.fromLTRB(10, 10, 0, 10),
       child: Material(

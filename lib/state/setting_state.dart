@@ -602,7 +602,7 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<void> _saveShowNotesFonts() async {
-    await _showNotesFontStorage.saveInt(_showNotesFontIndex!);
+    await _showNotesFontStorage.saveInt(_showNotesFontIndex);
   }
 
   Future<SettingsBackup> backup() async {
