@@ -56,7 +56,7 @@ class _CustomTabsState extends State<CustomTabView>
         _currentPosition = widget.itemCount - 1;
         _currentPosition = _currentPosition! < 0 ? 0 : _currentPosition;
         if (widget.onPositionChange is ValueChanged<int>) {
-          WidgetsBinding.instance!.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               widget.onPositionChange!(_currentPosition);
             }

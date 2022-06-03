@@ -8,7 +8,7 @@ part of 'searchpodcast.dart';
 
 SearchPodcast<P> _$SearchPodcastFromJson<P>(Map<String, dynamic> json) {
   return SearchPodcast<P>(
-    results: (json['results'] as List?)?.map(_ConvertP<P>().fromJson)?.toList(),
+    results: (json['results'] as List?)?.map(_ConvertP<P>().fromJson).toList(),
     nextOffset: json['next_offset'] as int?,
     total: json['total'] as int?,
     count: json['count'] as int?,
@@ -17,7 +17,7 @@ SearchPodcast<P> _$SearchPodcastFromJson<P>(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$SearchPodcastToJson<P>(SearchPodcast<P> instance) =>
     <String, dynamic>{
-      'results': instance.results?.map(_ConvertP<P>().toJson)?.toList(),
+      'results': instance.results?.map(_ConvertP<P>().toJson).toList(),
       'next_offset': instance.nextOffset,
       'total': instance.total,
       'count': instance.count,

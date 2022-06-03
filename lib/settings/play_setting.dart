@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -43,11 +41,11 @@ class _PlaySettingState extends State<PlaySetting> {
   String _volumeEffect(BuildContext context, int? i) {
     final s = context.s;
     if (i == 2000) {
-      return s!.playerHeightShort;
+      return s.playerHeightShort;
     } else if (i == 3000) {
-      return s!.playerHeightMed;
+      return s.playerHeightMed;
     }
-    return s!.playerHeightTall;
+    return s.playerHeightTall;
   }
 
   Future<bool> _getMarkListenedSkip() async {
@@ -142,7 +140,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 var startTime = data.item1!;
                 final timeOfDay = await showCustomTimePicker(
                     context: context,
-                    cancelText: s!.cancel,
+                    cancelText: s.cancel,
                     confirmText: s.confirm,
                     helpText: '',
                     initialTime: TimeOfDay(
@@ -227,10 +225,9 @@ class _PlaySettingState extends State<PlaySetting> {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
+        statusBarIconBrightness: context.brightness,
+        systemNavigationBarColor: context.primaryColor,
+        systemNavigationBarIconBrightness: context.iconBrightness,
       ),
       child: Scaffold(
         appBar: AppBar(
@@ -264,11 +261,13 @@ class _PlaySettingState extends State<PlaySetting> {
                 height: 30.0,
                 padding: EdgeInsets.symmetric(horizontal: 70),
                 alignment: Alignment.centerLeft,
-                child: Text(s.homeMenuPlaylist,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1!
-                        .copyWith(color: Theme.of(context).accentColor)),
+                child: Text(
+                  s.homeMenuPlaylist,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(color: context.accentColor),
+                ),
               ),
               Selector<SettingState, bool?>(
                 selector: (_, settings) => settings.autoPlay,
@@ -389,9 +388,11 @@ class _PlaySettingState extends State<PlaySetting> {
                 height: 30.0,
                 padding: EdgeInsets.symmetric(horizontal: 70),
                 alignment: Alignment.centerLeft,
-                child: Text(s.sleepTimer,
-                    style: context.textTheme.bodyText1!
-                        .copyWith(color: Theme.of(context).accentColor)),
+                child: Text(
+                  s.sleepTimer,
+                  style: context.textTheme.bodyText1!
+                      .copyWith(color: context.accentColor),
+                ),
               ),
               ListView(
                 physics: const BouncingScrollPhysics(),
@@ -494,7 +495,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
           SizedBox(height: 8),
           Text(des,
               style: TextStyle(
-                  fontSize: 12, color: context.textColor!.withOpacity(0.5)),
+                  fontSize: 12, color: context.textColor.withOpacity(0.5)),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.clip),
@@ -526,8 +527,8 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _notificationIcon(Icon(Icons.pause_circle_filled),
-                      '${s!.play}| ${s.pause}'),
+                  _notificationIcon(
+                      Icon(Icons.pause_circle_filled), '${s.play}| ${s.pause}'),
                   _notificationIcon(Icon(Icons.fast_forward), s.fastForward),
                   _notificationIcon(Icon(Icons.skip_next), s.skipToNext),
                   _notificationIcon(Icon(Icons.close), s.stop),
@@ -539,7 +540,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                         _notificationIcon(Icon(Icons.pause_circle_filled),
-                            '${s!.play}| ${s.pause}'),
+                            '${s.play}| ${s.pause}'),
                         _notificationIcon(
                             Icon(Icons.fast_rewind), s.fastRewind),
                         _notificationIcon(Icon(Icons.skip_next), s.skipToNext),
@@ -549,7 +550,7 @@ class __NotificationLayoutState extends State<_NotificationLayout> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _notificationIcon(Icon(Icons.fast_rewind), s!.fastRewind),
+                      _notificationIcon(Icon(Icons.fast_rewind), s.fastRewind),
                       _notificationIcon(Icon(Icons.pause_circle_filled),
                           '${s.play}| ${s.pause}'),
                       _notificationIcon(
@@ -612,38 +613,42 @@ class __SpeedListState extends State<_SpeedList> {
         children: [
           Text(s.settingsSpeedsDes),
           FutureBuilder<List<double>>(
-              future: _getSpeedList(),
-              initialData: [],
-              builder: (context, snapshot) {
-                var speedSelected = snapshot.data;
-                return Wrap(
-                    children: kSpeedToSelect
-                        .map((e) => Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: FilterChip(
-                                key: ValueKey<String>(e.toString()),
-                                label: Text('X ${e.toStringAsFixed(1)}'),
-                                selectedColor: context.accentColor,
-                                labelStyle: TextStyle(
-                                    color: snapshot.data!.contains(e)
-                                        ? Colors.white
-                                        : context.textColor),
-                                elevation: 0,
-                                showCheckmark: false,
-                                selected: snapshot.data!.contains(e),
-                                onSelected: (value) async {
-                                  if (!value) {
-                                    speedSelected!.remove(e);
-                                  } else {
-                                    speedSelected!.add(e);
-                                  }
-                                  await _saveSpeedList(speedSelected);
-                                  setState(() {});
-                                },
-                              ),
-                            ))
-                        .toList());
-              }),
+            future: _getSpeedList(),
+            initialData: [],
+            builder: (context, snapshot) {
+              var speedSelected = snapshot.data;
+              return Wrap(
+                children: kSpeedToSelect
+                    .map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: FilterChip(
+                          key: ValueKey<String>(e.toString()),
+                          label: Text('X ${e.toStringAsFixed(1)}'),
+                          selectedColor: context.accentColor,
+                          labelStyle: TextStyle(
+                              color: snapshot.data!.contains(e)
+                                  ? Colors.white
+                                  : context.textColor),
+                          elevation: 0,
+                          showCheckmark: false,
+                          selected: snapshot.data!.contains(e),
+                          onSelected: (value) async {
+                            if (!value) {
+                              speedSelected!.remove(e);
+                            } else {
+                              speedSelected!.add(e);
+                            }
+                            await _saveSpeedList(speedSelected);
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    )
+                    .toList(),
+              );
+            },
+          ),
         ],
       ),
     );

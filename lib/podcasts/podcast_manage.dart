@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:feature_discovery/feature_discovery.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -65,7 +64,7 @@ class _PodcastManageState extends State<PodcastManage>
         _controller.stop();
       }
     });
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       FeatureDiscovery.discoverFeatures(context,
           const <String>{addGroupFeature, configureGroup, configurePodcast});
     });
@@ -91,7 +90,7 @@ class _PodcastManageState extends State<PodcastManage>
           context,
           featureId: configureGroup,
           tapTarget: Icon(Icons.menu),
-          title: s!.featureDiscoveryEditGroup,
+          title: s.featureDiscoveryEditGroup,
           backgroundColor: Colors.cyan[600],
           description: s.featureDiscoveryEditGroupDes,
           buttonColor: Colors.cyan[500],
@@ -126,9 +125,7 @@ class _PodcastManageState extends State<PodcastManage>
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                    color: _fraction! > 0.5
-                        ? Colors.red
-                        : Theme.of(context).accentColor,
+                    color: _fraction! > 0.5 ? Colors.red : context.accentColor,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
@@ -159,10 +156,9 @@ class _PodcastManageState extends State<PodcastManage>
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
+        statusBarIconBrightness: context.brightness,
+        systemNavigationBarColor: context.primaryColor,
+        systemNavigationBarIconBrightness: context.iconBrightness,
         // statusBarColor: Theme.of(context).primaryColor,
       ),
       child: Scaffold(
@@ -530,8 +526,8 @@ class _AddGroupState extends State<AddGroup> {
                 Navigator.of(context).pop();
               }
             },
-            child: Text(s.confirm,
-                style: TextStyle(color: Theme.of(context).accentColor)),
+            child:
+                Text(s.confirm, style: TextStyle(color: context.accentColor)),
           )
         ],
         title: SizedBox(width: context.width - 160, child: Text(s.newGroup)),

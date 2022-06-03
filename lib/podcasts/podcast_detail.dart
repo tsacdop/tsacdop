@@ -457,14 +457,16 @@ class _PodcastDetailState extends State<PodcastDetail> {
                           borderRadius: BorderRadius.circular(5),
                           border: Border.all(
                               width: 2,
-                              color: context.textColor!.withOpacity(0.2))),
+                              color: context.textColor.withOpacity(0.2))),
                       child: _query == ''
                           ? Row(
                               children: [
-                                Text(s.search,
-                                    style: TextStyle(
-                                        color: context.textColor!
-                                            .withOpacity(0.4))),
+                                Text(
+                                  s.search,
+                                  style: TextStyle(
+                                    color: context.textColor.withOpacity(0.4),
+                                  ),
+                                ),
                                 Spacer()
                               ],
                             )
@@ -732,7 +734,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
                             physics: const AlwaysScrollableScrollPhysics(),
                             slivers: <Widget>[
                               SliverAppBar(
-                                brightness: Brightness.dark,
                                 actions: <Widget>[
                                   IconButton(
                                     icon: Icon(Icons.more_vert),

@@ -84,9 +84,9 @@ class _DownloadsManageState extends State<DownloadsManage> {
     var date = DateTime.fromMillisecondsSinceEpoch(downloadDate);
     var diffrence = DateTime.now().toUtc().difference(date);
     if (diffrence.inHours < 24) {
-      return s!.hoursAgo(diffrence.inHours);
+      return s.hoursAgo(diffrence.inHours);
     } else if (diffrence.inDays < 7) {
-      return s!.daysAgo(diffrence.inDays);
+      return s.daysAgo(diffrence.inDays);
     } else {
       return DateFormat.yMMMd().format(
           DateTime.fromMillisecondsSinceEpoch(pubDate!, isUtc: true).toLocal());

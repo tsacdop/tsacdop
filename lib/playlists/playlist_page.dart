@@ -43,9 +43,9 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
         ),
         title: Text(_selectedEpisodes.isEmpty
             ? widget.playlist.isQueue
-                ? s!.queue
+                ? s.queue
                 : widget.playlist.name!
-            : s!.selected(_selectedEpisodes.length)),
+            : s.selected(_selectedEpisodes.length)),
         actions: [
           if (_selectedEpisodes.isNotEmpty)
             IconButton(
@@ -86,40 +86,40 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
         ],
       ),
       body: Selector<AudioPlayerNotifier, List<Playlist>>(
-          selector: (_, audio) => audio.playlists,
-          builder: (_, data, __) {
-            final playlist = data.firstWhereOrNull(
-              (e) => e == widget.playlist,
-            );
-            final episodes = playlist?.episodes ?? [];
-            return ReorderableListView(
-                onReorder: (oldIndex, newIndex) {
-                  if (widget.playlist.isQueue) {
-                    context
-                        .read<AudioPlayerNotifier>()
-                        .reorderPlaylist(oldIndex, newIndex);
-                    setState(() {});
-                  } else {
-                    context
-                        .read<AudioPlayerNotifier>()
-                        .reorderEpisodesInPlaylist(widget.playlist,
-                            oldIndex: oldIndex, newIndex: newIndex);
-                    setState(() {});
-                  }
-                },
-                scrollDirection: Axis.vertical,
-                children: episodes.map<Widget>((episode) {
-                  return _PlaylistItem(episode,
-                      key: ValueKey(episode!.enclosureUrl),
-                      onSelect: (episode) {
-                    _selectedEpisodes.add(episode);
-                    setState(() {});
-                  }, onRemove: (episode) {
-                    _selectedEpisodes.remove(episode);
-                    setState(() {});
-                  }, reset: _resetSelected);
-                }).toList());
-          }),
+        selector: (_, audio) => audio.playlists,
+        builder: (_, data, __) {
+          final playlist = data.firstWhereOrNull(
+            (e) => e == widget.playlist,
+          );
+          final episodes = playlist?.episodes ?? [];
+          return ReorderableListView(
+              onReorder: (oldIndex, newIndex) {
+                if (widget.playlist.isQueue) {
+                  context
+                      .read<AudioPlayerNotifier>()
+                      .reorderPlaylist(oldIndex, newIndex);
+                  setState(() {});
+                } else {
+                  context.read<AudioPlayerNotifier>().reorderEpisodesInPlaylist(
+                      widget.playlist,
+                      oldIndex: oldIndex,
+                      newIndex: newIndex);
+                  setState(() {});
+                }
+              },
+              scrollDirection: Axis.vertical,
+              children: episodes.map<Widget>((episode) {
+                return _PlaylistItem(episode,
+                    key: ValueKey(episode!.enclosureUrl), onSelect: (episode) {
+                  _selectedEpisodes.add(episode);
+                  setState(() {});
+                }, onRemove: (episode) {
+                  _selectedEpisodes.remove(episode);
+                  setState(() {});
+                }, reset: _resetSelected);
+              }).toList());
+        },
+      ),
     );
   }
 }
@@ -269,7 +269,7 @@ class __PlaylistItemState extends State<_PlaylistItem>
                       _episodeTag(
                           episode.duration == 0
                               ? ''
-                              : s!.minsCount(episode.duration! ~/ 60),
+                              : s.minsCount(episode.duration! ~/ 60),
                           Colors.cyan[300]),
                     if (episode.enclosureLength != null)
                       _episodeTag(
@@ -338,7 +338,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                FlatButton(
+                TextButton(
                   onPressed: () => setState(() {
                     _clearConfirm = false;
                   }),
@@ -381,7 +381,7 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                FlatButton(
+                TextButton(
                   onPressed: () => setState(() {
                     _removeConfirm = false;
                   }),
@@ -407,9 +407,9 @@ class __PlaylistSettingState extends State<_PlaylistSetting> {
             child: Row(
               children: [
                 Icon(Icons.info_outline,
-                    size: 16, color: context.textColor!.withAlpha(90)),
+                    size: 16, color: context.textColor.withAlpha(90)),
                 Text(s.defaultQueueReminder,
-                    style: TextStyle(color: context.textColor!.withAlpha(90))),
+                    style: TextStyle(color: context.textColor.withAlpha(90))),
               ],
             ),
           )

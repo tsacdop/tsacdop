@@ -123,10 +123,9 @@ class _PlayedHistoryState extends State<PlayedHistory>
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        statusBarIconBrightness: context.brightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
+        systemNavigationBarIconBrightness: context.iconBrightness,
       ),
       child: Scaffold(
         backgroundColor: context.primaryColor,
@@ -147,7 +146,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                       return FlexibleSpaceBar(
                         title: top < 70 + MediaQuery.of(context).padding.top
                             ? Text(
-                                s!.settingsHistory,
+                                s.settingsHistory,
                               )
                             : Center(),
                         background: Padding(
@@ -237,7 +236,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                         .data![index]
                                                         .playdate!),
                                                 style: TextStyle(
-                                                    color: context.textColor!
+                                                    color: context.textColor
                                                         .withOpacity(0.8),
                                                     fontSize: 15,
                                                     fontStyle:
@@ -285,7 +284,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                 padding: EdgeInsets.all(2),
                                                 child: Text(
                                                   seconds == 0 && seekValue == 1
-                                                      ? s!.mark
+                                                      ? s.mark
                                                       : seconds!.toInt().toTime,
                                                   style: TextStyle(
                                                       color: Colors.white),
@@ -334,7 +333,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                           DateFormat.yMd().add_jm().format(
                                               snapshot.data![index].subDate),
                                           style: TextStyle(
-                                              color: context.textColor!
+                                              color: context.textColor
                                                   .withOpacity(0.8),
                                               fontSize: 15,
                                               fontStyle: FontStyle.italic),
@@ -348,7 +347,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                 snapshot.data![index].subDate)
                                             .inDays))
                                         : Text(
-                                            s!.removedAt(DateFormat.yMd()
+                                            s.removedAt(DateFormat.yMd()
                                                 .add_jm()
                                                 .format(snapshot
                                                     .data![index].delDate)),

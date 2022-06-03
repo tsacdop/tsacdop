@@ -525,7 +525,7 @@ class __HistoryState extends State<_History> {
                   onPressed: () async {
                     audio.delFromPlaylist(episode!);
                     Fluttertoast.showToast(
-                      msg: s!.toastRemovePlaylist,
+                      msg: s.toastRemovePlaylist,
                       gravity: ToastGravity.BOTTOM,
                     );
                   })
@@ -534,7 +534,7 @@ class __HistoryState extends State<_History> {
                   onPressed: () async {
                     audio.addToPlaylist(episode!);
                     Fluttertoast.showToast(
-                      msg: s!.toastAddPlaylist,
+                      msg: s.toastAddPlaylist,
                       gravity: ToastGravity.BOTTOM,
                     );
                   });
@@ -724,7 +724,7 @@ class __PlaylistsState extends State<_Playlists> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  s!.queue,
+                                  s.queue,
                                   style: context.textTheme.headline6,
                                 ),
                                 Text(
@@ -743,14 +743,13 @@ class __PlaylistsState extends State<_Playlists> {
                                     children: <Widget>[
                                       Text(s.play.toUpperCase(),
                                           style: TextStyle(
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: context.accentColor,
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                           )),
                                       Icon(
                                         Icons.play_arrow,
-                                        color: Theme.of(context).accentColor,
+                                        color: context.accentColor,
                                       ),
                                     ],
                                   ),
@@ -798,7 +797,7 @@ class __PlaylistsState extends State<_Playlists> {
                       ),
                       title: Text(data[index].name!),
                       subtitle: Text(
-                          '${data[index].length} ${s!.episode(data[index].length).toLowerCase()}'),
+                          '${data[index].length} ${s.episode(data[index].length).toLowerCase()}'),
                       trailing: TextButton(
                         style: TextButton.styleFrom(
                             primary: context.accentColor,
@@ -808,13 +807,13 @@ class __PlaylistsState extends State<_Playlists> {
                           children: <Widget>[
                             Text(s.play.toUpperCase(),
                                 style: TextStyle(
-                                  color: Theme.of(context).accentColor,
+                                  color: context.accentColor,
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                 )),
                             Icon(
                               Icons.play_arrow,
-                              color: Theme.of(context).accentColor,
+                              color: context.accentColor,
                             ),
                           ],
                         ),

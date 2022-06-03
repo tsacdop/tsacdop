@@ -65,11 +65,11 @@ class _LayoutSettingState extends State<LayoutSetting> {
     final s = context.s;
     switch (mode) {
       case PlayerHeight.short:
-        return s!.playerHeightShort;
+        return s.playerHeightShort;
       case PlayerHeight.mid:
-        return s!.playerHeightMed;
+        return s.playerHeightMed;
       case PlayerHeight.tall:
-        return s!.playerHeightTall;
+        return s.playerHeightTall;
       default:
         return '';
     }
