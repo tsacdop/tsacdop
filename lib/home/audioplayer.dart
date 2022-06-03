@@ -349,13 +349,15 @@ class LastPosition extends StatelessWidget {
                               )
                             : snapshot.data!.seconds! < 10
                                 ? Center()
-                                : OutlineButton(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(100.0),
-                                        side: BorderSide(
-                                            color: context.accentColor)),
-                                    highlightedBorderColor: Colors.green[700],
+                                : OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(100.0),
+                                          side: BorderSide(
+                                              color: context.accentColor)),
+                                    ),
+                                    // highlightedBorderColor: Colors.green[700],
                                     onPressed: () => audio.seekTo(
                                         (snapshot.data!.seconds! * 1000)
                                             .toInt()),
@@ -931,11 +933,14 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                 child: ButtonTheme(
                   height: 28,
                   padding: EdgeInsets.symmetric(horizontal: 0),
-                  child: OutlineButton(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100.0),
                         side: BorderSide(color: context.accentColor)),
-                    highlightedBorderColor: Colors.green[700],
+                    ),
+                    // highlightedBorderColor: Colors.green[700],
                     onPressed: () {
                       context
                           .read<AudioPlayerNotifier>()

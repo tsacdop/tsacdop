@@ -331,12 +331,14 @@ class _RssResultState extends State<RssResult> {
                       return Container(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                         alignment: Alignment.center,
-                        child: OutlineButton(
-                          highlightedBorderColor: context.accentColor,
-                          splashColor: context.accentColor.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(100))),
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            // highlightedBorderColor: context.accentColor,
+                            onSurface: context.accentColor.withOpacity(0.5),
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(100))),
+                          ),
                           child: Text(context.s!.loadMore),
                           onPressed: () => setState(
                             () => _loadItems += 10,
@@ -542,11 +544,13 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    OutlineButton(
-                      highlightedBorderColor: context.accentColor,
-                      splashColor: context.accentColor.withOpacity(0.5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100)),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: context.accentColor),
+                        onSurface: context.accentColor.withOpacity(0.5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100)),
+                      ),
                       child: _loading
                           ? SizedBox(
                               height: 20,
@@ -704,11 +708,13 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      OutlineButton(
-                        highlightedBorderColor: context.accentColor,
-                        splashColor: context.accentColor.withOpacity(0.5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100)),
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: context.accentColor),
+                          onSurface: context.accentColor.withOpacity(0.5),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100)),
+                        ),
                         child: _loading
                             ? SizedBox(
                                 height: 20,
@@ -991,11 +997,13 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                     padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                     alignment: Alignment.center,
                     child: SizedBox(
-                      child: OutlineButton(
-                          highlightedBorderColor: context.accentColor,
-                          splashColor: context.accentColor.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100)),
+                      child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: context.accentColor),
+                            onSurface: context.accentColor.withOpacity(0.5),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100)),
+                          ),
                           child: _loading
                               ? SizedBox(
                                   height: 20,
@@ -1252,43 +1260,50 @@ class SubscribeButton extends StatelessWidget {
       searchState.addPodcast(podcast);
     }
 
-    return Consumer<SearchState>(builder: (_, searchState, __) {
-      final subscribed = searchState.isSubscribed(onlinePodcast);
-      return !subscribed
-          ? ButtonTheme(
-              height: 32,
-              child: OutlineButton(
-                  highlightedBorderColor: context.accentColor,
-                  borderSide: BorderSide(color: context.accentColor),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100.0),
-                      side: BorderSide(color: context.accentColor)),
-                  splashColor: context.accentColor.withOpacity(0.5),
-                  child: Text(s!.subscribe,
-                      style: TextStyle(color: context.accentColor)),
-                  onPressed: () {
-                    Fluttertoast.showToast(
-                      msg: s.podcastSubscribed,
-                      gravity: ToastGravity.BOTTOM,
-                    );
-                    subscribePodcast(onlinePodcast!);
-                    searchState.addPodcast(onlinePodcast);
-                  }),
-            )
-          : ButtonTheme(
-              height: 32,
-              child: OutlineButton(
-                  color: context.accentColor.withOpacity(0.5),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100.0),
-                      side: BorderSide(color: Colors.grey[500]!)),
-                  highlightedBorderColor: Colors.grey[500],
-                  disabledTextColor: Colors.grey[500],
-                  child: Text(s!.subscribe),
-                  disabledBorderColor: Colors.grey[500],
-                  onPressed: () {}),
-            );
-    });
+    return Consumer<SearchState>(
+      builder: (_, searchState, __) {
+        final subscribed = searchState.isSubscribed(onlinePodcast);
+        return !subscribed
+            ? ButtonTheme(
+                height: 32,
+                child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: context.accentColor),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(color: context.accentColor)),
+                      onSurface: context.accentColor.withOpacity(0.5),
+                    ),
+                    child: Text(s!.subscribe,
+                        style: TextStyle(color: context.accentColor)),
+                    onPressed: () {
+                      Fluttertoast.showToast(
+                        msg: s.podcastSubscribed,
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                      subscribePodcast(onlinePodcast!);
+                      searchState.addPodcast(onlinePodcast);
+                    }),
+              )
+            : ButtonTheme(
+                height: 32,
+                child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      primary: context.accentColor.withOpacity(0.5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(color: Colors.grey[500]!)),
+                      side: BorderSide(
+                        color: Colors.grey[500]!,
+                      ),
+                      // disabledTextColor: Colors.grey[500],
+                      // disabledBorderColor: Colors.grey[500],
+                    ),
+                    child: Text(s!.subscribe),
+                    onPressed: () {}),
+              );
+      },
+    );
   }
 }
 

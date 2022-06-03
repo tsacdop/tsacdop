@@ -102,15 +102,17 @@ class DiscoveryPageState extends State<DiscoveryPage> {
             child: Center(
               child: SizedBox(
                 height: 32,
-                child: OutlineButton(
-                    color: context.accentColor.withOpacity(0.5),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(color: Colors.grey[500]!)),
-                    highlightedBorderColor: Colors.grey[500],
-                    disabledTextColor: Colors.grey[500],
+                child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      primary: context.accentColor.withOpacity(0.5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(color: Colors.grey[500]!)),
+                      // highlightedBorderColor: Colors.grey[500],
+                      // disabledTextColor: Colors.grey[500],
+                      // disabledBorderColor: Colors.grey[500],
+                    ),
                     child: Text(context.s!.subscribe),
-                    disabledBorderColor: Colors.grey[500],
                     onPressed: () {}),
               ),
             ),
@@ -460,11 +462,14 @@ class __TopPodcastListState extends State<_TopPodcastList> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
-                    child: OutlineButton(
-                      highlightedBorderColor: context.accentColor,
-                      splashColor: context.accentColor.withOpacity(0.5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(100))),
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(100))),
+                      ),
+                      // highlightedBorderColor: context.accentColor,
+                      // splashColor: context.accentColor.withOpacity(0.5),
                       child: _loading
                           ? SizedBox(
                               height: 20,

@@ -154,7 +154,14 @@ class SettingState extends ChangeNotifier {
             iconTheme: IconThemeData(color: Colors.black),
             systemOverlayStyle: SystemUiOverlayStyle.dark),
         textTheme: TextTheme(
-          bodyText2: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
+          bodyLarge: TextStyle(
+              fontSize: 17.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
+          bodyMedium: TextStyle(
+              fontSize: 15.0,
+              color: Colors.black,
+              fontWeight: FontWeight.normal),
         ),
         tabBarTheme: TabBarTheme(
           labelColor: Colors.black,
@@ -178,6 +185,16 @@ class SettingState extends ChangeNotifier {
             .copyWith(brightness: Brightness.dark, secondary: _accentSetColor),
         brightness: Brightness.light,
         primaryColorDark: Colors.grey[800],
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(
+              fontSize: 17.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
+          bodyMedium: TextStyle(
+              fontSize: 15.0,
+              color: Colors.white,
+              fontWeight: FontWeight.normal),
+        ),
         scaffoldBackgroundColor:
             _realDark! ? Colors.black87 : Color(0XFF212121),
         primaryColor: _realDark! ? Colors.black : Color(0XFF1B1B1B),

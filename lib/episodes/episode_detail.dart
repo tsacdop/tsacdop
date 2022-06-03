@@ -124,7 +124,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                         pinned: true,
                         title: _showTitle
                             ? Text(
-                                widget.episodeItem!.title!,
+                                widget.episodeItem?.title ?? '',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               )
@@ -133,8 +133,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                 maxLines: 1,
                                 style: TextStyle(
                                     fontSize: 15,
-                                    color:
-                                        context.textColor!.withOpacity(0.7)),
+                                    color: context.textColor!.withOpacity(0.7)),
                               ),
                         leading: CustomBackButton(),
                         elevation: _showTitle ? 1 : 0,
@@ -164,8 +163,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                   s.published(DateFormat.yMMMd().format(
                                       DateTime.fromMillisecondsSinceEpoch(
                                           widget.episodeItem!.pubDate!))),
-                                  style:
-                                      TextStyle(color: context.accentColor)),
+                                  style: TextStyle(color: context.accentColor)),
                               SizedBox(width: 10),
                               if (widget.episodeItem!.explicit == 1)
                                 Text('E',
@@ -177,8 +175,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 5),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                           child: Row(
                             children: <Widget>[
                               if (widget.episodeItem!.duration != 0)
@@ -189,8 +187,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                             Radius.circular(16.0))),
                                     height: 28.0,
                                     margin: EdgeInsets.only(right: 10.0),
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 10.0),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10.0),
                                     alignment: Alignment.center,
                                     child: Text(
                                       s.minsCount(
@@ -198,8 +196,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                       ),
                                       style: TextStyle(color: Colors.black),
                                     )),
-                              if (widget.episodeItem!.enclosureLength !=
-                                      null &&
+                              if (widget.episodeItem!.enclosureLength != null &&
                                   widget.episodeItem!.enclosureLength != 0)
                                 Container(
                                   decoration: BoxDecoration(
@@ -227,18 +224,18 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                         snapshot.data!.seconds! > 10) {
                                       return ButtonTheme(
                                         height: 28,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 0),
-                                        child: OutlineButton(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      100.0),
-                                              side: BorderSide(
-                                                  color:
-                                                      context.accentColor)),
-                                          highlightedBorderColor:
-                                              Colors.green[700],
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 0),
+                                        child: OutlinedButton(
+                                          style: OutlinedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        100.0),
+                                                side: BorderSide(
+                                                    color:
+                                                        context.accentColor)),
+                                          ),
                                           onPressed: () => audio.episodeLoad(
                                               widget.episodeItem,
                                               startPosition:
@@ -258,8 +255,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                               ),
                                               SizedBox(width: 5),
                                               Text(
-                                                snapshot
-                                                    .data!.seconds!.toTime,
+                                                snapshot.data!.seconds!.toTime,
                                               ),
                                             ],
                                           ),
@@ -275,11 +271,10 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                         ShowNote(episode: widget.episodeItem),
                         Selector<AudioPlayerNotifier,
                                 Tuple2<bool, PlayerHeight?>>(
-                            selector: (_, audio) => Tuple2(
-                                audio.playerRunning, audio.playerHeight),
+                            selector: (_, audio) =>
+                                Tuple2(audio.playerRunning, audio.playerHeight),
                             builder: (_, data, __) {
-                              var height =
-                                  kMinPlayerHeight[data.item2!.index];
+                              var height = kMinPlayerHeight[data.item2!.index];
                               return SizedBox(
                                 height: data.item1 ? height : 0,
                               );
@@ -560,13 +555,13 @@ class __MenuBarState extends State<_MenuBar> {
                             children: <Widget>[
                               Text(s!.play.toUpperCase(),
                                   style: TextStyle(
-                                    color: Theme.of(context).accentColor,
+                                    color: context.accentColor,
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                   )),
                               Icon(
                                 Icons.play_arrow,
-                                color: Theme.of(context).accentColor,
+                                color: context.accentColor,
                               ),
                             ],
                           ),

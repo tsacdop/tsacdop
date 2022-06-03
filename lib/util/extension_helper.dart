@@ -12,7 +12,7 @@ extension ContextExtension on BuildContext {
   Color get accentColor => Theme.of(this).colorScheme.secondary;
   Color get scaffoldBackgroundColor => Theme.of(this).scaffoldBackgroundColor;
   Color get primaryColorDark => Theme.of(this).primaryColorDark;
-  Color? get textColor => Theme.of(this).textTheme.bodyText1!.color;
+  Color get textColor => textTheme.bodyLarge!.color!;
   Color get dialogBackgroundColor => Theme.of(this).dialogBackgroundColor;
   Brightness get brightness => Theme.of(this).brightness;
   Brightness get iconBrightness => Theme.of(this).colorScheme.brightness;

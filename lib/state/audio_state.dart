@@ -52,6 +52,7 @@ MediaControl rewindControl = MediaControl(
 
 /// Sleep timer mode.
 enum SleepTimerMode { endOfEpisode, timer, undefined }
+
 enum PlayerHeight { short, mid, tall }
 
 class AudioPlayerNotifier extends ChangeNotifier {
@@ -304,9 +305,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         if (state[1] != '') {
           var episode = await _dbHelper.getRssItemWithUrl(state[1]);
           if (episode != null &&
-              ((!_playlist!.isQueue &&
-                      episode != null &&
-                      _playlist!.contains(episode)) ||
+              ((!_playlist!.isQueue && _playlist!.contains(episode)) ||
                   (_playlist!.isQueue &&
                       _queue.isNotEmpty &&
                       _queue.episodes.first!.title == episode.title))) {
@@ -987,7 +986,16 @@ class CustomAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
   final cacheStorage = KeyValueStorage(cacheMaxKey);
   final layoutStorage = KeyValueStorage(notificationLayoutKey);
-  final AudioPlayer _player = AudioPlayer();
+  final _equalizer = AndroidEqualizer();
+  final _loudnessEnhancer = AndroidLoudnessEnhancer();
+  late final AudioPlayer _player = AudioPlayer(
+    audioPipeline: AudioPipeline(
+      androidAudioEffects: [
+        _loudnessEnhancer,
+        _equalizer,
+      ],
+    ),
+  );
   bool _interrupted = false;
   int? _layoutIndex;
   bool _stopAtEnd = false;
@@ -1007,7 +1015,7 @@ class CustomAudioHandler extends BaseAudioHandler
   PublishSubject<Map<String, dynamic>> customEvent = PublishSubject()..add({});
 
   CustomAudioHandler(int cacheMax) {
-    _player.cacheMax = cacheMax;
+    // _player.cacheMax = cacheMax;
     _handleInterruption();
     _player.currentIndexStream.listen(
       (index) {
@@ -1147,8 +1155,7 @@ class CustomAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> play() async {
-    if (playing == null || playing == false) {
-      log('playing');
+    if (!playing) {
       await super.play();
       await _player.play();
     } else {
@@ -1285,11 +1292,12 @@ class CustomAudioHandler extends BaseAudioHandler
   }
 
   Future _setSkipSilence(bool boo) async {
-    await _player.setSkipSilence(boo);
+    await _player.setSkipSilenceEnabled(boo);
   }
 
-  Future _setBoostVolume(bool boo, int gain) async {
-    await _player.setBoostVolume(boo, gain);
+  Future _setBoostVolume(bool enabled, int gain) async {
+    await _loudnessEnhancer.setEnabled(enabled);
+    await _loudnessEnhancer.setTargetGain(1.5);
   }
 
   List<MediaControl> _getControls(int? index) {
@@ -1301,7 +1309,6 @@ class CustomAudioHandler extends BaseAudioHandler
           skipToNextControl,
           stopControl
         ];
-        break;
       case 1:
         return [
           playing ? pauseControl : playControl,
@@ -1309,7 +1316,6 @@ class CustomAudioHandler extends BaseAudioHandler
           skipToNextControl,
           stopControl
         ];
-        break;
       case 2:
         return [
           rewindControl,
@@ -1318,7 +1324,6 @@ class CustomAudioHandler extends BaseAudioHandler
           stopControl
         ];
 
-        break;
       default:
         return [
           playing ? pauseControl : playControl,
@@ -1326,7 +1331,6 @@ class CustomAudioHandler extends BaseAudioHandler
           skipToNextControl,
           stopControl
         ];
-        break;
     }
   }
 

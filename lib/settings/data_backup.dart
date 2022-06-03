@@ -181,10 +181,9 @@ class _DataBackupState extends State<DataBackup> {
     final s = context.s!;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        statusBarIconBrightness: context.iconBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
+        systemNavigationBarIconBrightness: context.brightness,
       ),
       child: Scaffold(
         appBar: AppBar(
@@ -255,11 +254,12 @@ class _DataBackupState extends State<DataBackup> {
                             style: TextStyle(color: Colors.purple[700])),
                         ButtonTheme(
                           height: 32,
-                          child: OutlineButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100.0),
-                                side: BorderSide(color: Colors.purple[700]!)),
-                            highlightedBorderColor: Colors.purple[700],
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100.0),
+                                  side: BorderSide(color: Colors.purple[700]!)),
+                            ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -365,11 +365,12 @@ class _DataBackupState extends State<DataBackup> {
                 children: [
                   ButtonTheme(
                     height: 32,
-                    child: OutlineButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100.0),
-                            side: BorderSide(color: Colors.green[700]!)),
-                        highlightedBorderColor: Colors.green[700],
+                    child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100.0),
+                              side: BorderSide(color: Colors.green[700]!)),
+                        ),
                         child: Row(
                           children: [
                             Icon(
@@ -390,11 +391,12 @@ class _DataBackupState extends State<DataBackup> {
                   SizedBox(width: 10),
                   ButtonTheme(
                     height: 32,
-                    child: OutlineButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100.0),
-                            side: BorderSide(color: Colors.blue[700]!)),
-                        highlightedBorderColor: Colors.blue[700],
+                    child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100.0),
+                              side: BorderSide(color: Colors.blue[700]!)),
+                        ),
                         child: Row(
                           children: [
                             Icon(
@@ -434,11 +436,12 @@ class _DataBackupState extends State<DataBackup> {
               child: Wrap(children: [
                 ButtonTheme(
                   height: 32,
-                  child: OutlineButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(color: Colors.green[700]!)),
-                      highlightedBorderColor: Colors.green[700],
+                  child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100.0),
+                            side: BorderSide(color: Colors.green[700]!)),
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -460,11 +463,12 @@ class _DataBackupState extends State<DataBackup> {
                 SizedBox(width: 10),
                 ButtonTheme(
                   height: 32,
-                  child: OutlineButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(color: Colors.blue[700]!)),
-                      highlightedBorderColor: Colors.blue[700],
+                  child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100.0),
+                            side: BorderSide(color: Colors.blue[700]!)),
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -486,11 +490,12 @@ class _DataBackupState extends State<DataBackup> {
                 SizedBox(width: 10),
                 ButtonTheme(
                   height: 32,
-                  child: OutlineButton(
-                    highlightedBorderColor: Colors.red[700],
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(color: Colors.red[700]!)),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(color: Colors.red[700]!)),
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -815,11 +820,12 @@ class __LoginGpodderState extends State<_LoginGpodder> {
                           ],
                         ),
                         Center(
-                          child: OutlineButton(
+                          child: OutlinedButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              highlightedBorderColor: context.accentColor,
+                              style: OutlinedButton.styleFrom(
+                                  side: BorderSide(color: context.accentColor)),
                               child: Text(s.back)),
                         ),
                       ]),
@@ -987,8 +993,7 @@ class __GpodderInfoState extends State<_GpodderInfo> {
   Future<List<String>?> _getLoginInfo() async {
     final storage = KeyValueStorage(gpodderApiKey);
     final androidInfo = await DeviceInfoPlugin().androidInfo;
-    final deviceInfo =
-        await storage.getStringList();
+    final deviceInfo = await storage.getStringList();
     deviceInfo.add("Tsacdop on ${androidInfo.model}");
     return deviceInfo;
   }

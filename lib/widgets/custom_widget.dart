@@ -652,7 +652,7 @@ class _LineLoaderState extends State<LineLoader>
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-        painter: LinePainter(_fraction, Theme.of(context).accentColor));
+        painter: LinePainter(_fraction, context.accentColor));
   }
 }
 
@@ -1116,7 +1116,7 @@ class LayoutButton extends StatelessWidget {
                   width: 30,
                   child: CustomPaint(
                     painter:
-                        LayoutPainter(4, context.textTheme.bodyText1!.color),
+                        LayoutPainter(4, context.textColor),
                   ),
                 ),
     );

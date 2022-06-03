@@ -47,7 +47,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   TabController? _controller;
   Decoration _getIndicator(BuildContext context) {
     return UnderlineTabIndicator(
-        borderSide: BorderSide(color: Theme.of(context).accentColor, width: 3),
+        borderSide: BorderSide(color: context.accentColor, width: 3),
         insets: EdgeInsets.only(
           left: 10.0,
           right: 10.0,
@@ -96,9 +96,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
+            context.brightness,
+        statusBarIconBrightness: context.iconBrightness,
+        systemNavigationBarColor: context.primaryColor,
       ),
       child: WillPopScope(
         onWillPop: () async {
