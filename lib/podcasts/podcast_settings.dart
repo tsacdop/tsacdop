@@ -404,7 +404,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
             ));
         var image = img.decodeImage(imageResponse.data!)!;
         thumbnail = img.copyResize(image, width: 300);
-        File(filePath)..writeAsBytesSync(img.encodePng(thumbnail));
+        File(filePath).writeAsBytesSync(img.encodePng(thumbnail));
         _dbHelper.updatePodcastImage(
             id: widget.podcastLocal!.id, filePath: filePath);
         print('saved image');

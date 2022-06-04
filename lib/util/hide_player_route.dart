@@ -7,7 +7,8 @@ import '../state/audio_state.dart';
 import '../util/extension_helper.dart';
 
 class HidePlayerRoute extends ModalRoute<void> {
-  HidePlayerRoute(this.openPage, this.transitionPage, {required Duration duration})
+  HidePlayerRoute(this.openPage, this.transitionPage,
+      {required Duration duration})
       : transitionDuration = duration;
   final openPage;
   final transitionPage;

@@ -28,7 +28,7 @@ class ListenNotesSearch {
 
   Future<SearchPodcast<dynamic>?> searchPodcasts(
       {String? searchText, int? nextOffset}) async {
-    if(!_validApi) return null;
+    if (!_validApi) return null;
     var url = "${_baseUrl}search?q="
         "${Uri.encodeComponent(searchText!)}${"&sort_by_date=0&type=podcast&offset=$nextOffset"}";
     var response = await _dio.get(url,
@@ -37,28 +37,29 @@ class ListenNotesSearch {
           'Accept': "application/json"
         }));
     Map searchResultMap = jsonDecode(response.toString());
-    var searchResult = SearchPodcast.fromJson(searchResultMap as Map<String, dynamic>);
+    var searchResult =
+        SearchPodcast.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 
   Future<SearchEpisodes<dynamic>?> fetchEpisode(
       {String? id, int? nextEpisodeDate}) async {
-    if(!_validApi) return null;
-    var url =
-        "${_baseUrl}podcasts/$id?next_episode_pub_date=$nextEpisodeDate";
+    if (!_validApi) return null;
+    var url = "${_baseUrl}podcasts/$id?next_episode_pub_date=$nextEpisodeDate";
     var response = await _dio.get(url,
         options: Options(headers: {
           'X-ListenAPI-Key': "$_apiKey",
           'Accept': "application/json"
         }));
     Map searchResultMap = jsonDecode(response.toString());
-    var searchResult = SearchEpisodes.fromJson(searchResultMap as Map<String, dynamic>);
+    var searchResult =
+        SearchEpisodes.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 
   Future<SearchTopPodcast<dynamic>?> fetchBestPodcast(
       {String? genre, int? page, String region = 'us'}) async {
-    if(!_validApi) return null;
+    if (!_validApi) return null;
     var url =
         "${_baseUrl}best_podcasts?genre_id=$genre&page=$page&region=$region";
     var response = await Dio().get(url,
@@ -67,7 +68,8 @@ class ListenNotesSearch {
           'Accept': "application/json"
         }));
     Map searchResultMap = jsonDecode(response.toString());
-    var searchResult = SearchTopPodcast.fromJson(searchResultMap as Map<String, dynamic>);
+    var searchResult =
+        SearchTopPodcast.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 }
@@ -81,7 +83,8 @@ class ItunesSearch {
         .get(url, options: Options(headers: {'Accept': "application/json"}));
     print(response.toString());
     Map searchResultMap = jsonDecode(response.toString());
-    final searchResult = ItunesSearchResult.fromJson(searchResultMap as Map<String, dynamic>);
+    final searchResult =
+        ItunesSearchResult.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 }
@@ -121,7 +124,8 @@ class PodcastsIndexSearch {
     final headers = _initSearch();
     final response = await _dio.get(url, options: Options(headers: headers));
     Map searchResultMap = jsonDecode(response.toString());
-    final searchResult = PodcastIndexSearchResult.fromJson(searchResultMap as Map<String, dynamic>);
+    final searchResult = PodcastIndexSearchResult.fromJson(
+        searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 
@@ -130,7 +134,8 @@ class PodcastsIndexSearch {
     final headers = _initSearch();
     final response = await _dio.get(url, options: Options(headers: headers));
     Map searchResultMap = jsonDecode(response.toString());
-    final searchResult = IndexEpisodeResult.fromJson(searchResultMap as Map<String, dynamic>);
+    final searchResult =
+        IndexEpisodeResult.fromJson(searchResultMap as Map<String, dynamic>);
     return searchResult;
   }
 }

@@ -54,12 +54,12 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
     case 6:
       return Row(mainAxisSize: MainAxisSize.min, children: [
         IconButton(
-            splashRadius: 20,
+          splashRadius: 20,
           icon: Icon(Icons.play_circle_filled),
           onPressed: () => downloader.resumeTask(task.episode!),
         ),
         IconButton(
-            splashRadius: 20,
+          splashRadius: 20,
           icon: Icon(Icons.close),
           onPressed: () => downloader.delTask(task.episode!),
         ),

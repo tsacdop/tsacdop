@@ -14,7 +14,9 @@ class CustomCacheManager extends CacheManager with ImageCacheManager {
 
   @override
   Future<FileInfo> downloadFile(String url,
-      {String? key, Map<String, String>? authHeaders, bool force = false}) async {
+      {String? key,
+      Map<String, String>? authHeaders,
+      bool force = false}) async {
     var file;
     try {
       file = await super
@@ -41,9 +43,7 @@ class CustomCacheManager extends CacheManager with ImageCacheManager {
           withProgress: withProgress,
           maxHeight: maxHeight,
           maxWidth: maxWidth);
-    } catch (e) {
-      
-    }
+    } catch (e) {}
   }
 
   CustomCacheManager._() : super(Config(key));

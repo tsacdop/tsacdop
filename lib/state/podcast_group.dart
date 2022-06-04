@@ -660,7 +660,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         }
         var uuid = Uuid().v4();
         File("${dir.path}/$uuid.png")
-          ..writeAsBytesSync(img.encodePng(thumbnail!));
+            .writeAsBytesSync(img.encodePng(thumbnail!));
         var imagePath = "${dir.path}/$uuid.png";
         var primaryColor = await _getColor(File(imagePath));
         var author = p.itunes!.author ?? p.author ?? '';

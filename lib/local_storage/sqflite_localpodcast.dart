@@ -15,6 +15,7 @@ import '../type/podcastlocal.dart';
 import '../type/sub_history.dart';
 
 enum Filter { downloaded, liked, search, all }
+
 const localFolderId = "46e48103-06c7-4fe1-a0b1-68aa7205b7f0";
 
 class DBHelper {

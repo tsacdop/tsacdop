@@ -31,7 +31,8 @@ Future generalDialog(BuildContext context,
       ),
     );
 
-Future generalSheet(BuildContext context, {Widget? child, String? title}) async =>
+Future generalSheet(BuildContext context,
+        {Widget? child, String? title}) async =>
     await showModalBottomSheet(
       useRootNavigator: true,
       isScrollControlled: true,

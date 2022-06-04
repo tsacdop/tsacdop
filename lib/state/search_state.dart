@@ -22,7 +22,8 @@ class SearchState extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isSubscribed(OnlinePodcast? podcast) => _subscribedList.contains(podcast);
+  bool isSubscribed(OnlinePodcast? podcast) =>
+      _subscribedList.contains(podcast);
 
   void clearSelect() {
     _selectedPodcast = null;
@@ -33,7 +34,7 @@ class SearchState extends ChangeNotifier {
     _subscribedList.clear();
   }
 
-  void clearGenre(){
+  void clearGenre() {
     _genre = null;
     notifyListeners();
   }

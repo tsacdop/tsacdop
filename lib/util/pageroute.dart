@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 //Slide Transition
 class SlideLeftRoute extends PageRouteBuilder {
-  @override 
+  @override
   Duration get transitionDuration => Duration(milliseconds: 300);
   final Widget? page;
   SlideLeftRoute({this.page})

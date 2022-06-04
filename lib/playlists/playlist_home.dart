@@ -964,7 +964,7 @@ class __NewPlaylistState extends State<_NewPlaylist> {
       final image = img.decodeImage(metadata.albumArt!)!;
       final thumbnail = img.copyResize(image, width: 300);
       var uuid = Uuid().v4();
-      File("${dir.path}/$uuid.png")..writeAsBytesSync(img.encodePng(thumbnail));
+      File("${dir.path}/$uuid.png").writeAsBytesSync(img.encodePng(thumbnail));
       imagePath = "${dir.path}/$uuid.png";
       primaryColor = await _getColor(File(imagePath));
     }

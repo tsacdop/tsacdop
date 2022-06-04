@@ -56,7 +56,8 @@ class EpisodeBrief extends Equatable {
         artist: feedTitle,
         album: feedTitle,
         duration: Duration.zero,
-        artUri: Uri.parse(imagePath == '' ? episodeImage! : 'file://$imagePath'),
+        artUri:
+            Uri.parse(imagePath == '' ? episodeImage! : 'file://$imagePath'),
         extras: {
           'skipSecondsStart': skipSecondsStart,
           'skipSecondsEnd': skipSecondsEnd
@@ -69,8 +70,9 @@ class EpisodeBrief extends Equatable {
         : File(episodeImage!).existsSync()
             ? FileImage(File(episodeImage!))
             : ((episodeImage != '')
-                ? CachedNetworkImageProvider(episodeImage!)
-                : AssetImage('assets/avatar_backup.png')) as ImageProvider<Object>;
+                    ? CachedNetworkImageProvider(episodeImage!)
+                    : AssetImage('assets/avatar_backup.png'))
+                as ImageProvider<Object>;
   }
 
   Color backgroudColor(BuildContext context) {
@@ -79,7 +81,7 @@ class EpisodeBrief extends Equatable {
         ? primaryColor!.colorizedark()
         : primaryColor!.colorizeLight();
   }
-  
+
   Color cardColor(BuildContext context) {
     final schema = ColorScheme.fromSeed(
       seedColor: primaryColor!.colorizedark(),
