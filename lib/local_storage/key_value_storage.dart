@@ -61,6 +61,7 @@ const String playlistsAllKey = 'playlistsAllKey';
 const String playerStateKey = 'playerStateKey';
 const String openPlaylistDefaultKey = 'openPlaylistDefaultKey';
 const String openAllPodcastDefaultKey = 'openAllPodcastDefaultKey';
+const String useWallpapterThemeKey = 'useWallpaperThemeKet';
 
 class KeyValueStorage {
   final String key;

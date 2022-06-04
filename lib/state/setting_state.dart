@@ -99,12 +99,14 @@ class SettingState extends ChangeNotifier {
   final _openPlaylistDefaultStorage = KeyValueStorage(openPlaylistDefaultKey);
   final _openAllPodcastDefaultStorage =
       KeyValueStorage(openAllPodcastDefaultKey);
+  final _useWallpaperThemeStorage = KeyValueStorage(useWallpapterThemeKey);
 
   Future initData() async {
     await _getTheme();
     await _getAccentSetColor();
     await _getShowIntro();
     await _getRealDark();
+    await _getUseWallpaperTheme();
     await _getOpenPlaylistDefault();
   }
 
@@ -349,6 +351,15 @@ class SettingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Use wallpaper theme, default false.
+  bool? _useWallpaperTheme;
+  bool? get useWallpaperTheme => _useWallpaperTheme;
+  set setWallpaperTheme(bool boo) {
+    _useWallpaperTheme = boo;
+    _saveUseWallpaperTheme();
+    notifyListeners();
+  }
+
   /// Open playlist page default
   bool? _openPlaylistDefault;
   bool? get openPlaylistDefault => _openPlaylistDefault;
@@ -447,7 +458,7 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _getAccentSetColor() async {
-    var colorString = await _accentStorage.getString();
+    final colorString = await _accentStorage.getString();
     if (colorString.isNotEmpty) {
       var color = int.parse('FF${colorString.toUpperCase()}', radix: 16);
       _accentSetColor = Color(color).withOpacity(1.0);
@@ -483,6 +494,11 @@ class SettingState extends ChangeNotifier {
 
   Future _getRealDark() async {
     _realDark = await _realDarkStorage.getBool(defaultValue: false);
+  }
+
+  Future _getUseWallpaperTheme() async {
+    _useWallpaperTheme =
+        await _useWallpaperThemeStorage.getBool(defaultValue: true);
   }
 
   Future _getOpenPlaylistDefault() async {
@@ -583,6 +599,10 @@ class SettingState extends ChangeNotifier {
     await _autoSleepTimerStorage.saveBool(_autoSleepTimer);
   }
 
+  Future<void> _saveUseWallpaperTheme() async {
+    await _useWallpaperThemeStorage.saveBool(_useWallpaperTheme);
+  }
+
   Future<void> _saveAutoSleepTimerMode() async {
     await _autoSleepTimerModeStorage.saveInt(_autoSleepTimerMode!);
   }
@@ -611,6 +631,8 @@ class SettingState extends ChangeNotifier {
     var theme = await _themeStorage.getInt();
     var accentColor = await _accentStorage.getString();
     var realDark = await _realDarkStorage.getBool(defaultValue: false);
+    var useWallpaperTheme =
+        await _useWallpaperThemeStorage.getBool(defaultValue: true);
     var autoPlay =
         await _autoPlayStorage.getBool(defaultValue: true, reverse: true);
     var autoUpdate =
@@ -665,6 +687,7 @@ class SettingState extends ChangeNotifier {
         theme: theme,
         accentColor: accentColor,
         realDark: realDark,
+        useWallpaperTheme: useWallpaperTheme,
         autoPlay: autoPlay,
         autoUpdate: autoUpdate,
         updateInterval: updateInterval,
@@ -702,6 +725,7 @@ class SettingState extends ChangeNotifier {
     await _themeStorage.saveInt(backup.theme!);
     await _accentStorage.saveString(backup.accentColor!);
     await _realDarkStorage.saveBool(backup.realDark);
+    await _useWallpaperThemeStorage.saveBool(backup.useWallpaperTheme);
     await _autoPlayStorage.saveBool(backup.autoPlay, reverse: true);
     await _autoupdateStorage.saveBool(backup.autoUpdate, reverse: true);
     await _intervalStorage.saveInt(backup.updateInterval!);

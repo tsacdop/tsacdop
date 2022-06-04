@@ -770,6 +770,10 @@
   "@username": {},
   "usernameRequired": "用户名为空",
   "@usernameRequired": {},
+  "useWallpaperTheme": "",
+  "@useWallpaperTheme": {},
+  "useWallpaperThemeDes": "",
+  "@useWallpaperThemeDes": {},
   "version": "版本：{version}",
   "@version": {
     "placeholders": {

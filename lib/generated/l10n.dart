@@ -10,28 +10,43 @@ import 'intl/messages_all.dart';
 
 // ignore_for_file: non_constant_identifier_names, lines_longer_than_80_chars
 // ignore_for_file: join_return_with_assignment, prefer_final_in_for_each
-// ignore_for_file: avoid_redundant_argument_values
+// ignore_for_file: avoid_redundant_argument_values, avoid_escaping_inner_quotes
 
 class S {
   S();
-  
-  static late S current;
-  
-  static const AppLocalizationDelegate delegate =
-    AppLocalizationDelegate();
+
+  static S? _current;
+
+  static S get current {
+    assert(_current != null,
+        'No instance of S was loaded. Try to initialize the S delegate before accessing S.current.');
+    return _current!;
+  }
+
+  static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<S> load(Locale locale) {
-    final name = (locale.countryCode?.isEmpty ?? false) ? locale.languageCode : locale.toString();
-    final localeName = Intl.canonicalizedLocale(name); 
+    final name = (locale.countryCode?.isEmpty ?? false)
+        ? locale.languageCode
+        : locale.toString();
+    final localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
-      S.current = S();
-      
-      return S.current;
-    });
-  } 
+      final instance = S();
+      S._current = instance;
 
-  static S? of(BuildContext context) {
+      return instance;
+    });
+  }
+
+  static S of(BuildContext context) {
+    final instance = S.maybeOf(context);
+    assert(instance != null,
+        'No instance of S present in the widget tree. Did you add S.delegate in localizationsDelegates?');
+    return instance!;
+  }
+
+  static S? maybeOf(BuildContext context) {
     return Localizations.of<S>(context, S);
   }
 
@@ -735,7 +750,8 @@ class S {
     return Intl.message(
       'Group already exists',
       name: 'groupExisted',
-      desc: 'Group name validate in add group dialog. User can\'t add group with same name.',
+      desc:
+          'Group name validate in add group dialog. User can\'t add group with same name.',
       args: [],
     );
   }
@@ -1733,7 +1749,8 @@ class S {
     return Intl.message(
       'Recover subscribe',
       name: 'recoverSubscribe',
-      desc: 'User can recover subscribe podcast after remove it in subscribe history page.',
+      desc:
+          'User can recover subscribe podcast after remove it in subscribe history page.',
       args: [],
     );
   }
@@ -2129,7 +2146,8 @@ class S {
     return Intl.message(
       'Reenable "Discover Features"',
       name: 'settingsDiscovery',
-      desc: 'Reset feature discovery state. User tap it and restart app, will see features tutorial again.',
+      desc:
+          'Reset feature discovery state. User tap it and restart app, will see features tutorial again.',
       args: [],
     );
   }
@@ -2839,7 +2857,8 @@ class S {
     return Intl.message(
       'Last time $time',
       name: 'timeLastPlayed',
-      desc: 'Show last time stop position  in player when a episode have been played.',
+      desc:
+          'Show last time stop position  in player when a episode have been played.',
       args: [time],
     );
   }
@@ -2879,7 +2898,8 @@ class S {
     return Intl.message(
       'Discovery feature reenabled, please reopen the app',
       name: 'toastDiscovery',
-      desc: 'Toast displayed when user tap Discovery Features Again in settings page.',
+      desc:
+          'Toast displayed when user tap Discovery Features Again in settings page.',
       args: [],
     );
   }
@@ -3107,6 +3127,26 @@ class S {
     );
   }
 
+  /// `Pick theme from wallpaper`
+  String get useWallpaperTheme {
+    return Intl.message(
+      'Pick theme from wallpaper',
+      name: 'useWallpaperTheme',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pick theme from wallpaper.`
+  String get useWallpaperThemeDes {
+    return Intl.message(
+      'Pick theme from wallpaper.',
+      name: 'useWallpaperThemeDes',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Version: {version}`
   String version(Object version) {
     return Intl.message(
@@ -3129,6 +3169,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
       Locale.fromSubtags(languageCode: 'fr'),
       Locale.fromSubtags(languageCode: 'it'),
       Locale.fromSubtags(languageCode: 'pt'),
+      Locale.fromSubtags(languageCode: 'ru'),
       Locale.fromSubtags(languageCode: 'tr'),
       Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
     ];
@@ -3142,11 +3183,9 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
   bool shouldReload(AppLocalizationDelegate old) => false;
 
   bool _isSupported(Locale locale) {
-    if (locale != null) {
-      for (var supportedLocale in supportedLocales) {
-        if (supportedLocale.languageCode == locale.languageCode) {
-          return true;
-        }
+    for (var supportedLocale in supportedLocales) {
+      if (supportedLocale.languageCode == locale.languageCode) {
+        return true;
       }
     }
     return false;

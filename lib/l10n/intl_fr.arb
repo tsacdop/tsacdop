@@ -44,7 +44,7 @@
   "@chooseA": {},
   "clear": "Effacer",
   "@clear": {},
-  "clearAll": "Clear all",
+  "clearAll": "",
   "@clearAll": {
     "description": "Clear all episodes in playlist."
   },
@@ -52,7 +52,7 @@
   "@color": {},
   "confirm": "CONFIRMER",
   "@confirm": {},
-  "createNewPlaylist": "New playlist",
+  "createNewPlaylist": "",
   "@createNewPlaylist": {},
   "darkMode": "Mode sombre",
   "@darkMode": {},
@@ -60,7 +60,7 @@
   "@daysAgo": {},
   "daysCount": "{count, plural, zero{Jamais} one{{count} jour} other{{count} jours}}",
   "@daysCount": {},
-  "defaultQueueReminder": "This is the default queue, can't be removed.",
+  "defaultQueueReminder": "",
   "@defaultQueueReminder": {
     "description": "Remind user that default queue can't be removed."
   },
@@ -374,15 +374,15 @@
   "@playerHeightTall": {},
   "playing": "En cours",
   "@playing": {},
-  "playlistExisted": "Playlist name existed",
+  "playlistExisted": "",
   "@playlistExisted": {
     "description": "Error string when creating new playlist."
   },
-  "playlistNameEmpty": "Playlist name is empty",
+  "playlistNameEmpty": "",
   "@playlistNameEmpty": {
     "description": "Error string when creating new playlist."
   },
-  "playlists": "Playlists",
+  "playlists": "",
   "@playlists": {
     "description": "Title for playlists tab."
   },
@@ -428,7 +428,7 @@
   },
   "publishedYearly": "Annuel",
   "@publishedYearly": {},
-  "queue": "Queue",
+  "queue": "",
   "@queue": {
     "description": "Queue"
   },
@@ -436,7 +436,7 @@
   "@recoverSubscribe": {
     "description": "User can recover subscribe podcast after remove it in subscribe history page."
   },
-  "refresh": "Refresh",
+  "refresh": "",
   "@refresh": {
     "description": "Refresh"
   },
@@ -461,7 +461,7 @@
       "date": {}
     }
   },
-  "removeNewMark": "Remove new mark",
+  "removeNewMark": "",
   "@removeNewMark": {
     "description": "Remove new mark for new episodes."
   },
@@ -485,7 +485,7 @@
   "@secCount": {},
   "secondsAgo": "{count, plural, zero{A l'instant} one{Il y a {count} seconde} other{Il y a {count} secondes}}",
   "@secondsAgo": {},
-  "selected": "{count} selected",
+  "selected": "",
   "@selected": {
     "placeholders": {
       "count": {}
@@ -770,6 +770,10 @@
   "@username": {},
   "usernameRequired": "Username required",
   "@usernameRequired": {},
+  "useWallpaperTheme": "",
+  "@useWallpaperTheme": {},
+  "useWallpaperThemeDes": "",
+  "@useWallpaperThemeDes": {},
   "version": "Version : {version}",
   "@version": {
     "placeholders": {

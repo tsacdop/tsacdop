@@ -2,6 +2,7 @@ class SettingsBackup {
   final int? theme;
   final String? accentColor;
   final bool? realDark;
+  final bool? useWallpaperTheme;
   final bool? autoPlay;
   final bool? autoUpdate;
   final int? updateInterval;
@@ -38,6 +39,7 @@ class SettingsBackup {
       {this.theme,
       this.accentColor,
       this.realDark,
+      this.useWallpaperTheme,
       this.autoPlay,
       this.autoUpdate,
       this.updateInterval,
@@ -75,6 +77,7 @@ class SettingsBackup {
       'theme': theme,
       'accentColor': accentColor,
       'realDark': realDark,
+      'useWallpaperTheme': useWallpaperTheme,
       'autoPlay': autoPlay,
       'autoUpdate': autoUpdate,
       'updateInterval': updateInterval,
@@ -109,12 +112,14 @@ class SettingsBackup {
   }
 
   static SettingsBackup fromJson(Map<String, Object> json) {
-    final menuList = List<String>.from(json['episodePopupMenu'] as Iterable<dynamic>);
+    final menuList =
+        List<String>.from(json['episodePopupMenu'] as Iterable<dynamic>);
     final speedList = List<String>.from(json['speedList'] as Iterable<dynamic>);
     return SettingsBackup(
         theme: json['theme'] as int?,
         accentColor: json['accentColor'] as String?,
         realDark: json['realDark'] as bool?,
+        useWallpaperTheme: json['useWallpaperTheme'] as bool?,
         autoPlay: json['autoPlay'] as bool?,
         autoUpdate: json['autoUpdate'] as bool?,
         updateInterval: json['updateInterval'] as int?,

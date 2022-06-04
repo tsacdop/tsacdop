@@ -37,7 +37,7 @@ extension ContextExtension on BuildContext {
         systemNavigationBarColor: background,
         systemNavigationBarIconBrightness: iconBrightness,
       );
-  S get s => S.of(this)!;
+  S get s => S.of(this);
 }
 
 extension IntExtension on int {

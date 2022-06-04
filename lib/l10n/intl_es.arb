@@ -770,6 +770,10 @@
   "@username": {},
   "usernameRequired": "Nombre de usuario requerido",
   "@usernameRequired": {},
+  "useWallpaperTheme": "",
+  "@useWallpaperTheme": {},
+  "useWallpaperThemeDes": "",
+  "@useWallpaperThemeDes": {},
   "version": "Versión: {version}",
   "@version": {
     "placeholders": {

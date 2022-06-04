@@ -148,6 +148,27 @@ class ThemeSetting extends StatelessWidget {
                 ),
               ),
             ),
+            Selector<SettingState, bool?>(
+              selector: (_, setting) => setting.useWallpaperTheme,
+              builder: (_, data, __) => ListTile(
+                onTap: () => settings.setWallpaperTheme = !data!,
+                contentPadding: const EdgeInsets.only(
+                    left: 70.0, right: 20, bottom: 10, top: 10),
+                //  leading: Icon(Icons.colorize),
+                title: Text(
+                  s.useWallpaperTheme,
+                ),
+                subtitle: Text(s.useWallpaperThemeDes),
+                trailing: Transform.scale(
+                  scale: 0.9,
+                  child: Switch(
+                      value: data!,
+                      onChanged: (boo) async {
+                        settings.setWallpaperTheme = boo;
+                      }),
+                ),
+              ),
+            ),
             ListTile(
               onTap: () => generalDialog(
                 context,
