@@ -12,11 +12,11 @@
 
 Enjoy podcasts with Tsacdop.
 
-Tsacdop is a podcast player developed with Flutter, a clean, simply beautiful and friendly app, which is also free and open source.
+Tsacdop is a podcast player developed with Flutter, a clean, simply beautiful, and friendly app, which is also free and open source.
 
-Credit to Flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed) , [Just_Audio](https://pub.dev/packages/just_audio) and [Provider](https://pub.dev/packages/provider).
+Credit to the Flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed), [Just_Audio](https://pub.dev/packages/just_audio), and [Provider](https://pub.dev/packages/provider).
 
-The podcast search engine is powered by [ListenNotes](https://listennotes.com) & [PodcastIndex](https://podcastindex.org/).
+The podcast search engine is powered by, [ListenNotes](https://listennotes.com) & [PodcastIndex](https://podcastindex.org/).
 
 ## Features
 
@@ -24,11 +24,11 @@ The podcast search engine is powered by [ListenNotes](https://listennotes.com) &
 * Playlists support
 * Sleep timer / speed setting
 * OPML file export and import
-* Auto syncing in background
+* Auto-syncing in the background
 * Listening and subscription history record
 * Dark mode / accent color
 * Download for offline play
-* Auto download new episodes / auto delete outdated downloads
+* Auto-download new episodes / auto-delete outdated downloads
 * Settings backup
 * Skip silence
 * Boost volume
@@ -63,8 +63,8 @@ Tsacdop is licensed under the [GPL v3.0](https://github.com/stonega/tsacdop/blob
 
 ## Build
 
-1. If you don't have Flutter SDK installed, please visit offcial [Flutter][Flutter Install] site.
-2. Fetch latest sorce code from master branch.
+1. If you don't have Flutter SDK installed; Please visit the official [Flutter][Flutter Install] site.
+2. Fetch the latest source code from the master branch.
 
 ``` 
 git clone https://github.com/stonega/tsacdop.git
@@ -72,9 +72,9 @@ git clone https://github.com/stonega/tsacdop.git
 
 3. Add api search api configure file.  
 
-Tsacdop uses ListenNotes API 1.0 pro to search for podcasts, which is not free, so I can not expose the API key in the repo.
-If you want to build the app, you need to create a new file named `.env.dart` in lib folder. Add the following code to `.env.dart`. If you don't have ListenNotes api key, just keep apiKey ''. Than the app will only support the PodcastIndex search.
-You can get your own ListenNotes API key on [ListenNotes](https://www.listennotes.com/api/), remember that you need to get pro plan API, because basic plan dosen't provide rss link for serach result. 
+Tsacdop uses the ListenNotes API 1.0 pro to search for podcasts, which is not free, so I can not expose the API key in the repo.
+If you want to build the app, you need to create a new file named `.env.dart` in the lib folder. Add the following code to `.env.dart`. If you don't have a ListenNotes api key, keep the apiKey empty like ''. Then the app will only support the PodcastIndex search.
+You can get your own ListenNotes API key on [ListenNotes](https://www.listennotes.com/api/). Remember that you need to get a pro plan API because the basic plan doesn't provide an rss link for the search result. 
 
 ``` dart
 final environment = {"apiKey":""};
@@ -91,7 +91,7 @@ flutter run
 
 If you have an issue or found a bug, please raise a GitHub issue. Pull requests are also welcome.
 
-## Archetecture
+## Architecture
 
 ### Plugins
 
