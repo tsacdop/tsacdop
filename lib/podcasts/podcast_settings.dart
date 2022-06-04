@@ -52,153 +52,6 @@ class _PodcastSettingState extends State<PodcastSetting> {
     _showEndTimePicker = false;
   }
 
-  Future<void> _setAutoDownload(bool boo) async {
-    var permission = await _checkPermmison();
-    if (permission) {
-      await _dbHelper.saveAutoDownload(widget.podcastLocal!.id, boo: boo);
-    }
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _setNeverUpdate(bool boo) async {
-    await _dbHelper.saveNeverUpdate(widget.podcastLocal!.id, boo: boo);
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _setHideNewMark(bool boo) async {
-    await _dbHelper.saveHideNewMark(widget.podcastLocal!.id, boo: boo);
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _saveSkipSecondsStart(int? seconds) async {
-    await _dbHelper.saveSkipSecondsStart(widget.podcastLocal!.id, seconds);
-  }
-
-  Future<void> _saveSkipSecondsEnd(int seconds) async {
-    await _dbHelper.saveSkipSecondsEnd(widget.podcastLocal!.id, seconds);
-  }
-
-  Future<bool> _getAutoDownload(String? id) async {
-    return await _dbHelper.getAutoDownload(id);
-  }
-
-  Future<bool> _getNeverUpdate(String? id) async {
-    return await _dbHelper.getNeverUpdate(id);
-  }
-
-  Future<bool> _getHideNewMark(String? id) async {
-    return await _dbHelper.getHideNewMark(id);
-  }
-
-  Future<int?> _getSkipSecondStart(String? id) async {
-    return await _dbHelper.getSkipSecondsStart(id);
-  }
-
-  Future<int?> _getSkipSecondEnd(String id) async {
-    return await _dbHelper.getSkipSecondsEnd(id);
-  }
-
-  Future<void> _markListened(String? podcastId) async {
-    setState(() {
-      _markStatus = MarkStatus.start;
-    });
-    final episodes = await _dbHelper.getRssItem(podcastId, -1,
-        reverse: true, hideListened: true);
-    for (var episode in episodes) {
-      final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
-      await _dbHelper.saveHistory(history);
-    }
-    if (mounted) {
-      setState(() {
-        _markStatus = MarkStatus.complete;
-      });
-    }
-  }
-
-  Future<void> _refreshArtWork() async {
-    setState(() => _coverStatus = RefreshCoverStatus.start);
-    var options = BaseOptions(
-      connectTimeout: 30000,
-      receiveTimeout: 90000,
-    );
-    var dir = await getApplicationDocumentsDirectory();
-    var filePath = "${dir.path}/${widget.podcastLocal!.id}.png";
-    var dio = Dio(options);
-    String? imageUrl;
-
-    try {
-      var response = await dio.get(widget.podcastLocal!.rssUrl);
-      try {
-        var p = RssFeed.parse(response.data);
-        imageUrl = p.itunes!.image!.href ?? p.image!.url;
-      } catch (e) {
-        developer.log(e.toString());
-        if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
-      }
-    } catch (e) {
-      developer.log(e.toString());
-      if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
-    }
-    if (imageUrl != null && imageUrl.contains('http')) {
-      try {
-        img.Image thumbnail;
-        var imageResponse = await dio.get<List<int>>(imageUrl,
-            options: Options(
-              responseType: ResponseType.bytes,
-            ));
-        var image = img.decodeImage(imageResponse.data!)!;
-        thumbnail = img.copyResize(image, width: 300);
-        if (thumbnail != null) {
-          File(filePath)..writeAsBytesSync(img.encodePng(thumbnail));
-          _dbHelper.updatePodcastImage(
-              id: widget.podcastLocal!.id, filePath: filePath);
-          print('saved image');
-          if (mounted) {
-            setState(() => _coverStatus = RefreshCoverStatus.complete);
-          }
-        }
-      } catch (e) {
-        developer.log(e.toString());
-        if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
-      }
-    } else if (_coverStatus == RefreshCoverStatus.start && mounted) {
-      setState(() => _coverStatus = RefreshCoverStatus.complete);
-    }
-  }
-
-  Future<bool> _checkPermmison() async {
-    var permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
-      var permissions = await [Permission.storage].request();
-      if (permissions[Permission.storage] == PermissionStatus.granted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
-  }
-
-  Widget _getRefreshStatusIcon(RefreshCoverStatus status) {
-    switch (status) {
-      case RefreshCoverStatus.none:
-        return Center();
-        break;
-      case RefreshCoverStatus.start:
-        return CircularProgressIndicator(strokeWidth: 2);
-        break;
-      case RefreshCoverStatus.complete:
-        return Icon(Icons.done);
-        break;
-      case RefreshCoverStatus.error:
-        return Icon(Icons.refresh, color: Colors.red);
-        break;
-      default:
-        return Center();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final s = context.s;
@@ -341,42 +194,43 @@ class _PodcastSettingState extends State<PodcastSetting> {
                     child: _getRefreshStatusIcon(_coverStatus)))),
         Divider(height: 1),
         ListTile(
-            onTap: () {
-              setState(() {
-                _removeConfirm = false;
-                _showStartTimePicker = false;
-                _showEndTimePicker = false;
-                _markConfirm = !_markConfirm;
-              });
-            },
-            dense: true,
-            title: Row(
-              children: [
-                SizedBox(
-                  height: 18,
-                  width: 18,
-                  child: CustomPaint(
-                    painter: ListenedAllPainter(context.accentColor, stroke: 2),
-                  ),
+          onTap: () {
+            setState(() {
+              _removeConfirm = false;
+              _showStartTimePicker = false;
+              _showEndTimePicker = false;
+              _markConfirm = !_markConfirm;
+            });
+          },
+          dense: true,
+          title: Row(
+            children: [
+              SizedBox(
+                height: 18,
+                width: 18,
+                child: CustomPaint(
+                  painter: ListenedAllPainter(context.accentColor, stroke: 2),
                 ),
-                SizedBox(width: 20),
-                Text(s.menuMarkAllListened,
-                    style: textStyle.copyWith(
-                        color: context.accentColor,
-                        fontWeight: FontWeight.bold)),
-              ],
+              ),
+              SizedBox(width: 20),
+              Text(s.menuMarkAllListened,
+                  style: textStyle.copyWith(
+                      color: context.accentColor, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          trailing: Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: SizedBox(
+              height: 20,
+              width: 20,
+              child: _markStatus == MarkStatus.none
+                  ? Center()
+                  : _markStatus == MarkStatus.start
+                      ? CircularProgressIndicator(strokeWidth: 2)
+                      : Icon(Icons.done),
             ),
-            trailing: Padding(
-              padding: const EdgeInsets.only(right: 10.0),
-              child: SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: _markStatus == MarkStatus.none
-                      ? Center()
-                      : _markStatus == MarkStatus.start
-                          ? CircularProgressIndicator(strokeWidth: 2)
-                          : Icon(Icons.done)),
-            )),
+          ),
+        ),
         if (_markConfirm)
           Container(
             width: double.infinity,
@@ -384,7 +238,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                FlatButton(
+                TextButton(
                     onPressed: () => setState(() {
                           _markConfirm = false;
                         }),
@@ -392,7 +246,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                       s.cancel,
                       style: TextStyle(color: Colors.grey[600]),
                     )),
-                FlatButton(
+                TextButton(
                     onPressed: () {
                       if (_markStatus != MarkStatus.start) {
                         _markListened(widget.podcastLocal!.id);
@@ -402,7 +256,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
                       });
                     },
                     child: Text(s.confirm,
-                        style: TextStyle(color: context.accentColor))),
+                        style: TextStyle(color: context.error))),
               ],
             ),
           ),
@@ -433,15 +287,14 @@ class _PodcastSettingState extends State<PodcastSetting> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                FlatButton(
+                TextButton(
                   onPressed: () => setState(() {
                     _removeConfirm = false;
                   }),
                   child:
                       Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
                 ),
-                FlatButton(
-                    splashColor: Colors.red.withAlpha(70),
+                TextButton(
                     onPressed: () async {
                       await groupList.removePodcast(widget.podcastLocal!);
                       Navigator.of(context).pop();
@@ -453,6 +306,147 @@ class _PodcastSettingState extends State<PodcastSetting> {
           ),
       ],
     );
+  }
+
+  Future<void> _setAutoDownload(bool boo) async {
+    var permission = await _checkPermmison();
+    if (permission) {
+      await _dbHelper.saveAutoDownload(widget.podcastLocal!.id, boo: boo);
+    }
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _setNeverUpdate(bool boo) async {
+    await _dbHelper.saveNeverUpdate(widget.podcastLocal!.id, boo: boo);
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _setHideNewMark(bool boo) async {
+    await _dbHelper.saveHideNewMark(widget.podcastLocal!.id, boo: boo);
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _saveSkipSecondsStart(int? seconds) async {
+    await _dbHelper.saveSkipSecondsStart(widget.podcastLocal!.id, seconds);
+  }
+
+  Future<void> _saveSkipSecondsEnd(int seconds) async {
+    await _dbHelper.saveSkipSecondsEnd(widget.podcastLocal!.id, seconds);
+  }
+
+  Future<bool> _getAutoDownload(String? id) async {
+    return await _dbHelper.getAutoDownload(id);
+  }
+
+  Future<bool> _getNeverUpdate(String? id) async {
+    return await _dbHelper.getNeverUpdate(id);
+  }
+
+  Future<bool> _getHideNewMark(String? id) async {
+    return await _dbHelper.getHideNewMark(id);
+  }
+
+  Future<int?> _getSkipSecondStart(String? id) async {
+    return await _dbHelper.getSkipSecondsStart(id);
+  }
+
+  Future<int?> _getSkipSecondEnd(String id) async {
+    return await _dbHelper.getSkipSecondsEnd(id);
+  }
+
+  Future<void> _markListened(String? podcastId) async {
+    setState(() {
+      _markStatus = MarkStatus.start;
+    });
+    final episodes = await _dbHelper.getRssItem(podcastId, -1,
+        reverse: true, hideListened: true);
+    for (var episode in episodes) {
+      final history = PlayHistory(episode.title, episode.enclosureUrl, 0, 1);
+      await _dbHelper.saveHistory(history);
+    }
+    if (mounted) {
+      setState(() {
+        _markStatus = MarkStatus.complete;
+      });
+    }
+  }
+
+  Future<void> _refreshArtWork() async {
+    setState(() => _coverStatus = RefreshCoverStatus.start);
+    var options = BaseOptions(
+      connectTimeout: 30000,
+      receiveTimeout: 90000,
+    );
+    var dir = await getApplicationDocumentsDirectory();
+    var filePath = "${dir.path}/${widget.podcastLocal!.id}.png";
+    var dio = Dio(options);
+    String? imageUrl;
+
+    try {
+      var response = await dio.get(widget.podcastLocal!.rssUrl);
+      try {
+        var p = RssFeed.parse(response.data);
+        imageUrl = p.itunes!.image!.href ?? p.image!.url;
+      } catch (e) {
+        developer.log(e.toString());
+        if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
+      }
+    } catch (e) {
+      developer.log(e.toString());
+      if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
+    }
+    if (imageUrl != null && imageUrl.contains('http')) {
+      try {
+        img.Image thumbnail;
+        var imageResponse = await dio.get<List<int>>(imageUrl,
+            options: Options(
+              responseType: ResponseType.bytes,
+            ));
+        var image = img.decodeImage(imageResponse.data!)!;
+        thumbnail = img.copyResize(image, width: 300);
+        File(filePath)..writeAsBytesSync(img.encodePng(thumbnail));
+        _dbHelper.updatePodcastImage(
+            id: widget.podcastLocal!.id, filePath: filePath);
+        print('saved image');
+        if (mounted) {
+          setState(() => _coverStatus = RefreshCoverStatus.complete);
+        }
+      } catch (e) {
+        developer.log(e.toString());
+        if (mounted) setState(() => _coverStatus = RefreshCoverStatus.error);
+      }
+    } else if (_coverStatus == RefreshCoverStatus.start && mounted) {
+      setState(() => _coverStatus = RefreshCoverStatus.complete);
+    }
+  }
+
+  Future<bool> _checkPermmison() async {
+    var permission = await Permission.storage.status;
+    if (permission != PermissionStatus.granted) {
+      var permissions = await [Permission.storage].request();
+      if (permissions[Permission.storage] == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
+
+  Widget _getRefreshStatusIcon(RefreshCoverStatus status) {
+    switch (status) {
+      case RefreshCoverStatus.none:
+        return Center();
+      case RefreshCoverStatus.start:
+        return CircularProgressIndicator(strokeWidth: 2);
+      case RefreshCoverStatus.complete:
+        return Icon(Icons.done);
+      case RefreshCoverStatus.error:
+        return Icon(Icons.refresh, color: Colors.red);
+      default:
+        return Center();
+    }
   }
 }
 
@@ -477,15 +471,16 @@ class _TimePicker extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              FlatButton(
+              TextButton(
                 onPressed: onCancel,
                 child: Text(
                   s.cancel,
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               ),
-              FlatButton(
-                splashColor: context.accentColor.withAlpha(70),
+              TextButton(
+                style: TextButton.styleFrom(
+                    surfaceTintColor: context.priamryContainer),
                 onPressed: onConfirm,
                 child: Text(
                   s.confirm,

@@ -44,7 +44,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: context.overlay,
       child: Scaffold(
-        backgroundColor: context.onPrimary,
+        backgroundColor: context.background,
         body: SafeArea(
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxScrolled) {

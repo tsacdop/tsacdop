@@ -72,16 +72,16 @@ class _SettingsState extends State<Settings> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: context.brightness,
-        systemNavigationBarColor: context.onPrimary,
+        systemNavigationBarColor: context.background,
         systemNavigationBarIconBrightness: context.iconBrightness,
       ),
       child: Scaffold(
-        backgroundColor: context.onPrimary,
+        backgroundColor: context.background,
         appBar: AppBar(
           title: Text(s.settings),
           leading: CustomBackButton(),
           elevation: _showTitle ? 1 : 0,
-          backgroundColor: context.onPrimary,
+          backgroundColor: context.background,
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,

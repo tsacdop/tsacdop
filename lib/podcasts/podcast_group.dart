@@ -85,45 +85,6 @@ class __PodcastCardState extends State<_PodcastCard>
   int? _seconds;
   int? _skipSeconds;
 
-  Future<int?> _getSkipSecond(String? id) async {
-    var dbHelper = DBHelper();
-    var seconds = await dbHelper.getSkipSecondsStart(id);
-    _skipSeconds = seconds;
-    return seconds;
-  }
-
-  _saveSkipSeconds(String? id, int? seconds) async {
-    var dbHelper = DBHelper();
-    await dbHelper.saveSkipSecondsStart(id, seconds);
-  }
-
-  _setAutoDownload(String? id, bool boo) async {
-    var permission = await _checkPermmison();
-    if (permission) {
-      var dbHelper = DBHelper();
-      await dbHelper.saveAutoDownload(id, boo: boo);
-    }
-  }
-
-  Future<bool> _getAutoDownload(String? id) async {
-    var dbHelper = DBHelper();
-    return await dbHelper.getAutoDownload(id);
-  }
-
-  Future<bool> _checkPermmison() async {
-    var permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
-      var permissions = await [Permission.storage].request();
-      if (permissions[Permission.storage] == PermissionStatus.granted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -134,43 +95,20 @@ class __PodcastCardState extends State<_PodcastCard>
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
-      ..addListener(() {
-        setState(() {
-          _value = _animation.value;
-        });
-      });
-  }
-
-  Widget _buttonOnMenu(
-          {required Widget icon,
-          VoidCallback? onTap,
-          required String tooltip}) =>
-      Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-              height: 50.0,
-              padding: EdgeInsets.symmetric(horizontal: 5.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: icon,
-                  ),
-                  Text(tooltip, style: context.textTheme.subtitle2),
-                ],
-              )),
-        ),
+      ..addListener(
+        () {
+          setState(() {
+            _value = _animation.value;
+          });
+        },
       );
+  }
 
   @override
   Widget build(BuildContext context) {
     final c = widget.podcastLocal!.backgroudColor(context);
     final s = context.s;
-    var groupList = context.watch<GroupList>();
+    final groupList = context.watch<GroupList>();
     _belongGroups = groupList.getPodcastGroup(widget.podcastLocal!.id);
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -398,9 +336,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                                 _seconds = value.inSeconds,
                                           ),
                                           actions: <Widget>[
-                                            FlatButton(
-                                              splashColor: context.accentColor
-                                                  .withAlpha(70),
+                                            TextButton(
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                                 _seconds = 0;
@@ -411,9 +347,7 @@ class __PodcastCardState extends State<_PodcastCard>
                                                     color: Colors.grey[600]),
                                               ),
                                             ),
-                                            FlatButton(
-                                              splashColor: context.accentColor
-                                                  .withAlpha(70),
+                                            TextButton(
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                                 _saveSkipSeconds(
@@ -431,44 +365,42 @@ class __PodcastCardState extends State<_PodcastCard>
                                       });
                                 }),
                             _buttonOnMenu(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                  size: _value == 0 ? 1 : 20 * _value!,
-                                ),
-                                tooltip: s.remove,
-                                onTap: () {
-                                  generalDialog(
-                                    context,
-                                    title: Text(s.removeConfirm),
-                                    content: Text(s.removePodcastDes),
-                                    actions: <Widget>[
-                                      FlatButton(
-                                        splashColor:
-                                            context.accentColor.withAlpha(70),
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: Text(
-                                          s.cancel,
-                                          style: TextStyle(
-                                              color: Colors.grey[600]),
-                                        ),
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                                size: _value == 0 ? 1 : 20 * _value!,
+                              ),
+                              tooltip: s.remove,
+                              onTap: () {
+                                generalDialog(
+                                  context,
+                                  title: Text(s.removeConfirm),
+                                  content: Text(s.removePodcastDes),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: Text(
+                                        s.cancel,
+                                        style:
+                                            TextStyle(color: Colors.grey[600]),
                                       ),
-                                      FlatButton(
-                                        splashColor: Colors.red.withAlpha(70),
-                                        onPressed: () {
-                                          groupList.removePodcast(
-                                              widget.podcastLocal!);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text(
-                                          s.confirm,
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      )
-                                    ],
-                                  );
-                                }),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        groupList.removePodcast(
+                                            widget.podcastLocal!);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        s.confirm,
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    )
+                                  ],
+                                );
+                              },
+                            ),
                           ],
                         ),
                 ),
@@ -476,6 +408,71 @@ class __PodcastCardState extends State<_PodcastCard>
         Divider(height: 1)
       ],
     );
+  }
+
+  Widget _buttonOnMenu(
+          {required Widget icon,
+          VoidCallback? onTap,
+          required String tooltip}) =>
+      Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            height: 50.0,
+            padding: EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: icon,
+                ),
+                Text(tooltip, style: context.textTheme.subtitle2),
+              ],
+            ),
+          ),
+        ),
+      );
+
+  Future<int?> _getSkipSecond(String? id) async {
+    final dbHelper = DBHelper();
+    final seconds = await dbHelper.getSkipSecondsStart(id);
+    _skipSeconds = seconds;
+    return seconds;
+  }
+
+  _saveSkipSeconds(String? id, int? seconds) async {
+    final dbHelper = DBHelper();
+    await dbHelper.saveSkipSecondsStart(id, seconds);
+  }
+
+  _setAutoDownload(String? id, bool boo) async {
+    final permission = await _checkPermmison();
+    if (permission) {
+      final dbHelper = DBHelper();
+      await dbHelper.saveAutoDownload(id, boo: boo);
+    }
+  }
+
+  Future<bool> _getAutoDownload(String? id) async {
+    final dbHelper = DBHelper();
+    return await dbHelper.getAutoDownload(id);
+  }
+
+  Future<bool> _checkPermmison() async {
+    final permission = await Permission.storage.status;
+    if (permission != PermissionStatus.granted) {
+      final permissions = await [Permission.storage].request();
+      if (permissions[Permission.storage] == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
   }
 }
 
@@ -511,7 +508,7 @@ class _RenameGroupState extends State<RenameGroup> {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.light,
+        statusBarColor: Colors.transparent,
         systemNavigationBarColor:
             Theme.of(context).brightness == Brightness.light
                 ? Color.fromRGBO(113, 113, 113, 1)
@@ -519,27 +516,28 @@ class _RenameGroupState extends State<RenameGroup> {
       ),
       child: AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
         elevation: 1,
         contentPadding: EdgeInsets.symmetric(horizontal: 20),
         titlePadding: EdgeInsets.all(20),
         actionsPadding: EdgeInsets.zero,
         actions: <Widget>[
-          FlatButton(
-            splashColor: context.accentColor.withAlpha(70),
+          TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               s.cancel,
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
-          FlatButton(
-            splashColor: context.accentColor.withAlpha(70),
+          TextButton(
             onPressed: () async {
               if (list.contains(_newName)) {
                 setState(() => _error = 1);
               } else {
-                var newGroup = PodcastGroup(_newName,
+                final newGroup = PodcastGroup(_newName,
                     color: widget.group!.color,
                     id: widget.group!.id,
                     podcastList: widget.group!.podcastList);
@@ -547,12 +545,16 @@ class _RenameGroupState extends State<RenameGroup> {
                 Navigator.of(context).pop();
               }
             },
-            child: Text(s.confirm,
-                style: TextStyle(color: Theme.of(context).accentColor)),
+            child: Text(
+              s.confirm,
+              style: TextStyle(color: context.accentColor),
+            ),
           )
         ],
-        title:
-            SizedBox(width: context.width - 160, child: Text(s.editGroupName)),
+        title: SizedBox(
+          width: context.width - 160,
+          child: Text(s.editGroupName),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -578,7 +580,7 @@ class _RenameGroupState extends State<RenameGroup> {
                 _newName = value;
               },
             ),
-            Container(
+            Align(
               alignment: Alignment.centerLeft,
               child: (_error == 1)
                   ? Text(

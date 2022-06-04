@@ -122,12 +122,12 @@ class _PodcastDetailState extends State<PodcastDetail> {
       );
     }
     if (result > 0) {
-      var autoDownload = await _dbHelper.getAutoDownload(podcastLocal.id);
+      final autoDownload = await _dbHelper.getAutoDownload(podcastLocal.id);
       if (autoDownload) {
-        var downloader = Provider.of<DownloadState>(context, listen: false);
-        var result = await Connectivity().checkConnectivity();
-        var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
-        var autoDownloadNetwork = await autoDownloadStorage.getInt();
+        final downloader = Provider.of<DownloadState>(context, listen: false);
+        final result = await Connectivity().checkConnectivity();
+        final autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+        final autoDownloadNetwork = await autoDownloadStorage.getInt();
         if (autoDownloadNetwork == 1) {
           var episodes = await _dbHelper.getNewEpisodes(podcastLocal.id);
           // For safety
@@ -232,31 +232,32 @@ class _PodcastDetailState extends State<PodcastDetail> {
       VoidCallback? onTap,
       required Color backgroundColor}) {
     return Container(
-        padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
-        width: 60.0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: onTap,
-              child: CircleAvatar(
-                radius: 20,
-                child: child,
-                backgroundColor: backgroundColor.withOpacity(0.5),
-              ),
+      padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+      width: 60.0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: onTap,
+            child: CircleAvatar(
+              radius: 20,
+              child: child,
+              backgroundColor: backgroundColor.withOpacity(0.5),
             ),
-            SizedBox(height: 4),
-            Text(
-              title,
-              style: context.textTheme.subtitle2,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.fade,
-            ),
-          ],
-        ));
+          ),
+          SizedBox(height: 4),
+          Text(
+            title,
+            style: context.textTheme.subtitle2,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.fade,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _hostsList(BuildContext context, PodcastLocal podcastLocal) {
@@ -673,11 +674,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: color,
-        statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: context.primaryColor,
-        systemNavigationBarIconBrightness: context.iconBrightness,
-      ),
+          statusBarColor: color, statusBarIconBrightness: Brightness.light),
       child: WillPopScope(
         onWillPop: () {
           if (_playerKey.currentState != null &&
@@ -690,7 +687,6 @@ class _PodcastDetailState extends State<PodcastDetail> {
         },
         child: Scaffold(
           body: SafeArea(
-            top: false,
             child: RefreshIndicator(
               key: _refreshIndicatorKey,
               displacement: context.paddingTop + 40,
@@ -751,6 +747,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                   ),
                                 ],
                                 elevation: 0,
+                                scrolledUnderElevation: 0,
                                 iconTheme: IconThemeData(
                                   color: Colors.white,
                                 ),
@@ -1021,17 +1018,6 @@ class AboutPodcast extends StatefulWidget {
 class _AboutPodcastState extends State<AboutPodcast> {
   late String _description;
   late bool _load;
-  void getDescription(String? id) async {
-    var dbHelper = DBHelper();
-    var description = await dbHelper.getFeedDescription(id);
-    if (description == null || description.isEmpty) {
-      _description = '';
-    } else {
-      var doc = parse(description);
-      _description = parse(doc.body!.text).documentElement!.text;
-    }
-    if (mounted) setState(() => _load = true);
-  }
 
   @override
   void initState() {
@@ -1042,75 +1028,30 @@ class _AboutPodcastState extends State<AboutPodcast> {
 
   @override
   Widget build(BuildContext context) {
-    return !_load
-        ? Center()
-        : Linkify(
-            text: _description,
-            onOpen: (link) {
-              link.url!.launchUrl;
-            },
-            linkStyle: TextStyle(
-                color: Theme.of(context).accentColor,
-                decoration: TextDecoration.underline,
-                textBaseline: TextBaseline.ideographic),
-          );
-    // LayoutBuilder(
-    //     builder: (context, size) {
-    //       final span = TextSpan(text: _description);
-    //       final tp = TextPainter(
-    //           text: span, maxLines: 3, textDirection: TextDirection.ltr);
-    //       tp.layout(maxWidth: size.maxWidth);
+    if (_load)
+      return Linkify(
+        text: _description,
+        onOpen: (link) {
+          link.url!.launchUrl;
+        },
+        linkStyle: TextStyle(
+            color: context.accentColor,
+            decoration: TextDecoration.underline,
+            textBaseline: TextBaseline.ideographic),
+      );
+    return Center();
+  }
 
-    //       if (tp.didExceedMaxLines) {
-    //         return GestureDetector(
-    //           onTap: () {
-    //             setState(() => _expand = !_expand);
-    //           },
-    //           child: !_expand
-    //               ? Column(
-    //                   mainAxisAlignment: MainAxisAlignment.start,
-    //                   mainAxisSize: MainAxisSize.min,
-    //                   crossAxisAlignment: CrossAxisAlignment.start,
-    //                   children: <Widget>[
-    //                     Linkify(
-    //                       onOpen: (link) {
-    //                         link.url.launchUrl;
-    //                       },
-    //                       text: _description,
-    //                       linkStyle: TextStyle(
-    //                           color: Theme.of(context).accentColor,
-    //                           decoration: TextDecoration.underline,
-    //                           textBaseline: TextBaseline.ideographic),
-    //                       maxLines: 3,
-    //                       overflow: TextOverflow.ellipsis,
-    //                     ),
-    //                   ],
-    //                 )
-    //               : Linkify(
-    //                   onOpen: (link) {
-    //                     link.url.launchUrl;
-    //                   },
-    //                   text: _description,
-    //                   linkStyle: TextStyle(
-    //                       color: Theme.of(context).accentColor,
-    //                       decoration: TextDecoration.underline,
-    //                       textBaseline: TextBaseline.ideographic),
-    //                 ),
-    //         );
-    //       } else {
-    //         return Linkify(
-    //           text: _description,
-    //           onOpen: (link) {
-    //             link.url.launchUrl;
-    //           },
-    //           linkStyle: TextStyle(
-    //               color: Theme.of(context).accentColor,
-    //               decoration: TextDecoration.underline,
-    //               textBaseline: TextBaseline.ideographic),
-    //         );
-    //       }
-    //     },
-    //   );
+  void getDescription(String? id) async {
+    final dbHelper = DBHelper();
+    final description = await dbHelper.getFeedDescription(id);
+    if (description == null || description.isEmpty) {
+      _description = '';
+    } else {
+      final doc = parse(description);
+      _description = parse(doc.body!.text).documentElement!.text;
+    }
+    if (mounted) setState(() => _load = true);
   }
 }
 
@@ -1156,8 +1097,7 @@ class _SearchEpisodeState extends State<SearchEpisode> {
         titlePadding: const EdgeInsets.all(20),
         actionsPadding: EdgeInsets.zero,
         actions: <Widget>[
-          FlatButton(
-            splashColor: context.accentColor.withAlpha(70),
+          TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               s.cancel,
@@ -1165,8 +1105,7 @@ class _SearchEpisodeState extends State<SearchEpisode> {
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
-          FlatButton(
-            splashColor: context.accentColor.withAlpha(70),
+          TextButton(
             onPressed: () {
               if ((_query ?? '').isNotEmpty) {
                 widget.onSearch!(_query);

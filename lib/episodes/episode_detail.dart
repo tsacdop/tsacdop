@@ -104,7 +104,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
           }
         },
         child: Scaffold(
-          backgroundColor: context.onPrimary,
+          backgroundColor: context.background,
           body: SafeArea(
             child: Stack(
               children: <Widget>[
@@ -120,6 +120,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                               widget.episodeItem!.cardColor(context),
                           floating: true,
                           pinned: true,
+                          scrolledUnderElevation: 0,
                           title: _showTitle
                               ? Text(
                                   widget.episodeItem?.title ?? '',
@@ -195,8 +196,8 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                         s.minsCount(
                                           widget.episodeItem!.duration! ~/ 60,
                                         ),
-                                        style:
-                                            TextStyle(color: context.onPrimary),
+                                        style: TextStyle(
+                                            color: context.background),
                                       )),
                                 if (widget.episodeItem!.enclosureLength !=
                                         null &&
@@ -214,7 +215,7 @@ class _EpisodeDetailState extends State<EpisodeDetail> {
                                     child: Text(
                                       '${widget.episodeItem!.enclosureLength! ~/ 1000000}MB',
                                       style:
-                                          TextStyle(color: context.onPrimary),
+                                          TextStyle(color: context.background),
                                     ),
                                   ),
                                 FutureBuilder<PlayHistory>(

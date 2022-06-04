@@ -40,7 +40,7 @@ class MyHomePageDelegate extends SearchDelegate<int?> {
         connectTimeout: 30000,
         receiveTimeout: 90000,
       );
-      var response = await Dio(options).get(url);
+      final response = await Dio(options).get(url);
       return RssFeed.parse(response.data);
     } catch (e) {
       rethrow;
@@ -88,7 +88,10 @@ class MyHomePageDelegate extends SearchDelegate<int?> {
       child: IconButton(
         tooltip: context.s.back,
         splashRadius: 20,
-        icon: Icon(_getIconData(Theme.of(context).platform)),
+        icon: Icon(
+          _getIconData(Theme.of(context).platform),
+          color: context.textColor,
+        ),
         onPressed: () {
           close(context, 1);
         },
@@ -164,12 +167,10 @@ class MyHomePageDelegate extends SearchDelegate<int?> {
       switch (_searchEngine) {
         case SearchEngine.listenNotes:
           return _ListenNotesSearch(query: query);
-          break;
         case SearchEngine.podcastIndex:
           return _PodcastIndexSearch(query: query);
         default:
           return Center();
-          break;
       }
     }
   }
@@ -217,14 +218,14 @@ class _RssResultState extends State<RssResult> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    var items = widget.rssFeed!.items!;
+    final items = widget.rssFeed!.items!;
     return DefaultTabController(
       length: 2,
       child: Column(
         children: [
           Container(
             color: context.primaryColor,
-            height: 140,
+            height: 160,
             child: Row(
               children: [
                 Expanded(
@@ -314,8 +315,12 @@ class _RssResultState extends State<RssResult> {
                         url!.launchUrl;
                       },
                       style: {
+                        'html': Style(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                        ),
                         'a': Style(
                           color: context.accentColor,
+                          textDecoration: TextDecoration.none,
                         )
                       },
                       shrinkWrap: true,
@@ -331,13 +336,9 @@ class _RssResultState extends State<RssResult> {
                       return Container(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                         alignment: Alignment.center,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            // highlightedBorderColor: context.accentColor,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
                             onSurface: context.accentColor.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(100))),
                           ),
                           child: Text(context.s.loadMore),
                           onPressed: () => setState(
@@ -378,18 +379,12 @@ class __SearchPopupMenuState extends State<_SearchPopupMenu> {
     _getSearchEngine();
   }
 
-  Future<void> _getSearchEngine() async {
-    final storage = KeyValueStorage(searchEngineKey);
-    final index = await storage.getInt();
-    setState(() => _searchEngine = SearchEngine.values[index]);
-    widget.onSelected!(_searchEngine);
-  }
-
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<SearchEngine>(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 1,
+      color: context.priamryContainer,
       icon: SizedBox(
         height: 25,
         width: 25,
@@ -437,11 +432,18 @@ class __SearchPopupMenuState extends State<_SearchPopupMenu> {
       ],
     );
   }
+
+  Future<void> _getSearchEngine() async {
+    final storage = KeyValueStorage(searchEngineKey);
+    final index = await storage.getInt();
+    setState(() => _searchEngine = SearchEngine.values[index]);
+    widget.onSelected!(_searchEngine);
+  }
 }
 
 class _ListenNotesSearch extends StatefulWidget {
-  final String? query;
-  _ListenNotesSearch({this.query, Key? key}) : super(key: key);
+  final String query;
+  _ListenNotesSearch({required this.query, Key? key}) : super(key: key);
 
   @override
   __ListenNotesSearchState createState() => __ListenNotesSearchState();
@@ -461,9 +463,9 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
     _searchFuture = _getListenNotesList(widget.query, _nextOffset);
   }
 
-  Future<void> _saveHistory(String? query) async {
+  Future<void> _saveHistory(String query) async {
     final storage = KeyValueStorage(searchHistoryKey);
-    final history = await (storage.getStringList() as FutureOr<List<String?>>);
+    final history = await storage.getStringList();
     if (!history.contains(query)) {
       if (history.length >= 6) {
         history.removeLast();
@@ -474,7 +476,7 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
   }
 
   Future<List<OnlinePodcast>> _getListenNotesList(
-      String? searchText, int? nextOffset) async {
+      String searchText, int? nextOffset) async {
     if (nextOffset == 0) _saveHistory(searchText);
     final searchEngine = ListenNotesSearch();
     var searchResult;
@@ -544,12 +546,13 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
+                    TextButton(
+                      style: TextButton.styleFrom(
                         side: BorderSide(color: context.accentColor),
                         onSurface: context.accentColor.withOpacity(0.5),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100)),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
                       ),
                       child: _loading
                           ? SizedBox(
@@ -582,7 +585,9 @@ class __ListenNotesSearchState extends State<_ListenNotesSearch> {
                   child: Text(
                     'Powered by ListenNotes',
                     style: GoogleFonts.quicksand(
-                        color: Colors.red, textStyle: TextStyle(fontSize: 15)),
+                      color: Colors.red,
+                      textStyle: TextStyle(fontSize: 15),
+                    ),
                   ),
                   //  Image(
                   //   image: context.brightness == Brightness.light
@@ -662,101 +667,102 @@ class __PodcastIndexSearchState extends State<_PodcastIndexSearch> {
     return PodcastSlideup(
       searchEngine: SearchEngine.podcastIndex,
       child: FutureBuilder<List>(
-          future: _searchFuture.then((value) => value as List<dynamic>),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData && widget.query != null) {
+        future: _searchFuture.then((value) => value as List<dynamic>),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData && widget.query != null) {
+            return Container(
+              padding: EdgeInsets.only(top: 200),
+              alignment: Alignment.topCenter,
+              child: Platform.isIOS
+                  ? CupertinoActivityIndicator()
+                  : CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.data!.isEmpty) {
+            if (_loadError) {
               return Container(
                 padding: EdgeInsets.only(top: 200),
                 alignment: Alignment.topCenter,
-                child: Platform.isIOS
-                    ? CupertinoActivityIndicator()
-                    : CircularProgressIndicator(),
+                child: Text('Network error.',
+                    style: context.textTheme.headline6!
+                        .copyWith(color: Colors.red)),
+              );
+            } else {
+              return Container(
+                padding: EdgeInsets.only(top: 200),
+                alignment: Alignment.topCenter,
+                child: Text('No result found.',
+                    style: context.textTheme.headline6!
+                        .copyWith(color: context.accentColor)),
               );
             }
-            if (snapshot.data!.isEmpty) {
-              if (_loadError) {
-                return Container(
-                  padding: EdgeInsets.only(top: 200),
-                  alignment: Alignment.topCenter,
-                  child: Text('Network error.',
-                      style: context.textTheme.headline6!
-                          .copyWith(color: Colors.red)),
-                );
-              } else {
-                return Container(
-                  padding: EdgeInsets.only(top: 200),
-                  alignment: Alignment.topCenter,
-                  child: Text('No result found.',
-                      style: context.textTheme.headline6!
-                          .copyWith(color: context.accentColor)),
-                );
-              }
-            }
-            var content = snapshot.data!;
-            return CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return SearchResult(onlinePodcast: content[index]);
-                    },
-                    childCount: content.length,
-                  ),
+          }
+          var content = snapshot.data!;
+          return CustomScrollView(
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return SearchResult(onlinePodcast: content[index]);
+                  },
+                  childCount: content.length,
                 ),
-                SliverToBoxAdapter(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: context.accentColor),
-                          onSurface: context.accentColor.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100)),
-                        ),
-                        child: _loading
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ))
-                            : Text(context.s.loadMore),
-                        onPressed: () => _loading
-                            ? null
-                            : setState(
-                                () {
-                                  _loading = true;
-                                  _limit += 10;
-                                  _searchFuture = _getPodcatsIndexList(
-                                      widget.query!,
-                                      limit: _limit);
-                                },
+              ),
+              SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        side: BorderSide(color: context.accentColor),
+                        onSurface: context.accentColor.withOpacity(0.5),
+                      ),
+                      child: _loading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
                               ),
-                      )
-                    ],
-                  ),
+                            )
+                          : Text(context.s.loadMore),
+                      onPressed: () => _loading
+                          ? null
+                          : setState(
+                              () {
+                                _loading = true;
+                                _limit += 10;
+                                _searchFuture = _getPodcatsIndexList(
+                                    widget.query!,
+                                    limit: _limit);
+                              },
+                            ),
+                    )
+                  ],
                 ),
-                SliverToBoxAdapter(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        child: Center(
-                          child: Text(
-                            'Powered by PODCASTINDEX',
-                            style: GoogleFonts.quicksand(
-                                color: Colors.red,
-                                textStyle: TextStyle(fontSize: 15)),
-                          ),
-                        )
-                        // Image(
-                        //   image: AssetImage('assets/podcastindex.png'),
-                        //   height: 15,
-                        // ),
-                        ))
-              ],
-            );
-          }),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Center(
+                      child: Text(
+                        'Powered by PODCASTINDEX',
+                        style: GoogleFonts.quicksand(
+                            color: Colors.red,
+                            textStyle: TextStyle(fontSize: 15)),
+                      ),
+                    )
+                    // Image(
+                    //   image: AssetImage('assets/podcastindex.png'),
+                    //   height: 15,
+                    // ),
+                    ),
+              )
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -997,12 +1003,10 @@ class _SearchResultDetailState extends State<SearchResultDetail>
                     padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                     alignment: Alignment.center,
                     child: SizedBox(
-                      child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
+                      child: TextButton(
+                          style: TextButton.styleFrom(
                             side: BorderSide(color: context.accentColor),
                             onSurface: context.accentColor.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100)),
                           ),
                           child: _loading
                               ? SizedBox(

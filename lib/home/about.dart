@@ -30,16 +30,16 @@ class AboutApp extends StatelessWidget {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: context.onPrimary,
+        statusBarColor: context.background,
         statusBarIconBrightness: context.iconBrightness,
-        systemNavigationBarColor: context.onPrimary,
+        systemNavigationBarColor: context.background,
         systemNavigationBarIconBrightness: context.iconBrightness,
       ),
       child: SafeArea(
         child: Scaffold(
-          backgroundColor: context.onPrimary,
+          backgroundColor: context.background,
           appBar: AppBar(
-            backgroundColor: context.onPrimary,
+            backgroundColor: context.background,
             title: Text(s.homeToprightMenuAbout),
             scrolledUnderElevation: 1,
             leading: CustomBackButton(),

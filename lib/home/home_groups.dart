@@ -94,113 +94,115 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 GestureDetector(
-                    onVerticalDragEnd: (event) {
-                      if (event.primaryVelocity! > 200) {
-                        if (groups.length == 1) {
-                          Fluttertoast.showToast(
-                            msg: s.addSomeGroups,
-                            gravity: ToastGravity.BOTTOM,
-                          );
-                        } else {
-                          if (mounted) {
-                            setState(() {
-                              (_groupIndex != 0)
-                                  ? _groupIndex--
-                                  : _groupIndex = groups.length - 1;
-                            });
-                          }
-                        }
-                      } else if (event.primaryVelocity! < -200) {
-                        if (groups.length == 1) {
-                          Fluttertoast.showToast(
-                            msg: s.addSomeGroups,
-                            gravity: ToastGravity.BOTTOM,
-                          );
-                        } else {
-                          if (mounted) {
-                            setState(
-                              () {
-                                (_groupIndex < groups.length - 1)
-                                    ? _groupIndex++
-                                    : _groupIndex = 0;
-                              },
-                            );
-                          }
+                  onVerticalDragEnd: (event) {
+                    if (event.primaryVelocity! > 200) {
+                      if (groups.length == 1) {
+                        Fluttertoast.showToast(
+                          msg: s.addSomeGroups,
+                          gravity: ToastGravity.BOTTOM,
+                        );
+                      } else {
+                        if (mounted) {
+                          setState(() {
+                            (_groupIndex != 0)
+                                ? _groupIndex--
+                                : _groupIndex = groups.length - 1;
+                          });
                         }
                       }
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 30,
-                          child: Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                                child: Text(
-                                  groups[_groupIndex]!.name!,
-                                  style: context.textTheme.bodyText1!
-                                      .copyWith(color: context.accentColor),
-                                ),
+                    } else if (event.primaryVelocity! < -200) {
+                      if (groups.length == 1) {
+                        Fluttertoast.showToast(
+                          msg: s.addSomeGroups,
+                          gravity: ToastGravity.BOTTOM,
+                        );
+                      } else {
+                        if (mounted) {
+                          setState(
+                            () {
+                              (_groupIndex < groups.length - 1)
+                                  ? _groupIndex++
+                                  : _groupIndex = 0;
+                            },
+                          );
+                        }
+                      }
+                    }
+                  },
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 30,
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15.0),
+                              child: Text(
+                                groups[_groupIndex]!.name!,
+                                style: context.textTheme.bodyText1!
+                                    .copyWith(color: context.accentColor),
                               ),
-                              Spacer(),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
-                                child: InkWell(
-                                  onTap: () {
-                                    if (!import) {
-                                      Navigator.push(
-                                        context,
-                                        SlideLeftRoute(
-                                          page: context
-                                                  .read<SettingState>()
-                                                  .openAllPodcastDefalt!
-                                              ? PodcastList()
-                                              : PodcastManage(),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  onLongPress: () {
-                                    if (!import) {
-                                      Navigator.push(
-                                        context,
-                                        SlideLeftRoute(page: PodcastList()),
-                                      );
-                                    }
-                                  },
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      s.homeGroupsSeeAll,
-                                      style: context.textTheme.bodyText1!
-                                          .copyWith(
-                                              color: import
-                                                  ? context.primaryColorDark
-                                                  : context.accentColor),
+                            ),
+                            Spacer(),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(15),
+                                onTap: () {
+                                  if (!import) {
+                                    Navigator.push(
+                                      context,
+                                      SlideLeftRoute(
+                                        page: context
+                                                .read<SettingState>()
+                                                .openAllPodcastDefalt!
+                                            ? PodcastList()
+                                            : PodcastManage(),
+                                      ),
+                                    );
+                                  }
+                                },
+                                onLongPress: () {
+                                  if (!import) {
+                                    Navigator.push(
+                                      context,
+                                      SlideLeftRoute(page: PodcastList()),
+                                    );
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Text(
+                                    s.homeGroupsSeeAll,
+                                    style:
+                                        context.textTheme.bodyText1!.copyWith(
+                                      color: import
+                                          ? context.primaryColorDark
+                                          : context.accentColor,
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Container(
-                            height: 70,
-                            color: context.background,
-                            child: Row(
-                              children: <Widget>[
-                                _circleContainer(context),
-                                _circleContainer(context),
-                                _circleContainer(context)
-                              ],
-                            )),
-                      ],
-                    )),
+                      ),
+                      Container(
+                          height: 70,
+                          color: context.background,
+                          child: Row(
+                            children: <Widget>[
+                              _circleContainer(context),
+                              _circleContainer(context),
+                              _circleContainer(context)
+                            ],
+                          )),
+                    ],
+                  ),
+                ),
                 Container(
                   height: (width - 20) / 3 + 40,
-                  color: context.onPrimary,
+                  color: context.background,
                   margin: EdgeInsets.symmetric(horizontal: 15),
                   child: Center(
                       child: _groupIndex == 0
@@ -297,39 +299,39 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: InkWell(
-                                onTap: () {
-                                  if (!import) {
-                                    Navigator.push(
-                                      context,
-                                      SlideLeftRoute(
-                                          page: context
-                                                  .read<SettingState>()
-                                                  .openAllPodcastDefalt!
-                                              ? PodcastList()
-                                              : PodcastManage()),
-                                    );
-                                  }
-                                },
-                                onLongPress: () {
-                                  if (!import) {
-                                    Navigator.push(
-                                      context,
-                                      SlideLeftRoute(page: PodcastList()),
-                                    );
-                                  }
-                                },
-                                borderRadius: BorderRadius.circular(5),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    s.homeGroupsSeeAll,
-                                    style: context.textTheme.bodyText1!
-                                        .copyWith(
-                                            color: import
-                                                ? context.primaryColorDark
-                                                : context.accentColor),
-                                  ),
-                                )),
+                              onTap: () {
+                                if (!import) {
+                                  Navigator.push(
+                                    context,
+                                    SlideLeftRoute(
+                                        page: context
+                                                .read<SettingState>()
+                                                .openAllPodcastDefalt!
+                                            ? PodcastList()
+                                            : PodcastManage()),
+                                  );
+                                }
+                              },
+                              onLongPress: () {
+                                if (!import) {
+                                  Navigator.push(
+                                    context,
+                                    SlideLeftRoute(page: PodcastList()),
+                                  );
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(5),
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  s.homeGroupsSeeAll,
+                                  style: context.textTheme.bodyText1!.copyWith(
+                                      color: import
+                                          ? context.primaryColorDark
+                                          : context.accentColor),
+                                ),
+                              ),
+                            ),
                           )
                         ],
                       ),
@@ -338,7 +340,7 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                       height: 70,
                       width: width,
                       alignment: Alignment.centerLeft,
-                      color: context.onPrimary,
+                      color: context.background,
                       child: TabBar(
                         labelPadding: EdgeInsets.fromLTRB(6.0, 5.0, 6.0, 10.0),
                         indicator: CircleTabIndicator(
@@ -370,47 +372,45 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
               ),
               Container(
                 height: (width - 20) / 3 + 40,
-                margin: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   color: context.background,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: ScrollConfiguration(
-                  behavior: NoGrowBehavior(),
-                  child: TabBarView(
-                    children: groups[_groupIndex]!.podcasts.map<Widget>(
-                      (podcastLocal) {
-                        return Container(
-                          decoration: BoxDecoration(
-                              color: context.brightness == Brightness.light
-                                  ? context.primaryColor
-                                  : Colors.black12),
-                          margin: EdgeInsets.symmetric(horizontal: 5.0),
-                          key: ObjectKey(podcastLocal.title),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    HidePlayerRoute(
-                                      PodcastDetail(
-                                        podcastLocal: podcastLocal,
-                                      ),
-                                      PodcastDetail(
-                                          podcastLocal: podcastLocal,
-                                          hide: true),
-                                      duration: Duration(milliseconds: 300),
-                                    ));
-                              },
-                              child: PodcastPreview(
-                                podcastLocal: podcastLocal,
-                              ),
+                child: TabBarView(
+                  children: groups[_groupIndex]!.podcasts.map<Widget>(
+                    (podcastLocal) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            color: context.brightness == Brightness.light
+                                ? context.primaryColor
+                                : Colors.black12),
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        key: ObjectKey(podcastLocal.title),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                HidePlayerRoute(
+                                  PodcastDetail(
+                                    podcastLocal: podcastLocal,
+                                  ),
+                                  PodcastDetail(
+                                      podcastLocal: podcastLocal, hide: true),
+                                  duration: Duration(milliseconds: 300),
+                                ),
+                              );
+                            },
+                            child: PodcastPreview(
+                              podcastLocal: podcastLocal,
                             ),
                           ),
-                        );
-                      },
-                    ).toList(),
-                  ),
+                        ),
+                      );
+                    },
+                  ).toList(),
                 ),
               ),
             ],
@@ -494,7 +494,9 @@ class _PodcastPreviewState extends State<PodcastPreview> {
                           episodes: snapshot.data,
                           podcastLocal: widget.podcastLocal,
                         )
-                      : Padding(padding: const EdgeInsets.all(5.0));
+                      : Padding(
+                          padding: const EdgeInsets.all(5.0),
+                        );
                 },
               );
             },
@@ -561,8 +563,8 @@ class ShowEpisode extends StatelessWidget {
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               childAspectRatio: 1.5,
               crossAxisCount: 2,
-              mainAxisSpacing: 8.0,
-              crossAxisSpacing: 6.0,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 14,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {

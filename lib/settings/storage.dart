@@ -46,7 +46,7 @@ class _StorageSettingState extends State<StorageSetting>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: context.overlay,
       child: Scaffold(
-        backgroundColor: context.onPrimary,
+        backgroundColor: context.background,
         appBar: AppBar(
           title: Text(s.settingStorage),
           leading: CustomBackButton(),

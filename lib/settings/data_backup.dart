@@ -45,7 +45,7 @@ class _DataBackupState extends State<DataBackup> {
         systemNavigationBarIconBrightness: context.brightness,
       ),
       child: Scaffold(
-        backgroundColor: context.onPrimary,
+        backgroundColor: context.background,
         appBar: AppBar(
           elevation: 0,
           title: Text(s.settingsBackup),

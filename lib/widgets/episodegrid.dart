@@ -72,11 +72,11 @@ class EpisodeGrid extends StatelessWidget {
 
   Future<Tuple5<int, bool, bool, bool, List<int>>> _initData(
       EpisodeBrief episode) async {
-    var menuList = await _getEpisodeMenu();
-    var tapToOpen = await _getTapToOpenPopupMenu();
-    var listened = await _isListened(episode);
-    var liked = await _isLiked(episode);
-    var downloaded = await _isDownloaded(episode);
+    final menuList = await _getEpisodeMenu();
+    final tapToOpen = await _getTapToOpenPopupMenu();
+    final listened = await _isListened(episode);
+    final liked = await _isLiked(episode);
+    final downloaded = await _isDownloaded(episode);
     return Tuple5(listened, liked, downloaded, tapToOpen, menuList);
   }
 
@@ -85,8 +85,8 @@ class EpisodeGrid extends StatelessWidget {
   }
 
   Future<List<int>> _getEpisodeMenu() async {
-    var popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
-    var list = await popupMenuStorage.getMenu();
+    final popupMenuStorage = KeyValueStorage(episodePopupMenuKey);
+    final list = await popupMenuStorage.getMenu();
     return list;
   }
 
@@ -95,8 +95,8 @@ class EpisodeGrid extends StatelessWidget {
   }
 
   Future<bool> _getTapToOpenPopupMenu() async {
-    var tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
-    var boo = await tapToOpenPopupMenuStorage.getBool(defaultValue: false);
+    final tapToOpenPopupMenuStorage = KeyValueStorage(tapToOpenPopupMenuKey);
+    final boo = await tapToOpenPopupMenuStorage.getBool(defaultValue: false);
     return boo;
   }
 
@@ -307,102 +307,131 @@ class EpisodeGrid extends StatelessWidget {
       Color? color,
       bool? isLiked,
       bool? isDownloaded,
+      Color? cardColor,
+      required int isListened,
       bool? boo}) {
-    var width = context.width;
+    final width = context.width;
     if (layout == Layout.one) {
       return _layoutOneCard(context,
           index: index!,
           color: color,
           isLiked: isLiked!,
+          cardColor: cardColor,
+          isListened: isListened,
           isDownloaded: isDownloaded,
           boo: boo!);
     }
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Expanded(
-            flex: layout == Layout.one ? 1 : 2,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                layout != Layout.one
-                    ? _circleImage(context,
-                        episode: episodes![index!], color: color, boo: boo!)
-                    : _pubDate(context,
-                        episode: episodes![index!], color: color),
-                Spacer(),
-                _isNewIndicator(episodes![index]),
-                _downloadIndicater(context,
-                    episode: episodes![index], isDownloaded: isDownloaded),
-                _numberIndicater(context, index: index, color: color)
-              ],
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: Stack(
+        alignment: AlignmentDirectional.bottomCenter,
+        children: [
+          if (isListened > 0)
+            Container(
+              height: 4,
+              color: context.accentColor,
             ),
-          ),
-          Expanded(
-            flex: layout == Layout.one ? 3 : 5,
-            child: layout != Layout.one
-                ? _title(episodes![index])
-                : Row(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Expanded(
+                  flex: layout == Layout.one ? 1 : 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _circleImage(context,
-                          episode: episodes![index], color: color, boo: boo!),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(child: _title(episodes![index]))
+                    children: <Widget>[
+                      layout != Layout.one
+                          ? _circleImage(context,
+                              episode: episodes![index!],
+                              color: color,
+                              boo: boo!)
+                          : _pubDate(context,
+                              episode: episodes![index!], color: color),
+                      Spacer(),
+                      _isNewIndicator(episodes![index]),
+                      _downloadIndicater(context,
+                          episode: episodes![index],
+                          isDownloaded: isDownloaded),
+                      _numberIndicater(context, index: index, color: color)
                     ],
                   ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                if (layout != Layout.one)
-                  _pubDate(context, episode: episodes![index], color: color),
-                Spacer(),
-                if (layout != Layout.three && episodes![index].duration != 0)
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      episodes![index].duration!.toTime,
-                      style: TextStyle(fontSize: width / 35),
-                    ),
-                  ),
-                if (episodes![index].duration != 0 &&
-                    episodes![index].enclosureLength != null &&
-                    episodes![index].enclosureLength != 0 &&
-                    layout != Layout.three)
-                  Text(
-                    '|',
-                    style: TextStyle(
-                      fontSize: width / 35,
-                    ),
-                  ),
-                if (layout != Layout.three &&
-                    episodes![index].enclosureLength != null &&
-                    episodes![index].enclosureLength != 0)
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      '${episodes![index].enclosureLength! ~/ 1000000}MB',
-                      style: TextStyle(fontSize: width / 35),
-                    ),
-                  ),
-                Padding(
-                  padding: EdgeInsets.all(1),
                 ),
-                if ((showFavorite || layout != Layout.three) && isLiked!)
-                  Icon(
-                    Icons.favorite,
-                    color: Colors.red,
-                    size: width / 35,
-                  )
+                Expanded(
+                  flex: layout == Layout.one ? 3 : 5,
+                  child: layout != Layout.one
+                      ? _title(episodes![index])
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            _circleImage(context,
+                                episode: episodes![index],
+                                color: color,
+                                boo: boo!),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Expanded(child: _title(episodes![index]))
+                          ],
+                        ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      if (layout != Layout.one)
+                        _pubDate(context,
+                            episode: episodes![index], color: color),
+                      Spacer(),
+                      if (layout != Layout.three &&
+                          episodes![index].duration != 0)
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            episodes![index].duration!.toTime,
+                            style: TextStyle(fontSize: width / 35),
+                          ),
+                        ),
+                      if (episodes![index].duration != 0 &&
+                          episodes![index].enclosureLength != null &&
+                          episodes![index].enclosureLength != 0 &&
+                          layout != Layout.three)
+                        Text(
+                          '|',
+                          style: TextStyle(
+                            fontSize: width / 35,
+                          ),
+                        ),
+                      if (layout != Layout.three &&
+                          episodes![index].enclosureLength != null &&
+                          episodes![index].enclosureLength != 0)
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${episodes![index].enclosureLength! ~/ 1000000}MB',
+                            style: TextStyle(fontSize: width / 35),
+                          ),
+                        ),
+                      Padding(
+                        padding: EdgeInsets.all(1),
+                      ),
+                      if ((showFavorite || layout != Layout.three) && isLiked!)
+                        Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                          size: width / 35,
+                        )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -416,106 +445,127 @@ class EpisodeGrid extends StatelessWidget {
       Color? color,
       required bool isLiked,
       bool? isDownloaded,
+      Color? cardColor,
+      required int isListened,
       required bool boo}) {
     var width = context.width;
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: Stack(
+        alignment: AlignmentDirectional.bottomCenter,
         children: [
-          Expanded(
-            flex: 1,
-            child: Center(
-              child: _circleImage(context,
-                  episode: episodes![index],
-                  color: color,
-                  boo: boo,
-                  radius: context.width / 8),
+          if (isListened > 0)
+            Container(
+              height: 4,
+              color: context.accentColor,
             ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Column(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   flex: 1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(episodes![index].feedTitle!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, color: color)),
-                      ),
-                      _isNewIndicator(episodes![index]),
-                      _downloadIndicater(context,
-                          episode: episodes![index],
-                          isDownloaded: isDownloaded),
-                      _numberIndicater(context, index: index, color: color)
-                    ],
+                  child: Center(
+                    child: _circleImage(context,
+                        episode: episodes![index],
+                        color: color,
+                        boo: boo,
+                        radius: context.width / 8),
                   ),
                 ),
                 Expanded(
-                    flex: 2,
-                    child: Align(
-                        alignment: Alignment.topLeft,
-                        child: _title(episodes![index]))),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        if (episodes![index].duration != 0)
-                          Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              episodes![index].duration!.toTime,
-                              style: TextStyle(fontSize: width / 35),
+                  flex: 4,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(episodes![index].feedTitle!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: color)),
                             ),
-                          ),
-                        if (episodes![index].duration != 0 &&
-                            episodes![index].enclosureLength != null &&
-                            episodes![index].enclosureLength != 0 &&
-                            layout != Layout.three)
-                          Text(
-                            '|',
-                            style: TextStyle(
-                              fontSize: width / 35,
-                            ),
-                          ),
-                        if (episodes![index].enclosureLength != null &&
-                            episodes![index].enclosureLength != 0)
-                          Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              '${episodes![index].enclosureLength! ~/ 1000000}MB',
-                              style: TextStyle(fontSize: width / 35),
-                            ),
-                          ),
-                        SizedBox(width: 4),
-                        if (isLiked)
-                          Icon(
-                            Icons.favorite,
-                            color: Colors.red,
-                            size: width / 35,
-                          ),
-                        Spacer(),
-                        _pubDate(context,
-                            episode: episodes![index], color: color),
-                      ]),
-                )
+                            _isNewIndicator(episodes![index]),
+                            _downloadIndicater(context,
+                                episode: episodes![index],
+                                isDownloaded: isDownloaded),
+                            _numberIndicater(context,
+                                index: index, color: color)
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                          flex: 2,
+                          child: Align(
+                              alignment: Alignment.topLeft,
+                              child: _title(episodes![index]))),
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              if (episodes![index].duration != 0)
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    episodes![index].duration!.toTime,
+                                    style: TextStyle(fontSize: width / 35),
+                                  ),
+                                ),
+                              if (episodes![index].duration != 0 &&
+                                  episodes![index].enclosureLength != null &&
+                                  episodes![index].enclosureLength != 0 &&
+                                  layout != Layout.three)
+                                Text(
+                                  '|',
+                                  style: TextStyle(
+                                    fontSize: width / 35,
+                                  ),
+                                ),
+                              if (episodes![index].enclosureLength != null &&
+                                  episodes![index].enclosureLength != 0)
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    '${episodes![index].enclosureLength! ~/ 1000000}MB',
+                                    style: TextStyle(fontSize: width / 35),
+                                  ),
+                                ),
+                              SizedBox(width: 4),
+                              if (isLiked)
+                                Icon(
+                                  Icons.favorite,
+                                  color: Colors.red,
+                                  size: width / 35,
+                                ),
+                              Spacer(),
+                              _pubDate(context,
+                                  episode: episodes![index], color: color),
+                            ]),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8)
               ],
             ),
           ),
-          SizedBox(width: 8)
         ],
       ),
     );
@@ -533,7 +583,7 @@ class EpisodeGrid extends StatelessWidget {
     final s = context.s;
     return SliverPadding(
       padding: const EdgeInsets.only(
-          top: 10.0, bottom: 5.0, left: 15.0, right: 15.0),
+          top: 10.0, bottom: 5.0, left: 10.0, right: 10.0),
       sliver: LiveSliverGrid.options(
         controller: scrollController,
         options: options,
@@ -549,8 +599,8 @@ class EpisodeGrid extends StatelessWidget {
               : layout == Layout.two
                   ? 2
                   : 1,
-          mainAxisSpacing: 6.0,
-          crossAxisSpacing: 6.0,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
         ),
         itemBuilder: (context, index, animation) {
           final c = episodes![index].backgroudColor(context);
@@ -576,28 +626,31 @@ class EpisodeGrid extends StatelessWidget {
                   future: _initData(episodes![index]),
                   initialData: Tuple5(0, false, false, false, []),
                   builder: (context, snapshot) {
-                    var isListened = snapshot.data!.item1;
-                    var isLiked = snapshot.data!.item2;
-                    var isDownloaded = snapshot.data!.item3;
-                    var tapToOpen = snapshot.data!.item4;
-                    var menuList = snapshot.data!.item5;
+                    final isListened = snapshot.data!.item1;
+                    final isLiked = snapshot.data!.item2;
+                    final isDownloaded = snapshot.data!.item3;
+                    final tapToOpen = snapshot.data!.item4;
+                    final menuList = snapshot.data!.item5;
                     return Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                          color: isListened > 0
-                              ? context.brightness == Brightness.light
-                                  ? Colors.grey[200]
-                                  : Color.fromRGBO(50, 50, 50, 1)
-                              : context.background,
-                          boxShadow: [
-                            BoxShadow(
-                              color: context.brightness == Brightness.light
-                                  ? context.primaryColor
-                                  : Color.fromRGBO(40, 40, 40, 1),
-                              blurRadius: 0.5,
-                              spreadRadius: 0.5,
-                            ),
-                          ]),
+                      // decoration: BoxDecoration(
+                      //   borderRadius: BorderRadius.all(
+                      //     Radius.circular(15.0),
+                      //   ),
+                      //   color: isListened > 0
+                      //       ? context.brightness == Brightness.light
+                      //           ? Colors.grey[200]
+                      //           : Color.fromRGBO(50, 50, 50, 1)
+                      //       : context.priamryContainer,
+                      // ),
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: context.brightness == Brightness.light
+                      //         ? context.primaryColor
+                      //         : Color.fromRGBO(40, 40, 40, 1),
+                      //     blurRadius: 0.5,
+                      //     spreadRadius: 0.5,
+                      //   ),
+                      // ]),
                       alignment: Alignment.center,
                       child: multiSelect!
                           ? Material(
@@ -616,7 +669,8 @@ class EpisodeGrid extends StatelessWidget {
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5.0),
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    color: episodes![index].cardColor(context),
                                     border: Border.all(
                                       color: selectedList!
                                               .contains(episodes![index])
@@ -632,6 +686,7 @@ class EpisodeGrid extends StatelessWidget {
                                       index: index,
                                       isLiked: isLiked,
                                       isDownloaded: isDownloaded,
+                                      isListened: isListened,
                                       color: c,
                                       boo: boo),
                                 ),
@@ -639,7 +694,8 @@ class EpisodeGrid extends StatelessWidget {
                             )
                           : Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
+                                color: episodes![index].cardColor(context),
+                                borderRadius: BorderRadius.circular(20.0),
                                 border: Border.all(
                                   color: context.brightness == Brightness.light
                                       ? context.primaryColor
@@ -652,7 +708,7 @@ class EpisodeGrid extends StatelessWidget {
                                 menuItemExtent: 45,
                                 menuBoxDecoration: BoxDecoration(
                                     color: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(15.0)),
+                                    borderRadius: BorderRadius.circular(20.0)),
                                 duration: Duration(milliseconds: 100),
                                 tapMode: tapToOpen
                                     ? TapMode.onTap
@@ -666,10 +722,7 @@ class EpisodeGrid extends StatelessWidget {
                                 menuOffset: 6,
                                 menuItems: <FocusedMenuItem>[
                                   FocusedMenuItem(
-                                      backgroundColor:
-                                          context.brightness == Brightness.light
-                                              ? context.primaryColor
-                                              : context.dialogBackgroundColor,
+                                      backgroundColor: context.priamryContainer,
                                       title: Text(
                                           data.item1 != episodes![index] ||
                                                   !data.item4
@@ -687,10 +740,8 @@ class EpisodeGrid extends StatelessWidget {
                                       }),
                                   if (menuList.contains(1))
                                     FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
+                                        backgroundColor:
+                                            context.priamryContainer,
                                         title: data.item2.contains(
                                                 episodes![index].enclosureUrl)
                                             ? Text(s.remove)
@@ -719,10 +770,8 @@ class EpisodeGrid extends StatelessWidget {
                                         }),
                                   if (menuList.contains(2))
                                     FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
+                                        backgroundColor:
+                                            context.priamryContainer,
                                         title: isLiked
                                             ? Text(s.unlike)
                                             : Text(s.like),
@@ -749,10 +798,8 @@ class EpisodeGrid extends StatelessWidget {
                                         }),
                                   if (menuList.contains(3))
                                     FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
+                                        backgroundColor:
+                                            context.priamryContainer,
                                         title: isListened > 0
                                             ? Text(s.markNotListened,
                                                 style: TextStyle(
@@ -792,10 +839,8 @@ class EpisodeGrid extends StatelessWidget {
                                         }),
                                   if (menuList.contains(4))
                                     FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
+                                        backgroundColor:
+                                            context.priamryContainer,
                                         title: isDownloaded
                                             ? Text(s.downloaded,
                                                 style: TextStyle(
@@ -812,30 +857,33 @@ class EpisodeGrid extends StatelessWidget {
                                         }),
                                   if (menuList.contains(5))
                                     FocusedMenuItem(
-                                        backgroundColor: context.brightness ==
-                                                Brightness.light
-                                            ? context.primaryColor
-                                            : context.dialogBackgroundColor,
-                                        title: Text(s.playNext),
-                                        trailingIcon: Icon(
-                                          LineIcons.lightningBolt,
-                                          color: Colors.amber,
-                                        ),
-                                        onPressed: () {
-                                          audio.moveToTop(episodes![index]);
-                                          Fluttertoast.showToast(
-                                            msg: s.playNextDes,
-                                            gravity: ToastGravity.BOTTOM,
-                                          );
-                                        }),
+                                      backgroundColor: context.priamryContainer,
+                                      title: Text(s.playNext),
+                                      trailingIcon: Icon(
+                                        LineIcons.lightningBolt,
+                                        color: Colors.amber,
+                                      ),
+                                      onPressed: () {
+                                        audio.moveToTop(episodes![index]);
+                                        Fluttertoast.showToast(
+                                          msg: s.playNextDes,
+                                          gravity: ToastGravity.BOTTOM,
+                                        );
+                                      },
+                                    ),
                                 ],
                                 onPressed: action,
-                                child: _episodeCard(context,
-                                    index: index,
-                                    isLiked: isLiked,
-                                    isDownloaded: isDownloaded,
-                                    color: c,
-                                    boo: boo),
+                                child: _episodeCard(
+                                  context,
+                                  index: index,
+                                  isLiked: isLiked,
+                                  isListened: isListened,
+                                  isDownloaded: isDownloaded,
+                                  cardColor:
+                                      episodes![index].cardColor(context),
+                                  color: c,
+                                  boo: boo,
+                                ),
                               ),
                             ),
                     );

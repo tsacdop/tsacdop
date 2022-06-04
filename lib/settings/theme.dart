@@ -11,16 +11,16 @@ class ThemeSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    var settings = Provider.of<SettingState>(context, listen: false);
+    final settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: context.overlay,
       child: Scaffold(
-        backgroundColor: context.onPrimary,
+        backgroundColor: context.background,
         appBar: AppBar(
           title: Text(s.settingsAppearance),
           leading: CustomBackButton(),
           elevation: 0,
-          backgroundColor: context.onPrimary,
+          backgroundColor: context.background,
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -52,7 +52,7 @@ class ThemeSetting extends StatelessWidget {
                 pageBuilder: (context, animaiton, secondaryAnimation) =>
                     AnnotatedRegion<SystemUiOverlayStyle>(
                   value: SystemUiOverlayStyle(
-                    statusBarIconBrightness: Brightness.light,
+                    statusBarColor: Colors.transparent,
                     systemNavigationBarColor:
                         Theme.of(context).brightness == Brightness.light
                             ? Color.fromRGBO(113, 113, 113, 1)
@@ -151,13 +151,18 @@ class ThemeSetting extends StatelessWidget {
             ListTile(
               onTap: () => generalDialog(
                 context,
-                title: Text.rich(TextSpan(text: s.chooseA, children: [
+                title: Text.rich(
                   TextSpan(
-                      text: ' ${s.color}',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: context.accentColor))
-                ])),
+                    text: s.chooseA,
+                    children: [
+                      TextSpan(
+                          text: ' ${s.color}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: context.accentColor))
+                    ],
+                  ),
+                ),
                 content: _ColorPicker(
                   onColorChanged: (value) => settings.setAccentColor = value,
                 ),
@@ -252,29 +257,6 @@ class __ColorPickerState extends State<_ColorPicker>
         setState(() => _index = _controller!.index);
       });
   }
-
-  Widget _colorCircle(Color color) => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          onTap: () => widget.onColorChanged!(color),
-          child: Container(
-            decoration: BoxDecoration(
-                border: color == context.accentColor
-                    ? Border.all(color: Colors.grey[400]!, width: 4)
-                    : null,
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: color),
-          ),
-        ),
-      );
-
-  List<Widget> _accentList(MaterialAccentColor color) => [
-        _colorCircle(color.shade100),
-        _colorCircle(color.shade200),
-        _colorCircle(color.shade400),
-        _colorCircle(color.shade700)
-      ];
 
   @override
   Widget build(BuildContext context) {
@@ -397,4 +379,27 @@ class __ColorPickerState extends State<_ColorPicker>
       ),
     );
   }
+
+  Widget _colorCircle(Color color) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          onTap: () => widget.onColorChanged!(color),
+          child: Container(
+            decoration: BoxDecoration(
+                border: color == context.accentColor
+                    ? Border.all(color: Colors.grey[400]!, width: 4)
+                    : null,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: color),
+          ),
+        ),
+      );
+
+  List<Widget> _accentList(MaterialAccentColor color) => [
+        _colorCircle(color.shade100),
+        _colorCircle(color.shade200),
+        _colorCircle(color.shade400),
+        _colorCircle(color.shade700)
+      ];
 }

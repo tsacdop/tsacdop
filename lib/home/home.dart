@@ -97,8 +97,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       value: SystemUiOverlayStyle(
         systemNavigationBarIconBrightness: context.brightness,
         statusBarIconBrightness: context.iconBrightness,
-        systemNavigationBarColor: context.onPrimary,
-        statusBarColor: context.onPrimary,
+        systemNavigationBarColor: context.background,
+        statusBarColor: context.background,
       ),
       child: WillPopScope(
         onWillPop: () async {
@@ -115,7 +115,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         },
         child: Scaffold(
           key: _scaffoldKey,
-          backgroundColor: context.onPrimary,
+          backgroundColor: context.background,
           body: Stack(
             children: <Widget>[
               SafeArea(
@@ -163,8 +163,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                       Theme.of(context).brightness ==
                                               Brightness.light
                                           ? settings.setTheme = ThemeMode.dark
-                                          : settings.setTheme =
-                                              ThemeMode.light
+                                          : settings.setTheme = ThemeMode.light
                                     },
                                     child: Text(
                                       'Tsacdop',

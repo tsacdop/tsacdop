@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tsacdop/util/extension_helper.dart';
 
 class CustomTabView extends StatefulWidget {
   final int itemCount;
@@ -108,7 +109,7 @@ class _CustomTabsState extends State<CustomTabView>
             unselectedLabelColor: Colors.grey[700],
             indicator: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(15)),
-              color: Theme.of(context).accentColor,
+              color: context.accentColor,
             ),
             tabs: List.generate(
               widget.itemCount,

@@ -32,9 +32,9 @@ extension ContextExtension on BuildContext {
   double get paddingTop => MediaQuery.of(this).padding.top;
   TextTheme get textTheme => Theme.of(this).textTheme;
   SystemUiOverlayStyle get overlay => SystemUiOverlayStyle(
-        statusBarColor: onPrimary,
+        statusBarColor: background,
         statusBarIconBrightness: iconBrightness,
-        systemNavigationBarColor: onPrimary,
+        systemNavigationBarColor: background,
         systemNavigationBarIconBrightness: iconBrightness,
       );
   S get s => S.of(this)!;
