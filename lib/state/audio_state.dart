@@ -165,7 +165,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   bool? _boostVolume;
 
   /// Boost volume gain.
-  int? _volumeGain;
+  late int _volumeGain;
 
   // ignore: prefer_final_fields
   bool _playerRunning = false;
@@ -241,7 +241,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   PlayerHeight? get playerHeight => _playerHeight;
   bool? get skipSilence => _skipSilence;
   bool? get boostVolume => _boostVolume;
-  int? get volumeGain => _volumeGain;
+  int get volumeGain => _volumeGain;
 
   set setSwitchValue(double value) {
     _switchValue = value;
@@ -303,7 +303,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
         );
         await _playlist!.getPlaylist();
         if (state[1] != '') {
-          var episode = await _dbHelper.getRssItemWithUrl(state[1]);
+          final episode = await _dbHelper.getRssItemWithUrl(state[1]);
           if (episode != null &&
               ((!_playlist!.isQueue && _playlist!.contains(episode)) ||
                   (_playlist!.isQueue &&
@@ -476,18 +476,18 @@ class AudioPlayerNotifier extends ChangeNotifier {
     //Check auto sleep timer setting
     await _getAutoSleepTimer();
     if (_autoSleepTimer!) {
-      var startTime = await (_autoSleepTimerStartStorage.getInt(
-          defaultValue: 1380) as FutureOr<int>);
-      var endTime = await (_autoSleepTimerEndStorage.getInt(defaultValue: 360)
-          as FutureOr<int>);
-      var currentTime = DateTime.now().hour * 60 + DateTime.now().minute;
+      final startTime =
+          await (_autoSleepTimerStartStorage.getInt(defaultValue: 1380));
+      final endTime =
+          await (_autoSleepTimerEndStorage.getInt(defaultValue: 360));
+      final currentTime = DateTime.now().hour * 60 + DateTime.now().minute;
       if ((startTime > endTime &&
               (currentTime > startTime || currentTime < endTime)) ||
           ((startTime < endTime) &&
               (currentTime > startTime && currentTime < endTime))) {
-        var mode = await (_autoSleepTimerModeStorage.getInt() as FutureOr<int>);
+        final mode = await (_autoSleepTimerModeStorage.getInt());
         _sleepTimerMode = SleepTimerMode.values[mode];
-        var defaultTimer =
+        final defaultTimer =
             await _defaultSleepTimerStorage.getInt(defaultValue: 30);
         sleepTimer(defaultTimer);
       }
@@ -619,7 +619,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   /// Queue management
   Future<void> addToPlaylist(EpisodeBrief episode) async {
-    var episodeNew = await (_dbHelper.getRssItemWithUrl(episode.enclosureUrl)
+    final episodeNew = await (_dbHelper.getRssItemWithUrl(episode.enclosureUrl)
         as FutureOr<EpisodeBrief>);
     if (episodeNew.isNew == 1) {
       await _dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
@@ -635,7 +635,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> addToPlaylistAt(EpisodeBrief episode, int index) async {
-    var episodeNew = await (_dbHelper.getRssItemWithUrl(episode.enclosureUrl)
+    final episodeNew = await (_dbHelper.getRssItemWithUrl(episode.enclosureUrl)
         as FutureOr<EpisodeBrief>);
     if (episodeNew.isNew == 1) {
       await _dbHelper.removeEpisodeNewMark(episodeNew.enclosureUrl);
@@ -680,11 +680,11 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<int> delFromPlaylist(EpisodeBrief episode) async {
-    var episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
+    final episodeNew = await _dbHelper.getRssItemWithUrl(episode.enclosureUrl);
     if (playerRunning && _playlist!.isQueue) {
       await _audioHandler.removeQueueItem(episodeNew!.toMediaItem());
     }
-    var index = _queue.delFromPlaylist(episodeNew);
+    final index = _queue.delFromPlaylist(episodeNew);
     if (index == 0) {
       _lastPosition = 0;
       await _positionStorage.saveInt(0);
@@ -697,7 +697,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
-    var episode = _queue.episodes[oldIndex]!;
+    final episode = _queue.episodes[oldIndex]!;
     _queue.addToPlayListAt(episode, newIndex);
     updatePlaylist(_queue, updateEpisodes: false);
     if (playerRunning && _playlist!.name == 'Queue') {
@@ -910,13 +910,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
   set setVolumeGain(int volumeGain) {
     _volumeGain = volumeGain;
     if (_playerRunning && _boostVolume!) {
-      setBoostVolume(boostVolume: _boostVolume, gain: _volumeGain);
+      setBoostVolume(boostVolume: _boostVolume!, gain: _volumeGain);
     }
     notifyListeners();
     _volumeGainStorage.saveInt(volumeGain);
   }
 
-  Future<void> setBoostVolume({required bool? boostVolume, int? gain}) async {
+  Future<void> setBoostVolume({required bool boostVolume, int? gain}) async {
     await _audioHandler.customAction(
         'setBoostVolume', {'boostVolume': boostVolume, 'gain': _volumeGain});
     _boostVolume = boostVolume;
@@ -1297,7 +1297,7 @@ class CustomAudioHandler extends BaseAudioHandler
 
   Future _setBoostVolume(bool enabled, int gain) async {
     await _loudnessEnhancer.setEnabled(enabled);
-    await _loudnessEnhancer.setTargetGain(1.5);
+    await _loudnessEnhancer.setTargetGain(gain / 2000);
   }
 
   List<MediaControl> _getControls(int? index) {

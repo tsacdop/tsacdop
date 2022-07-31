@@ -180,7 +180,7 @@ class _PlaySettingState extends State<PlaySetting> {
                     EdgeInsets.only(left: 70.0, right: 20, bottom: 10, top: 10),
                 title: Text(s.settingsBoostVolume),
                 subtitle: Text(s.settingsBoostVolumeDes),
-                trailing: Selector<AudioPlayerNotifier, int?>(
+                trailing: Selector<AudioPlayerNotifier, int>(
                   selector: (_, audio) => audio.volumeGain,
                   builder: (_, volumeGain, __) => MyDropdownButton(
                       hint: Text(_volumeEffect(context, volumeGain)),
@@ -189,7 +189,7 @@ class _PlaySettingState extends State<PlaySetting> {
                       displayItemCount: 5,
                       isDense: true,
                       value: volumeGain,
-                      onChanged: (dynamic value) => audio.setVolumeGain = value,
+                      onChanged: (int value) => audio.setVolumeGain = value,
                       items: [2000, 3000, 4000].map<DropdownMenuItem<int>>((e) {
                         return DropdownMenuItem<int>(
                             value: e, child: Text(_volumeEffect(context, e)));

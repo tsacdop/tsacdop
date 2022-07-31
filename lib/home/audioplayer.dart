@@ -54,11 +54,54 @@ class PlayerWidget extends StatelessWidget {
   PlayerWidget({this.playerKey, this.isPlayingPage = false});
   final GlobalKey<AudioPanelState>? playerKey;
   final bool isPlayingPage;
-  Widget _miniPanel(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight?>>(
+      selector: (_, audio) => Tuple2(audio.playerRunning, audio.playerHeight),
+      builder: (_, data, __) {
+        if (!data.item1) {
+          return Center();
+        } else {
+          final minHeight = kMinPlayerHeight[data.item2!.index];
+          final maxHeight = math.min(
+              kMaxPlayerHeight[data.item2!.index] as double,
+              context.height - 20);
+          return AudioPanel(
+            minHeight: minHeight,
+            maxHeight: maxHeight,
+            expandHeight: context.height - context.paddingTop - 20,
+            key: playerKey,
+            miniPanel: _MiniPanel(),
+            expandedPanel: ControlPanel(
+              maxHeight: maxHeight,
+              isPlayingPage: isPlayingPage,
+              onExpand: () {
+                playerKey!.currentState!.scrollToTop();
+              },
+              onClose: () {
+                playerKey!.currentState!.backToMini();
+              },
+            ),
+          );
+        }
+      },
+    );
+  }
+}
+
+class _MiniPanel extends StatelessWidget {
+  const _MiniPanel({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
+    final bgColor = audio.episode == null
+        ? context.primaryColor
+        : audio.episode!.cardColor(context);
     return Container(
-      color: context.primaryColor,
+      color: bgColor,
       height: 60,
       child:
           Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
@@ -70,7 +113,7 @@ class PlayerWidget extends StatelessWidget {
               height: 2,
               child: LinearProgressIndicator(
                 value: data.item2,
-                backgroundColor: context.primaryColor,
+                backgroundColor: bgColor,
                 valueColor: AlwaysStoppedAnimation<Color>(c),
               ),
             );
@@ -223,40 +266,6 @@ class PlayerWidget extends StatelessWidget {
       ]),
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight?>>(
-      selector: (_, audio) => Tuple2(audio.playerRunning, audio.playerHeight),
-      builder: (_, data, __) {
-        if (!data.item1) {
-          return Center();
-        } else {
-          final minHeight = kMinPlayerHeight[data.item2!.index];
-          final maxHeight = math.min(
-              kMaxPlayerHeight[data.item2!.index] as double,
-              context.height - 20);
-          return AudioPanel(
-            minHeight: minHeight,
-            maxHeight: maxHeight,
-            expandHeight: context.height - context.paddingTop - 20,
-            key: playerKey,
-            miniPanel: _miniPanel(context),
-            expandedPanel: ControlPanel(
-              maxHeight: maxHeight,
-              isPlayingPage: isPlayingPage,
-              onExpand: () {
-                playerKey!.currentState!.scrollToTop();
-              },
-              onClose: () {
-                playerKey!.currentState!.backToMini();
-              },
-            ),
-          );
-        }
-      },
-    );
-  }
 }
 
 class LastPosition extends StatelessWidget {
@@ -285,9 +294,19 @@ class LastPosition extends StatelessWidget {
                   builder: (_, data, __) => TextButton(
                       child: Row(
                         children: [
-                          Icon(Icons.flash_on, size: 18),
+                          Icon(Icons.flash_on,
+                              size: 18,
+                              color: data!
+                                  ? context.accentColor
+                                  : context.textColor),
                           SizedBox(width: 5),
-                          Text(s.skipSilence),
+                          Text(
+                            s.skipSilence,
+                            style: TextStyle(
+                                color: data
+                                    ? context.accentColor
+                                    : context.textColor),
+                          ),
                         ],
                       ),
                       style: TextButton.styleFrom(
@@ -308,26 +327,38 @@ class LastPosition extends StatelessWidget {
               SizedBox(width: 10),
               Selector<AudioPlayerNotifier, bool?>(
                   selector: (_, audio) => audio.boostVolume,
-                  builder: (_, data, __) => FlatButton(
+                  builder: (_, data, __) => TextButton(
                       child: Row(
                         children: [
-                          Icon(Icons.volume_up, size: 18),
+                          Icon(Icons.volume_up,
+                              size: 18,
+                              color: data!
+                                  ? context.accentColor
+                                  : context.textColor),
                           SizedBox(width: 5),
-                          Text(s.boostVolume),
+                          Text(
+                            s.boostVolume,
+                            style: TextStyle(
+                                color: data
+                                    ? context.accentColor
+                                    : context.textColor),
+                          ),
                         ],
                       ),
-                      color: data! ? context.accentColor : Colors.transparent,
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(
-                              color: data
-                                  ? context.accentColor
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.12))),
-                      textColor: data ? Colors.white : null,
+                      style: TextButton.styleFrom(
+                        primary:
+                            data ? context.accentColor : Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100.0),
+                            side: BorderSide(
+                                color: data
+                                    ? context.accentColor
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.12))),
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                      ),
                       onPressed: () =>
                           audio.setBoostVolume(boostVolume: !data))),
               SizedBox(width: 10),
@@ -1268,10 +1299,10 @@ class _ControlPanelState extends State<ControlPanel>
 
   @override
   Widget build(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    final audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return LayoutBuilder(
       builder: (context, constraints) {
-        var height = constraints.maxHeight;
+        final height = constraints.maxHeight;
         return Container(
           color: context.primaryColor,
           height: 300,
@@ -1499,12 +1530,12 @@ class _ControlPanelState extends State<ControlPanel>
                             padding: EdgeInsets.only(left: 60, right: 60),
                             child: LayoutBuilder(
                               builder: (context, size) {
-                                var span = TextSpan(
+                                final span = TextSpan(
                                     text: title,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20));
-                                var tp = TextPainter(
+                                final tp = TextPainter(
                                     text: span,
                                     maxLines: 1,
                                     textDirection: TextDirection.ltr);

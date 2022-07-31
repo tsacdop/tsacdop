@@ -150,7 +150,7 @@ class _DropdownMenuItemButtonState<T>
 
     Navigator.pop(
       context,
-      _DropdownRouteResult<T?>(dropdownMenuItem.value),
+      _DropdownRouteResult<T>(dropdownMenuItem.value!),
     );
   }
 

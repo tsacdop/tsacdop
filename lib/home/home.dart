@@ -58,6 +58,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   final _androidAppRetain = MethodChannel("android_app_retain");
   var feature1OverflowMode = OverflowMode.clipContent;
   var feature1EnablePulsingAnimation = false;
+  double top = 0;
 
   @override
   void initState() {
@@ -87,7 +88,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  double top = 0;
   @override
   Widget build(BuildContext context) {
     final height = (context.width - 20) / 3 + 140;
