@@ -9,33 +9,33 @@ enum SlideDirection { up, down }
 class AudioPanel extends StatefulWidget {
   final Widget miniPanel;
   final Widget expandedPanel;
-  final Widget optionPanel;
+  final Widget? optionPanel;
   final double minHeight;
   final double maxHeight;
-  final double expandHeight;
+  final double? expandHeight;
 
   AudioPanel(
-      {@required this.miniPanel,
-      @required this.expandedPanel,
+      {required this.miniPanel,
+      required this.expandedPanel,
       this.optionPanel,
       this.minHeight = 70,
       this.maxHeight = 300,
       this.expandHeight,
-      Key key})
+      Key? key})
       : super(key: key);
   @override
   AudioPanelState createState() => AudioPanelState();
 }
 
 class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
-  double initSize;
-  double _startdy;
+  double? initSize;
+  late double _startdy;
   double _move = 0;
-  AnimationController _controller;
-  AnimationController _slowController;
-  Animation _animation;
-  SlideDirection _slideDirection;
-  double _expandHeight;
+  late AnimationController _controller;
+  late AnimationController _slowController;
+  late Animation _animation;
+  SlideDirection? _slideDirection;
+  double? _expandHeight;
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
   }
 
-  double _getHeight() {
+  double? _getHeight() {
     if (_animation.value >= _expandHeight) {
       return _expandHeight;
     } else if (_animation.value <= widget.minHeight) {
@@ -94,8 +94,8 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                 child: GestureDetector(
                   onTap: backToMini,
                   child: Container(
-                    color: context.scaffoldBackgroundColor.withOpacity(0.9 *
-                        math.min(_animation.value / widget.maxHeight, 1)),
+                    color: context.background.withOpacity(
+                        0.9 * math.min(_animation.value / widget.maxHeight, 1)),
                   ),
                 ),
               )
@@ -130,22 +130,22 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                           offset: Offset(0, -1),
                           blurRadius: 1,
                           color: context.brightness == Brightness.light
-                              ? Colors.grey[400].withOpacity(0.5)
-                              : Colors.grey[800],
+                              ? Colors.grey[400]!.withOpacity(0.5)
+                              : Colors.grey[800]!,
                         ),
                         BoxShadow(
                           offset: Offset(-1, 0),
                           blurRadius: 1,
                           color: context.brightness == Brightness.light
-                              ? Colors.grey[400].withOpacity(0.5)
-                              : Colors.grey[800],
+                              ? Colors.grey[400]!.withOpacity(0.5)
+                              : Colors.grey[800]!,
                         ),
                         BoxShadow(
                           offset: Offset(1, 0),
                           blurRadius: 1,
                           color: context.brightness == Brightness.light
-                              ? Colors.grey[400].withOpacity(0.5)
-                              : Colors.grey[800],
+                              ? Colors.grey[400]!.withOpacity(0.5)
+                              : Colors.grey[800]!,
                         ),
                       ],
                     ),
@@ -158,7 +158,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
                             : 1,
                         child: SizedBox(
                           height: math.max(widget.maxHeight,
-                              math.min(_animation.value, _expandHeight)),
+                              math.min(_animation.value, _expandHeight!)),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -206,7 +206,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   _update(DragUpdateDetails event) {
     setState(() {
       _move = _startdy - event.localPosition.dy;
-      _animation = Tween<double>(begin: initSize, end: initSize + _move)
+      _animation = Tween<double>(begin: initSize, end: initSize! + _move)
           .animate(_controller);
       _slideDirection = _move > 0 ? SlideDirection.up : SlideDirection.down;
     });
@@ -292,9 +292,9 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
 }
 
 class _AudioPanelRoute extends StatefulWidget {
-  _AudioPanelRoute({this.expandPanel, this.height, Key key}) : super(key: key);
-  final Widget expandPanel;
-  final double height;
+  _AudioPanelRoute({this.expandPanel, this.height, Key? key}) : super(key: key);
+  final Widget? expandPanel;
+  final double? height;
   @override
   __AudioPanelRouteState createState() => __AudioPanelRouteState();
 }
@@ -314,7 +314,7 @@ class __AudioPanelRouteState extends State<_AudioPanelRoute> {
                 // child:
                 // Container(
                 //   color: Theme.of(context)
-                //       .scaffoldBackgroundColor
+                //       .background
                 //       .withOpacity(0.8),
                 //
                 //),
@@ -332,8 +332,8 @@ class __AudioPanelRouteState extends State<_AudioPanelRoute> {
                     offset: Offset(0, -1),
                     blurRadius: 1,
                     color: context.brightness == Brightness.light
-                        ? Colors.grey[400].withOpacity(0.5)
-                        : Colors.grey[800],
+                        ? Colors.grey[400]!.withOpacity(0.5)
+                        : Colors.grey[800]!,
                   ),
                 ],
               ),

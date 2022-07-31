@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -43,10 +44,11 @@ Future main() async {
       child: MyApp(),
     ),
   );
-  var systemUiOverlayStyle = SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.transparent);
-  SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent,
+    statusBarColor: Colors.transparent,
+  ));
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 }
@@ -54,33 +56,41 @@ Future main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Selector<SettingState, Tuple3<ThemeMode, ThemeData, ThemeData>>(
-      selector: (_, setting) =>
-          Tuple3(setting.theme, setting.lightTheme, setting.darkTheme),
+    return Selector<SettingState,
+        Tuple4<ThemeMode?, ThemeData, ThemeData, bool?>>(
+      selector: (_, setting) => Tuple4(setting.theme, setting.lightTheme,
+          setting.darkTheme, setting.useWallpaperTheme),
       builder: (_, data, child) {
         return FeatureDiscovery(
-          child: MaterialApp(
-            themeMode: data.item1,
-            debugShowCheckedModeBanner: false,
-            title: 'Tsacdop',
-            theme: data.item2,
-            darkTheme: data.item3,
-            localizationsDelegates: [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            home: context.read<SettingState>().showIntro
-                ? SlideIntro(goto: Goto.home)
-                : context.read<SettingState>().openPlaylistDefault
-                    ? PlaylistHome()
-                    : Home(),
-          ),
+          child: DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
+            final lightTheme = data.item4!
+                ? data.item2.copyWith(colorScheme: lightDynamic)
+                : data.item2;
+            final darkTheme = data.item4!
+                ? data.item3.copyWith(colorScheme: lightDynamic)
+                : data.item3;
+            return MaterialApp(
+              themeMode: data.item1,
+              debugShowCheckedModeBanner: false,
+              title: 'Tsacdop',
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              localizationsDelegates: [
+                S.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: S.delegate.supportedLocales,
+              home: context.read<SettingState>().showIntro!
+                  ? SlideIntro(goto: Goto.home)
+                  : context.read<SettingState>().openPlaylistDefault!
+                      ? PlaylistHome()
+                      : Home(),
+            );
+          }),
         );
       },
-      //child: FeatureDiscovery(child: Home()),
     );
   }
 }

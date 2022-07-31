@@ -25,86 +25,6 @@ class PlayedHistory extends StatefulWidget {
 
 class _PlayedHistoryState extends State<PlayedHistory>
     with SingleTickerProviderStateMixin {
-  /// Get play history.
-  Future<List<PlayHistory>> _getPlayHistory(int top) async {
-    var dbHelper = DBHelper();
-    List<PlayHistory> playHistory;
-    playHistory = await dbHelper.getPlayHistory(top);
-    for (var record in playHistory) {
-      await record.getEpisode();
-    }
-    return playHistory;
-  }
-
-  bool _loadMore = false;
-
-  Future<void> _loadMoreData() async {
-    if (mounted) {
-      setState(() {
-        _loadMore = true;
-      });
-    }
-    await Future.delayed(Duration(milliseconds: 500));
-    if (mounted) {
-      setState(() {
-        _top = _top + 10;
-        _loadMore = false;
-      });
-    }
-  }
-
-  int _top = 10;
-
-  Future<List<SubHistory>> getSubHistory() async {
-    var dbHelper = DBHelper();
-    return await dbHelper.getSubHistory();
-  }
-
-  TabController _controller;
-  List<int> list = const [0, 1, 2, 3, 4, 5, 6];
-
-  Future<List<FlSpot>> getData() async {
-    var dbHelper = DBHelper();
-    var stats = <FlSpot>[];
-
-    for (var day in list) {
-      var mins = await dbHelper.listenMins(7 - day);
-      stats.add(FlSpot(day.toDouble(), mins));
-    }
-    return stats;
-  }
-
-  Future recoverSub(BuildContext context, String url) async {
-    Fluttertoast.showToast(
-      msg: context.s.toastPodcastRecovering,
-      gravity: ToastGravity.BOTTOM,
-    );
-    var subscribeWorker = context.watch<GroupList>();
-    try {
-      var options = BaseOptions(
-        connectTimeout: 10000,
-        receiveTimeout: 10000,
-      );
-      var response = await Dio(options).get(url);
-      var p = RssFeed.parse(response.data);
-      var podcast = OnlinePodcast(
-          rss: url,
-          title: p.title,
-          publisher: p.author,
-          description: p.description,
-          image: p.itunes.image.href);
-      var item = SubscribeItem(podcast.rss, podcast.title,
-          imgUrl: podcast.image, group: 'Home');
-      subscribeWorker.setSubscribeItem(item);
-    } catch (e) {
-      developer.log(e.toString(), name: 'Recover podcast error');
-      Fluttertoast.showToast(
-        msg: context.s.toastRecoverFailed,
-        gravity: ToastGravity.BOTTOM,
-      );
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -113,7 +33,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -122,14 +42,9 @@ class _PlayedHistoryState extends State<PlayedHistory>
   Widget build(BuildContext context) {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-      ),
+      value: context.overlay,
       child: Scaffold(
-        backgroundColor: context.primaryColor,
+        backgroundColor: context.background,
         body: SafeArea(
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxScrolled) {
@@ -196,7 +111,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                           onNotification: (scrollInfo) {
                             if (scrollInfo.metrics.pixels ==
                                     scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data.length == _top) {
+                                snapshot.data!.length == _top) {
                               if (!_loadMore) {
                                 _loadMoreData();
                               }
@@ -205,9 +120,9 @@ class _PlayedHistoryState extends State<PlayedHistory>
                           },
                           child: ListView.builder(
                               scrollDirection: Axis.vertical,
-                              itemCount: snapshot.data.length + 1,
+                              itemCount: snapshot.data!.length + 1,
                               itemBuilder: (context, index) {
-                                if (index == snapshot.data.length) {
+                                if (index == snapshot.data!.length) {
                                   return SizedBox(
                                       height: 2,
                                       child: _loadMore
@@ -215,12 +130,12 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                           : Center());
                                 } else {
                                   var seekValue =
-                                      snapshot.data[index].seekValue;
-                                  var seconds = snapshot.data[index].seconds;
+                                      snapshot.data![index].seekValue!;
+                                  var seconds = snapshot.data![index].seconds;
                                   return Container(
                                     padding:
                                         const EdgeInsets.symmetric(vertical: 5),
-                                    color: context.scaffoldBackgroundColor,
+                                    color: context.background,
                                     child: Column(
                                       children: <Widget>[
                                         ListTile(
@@ -234,7 +149,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                 DateFormat.yMd()
                                                     .add_jm()
                                                     .format(snapshot
-                                                        .data[index].playdate),
+                                                        .data![index]
+                                                        .playdate!),
                                                 style: TextStyle(
                                                     color: context.textColor
                                                         .withOpacity(0.8),
@@ -243,7 +159,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                         FontStyle.italic),
                                               ),
                                               Text(
-                                                snapshot.data[index].title,
+                                                snapshot.data![index].title!,
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -261,7 +177,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                     border: Border(
                                                         bottom: BorderSide(
                                                             color: Colors
-                                                                .grey[400],
+                                                                .grey[400]!,
                                                             width: 2.0))),
                                                 width: width * seekValue <
                                                         (width - 120)
@@ -285,7 +201,7 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                 child: Text(
                                                   seconds == 0 && seekValue == 1
                                                       ? s.mark
-                                                      : seconds.toInt().toTime,
+                                                      : seconds!.toInt().toTime,
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),
@@ -314,11 +230,11 @@ class _PlayedHistoryState extends State<PlayedHistory>
                       ? ListView.builder(
                           // shrinkWrap: true,
                           scrollDirection: Axis.vertical,
-                          itemCount: snapshot.data.length,
+                          itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
-                            var _status = snapshot.data[index].status;
+                            var _status = snapshot.data![index].status;
                             return Container(
-                              color: context.scaffoldBackgroundColor,
+                              color: context.background,
                               child: Column(
                                 children: <Widget>[
                                   ListTile(
@@ -331,26 +247,26 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                       children: <Widget>[
                                         Text(
                                           DateFormat.yMd().add_jm().format(
-                                              snapshot.data[index].subDate),
+                                              snapshot.data![index].subDate),
                                           style: TextStyle(
                                               color: context.textColor
                                                   .withOpacity(0.8),
                                               fontSize: 15,
                                               fontStyle: FontStyle.italic),
                                         ),
-                                        Text(snapshot.data[index].title),
+                                        Text(snapshot.data![index].title!),
                                       ],
                                     ),
                                     subtitle: _status
                                         ? Text(s.daysAgo(DateTime.now()
                                             .difference(
-                                                snapshot.data[index].subDate)
+                                                snapshot.data![index].subDate)
                                             .inDays))
                                         : Text(
                                             s.removedAt(DateFormat.yMd()
                                                 .add_jm()
                                                 .format(snapshot
-                                                    .data[index].delDate)),
+                                                    .data![index].delDate)),
                                             style: TextStyle(color: Colors.red),
                                           ),
                                     trailing: !_status
@@ -362,7 +278,8 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                                   .alternativeTrashRestore),
                                               onPressed: () => recoverSub(
                                                   context,
-                                                  snapshot.data[index].rssUrl),
+                                                  snapshot
+                                                      .data![index].rssUrl!),
                                             ),
                                           )
                                         : null,
@@ -387,6 +304,86 @@ class _PlayedHistoryState extends State<PlayedHistory>
         ),
       ),
     );
+  }
+
+  /// Get play history.
+  Future<List<PlayHistory>> _getPlayHistory(int top) async {
+    var dbHelper = DBHelper();
+    List<PlayHistory> playHistory;
+    playHistory = await dbHelper.getPlayHistory(top);
+    for (var record in playHistory) {
+      await record.getEpisode();
+    }
+    return playHistory;
+  }
+
+  bool _loadMore = false;
+
+  Future<void> _loadMoreData() async {
+    if (mounted) {
+      setState(() {
+        _loadMore = true;
+      });
+    }
+    await Future.delayed(Duration(milliseconds: 500));
+    if (mounted) {
+      setState(() {
+        _top = _top + 10;
+        _loadMore = false;
+      });
+    }
+  }
+
+  int _top = 10;
+
+  Future<List<SubHistory>> getSubHistory() async {
+    var dbHelper = DBHelper();
+    return await dbHelper.getSubHistory();
+  }
+
+  TabController? _controller;
+  List<int> list = const [0, 1, 2, 3, 4, 5, 6];
+
+  Future<List<FlSpot>> getData() async {
+    var dbHelper = DBHelper();
+    var stats = <FlSpot>[];
+
+    for (var day in list) {
+      var mins = await dbHelper.listenMins(7 - day);
+      stats.add(FlSpot(day.toDouble(), mins));
+    }
+    return stats;
+  }
+
+  Future recoverSub(BuildContext context, String url) async {
+    Fluttertoast.showToast(
+      msg: context.s.toastPodcastRecovering,
+      gravity: ToastGravity.BOTTOM,
+    );
+    var subscribeWorker = context.watch<GroupList>();
+    try {
+      var options = BaseOptions(
+        connectTimeout: 10000,
+        receiveTimeout: 10000,
+      );
+      var response = await Dio(options).get(url);
+      var p = RssFeed.parse(response.data);
+      var podcast = OnlinePodcast(
+          rss: url,
+          title: p.title,
+          publisher: p.author,
+          description: p.description,
+          image: p.itunes!.image!.href);
+      var item = SubscribeItem(podcast.rss, podcast.title,
+          imgUrl: podcast.image, group: 'Home');
+      subscribeWorker.setSubscribeItem(item);
+    } catch (e) {
+      developer.log(e.toString(), name: 'Recover podcast error');
+      Fluttertoast.showToast(
+        msg: context.s.toastRecoverFailed,
+        gravity: ToastGravity.BOTTOM,
+      );
+    }
   }
 }
 
@@ -416,7 +413,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class HistoryChart extends StatelessWidget {
-  final List<FlSpot> stats;
+  final List<FlSpot>? stats;
   HistoryChart(this.stats);
   @override
   Widget build(BuildContext context) {
@@ -476,12 +473,12 @@ class HistoryChart extends StatelessWidget {
           lineTouchData: LineTouchData(
             enabled: true,
             touchTooltipData: LineTouchTooltipData(
-              tooltipBgColor: context.scaffoldBackgroundColor,
+              tooltipBgColor: context.background,
               fitInsideHorizontally: true,
               getTooltipItems: (touchedBarSpots) {
                 return touchedBarSpots.map((barSpot) {
                   return LineTooltipItem(context.s.minsCount(barSpot.y.toInt()),
-                      context.textTheme.subtitle1);
+                      context.textTheme.subtitle1!);
                 }).toList();
               },
             ),

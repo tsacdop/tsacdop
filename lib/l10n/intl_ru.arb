@@ -1,0 +1,783 @@
+{
+  "@@locale": "ru",
+  "add": "Добавить",
+  "@add": {
+    "description": "Subscribe new podcast"
+  },
+  "addEpisodeGroup": "{count, plural, zero{} one{{count} выпуск в {groupName} добавлен в плейлист} few{{count} выпуска в {groupName} добавлены в плейлист} many{{count} выпусков в {groupName} добавлены в плейлист} other{{count} выпусков в {groupName} добавлены в плейлист}}",
+  "@addEpisodeGroup": {
+    "placeholders": {
+      "groupName": {}
+    }
+  },
+  "addNewEpisodeAll": "{count, plural, zero{} one{{count} выпуск добавлен в плейлист} few{{count} выпуска добавлены в плейлист} many{{count} выпусков добавлены в плейлист} other{{count} выпусков добавлены в плейлист}}",
+  "@addNewEpisodeAll": {},
+  "addNewEpisodeTooltip": "Добавить новые выпуски в плейлист",
+  "@addNewEpisodeTooltip": {},
+  "addSomeGroups": "Добавить несколько групп",
+  "@addSomeGroups": {
+    "description": "Please add new groups"
+  },
+  "all": "Все",
+  "@all": {},
+  "autoDownload": "Автозагрузка",
+  "@autoDownload": {},
+  "back": "Назад",
+  "@back": {},
+  "boostVolume": "Усиление громкости",
+  "@boostVolume": {
+    "description": "Boost volume in player widget."
+  },
+  "buffering": "Буферизация",
+  "@buffering": {},
+  "cancel": "ОТМЕНА",
+  "@cancel": {},
+  "cellularConfirm": "Предупреждение о мобильной сети",
+  "@cellularConfirm": {},
+  "cellularConfirmDes": "Вы уверены, что хотите использовать мобильную сеть для загрузки?",
+  "@cellularConfirmDes": {},
+  "changeLayout": "Изменить интерфейс",
+  "@changeLayout": {},
+  "changelog": "История изменений",
+  "@changelog": {},
+  "chooseA": "Выберите",
+  "@chooseA": {},
+  "clear": "Очистить",
+  "@clear": {},
+  "clearAll": "Очистить все",
+  "@clearAll": {
+    "description": "Clear all episodes in playlist."
+  },
+  "color": "цвет",
+  "@color": {},
+  "confirm": "ПОДТВЕРДИТЬ",
+  "@confirm": {},
+  "createNewPlaylist": "Новый плейлист",
+  "@createNewPlaylist": {},
+  "darkMode": "Темная",
+  "@darkMode": {},
+  "daysAgo": "{count, plural, zero{Сегодня} one{День назад} few{{count} дня назад} many{{count} дней назад} other{{count} дней назад}}",
+  "@daysAgo": {},
+  "daysCount": "{count, plural, zero{Никогда} one{День} few{{count} дня} many{{count} дней} other{{count} дней}}",
+  "@daysCount": {},
+  "defaultQueueReminder": "Это очередь по умолчанию. Ее удалить нельзя.",
+  "@defaultQueueReminder": {
+    "description": "Remind user that default queue can't be removed."
+  },
+  "defaultSearchEngine": "Поисковая система подкастов по умолчанию",
+  "@defaultSearchEngine": {},
+  "defaultSearchEngineDes": "Выберите поисковую систему подкастов по умолчанию",
+  "@defaultSearchEngineDes": {
+    "description": "Choose the default podcast search engine"
+  },
+  "delete": "Удалить",
+  "@delete": {},
+  "developer": "Разработчик",
+  "@developer": {
+    "description": "Can also translate to About me"
+  },
+  "dismiss": "Отклонить",
+  "@dismiss": {},
+  "done": "Готово",
+  "@done": {},
+  "download": "Загружено",
+  "@download": {},
+  "downloaded": "Загружено",
+  "@downloaded": {},
+  "downloadRemovedToast": "Загрузка удалена",
+  "@downloadRemovedToast": {},
+  "downloadStart": "Загрузка",
+  "@downloadStart": {
+    "description": "Toast of downloading"
+  },
+  "editGroupName": "Изменить название группы",
+  "@editGroupName": {},
+  "endOfEpisode": "Конец выпуска",
+  "@endOfEpisode": {},
+  "episode": "{count, plural, zero{} one{выпуск} few{выпуска} many{выпусков} other{выпусков}}",
+  "@episode": {},
+  "fastForward": "Перемотка вперед",
+  "@fastForward": {},
+  "fastRewind": "Быстрая перемотка",
+  "@fastRewind": {},
+  "featureDiscoveryEditGroup": "Нажмите, чтобы изменить группу",
+  "@featureDiscoveryEditGroup": {},
+  "featureDiscoveryEditGroupDes": "Здесь можно изменить название группы или удалить ее. Домашнюю группу нельзя удалить или отредактировать.",
+  "@featureDiscoveryEditGroupDes": {},
+  "featureDiscoveryEpisode": "Просмотр выпуска",
+  "@featureDiscoveryEpisode": {},
+  "featureDiscoveryEpisodeDes": "Удерживайте для воспроизведения выпуска или добавления его в плейлист",
+  "@featureDiscoveryEpisodeDes": {},
+  "featureDiscoveryEpisodeTitle": "Удерживайте для немедленного воспроизведения выпуска",
+  "@featureDiscoveryEpisodeTitle": {},
+  "featureDiscoveryGroup": "Нажмите для добавления группы",
+  "@featureDiscoveryGroup": {},
+  "featureDiscoveryGroupDes": "Домашняя группа - это группа по умолчанию для новых подкастов. Вы можете создавать новые группы и перемещать в них подкасты, а также добавлять подкасты в несколько групп.",
+  "@featureDiscoveryGroupDes": {},
+  "featureDiscoveryGroupPodcast": "Нажмите и удерживайте, чтобы изменить порядок подкастов",
+  "@featureDiscoveryGroupPodcast": {},
+  "featureDiscoveryGroupPodcastDes": "Нажмите, чтобы получить доступ к дополнительным параметрам, длительное нажатие позволит изменить порядок подкастов в группе.",
+  "@featureDiscoveryGroupPodcastDes": {},
+  "featureDiscoveryOMPL": "Нажмите для импорта OPML",
+  "@featureDiscoveryOMPL": {},
+  "featureDiscoveryOMPLDes": "Вы можете импортировать файл OPML, перейти в настройки или обновить все подкасты.",
+  "@featureDiscoveryOMPLDes": {},
+  "featureDiscoveryPlaylist": "Нажмите для открытия плейлиста.",
+  "@featureDiscoveryPlaylist": {},
+  "featureDiscoveryPlaylistDes": "Добавьте выпуски в плейлист. Они будут автоматически удалены после прослушивания.",
+  "@featureDiscoveryPlaylistDes": {},
+  "featureDiscoveryPodcast": "Просмотр подкаста",
+  "@featureDiscoveryPodcast": {},
+  "featureDiscoveryPodcastDes": "Чтобы добавить группы или управлять подкастами, можно нажать 'Посмотреть все'.",
+  "@featureDiscoveryPodcastDes": {},
+  "featureDiscoveryPodcastTitle": "Прокрутите по вертикали, чтобы переключить группы",
+  "@featureDiscoveryPodcastTitle": {},
+  "featureDiscoverySearch": "Нажмите для поиска подкастов",
+  "@featureDiscoverySearch": {},
+  "featureDiscoverySearchDes": "Вы можете искать по названию подкаста, ключевому слову или RSS-ссылке, чтобы подписаться на новые подкасты.",
+  "@featureDiscoverySearchDes": {},
+  "feedbackEmail": "Написать мне",
+  "@feedbackEmail": {},
+  "feedbackGithub": "GitHub",
+  "@feedbackGithub": {},
+  "feedbackPlay": "Оценить в Play Store",
+  "@feedbackPlay": {
+    "description": "Rate on Google Play Store.\nUser can tap to open play link."
+  },
+  "feedbackTelegram": "Telegram",
+  "@feedbackTelegram": {},
+  "filter": "Фильтр",
+  "@filter": {},
+  "fonts": "Шрифты",
+  "@fonts": {},
+  "fontStyle": "Стиль шрифта",
+  "@fontStyle": {},
+  "from": "С {time}",
+  "@from": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "goodNight": "Спокойной ночи",
+  "@goodNight": {},
+  "gpodderLoginDes": "Поздравляем! Вы успешно связали учетную запись gpodder.net. Tsacdop будет автоматически синхронизировать подписки на вашем устройстве с вашей учетной записью gpodder.net.",
+  "@gpodderLoginDes": {},
+  "groupExisted": "Нажмите, чтобы добавить группу",
+  "@groupExisted": {
+    "description": "Group name validate in add group dialog. User can't add group with same name."
+  },
+  "groupFilter": "Фильтр по группе",
+  "@groupFilter": {},
+  "groupRemoveConfirm": "Вы уверены, что хотите удалить эту группу? Подкасты будут перемещены в домашнюю группу.",
+  "@groupRemoveConfirm": {},
+  "groups": "{count, plural, zero{Группа} one{Группа} few{Группы} many{Групп} other{Групп}}",
+  "@groups": {},
+  "hideListenedSetting": "Скрыть прослушанное",
+  "@hideListenedSetting": {},
+  "hidePodcastDiscovery": "Скрыть обнаружение подкастов",
+  "@hidePodcastDiscovery": {
+    "description": "Hide podcast discovery"
+  },
+  "hidePodcastDiscoveryDes": "Скрыть обнаружение подкастов на странице поиска",
+  "@hidePodcastDiscoveryDes": {},
+  "homeGroupsSeeAll": "Посмотреть все",
+  "@homeGroupsSeeAll": {},
+  "homeMenuPlaylist": "Плейлист",
+  "@homeMenuPlaylist": {},
+  "homeSubMenuSortBy": "Сортировка",
+  "@homeSubMenuSortBy": {},
+  "homeTabMenuFavotite": "Избранное",
+  "@homeTabMenuFavotite": {},
+  "homeTabMenuRecent": "Недавние",
+  "@homeTabMenuRecent": {},
+  "homeToprightMenuAbout": "О приложении",
+  "@homeToprightMenuAbout": {},
+  "homeToprightMenuImportOMPL": "Импорт OPML",
+  "@homeToprightMenuImportOMPL": {},
+  "homeToprightMenuRefreshAll": "Обновить все",
+  "@homeToprightMenuRefreshAll": {},
+  "hostedOn": "Размещено на {host}",
+  "@hostedOn": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "hoursAgo": "{count, plural, zero{В течение часа} one{Час назад} few{{count} часа назад} many{{count} часов назад} other{{count} часов назад}}",
+  "@hoursAgo": {},
+  "hoursCount": "{count, plural, zero{0 час.} one{{count} час.} few{{count} час.} many{{count} час.} other{{count} час.}}",
+  "@hoursCount": {},
+  "import": "Импорт",
+  "@import": {},
+  "intergateWith": "Интегрировать с  {service}",
+  "@intergateWith": {
+    "description": "Integrate with",
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "introFourthPage": "Длительное нажатие на выпуск запускает быстрые действия.",
+  "@introFourthPage": {},
+  "introSecondPage": "Подписка на подкаст через поиск или импорт файла OPML.",
+  "@introSecondPage": {},
+  "introThirdPage": "Вы можете создать новую группу для подкастов.",
+  "@introThirdPage": {},
+  "invalidName": "Неверное имя пользователя",
+  "@invalidName": {},
+  "lastUpdate": "Последнее обновление",
+  "@lastUpdate": {
+    "description": "gpodder.net update"
+  },
+  "later": "Позже",
+  "@later": {},
+  "lightMode": "Светлая",
+  "@lightMode": {},
+  "like": "Нравится",
+  "@like": {},
+  "liked": "Нравится",
+  "@liked": {},
+  "likeDate": "Дата добавления",
+  "@likeDate": {
+    "description": "Favorite tab, sort by like date."
+  },
+  "listen": "Слушать",
+  "@listen": {},
+  "listened": "Прослушано",
+  "@listened": {},
+  "loadMore": "Загрузить еще",
+  "@loadMore": {},
+  "loggedInAs": "Авторизован как {userName}",
+  "@loggedInAs": {
+    "description": "gpodder.net",
+    "placeholders": {
+      "userName": {}
+    }
+  },
+  "login": "Войти",
+  "@login": {
+    "description": "gpodder.net login"
+  },
+  "loginFailed": "Не удалось авторизоваться",
+  "@loginFailed": {},
+  "logout": "Выйти",
+  "@logout": {
+    "description": "gpodder.net logout"
+  },
+  "mark": "Пометить",
+  "@mark": {
+    "description": "In listen history page, if a episode is marked as listened."
+  },
+  "markConfirm": "Подтвердить отметку",
+  "@markConfirm": {},
+  "markConfirmContent": "Подтвердить отметку всех выпусков как прослушанных?",
+  "@markConfirmContent": {},
+  "markListened": "Отметить как прослушанное",
+  "@markListened": {},
+  "markNotListened": "Отметить непрослушанным",
+  "@markNotListened": {},
+  "menu": "Меню",
+  "@menu": {},
+  "menuAllPodcasts": "Все подкасты",
+  "@menuAllPodcasts": {},
+  "menuMarkAllListened": "Отметить все как прослушанные",
+  "@menuMarkAllListened": {},
+  "menuViewRSS": "Доступ к RSS-каналу",
+  "@menuViewRSS": {},
+  "menuVisitSite": "Посетить сайт",
+  "@menuVisitSite": {},
+  "minsAgo": "{count, plural, zero{Только что} one{Минуту назад} few{{count} минуты назад} many{{count} минут назад} other{{count} минут назад}}",
+  "@minsAgo": {},
+  "minsCount": "{count, plural, zero{0 мин.} one{{count} мин.} few{{count} мин.} many{{count} мин.} other{{count} мин.}}",
+  "@minsCount": {},
+  "network": "Сеть",
+  "@network": {},
+  "neverAutoUpdate": "Выключить автоматическое обновление",
+  "@neverAutoUpdate": {
+    "description": "Never auto  update in podcast settings."
+  },
+  "newestFirst": "Начиная с новых",
+  "@newestFirst": {},
+  "newGroup": "Создать новую группу",
+  "@newGroup": {},
+  "next": "Следующий",
+  "@next": {},
+  "noEpisodeDownload": "Выпуски пока не загружены",
+  "@noEpisodeDownload": {},
+  "noEpisodeFavorite": "Выпуски пока не добавлены",
+  "@noEpisodeFavorite": {},
+  "noEpisodeRecent": "Нет недавних выпусков",
+  "@noEpisodeRecent": {},
+  "noPodcastGroup": "В этой группе нет подкастов",
+  "@noPodcastGroup": {},
+  "noShownote": "Для этого выпуска нет примечаний.",
+  "@noShownote": {
+    "description": "Means this episode have no show notes."
+  },
+  "notificaitonFatch": "Получить данные {title}",
+  "@notificaitonFatch": {},
+  "notificationNetworkError": "Подписка не удалась, ошибка сети {title}",
+  "@notificationNetworkError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSetting": "Панель уведомлений",
+  "@notificationSetting": {},
+  "notificationSubscribe": "Подписаться на {title}",
+  "@notificationSubscribe": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSubscribeExisted": "Подписка не удалась, подкаст уже существует {title}",
+  "@notificationSubscribeExisted": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationSuccess": "Успешная подписка на {title}",
+  "@notificationSuccess": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdate": "Обновить {title}",
+  "@notificationUpdate": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "notificationUpdateError": "Ошибка обновления {title}",
+  "@notificationUpdateError": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "oldestFirst": "Начиная со старых",
+  "@oldestFirst": {},
+  "passwdRequired": "Требуется пароль",
+  "@passwdRequired": {},
+  "password": "Пароль",
+  "@password": {},
+  "pause": "Пауза",
+  "@pause": {},
+  "play": "Воспроизвести",
+  "@play": {},
+  "playback": "Управление воспроизведением",
+  "@playback": {},
+  "player": "Плейер",
+  "@player": {},
+  "playerHeightMed": "Средний",
+  "@playerHeightMed": {},
+  "playerHeightShort": "Низкий",
+  "@playerHeightShort": {},
+  "playerHeightTall": "Высокий",
+  "@playerHeightTall": {},
+  "playing": "Проигрывается",
+  "@playing": {},
+  "playlistExisted": "Название плейлиста существует",
+  "@playlistExisted": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlistNameEmpty": "Название плейлиста пустое",
+  "@playlistNameEmpty": {
+    "description": "Error string when creating new playlist."
+  },
+  "playlists": "Плейлисты",
+  "@playlists": {
+    "description": "Title for playlists tab."
+  },
+  "playNext": "Воспроизвести следующий",
+  "@playNext": {
+    "description": "Popup menu for episode."
+  },
+  "playNextDes": "Добавить выпуск в начало плейлиста",
+  "@playNextDes": {
+    "description": "Description for next play."
+  },
+  "plugins": "Плагины",
+  "@plugins": {},
+  "podcast": "{count, plural, zero{} one{Подкаст} few{Подкаста} many{Подкастов} other{Подкастов}}",
+  "@podcast": {},
+  "podcastSubscribed": "Подписка оформлена",
+  "@podcastSubscribed": {},
+  "popupMenuDownloadDes": "Скачать выпуск",
+  "@popupMenuDownloadDes": {},
+  "popupMenuLaterDes": "Добавить выпуск в плейлист",
+  "@popupMenuLaterDes": {},
+  "popupMenuLikeDes": "Добавить выпуск в избранное",
+  "@popupMenuLikeDes": {},
+  "popupMenuMarkDes": "Отметить выпуск как прослушанный",
+  "@popupMenuMarkDes": {},
+  "popupMenuPlayDes": "Воспроизвести выпуск",
+  "@popupMenuPlayDes": {},
+  "privacyPolicy": "Политика конфиденциальности",
+  "@privacyPolicy": {},
+  "published": "Опубликовано {date}",
+  "@published": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "publishedDaily": "Публикуется ежедневно",
+  "@publishedDaily": {},
+  "publishedMonthly": "Публикуется ежемесячно",
+  "@publishedMonthly": {},
+  "publishedWeekly": "Публикуется еженедельно",
+  "@publishedWeekly": {
+    "description": "In search podcast detail page."
+  },
+  "publishedYearly": "Публикуется ежегодно",
+  "@publishedYearly": {},
+  "queue": "Очередь",
+  "@queue": {
+    "description": "Queue"
+  },
+  "recoverSubscribe": "Восстановить подписку",
+  "@recoverSubscribe": {
+    "description": "User can recover subscribe podcast after remove it in subscribe history page."
+  },
+  "refresh": "Обновить",
+  "@refresh": {
+    "description": "Refresh"
+  },
+  "refreshArtwork": "Обновить обложку",
+  "@refreshArtwork": {},
+  "refreshStarted": "Обновление",
+  "@refreshStarted": {
+    "description": "Toast for refresh"
+  },
+  "remove": "Удалить",
+  "@remove": {
+    "description": "Remove not \"removed\". \nRemove a podcast or a group."
+  },
+  "removeConfirm": "Подтверждение удаления",
+  "@removeConfirm": {
+    "description": "unsubscribe podcast dialog"
+  },
+  "removedAt": "Удалено {date}",
+  "@removedAt": {
+    "description": "For example ：Removed at 2020.10.10",
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "removeNewMark": "Удалить новую пометку",
+  "@removeNewMark": {
+    "description": "Remove new mark for new episodes."
+  },
+  "removePodcastDes": "Вы уверены, что хотите отказаться от подписки?",
+  "@removePodcastDes": {},
+  "save": "Сохранить",
+  "@save": {},
+  "schedule": "Расписание",
+  "@schedule": {},
+  "search": "Поиск",
+  "@search": {},
+  "searchEpisode": "Поиск выпуска",
+  "@searchEpisode": {},
+  "searchHelper": "Введите название подкаста, ключевые слова или введите URL канала.",
+  "@searchHelper": {},
+  "searchInvalidRss": "Неверная ссылка RSS",
+  "@searchInvalidRss": {},
+  "searchPodcast": "Искать подкасты",
+  "@searchPodcast": {},
+  "secCount": "{count, plural, zero{0 сек} one{{count} сек} few{{count} сек} many{{count} сек} other{{count} сек}}",
+  "@secCount": {},
+  "secondsAgo": "{count, plural, zero{Только что} one{Секунду назад} few{{count} секунды назад} many{{count} секунд назад} other{{count} секунд назад}}",
+  "@secondsAgo": {},
+  "selected": "выбрано {count}",
+  "@selected": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settings": "Настройки",
+  "@settings": {},
+  "settingsAccentColor": "Цвет акцента",
+  "@settingsAccentColor": {},
+  "settingsAccentColorDes": "Выбор цвета темы",
+  "@settingsAccentColorDes": {},
+  "settingsAppearance": "Внешний вид",
+  "@settingsAppearance": {},
+  "settingsAppearanceDes": "Цвета и темы",
+  "@settingsAppearanceDes": {},
+  "settingsAppIntro": "Тур по приложению",
+  "@settingsAppIntro": {},
+  "settingsAudioCache": "Аудиокэш",
+  "@settingsAudioCache": {},
+  "settingsAudioCacheDes": "Максимальный размер аудиокэша",
+  "@settingsAudioCacheDes": {},
+  "settingsAutoDelete": "Автоудаление загрузок через",
+  "@settingsAutoDelete": {},
+  "settingsAutoDeleteDes": "По умолчанию 30 дней",
+  "@settingsAutoDeleteDes": {},
+  "settingsAutoPlayDes": "Автоматическое воспроизведение следующего выпуска в плейлисте",
+  "@settingsAutoPlayDes": {},
+  "settingsBackup": "Резервное копирование",
+  "@settingsBackup": {},
+  "settingsBackupDes": "Резервное копирование данных приложения",
+  "@settingsBackupDes": {},
+  "settingsBoostVolume": "Уровень усиления громкости",
+  "@settingsBoostVolume": {},
+  "settingsBoostVolumeDes": "Изменение уровня усиления громкости",
+  "@settingsBoostVolumeDes": {},
+  "settingsDefaultGrid": "Вид сетки по умолчанию",
+  "@settingsDefaultGrid": {},
+  "settingsDefaultGridDownload": "Вкладка 'Загрузки'",
+  "@settingsDefaultGridDownload": {},
+  "settingsDefaultGridFavorite": "Вкладка 'Избранное'",
+  "@settingsDefaultGridFavorite": {},
+  "settingsDefaultGridPodcast": "Страница подкаста",
+  "@settingsDefaultGridPodcast": {},
+  "settingsDefaultGridRecent": "Вкладка 'Недавние'",
+  "@settingsDefaultGridRecent": {},
+  "settingsDiscovery": "Повторно активировать руководство",
+  "@settingsDiscovery": {
+    "description": "Reset feature discovery state. User tap it and restart app, will see features tutorial again."
+  },
+  "settingsDownloadPosition": "Позиция для скачивания",
+  "@settingsDownloadPosition": {
+    "description": "Choose folder for downloads."
+  },
+  "settingsEnableSyncing": "Включить синхронизацию",
+  "@settingsEnableSyncing": {},
+  "settingsEnableSyncingDes": "Обновлять все подкасты в фоновом режиме, чтобы получать последние выпуски.",
+  "@settingsEnableSyncingDes": {},
+  "settingsExportDes": "Экспорт и импорт настроек приложения",
+  "@settingsExportDes": {},
+  "settingsFastForwardSec": "Секунды перемотки вперед",
+  "@settingsFastForwardSec": {},
+  "settingsFastForwardSecDes": "Изменение времени перемотки вперед в плеере",
+  "@settingsFastForwardSecDes": {},
+  "settingsFeedback": "Обратная связь",
+  "@settingsFeedback": {},
+  "settingsFeedbackDes": "Ошибки и пожелания",
+  "@settingsFeedbackDes": {},
+  "settingsHistory": "История",
+  "@settingsHistory": {},
+  "settingsHistoryDes": "Данные о прослушивании",
+  "@settingsHistoryDes": {},
+  "settingsInfo": "Информация",
+  "@settingsInfo": {},
+  "settingsInterface": "Интерфейс",
+  "@settingsInterface": {},
+  "settingsLanguages": "Языки",
+  "@settingsLanguages": {},
+  "settingsLanguagesDes": "Изменить язык",
+  "@settingsLanguagesDes": {},
+  "settingsLayout": "Стиль",
+  "@settingsLayout": {},
+  "settingsLayoutDes": "Стиль приложения",
+  "@settingsLayoutDes": {},
+  "settingsLibraries": "Библиотеки",
+  "@settingsLibraries": {},
+  "settingsLibrariesDes": "Библиотеки с открытым исходным кодом, используемые в этом приложении",
+  "@settingsLibrariesDes": {},
+  "settingsManageDownload": "Управление загрузками",
+  "@settingsManageDownload": {},
+  "settingsManageDownloadDes": "Управление загруженными аудиофайлами",
+  "@settingsManageDownloadDes": {},
+  "settingsMarkListenedSkip": "Отметить как прослушанный, если пропущен",
+  "@settingsMarkListenedSkip": {
+    "description": "Mark episode as listened when skipped to next."
+  },
+  "settingsMarkListenedSkipDes": "Автоматическая отметка выпуска как прослушанного при переходе к следующему",
+  "@settingsMarkListenedSkipDes": {},
+  "settingsMenuAutoPlay": "Автовоспроизведение",
+  "@settingsMenuAutoPlay": {},
+  "settingsNetworkCellular": "Запрос перед использованием мобильной сети",
+  "@settingsNetworkCellular": {},
+  "settingsNetworkCellularAuto": "Автоматическая загрузка через мобильную сеть",
+  "@settingsNetworkCellularAuto": {},
+  "settingsNetworkCellularAutoDes": "Вы можете настроить автоматическую загрузку подкастов на странице управления группой",
+  "@settingsNetworkCellularAutoDes": {},
+  "settingsNetworkCellularDes": "Запрашивать подтверждение при использовании мобильной сети для загрузки выпусков",
+  "@settingsNetworkCellularDes": {},
+  "settingsPlayDes": "Плейлист и плеер",
+  "@settingsPlayDes": {},
+  "settingsPlayerHeight": "Высота плейера",
+  "@settingsPlayerHeight": {},
+  "settingsPlayerHeightDes": "Изменение высоты виджета плеера по своему усмотрению",
+  "@settingsPlayerHeightDes": {},
+  "settingsPopupMenu": "Всплывающее меню выпусков",
+  "@settingsPopupMenu": {},
+  "settingsPopupMenuDes": "Настройка всплывающего меню выпусков",
+  "@settingsPopupMenuDes": {},
+  "settingsPrefrence": "Предпочтения",
+  "@settingsPrefrence": {},
+  "settingsRealDark": "Истинный черный",
+  "@settingsRealDark": {},
+  "settingsRealDarkDes": "Акцентированный темный режим",
+  "@settingsRealDarkDes": {},
+  "settingsRewindSec": "Секунды перемотки назад",
+  "@settingsRewindSec": {},
+  "settingsRewindSecDes": "Изменение времени перемотки назад в плеере",
+  "@settingsRewindSecDes": {},
+  "settingsSpeeds": "Скорости",
+  "@settingsSpeeds": {
+    "description": "Playback speeds setting."
+  },
+  "settingsSpeedsDes": "Настроить доступные скорости",
+  "@settingsSpeedsDes": {
+    "description": "Playback speed setting description"
+  },
+  "settingsSTAuto": "Автоматическое включение таймера сна",
+  "@settingsSTAuto": {},
+  "settingsSTAutoDes": "Автоматический запуск таймера сна в запланированное время",
+  "@settingsSTAutoDes": {},
+  "settingsSTDefaultTime": "Время по умолчанию",
+  "@settingsSTDefaultTime": {},
+  "settingsSTDefautTimeDes": "Время по умолчанию для таймера сна",
+  "@settingsSTDefautTimeDes": {},
+  "settingsSTMode": "Автоматический режим таймера сна",
+  "@settingsSTMode": {},
+  "settingsStorageDes": "Управление кэшем и хранилищем загрузок",
+  "@settingsStorageDes": {},
+  "settingsSyncing": "Синхронизация",
+  "@settingsSyncing": {},
+  "settingsSyncingDes": "Обновление подкастов в фоновом режиме",
+  "@settingsSyncingDes": {},
+  "settingsTapToOpenPopupMenu": "Нажмите для открытия всплывающего меню",
+  "@settingsTapToOpenPopupMenu": {},
+  "settingsTapToOpenPopupMenuDes": "Для открытия страницы выпуска нажмите и удерживайте",
+  "@settingsTapToOpenPopupMenuDes": {},
+  "settingsTheme": "Тема",
+  "@settingsTheme": {},
+  "settingStorage": "Хранилище",
+  "@settingStorage": {},
+  "settingsUpdateInterval": "Интервал обновления",
+  "@settingsUpdateInterval": {},
+  "settingsUpdateIntervalDes": "По умолчанию 24 часа",
+  "@settingsUpdateIntervalDes": {},
+  "share": "Поделиться",
+  "@share": {},
+  "showNotesFonts": "Показать шрифт заметок",
+  "@showNotesFonts": {},
+  "size": "Размер",
+  "@size": {},
+  "skipSecondsAtEnd": "Пропустить несколько секунд в конце",
+  "@skipSecondsAtEnd": {},
+  "skipSecondsAtStart": "Пропустить секунды при запуске",
+  "@skipSecondsAtStart": {},
+  "skipSilence": "Пропускать тишину",
+  "@skipSilence": {
+    "description": "Feature skip silence"
+  },
+  "skipToNext": "Перейти к следующему",
+  "@skipToNext": {},
+  "sleepTimer": "Таймер сна",
+  "@sleepTimer": {},
+  "status": "Статус",
+  "@status": {
+    "description": "gpodder.net status"
+  },
+  "statusAuthError": "Ошибка аутентификации",
+  "@statusAuthError": {
+    "description": "Sync error"
+  },
+  "statusFail": "Не удалось",
+  "@statusFail": {
+    "description": "Sync fail"
+  },
+  "statusSuccess": "Успешно",
+  "@statusSuccess": {
+    "description": "Sync status"
+  },
+  "stop": "Стоп",
+  "@stop": {},
+  "subscribe": "Подписаться",
+  "@subscribe": {},
+  "subscribeExportDes": "Экспорт OPML-файла всех подкастов",
+  "@subscribeExportDes": {},
+  "syncNow": "Синхронизировать",
+  "@syncNow": {},
+  "systemDefault": "По умолчанию",
+  "@systemDefault": {},
+  "timeLastPlayed": "Время остановки {time}",
+  "@timeLastPlayed": {
+    "description": "Show last time stop position  in player when a episode have been played.",
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "timeLeft": "Осталось {time}",
+  "@timeLeft": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "to": "До {time}",
+  "@to": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "toastAddPlaylist": "Добавлен в плейлист",
+  "@toastAddPlaylist": {},
+  "toastDiscovery": "Руководство сброшено. Перезапустите приложение.",
+  "@toastDiscovery": {
+    "description": "Toast displayed when user tap Discovery Features Again in settings page."
+  },
+  "toastFileError": "Ошибка файла, ошибка подписки",
+  "@toastFileError": {},
+  "toastFileNotValid": "Неверный файл",
+  "@toastFileNotValid": {},
+  "toastHomeGroupNotSupport": "Домашняя группа не поддерживается",
+  "@toastHomeGroupNotSupport": {},
+  "toastImportSettingsSuccess": "Настройки успешно импортированы",
+  "@toastImportSettingsSuccess": {},
+  "toastOneGroup": "Выберите хотя бы одну группу",
+  "@toastOneGroup": {},
+  "toastPodcastRecovering": "Восстановление, подождите немного",
+  "@toastPodcastRecovering": {
+    "description": "Resubscribe removed podcast"
+  },
+  "toastReadFile": "Файл успешно прочитан",
+  "@toastReadFile": {},
+  "toastRecoverFailed": "Не удалось восстановить подкаст",
+  "@toastRecoverFailed": {
+    "description": "Resubscribe removed podast"
+  },
+  "toastRemovePlaylist": "Выпуск удален из плейлиста",
+  "@toastRemovePlaylist": {},
+  "toastSettingSaved": "Настройки сохранены",
+  "@toastSettingSaved": {},
+  "toastTimeEqualEnd": "Время соответствует времени конца",
+  "@toastTimeEqualEnd": {
+    "description": "User can't choose the same time as schedule end time."
+  },
+  "toastTimeEqualStart": "Время соответствует времени начала",
+  "@toastTimeEqualStart": {
+    "description": "User can't choose the same time as schedule start time."
+  },
+  "translators": "Переводчики",
+  "@translators": {},
+  "understood": "Понятно",
+  "@understood": {},
+  "undo": "ВЕРНУТЬ",
+  "@undo": {},
+  "unlike": "Не нравится",
+  "@unlike": {},
+  "unliked": "Выпуск удален из избранного",
+  "@unliked": {},
+  "updateDate": "Дата обновления",
+  "@updateDate": {},
+  "updateEpisodesCount": "{count, plural, zero{Нет обновлений} one{Обновлен {count} выпуск} few{Обновлено {count} выпуска} many{Обновлены {count} выпусков} other{Обновлены {count} выпусков}}",
+  "@updateEpisodesCount": {},
+  "updateFailed": "Ошибка обновления, ошибка сети",
+  "@updateFailed": {},
+  "username": "Имя пользователя",
+  "@username": {},
+  "usernameRequired": "Требуется имя пользователя",
+  "@usernameRequired": {},
+  "useWallpaperTheme": "",
+  "@useWallpaperTheme": {},
+  "useWallpaperThemeDes": "",
+  "@useWallpaperThemeDes": {},
+  "version": "Версия: {version}",
+  "@version": {
+    "placeholders": {
+      "version": {}
+    }
+  }
+}

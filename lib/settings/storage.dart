@@ -20,80 +20,11 @@ class StorageSetting extends StatefulWidget {
 class _StorageSettingState extends State<StorageSetting>
     with SingleTickerProviderStateMixin {
   final KeyValueStorage cacheStorage = KeyValueStorage(cacheMaxKey);
-  AnimationController _controller;
-  Animation<double> _animation;
-  List<String> _dirs;
-  Future<void> _getCacheMax() async {
-    var cache =
-        await cacheStorage.getInt(defaultValue: (200 * 1024 * 1024).toInt());
-    if (cache == 0) {
-      await cacheStorage.saveInt((200 * 1024 * 1024).toInt());
-      cache = 200 * 1024 * 1024;
-    }
-    var value = cache ~/ (1024 * 1024);
-    if (value > 100) {
-      _controller = AnimationController(
-          vsync: this, duration: Duration(milliseconds: value * 2));
-      _animation = Tween<double>(begin: 100, end: value.toDouble()).animate(
-          CurvedAnimation(curve: Curves.easeOutQuart, parent: _controller))
-        ..addListener(() {
-          setState(() => _value = _animation.value);
-        });
-      _controller.forward();
-    }
-  }
+  AnimationController? _controller;
+  late Animation<double> _animation;
+  List<String>? _dirs;
 
-  Future<bool> _getAutoDownloadNetwork() async {
-    var storage = KeyValueStorage(autoDownloadNetworkKey);
-    var value = await storage.getBool(defaultValue: false);
-    return value;
-  }
-
-  Future<int> _getAutoDeleteDays() async {
-    var storage = KeyValueStorage(autoDeleteKey);
-    var days = await storage.getInt();
-    if (days == 0) {
-      storage.saveInt(30);
-      return 30;
-    }
-    return days;
-  }
-
-  Future<int> _getDownloadPasition() async {
-    final storage = KeyValueStorage(downloadPositionKey);
-    final index = await storage.getInt();
-    final externalDirs = await getExternalStorageDirectories();
-    _dirs = [for (var dir in externalDirs) dir.path];
-    return index;
-  }
-
-  Future<bool> _getDelteAfterPlayed() async {
-    final storage = KeyValueStorage(deleteAfterPlayedKey);
-    return await storage.getBool(defaultValue: false);
-  }
-
-  Future<void> _setAutoDeleteDays(int days) async {
-    var storage = KeyValueStorage(autoDeleteKey);
-    await storage.saveInt(days);
-    setState(() {});
-  }
-
-  Future<void> _setAudtDownloadNetwork(bool boo) async {
-    var storage = KeyValueStorage(autoDownloadNetworkKey);
-    await storage.saveBool(boo);
-  }
-
-  Future<void> _setDownloadPosition(int index) async {
-    final storage = KeyValueStorage(downloadPositionKey);
-    await storage.saveInt(index);
-  }
-
-  Future<void> _setDeleteAfterPlayed(bool boo) async {
-    final storage = KeyValueStorage(deleteAfterPlayedKey);
-    await storage.saveBool(boo);
-  }
-
-  double _value;
+  late double _value;
 
   @override
   void initState() {
@@ -113,13 +44,9 @@ class _StorageSettingState extends State<StorageSetting>
     final s = context.s;
     var settings = Provider.of<SettingState>(context, listen: false);
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
-        systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
-      ),
+      value: context.overlay,
       child: Scaffold(
+        backgroundColor: context.background,
         appBar: AppBar(
           title: Text(s.settingStorage),
           leading: CustomBackButton(),
@@ -140,14 +67,14 @@ class _StorageSettingState extends State<StorageSetting>
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text(s.network,
-                      style: context.textTheme.bodyText1
+                      style: context.textTheme.bodyText1!
                           .copyWith(color: context.accentColor)),
                 ),
-                Selector<SettingState, bool>(
+                Selector<SettingState, bool?>(
                   selector: (_, settings) => settings.downloadUsingData,
                   builder: (_, data, __) {
                     return ListTile(
-                      onTap: () => settings.downloadUsingData = !data,
+                      onTap: () => settings.downloadUsingData = !data!,
                       contentPadding: EdgeInsets.only(
                           left: 70.0, right: 25, bottom: 10, top: 10),
                       title: Text(s.settingsNetworkCellular),
@@ -155,7 +82,7 @@ class _StorageSettingState extends State<StorageSetting>
                       trailing: Transform.scale(
                         scale: 0.9,
                         child: Switch(
-                          value: data,
+                          value: data!,
                           onChanged: (value) =>
                               settings.downloadUsingData = value,
                         ),
@@ -169,7 +96,7 @@ class _StorageSettingState extends State<StorageSetting>
                     builder: (context, snapshot) {
                       return ListTile(
                         onTap: () async {
-                          _setAudtDownloadNetwork(!snapshot.data);
+                          _setAudtDownloadNetwork(!snapshot.data!);
                           setState(() {});
                         },
                         contentPadding: EdgeInsets.only(
@@ -179,7 +106,7 @@ class _StorageSettingState extends State<StorageSetting>
                         trailing: Transform.scale(
                           scale: 0.9,
                           child: Switch(
-                            value: snapshot.data,
+                            value: snapshot.data!,
                             onChanged: (value) async {
                               await _setAudtDownloadNetwork(value);
                               setState(() {});
@@ -197,7 +124,7 @@ class _StorageSettingState extends State<StorageSetting>
                   padding: EdgeInsets.symmetric(horizontal: 70),
                   alignment: Alignment.centerLeft,
                   child: Text(s.settingStorage,
-                      style: context.textTheme.bodyText1
+                      style: context.textTheme.bodyText1!
                           .copyWith(color: context.accentColor)),
                 ),
                 ListTile(
@@ -209,7 +136,7 @@ class _StorageSettingState extends State<StorageSetting>
                   title: Text(s.download),
                   subtitle: Text(s.settingsManageDownloadDes),
                 ),
-                FutureBuilder<int>(
+                FutureBuilder<int?>(
                     future: _getDownloadPasition(),
                     initialData: 0,
                     builder: (context, snapshot) {
@@ -217,7 +144,7 @@ class _StorageSettingState extends State<StorageSetting>
                         contentPadding: EdgeInsets.fromLTRB(70, 10, 20, 10),
                         title: Text(s.settingsDownloadPosition),
                         subtitle: Text(
-                            _dirs == null ? '' : _dirs[snapshot.data],
+                            _dirs == null ? '' : _dirs![snapshot.data!],
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis),
                         onTap: () => generalSheet(
@@ -227,13 +154,13 @@ class _StorageSettingState extends State<StorageSetting>
                             SizedBox(
                               height: 10,
                             ),
-                            for (var dir in _dirs)
+                            for (var dir in _dirs!)
                               ListTile(
                                 title: Text(dir),
                                 onTap: () =>
-                                    _setDownloadPosition(_dirs.indexOf(dir)),
+                                    _setDownloadPosition(_dirs!.indexOf(dir)),
                                 trailing: Radio<int>(
-                                    value: _dirs.indexOf(dir),
+                                    value: _dirs!.indexOf(dir),
                                     groupValue: snapshot.data,
                                     onChanged: _setDownloadPosition),
                               ),
@@ -244,7 +171,7 @@ class _StorageSettingState extends State<StorageSetting>
                         ),
                       );
                     }),
-                FutureBuilder<int>(
+                FutureBuilder<int?>(
                   future: _getAutoDeleteDays(),
                   initialData: 30,
                   builder: (context, snapshot) {
@@ -255,11 +182,11 @@ class _StorageSettingState extends State<StorageSetting>
                       trailing: MyDropdownButton(
                           hint: snapshot.data == -1
                               ? Text(s.daysCount(0))
-                              : Text(s.daysCount(snapshot.data)),
+                              : Text(s.daysCount(snapshot.data!)),
                           underline: Center(),
                           elevation: 1,
                           value: snapshot.data,
-                          onChanged: (value) async {
+                          onChanged: (dynamic value) async {
                             await _setAutoDeleteDays(value);
                           },
                           items: <int>[-1, 5, 10, 15, 30]
@@ -288,7 +215,7 @@ class _StorageSettingState extends State<StorageSetting>
                         trailing: Transform.scale(
                           scale: 0.9,
                           child: Switch(
-                            value: snapshot.data,
+                            value: snapshot.data!,
                             onChanged: (value) async {
                               await _setDeleteAfterPlayed(value);
                               setState(() {});
@@ -305,7 +232,7 @@ class _StorageSettingState extends State<StorageSetting>
                   trailing: Text.rich(TextSpan(
                       text: '${(_value ~/ 100) * 100}',
                       style: GoogleFonts.teko(
-                          textStyle: context.textTheme.headline6
+                          textStyle: context.textTheme.headline6!
                               .copyWith(color: context.accentColor)),
                       children: [
                         TextSpan(
@@ -344,5 +271,75 @@ class _StorageSettingState extends State<StorageSetting>
         ),
       ),
     );
+  }
+
+  Future<void> _getCacheMax() async {
+    var cache =
+        await cacheStorage.getInt(defaultValue: (200 * 1024 * 1024).toInt());
+    if (cache == 0) {
+      await cacheStorage.saveInt((200 * 1024 * 1024).toInt());
+      cache = 200 * 1024 * 1024;
+    }
+    var value = cache ~/ (1024 * 1024);
+    if (value > 100) {
+      _controller = AnimationController(
+          vsync: this, duration: Duration(milliseconds: value * 2));
+      _animation = Tween<double>(begin: 100, end: value.toDouble()).animate(
+          CurvedAnimation(curve: Curves.easeOutQuart, parent: _controller!))
+        ..addListener(() {
+          setState(() => _value = _animation.value);
+        });
+      _controller!.forward();
+    }
+  }
+
+  Future<bool> _getAutoDownloadNetwork() async {
+    var storage = KeyValueStorage(autoDownloadNetworkKey);
+    var value = await storage.getBool(defaultValue: false);
+    return value;
+  }
+
+  Future<int?> _getAutoDeleteDays() async {
+    var storage = KeyValueStorage(autoDeleteKey);
+    var days = await storage.getInt();
+    if (days == 0) {
+      storage.saveInt(30);
+      return 30;
+    }
+    return days;
+  }
+
+  Future<int?> _getDownloadPasition() async {
+    final storage = KeyValueStorage(downloadPositionKey);
+    final index = await storage.getInt();
+    final externalDirs = await getExternalStorageDirectories();
+    _dirs = [for (var dir in externalDirs!) dir.path];
+    return index;
+  }
+
+  Future<bool> _getDelteAfterPlayed() async {
+    final storage = KeyValueStorage(deleteAfterPlayedKey);
+    return await storage.getBool(defaultValue: false);
+  }
+
+  Future<void> _setAutoDeleteDays(int days) async {
+    var storage = KeyValueStorage(autoDeleteKey);
+    await storage.saveInt(days);
+    setState(() {});
+  }
+
+  Future<void> _setAudtDownloadNetwork(bool boo) async {
+    var storage = KeyValueStorage(autoDownloadNetworkKey);
+    await storage.saveBool(boo);
+  }
+
+  Future<void> _setDownloadPosition(int? index) async {
+    final storage = KeyValueStorage(downloadPositionKey);
+    await storage.saveInt(index!);
+  }
+
+  Future<void> _setDeleteAfterPlayed(bool? boo) async {
+    final storage = KeyValueStorage(deleteAfterPlayedKey);
+    await storage.saveBool(boo);
   }
 }

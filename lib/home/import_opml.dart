@@ -14,28 +14,29 @@ class Import extends StatelessWidget {
     return Container(
       color: context.primaryColorDark,
       child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SizedBox(height: 2.0, child: LinearProgressIndicator()),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              height: 20.0,
-              alignment: Alignment.centerLeft,
-              child: Text(text),
-            ),
-          ]),
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(height: 2.0, child: LinearProgressIndicator()),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            height: 20.0,
+            alignment: Alignment.centerLeft,
+            child: Text(text),
+          ),
+        ],
+      ),
     );
   }
 
   _autoDownloadNew(BuildContext context) async {
     final dbHelper = DBHelper();
-    var downloader = Provider.of<DownloadState>(context, listen: false);
-    var result = await Connectivity().checkConnectivity();
-    var autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
-    var autoDownloadNetwork = await autoDownloadStorage.getInt();
+    final downloader = Provider.of<DownloadState>(context, listen: false);
+    final result = await Connectivity().checkConnectivity();
+    final autoDownloadStorage = KeyValueStorage(autoDownloadNetworkKey);
+    final autoDownloadNetwork = await autoDownloadStorage.getInt();
     if (autoDownloadNetwork == 1) {
-      var episodes = await dbHelper.getNewEpisodes('all');
+      final episodes = await dbHelper.getNewEpisodes('all');
       // For safety
       if (episodes.length < 100 && episodes.length > 0) {
         for (var episode in episodes) {
@@ -56,26 +57,27 @@ class Import extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
-    var groupList = Provider.of<GroupList>(context, listen: false);
+    final groupList = Provider.of<GroupList>(context, listen: false);
     return Column(
       children: <Widget>[
         Consumer<GroupList>(
           builder: (_, subscribeWorker, __) {
-            var item = subscribeWorker.currentSubscribeItem;
+            final item = subscribeWorker.currentSubscribeItem;
             switch (item.subscribeState) {
               case SubscribeState.start:
                 return importColumn(
-                    s.notificationSubscribe(item.title), context);
+                    s.notificationSubscribe(item.title!), context);
               case SubscribeState.subscribe:
-                return importColumn(s.notificaitonFatch(item.title), context);
+                return importColumn(s.notificaitonFatch(item.title!), context);
               case SubscribeState.fetch:
-                return importColumn(s.notificationSuccess(item.title), context);
+                return importColumn(
+                    s.notificationSuccess(item.title!), context);
               case SubscribeState.exist:
                 return importColumn(
-                    s.notificationSubscribeExisted(item.title), context);
+                    s.notificationSubscribeExisted(item.title!), context);
               case SubscribeState.error:
                 return importColumn(
-                    s.notificationNetworkError(item.title), context);
+                    s.notificationNetworkError(item.title!), context);
               default:
                 return Center();
             }
@@ -83,7 +85,7 @@ class Import extends StatelessWidget {
         ),
         Consumer<RefreshWorker>(
           builder: (context, refreshWorker, child) {
-            var item = refreshWorker.currentRefreshItem;
+            final item = refreshWorker.currentRefreshItem;
             if (refreshWorker.complete) {
               groupList.updateGroups();
               _autoDownloadNew(context);

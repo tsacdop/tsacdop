@@ -14,8 +14,8 @@ import 'thirdpage.dart';
 enum Goto { home, settings }
 
 class SlideIntro extends StatefulWidget {
-  final Goto goto;
-  SlideIntro({this.goto, Key key}) : super(key: key);
+  final Goto? goto;
+  SlideIntro({this.goto, Key? key}) : super(key: key);
 
   @override
   _SlideIntroState createState() => _SlideIntroState();
@@ -29,8 +29,8 @@ class _SlideIntroState extends State<SlideIntro> {
   //      offset: Offset(2, 2),
   //      color: Colors.grey[600].withOpacity(0.4))
   //];
-  PageController _controller;
-  double _position;
+  PageController? _controller;
+  double? _position;
   @override
   void initState() {
     super.initState();
@@ -38,19 +38,19 @@ class _SlideIntroState extends State<SlideIntro> {
     _controller = PageController()
       ..addListener(() {
         setState(() {
-          _position = _controller.page;
+          _position = _controller!.page;
         });
       });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
   Widget _indicatorWidget(int index) {
-    final distance = (_position - index).abs();
+    final distance = (_position! - index).abs();
     final size = distance > 1 ? 10.0 : 10 * (2 - distance);
     return Center(
       child: Container(
@@ -97,7 +97,7 @@ class _SlideIntroState extends State<SlideIntro> {
                 bottom: 0,
                 left: 0,
                 child: Container(
-                  color: Colors.grey[100].withOpacity(0.5),
+                  color: Colors.grey[100]!.withOpacity(0.5),
                   width: context.width,
                   padding:
                       EdgeInsets.only(left: 40, right: 20, bottom: 30, top: 20),
@@ -130,12 +130,12 @@ class _SlideIntroState extends State<SlideIntro> {
                         ),
                         child: Material(
                           color: Colors.transparent,
-                          child: _position < 2.5
+                          child: _position! < 2.5
                               ? InkWell(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20)),
-                                  onTap: () => _controller.animateToPage(
-                                      _position.toInt() + 1,
+                                  onTap: () => _controller!.animateToPage(
+                                      _position!.toInt() + 1,
                                       duration: Duration(milliseconds: 200),
                                       curve: Curves.linear),
                                   child: SizedBox(

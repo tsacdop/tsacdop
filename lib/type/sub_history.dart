@@ -11,11 +11,11 @@ class SubHistory {
   bool status;
 
   /// POdcast title.
-  String title;
+  String? title;
 
   /// POdcast rss link.
-  String rssUrl;
+  String? rssUrl;
 
   SubHistory(this.delDate, this.subDate, this.rssUrl, this.title,
-      {@required this.status});
+      {required this.status});
 }

@@ -1,6 +1,6 @@
 class ChapterInfo {
-  List<Chapters> chapters;
-  String version;
+  List<Chapters>? chapters;
+  String? version;
 
   ChapterInfo({this.chapters, this.version});
 
@@ -8,7 +8,7 @@ class ChapterInfo {
     if (json['chapters'] != null) {
       chapters = <Chapters>[];
       json['chapters'].forEach((v) {
-        chapters.add(Chapters.fromJson(v));
+        chapters!.add(Chapters.fromJson(v));
       });
     }
     version = json['version'];
@@ -16,10 +16,10 @@ class ChapterInfo {
 }
 
 class Chapters {
-  String img;
-  int startTime;
-  String title;
-  String url;
+  String? img;
+  int? startTime;
+  String? title;
+  String? url;
 
   Chapters({this.img, this.startTime, this.title, this.url});
 

@@ -5,13 +5,13 @@ import 'dart:math' as math;
 
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
+import 'package:tsacdop/episodes/shownote.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
@@ -35,14 +35,14 @@ final List<BoxShadow> _customShadow = [
   BoxShadow(
       blurRadius: 8,
       offset: Offset(2, 2),
-      color: Colors.grey[600].withOpacity(0.4))
+      color: Colors.grey[600]!.withOpacity(0.4))
 ];
 
 final List<BoxShadow> _customShadowNight = [
   BoxShadow(
       blurRadius: 6,
       offset: Offset(-1, -1),
-      color: Colors.grey[100].withOpacity(0.3)),
+      color: Colors.grey[100]!.withOpacity(0.3)),
   BoxShadow(blurRadius: 8, offset: Offset(2, 2), color: Colors.black)
 ];
 
@@ -52,25 +52,68 @@ const List kMaxPlayerHeight = <double>[300.0, 325.0, 350.0];
 
 class PlayerWidget extends StatelessWidget {
   PlayerWidget({this.playerKey, this.isPlayingPage = false});
-  final GlobalKey<AudioPanelState> playerKey;
+  final GlobalKey<AudioPanelState>? playerKey;
   final bool isPlayingPage;
-  Widget _miniPanel(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight?>>(
+      selector: (_, audio) => Tuple2(audio.playerRunning, audio.playerHeight),
+      builder: (_, data, __) {
+        if (!data.item1) {
+          return Center();
+        } else {
+          final minHeight = kMinPlayerHeight[data.item2!.index];
+          final maxHeight = math.min(
+              kMaxPlayerHeight[data.item2!.index] as double,
+              context.height - 20);
+          return AudioPanel(
+            minHeight: minHeight,
+            maxHeight: maxHeight,
+            expandHeight: context.height - context.paddingTop - 20,
+            key: playerKey,
+            miniPanel: _MiniPanel(),
+            expandedPanel: ControlPanel(
+              maxHeight: maxHeight,
+              isPlayingPage: isPlayingPage,
+              onExpand: () {
+                playerKey!.currentState!.scrollToTop();
+              },
+              onClose: () {
+                playerKey!.currentState!.backToMini();
+              },
+            ),
+          );
+        }
+      },
+    );
+  }
+}
+
+class _MiniPanel extends StatelessWidget {
+  const _MiniPanel({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     final s = context.s;
+    final bgColor = audio.episode == null
+        ? context.primaryColor
+        : audio.episode!.cardColor(context);
     return Container(
-      color: context.primaryColor,
+      color: bgColor,
       height: 60,
       child:
           Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-        Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief, double>>(
+        Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief?, double>>(
           selector: (_, audio) => Tuple2(audio.episode, audio.seekSliderValue),
           builder: (_, data, __) {
-            final c = data.item1.backgroudColor(context);
+            final c = data.item1!.backgroudColor(context);
             return SizedBox(
               height: 2,
               child: LinearProgressIndicator(
                 value: data.item2,
-                backgroundColor: context.primaryColor,
+                backgroundColor: bgColor,
                 valueColor: AlwaysStoppedAnimation<Color>(c),
               ),
             );
@@ -85,11 +128,11 @@ class PlayerWidget extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   flex: 4,
-                  child: Selector<AudioPlayerNotifier, String>(
+                  child: Selector<AudioPlayerNotifier, String?>(
                     selector: (_, audio) => audio.episode?.title,
                     builder: (_, title, __) {
                       return Text(
-                        title,
+                        title!,
                         style: TextStyle(fontWeight: FontWeight.bold),
                         maxLines: 2,
                         overflow: TextOverflow.clip,
@@ -100,18 +143,18 @@ class PlayerWidget extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: Selector<AudioPlayerNotifier,
-                      Tuple3<bool, double, String>>(
+                      Tuple3<bool, double, String?>>(
                     selector: (_, audio) => Tuple3(
                         audio.buffering,
                         (audio.backgroundAudioDuration -
-                                audio.backgroundAudioPosition) /
+                                audio.backgroundAudioPosition!) /
                             1000,
                         audio.remoteErrorMessage),
                     builder: (_, data, __) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: data.item3 != null
-                            ? Text(data.item3,
+                            ? Text(data.item3!,
                                 style:
                                     const TextStyle(color: Color(0xFFFF0000)))
                             : data.item1
@@ -121,8 +164,7 @@ class PlayerWidget extends StatelessWidget {
                                         TextStyle(color: context.accentColor),
                                   )
                                 : Text(
-                                    s.timeLeft(
-                                        (data.item2).toInt().toTime ?? ''),
+                                    s.timeLeft((data.item2).toInt().toTime),
                                     maxLines: 2,
                                   ),
                       );
@@ -132,7 +174,7 @@ class PlayerWidget extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: Selector<AudioPlayerNotifier,
-                      Tuple3<bool, bool, EpisodeBrief>>(
+                      Tuple3<bool, bool, EpisodeBrief?>>(
                     selector: (_, audio) =>
                         Tuple3(audio.buffering, audio.playing, audio.episode),
                     builder: (_, data, __) {
@@ -150,10 +192,10 @@ class PlayerWidget extends StatelessWidget {
                                           height: 30.0,
                                           width: 30.0,
                                           child: CircleAvatar(
-                                            backgroundColor: data.item3
+                                            backgroundColor: data.item3!
                                                 .backgroudColor(context),
                                             backgroundImage:
-                                                data.item3.avatarImage,
+                                                data.item3!.avatarImage,
                                           ),
                                         ),
                                       ),
@@ -186,10 +228,10 @@ class PlayerWidget extends StatelessWidget {
                                               height: 30.0,
                                               width: 30.0,
                                               child: CircleAvatar(
-                                                backgroundColor: data.item3
+                                                backgroundColor: data.item3!
                                                     .backgroudColor(context),
                                                 backgroundImage:
-                                                    data.item3.avatarImage,
+                                                    data.item3!.avatarImage,
                                               ),
                                             ),
                                           ),
@@ -224,44 +266,10 @@ class PlayerWidget extends StatelessWidget {
       ]),
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight>>(
-      selector: (_, audio) => Tuple2(audio.playerRunning, audio?.playerHeight),
-      builder: (_, data, __) {
-        if (!data.item1) {
-          return Center();
-        } else {
-          final minHeight = kMinPlayerHeight[data.item2.index];
-          final maxHeight = math.min(
-              kMaxPlayerHeight[data.item2.index] as double,
-              context.height - 20);
-          return AudioPanel(
-            minHeight: minHeight,
-            maxHeight: maxHeight,
-            expandHeight: context.height - context.paddingTop - 20,
-            key: playerKey,
-            miniPanel: _miniPanel(context),
-            expandedPanel: ControlPanel(
-              maxHeight: maxHeight,
-              isPlayingPage: isPlayingPage,
-              onExpand: () {
-                playerKey.currentState.scrollToTop();
-              },
-              onClose: () {
-                playerKey.currentState.backToMini();
-              },
-            ),
-          );
-        }
-      },
-    );
-  }
 }
 
 class LastPosition extends StatelessWidget {
-  LastPosition({Key key}) : super(key: key);
+  LastPosition({Key? key}) : super(key: key);
 
   Future<PlayHistory> getPosition(EpisodeBrief episode) async {
     var dbHelper = DBHelper();
@@ -272,7 +280,7 @@ class LastPosition extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = context.s;
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
-    return Selector<AudioPlayerNotifier, EpisodeBrief>(
+    return Selector<AudioPlayerNotifier, EpisodeBrief?>(
       selector: (_, audio) => audio.episode,
       builder: (context, episode, child) {
         return SingleChildScrollView(
@@ -281,61 +289,84 @@ class LastPosition extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Selector<AudioPlayerNotifier, bool>(
+              Selector<AudioPlayerNotifier, bool?>(
                   selector: (_, audio) => audio.skipSilence,
-                  builder: (_, data, __) => FlatButton(
+                  builder: (_, data, __) => TextButton(
                       child: Row(
                         children: [
-                          Icon(Icons.flash_on, size: 18),
+                          Icon(Icons.flash_on,
+                              size: 18,
+                              color: data!
+                                  ? context.accentColor
+                                  : context.textColor),
                           SizedBox(width: 5),
-                          Text(s.skipSilence),
+                          Text(
+                            s.skipSilence,
+                            style: TextStyle(
+                                color: data
+                                    ? context.accentColor
+                                    : context.textColor),
+                          ),
                         ],
                       ),
-                      color: data ? context.accentColor : Colors.transparent,
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(
-                              color: data
-                                  ? context.accentColor
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.12))),
-                      textColor: data ? Colors.white : null,
+                      style: TextButton.styleFrom(
+                        primary:
+                            data! ? context.accentColor : Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100.0),
+                            side: BorderSide(
+                                color: data
+                                    ? context.accentColor
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.12))),
+                      ),
                       onPressed: () =>
                           audio.setSkipSilence(skipSilence: !data))),
               SizedBox(width: 10),
-              Selector<AudioPlayerNotifier, bool>(
+              Selector<AudioPlayerNotifier, bool?>(
                   selector: (_, audio) => audio.boostVolume,
-                  builder: (_, data, __) => FlatButton(
+                  builder: (_, data, __) => TextButton(
                       child: Row(
                         children: [
-                          Icon(Icons.volume_up, size: 18),
+                          Icon(Icons.volume_up,
+                              size: 18,
+                              color: data!
+                                  ? context.accentColor
+                                  : context.textColor),
                           SizedBox(width: 5),
-                          Text(s.boostVolume),
+                          Text(
+                            s.boostVolume,
+                            style: TextStyle(
+                                color: data
+                                    ? context.accentColor
+                                    : context.textColor),
+                          ),
                         ],
                       ),
-                      color: data ? context.accentColor : Colors.transparent,
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100.0),
-                          side: BorderSide(
-                              color: data
-                                  ? context.accentColor
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.12))),
-                      textColor: data ? Colors.white : null,
+                      style: TextButton.styleFrom(
+                        primary:
+                            data ? context.accentColor : Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100.0),
+                            side: BorderSide(
+                                color: data
+                                    ? context.accentColor
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.12))),
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                      ),
                       onPressed: () =>
                           audio.setBoostVolume(boostVolume: !data))),
               SizedBox(width: 10),
               FutureBuilder<PlayHistory>(
-                  future: getPosition(episode),
+                  future: getPosition(episode!),
                   builder: (context, snapshot) {
                     return snapshot.hasData
-                        ? snapshot.data.seekValue > 0.90
+                        ? snapshot.data!.seekValue! > 0.90
                             ? Container(
                                 height: 20,
                                 padding: EdgeInsets.symmetric(horizontal: 10),
@@ -349,17 +380,20 @@ class LastPosition extends StatelessWidget {
                                   ),
                                 ),
                               )
-                            : snapshot.data.seconds < 10
+                            : snapshot.data!.seconds! < 10
                                 ? Center()
-                                : OutlineButton(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(100.0),
-                                        side: BorderSide(
-                                            color: context.accentColor)),
-                                    highlightedBorderColor: Colors.green[700],
+                                : OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(100.0),
+                                          side: BorderSide(
+                                              color: context.accentColor)),
+                                    ),
+                                    // highlightedBorderColor: Colors.green[700],
                                     onPressed: () => audio.seekTo(
-                                        (snapshot.data.seconds * 1000).toInt()),
+                                        (snapshot.data!.seconds! * 1000)
+                                            .toInt()),
                                     child: Row(
                                       children: [
                                         SizedBox(
@@ -372,7 +406,7 @@ class LastPosition extends StatelessWidget {
                                           ),
                                         ),
                                         SizedBox(width: 5),
-                                        Text(snapshot.data.seconds.toTime),
+                                        Text(snapshot.data!.seconds!.toTime),
                                       ],
                                     ),
                                   )
@@ -399,7 +433,7 @@ class LastPosition extends StatelessWidget {
 }
 
 class PlaylistWidget extends StatefulWidget {
-  const PlaylistWidget({Key key}) : super(key: key);
+  const PlaylistWidget({Key? key}) : super(key: key);
 
   @override
   _PlaylistWidgetState createState() => _PlaylistWidgetState();
@@ -420,10 +454,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           color: context.accentColor.withAlpha(70),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Selector<AudioPlayerNotifier, Tuple2<Playlist, EpisodeBrief>>(
+        child: Selector<AudioPlayerNotifier, Tuple2<Playlist?, EpisodeBrief?>>(
           selector: (_, audio) => Tuple2(audio.playlist, audio.episode),
           builder: (_, data, __) {
-            var episodes = data.item1.episodes;
+            var episodes = data.item1!.episodes;
             return Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
@@ -437,7 +471,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       return InkWell(
                         onTap: () async {
                           if (!isPlaying) {
-                            if (data.item1.name == 'Queue') {
+                            if (data.item1!.name == 'Queue') {
                               audio.episodeLoad(episodes[index]);
                             } else {
                               await context
@@ -460,13 +494,13 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                 child: CircleAvatar(
                                     radius: 15,
                                     backgroundImage:
-                                        episodes[index].avatarImage),
+                                        episodes[index]!.avatarImage),
                               ),
                               Expanded(
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    episodes[index].title,
+                                    episodes[index]!.title!,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -497,9 +531,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                     child: Row(
                       children: <Widget>[
                         Text(
-                          data.item1.name == 'Queue'
+                          data.item1!.name == 'Queue'
                               ? context.s.queue
-                              : '${context.s.homeMenuPlaylist}${'-${data.item1.name}'}',
+                              : '${context.s.homeMenuPlaylist}${'-${data.item1!.name}'}',
                           overflow: TextOverflow.fade,
                           style: TextStyle(
                               color: context.accentColor,
@@ -567,7 +601,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 }
 
 class SleepMode extends StatefulWidget {
-  SleepMode({Key key}) : super(key: key);
+  SleepMode({Key? key}) : super(key: key);
 
   @override
   SleepModeState createState() => SleepModeState();
@@ -575,10 +609,10 @@ class SleepMode extends StatefulWidget {
 
 class SleepModeState extends State<SleepMode>
     with SingleTickerProviderStateMixin {
-  int _minSelected;
-  bool _openClock;
-  AnimationController _controller;
-  Animation<double> _animation;
+  int? _minSelected;
+  late bool _openClock;
+  late AnimationController _controller;
+  late Animation<double> _animation;
   Future _getDefaultTime() async {
     var defaultSleepTimerStorage = KeyValueStorage(defaultSleepTimerKey);
     var defaultTime = await defaultSleepTimerStorage.getInt(defaultValue: 30);
@@ -623,13 +657,13 @@ class SleepModeState extends State<SleepMode>
         BoxShadow(
             blurRadius: 8 * (1 - scale),
             offset: Offset(2, 2) * (1 - scale),
-            color: Colors.grey[600].withOpacity(0.4))
+            color: Colors.grey[600]!.withOpacity(0.4))
       ];
   List<BoxShadow> customShadowNight(double scale) => [
         BoxShadow(
             blurRadius: 6 * (1 - scale),
             offset: Offset(-1, -1) * (1 - scale),
-            color: Colors.grey[100].withOpacity(0.3)),
+            color: Colors.grey[100]!.withOpacity(0.3)),
         BoxShadow(
             blurRadius: 8 * (1 - scale),
             offset: Offset(2, 2) * (1 - scale),
@@ -644,7 +678,7 @@ class SleepModeState extends State<SleepMode>
     var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return Selector<AudioPlayerNotifier, Tuple3<int, double, SleepTimerMode>>(
       selector: (_, audio) =>
-          Tuple3(audio?.timeLeft, audio?.switchValue, audio.sleepTimerMode),
+          Tuple3(audio.timeLeft, audio.switchValue, audio.sleepTimerMode),
       builder: (_, data, __) {
         var fraction =
             data.item2 == 1 ? 1.0 : math.min(_animation.value * 2, 1.0);
@@ -802,7 +836,7 @@ class SleepModeState extends State<SleepMode>
                                           child: Text(
                                             data.item2 == 1
                                                 ? data.item1.toTime
-                                                : (_minSelected * 60).toTime,
+                                                : (_minSelected! * 60).toTime,
                                             style: TextStyle(
                                                 color: (move > 0
                                                     ? Colors.white
@@ -887,14 +921,14 @@ class SleepModeState extends State<SleepMode>
 }
 
 class ChaptersWidget extends StatefulWidget {
-  ChaptersWidget({Key key}) : super(key: key);
+  ChaptersWidget({Key? key}) : super(key: key);
 
   @override
   _ChaptersWidgetState createState() => _ChaptersWidgetState();
 }
 
 class _ChaptersWidgetState extends State<ChaptersWidget> {
-  bool _showChapter;
+  late bool _showChapter;
 
   @override
   void initState() {
@@ -902,13 +936,13 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
     _showChapter = false;
   }
 
-  Future<List<Chapters>> _getChapters(EpisodeBrief episode) async {
+  Future<List<Chapters>?> _getChapters(EpisodeBrief episode) async {
     if (episode.chapterLink == '' || episode.chapterLink == null) {
       return [];
     }
     try {
       final file =
-          await DefaultCacheManager().getSingleFile(episode.chapterLink);
+          await DefaultCacheManager().getSingleFile(episode.chapterLink!);
       final response = file.readAsStringSync();
       var chapterInfo = ChapterInfo.fromJson(jsonDecode(response));
       return chapterInfo.chapters;
@@ -932,15 +966,17 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                 child: ButtonTheme(
                   height: 28,
                   padding: EdgeInsets.symmetric(horizontal: 0),
-                  child: OutlineButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0),
-                        side: BorderSide(color: context.accentColor)),
-                    highlightedBorderColor: Colors.green[700],
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0),
+                          side: BorderSide(color: context.accentColor)),
+                    ),
+                    // highlightedBorderColor: Colors.green[700],
                     onPressed: () {
                       context
                           .read<AudioPlayerNotifier>()
-                          .seekTo(chapters.startTime * 1000);
+                          .seekTo(chapters.startTime! * 1000);
                     },
                     child: Row(
                       children: [
@@ -954,7 +990,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          chapters.startTime.toTime,
+                          chapters.startTime!.toTime,
                         ),
                       ],
                     ),
@@ -966,7 +1002,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 15),
-                  Text(chapters.title,
+                  Text(chapters.title!,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: context.textTheme.bodyText1),
@@ -974,7 +1010,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                     Row(
                       children: [
                         Expanded(
-                            child: Text(chapters.url,
+                            child: Text(chapters.url!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: context.accentColor))),
@@ -985,7 +1021,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                               overlayColor: MaterialStateProperty.all<Color>(
                                   context.primaryColor.withOpacity(0.3)),
                             ),
-                            onPressed: () => chapters.url.launchUrl,
+                            onPressed: () => chapters.url!.launchUrl,
                             child: Text('Visit')),
                       ],
                     ),
@@ -1015,18 +1051,18 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
           color: context.accentColor.withAlpha(70),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Selector<AudioPlayerNotifier, EpisodeBrief>(
+        child: Selector<AudioPlayerNotifier, EpisodeBrief?>(
           selector: (_, audio) => audio.episode,
           builder: (_, episode, __) => Scrollbar(
             child: Column(
               children: [
                 Expanded(
                   child: _showChapter
-                      ? FutureBuilder<List<Chapters>>(
-                          future: _getChapters(episode),
+                      ? FutureBuilder<List<Chapters>?>(
+                          future: _getChapters(episode!),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
-                              final data = snapshot.data;
+                              final data = snapshot.data!;
                               return ListView.builder(
                                   itemCount: data.length,
                                   padding: EdgeInsets.zero,
@@ -1047,14 +1083,14 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                       : ListView(
                           padding: EdgeInsets.zero,
                           children: <Widget>[
-                            if (episode.episodeImage != '')
+                            if (episode!.episodeImage != '')
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(10.0),
                                 child: CachedNetworkImage(
                                     width: 100,
                                     fit: BoxFit.fitWidth,
                                     alignment: Alignment.center,
-                                    imageUrl: episode.episodeImage,
+                                    imageUrl: episode.episodeImage!,
                                     placeholderFadeInDuration: Duration.zero,
                                     progressIndicatorBuilder: (context, url,
                                             downloadProgress) =>
@@ -1128,15 +1164,15 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
 }
 
 class _ChapterImage extends StatefulWidget {
-  final String url;
-  _ChapterImage(this.url, {Key key}) : super(key: key);
+  final String? url;
+  _ChapterImage(this.url, {Key? key}) : super(key: key);
 
   @override
   __ChapterImageState createState() => __ChapterImageState();
 }
 
 class __ChapterImageState extends State<_ChapterImage> {
-  bool _openFullImage;
+  late bool _openFullImage;
   @override
   void initState() {
     super.initState();
@@ -1157,7 +1193,7 @@ class __ChapterImageState extends State<_ChapterImage> {
                 height: _openFullImage ? null : 50,
                 fit: BoxFit.fitWidth,
                 alignment: Alignment.center,
-                imageUrl: widget.url,
+                imageUrl: widget.url!,
                 placeholderFadeInDuration: Duration.zero,
                 progressIndicatorBuilder: (contlext, url, downloadProgress) =>
                     Container(
@@ -1195,11 +1231,11 @@ class ControlPanel extends StatefulWidget {
       this.onClose,
       this.maxHeight,
       this.isPlayingPage = false,
-      Key key})
+      Key? key})
       : super(key: key);
-  final VoidCallback onExpand;
-  final VoidCallback onClose;
-  final double maxHeight;
+  final VoidCallback? onExpand;
+  final VoidCallback? onClose;
+  final double? maxHeight;
   final bool isPlayingPage;
   @override
   _ControlPanelState createState() => _ControlPanelState();
@@ -1207,10 +1243,10 @@ class ControlPanel extends StatefulWidget {
 
 class _ControlPanelState extends State<ControlPanel>
     with TickerProviderStateMixin {
-  double _setSpeed;
-  AnimationController _controller;
-  Animation<double> _animation;
-  TabController _tabController;
+  double? _setSpeed;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  TabController? _tabController;
   int _tabIndex = 0;
   List<BoxShadow> customShadow(double scale) => [
         BoxShadow(
@@ -1220,13 +1256,13 @@ class _ControlPanelState extends State<ControlPanel>
         BoxShadow(
             blurRadius: 8 * (1 - scale),
             offset: Offset(2, 2) * (1 - scale),
-            color: Colors.grey[600].withOpacity(0.4))
+            color: Colors.grey[600]!.withOpacity(0.4))
       ];
   List<BoxShadow> customShadowNight(double scale) => [
         BoxShadow(
             blurRadius: 6 * (1 - scale),
             offset: Offset(-1, -1) * (1 - scale),
-            color: Colors.grey[100].withOpacity(0.3)),
+            color: Colors.grey[100]!.withOpacity(0.3)),
         BoxShadow(
             blurRadius: 8 * (1 - scale),
             offset: Offset(2, 2) * (1 - scale),
@@ -1243,7 +1279,7 @@ class _ControlPanelState extends State<ControlPanel>
     _setSpeed = 0;
     _tabController = TabController(vsync: this, length: 3)
       ..addListener(() {
-        setState(() => _tabIndex = _tabController.index);
+        setState(() => _tabIndex = _tabController!.index);
       });
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
@@ -1257,16 +1293,16 @@ class _ControlPanelState extends State<ControlPanel>
   @override
   void dispose() {
     _controller.dispose();
-    _tabController.dispose();
+    _tabController!.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
+    final audio = Provider.of<AudioPlayerNotifier>(context, listen: false);
     return LayoutBuilder(
       builder: (context, constraints) {
-        var height = constraints.maxHeight;
+        final height = constraints.maxHeight;
         return Container(
           color: context.primaryColor,
           height: 300,
@@ -1312,15 +1348,14 @@ class _ControlPanelState extends State<ControlPanel>
                         child: Row(
                           children: <Widget>[
                             Text(
-                              (data.backgroundAudioPosition ~/ 1000).toTime ??
-                                  '',
+                              (data.backgroundAudioPosition! ~/ 1000).toTime,
                               style: TextStyle(fontSize: 10),
                             ),
                             Expanded(
                               child: Container(
                                 alignment: Alignment.center,
                                 child: data.remoteErrorMessage != null
-                                    ? Text(data.remoteErrorMessage,
+                                    ? Text(data.remoteErrorMessage!,
                                         style: const TextStyle(
                                             color: Color(0xFFFF0000)))
                                     : Text(
@@ -1337,8 +1372,7 @@ class _ControlPanelState extends State<ControlPanel>
                               ),
                             ),
                             Text(
-                              (data.backgroundAudioDuration ~/ 1000).toTime ??
-                                  '',
+                              (data.backgroundAudioDuration ~/ 1000).toTime,
                               style: TextStyle(fontSize: 10),
                             ),
                           ],
@@ -1372,7 +1406,7 @@ class _ControlPanelState extends State<ControlPanel>
                                 Icon(Icons.fast_rewind,
                                     size: 32, color: Colors.grey[500]),
                                 SizedBox(width: 5),
-                                Selector<AudioPlayerNotifier, int>(
+                                Selector<AudioPlayerNotifier, int?>(
                                     selector: (_, audio) => audio.rewindSeconds,
                                     builder: (_, seconds, __) => Padding(
                                           padding:
@@ -1457,7 +1491,7 @@ class _ControlPanelState extends State<ControlPanel>
                                 side: BorderSide(color: Colors.transparent)),
                             child: Row(
                               children: [
-                                Selector<AudioPlayerNotifier, int>(
+                                Selector<AudioPlayerNotifier, int?>(
                                     selector: (_, audio) =>
                                         audio.fastForwardSeconds,
                                     builder: (_, seconds, __) => Padding(
@@ -1489,26 +1523,26 @@ class _ControlPanelState extends State<ControlPanel>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Expanded(
-                      child: Selector<AudioPlayerNotifier, String>(
-                        selector: (_, audio) => audio.episode.title,
+                      child: Selector<AudioPlayerNotifier, String?>(
+                        selector: (_, audio) => audio.episode!.title,
                         builder: (_, title, __) {
                           return Container(
                             padding: EdgeInsets.only(left: 60, right: 60),
                             child: LayoutBuilder(
                               builder: (context, size) {
-                                var span = TextSpan(
+                                final span = TextSpan(
                                     text: title,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20));
-                                var tp = TextPainter(
+                                final tp = TextPainter(
                                     text: span,
                                     maxLines: 1,
                                     textDirection: TextDirection.ltr);
                                 tp.layout(maxWidth: size.maxWidth);
                                 if (tp.didExceedMaxLines) {
                                   return Marquee(
-                                    text: title,
+                                    text: title!,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
@@ -1528,7 +1562,7 @@ class _ControlPanelState extends State<ControlPanel>
                                   );
                                 } else {
                                   return Text(
-                                    title,
+                                    title!,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20),
@@ -1540,13 +1574,13 @@ class _ControlPanelState extends State<ControlPanel>
                         },
                       ),
                     ),
-                    if (height <= widget.maxHeight) LastPosition()
+                    if (height <= widget.maxHeight!) LastPosition()
                   ],
                 ),
               ),
-              if (height > widget.maxHeight)
+              if (height > widget.maxHeight!)
                 SizedBox(
-                  height: height - widget.maxHeight,
+                  height: height - widget.maxHeight!,
                   child: SingleChildScrollView(
                       physics: NeverScrollableScrollPhysics(),
                       child: SizedBox(
@@ -1576,9 +1610,9 @@ class _ControlPanelState extends State<ControlPanel>
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    if (height <= widget.maxHeight)
+                    if (height <= widget.maxHeight!)
                       Selector<AudioPlayerNotifier,
-                          Tuple4<EpisodeBrief, bool, bool, double>>(
+                          Tuple4<EpisodeBrief?, bool, bool, double?>>(
                         selector: (_, audio) => Tuple4(
                             audio.episode,
                             audio.stopOnComplete,
@@ -1597,7 +1631,7 @@ class _ControlPanelState extends State<ControlPanel>
                                   Expanded(
                                     child: InkWell(
                                       onTap: () async {
-                                        widget.onClose();
+                                        widget.onClose!();
                                         if (!widget.isPlayingPage) {
                                           Navigator.push(
                                               context,
@@ -1614,14 +1648,14 @@ class _ControlPanelState extends State<ControlPanel>
                                             width: 30.0,
                                             child: CircleAvatar(
                                               backgroundImage:
-                                                  data.item1.avatarImage,
+                                                  data.item1!.avatarImage,
                                             ),
                                           ),
                                           SizedBox(width: 5),
                                           SizedBox(
                                             width: 100,
                                             child: Text(
-                                              data.item1.feedTitle,
+                                              data.item1!.feedTitle!,
                                               maxLines: 1,
                                               overflow: TextOverflow.fade,
                                             ),
@@ -1630,7 +1664,7 @@ class _ControlPanelState extends State<ControlPanel>
                                       ),
                                     ),
                                   ),
-                                if (_setSpeed > 0)
+                                if (_setSpeed! > 0)
                                   Expanded(
                                     child: SingleChildScrollView(
                                       padding: EdgeInsets.all(10.0),
@@ -1639,7 +1673,7 @@ class _ControlPanelState extends State<ControlPanel>
                                         future: _getSpeedList(),
                                         initialData: [],
                                         builder: (context, snapshot) => Row(
-                                          children: snapshot.data
+                                          children: snapshot.data!
                                               .map<Widget>((e) => InkWell(
                                                     onTap: () {
                                                       if (_setSpeed == 1) {
@@ -1654,7 +1688,7 @@ class _ControlPanelState extends State<ControlPanel>
                                                               horizontal: 5),
                                                       decoration: e ==
                                                                   currentSpeed &&
-                                                              _setSpeed > 0
+                                                              _setSpeed! > 0
                                                           ? BoxDecoration(
                                                               color: context
                                                                   .accentColor,
@@ -1679,12 +1713,12 @@ class _ControlPanelState extends State<ControlPanel>
                                                                       Brightness
                                                                           .light
                                                                   ? customShadow(1 -
-                                                                      _setSpeed)
+                                                                      _setSpeed!)
                                                                   : customShadowNight(1 -
-                                                                      _setSpeed)),
+                                                                      _setSpeed!)),
                                                       alignment:
                                                           Alignment.center,
-                                                      child: _setSpeed > 0
+                                                      child: _setSpeed! > 0
                                                           ? Text(e.toString(),
                                                               style: TextStyle(
                                                                   fontWeight:
@@ -1717,7 +1751,7 @@ class _ControlPanelState extends State<ControlPanel>
                                         MainAxisAlignment.spaceEvenly,
                                     children: <Widget>[
                                       Transform.rotate(
-                                          angle: math.pi * _setSpeed,
+                                          angle: math.pi * _setSpeed!,
                                           child: Text('X')),
                                       Text(currentSpeed.toStringAsFixed(1)),
                                     ],
@@ -1747,25 +1781,25 @@ class _ControlPanelState extends State<ControlPanel>
                                         index: _tabIndex,
                                         indicatorSize: 10,
                                         fraction:
-                                            (height + 16 - widget.maxHeight) /
+                                            (height + 16 - widget.maxHeight!) /
                                                 (context.height -
                                                     context.paddingTop -
                                                     20 -
-                                                    widget.maxHeight),
+                                                    widget.maxHeight!),
                                         accentColor: context.accentColor,
                                         color: context.textColor)),
                               ),
                             ),
                             onTap: widget.onExpand),
                       ),
-                    if (_setSpeed == 0 && height > widget.maxHeight)
+                    if (_setSpeed == 0 && height > widget.maxHeight!)
                       Transform.translate(
                         offset: Offset(0, 5) *
-                            (height - widget.maxHeight) /
+                            (height - widget.maxHeight!) /
                             (context.height -
                                 context.paddingTop -
                                 20 -
-                                widget.maxHeight),
+                                widget.maxHeight!),
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: context.width / 2 - 80),

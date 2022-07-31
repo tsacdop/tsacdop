@@ -3,7 +3,7 @@ import 'package:flare_flutter/flare_actor.dart';
 import '../util/extension_helper.dart';
 
 class FirstPage extends StatefulWidget {
-  FirstPage({Key key}) : super(key: key);
+  FirstPage({Key? key}) : super(key: key);
 
   @override
   _FirstPageState createState() => _FirstPageState();

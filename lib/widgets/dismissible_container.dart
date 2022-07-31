@@ -8,9 +8,9 @@ import '../util/extension_helper.dart';
 import 'custom_widget.dart';
 
 class DismissibleContainer extends StatefulWidget {
-  final EpisodeBrief episode;
-  final ValueChanged<bool> onRemove;
-  DismissibleContainer({this.episode, this.onRemove, Key key})
+  final EpisodeBrief? episode;
+  final ValueChanged<bool>? onRemove;
+  DismissibleContainer({this.episode, this.onRemove, Key? key})
       : super(key: key);
 
   @override
@@ -18,7 +18,7 @@ class DismissibleContainer extends StatefulWidget {
 }
 
 class _DismissibleContainerState extends State<DismissibleContainer> {
-  bool _delete;
+  late bool _delete;
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Dismissible(
-                    key: ValueKey('${widget.episode.enclosureUrl}dis'),
+                    key: ValueKey('${widget.episode!.enclosureUrl}dis'),
                     background: Container(
                       padding: EdgeInsets.symmetric(horizontal: 20.0),
                       height: 30,
@@ -81,8 +81,8 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                       });
                       var index = await context
                           .read<AudioPlayerNotifier>()
-                          .delFromPlaylist(widget.episode);
-                      widget.onRemove(true);
+                          .delFromPlaylist(widget.episode!);
+                      widget.onRemove!(true);
                       final episodeRemove = widget.episode;
                       Scaffold.of(context).removeCurrentSnackBar();
                       Scaffold.of(context).showSnackBar(SnackBar(
@@ -96,13 +96,13 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                             onPressed: () async {
                               await context
                                   .read<AudioPlayerNotifier>()
-                                  .addToPlaylistAt(episodeRemove, index);
-                              widget.onRemove(false);
+                                  .addToPlaylistAt(episodeRemove!, index);
+                              widget.onRemove!(false);
                             }),
                       ));
                     },
                     child: EpisodeCard(
-                      widget.episode,
+                      widget.episode!,
                       isPlaying: false,
                       canReorder: true,
                       showDivider: false,
@@ -110,7 +110,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                         await context
                             .read<AudioPlayerNotifier>()
                             .episodeLoad(widget.episode);
-                        widget.onRemove(true);
+                        widget.onRemove!(true);
                       },
                     ),
                   ),
@@ -124,9 +124,9 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
 
 class EpisodeCard extends StatelessWidget {
   final EpisodeBrief episode;
-  final Color tileColor;
-  final VoidCallback onTap;
-  final bool isPlaying;
+  final Color? tileColor;
+  final VoidCallback? onTap;
+  final bool? isPlaying;
   final bool canReorder;
   final bool showDivider;
   final bool havePadding;
@@ -137,7 +137,7 @@ class EpisodeCard extends StatelessWidget {
       this.canReorder = false,
       this.showDivider = true,
       this.havePadding = false,
-      Key key})
+      Key? key})
       : assert(episode != null),
         super(key: key);
 
@@ -157,7 +157,7 @@ class EpisodeCard extends StatelessWidget {
               onTap: onTap,
               title: Container(
                 child: Text(
-                  episode.title,
+                  episode.title!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -194,18 +194,18 @@ class EpisodeCard extends StatelessWidget {
                       episodeTag(
                           episode.duration == 0
                               ? ''
-                              : s.minsCount(episode.duration ~/ 60),
+                              : s.minsCount(episode.duration! ~/ 60),
                           Colors.cyan[300]),
                     if (episode.enclosureLength != null)
                       episodeTag(
                           episode.enclosureLength == 0
                               ? ''
-                              : '${(episode.enclosureLength) ~/ 1000000}MB',
+                              : '${episode.enclosureLength! ~/ 1000000}MB',
                           Colors.lightBlue[300]),
                   ],
                 ),
               ),
-              trailing: isPlaying
+              trailing: isPlaying!
                   ? Container(
                       height: 20,
                       width: 20,

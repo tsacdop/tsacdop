@@ -770,6 +770,10 @@
   "@username": {},
   "usernameRequired": "Kullanıcı adı gerekli",
   "@usernameRequired": {},
+  "useWallpaperTheme": "",
+  "@useWallpaperTheme": {},
+  "useWallpaperThemeDes": "",
+  "@useWallpaperThemeDes": {},
   "version": "Version: {version}",
   "@version": {
     "placeholders": {

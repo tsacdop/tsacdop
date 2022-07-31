@@ -15,14 +15,15 @@ import '../type/podcastlocal.dart';
 import '../type/sub_history.dart';
 
 enum Filter { downloaded, liked, search, all }
+
 const localFolderId = "46e48103-06c7-4fe1-a0b1-68aa7205b7f0";
 
 class DBHelper {
-  static Database _db;
+  Database? _db;
   Future<Database> get database async {
-    if (_db != null) return _db;
+    if (_db != null) return _db!;
     _db = await initDb();
-    return _db;
+    return _db!;
   }
 
   initDb() async {
@@ -135,7 +136,7 @@ class DBHelper {
         "ALTER TABLE PodcastLocal ADD hide_new_mark INTEGER DEFAULT 0");
   }
 
-  Future<List<PodcastLocal>> getPodcastLocal(List<String> podcasts,
+  Future<List<PodcastLocal>> getPodcastLocal(List<String?> podcasts,
       {bool updateOnly = false}) async {
     var dbClient = await database;
     var podcastLocal = <PodcastLocal>[];
@@ -209,7 +210,7 @@ class DBHelper {
     return podcastLocal;
   }
 
-  Future<PodcastLocal> getPodcastWithUrl(String url) async {
+  Future<PodcastLocal?> getPodcastWithUrl(String? url) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         """SELECT P.id, P.title, P.imageUrl, P.rssUrl, P.primaryColor, P.author, P.imagePath,
@@ -233,7 +234,7 @@ class DBHelper {
     return null;
   }
 
-  Future<int> getPodcastCounts(String id) async {
+  Future<int?> getPodcastCounts(String? id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT episode_count FROM PodcastLocal WHERE id = ?', [id]);
@@ -241,7 +242,7 @@ class DBHelper {
     return 0;
   }
 
-  Future<void> removePodcastNewMark(String id) async {
+  Future<void> removePodcastNewMark(String? id) async {
     var dbClient = await database;
     await dbClient.transaction((txn) async {
       await txn.rawUpdate(
@@ -250,7 +251,7 @@ class DBHelper {
     });
   }
 
-  Future<bool> getNeverUpdate(String id) async {
+  Future<bool> getNeverUpdate(String? id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT never_update FROM PodcastLocal WHERE id = ?', [id]);
@@ -258,14 +259,14 @@ class DBHelper {
     return false;
   }
 
-  Future<int> saveNeverUpdate(String id, {bool boo}) async {
+  Future<int> saveNeverUpdate(String? id, {required bool boo}) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET never_update = ? WHERE id = ?",
         [boo ? 1 : 0, id]);
   }
 
-  Future<bool> getHideNewMark(String id) async {
+  Future<bool> getHideNewMark(String? id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT hide_new_mark FROM PodcastLocal WHERE id = ?', [id]);
@@ -273,14 +274,14 @@ class DBHelper {
     return false;
   }
 
-  Future<int> saveHideNewMark(String id, {bool boo}) async {
+  Future<int> saveHideNewMark(String? id, {required bool boo}) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET hide_new_mark = ? WHERE id = ?",
         [boo ? 1 : 0, id]);
   }
 
-  Future<int> getPodcastUpdateCounts(String id) async {
+  Future<int?> getPodcastUpdateCounts(String? id) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECt count(*) as count FROM Episodes WHERE feed_id = ? AND is_new = 1',
@@ -289,7 +290,7 @@ class DBHelper {
     return 0;
   }
 
-  Future<int> getSkipSecondsStart(String id) async {
+  Future<int?> getSkipSecondsStart(String? id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT skip_seconds FROM PodcastLocal WHERE id = ?', [id]);
@@ -297,13 +298,13 @@ class DBHelper {
     return 0;
   }
 
-  Future<int> saveSkipSecondsStart(String id, int seconds) async {
+  Future<int> saveSkipSecondsStart(String? id, int? seconds) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET skip_seconds = ? WHERE id = ?", [seconds, id]);
   }
 
-  Future<int> getSkipSecondsEnd(String id) async {
+  Future<int?> getSkipSecondsEnd(String id) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT skip_seconds_end FROM PodcastLocal WHERE id = ?', [id]);
@@ -311,14 +312,14 @@ class DBHelper {
     return 0;
   }
 
-  Future<int> saveSkipSecondsEnd(String id, int seconds) async {
+  Future<int> saveSkipSecondsEnd(String? id, int seconds) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET skip_seconds_end = ? WHERE id = ?",
         [seconds, id]);
   }
 
-  Future<bool> getAutoDownload(String id) async {
+  Future<bool> getAutoDownload(String? id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT auto_download FROM PodcastLocal WHERE id = ?', [id]);
@@ -326,14 +327,14 @@ class DBHelper {
     return false;
   }
 
-  Future<int> saveAutoDownload(String id, {bool boo}) async {
+  Future<int> saveAutoDownload(String? id, {required bool boo}) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET auto_download = ? WHERE id = ?",
         [boo ? 1 : 0, id]);
   }
 
-  Future<String> checkPodcast(String url) async {
+  Future<String?> checkPodcast(String? url) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT id FROM PodcastLocal WHERE rssUrl = ?', [url]);
@@ -376,13 +377,13 @@ class DBHelper {
     });
   }
 
-  Future<void> updatePodcastImage({String id, String filePath}) async {
+  Future<int> updatePodcastImage({String? id, String? filePath}) async {
     var dbClient = await database;
     return await dbClient.rawUpdate(
         "UPDATE PodcastLocal SET imagePath= ? WHERE id = ?", [filePath, id]);
   }
 
-  Future<int> saveFiresideData(List<String> list) async {
+  Future<int> saveFiresideData(List<String?> list) async {
     var dbClient = await database;
     var result = await dbClient.rawUpdate(
         'UPDATE PodcastLocal SET background_image = ? , hosts = ? WHERE id = ?',
@@ -390,18 +391,18 @@ class DBHelper {
     return result;
   }
 
-  Future<List<String>> getFiresideData(String id) async {
+  Future<List<String?>> getFiresideData(String? id) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT background_image, hosts FROM PodcastLocal WHERE id = ?', [id]);
     if (list.isNotEmpty) {
-      var data = <String>[list.first['background_image'], list.first['hosts']];
+      var data = <String?>[list.first['background_image'], list.first['hosts']];
       return data;
     }
     return ['', ''];
   }
 
-  Future<void> delPodcastLocal(String id) async {
+  Future<void> delPodcastLocal(String? id) async {
     var dbClient = await database;
     await dbClient.rawDelete('DELETE FROM PodcastLocal WHERE id =?', [id]);
     List<Map> list = await dbClient.rawQuery(
@@ -421,13 +422,13 @@ class DBHelper {
   }
 
   Future<void> saveHistory(PlayHistory history) async {
-    if (history.url.substring(0, 7) != 'file://') {
+    if (history.url!.substring(0, 7) != 'file://') {
       var dbClient = await database;
       final milliseconds = DateTime.now().millisecondsSinceEpoch;
       var recent = await getPlayHistory(1);
       if (recent.isNotEmpty && recent.first.title == history.title) {
         await dbClient.rawDelete("DELETE FROM PlayHistory WHERE add_date = ?",
-            [recent.first.playdate.millisecondsSinceEpoch]);
+            [recent.first.playdate!.millisecondsSinceEpoch]);
       }
       await dbClient.transaction((txn) async {
         return await txn.rawInsert(
@@ -439,7 +440,7 @@ class DBHelper {
               history.seconds,
               history.seekValue,
               milliseconds,
-              history.seekValue > 0.95 ? 1 : 0
+              history.seekValue! > 0.95 ? 1 : 0
             ]);
       });
     }
@@ -461,7 +462,7 @@ class DBHelper {
   }
 
   /// History list in playlist page, not include marked episdoes.
-  Future<List<PlayHistory>> getPlayRecords(int top) async {
+  Future<List<PlayHistory>> getPlayRecords(int? top) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         """SELECT title, enclosure_url, seconds, seek_value, add_date FROM PlayHistory 
@@ -478,7 +479,7 @@ class DBHelper {
 
   Future<int> isListened(String url) async {
     var dbClient = await database;
-    var i = 0;
+    int? i = 0;
     List<Map> list = await dbClient.rawQuery(
         "SELECT SUM(listen_time) FROM PlayHistory WHERE enclosure_url = ?",
         [url]);
@@ -489,9 +490,9 @@ class DBHelper {
     return 0;
   }
 
-  Future<int> markNotListened(String url) async {
+  Future<int?> markNotListened(String url) async {
     var dbClient = await database;
-    int count;
+    int? count;
     await dbClient.transaction((txn) async {
       count = await txn.rawUpdate(
           "UPDATE OR IGNORE PlayHistory SET listen_time = 0 WHERE enclosure_url = ?",
@@ -567,7 +568,7 @@ class DBHelper {
     return list.isNotEmpty;
   }
 
-  DateTime _parsePubDate(String pubDate) {
+  DateTime _parsePubDate(String? pubDate) {
     if (pubDate == null) return DateTime.now();
     DateTime date;
     var yyyy = RegExp(r'[1-2][0-9]{3}');
@@ -623,7 +624,7 @@ class DBHelper {
     return date;
   }
 
-  int _getExplicit(bool b) {
+  int _getExplicit(bool? b) {
     int result;
     if (b == true) {
       result = 1;
@@ -654,29 +655,31 @@ class DBHelper {
   }
 
   Future<int> savePodcastRss(RssFeed feed, String id) async {
-    feed.items.removeWhere((item) => item == null);
-    var result = feed.items.length;
+    feed.items!.removeWhere((item) => item == null);
+    var result = feed.items!.length;
     var dbClient = await database;
-    String description, url;
+    String? description, url;
     for (var i = 0; i < result; i++) {
-      developer.log(feed.items[i].title);
-      description = _getDescription(feed.items[i]?.content?.value ?? '',
-          feed.items[i].description ?? '', feed.items[i].itunes.summary ?? '');
-      if (feed.items[i].enclosure != null) {
-        _isXimalaya(feed.items[i].enclosure.url)
-            ? url = feed.items[i].enclosure.url.split('=').last
-            : url = feed.items[i].enclosure.url;
+      developer.log(feed.items![i].title!);
+      description = _getDescription(
+          feed.items![i].content?.value ?? '',
+          feed.items![i].description ?? '',
+          feed.items![i].itunes!.summary ?? '');
+      if (feed.items![i].enclosure != null) {
+        _isXimalaya(feed.items![i].enclosure!.url!)
+            ? url = feed.items![i].enclosure!.url!.split('=').last
+            : url = feed.items![i].enclosure!.url;
       }
 
-      final title = feed.items[i].itunes.title ?? feed.items[i].title;
-      final length = feed.items[i]?.enclosure?.length;
-      final pubDate = feed.items[i].pubDate;
+      final title = feed.items![i].itunes!.title ?? feed.items![i].title;
+      final length = feed.items![i].enclosure?.length;
+      final pubDate = feed.items![i].pubDate;
       final date = _parsePubDate(pubDate);
       final milliseconds = date.millisecondsSinceEpoch;
-      final duration = feed.items[i].itunes.duration?.inSeconds ?? 0;
-      final explicit = _getExplicit(feed.items[i].itunes.explicit);
-      final chapter = feed.items[i].podcastChapters?.url ?? '';
-      final image = feed.items[i].itunes.image?.href ?? '';
+      final duration = feed.items![i].itunes!.duration?.inSeconds ?? 0;
+      final explicit = _getExplicit(feed.items![i].itunes!.explicit);
+      final chapter = feed.items![i].podcastChapters?.url ?? '';
+      final image = feed.items![i].itunes!.image?.href ?? '';
       if (url != null) {
         await dbClient.transaction((txn) {
           return txn.rawInsert(
@@ -710,7 +713,7 @@ class DBHelper {
   }
 
   Future<int> updatePodcastRss(PodcastLocal podcastLocal,
-      {int removeMark = 0}) async {
+      {int? removeMark = 0}) async {
     final options = BaseOptions(
       connectTimeout: 20000,
       receiveTimeout: 20000,
@@ -720,38 +723,38 @@ class DBHelper {
       var response = await Dio(options).get(podcastLocal.rssUrl);
       if (response.statusCode == 200) {
         var feed = RssFeed.parse(response.data);
-        String url, description;
-        feed.items.removeWhere((item) => item == null);
+        String? url, description;
+        feed.items!.removeWhere((item) => item == null);
 
         var dbClient = await database;
         var count = Sqflite.firstIntValue(await dbClient.rawQuery(
             'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?',
-            [podcastLocal.id]));
+            [podcastLocal.id]))!;
         if (removeMark == 0) {
           await dbClient.rawUpdate(
               "UPDATE Episodes SET is_new = 0 WHERE feed_id = ?",
               [podcastLocal.id]);
         }
-        for (var item in feed.items) {
-          developer.log(item.title);
-          description = _getDescription(item.content.value ?? '',
-              item.description ?? '', item.itunes.summary ?? '');
+        for (var item in feed.items!) {
+          developer.log(item.title!);
+          description = _getDescription(item.content!.value,
+              item.description ?? '', item.itunes!.summary ?? '');
 
           if (item.enclosure?.url != null) {
-            _isXimalaya(item.enclosure.url)
-                ? url = item.enclosure.url.split('=').last
-                : url = item.enclosure.url;
+            _isXimalaya(item.enclosure!.url!)
+                ? url = item.enclosure!.url!.split('=').last
+                : url = item.enclosure!.url;
           }
 
-          final title = item.itunes.title ?? item.title;
-          final length = item?.enclosure?.length ?? 0;
+          final title = item.itunes!.title ?? item.title;
+          final length = item.enclosure?.length ?? 0;
           final pubDate = item.pubDate;
           final date = _parsePubDate(pubDate);
           final milliseconds = date.millisecondsSinceEpoch;
-          final duration = item.itunes.duration?.inSeconds ?? 0;
-          final explicit = _getExplicit(item.itunes.explicit);
+          final duration = item.itunes!.duration?.inSeconds ?? 0;
+          final explicit = _getExplicit(item.itunes!.explicit);
           final chapter = item.podcastChapters?.url ?? '';
-          final image = item.itunes.image?.href ?? '';
+          final image = item.itunes!.image?.href ?? '';
 
           if (url != null) {
             await dbClient.transaction((txn) async {
@@ -779,7 +782,7 @@ class DBHelper {
         }
         var countUpdate = Sqflite.firstIntValue(await dbClient.rawQuery(
             'SELECT COUNT(*) FROM Episodes WHERE feed_id = ?',
-            [podcastLocal.id]));
+            [podcastLocal.id]))!;
 
         await dbClient.rawUpdate(
             """UPDATE PodcastLocal SET update_count = ?, episode_count = ? WHERE id = ?""",
@@ -823,17 +826,17 @@ class DBHelper {
         'DELETE FROM Episodes WHERE enclosure_url in (${s.join(',')})');
   }
 
-  Future<List<EpisodeBrief>> getRssItem(String id, int count,
-      {bool reverse,
-      Filter filter = Filter.all,
-      String query = '',
+  Future<List<EpisodeBrief>> getRssItem(String? id, int? count,
+      {bool? reverse,
+      Filter? filter = Filter.all,
+      String? query = '',
       bool hideListened = false}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     var list = <Map>[];
     if (hideListened) {
       if (count == -1) {
-        if (reverse) {
+        if (reverse!) {
           switch (filter) {
             case Filter.all:
               list = await dbClient.rawQuery(
@@ -906,7 +909,7 @@ class DBHelper {
             default:
           }
         }
-      } else if (reverse) {
+      } else if (reverse!) {
         switch (filter) {
           case Filter.all:
             list = await dbClient.rawQuery(
@@ -998,7 +1001,7 @@ class DBHelper {
       }
     } else {
       if (count == -1) {
-        if (reverse) {
+        if (reverse!) {
           switch (filter) {
             case Filter.all:
               list = await dbClient.rawQuery(
@@ -1067,7 +1070,7 @@ class DBHelper {
             default:
           }
         }
-      } else if (reverse) {
+      } else if (reverse!) {
         switch (filter) {
           case Filter.all:
             list = await dbClient.rawQuery(
@@ -1158,7 +1161,7 @@ class DBHelper {
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> getNewEpisodes(String id) async {
+  Future<List<EpisodeBrief>> getNewEpisodes(String? id) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     List<Map> list;
@@ -1195,7 +1198,7 @@ class DBHelper {
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> getRssItemTop(String id) async {
+  Future<List<EpisodeBrief>> getRssItemTop(String? id) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     List<Map> list = await dbClient.rawQuery(
@@ -1299,14 +1302,14 @@ class DBHelper {
     return episodes;
   }
 
-  Future<List<EpisodeBrief>> getGroupRssItem(int top, List<String> group,
-      {bool hideListened = false}) async {
+  Future<List<EpisodeBrief>> getGroupRssItem(int top, List<String?> group,
+      {bool? hideListened = false}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     if (group.length > 0) {
       var s = group.map<String>((e) => "'$e'").toList();
       var list = <Map>[];
-      if (hideListened) {
+      if (hideListened!) {
         list = await dbClient.rawQuery(
             """SELECT E.title, E.enclosure_url, E.enclosure_length, E.is_new,
         E.milliseconds, P.title as feed_title, E.duration, E.explicit, 
@@ -1369,7 +1372,7 @@ class DBHelper {
   }
 
   Future<List<EpisodeBrief>> getOutdatedEpisode(int deadline,
-      {bool deletePlayed}) async {
+      {required bool deletePlayed}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     List<Map> list = await dbClient.rawQuery(
@@ -1421,11 +1424,11 @@ class DBHelper {
     return episodes.toSet().toList();
   }
 
-  Future<List<EpisodeBrief>> getDownloadedEpisode(int mode,
+  Future<List<EpisodeBrief>> getDownloadedEpisode(int? mode,
       {bool hideListened = false}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
-    List<Map> list;
+    late List<Map> list;
     if (hideListened) {
       if (mode == 0) {
         list = await dbClient.rawQuery(
@@ -1509,7 +1512,7 @@ class DBHelper {
     });
   }
 
-  Future<List<EpisodeBrief>> getGroupNewRssItem(List<String> group) async {
+  Future<List<EpisodeBrief>> getGroupNewRssItem(List<String?> group) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
     if (group.length > 0) {
@@ -1539,7 +1542,7 @@ class DBHelper {
     return episodes;
   }
 
-  Future<void> removeGroupNewMark(List<String> group) async {
+  Future<void> removeGroupNewMark(List<String?> group) async {
     var dbClient = await database;
     if (group.isNotEmpty) {
       var s = group.map<String>((e) => "'$e'").toList();
@@ -1550,7 +1553,7 @@ class DBHelper {
     }
   }
 
-  Future<void> removeEpisodeNewMark(String url) async {
+  Future<void> removeEpisodeNewMark(String? url) async {
     var dbClient = await database;
     await dbClient.transaction((txn) async {
       await txn.rawUpdate(
@@ -1559,7 +1562,7 @@ class DBHelper {
     developer.log('remove episode mark $url');
   }
 
-  Future<List<EpisodeBrief>> getLikedRssItem(int i, int sortBy,
+  Future<List<EpisodeBrief>> getLikedRssItem(int i, int? sortBy,
       {bool hideListened = false}) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
@@ -1653,10 +1656,10 @@ class DBHelper {
     return list.isNotEmpty;
   }
 
-  Future<int> saveDownloaded(String url, String id) async {
+  Future<int?> saveDownloaded(String url, String? id) async {
     var dbClient = await database;
     var milliseconds = DateTime.now().millisecondsSinceEpoch;
-    int count;
+    int? count;
     await dbClient.transaction((txn) async {
       count = await txn.rawUpdate(
           "UPDATE Episodes SET downloaded = ?, download_date = ? WHERE enclosure_url = ?",
@@ -1665,10 +1668,11 @@ class DBHelper {
     return count;
   }
 
-  Future<int> saveMediaId(String url, String path, String id, int size) async {
+  Future<int?> saveMediaId(
+      String url, String path, String? id, int size) async {
     var dbClient = await database;
     var milliseconds = DateTime.now().millisecondsSinceEpoch;
-    int count;
+    int? count;
     await dbClient.transaction((txn) async {
       count = await txn.rawUpdate(
           "UPDATE Episodes SET enclosure_length = ?, media_id = ?, download_date = ?, downloaded = ? WHERE enclosure_url = ?",
@@ -1677,9 +1681,9 @@ class DBHelper {
     return count;
   }
 
-  Future<int> delDownloaded(String url) async {
+  Future<int?> delDownloaded(String url) async {
     var dbClient = await database;
-    int count;
+    int? count;
     await dbClient.transaction((txn) async {
       count = await txn.rawUpdate(
           "UPDATE Episodes SET downloaded = 'ND', media_id = ? WHERE enclosure_url = ?",
@@ -1689,15 +1693,15 @@ class DBHelper {
     return count;
   }
 
-  Future<String> getDescription(String url) async {
+  Future<String?> getDescription(String url) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT description FROM Episodes WHERE enclosure_url = ?', [url]);
-    String description = list[0]['description'];
+    String? description = list[0]['description'];
     return description;
   }
 
-  Future saveEpisodeDes(String url, {String description}) async {
+  Future saveEpisodeDes(String url, {String? description}) async {
     var dbClient = await database;
     await dbClient.transaction((txn) async {
       await txn.rawUpdate(
@@ -1706,31 +1710,31 @@ class DBHelper {
     });
   }
 
-  Future<String> getFeedDescription(String id) async {
+  Future<String?> getFeedDescription(String? id) async {
     var dbClient = await database;
     List<Map> list = await dbClient
         .rawQuery('SELECT description FROM PodcastLocal WHERE id = ?', [id]);
-    String description = list[0]['description'];
+    String? description = list[0]['description'];
     return description;
   }
 
-  Future<String> getChapter(String url) async {
+  Future<String?> getChapter(String url) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT chapter_link FROM Episodes WHERE enclosure_url = ?', [url]);
-    String chapter = list[0]['chapter_link'];
+    String? chapter = list[0]['chapter_link'];
     return chapter;
   }
 
-  Future<String> getEpisodeImage(String url) async {
+  Future<String?> getEpisodeImage(String url) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         'SELECT episode_image FROM Episodes WHERE enclosure_url = ?', [url]);
-    String image = list[0]['episode_image'];
+    String? image = list[0]['episode_image'];
     return image;
   }
 
-  Future<EpisodeBrief> getRssItemWithUrl(String url) async {
+  Future<EpisodeBrief?> getRssItemWithUrl(String? url) async {
     var dbClient = await database;
     EpisodeBrief episode;
     List<Map> list = await dbClient.rawQuery(
@@ -1762,7 +1766,7 @@ class DBHelper {
     }
   }
 
-  Future<EpisodeBrief> getRssItemWithMediaId(String id) async {
+  Future<EpisodeBrief?> getRssItemWithMediaId(String id) async {
     var dbClient = await database;
     EpisodeBrief episode;
     List<Map> list = await dbClient.rawQuery(
@@ -1794,7 +1798,7 @@ class DBHelper {
     }
   }
 
-  Future<String> getImageUrl(String url) async {
+  Future<String?> getImageUrl(String url) async {
     var dbClient = await database;
     List<Map> list = await dbClient.rawQuery(
         """SELECT P.imageUrl FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id 

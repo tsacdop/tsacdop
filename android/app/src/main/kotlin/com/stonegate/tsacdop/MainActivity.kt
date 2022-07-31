@@ -13,10 +13,10 @@ import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.embedding.engine.dart.DartExecutor.DartCallback
 import com.rmawatson.flutterisolate.FlutterIsolatePlugin
 
+
 class MainActivity: FlutterActivity() {
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine);
-        FlutterIsolatePlugin.setCustomIsolateRegistrant(IsolatePluginRegistrant::class.java);
         MethodChannel(flutterEngine.dartExecutor, "android_app_retain").apply {
             setMethodCallHandler { method, result ->
                 if (method.method == "sendToBackground") {

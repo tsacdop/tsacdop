@@ -5,12 +5,12 @@ part 'search_top_podcast.g.dart';
 @JsonSerializable()
 class SearchTopPodcast<T> {
   @_ConvertT()
-  final List<T> podcasts;
-  final int id;
-  final int page;
-  final int total;
+  final List<T>? podcasts;
+  final int? id;
+  final int? page;
+  final int? total;
   @JsonKey(name: 'has_next')
-  final bool hasNext;
+  final bool? hasNext;
   SearchTopPodcast(
       {this.podcasts, this.id, this.total, this.hasNext, this.page});
 
@@ -19,15 +19,15 @@ class SearchTopPodcast<T> {
   Map<String, dynamic> toJson() => _$SearchTopPodcastToJson(this);
 }
 
-class _ConvertT<T> implements JsonConverter<T, Object> {
+class _ConvertT<T> implements JsonConverter<T, Object?> {
   const _ConvertT();
   @override
-  T fromJson(Object json) {
-    return OnlineTopPodcast.fromJson(json) as T;
+  T fromJson(Object? json) {
+    return OnlineTopPodcast.fromJson(json as Map<String, dynamic>) as T;
   }
 
   @override
-  Object toJson(T object) {
+  Object? toJson(T object) {
     return object;
   }
 }
@@ -35,20 +35,20 @@ class _ConvertT<T> implements JsonConverter<T, Object> {
 @JsonSerializable()
 class OnlineTopPodcast {
   @JsonKey(name: 'earliest_pub_date_ms')
-  final int earliestPubDate;
+  final int? earliestPubDate;
   @JsonKey(name: 'title')
-  final String title;
-  final String rss;
+  final String? title;
+  final String? rss;
   @JsonKey(name: 'latest_pub_date_ms')
-  final int latestPubDate;
+  final int? latestPubDate;
   @JsonKey(name: 'description')
-  final String description;
+  final String? description;
   @JsonKey(name: 'total_episodes')
-  final int count;
-  final String image;
+  final int? count;
+  final String? image;
   @JsonKey(name: 'publisher')
-  final String publisher;
-  final String id;
+  final String? publisher;
+  final String? id;
   OnlineTopPodcast(
       {this.earliestPubDate,
       this.title,

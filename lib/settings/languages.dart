@@ -8,7 +8,7 @@ import '../local_storage/key_value_storage.dart';
 import '../util/extension_helper.dart';
 
 class LanguagesSetting extends StatefulWidget {
-  const LanguagesSetting({Key key}) : super(key: key);
+  const LanguagesSetting({Key? key}) : super(key: key);
 
   @override
   _LanguagesSettingState createState() => _LanguagesSettingState();
@@ -21,7 +21,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
     findSystemLocale();
   }
 
-  _setLocale(Locale locale, {bool systemDefault = false}) async {
+  _setLocale(Locale? locale, {bool systemDefault = false}) async {
     var localeStorage = KeyValueStorage(localeKey);
     if (systemDefault) {
       await localeStorage.saveStringList([]);
@@ -41,7 +41,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
       }
     } else {
       await localeStorage
-          .saveStringList([locale.languageCode, locale.countryCode??'']);
+          .saveStringList([locale!.languageCode, locale.countryCode ?? '']);
       await S.load(locale);
       if (mounted) {
         setState(() {});
@@ -49,14 +49,14 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
     }
   }
 
-  Widget _langListTile(String lang, {Locale locale}) => ListTile(
+  Widget _langListTile(String lang, {Locale? locale}) => ListTile(
         title: Text(lang, style: context.textTheme.bodyText2),
         onTap: () => _setLocale(locale),
         dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20),
         trailing: Transform.scale(
           scale: 0.8,
-          child: Radio<Locale>(
+          child: Radio<Locale?>(
               value: locale,
               groupValue: Locale(Intl.getCurrentLocale()),
               onChanged: _setLocale),
@@ -65,7 +65,7 @@ class _LanguagesSettingState extends State<LanguagesSetting> {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = context.textTheme.bodyText2;
+    final textStyle = context.textTheme.bodyText2!;
     final s = context.s;
     return Column(
       children: [

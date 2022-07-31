@@ -8,25 +8,25 @@ import 'package:flutter/material.dart';
 import '../util/extension_helper.dart';
 
 class EpisodeBrief extends Equatable {
-  final String title;
+  final String? title;
   final String description;
-  final int pubDate;
-  final int enclosureLength;
+  final int? pubDate;
+  final int? enclosureLength;
   final String enclosureUrl;
-  final String feedTitle;
-  final String primaryColor;
-  final int liked;
-  final String downloaded;
-  final int duration;
-  final int explicit;
-  final String imagePath;
-  final String mediaId;
-  final int isNew;
-  final int skipSecondsStart;
-  final int skipSecondsEnd;
-  final int downloadDate;
-  final String episodeImage;
-  final String chapterLink;
+  final String? feedTitle;
+  final String? primaryColor;
+  final int? liked;
+  final String? downloaded;
+  final int? duration;
+  final int? explicit;
+  final String? imagePath;
+  final String? mediaId;
+  final int? isNew;
+  final int? skipSecondsStart;
+  final int? skipSecondsEnd;
+  final int? downloadDate;
+  final String? episodeImage;
+  final String? chapterLink;
   EpisodeBrief(
       this.title,
       this.enclosureUrl,
@@ -51,12 +51,13 @@ class EpisodeBrief extends Equatable {
 
   MediaItem toMediaItem() {
     return MediaItem(
-        id: mediaId,
-        title: title,
+        id: mediaId!,
+        title: title!,
         artist: feedTitle,
         album: feedTitle,
         duration: Duration.zero,
-        artUri: Uri.parse(imagePath == '' ? episodeImage : 'file://$imagePath'),
+        artUri:
+            Uri.parse(imagePath == '' ? episodeImage! : 'file://$imagePath'),
         extras: {
           'skipSecondsStart': skipSecondsStart,
           'skipSecondsEnd': skipSecondsEnd
@@ -64,24 +65,33 @@ class EpisodeBrief extends Equatable {
   }
 
   ImageProvider get avatarImage {
-    return File(imagePath).existsSync()
-        ? FileImage(File(imagePath))
-        : File(episodeImage).existsSync()
-            ? FileImage(File(episodeImage))
-            : (episodeImage != '')
-                ? CachedNetworkImageProvider(episodeImage)
-                : AssetImage('assets/avatar_backup.png');
+    return File(imagePath!).existsSync()
+        ? FileImage(File(imagePath!))
+        : File(episodeImage!).existsSync()
+            ? FileImage(File(episodeImage!))
+            : ((episodeImage != '')
+                    ? CachedNetworkImageProvider(episodeImage!)
+                    : AssetImage('assets/avatar_backup.png'))
+                as ImageProvider<Object>;
   }
 
   Color backgroudColor(BuildContext context) {
     if (primaryColor == '') return context.accentColor;
     return context.brightness == Brightness.light
-        ? primaryColor.colorizedark()
-        : primaryColor.colorizeLight();
+        ? primaryColor!.colorizedark()
+        : primaryColor!.colorizeLight();
+  }
+
+  Color cardColor(BuildContext context) {
+    final schema = ColorScheme.fromSeed(
+      seedColor: primaryColor!.colorizedark(),
+      brightness: context.brightness,
+    );
+    return schema.primaryContainer;
   }
 
   EpisodeBrief copyWith({
-    String mediaId,
+    String? mediaId,
   }) =>
       EpisodeBrief(title, enclosureUrl, enclosureLength, pubDate, feedTitle,
           primaryColor, duration, explicit, imagePath, isNew,
@@ -93,5 +103,5 @@ class EpisodeBrief extends Equatable {
           downloadDate: downloadDate);
 
   @override
-  List<Object> get props => [enclosureUrl, title];
+  List<Object?> get props => [enclosureUrl, title];
 }

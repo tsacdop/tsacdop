@@ -12,23 +12,23 @@ const kHalfPi = math.pi / 2;
 
 //Layout change indicator
 class LayoutPainter extends CustomPainter {
-  double scale;
-  Color color;
+  double? scale;
+  Color? color;
   LayoutPainter(this.scale, this.color);
   @override
   void paint(Canvas canvas, Size size) {
     var _paint = Paint()
-      ..color = color
+      ..color = color!
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    canvas.drawRect(Rect.fromLTRB(0, 0, 10 + 5 * scale, 10), _paint);
-    if (scale < 4) {
+    canvas.drawRect(Rect.fromLTRB(0, 0, 10 + 5 * scale!, 10), _paint);
+    if (scale! < 4) {
       canvas.drawRect(
-          Rect.fromLTRB(10 + 5 * scale, 0, 20 + 10 * scale, 10), _paint);
+          Rect.fromLTRB(10 + 5 * scale!, 0, 20 + 10 * scale!, 10), _paint);
       canvas.drawRect(
-          Rect.fromLTRB(20 + 5 * scale, 0, 30, 10 - 10 * scale), _paint);
+          Rect.fromLTRB(20 + 5 * scale!, 0, 30, 10 - 10 * scale!), _paint);
     }
   }
 
@@ -41,7 +41,7 @@ class LayoutPainter extends CustomPainter {
 /// Multi select button.
 class MultiSelectPainter extends CustomPainter {
   Color color;
-  MultiSelectPainter({@required this.color});
+  MultiSelectPainter({required this.color});
   @override
   void paint(Canvas canvas, Size size) {
     var paint = Paint()
@@ -165,13 +165,13 @@ class StarSky extends CustomPainter {
 
 //Listened indicator
 class ListenedPainter extends CustomPainter {
-  final Color _color;
+  final Color? _color;
   double stroke;
   ListenedPainter(this._color, {this.stroke = 1.0});
   @override
   void paint(Canvas canvas, Size size) {
     var _paint = Paint()
-      ..color = _color
+      ..color = _color!
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -198,13 +198,13 @@ class ListenedPainter extends CustomPainter {
 
 //Listened Completely indicator
 class ListenedAllPainter extends CustomPainter {
-  final Color color;
+  final Color? color;
   final double stroke;
   ListenedAllPainter(this.color, {this.stroke = 1.0});
   @override
   void paint(Canvas canvas, Size size) {
     var _paint = Paint()
-      ..color = color
+      ..color = color!
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -267,21 +267,21 @@ class MarkListenedPainter extends CustomPainter {
 
 /// Hide listened painter.
 class HideListenedPainter extends CustomPainter {
-  Color color;
-  Color backgroundColor;
-  double fraction;
+  Color? color;
+  Color? backgroundColor;
+  double? fraction;
   double stroke;
   HideListenedPainter(
       {this.color, this.stroke = 1.0, this.backgroundColor, this.fraction});
   @override
   void paint(Canvas canvas, Size size) {
     var _paint = Paint()
-      ..color = color
+      ..color = color!
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
     var _linePaint = Paint()
-      ..color = backgroundColor
+      ..color = backgroundColor!
       ..strokeWidth = stroke * 2
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -299,11 +299,11 @@ class HideListenedPainter extends CustomPainter {
     _path.lineTo(size.width * 2 / 3, size.height * 3 / 4);
 
     canvas.drawPath(_path, _paint);
-    if (fraction > 0) {
+    if (fraction! > 0) {
       canvas.drawLine(
           Offset(size.width, size.height) / 5,
           Offset(size.width, size.height) / 5 +
-              Offset(size.width, size.height) * 3 / 5 * fraction,
+              Offset(size.width, size.height) * 3 / 5 * fraction!,
           _linePaint);
     }
   }
@@ -315,8 +315,8 @@ class HideListenedPainter extends CustomPainter {
 }
 
 class HideListened extends StatefulWidget {
-  final bool hideListened;
-  HideListened({this.hideListened, Key key}) : super(key: key);
+  final bool? hideListened;
+  HideListened({this.hideListened, Key? key}) : super(key: key);
   @override
   _HideListenedState createState() => _HideListenedState();
 }
@@ -324,8 +324,8 @@ class HideListened extends StatefulWidget {
 class _HideListenedState extends State<HideListened>
     with SingleTickerProviderStateMixin {
   double _fraction = 0.0;
-  Animation animation;
-  AnimationController _controller;
+  late Animation animation;
+  late AnimationController _controller;
   @override
   void initState() {
     super.initState();
@@ -339,13 +339,13 @@ class _HideListenedState extends State<HideListened>
           });
         }
       });
-    if (widget.hideListened) _controller.forward();
+    if (widget.hideListened!) _controller.forward();
   }
 
   @override
   void didUpdateWidget(HideListened oldWidget) {
     if (oldWidget.hideListened != widget.hideListened) {
-      if (widget.hideListened) {
+      if (widget.hideListened!) {
         _controller.forward();
       } else {
         _controller.reverse();
@@ -411,14 +411,14 @@ class AddToPlaylistPainter extends CustomPainter {
 
 /// Remove new flag icon.
 class RemoveNewFlagPainter extends CustomPainter {
-  final Color color;
+  final Color? color;
   final Color textColor;
   RemoveNewFlagPainter(this.color, this.textColor);
 
   @override
   void paint(Canvas canvas, Size size) {
     var _paint = Paint()
-      ..color = color
+      ..color = color!
       ..strokeWidth = 1
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -456,7 +456,7 @@ class RemoveNewFlagPainter extends CustomPainter {
 //Wave play indicator
 class WavePainter extends CustomPainter {
   final double _fraction;
-  double _value;
+  late double _value;
   final Color _color;
   WavePainter(this._fraction, this._color);
   @override
@@ -504,9 +504,9 @@ class WavePainter extends CustomPainter {
 }
 
 class WaveLoader extends StatefulWidget {
-  final Color color;
+  final Color? color;
   final bool animate;
-  WaveLoader({this.color, this.animate = true, Key key}) : super(key: key);
+  WaveLoader({this.color, this.animate = true, Key? key}) : super(key: key);
   @override
   _WaveLoaderState createState() => _WaveLoaderState();
 }
@@ -514,8 +514,8 @@ class WaveLoader extends StatefulWidget {
 class _WaveLoaderState extends State<WaveLoader>
     with SingleTickerProviderStateMixin {
   double _fraction = 0.0;
-  Animation animation;
-  AnimationController _controller;
+  late Animation animation;
+  late AnimationController _controller;
   @override
   void initState() {
     super.initState();
@@ -589,7 +589,7 @@ class LovePainter extends CustomPainter {
 //Not used
 class LinePainter extends CustomPainter {
   final double _fraction;
-  Paint _paint;
+  late Paint _paint;
   final Color _maincolor;
   LinePainter(this._fraction, this._maincolor) {
     _paint = Paint()
@@ -618,8 +618,8 @@ class LineLoader extends StatefulWidget {
 class _LineLoaderState extends State<LineLoader>
     with SingleTickerProviderStateMixin {
   double _fraction = 0.0;
-  Animation animation;
-  AnimationController controller;
+  late Animation animation;
+  late AnimationController controller;
   @override
   void initState() {
     super.initState();
@@ -651,23 +651,22 @@ class _LineLoaderState extends State<LineLoader>
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-        painter: LinePainter(_fraction, Theme.of(context).accentColor));
+    return CustomPaint(painter: LinePainter(_fraction, context.accentColor));
   }
 }
 
 class ImageRotate extends StatefulWidget {
-  final EpisodeBrief episodeItem;
-  ImageRotate({this.episodeItem, Key key}) : super(key: key);
+  final EpisodeBrief? episodeItem;
+  ImageRotate({this.episodeItem, Key? key}) : super(key: key);
   @override
   _ImageRotateState createState() => _ImageRotateState();
 }
 
 class _ImageRotateState extends State<ImageRotate>
     with SingleTickerProviderStateMixin {
-  Animation _animation;
-  AnimationController _controller;
-  double _value;
+  late Animation _animation;
+  late AnimationController _controller;
+  late double _value;
 
   @override
   void initState() {
@@ -711,8 +710,8 @@ class _ImageRotateState extends State<ImageRotate>
           width: 30,
           height: 30,
           child: CircleAvatar(
-              backgroundColor: widget.episodeItem.backgroudColor(context),
-              backgroundImage: widget.episodeItem.avatarImage),
+              backgroundColor: widget.episodeItem!.backgroudColor(context),
+              backgroundImage: widget.episodeItem!.avatarImage),
         ),
       ),
     );
@@ -726,8 +725,8 @@ class LoveOpen extends StatefulWidget {
 
 class _LoveOpenState extends State<LoveOpen>
     with SingleTickerProviderStateMixin {
-  Animation _animationA;
-  AnimationController _controller;
+  late Animation _animationA;
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -760,7 +759,7 @@ class _LoveOpenState extends State<LoveOpen>
         alignment: Alignment.centerLeft,
         padding: EdgeInsets.only(left: value),
         child: ScaleTransition(
-          scale: _animationA,
+          scale: _animationA as Animation<double>,
           alignment: Alignment.center,
           child: Transform.rotate(
             angle: angle,
@@ -812,9 +811,9 @@ class _LoveOpenState extends State<LoveOpen>
 
 //Heart rise
 class HeartSet extends StatefulWidget {
-  final double height;
-  final double width;
-  HeartSet({Key key, this.height, this.width}) : super(key: key);
+  final double? height;
+  final double? width;
+  HeartSet({Key? key, this.height, this.width}) : super(key: key);
 
   @override
   _HeartSetState createState() => _HeartSetState();
@@ -822,9 +821,9 @@ class HeartSet extends StatefulWidget {
 
 class _HeartSetState extends State<HeartSet>
     with SingleTickerProviderStateMixin {
-  Animation _animation;
-  AnimationController _controller;
-  double _value;
+  late Animation _animation;
+  late AnimationController _controller;
+  late double _value;
   @override
   void initState() {
     super.initState();
@@ -870,9 +869,9 @@ class _HeartSetState extends State<HeartSet>
 }
 
 class HeartOpen extends StatefulWidget {
-  final double height;
-  final double width;
-  HeartOpen({Key key, this.height, this.width}) : super(key: key);
+  final double? height;
+  final double? width;
+  HeartOpen({Key? key, this.height, this.width}) : super(key: key);
 
   @override
   _HeartOpenState createState() => _HeartOpenState();
@@ -880,9 +879,9 @@ class HeartOpen extends StatefulWidget {
 
 class _HeartOpenState extends State<HeartOpen>
     with SingleTickerProviderStateMixin {
-  Animation _animation;
-  AnimationController _controller;
-  double _value;
+  late Animation _animation;
+  late AnimationController _controller;
+  late double _value;
   @override
   void initState() {
     super.initState();
@@ -919,8 +918,8 @@ class _HeartOpenState extends State<HeartOpen>
     var scale = _list[i];
     var position = _list[i + 1];
     return Positioned(
-      left: widget.width * position,
-      bottom: widget.height * _value * scale,
+      left: widget.width! * position,
+      bottom: widget.height! * _value * scale,
       child: Icon(Icons.favorite,
           color: _value > 0.5
               ? Colors.red.withOpacity(2 - _value * 2)
@@ -951,7 +950,7 @@ class _HeartOpenState extends State<HeartOpen>
 
 /// Icon using a painter.
 class IconPainter extends StatelessWidget {
-  const IconPainter(this.painter, {this.height = 10, this.width = 30, Key key})
+  const IconPainter(this.painter, {this.height = 10, this.width = 30, Key? key})
       : super(key: key);
   final double height;
   final double width;
@@ -970,10 +969,10 @@ class IconPainter extends StatelessWidget {
 
 /// A dot just a dot.
 class DotIndicator extends StatelessWidget {
-  DotIndicator({this.radius = 8, this.color, Key key})
+  DotIndicator({this.radius = 8, this.color, Key? key})
       : assert(radius > 0),
         super(key: key);
-  final Color color;
+  final Color? color;
   final double radius;
 
   @override
@@ -988,9 +987,9 @@ class DotIndicator extends StatelessWidget {
 
 ///Download button.
 class DownloadPainter extends CustomPainter {
-  double fraction;
-  Color color;
-  Color progressColor;
+  double? fraction;
+  Color? color;
+  Color? progressColor;
   double progress;
   double pauseProgress;
   double stroke;
@@ -1005,15 +1004,15 @@ class DownloadPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     var _paint = Paint()
-      ..color = color
+      ..color = color!
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round;
     var _circlePaint = Paint()
-      ..color = color.withAlpha(70)
+      ..color = color!.withAlpha(70)
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke;
     var _progressPaint = Paint()
-      ..color = progressColor
+      ..color = progressColor!
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke;
@@ -1034,9 +1033,9 @@ class DownloadPainter extends CustomPainter {
           Offset(width / 5, height), Offset(width * 4 / 5, height), _paint);
     } else if (progress < 1) {
       canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
-          math.pi / 2, math.pi * fraction, false, _circlePaint);
+          math.pi / 2, math.pi * fraction!, false, _circlePaint);
       canvas.drawArc(Rect.fromCircle(center: center, radius: width / 2),
-          math.pi / 2, -math.pi * fraction, false, _circlePaint);
+          math.pi / 2, -math.pi * fraction!, false, _circlePaint);
     }
 
     if (progress == 1) {
@@ -1079,20 +1078,20 @@ class DownloadPainter extends CustomPainter {
 
 /// Layout icon button.
 class LayoutButton extends StatelessWidget {
-  const LayoutButton({this.layout, this.onPressed, Key key}) : super(key: key);
-  final Layout layout;
-  final ValueChanged<Layout> onPressed;
+  const LayoutButton({this.layout, this.onPressed, Key? key}) : super(key: key);
+  final Layout? layout;
+  final ValueChanged<Layout>? onPressed;
   @override
   Widget build(BuildContext context) {
     return IconButton(
       padding: EdgeInsets.zero,
       onPressed: () {
         if (layout == Layout.three) {
-          onPressed(Layout.one);
+          onPressed!(Layout.one);
         } else if (layout == Layout.two) {
-          onPressed(Layout.three);
+          onPressed!(Layout.three);
         } else {
-          onPressed(Layout.two);
+          onPressed!(Layout.two);
         }
       },
       icon: layout == Layout.three
@@ -1115,8 +1114,7 @@ class LayoutButton extends StatelessWidget {
                   height: 10,
                   width: 30,
                   child: CustomPaint(
-                    painter:
-                        LayoutPainter(4, context.textTheme.bodyText1.color),
+                    painter: LayoutPainter(4, context.textColor),
                   ),
                 ),
     );
@@ -1133,7 +1131,7 @@ class NoGrowBehavior extends ScrollBehavior {
 }
 
 class Meteor extends CustomPainter {
-  Paint _paint;
+  late Paint _paint;
   Meteor() {
     _paint = Paint()
       ..color = Colors.white
@@ -1160,10 +1158,10 @@ class MeteorLoader extends StatefulWidget {
 
 class _MeteorLoaderState extends State<MeteorLoader>
     with SingleTickerProviderStateMixin {
-  double _fraction = 0.0;
+  double? _fraction = 0.0;
   double _move = 0.0;
-  Animation animation;
-  AnimationController controller;
+  late Animation animation;
+  late AnimationController controller;
   @override
   void initState() {
     super.initState();
@@ -1177,7 +1175,7 @@ class _MeteorLoaderState extends State<MeteorLoader>
             if (animation.value <= 0.5) {
               _fraction = animation.value * 2;
             } else {
-              _fraction = 2 - (animation.value) * 2;
+              _fraction = 2 - (animation.value) * 2 as double?;
             }
           });
         }
@@ -1197,8 +1195,8 @@ class _MeteorLoaderState extends State<MeteorLoader>
       top: 300 * _move + 10,
       left: 150 * _move + 50,
       child: SizedBox(
-          width: 50 * _fraction,
-          height: 100 * _fraction,
+          width: 50 * _fraction!,
+          height: 100 * _fraction!,
           child: CustomPaint(painter: Meteor())),
     );
   }
@@ -1206,11 +1204,11 @@ class _MeteorLoaderState extends State<MeteorLoader>
 
 /// Custom paint in player widget. Tab indicator.
 class TabIndicator extends CustomPainter {
-  double fraction;
-  double indicatorSize;
-  Color color;
-  Color accentColor;
-  int index;
+  double? fraction;
+  double? indicatorSize;
+  Color? color;
+  Color? accentColor;
+  int? index;
   TabIndicator(
       {this.fraction,
       this.color,
@@ -1221,32 +1219,32 @@ class TabIndicator extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     var _paint = Paint()
-      ..color = color
+      ..color = color!
       ..strokeWidth = 3.0
       ..strokeCap = StrokeCap.round;
     var _accentPaint = Paint()
-      ..color = accentColor
+      ..color = accentColor!
       ..strokeWidth = 3.0
       ..strokeCap = StrokeCap.round;
-    var leftStartE = Offset(indicatorSize, size.height);
-    var rightStartE = Offset(size.width - indicatorSize, size.height);
+    var leftStartE = Offset(indicatorSize!, size.height);
+    var rightStartE = Offset(size.width - indicatorSize!, size.height);
     var startPoint = Offset(size.width / 2, 0);
-    var leftStart = startPoint + (leftStartE - startPoint) * fraction;
-    var rightStart = startPoint + (rightStartE - startPoint) * fraction;
+    var leftStart = startPoint + (leftStartE - startPoint) * fraction!;
+    var rightStart = startPoint + (rightStartE - startPoint) * fraction!;
     var leftEnd = startPoint +
         Offset(-size.height, size.height) +
-        Offset(-(size.width / 2 - size.height) * fraction, 0);
+        Offset(-(size.width / 2 - size.height) * fraction!, 0);
     var rightEnd = startPoint +
         Offset(size.height, size.height) +
-        Offset((size.width / 2 - size.height) * fraction, 0);
+        Offset((size.width / 2 - size.height) * fraction!, 0);
     canvas.drawLine(leftStart, leftEnd,
         index == 0 || fraction == 0 ? _accentPaint : _paint);
     canvas.drawLine(rightStart, rightEnd,
         index == 2 || fraction == 0 ? _accentPaint : _paint);
     if (fraction == 1) {
       canvas.drawLine(
-          Offset(size.width / 2 - indicatorSize / 2, size.height),
-          Offset(size.width / 2 + indicatorSize / 2, size.height),
+          Offset(size.width / 2 - indicatorSize! / 2, size.height),
+          Offset(size.width / 2 + indicatorSize! / 2, size.height),
           index == 1 || fraction == 0 ? _accentPaint : _paint);
     }
   }
@@ -1259,7 +1257,7 @@ class TabIndicator extends CustomPainter {
 
 /// Custom back button
 class CustomBackButton extends StatelessWidget {
-  const CustomBackButton({Key key}) : super(key: key);
+  const CustomBackButton({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -1274,7 +1272,7 @@ class CustomBackButton extends StatelessWidget {
 }
 
 // Episode tag widget.
-Widget episodeTag(String text, Color color) {
+Widget episodeTag(String text, Color? color) {
   if (text == '') {
     return Center();
   }
@@ -1291,8 +1289,8 @@ Widget episodeTag(String text, Color color) {
 
 // Sleep time picker.
 class SleepTimerPicker extends StatefulWidget {
-  final ValueChanged<Duration> onChange;
-  SleepTimerPicker({this.onChange, Key key}) : super(key: key);
+  final ValueChanged<Duration>? onChange;
+  SleepTimerPicker({this.onChange, Key? key}) : super(key: key);
 
   @override
   _SleepTimerPickerState createState() => _SleepTimerPickerState();
@@ -1300,8 +1298,8 @@ class SleepTimerPicker extends StatefulWidget {
 
 class _SleepTimerPickerState extends State<SleepTimerPicker> {
   final textStyle = TextStyle(fontSize: 60);
-  int hour;
-  int minute;
+  late int hour;
+  late int minute;
   @override
   void initState() {
     _initTimer();
@@ -1348,13 +1346,13 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
                     hour++;
                   }
                 });
-                widget.onChange(_getDuration());
+                widget.onChange!(_getDuration());
               },
               onLongPress: () {
                 setState(() {
                   hour = DateTime.now().hour;
                 });
-                widget.onChange(_getDuration());
+                widget.onChange!(_getDuration());
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -1380,13 +1378,13 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
                     minute += 5;
                   }
                 });
-                widget.onChange(_getDuration());
+                widget.onChange!(_getDuration());
               }),
               onLongPress: () {
                 setState(() {
                   minute = 0;
                 });
-                widget.onChange(_getDuration());
+                widget.onChange!(_getDuration());
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -1403,9 +1401,9 @@ class _SleepTimerPickerState extends State<SleepTimerPicker> {
 }
 
 class UpDownIndicator extends StatefulWidget {
-  final bool status;
+  final bool? status;
   final Color color;
-  UpDownIndicator({this.status, this.color = Colors.white, Key key})
+  UpDownIndicator({this.status, this.color = Colors.white, Key? key})
       : super(key: key);
 
   @override
@@ -1414,9 +1412,9 @@ class UpDownIndicator extends StatefulWidget {
 
 class _UpDownIndicatorState extends State<UpDownIndicator>
     with SingleTickerProviderStateMixin {
-  double _value;
-  AnimationController _controller;
-  Animation _animation;
+  late double _value;
+  late AnimationController _controller;
+  late Animation _animation;
   @override
   void initState() {
     super.initState();
@@ -1434,7 +1432,7 @@ class _UpDownIndicatorState extends State<UpDownIndicator>
   @override
   void didUpdateWidget(covariant UpDownIndicator oldWidget) {
     if (widget.status != oldWidget.status) {
-      widget.status ? _controller.forward() : _controller.reverse();
+      widget.status! ? _controller.forward() : _controller.reverse();
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -1448,7 +1446,7 @@ class _UpDownIndicatorState extends State<UpDownIndicator>
   @override
   Widget build(BuildContext context) {
     return Transform.rotate(
-      angle: widget.status ? math.pi * _value : -math.pi * _value,
+      angle: widget.status! ? math.pi * _value : -math.pi * _value,
       child: Icon(
         Icons.keyboard_arrow_down,
         color: widget.color,
@@ -1459,8 +1457,8 @@ class _UpDownIndicatorState extends State<UpDownIndicator>
 
 class CircleProgressIndicator extends CustomPainter {
   final int progress;
-  Paint _paint;
-  CircleProgressIndicator(this.progress, {Color color}) {
+  late Paint _paint;
+  CircleProgressIndicator(this.progress, {required Color color}) {
     _paint = Paint()
       ..color = color
       ..strokeWidth = 2.0

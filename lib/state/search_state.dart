@@ -3,16 +3,16 @@ import 'package:tsacdop/type/search_api/search_genre.dart';
 import '../type/search_api/searchpodcast.dart';
 
 class SearchState extends ChangeNotifier {
-  final List<OnlinePodcast> _subscribedList = [];
+  final List<OnlinePodcast?> _subscribedList = [];
   bool _update = false;
-  List<OnlinePodcast> get subscribedList => _subscribedList;
+  List<OnlinePodcast?> get subscribedList => _subscribedList;
   bool get update => _update;
-  OnlinePodcast _selectedPodcast;
-  OnlinePodcast get selectedPodcast => _selectedPodcast;
-  Genre _genre;
-  Genre get genre => _genre;
+  OnlinePodcast? _selectedPodcast;
+  OnlinePodcast? get selectedPodcast => _selectedPodcast;
+  Genre? _genre;
+  Genre? get genre => _genre;
 
-  set selectedPodcast(OnlinePodcast podcast) {
+  set selectedPodcast(OnlinePodcast? podcast) {
     _selectedPodcast = podcast;
     notifyListeners();
   }
@@ -22,7 +22,8 @@ class SearchState extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isSubscribed(OnlinePodcast podcast) => _subscribedList.contains(podcast);
+  bool isSubscribed(OnlinePodcast? podcast) =>
+      _subscribedList.contains(podcast);
 
   void clearSelect() {
     _selectedPodcast = null;
@@ -33,12 +34,12 @@ class SearchState extends ChangeNotifier {
     _subscribedList.clear();
   }
 
-  void clearGenre(){
+  void clearGenre() {
     _genre = null;
     notifyListeners();
   }
 
-  void addPodcast(OnlinePodcast podcast) {
+  void addPodcast(OnlinePodcast? podcast) {
     _subscribedList.add(podcast);
     _update = !_update;
     notifyListeners();

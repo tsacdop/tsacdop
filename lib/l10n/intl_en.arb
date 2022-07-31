@@ -770,6 +770,10 @@
   "@username": {},
   "usernameRequired": "Username required",
   "@usernameRequired": {},
+  "useWallpaperTheme": "Pick theme from wallpaper",
+  "@useWallpaperTheme": {},
+  "useWallpaperThemeDes": "Pick theme from wallpaper.",
+  "@useWallpaperThemeDes": {},
   "version": "Version: {version}",
   "@version": {
     "placeholders": {

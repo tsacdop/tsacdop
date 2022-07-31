@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 //Slide Transition
 class SlideLeftRoute extends PageRouteBuilder {
-  @override 
+  @override
   Duration get transitionDuration => Duration(milliseconds: 300);
-  final Widget page;
+  final Widget? page;
   SlideLeftRoute({this.page})
       : super(
             pageBuilder: (
@@ -12,7 +12,7 @@ class SlideLeftRoute extends PageRouteBuilder {
               animation,
               secondaryAnimation,
             ) =>
-                page,
+                page!,
             transitionsBuilder: (
               context,
               animation,
@@ -31,7 +31,7 @@ class SlideLeftRoute extends PageRouteBuilder {
 
 //Slide Transition
 class SlideRightRoute extends PageRouteBuilder {
-  final Widget page;
+  final Widget? page;
   SlideRightRoute({this.page})
       : super(
             pageBuilder: (
@@ -39,7 +39,7 @@ class SlideRightRoute extends PageRouteBuilder {
               animation,
               secondaryAnimation,
             ) =>
-                page,
+                page!,
             transitionsBuilder: (
               context,
               animation,
@@ -57,7 +57,7 @@ class SlideRightRoute extends PageRouteBuilder {
 }
 
 class SlideLeftHideRoute extends PageRouteBuilder {
-  final Widget page;
+  final Widget? page;
   // final Widget transitionPage;
   SlideLeftHideRoute({this.page})
       : super(
@@ -66,7 +66,7 @@ class SlideLeftHideRoute extends PageRouteBuilder {
             animation,
             secondaryAnimation,
           ) =>
-              page,
+              page!,
           // transitionDuration: Duration(milliseconds: 300),
           transitionsBuilder: (
             context,
@@ -85,7 +85,7 @@ class SlideLeftHideRoute extends PageRouteBuilder {
 }
 
 class SlideUptRoute extends PageRouteBuilder {
-  final Widget page;
+  final Widget? page;
   SlideUptRoute({this.page})
       : super(
           pageBuilder: (
@@ -93,7 +93,7 @@ class SlideUptRoute extends PageRouteBuilder {
             animation,
             secondaryAnimation,
           ) =>
-              page,
+              page!,
           transitionsBuilder: (
             context,
             animation,
@@ -112,7 +112,7 @@ class SlideUptRoute extends PageRouteBuilder {
 
 //Scale Pageroute
 class ScaleRoute extends PageRouteBuilder {
-  final Widget page;
+  final Widget? page;
   ScaleRoute({this.page})
       : super(
           pageBuilder: (
@@ -120,7 +120,7 @@ class ScaleRoute extends PageRouteBuilder {
             animation,
             secondaryAnimation,
           ) =>
-              page,
+              page!,
           transitionsBuilder: (
             context,
             animation,
@@ -143,7 +143,7 @@ class ScaleRoute extends PageRouteBuilder {
 }
 
 class FadeRoute extends PageRouteBuilder {
-  final Widget page;
+  final Widget? page;
   FadeRoute({this.page})
       : super(
           pageBuilder: (
@@ -151,7 +151,7 @@ class FadeRoute extends PageRouteBuilder {
             animation,
             secondaryAnimation,
           ) =>
-              page,
+              page!,
           transitionsBuilder: (
             context,
             animation,

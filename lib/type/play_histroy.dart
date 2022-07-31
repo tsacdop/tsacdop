@@ -5,25 +5,25 @@ class PlayHistory {
   final DBHelper _dbHelper = DBHelper();
 
   /// Episdoe title.
-  String title;
+  String? title;
 
   /// Episode url
-  String url;
+  String? url;
 
   /// Play record seconds.
-  int seconds;
+  int? seconds;
 
   /// Play record count,
-  double seekValue;
+  double? seekValue;
 
   /// Listened date.
-  DateTime playdate;
+  DateTime? playdate;
 
   PlayHistory(this.title, this.url, this.seconds, this.seekValue,
       {this.playdate});
 
-  EpisodeBrief _episode;
-  EpisodeBrief get episode => _episode;
+  EpisodeBrief? _episode;
+  EpisodeBrief? get episode => _episode;
 
   Future<void> getEpisode() async {
     _episode = await _dbHelper.getRssItemWithUrl(url);

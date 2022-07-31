@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 
 const Duration _kMenuDuration = Duration(milliseconds: 300);
@@ -13,11 +12,10 @@ const double _kMenuScreenPadding = 8.0;
 
 class _MenuItem extends SingleChildRenderObjectWidget {
   const _MenuItem({
-    Key key,
-    @required this.onLayout,
-    Widget child,
-  })  : assert(onLayout != null),
-        super(key: key, child: child);
+    Key? key,
+    required this.onLayout,
+    Widget? child,
+  }) : super(key: key, child: child);
 
   final ValueChanged<Size> onLayout;
 
@@ -34,7 +32,7 @@ class _MenuItem extends SingleChildRenderObjectWidget {
 }
 
 class _RenderMenuItem extends RenderShiftedBox {
-  _RenderMenuItem(this.onLayout, [RenderBox child])
+  _RenderMenuItem(this.onLayout, [RenderBox? child])
       : assert(onLayout != null),
         super(child);
 
@@ -45,10 +43,10 @@ class _RenderMenuItem extends RenderShiftedBox {
     if (child == null) {
       size = Size.zero;
     } else {
-      child.layout(constraints, parentUsesSize: true);
-      size = constraints.constrain(child.size);
+      child!.layout(constraints, parentUsesSize: true);
+      size = constraints.constrain(child!.size);
     }
-    final childParentData = child.parentData as BoxParentData;
+    final childParentData = child!.parentData as BoxParentData;
     childParentData.offset = Offset.zero;
     onLayout(size);
   }
@@ -56,32 +54,32 @@ class _RenderMenuItem extends RenderShiftedBox {
 
 class _PopupMenu<T> extends StatelessWidget {
   const _PopupMenu({
-    Key key,
+    Key? key,
     this.route,
     this.semanticLabel,
   }) : super(key: key);
 
-  final _PopupMenuRoute<T> route;
-  final String semanticLabel;
+  final _PopupMenuRoute<T>? route;
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
     final unit = 1.0 /
-        (route.items.length +
+        (route!.items.length +
             1.5); // 1.0 for the width and 0.5 for the last item's fade.
     final children = <Widget>[];
     final popupMenuTheme = PopupMenuTheme.of(context);
 
-    for (var i = 0; i < route.items.length; i += 1) {
+    for (var i = 0; i < route!.items.length; i += 1) {
       final start = (i + 1) * unit;
-      final end = (start + 1.5 * unit).clamp(0.0, 1.0) as double;
+      final end = (start + 1.5 * unit).clamp(0.0, 1.0);
       final opacity = CurvedAnimation(
-        parent: route.animation,
+        parent: route!.animation!,
         curve: Interval(start, end),
       );
-      Widget item = route.items[i];
-      if (route.initialValue != null &&
-          route.items[i].represents(route.initialValue)) {
+      Widget item = route!.items[i];
+      if (route!.initialValue != null &&
+          route!.items[i].represents(route!.initialValue)) {
         item = Container(
           color: Theme.of(context).highlightColor,
           child: item,
@@ -90,7 +88,7 @@ class _PopupMenu<T> extends StatelessWidget {
       children.add(
         _MenuItem(
           onLayout: (size) {
-            route.itemSizes[i] = size;
+            route!.itemSizes[i] = size;
           },
           child: FadeTransition(
             opacity: opacity,
@@ -102,7 +100,7 @@ class _PopupMenu<T> extends StatelessWidget {
 
     final opacity = CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
     final width = CurveTween(curve: Interval(0.0, unit));
-    final height = CurveTween(curve: Interval(0.0, unit * route.items.length));
+    final height = CurveTween(curve: Interval(0.0, unit * route!.items.length));
 
     final Widget child = ConstrainedBox(
       constraints: const BoxConstraints(
@@ -125,19 +123,19 @@ class _PopupMenu<T> extends StatelessWidget {
     );
 
     return AnimatedBuilder(
-      animation: route.animation,
+      animation: route!.animation!,
       builder: (context, child) {
         return Opacity(
-          opacity: opacity.evaluate(route.animation),
+          opacity: opacity.evaluate(route!.animation!),
           child: Material(
-            shape: route.shape ?? popupMenuTheme.shape,
-            color: route.color ?? popupMenuTheme.color,
+            shape: route!.shape ?? popupMenuTheme.shape,
+            color: route!.color ?? popupMenuTheme.color,
             type: MaterialType.card,
-            elevation: route.elevation ?? popupMenuTheme.elevation ?? 8.0,
+            elevation: route!.elevation ?? popupMenuTheme.elevation ?? 8.0,
             child: Align(
               alignment: AlignmentDirectional.topEnd,
-              widthFactor: width.evaluate(route.animation),
-              heightFactor: height.evaluate(route.animation),
+              widthFactor: width.evaluate(route!.animation!),
+              heightFactor: height.evaluate(route!.animation!),
               child: child,
             ),
           ),
@@ -152,11 +150,11 @@ class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
   _PopupMenuRouteLayout(this.position, this.itemSizes, this.selectedItemIndex,
       this.textDirection);
 
-  final RelativeRect position;
+  final RelativeRect? position;
 
-  List<Size> itemSizes;
+  List<Size?> itemSizes;
 
-  final int selectedItemIndex;
+  final int? selectedItemIndex;
 
   final TextDirection textDirection;
 
@@ -171,33 +169,33 @@ class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    var y = position.top;
+    var y = position!.top;
     if (selectedItemIndex != null && itemSizes != null) {
       var selectedItemOffset = _kMenuVerticalPadding;
-      for (var index = 0; index < selectedItemIndex; index += 1) {
-        selectedItemOffset += itemSizes[index].height;
+      for (var index = 0; index < selectedItemIndex!; index += 1) {
+        selectedItemOffset += itemSizes[index]!.height;
       }
-      selectedItemOffset += itemSizes[selectedItemIndex].height / 2;
-      y = position.top +
-          (size.height - position.top - position.bottom) / 2.0 -
+      selectedItemOffset += itemSizes[selectedItemIndex!]!.height / 2;
+      y = position!.top +
+          (size.height - position!.top - position!.bottom) / 2.0 -
           selectedItemOffset;
     }
 
-    double x;
-    if (position.left > position.right) {
-      x = size.width - position.right - childSize.width;
-    } else if (position.left < position.right) {
+    late double x;
+    if (position!.left > position!.right) {
+      x = size.width - position!.right - childSize.width;
+    } else if (position!.left < position!.right) {
       // Menu button is closer to the left edge, so grow to the right, aligned to the left edge.
-      x = position.left;
+      x = position!.left;
     } else {
       // Menu button is equidistant from both edges, so grow in reading direction.
       assert(textDirection != null);
       switch (textDirection) {
         case TextDirection.rtl:
-          x = size.width - position.right - childSize.width;
+          x = size.width - position!.right - childSize.width;
           break;
         case TextDirection.ltr:
-          x = position.left;
+          x = position!.left;
           break;
       }
     }
@@ -229,7 +227,7 @@ class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
 class _PopupMenuRoute<T> extends PopupRoute<T> {
   _PopupMenuRoute({
     this.position,
-    this.items,
+    required this.items,
     this.initialValue,
     this.elevation,
     this.theme,
@@ -240,20 +238,20 @@ class _PopupMenuRoute<T> extends PopupRoute<T> {
     this.color,
     this.showMenuContext,
     this.captureInheritedThemes,
-  }) : itemSizes = List<Size>(items.length);
+  }) : itemSizes = List<Size?>.filled(items.length, null, growable: false);
 
-  final RelativeRect position;
+  final RelativeRect? position;
   final List<PopupMenuEntry<T>> items;
-  final List<Size> itemSizes;
-  final T initialValue;
-  final double elevation;
-  final ThemeData theme;
-  final String semanticLabel;
-  final ShapeBorder shape;
-  final Color color;
-  final PopupMenuThemeData popupMenuTheme;
-  final BuildContext showMenuContext;
-  final bool captureInheritedThemes;
+  final List<Size?> itemSizes;
+  final T? initialValue;
+  final double? elevation;
+  final ThemeData? theme;
+  final String? semanticLabel;
+  final ShapeBorder? shape;
+  final Color? color;
+  final PopupMenuThemeData? popupMenuTheme;
+  final BuildContext? showMenuContext;
+  final bool? captureInheritedThemes;
 
   @override
   Animation<double> createAnimation() {
@@ -271,15 +269,15 @@ class _PopupMenuRoute<T> extends PopupRoute<T> {
   bool get barrierDismissible => true;
 
   @override
-  Color get barrierColor => null;
+  Color? get barrierColor => null;
 
   @override
-  final String barrierLabel;
+  final String? barrierLabel;
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    int selectedItemIndex;
+    int? selectedItemIndex;
     if (initialValue != null) {
       for (var index = 0;
           selectedItemIndex == null && index < items.length;
@@ -289,10 +287,10 @@ class _PopupMenuRoute<T> extends PopupRoute<T> {
     }
 
     Widget menu = _PopupMenu<T>(route: this, semanticLabel: semanticLabel);
-    if (captureInheritedThemes) {
-      menu = InheritedTheme.captureAll(showMenuContext, menu);
+    if (captureInheritedThemes!) {
+      menu = InheritedTheme.captureAll(showMenuContext!, menu);
     } else {
-      if (theme != null) menu = Theme(data: theme, child: menu);
+      if (theme != null) menu = Theme(data: theme!, child: menu);
     }
 
     return MediaQuery.removePadding(
@@ -318,23 +316,19 @@ class _PopupMenuRoute<T> extends PopupRoute<T> {
   }
 }
 
-Future<T> _showMenu<T>({
-  @required BuildContext context,
-  @required RelativeRect position,
-  @required List<PopupMenuEntry<T>> items,
-  T initialValue,
-  double elevation,
-  String semanticLabel,
-  ShapeBorder shape,
-  Color color,
+Future<T?> _showMenu<T>({
+  required BuildContext context,
+  required RelativeRect position,
+  required List<PopupMenuEntry<T>> items,
+  T? initialValue,
+  double? elevation,
+  String? semanticLabel,
+  ShapeBorder? shape,
+  Color? color,
   bool captureInheritedThemes = true,
   bool useRootNavigator = false,
 }) {
-  assert(context != null);
-  assert(position != null);
-  assert(useRootNavigator != null);
-  assert(items != null && items.isNotEmpty);
-  assert(captureInheritedThemes != null);
+  assert(items.isNotEmpty);
   assert(debugCheckHasMaterialLocalizations(context));
 
   var label = semanticLabel;
@@ -347,8 +341,7 @@ Future<T> _showMenu<T>({
     case TargetPlatform.fuchsia:
     case TargetPlatform.linux:
     case TargetPlatform.windows:
-      label =
-          semanticLabel ?? MaterialLocalizations.of(context)?.popupMenuLabel;
+      label = semanticLabel ?? MaterialLocalizations.of(context).popupMenuLabel;
   }
 
   return Navigator.of(context, rootNavigator: useRootNavigator)
@@ -373,8 +366,8 @@ class MyPopupMenuButton<T> extends StatefulWidget {
   ///
   /// The [itemBuilder] argument must not be null.
   const MyPopupMenuButton({
-    Key key,
-    @required this.itemBuilder,
+    Key? key,
+    required this.itemBuilder,
     this.initialValue,
     this.onSelected,
     this.onCanceled,
@@ -398,26 +391,26 @@ class MyPopupMenuButton<T> extends StatefulWidget {
 
   final PopupMenuItemBuilder<T> itemBuilder;
 
-  final T initialValue;
-  final PopupMenuItemSelected<T> onSelected;
+  final T? initialValue;
+  final PopupMenuItemSelected<T>? onSelected;
 
-  final PopupMenuCanceled onCanceled;
+  final PopupMenuCanceled? onCanceled;
 
-  final String tooltip;
+  final String? tooltip;
 
-  final double elevation;
+  final double? elevation;
 
   final EdgeInsetsGeometry padding;
 
-  final Widget child;
+  final Widget? child;
 
-  final Widget icon;
+  final Widget? icon;
 
   final Offset offset;
   final bool enabled;
-  final ShapeBorder shape;
+  final ShapeBorder? shape;
 
-  final Color color;
+  final Color? color;
 
   final bool captureInheritedThemes;
 
@@ -429,7 +422,8 @@ class MyPopupMenuButtonState<T> extends State<MyPopupMenuButton<T>> {
   void showButtonMenu() {
     final popupMenuTheme = PopupMenuTheme.of(context);
     final button = context.findRenderObject() as RenderBox;
-    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox;
     final position = RelativeRect.fromRect(
       Rect.fromPoints(
         button.localToGlobal(widget.offset, ancestor: overlay),
@@ -438,7 +432,7 @@ class MyPopupMenuButtonState<T> extends State<MyPopupMenuButton<T>> {
       ),
       Offset.zero & overlay.size,
     );
-    final items = widget.itemBuilder(context);
+    final List<PopupMenuEntry<T>> items = widget.itemBuilder(context);
     // Only show the menu if there is something to show
     if (items.isNotEmpty) {
       _showMenu<T>(
@@ -453,15 +447,15 @@ class MyPopupMenuButtonState<T> extends State<MyPopupMenuButton<T>> {
       ).then<void>((newValue) {
         if (!mounted) return null;
         if (newValue == null) {
-          if (widget.onCanceled != null) widget.onCanceled();
+          if (widget.onCanceled != null) widget.onCanceled!();
           return null;
         }
-        if (widget.onSelected != null) widget.onSelected(newValue);
+        if (widget.onSelected != null) widget.onSelected!(newValue);
       });
     }
   }
 
-  Icon _getIcon(TargetPlatform platform) {
+  Icon? _getIcon(TargetPlatform platform) {
     assert(platform != null);
     switch (platform) {
       case TargetPlatform.android:
@@ -493,7 +487,7 @@ class MyPopupMenuButtonState<T> extends State<MyPopupMenuButton<T>> {
     }
 
     return IconButton(
-      icon: widget.icon ?? _getIcon(Theme.of(context).platform),
+      icon: widget.icon ?? _getIcon(Theme.of(context).platform)!,
       padding: widget.padding,
       tooltip:
           widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
@@ -504,28 +498,26 @@ class MyPopupMenuButtonState<T> extends State<MyPopupMenuButton<T>> {
 
 class MyPopupMenuItem<int> extends PopupMenuEntry<int> {
   const MyPopupMenuItem({
-    Key key,
+    Key? key,
     this.value,
     this.enabled = true,
     this.height = kMinInteractiveDimension,
     this.textStyle,
-    @required this.child,
-  })  : assert(enabled != null),
-        assert(height != null),
-        super(key: key);
+    required this.child,
+  }) : super(key: key);
 
-  final int value;
+  final int? value;
 
   final bool enabled;
 
   @override
   final double height;
-  final TextStyle textStyle;
+  final TextStyle? textStyle;
 
   final Widget child;
 
   @override
-  bool represents(int value) => value == this.value;
+  bool represents(int? value) => value == this.value;
 
   @override
   MyPopupMenuItemState<int, MyPopupMenuItem<int>> createState() =>
@@ -548,7 +540,7 @@ class MyPopupMenuItemState<int, W extends MyPopupMenuItem<int>>
     final popupMenuTheme = PopupMenuTheme.of(context);
     var style = widget.textStyle ??
         popupMenuTheme.textStyle ??
-        theme.textTheme.subtitle1;
+        theme.textTheme.subtitle1!;
 
     Widget item = AnimatedDefaultTextStyle(
       style: style,

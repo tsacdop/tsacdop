@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import '../util/extension_helper.dart';
 
 Future generalDialog(BuildContext context,
-        {Widget title, Widget content, List<Widget> actions}) async =>
+        {Widget? title, Widget? content, List<Widget>? actions}) async =>
     await showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -31,7 +31,8 @@ Future generalDialog(BuildContext context,
       ),
     );
 
-Future generalSheet(BuildContext context, {Widget child, String title}) async =>
+Future generalSheet(BuildContext context,
+        {Widget? child, String? title}) async =>
     await showModalBottomSheet(
       useRootNavigator: true,
       isScrollControlled: true,
@@ -62,7 +63,7 @@ Future generalSheet(BuildContext context, {Widget child, String title}) async =>
                   padding: EdgeInsets.only(
                       left: 50, right: 50, top: 6.0, bottom: 10),
                   child: Text(
-                    title,
+                    title!,
                     style: context.textTheme.subtitle2,
                     textAlign: TextAlign.center,
                     maxLines: 1,
