@@ -2,7 +2,7 @@ name: Flutter Build
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
