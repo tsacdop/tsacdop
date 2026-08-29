@@ -30,8 +30,10 @@
 .pub/
 /lib/.env.dart
 /build/
-pubspec.lock
-analysis_options.yaml
+/android/build/
+/coverage/
+**/ios/Flutter/.last_build_id
+.widget_preview/
 .fvm/
 
 # Web related

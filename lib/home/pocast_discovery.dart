@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
-import '../.env.dart';
+import '../environment.dart';
 import '../local_storage/key_value_storage.dart';
 import '../service/search_api.dart';
 import '../state/search_state.dart';
@@ -15,7 +15,7 @@ import '../widgets/custom_widget.dart';
 import 'search_podcast.dart';
 
 class DiscoveryPage extends StatefulWidget {
-  DiscoveryPage({this.onTap, Key? key}) : super(key: key);
+  const DiscoveryPage({this.onTap, super.key});
   final ValueChanged<String?>? onTap;
   @override
   DiscoveryPageState createState() => DiscoveryPageState();
@@ -89,8 +89,9 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                     child: Text(
                       context.s.searchHelper,
                       textAlign: TextAlign.center,
-                      style: context.textTheme.headline6!
-                          .copyWith(color: Colors.grey[400]),
+                      style: context.textTheme.titleLarge!.copyWith(
+                        color: Colors.grey[400],
+                      ),
                     ),
                   ),
                 ),
@@ -102,7 +103,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
             searchEngine: SearchEngine.listenNotes,
             child: Selector<SearchState, Genre?>(
               selector: (_, searchState) => searchState.genre,
-              builder: (_, genre, __) => IndexedStack(
+              builder: (_, genre, _) => IndexedStack(
                 index: genre == null ? 0 : 1,
                 children: [
                   SingleChildScrollView(
@@ -115,57 +116,70 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                         SizedBox(
                           height: 200,
                           child: FutureBuilder<List<OnlinePodcast>>(
-                              future: _searchTopPodcast!.then(
-                                  (value) => value as List<OnlinePodcast>),
-                              builder: (context, snapshot) {
-                                return ScrollConfiguration(
-                                  behavior: NoGrowBehavior(),
-                                  child: ListView(
-                                      addAutomaticKeepAlives: true,
-                                      scrollDirection: Axis.horizontal,
-                                      children: snapshot.hasData
-                                          ? snapshot.data!
-                                              .map<Widget>((podcast) {
-                                              return _podcastCard(
-                                                podcast,
-                                                onTap: () {
-                                                  context
-                                                          .read<SearchState>()
-                                                          .selectedPodcast =
-                                                      podcast;
-                                                  widget.onTap!('');
-                                                },
-                                              );
-                                            }).toList()
-                                          : [
-                                              _loadTopPodcasts(),
-                                              _loadTopPodcasts(),
-                                              _loadTopPodcasts(),
-                                              _loadTopPodcasts(),
-                                            ]),
-                                );
-                              }),
+                            future: _searchTopPodcast!.then(
+                              (value) => value as List<OnlinePodcast>,
+                            ),
+                            builder: (context, snapshot) {
+                              return ScrollConfiguration(
+                                behavior: NoGrowBehavior(),
+                                child: ListView(
+                                  addAutomaticKeepAlives: true,
+                                  scrollDirection: Axis.horizontal,
+                                  children: snapshot.hasData
+                                      ? snapshot.data!.map<Widget>((podcast) {
+                                          return _podcastCard(
+                                            podcast,
+                                            onTap: () {
+                                              context
+                                                      .read<SearchState>()
+                                                      .selectedPodcast =
+                                                  podcast;
+                                              widget.onTap!('');
+                                            },
+                                          );
+                                        }).toList()
+                                      : [
+                                          _loadTopPodcasts(),
+                                          _loadTopPodcasts(),
+                                          _loadTopPodcasts(),
+                                          _loadTopPodcasts(),
+                                        ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
                         Padding(
                           padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
-                          child: Text('Categories',
-                              style: context.textTheme.headline6!
-                                  .copyWith(color: context.accentColor)),
+                          child: Text(
+                            'Categories',
+                            style: context.textTheme.titleLarge!.copyWith(
+                              color: context.accentColor,
+                            ),
+                          ),
                         ),
                         ListView(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           children: genres
-                              .map<Widget>((e) => ListTile(
-                                    contentPadding:
-                                        EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                    onTap: () {
-                                      widget.onTap!('');
-                                      context.read<SearchState>().setGenre = e;
-                                    },
-                                    title: Text(e.name!,
-                                        style: context.textTheme.headline6),
-                                  ))
+                              .map<Widget>(
+                                (e) => ListTile(
+                                  contentPadding: EdgeInsets.fromLTRB(
+                                    20,
+                                    0,
+                                    20,
+                                    0,
+                                  ),
+                                  onTap: () {
+                                    widget.onTap!('');
+                                    context.read<SearchState>().setGenre = e;
+                                  },
+                                  title: Text(
+                                    e.name!,
+                                    style: context.textTheme.titleLarge,
+                                  ),
+                                ),
+                              )
                               .toList(),
                         ),
                         SizedBox(
@@ -178,7 +192,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                               height: 15,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -193,123 +207,128 @@ class DiscoveryPageState extends State<DiscoveryPage> {
   }
 
   Widget _loadTopPodcasts() => Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: context.primaryColor),
-        width: 120,
-        margin: EdgeInsets.fromLTRB(10, 10, 0, 10),
-        padding: EdgeInsets.all(4),
-        alignment: Alignment.topCenter,
-        child: Column(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Center(
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: context.primaryColorDark,
-                  ),
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    width: 20,
-                    height: 2,
-                    child: LinearProgressIndicator(value: 0),
-                  ),
-                ),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(10),
+      color: context.primaryColor,
+    ),
+    width: 120,
+    margin: EdgeInsets.fromLTRB(10, 10, 0, 10),
+    padding: EdgeInsets.all(4),
+    alignment: Alignment.topCenter,
+    child: Column(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Center(
+            child: Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: context.primaryColorDark,
+              ),
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 20,
+                height: 2,
+                child: LinearProgressIndicator(value: 0),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 80,
-                    height: context.textTheme.bodyText1!.fontSize,
-                    decoration: BoxDecoration(
-                        color: context.primaryColorDark,
-                        borderRadius: BorderRadius.circular(4)),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: 40,
-                    height: context.textTheme.bodyText1!.fontSize,
-                    decoration: BoxDecoration(
-                        color: context.primaryColorDark,
-                        borderRadius: BorderRadius.circular(4)),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Center(
-                child: SizedBox(
-                  height: 32,
-                  child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        primary: context.accentColor.withOpacity(0.5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100.0),
-                            side: BorderSide(color: Colors.grey[500]!)),
-                        // highlightedBorderColor: Colors.grey[500],
-                        // disabledTextColor: Colors.grey[500],
-                        // disabledBorderColor: Colors.grey[500],
-                      ),
-                      child: Text(context.s.subscribe),
-                      onPressed: () {}),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      );
+        Expanded(
+          flex: 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: context.textTheme.bodyLarge!.fontSize,
+                decoration: BoxDecoration(
+                  color: context.primaryColorDark,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: 40,
+                height: context.textTheme.bodyLarge!.fontSize,
+                decoration: BoxDecoration(
+                  color: context.primaryColorDark,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: SizedBox(
+              height: 32,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: context.accentColor.withValues(alpha: 0.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100.0),
+                    side: BorderSide(color: Colors.grey[500]!),
+                  ),
+                  // highlightedBorderColor: Colors.grey[500],
+                  // disabledTextColor: Colors.grey[500],
+                  // disabledBorderColor: Colors.grey[500],
+                ),
+                child: Text(context.s.subscribe),
+                onPressed: () {},
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 
   Widget _historyList() => FutureBuilder<List<String?>?>(
-        future: _getSearchHistory(),
-        initialData: [],
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            final history = snapshot.data!;
-            return Wrap(
-              direction: Axis.horizontal,
-              children: history
-                  .map<Widget>(
-                    (e) => Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 2, 0, 0),
-                      child: TextButton.icon(
-                        style: TextButton.styleFrom(
-                          primary: Colors.accents[history.indexOf(e)],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100.0),
-                          ),
-                        ),
-                        onPressed: () => widget.onTap!(e),
-                        label: Text(e!),
-                        icon: Icon(
-                          Icons.search,
-                          size: 20,
-                        ),
+    future: _getSearchHistory(),
+    initialData: [],
+    builder: (context, snapshot) {
+      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+        final history = snapshot.data!;
+        return Wrap(
+          direction: Axis.horizontal,
+          children: history
+              .map<Widget>(
+                (e) => Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 2, 0, 0),
+                  child: TextButton.icon(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.accents[history.indexOf(e)],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100.0),
                       ),
                     ),
-                  )
-                  .toList(),
-            );
-          }
-          return Center();
-        },
-      );
+                    onPressed: () => widget.onTap!(e),
+                    label: Text(e!),
+                    icon: Icon(Icons.search, size: 20),
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      }
+      return Center();
+    },
+  );
 
   Widget _podcastCard(OnlinePodcast podcast, {VoidCallback? onTap}) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: context.background,
-          border:
-              Border.all(color: context.textColor.withOpacity(0.1), width: 1)),
+        borderRadius: BorderRadius.circular(20),
+        color: context.background,
+        border: Border.all(
+          color: context.textColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
       width: 140,
       margin: EdgeInsets.fromLTRB(20, 10, 0, 10),
       child: Material(
@@ -322,10 +341,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
             padding: EdgeInsets.all(8.0),
             child: Column(
               children: [
-                Expanded(
-                  flex: 2,
-                  child: Center(child: PodcastAvatar(podcast)),
-                ),
+                Expanded(flex: 2, child: Center(child: PodcastAvatar(podcast))),
                 Expanded(
                   flex: 1,
                   child: Text(
@@ -339,8 +355,10 @@ class DiscoveryPageState extends State<DiscoveryPage> {
                 Expanded(
                   flex: 1,
                   child: Center(
-                    child:
-                        SizedBox(height: 32, child: SubscribeButton(podcast)),
+                    child: SizedBox(
+                      height: 32,
+                      child: SubscribeButton(podcast),
+                    ),
                   ),
                 ),
               ],
@@ -372,7 +390,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
         page: page,
       );
       final podcastTopList = [
-        for (final p in searchResult!.podcasts!) p.toOnlinePodcast
+        for (final p in searchResult!.podcasts!) p.toOnlinePodcast,
       ];
       _podcastList.addAll(podcastTopList.cast());
       return _podcastList;
@@ -389,7 +407,7 @@ class DiscoveryPageState extends State<DiscoveryPage> {
 
 class _TopPodcastList extends StatefulWidget {
   final Genre? genre;
-  _TopPodcastList({this.genre, Key? key}) : super(key: key);
+  const _TopPodcastList({this.genre});
 
   @override
   __TopPodcastListState createState() => __TopPodcastListState();
@@ -428,20 +446,18 @@ class __TopPodcastListState extends State<_TopPodcastList> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20, 10, 10, 4),
-                child: Text(widget.genre!.name!,
-                    style: context.textTheme.headline6!
-                        .copyWith(color: context.accentColor)),
+                child: Text(
+                  widget.genre!.name!,
+                  style: context.textTheme.titleLarge!.copyWith(
+                    color: context.accentColor,
+                  ),
+                ),
               ),
             ),
             SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return SearchResult(
-                    onlinePodcast: content[index],
-                  );
-                },
-                childCount: content.length,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return SearchResult(onlinePodcast: content[index]);
+              }, childCount: content.length),
             ),
             SliverToBoxAdapter(
               child: Row(
@@ -458,40 +474,41 @@ class __TopPodcastListState extends State<_TopPodcastList> {
                           ? SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ))
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           : Text(context.s.loadMore),
                       onPressed: () => _loading
                           ? null
-                          : setState(
-                              () {
-                                _loading = true;
-                                _page++;
-                                _searchFuture = _getTopPodcasts(
-                                    genre: widget.genre!, page: _page);
-                              },
-                            ),
+                          : setState(() {
+                              _loading = true;
+                              _page++;
+                              _searchFuture = _getTopPodcasts(
+                                genre: widget.genre!,
+                                page: _page,
+                              );
+                            }),
                     ),
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         );
       },
     );
   }
 
-  Future<List<OnlinePodcast>> _getTopPodcasts(
-      {required Genre genre, int? page}) async {
+  Future<List<OnlinePodcast>> _getTopPodcasts({
+    required Genre genre,
+    int? page,
+  }) async {
     final searchEngine = ListenNotesSearch();
     final searchResult = await searchEngine.fetchBestPodcast(
       genre: genre.id,
       page: page,
     );
     final podcastTopList = [
-      for (final p in searchResult!.podcasts!) p?.toOnlinePodcast
+      for (final p in searchResult!.podcasts!) p?.toOnlinePodcast,
     ];
     _podcastList.addAll(podcastTopList.cast());
     _loading = false;

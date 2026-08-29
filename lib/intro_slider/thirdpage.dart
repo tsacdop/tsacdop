@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+
 import '../util/extension_helper.dart';
 
 class ThirdPage extends StatefulWidget {
-  ThirdPage({Key? key}) : super(key: key);
+  const ThirdPage({super.key});
 
   @override
   _ThirdPageState createState() => _ThirdPageState();
@@ -29,13 +30,14 @@ class _ThirdPageState extends State<ThirdPage> {
               ),
             ),
             SizedBox(
-                height: context.width * 3 / 4,
-                child: FlareActor(
-                  'assets/swipe.flr',
-                  alignment: Alignment.center,
-                  animation: 'swipe',
-                  fit: BoxFit.cover,
-                )),
+              height: context.width * 3 / 4,
+              child: FlareActor(
+                'assets/swipe.flr',
+                alignment: Alignment.center,
+                animation: 'swipe',
+                fit: BoxFit.cover,
+              ),
+            ),
             Spacer(),
           ],
         ),

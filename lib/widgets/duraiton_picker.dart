@@ -48,9 +48,9 @@ class _DialPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const _epsilon = .001;
-    const _sweep = _kTwoPi - _epsilon;
-    const _startAngle = -math.pi / 2.0;
+    const epsilon = .001;
+    const sweep = _kTwoPi - epsilon;
+    const startAngle = -math.pi / 2.0;
 
     final radius = size.shortestSide / 2.0;
     final center = Offset(size.width / 2.0, size.height / 2.0);
@@ -63,18 +63,24 @@ class _DialPainter extends CustomPainter {
 
     // Draw a translucent circle for every hour
     for (var i = 0; i < multiplier; i = i + 1) {
-      canvas.drawCircle(centerPoint, radius,
-          Paint()..color = accentColor.withOpacity((i == 0) ? 0.3 : 0.1));
+      canvas.drawCircle(
+        centerPoint,
+        radius,
+        Paint()..color = accentColor.withValues(alpha: (i == 0) ? 0.3 : 0.1),
+      );
     }
 
     // Draw the inner background circle
-    canvas.drawCircle(centerPoint, radius * 0.88,
-        Paint()..color = Theme.of(context).canvasColor);
+    canvas.drawCircle(
+      centerPoint,
+      radius * 0.88,
+      Paint()..color = Theme.of(context).canvasColor,
+    );
 
     // Get the offset point for an angle value of theta, and a distance of _radius
-    Offset getOffsetForTheta(double theta, double _radius) {
+    Offset getOffsetForTheta(double theta, double radius) {
       return center +
-          Offset(_radius * math.cos(theta), -_radius * math.sin(theta));
+          Offset(radius * math.cos(theta), -radius * math.sin(theta));
     }
 
     // Draw the handle that is used to drag and to indicate the position around the circle
@@ -84,62 +90,61 @@ class _DialPainter extends CustomPainter {
 
     // Draw the Text in the center of the circle which displays hours and mins
     var minutes = (multiplier == 0) ? '' : "${multiplier}min ";
-//    int minutes = (pctTheta * 60).round();
-//    minutes = minutes == 60 ? 0 : minutes;
+    //    int minutes = (pctTheta * 60).round();
+    //    minutes = minutes == 60 ? 0 : minutes;
     var seconds = "$secondHand";
 
     var textDurationValuePainter = TextPainter(
-        textAlign: TextAlign.center,
-        text: TextSpan(
-            text: '$minutes$seconds',
-            style: Theme.of(context)
-                .textTheme
-                .headline4!
-                .copyWith(fontSize: size.shortestSide * 0.15)),
-        textDirection: TextDirection.ltr)
-      ..layout();
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        text: '$minutes$seconds',
+        style: Theme.of(context).textTheme.headlineMedium!
+            .copyWith(fontSize: size.shortestSide * 0.15),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
     var middleForValueText = Offset(
-        centerPoint.dx - (textDurationValuePainter.width / 2),
-        centerPoint.dy - textDurationValuePainter.height / 2);
+      centerPoint.dx - (textDurationValuePainter.width / 2),
+      centerPoint.dy - textDurationValuePainter.height / 2,
+    );
     textDurationValuePainter.paint(canvas, middleForValueText);
 
     var textMinPainter = TextPainter(
-        textAlign: TextAlign.center,
-        text: TextSpan(
-            text: 'sec', //th: ${theta}',
-            style: Theme.of(context).textTheme.bodyText1),
-        textDirection: TextDirection.ltr)
-      ..layout();
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        text: 'sec', //th: ${theta}',
+        style: Theme.of(context).textTheme.bodyLarge,
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
     textMinPainter.paint(
-        canvas,
-        Offset(
-            centerPoint.dx - (textMinPainter.width / 2),
-            centerPoint.dy +
-                (textDurationValuePainter.height / 2) -
-                textMinPainter.height / 2));
+      canvas,
+      Offset(
+        centerPoint.dx - (textMinPainter.width / 2),
+        centerPoint.dy +
+            (textDurationValuePainter.height / 2) -
+            textMinPainter.height / 2,
+      ),
+    );
 
     // Draw an arc around the circle for the amount of the circle that has elapsed.
     var elapsedPainter = Paint()
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
-      ..color = accentColor.withOpacity(0.3)
+      ..color = accentColor.withValues(alpha: 0.3)
       ..isAntiAlias = true
       ..strokeWidth = radius * 0.12;
 
     canvas.drawArc(
-      Rect.fromCircle(
-        center: centerPoint,
-        radius: radius - radius * 0.12 / 2,
-      ),
-      _startAngle,
-      _sweep * pctTheta,
+      Rect.fromCircle(center: centerPoint, radius: radius - radius * 0.12 / 2),
+      startAngle,
+      sweep * pctTheta,
       false,
       elapsedPainter,
     );
 
     // Paint the labels (the minute strings)
     void paintLabels(List<TextPainter> labels) {
-      if (labels == null) return;
       final labelThetaIncrement = -_kTwoPi / labels.length;
       var labelTheta = _kPiByTwo;
 
@@ -147,7 +152,9 @@ class _DialPainter extends CustomPainter {
         final labelOffset = Offset(-label.width / 2.0, -label.height / 2.0);
 
         label.paint(
-            canvas, getOffsetForTheta(labelTheta, radius - 40.0) + labelOffset);
+          canvas,
+          getOffsetForTheta(labelTheta, radius - 40.0) + labelOffset,
+        );
 
         labelTheta += labelThetaIncrement;
       }
@@ -166,9 +173,11 @@ class _DialPainter extends CustomPainter {
 }
 
 class _Dial extends StatefulWidget {
-  const _Dial(
-      {required this.duration, required this.onChanged, this.snapToMins = 1.0})
-      : assert(duration != null);
+  const _Dial({
+    required this.duration,
+    required this.onChanged,
+    this.snapToMins = 1.0,
+  });
 
   final Duration duration;
   final ValueChanged<Duration>? onChanged;
@@ -189,18 +198,18 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     );
     _thetaTween = Tween<double>(begin: _getThetaForDuration(widget.duration));
     _theta = _thetaTween!.animate(
-        CurvedAnimation(parent: _thetaController!, curve: Curves.fastOutSlowIn))
-      ..addListener(() => setState(() {}));
+      CurvedAnimation(parent: _thetaController!, curve: Curves.fastOutSlowIn),
+    )..addListener(() => setState(() {}));
     _thetaController!.addStatusListener((status) {
-//      if (status == AnimationStatus.completed && _hours != _snappedHours) {
-//        _hours = _snappedHours;
+      //      if (status == AnimationStatus.completed && _hours != _snappedHours) {
+      //        _hours = _snappedHours;
       if (status == AnimationStatus.completed) {
         _minutes = _minuteHand(_turningAngle);
         _seconds = _secondHand(_turningAngle);
         setState(() {});
       }
     });
-//    _hours = widget.duration.inHours;
+    //    _hours = widget.duration.inHours;
 
     _turningAngle = _kPiByTwo - widget.duration.inSeconds / 60.0 * _kTwoPi;
     _minutes = _minuteHand(_turningAngle);
@@ -242,8 +251,11 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
 
   void _animateTo(double targetTheta) {
     final currentTheta = _theta.value;
-    var beginTheta =
-        _nearest(targetTheta, currentTheta, currentTheta + _kTwoPi);
+    var beginTheta = _nearest(
+      targetTheta,
+      currentTheta,
+      currentTheta + _kTwoPi,
+    );
     beginTheta = _nearest(targetTheta, beginTheta, currentTheta - _kTwoPi);
     _thetaTween!
       ..begin = beginTheta
@@ -262,8 +274,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   Duration _notifyOnChangedIfNeeded() {
-//    final Duration current = _getTimeForTheta(_theta.value);
-//    var d = Duration(hours: _hours, minutes: current.inMinutes % 60);
+    //    final Duration current = _getTimeForTheta(_theta.value);
+    //    var d = Duration(hours: _hours, minutes: current.inMinutes % 60);
     _minutes = _minuteHand(_turningAngle);
     _seconds = _secondHand(_turningAngle);
 
@@ -284,7 +296,9 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
       if (angle >= _kCircleTop &&
           _theta.value <= _kCircleTop &&
           _theta.value >= 0.1 && // to allow the radians sign change at 15mins.
-          _minutes == 0) return;
+          _minutes == 0) {
+        return;
+      }
 
       _thetaTween!
         ..begin = angle
@@ -310,7 +324,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     _position = _position! + details.delta;
     _updateThetaForPan();
     var newTheta = _theta.value;
-//    _updateRotations(oldTheta, newTheta);
+    //    _updateRotations(oldTheta, newTheta);
     _updateTurningAngle(oldTheta, newTheta);
     _notifyOnChangedIfNeeded();
   }
@@ -330,7 +344,9 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
 
   Duration _secondToDuration(seconds) {
     return Duration(
-        minutes: (seconds ~/ 60).toInt(), seconds: (seconds % 60.0).toInt());
+      minutes: (seconds ~/ 60).toInt(),
+      seconds: (seconds % 60.0).toInt(),
+    );
   }
 
   double _angleToSeconds(double angle) {
@@ -384,9 +400,9 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   List<TextPainter> _buildSeconds(TextTheme textTheme) {
-    final style = textTheme.subtitle1;
+    final style = textTheme.titleMedium;
 
-    const _secondsMarkerValues = <Duration>[
+    const secondsMarkerValues = <Duration>[
       Duration(seconds: 0),
       Duration(seconds: 5),
       Duration(seconds: 10),
@@ -402,7 +418,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     ];
 
     final labels = <TextPainter>[];
-    for (var duration in _secondsMarkerValues) {
+    for (var duration in secondsMarkerValues) {
       var painter = TextPainter(
         text: TextSpan(style: style, text: duration.inSeconds.toString()),
         textDirection: TextDirection.ltr,
@@ -420,7 +436,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         backgroundColor = Colors.grey[200];
         break;
       case Brightness.dark:
-        backgroundColor = themeData.backgroundColor;
+        backgroundColor = themeData.colorScheme.surface;
         break;
     }
 
@@ -431,25 +447,26 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     _seconds = _secondHand(_turningAngle);
 
     return GestureDetector(
-        excludeFromSemantics: true,
-        onPanStart: _handlePanStart,
-        onPanUpdate: _handlePanUpdate,
-        onPanEnd: _handlePanEnd,
-        onTapUp: _handleTapUp,
-        child: CustomPaint(
-          painter: _DialPainter(
-            pct: _pct,
-            multiplier: _minutes,
-            secondHand: _seconds,
-            context: context,
-            selectedValue: selectedDialValue,
-            labels: _buildSeconds(theme.textTheme),
-            backgroundColor: backgroundColor,
-            accentColor: themeData.accentColor,
-            theta: _theta.value,
-            textDirection: Directionality.of(context),
-          ),
-        ));
+      excludeFromSemantics: true,
+      onPanStart: _handlePanStart,
+      onPanUpdate: _handlePanUpdate,
+      onPanEnd: _handlePanEnd,
+      onTapUp: _handleTapUp,
+      child: CustomPaint(
+        painter: _DialPainter(
+          pct: _pct,
+          multiplier: _minutes,
+          secondHand: _seconds,
+          context: context,
+          selectedValue: selectedDialValue,
+          labels: _buildSeconds(theme.textTheme),
+          backgroundColor: backgroundColor,
+          accentColor: themeData.colorScheme.secondary,
+          theta: _theta.value,
+          textDirection: Directionality.of(context),
+        ),
+      ),
+    );
   }
 }
 
@@ -463,10 +480,7 @@ class _DurationPickerDialog extends StatefulWidget {
   /// Creates a duration picker.
   ///
   /// [initialTime] must not be null.
-  const _DurationPickerDialog(
-      {Key? key, required this.initialTime, this.snapToMins})
-      : assert(initialTime != null),
-        super(key: key);
+  const _DurationPickerDialog({required this.initialTime, this.snapToMins});
 
   /// The duration initially selected when the dialog is shown.
   final Duration initialTime;
@@ -514,70 +528,76 @@ class _DurationPickerDialogState extends State<_DurationPickerDialog> {
     final theme = Theme.of(context);
 
     final Widget picker = Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: AspectRatio(
-            aspectRatio: 1.0,
-            child: _Dial(
-              duration: _selectedDuration!,
-              onChanged: _handleTimeChanged,
-              snapToMins: widget.snapToMins,
-            )));
-
-    final Widget actions = ButtonBar(children: <Widget>[
-      FlatButton(
-          child: Text(localizations.cancelButtonLabel),
-          onPressed: _handleCancel),
-      FlatButton(
-          child: Text(localizations.okButtonLabel), onPressed: _handleOk),
-    ]);
-
-    final dialog =
-        Dialog(child: OrientationBuilder(builder: (context, orientation) {
-      final Widget pickerAndActions = Container(
-        color: theme.dialogBackgroundColor,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Expanded(
-                child:
-                    picker), // picker grows and shrinks with the available space
-            actions,
-          ],
+      padding: const EdgeInsets.all(16.0),
+      child: AspectRatio(
+        aspectRatio: 1.0,
+        child: _Dial(
+          duration: _selectedDuration!,
+          onChanged: _handleTimeChanged,
+          snapToMins: widget.snapToMins,
         ),
-      );
+      ),
+    );
 
-      assert(orientation != null);
-      switch (orientation) {
-        case Orientation.portrait:
-          return SizedBox(
-              width: _kDurationPickerWidthPortrait,
-              height: _kDurationPickerHeightPortrait,
-              child: Column(
+    final Widget actions = OverflowBar(
+      children: <Widget>[
+        TextButton(
+          onPressed: _handleCancel,
+          child: Text(localizations.cancelButtonLabel),
+        ),
+        TextButton(
+          onPressed: _handleOk,
+          child: Text(localizations.okButtonLabel),
+        ),
+      ],
+    );
+
+    final dialog = Dialog(
+      child: OrientationBuilder(
+        builder: (context, orientation) {
+          final Widget pickerAndActions = Container(
+            color:
+                theme.dialogTheme.backgroundColor ?? theme.colorScheme.surface,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Expanded(
+                  child: picker,
+                ), // picker grows and shrinks with the available space
+                actions,
+              ],
+            ),
+          );
+
+          switch (orientation) {
+            case Orientation.portrait:
+              return SizedBox(
+                width: _kDurationPickerWidthPortrait,
+                height: _kDurationPickerHeightPortrait,
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Expanded(
-                      child: pickerAndActions,
-                    ),
-                  ]));
-        case Orientation.landscape:
-          return SizedBox(
-              width: _kDurationPickerWidthLandscape,
-              height: _kDurationPickerHeightLandscape,
-              child: Row(
+                  children: <Widget>[Expanded(child: pickerAndActions)],
+                ),
+              );
+            case Orientation.landscape:
+              return SizedBox(
+                width: _kDurationPickerWidthLandscape,
+                height: _kDurationPickerHeightLandscape,
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Flexible(
-                      child: pickerAndActions,
-                    ),
-                  ]));
-      }
-    }));
+                  children: <Widget>[Flexible(child: pickerAndActions)],
+                ),
+              );
+          }
+        },
+      ),
+    );
 
     return Theme(
       data: theme.copyWith(
-        dialogBackgroundColor: Colors.transparent,
+        dialogTheme: DialogThemeData(backgroundColor: Colors.transparent),
       ),
       child: dialog,
     );
@@ -602,13 +622,11 @@ class _DurationPickerDialogState extends State<_DurationPickerDialog> {
 ///   context: context,
 /// );
 /// ```
-Future<Duration?> showDurationPicker(
-    {required BuildContext context,
-    required Duration initialTime,
-    double? snapToMins}) async {
-  assert(context != null);
-  assert(initialTime != null);
-
+Future<Duration?> showDurationPicker({
+  required BuildContext context,
+  required Duration initialTime,
+  double? snapToMins,
+}) async {
   return await showDialog<Duration>(
     context: context,
     builder: (context) =>
@@ -624,14 +642,14 @@ class DurationPicker extends StatelessWidget {
   final double? width;
   final double? height;
 
-  DurationPicker(
-      {this.duration = const Duration(minutes: 0),
-      required this.onChange,
-      this.snapToMins,
-      this.width,
-      this.height,
-      Key? key})
-      : super(key: key);
+  const DurationPicker({
+    this.duration = const Duration(minutes: 0),
+    required this.onChange,
+    this.snapToMins,
+    this.width,
+    this.height,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

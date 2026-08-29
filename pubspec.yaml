@@ -1,10 +1,11 @@
 name: tsacdop
 description: An open source podcast player.
 
-version: 0.6.0+48
+version: 1.0.0+49
 publish_to: "none"
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ^3.13.2
+  flutter: ">=3.47.2"
 
 dependencies:
   flutter:
@@ -12,74 +13,88 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   auto_animated: ^3.0.0
-  audio_session: ^0.1.0
-  cached_network_image: ^3.1.0
+  audio_session: ^0.2.4
+  cached_network_image: ^4.0.0
   color_thief_dart: ^0.1.0
-  confetti: ^0.6.0
+  confetti: ^0.8.0
   cupertino_icons: ^1.0.2
-  connectivity: ^3.0.3
   crypto: ^3.0.1
-  device_info: ^2.0.2
-  dio_cookie_manager: ^2.0.0
-  dio: ^4.0.0
-  extended_nested_scroll_view: ^3.0.0
-  effective_dart: ^1.3.1
+  dio_cookie_manager: ^3.5.0
+  dio: ^5.11.0
+  extended_nested_scroll_view: ^6.2.1
   feature_discovery: ^0.14.0
-  file_picker: ^3.0.1
-  flutter_html: ^2.2.1
-  fluttertoast: ^8.0.9
-  flutter_isolate: ^2.0.0
-  flutter_linkify: ^5.0.2
-  flutter_file_dialog: ^2.1.1
-  flare_flutter: ^3.0.2
-  fl_chart: ^0.36.4
+  file_picker: ^12.0.0
+  flutter_html:
+    path: third_party/flutter_html
+  fluttertoast: ^10.0.0
+  flutter_isolate:
+    path: third_party/flutter_isolate
+  flutter_linkify: ^6.0.0
+  flutter_file_dialog:
+    path: third_party/flutter_file_dialog
+  flare_flutter:
+    path: third_party/flare_flutter
+  fl_chart: ^1.2.0
   line_icons: ^2.0.1
-  flutter_media_metadata: ^0.1.1
+  flutter_media_metadata:
+    path: third_party/flutter_media_metadata
   marquee: ^2.0.0
-  google_fonts: ^2.1.0
-  image: ^3.0.2
-  intl: ^0.17.0
-  json_serializable: ^4.1.0
+  google_fonts: ^8.2.1
+  image: ^4.9.2
+  intl: ^0.20.3
+  json_serializable: ^6.14.1
   json_annotation: ^4.0.1
-  permission_handler: ^6.1.1
+  permission_handler: ^13.0.1
   provider: ^6.0.0
   sqflite: ^2.0.0+3
-  state_notifier: ^0.7.0
+  state_notifier: ^1.0.0
   tuple: ^2.0.0
   url_launcher: ^6.0.3
-  uuid: ^3.0.4
-  workmanager: ^0.5.0
-  wc_flutter_share: ^0.4.0
-  xml: ^5.2.0
+  uuid: ^4.6.0
+  workmanager: ^0.10.9
+  xml: ^7.0.1
   audio_service: ^0.18.0
-  just_audio: ^0.9.23
+  just_audio: ^0.10.6
   flutter_downloader:
-    git:
-      url: https://github.com/tsacdop/flutter_downloader.git
+    path: third_party/flutter_downloader
   focused_menu:
     git:
       url: https://github.com/tsacdop/focused_menu.git
   webfeed:
-    git:
-      url: https://github.com/tsacdop/webfeed.git
+    path: third_party/webfeed
   equatable: ^2.0.0
   path_provider: ^2.0.1
   http_parser: ^4.0.0
   collection: ^1.15.0-nullsafety.4
   shared_preferences_android: ^2.0.12
   path_provider_android: ^2.0.14
-  material_color_utilities: ^0.1.4
-  dynamic_color: ^1.4.0
+  dynamic_color: ^2.1.0
 
+  linkify: any
+  flutter_cache_manager: any
+  shared_preferences: any
+  path: any
+  html: any
+  cookie_jar: any
+  convert: any
+  rxdart: any
+  connectivity_plus: ^7.3.1
+  device_info_plus: ^13.2.0
+  share_plus: ^13.3.0
+  material_ui: ^1.0.1
 dependency_overrides:
+  permission_handler_android:
+    path: third_party/permission_handler_android
+  workmanager_android:
+    path: third_party/workmanager_android
   linkify:
-    git:
-      url: https://github.com/tsacdop/linkify.git
+    path: third_party/linkify
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: ^2.1.10
+  flutter_lints: ^6.0.0
 
 flutter:
   assets:

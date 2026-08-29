@@ -13,14 +13,20 @@ class CustomCacheManager extends CacheManager with ImageCacheManager {
   }
 
   @override
-  Future<FileInfo> downloadFile(String url,
-      {String? key,
-      Map<String, String>? authHeaders,
-      bool force = false}) async {
-    var file;
+  Future<FileInfo> downloadFile(
+    String url, {
+    String? key,
+    Map<String, String>? authHeaders,
+    bool force = false,
+  }) async {
+    FileInfo file;
     try {
-      file = await super
-          .downloadFile(url, key: key, authHeaders: authHeaders, force: force);
+      file = await super.downloadFile(
+        url,
+        key: key,
+        authHeaders: authHeaders,
+        force: force,
+      );
     } catch (e) {
       rethrow;
     }
@@ -37,12 +43,14 @@ class CustomCacheManager extends CacheManager with ImageCacheManager {
     int? maxWidth,
   }) async* {
     try {
-      super.getImageFile(url,
-          key: key,
-          headers: headers,
-          withProgress: withProgress,
-          maxHeight: maxHeight,
-          maxWidth: maxWidth);
+      super.getImageFile(
+        url,
+        key: key,
+        headers: headers,
+        withProgress: withProgress,
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+      );
     } catch (e) {}
   }
 

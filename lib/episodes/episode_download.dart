@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,7 +19,7 @@ import '../widgets/general_dialog.dart';
 
 class DownloadButton extends StatefulWidget {
   final EpisodeBrief? episode;
-  DownloadButton({this.episode, Key? key}) : super(key: key);
+  const DownloadButton({this.episode, super.key});
   @override
   _DownloadButtonState createState() => _DownloadButtonState();
 }
@@ -30,7 +30,7 @@ class _DownloadButtonState extends State<DownloadButton> {
         .getBool(defaultValue: true, reverse: true);
     final permissionReady = await _checkPermmison();
     final result = await Connectivity().checkConnectivity();
-    final usingData = result == ConnectivityResult.mobile;
+    final usingData = result.contains(ConnectivityResult.mobile);
     var dataConfirm = true;
     if (permissionReady) {
       if (downloadUsingData && usingData) {
@@ -86,82 +86,86 @@ class _DownloadButtonState extends State<DownloadButton> {
       actions: <Widget>[
         TextButton(
           onPressed: Navigator.of(context).pop,
-          child: Text(
-            s.cancel,
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          child: Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
         ),
         TextButton(
           onPressed: () {
             ifUseData = true;
             Navigator.of(context).pop();
           },
-          child: Text(
-            s.confirm,
-            style: TextStyle(color: Colors.red),
-          ),
-        )
+          child: Text(s.confirm, style: TextStyle(color: Colors.red)),
+        ),
       ],
     );
     return ifUseData;
   }
 
   Widget _buttonOnMenu(Widget widget, Function() onTap) => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-              height: 50.0,
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: widget),
-        ),
-      );
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 50.0,
+        padding: EdgeInsets.symmetric(horizontal: 15.0),
+        child: widget,
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DownloadState>(builder: (_, downloader, __) {
-      var _task = Provider.of<DownloadState>(context, listen: false)
-          .episodeToTask(widget.episode);
-      return Row(
-        children: <Widget>[
-          _downloadButton(_task, context),
-          AnimatedContainer(
+    return Consumer<DownloadState>(
+      builder: (_, downloader, _) {
+        var task = Provider.of<DownloadState>(
+          context,
+          listen: false,
+        ).episodeToTask(widget.episode);
+        return Row(
+          children: <Widget>[
+            _downloadButton(task, context),
+            AnimatedContainer(
               duration: Duration(seconds: 1),
               decoration: BoxDecoration(
-                  color: context.accentColor,
-                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                color: context.accentColor,
+                borderRadius: BorderRadius.all(Radius.circular(15.0)),
+              ),
               height: 20.0,
-              width: (_task.status == DownloadTaskStatus.running) ? 50.0 : 0,
+              width: (task.status == DownloadTaskStatus.running) ? 50.0 : 0,
               alignment: Alignment.center,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Text('${math.max<int>(_task.progress!, 0)}%',
-                    style: TextStyle(color: Colors.white)),
-              )),
-        ],
-      );
-    });
-  }
-
-  Widget _downloadButton(EpisodeTask task, BuildContext context) {
-    switch (task.status!.value) {
-      case 0:
-        return _buttonOnMenu(
-            Center(
-              child: SizedBox(
-                height: 20,
-                width: 20,
-                child: CustomPaint(
-                  painter: DownloadPainter(
-                    color: Colors.grey[700],
-                    fraction: 0,
-                    progressColor: context.accentColor,
-                  ),
+                child: Text(
+                  '${math.max<int>(task.progress!, 0)}%',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
-            () => _requestDownload(task.episode));
-      case 2:
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _downloadButton(EpisodeTask task, BuildContext context) {
+    switch (task.status) {
+      case DownloadTaskStatus.undefined:
+        return _buttonOnMenu(
+          Center(
+            child: SizedBox(
+              height: 20,
+              width: 20,
+              child: CustomPaint(
+                painter: DownloadPainter(
+                  color: Colors.grey[700],
+                  fraction: 0,
+                  progressColor: context.accentColor,
+                ),
+              ),
+            ),
+          ),
+          () => _requestDownload(task.episode),
+        );
+      case DownloadTaskStatus.running:
         return Material(
           color: Colors.transparent,
           child: InkWell(
@@ -180,17 +184,18 @@ class _DownloadButtonState extends State<DownloadButton> {
                   width: 20,
                   child: CustomPaint(
                     painter: DownloadPainter(
-                        color: context.accentColor,
-                        fraction: fraction,
-                        progressColor: context.accentColor,
-                        progress: task.progress! / 100),
+                      color: context.accentColor,
+                      fraction: fraction,
+                      progressColor: context.accentColor,
+                      progress: task.progress! / 100,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         );
-      case 6:
+      case DownloadTaskStatus.paused:
         return Material(
           color: Colors.transparent,
           child: InkWell(
@@ -209,20 +214,23 @@ class _DownloadButtonState extends State<DownloadButton> {
                   width: 20,
                   child: CustomPaint(
                     painter: DownloadPainter(
-                        color: context.accentColor,
-                        fraction: 1,
-                        progressColor: context.accentColor,
-                        progress: task.progress! / 100,
-                        pauseProgress: fraction),
+                      color: context.accentColor,
+                      fraction: 1,
+                      progressColor: context.accentColor,
+                      progress: task.progress! / 100,
+                      pauseProgress: fraction,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         );
-      case 3:
-        Provider.of<AudioPlayerNotifier>(context, listen: false)
-            .updateMediaItem(task.episode!);
+      case DownloadTaskStatus.complete:
+        Provider.of<AudioPlayerNotifier>(
+          context,
+          listen: false,
+        ).updateMediaItem(task.episode!);
         return Material(
           color: Colors.transparent,
           child: InkWell(
@@ -248,9 +256,11 @@ class _DownloadButtonState extends State<DownloadButton> {
             ),
           ),
         );
-      case 4:
-        return _buttonOnMenu(Icon(Icons.refresh, color: Colors.red),
-            () => _retryDownload(task.episode!));
+      case DownloadTaskStatus.failed:
+        return _buttonOnMenu(
+          Icon(Icons.refresh, color: Colors.red),
+          () => _retryDownload(task.episode!),
+        );
       default:
         return Center();
     }

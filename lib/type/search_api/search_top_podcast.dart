@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import 'searchpodcast.dart';
 part 'search_top_podcast.g.dart';
 
@@ -11,8 +12,13 @@ class SearchTopPodcast<T> {
   final int? total;
   @JsonKey(name: 'has_next')
   final bool? hasNext;
-  SearchTopPodcast(
-      {this.podcasts, this.id, this.total, this.hasNext, this.page});
+  SearchTopPodcast({
+    this.podcasts,
+    this.id,
+    this.total,
+    this.hasNext,
+    this.page,
+  });
 
   factory SearchTopPodcast.fromJson(Map<String, dynamic> json) =>
       _$SearchTopPodcastFromJson<T>(json);
@@ -49,28 +55,30 @@ class OnlineTopPodcast {
   @JsonKey(name: 'publisher')
   final String? publisher;
   final String? id;
-  OnlineTopPodcast(
-      {this.earliestPubDate,
-      this.title,
-      this.count,
-      this.description,
-      this.image,
-      this.latestPubDate,
-      this.rss,
-      this.publisher,
-      this.id});
+  OnlineTopPodcast({
+    this.earliestPubDate,
+    this.title,
+    this.count,
+    this.description,
+    this.image,
+    this.latestPubDate,
+    this.rss,
+    this.publisher,
+    this.id,
+  });
   factory OnlineTopPodcast.fromJson(Map<String, dynamic> json) =>
       _$OnlineTopPodcastFromJson(json);
   Map<String, dynamic> toJson() => _$OnlineTopPodcastToJson(this);
 
   OnlinePodcast get toOnlinePodcast => OnlinePodcast(
-      earliestPubDate: earliestPubDate,
-      title: title,
-      count: count,
-      description: description,
-      image: image,
-      latestPubDate: latestPubDate,
-      rss: rss,
-      publisher: publisher,
-      id: id);
+    earliestPubDate: earliestPubDate,
+    title: title,
+    count: count,
+    description: description,
+    image: image,
+    latestPubDate: latestPubDate,
+    rss: rss,
+    publisher: publisher,
+    id: id,
+  );
 }

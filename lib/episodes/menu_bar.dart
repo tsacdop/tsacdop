@@ -14,8 +14,7 @@ class MenuBar extends StatefulWidget {
   final EpisodeBrief? episodeItem;
   final String? heroTag;
   final bool? hide;
-  MenuBar({this.episodeItem, this.heroTag, this.hide, Key? key})
-      : super(key: key);
+  const MenuBar({this.episodeItem, this.heroTag, this.hide, super.key});
   @override
   MenuBarState createState() => MenuBarState();
 }
@@ -27,9 +26,7 @@ class MenuBarState extends State<MenuBar> {
     final s = context.s;
     return Container(
       height: 50.0,
-      decoration: BoxDecoration(
-        color: widget.episodeItem!.cardColor(context),
-      ),
+      decoration: BoxDecoration(color: widget.episodeItem!.cardColor(context)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -45,7 +42,7 @@ class MenuBarState extends State<MenuBar> {
                     tag: widget.episodeItem!.enclosureUrl + widget.heroTag!,
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Container(
+                      child: SizedBox(
                         height: 30.0,
                         width: 30.0,
                         child: widget.hide!
@@ -53,7 +50,8 @@ class MenuBarState extends State<MenuBar> {
                             : CircleAvatar(
                                 radius: 15,
                                 backgroundImage:
-                                    widget.episodeItem!.avatarImage),
+                                    widget.episodeItem!.avatarImage,
+                              ),
                       ),
                     ),
                   ),
@@ -69,48 +67,54 @@ class MenuBarState extends State<MenuBar> {
                               ),
                               onTap: () async {
                                 await _saveLiked(
-                                    widget.episodeItem!.enclosureUrl);
-                                OverlayEntry _overlayEntry;
-                                _overlayEntry = _createOverlayEntry();
-                                Overlay.of(context)!.insert(_overlayEntry);
+                                  widget.episodeItem!.enclosureUrl,
+                                );
+                                OverlayEntry overlayEntry;
+                                overlayEntry = _createOverlayEntry();
+                                Overlay.of(context).insert(overlayEntry);
                                 await Future.delayed(Duration(seconds: 2));
-                                _overlayEntry.remove();
-                              })
+                                overlayEntry.remove();
+                              },
+                            )
                           : _buttonOnMenu(
-                              child: Icon(
-                                Icons.favorite,
-                                color: Colors.red,
-                              ),
-                              onTap: () => _setUnliked(
-                                  widget.episodeItem!.enclosureUrl));
+                              child: Icon(Icons.favorite, color: Colors.red),
+                              onTap: () =>
+                                  _setUnliked(widget.episodeItem!.enclosureUrl),
+                            );
                     },
                   ),
                   DownloadButton(episode: widget.episodeItem),
                   Selector<AudioPlayerNotifier, List<EpisodeBrief?>>(
                     selector: (_, audio) => audio.queue.episodes,
-                    builder: (_, data, __) {
+                    builder: (_, data, _) {
                       final inPlaylist = data.contains(widget.episodeItem);
                       return inPlaylist
                           ? _buttonOnMenu(
-                              child: Icon(Icons.playlist_add_check,
-                                  color: context.accentColor),
+                              child: Icon(
+                                Icons.playlist_add_check,
+                                color: context.accentColor,
+                              ),
                               onTap: () {
                                 audio.delFromPlaylist(widget.episodeItem!);
                                 Fluttertoast.showToast(
                                   msg: s.toastRemovePlaylist,
                                   gravity: ToastGravity.BOTTOM,
                                 );
-                              })
+                              },
+                            )
                           : _buttonOnMenu(
-                              child: Icon(Icons.playlist_add,
-                                  color: Colors.grey[700]),
+                              child: Icon(
+                                Icons.playlist_add,
+                                color: Colors.grey[700],
+                              ),
                               onTap: () {
                                 audio.addToPlaylist(widget.episodeItem!);
                                 Fluttertoast.showToast(
                                   msg: s.toastAddPlaylist,
                                   gravity: ToastGravity.BOTTOM,
                                 );
-                              });
+                              },
+                            );
                     },
                   ),
                   FutureBuilder<int>(
@@ -123,8 +127,10 @@ class MenuBarState extends State<MenuBar> {
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: CustomPaint(
                                   size: Size(25, 20),
-                                  painter: ListenedAllPainter(Colors.grey[700],
-                                      stroke: 2.0),
+                                  painter: ListenedAllPainter(
+                                    Colors.grey[700],
+                                    stroke: 2.0,
+                                  ),
                                 ),
                               ),
                               onTap: () {
@@ -133,20 +139,23 @@ class MenuBarState extends State<MenuBar> {
                                   msg: s.markListened,
                                   gravity: ToastGravity.BOTTOM,
                                 );
-                              })
+                              },
+                            )
                           : _buttonOnMenu(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: CustomPaint(
                                   size: Size(25, 20),
                                   painter: ListenedAllPainter(
-                                      context.accentColor,
-                                      stroke: 2.0),
+                                    context.accentColor,
+                                    stroke: 2.0,
+                                  ),
                                 ),
                               ),
                               onTap: () {
                                 _markNotListened(
-                                    widget.episodeItem!.enclosureUrl);
+                                  widget.episodeItem!.enclosureUrl,
+                                );
                                 Fluttertoast.showToast(
                                   msg: s.markNotListened,
                                   gravity: ToastGravity.BOTTOM,
@@ -161,14 +170,16 @@ class MenuBarState extends State<MenuBar> {
           ),
           Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief?, bool>>(
             selector: (_, audio) => Tuple2(audio.episode, audio.playerRunning),
-            builder: (_, data, __) {
+            builder: (_, data, _) {
               return (widget.episodeItem == data.item1 && data.item2)
                   ? Padding(
                       padding: EdgeInsets.only(right: 30),
                       child: SizedBox(
-                          width: 20,
-                          height: 15,
-                          child: WaveLoader(color: context.accentColor)))
+                        width: 20,
+                        height: 15,
+                        child: WaveLoader(color: context.accentColor),
+                      ),
+                    )
                   : Material(
                       color: Colors.transparent,
                       child: InkWell(
@@ -241,16 +252,18 @@ class MenuBarState extends State<MenuBar> {
   }
 
   Widget _buttonOnMenu({Widget? child, VoidCallback? onTap}) => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox(
-            height: 50,
-            child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0), child: child),
-          ),
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: onTap,
+      child: SizedBox(
+        height: 50,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15.0),
+          child: child,
         ),
-      );
+      ),
+    ),
+  );
 
   OverlayEntry _createOverlayEntry() {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
@@ -259,11 +272,12 @@ class MenuBarState extends State<MenuBar> {
       builder: (constext) => Positioned(
         left: offset.dx + 50,
         top: offset.dy - 60,
-        child: Container(
-            width: 70,
-            height: 100,
-            //color: Colors.grey[200],
-            child: HeartOpen(width: 50, height: 80)),
+        child: SizedBox(
+          width: 70,
+          height: 100,
+          //color: Colors.grey[200],
+          child: HeartOpen(width: 50, height: 80),
+        ),
       ),
     );
   }

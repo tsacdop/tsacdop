@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 
 import 'package:xml/xml.dart' as xml;
+
 import '../state/podcast_group.dart';
 
 class OmplOutline {
@@ -24,41 +25,57 @@ class PodcastsBackup {
   xml.XmlNode omplBuilder() {
     var builder = xml.XmlBuilder();
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
-    builder.element('ompl', nest: () {
-      builder.attribute('version', '1.0');
-      builder.element('head', nest: () {
-        builder.element('title', nest: 'Tsacdop Feed Groups');
-      });
-      builder.element('body', nest: () {
-        for (var group in groups) {
-          builder.element('outline', nest: () {
-            builder.attribute('text', '${group!.name}');
-            builder.attribute('title', '${group.name}');
-            for (var e in group.podcasts) {
+    builder.element(
+      'ompl',
+      nest: () {
+        builder.attribute('version', '1.0');
+        builder.element(
+          'head',
+          nest: () {
+            builder.element('title', nest: 'Tsacdop Feed Groups');
+          },
+        );
+        builder.element(
+          'body',
+          nest: () {
+            for (var group in groups) {
               builder.element(
                 'outline',
                 nest: () {
-                  builder.attribute('type', 'rss');
-                  builder.attribute('text', '${e.title}');
-                  builder.attribute('title', '${e.title}');
-                  builder.attribute('xmlUrl', '${e.rssUrl}');
+                  builder.attribute('text', '${group!.name}');
+                  builder.attribute('title', '${group.name}');
+                  for (var e in group.podcasts) {
+                    builder.element(
+                      'outline',
+                      nest: () {
+                        builder.attribute('type', 'rss');
+                        builder.attribute('text', '${e.title}');
+                        builder.attribute('title', '${e.title}');
+                        builder.attribute('xmlUrl', e.rssUrl);
+                      },
+                      isSelfClosing: true,
+                    );
+                  }
                 },
-                isSelfClosing: true,
               );
             }
-          });
-        }
-      });
-    });
+          },
+        );
+      },
+    );
     return builder.buildDocument();
   }
 
-  static parseOPML(String opml) {
+  static Map<String?, List<OmplOutline>> parseOPML(String opml) {
     var data = <String?, List<OmplOutline>>{};
     // var opml = file.readAsStringSync();
     var content = xml.XmlDocument.parse(opml);
-    var title =
-        content.findAllElements('head').first.findElements('title').first.text;
+    var title = content
+        .findAllElements('head')
+        .first
+        .findElements('title')
+        .first
+        .innerText;
     developer.log(title, name: 'Import OPML');
     var groups = content.findAllElements('body').first.findElements('outline');
     if (title != 'Tsacdop Feed Groups') {

@@ -9,7 +9,8 @@ class CustomTabView extends StatefulWidget {
   final ValueChanged<double>? onScroll;
   final int? initPosition;
 
-  CustomTabView({
+  const CustomTabView({
+    super.key,
     required this.itemCount,
     required this.tabBuilder,
     required this.pageBuilder,
@@ -130,7 +131,7 @@ class _CustomTabsState extends State<CustomTabView>
     );
   }
 
-  onPositionChange() {
+  void onPositionChange() {
     if (!controller!.indexIsChanging) {
       _currentPosition = controller!.index;
       if (widget.onPositionChange is ValueChanged<int>) {
@@ -139,7 +140,7 @@ class _CustomTabsState extends State<CustomTabView>
     }
   }
 
-  onScroll() {
+  void onScroll() {
     if (widget.onScroll is ValueChanged<double>) {
       widget.onScroll!(controller!.animation!.value);
     }

@@ -1,4 +1,4 @@
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -17,17 +17,16 @@ import 'custom_widget.dart';
 import 'general_dialog.dart';
 
 class MultiSelectMenuBar extends StatefulWidget {
-  MultiSelectMenuBar(
-      {this.selectedList,
-      this.selectAll,
-      this.onSelectAll,
-      required this.onClose,
-      this.onSelectAfter,
-      this.onSelectBefore,
-      this.hideFavorite = false,
-      Key? key})
-      : assert(onClose != null),
-        super(key: key);
+  const MultiSelectMenuBar({
+    this.selectedList,
+    this.selectAll,
+    this.onSelectAll,
+    required this.onClose,
+    this.onSelectAfter,
+    this.onSelectBefore,
+    this.hideFavorite = false,
+    super.key,
+  });
   final List<EpisodeBrief>? selectedList;
   final bool? selectAll;
   final ValueChanged<bool>? onSelectAll;
@@ -120,7 +119,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
         .getBool(defaultValue: true, reverse: true);
     var dataConfirm = true;
     final result = await Connectivity().checkConnectivity();
-    final usingData = result == ConnectivityResult.mobile;
+    final usingData = result.contains(ConnectivityResult.mobile);
     if (permissionReady) {
       if (downloadUsingData && usingData) {
         dataConfirm = await _useDataConfirm();
@@ -146,25 +145,19 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
       title: Text(s.cellularConfirm),
       content: Text(s.cellularConfirmDes),
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text(
-            s.cancel,
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          child: Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
         ),
-        FlatButton(
+        TextButton(
           onPressed: () {
             ifUseData = true;
             Navigator.of(context).pop();
           },
-          child: Text(
-            s.confirm,
-            style: TextStyle(color: Colors.red),
-          ),
-        )
+          child: Text(s.confirm, style: TextStyle(color: Colors.red)),
+        ),
       ],
     );
     return ifUseData;
@@ -190,116 +183,129 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
   }
 
   Widget _buttonOnMenu({Widget? child, VoidCallback? onTap}) => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox(
-            height: 40,
-            child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0), child: child),
-          ),
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: onTap,
+      child: SizedBox(
+        height: 40,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.0),
+          child: child,
         ),
-      );
+      ),
+    ),
+  );
 
   Widget _playlistList() => SizedBox(
-      height: 50,
-      child: Selector<AudioPlayerNotifier, List<Playlist>>(
-        selector: (_, audio) => audio.playlists,
-        builder: (_, data, child) {
-          return Align(
-            alignment: Alignment.centerLeft,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  for (var p in data)
-                    if (p.name == 'Queue')
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() => _showPlaylists = false);
-                            showGeneralDialog(
-                                context: context,
-                                barrierDismissible: true,
-                                barrierLabel: MaterialLocalizations.of(context)
-                                    .modalBarrierDismissLabel,
-                                barrierColor: Colors.black54,
-                                transitionDuration:
-                                    const Duration(milliseconds: 200),
-                                pageBuilder:
-                                    (context, animaiton, secondaryAnimation) =>
-                                        _NewPlaylist(widget.selectedList));
-                          },
-                          child: Container(
-                            height: 30,
-                            child: Row(
-                              children: [
-                                Container(
-                                  height: 30,
-                                  width: 30,
-                                  color: context.primaryColorDark,
-                                  child: Center(child: Icon(Icons.add)),
-                                ),
-                                SizedBox(width: 10),
-                                Text('New')
-                              ],
+    height: 50,
+    child: Selector<AudioPlayerNotifier, List<Playlist>>(
+      selector: (_, audio) => audio.playlists,
+      builder: (_, data, child) {
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                for (var p in data)
+                  if (p.name == 'Queue')
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() => _showPlaylists = false);
+                          showGeneralDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierLabel: MaterialLocalizations.of(context)
+                                .modalBarrierDismissLabel,
+                            barrierColor: Colors.black54,
+                            transitionDuration: const Duration(
+                              milliseconds: 200,
                             ),
-                          ),
-                        ),
-                      )
-                    else
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: InkWell(
-                          onTap: () {
-                            context
-                                .read<AudioPlayerNotifier>()
-                                .addEpisodesToPlaylist(p,
-                                    episodes: widget.selectedList!);
-                            setState(() {
-                              _showPlaylists = false;
-                            });
-                          },
-                          child: Container(
-                            height: 30,
-                            child: Row(
-                              children: [
-                                Container(
-                                  height: 30,
-                                  width: 30,
-                                  color: context.primaryColorDark,
-                                  child: p.episodeList.isEmpty
-                                      ? Center()
-                                      : FutureBuilder<EpisodeBrief?>(
-                                          future:
-                                              _getEpisode(p.episodeList.first),
-                                          builder: (_, snapshot) {
-                                            if (snapshot.data != null) {
-                                              return SizedBox(
-                                                  height: 30,
-                                                  width: 30,
-                                                  child: Image(
-                                                      image: snapshot
-                                                          .data!.avatarImage));
-                                            }
-                                            return Center();
-                                          }),
-                                ),
-                                SizedBox(width: 10),
-                                Text(p.name!),
-                              ],
-                            ),
+                            pageBuilder: (
+                              context,
+                              animaiton,
+                              secondaryAnimation,
+                            ) => _NewPlaylist(widget.selectedList),
+                          );
+                        },
+                        child: SizedBox(
+                          height: 30,
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 30,
+                                width: 30,
+                                color: context.primaryColorDark,
+                                child: Center(child: Icon(Icons.add)),
+                              ),
+                              SizedBox(width: 10),
+                              Text('New'),
+                            ],
                           ),
                         ),
                       ),
-                ],
-              ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: InkWell(
+                        onTap: () {
+                          context
+                              .read<AudioPlayerNotifier>()
+                              .addEpisodesToPlaylist(
+                                p,
+                                episodes: widget.selectedList!,
+                              );
+                          setState(() {
+                            _showPlaylists = false;
+                          });
+                        },
+                        child: SizedBox(
+                          height: 30,
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 30,
+                                width: 30,
+                                color: context.primaryColorDark,
+                                child: p.episodeList.isEmpty
+                                    ? Center()
+                                    : FutureBuilder<EpisodeBrief?>(
+                                        future: _getEpisode(
+                                          p.episodeList.first,
+                                        ),
+                                        builder: (_, snapshot) {
+                                          if (snapshot.data != null) {
+                                            return SizedBox(
+                                              height: 30,
+                                              width: 30,
+                                              child: Image(
+                                                image:
+                                                    snapshot.data!.avatarImage,
+                                              ),
+                                            );
+                                          }
+                                          return Center();
+                                        },
+                                      ),
+                              ),
+                              SizedBox(width: 10),
+                              Text(p.name!),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+              ],
             ),
-          );
-        },
-      ));
+          ),
+        );
+      },
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -311,11 +317,11 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
       builder: (context, dynamic value, child) => Container(
         height: widget.selectAll == null
             ? _showPlaylists
-                ? 90
-                : 40
+                  ? 90
+                  : 40
             : _showPlaylists
-                ? 140
-                : 90.0 * value,
+            ? 140
+            : 90.0 * value,
         decoration: BoxDecoration(color: context.primaryColor),
         child: SingleChildScrollView(
           child: Column(
@@ -329,11 +335,14 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                       height: 40,
                       child: Center(
                         child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.0),
-                            child: Text(
-                                '${widget.selectedList!.length} selected',
-                                style: context.textTheme.headline6!
-                                    .copyWith(color: context.accentColor))),
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Text(
+                            '${widget.selectedList!.length} selected',
+                            style: context.textTheme.titleLarge!.copyWith(
+                              color: context.accentColor,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     Spacer(),
@@ -343,16 +352,20 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5),
                           child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: context.accentColor),
-                                  primary: context.textColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(100)))),
-                              onPressed: () {
-                                widget.onSelectBefore!(true);
-                              },
-                              child: Text('Before')),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: context.textColor,
+                              side: BorderSide(color: context.accentColor),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(100),
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              widget.onSelectBefore!(true);
+                            },
+                            child: Text('Before'),
+                          ),
                         ),
                       ),
                     if (widget.selectedList!.length == 1)
@@ -361,16 +374,20 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5),
                           child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: context.accentColor),
-                                  primary: context.textColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(100)))),
-                              onPressed: () {
-                                widget.onSelectAfter!(true);
-                              },
-                              child: Text('After')),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: context.textColor,
+                              side: BorderSide(color: context.accentColor),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(100),
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              widget.onSelectAfter!(true);
+                            },
+                            child: Text('After'),
+                          ),
                         ),
                       ),
                     SizedBox(
@@ -378,23 +395,27 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5),
                         child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: context.accentColor),
-                                backgroundColor: widget.selectAll!
-                                    ? context.accentColor
-                                    : null,
-                                primary: widget.selectAll!
-                                    ? Colors.white
-                                    : context.textColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(100)))),
-                            onPressed: () {
-                              widget.onSelectAll!(!widget.selectAll!);
-                            },
-                            child: Text('All')),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: widget.selectAll!
+                                ? Colors.white
+                                : context.textColor,
+                            side: BorderSide(color: context.accentColor),
+                            backgroundColor: widget.selectAll!
+                                ? context.accentColor
+                                : null,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(100),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            widget.onSelectAll!(!widget.selectAll!);
+                          },
+                          child: Text('All'),
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               if (_showPlaylists) _playlistList(),
@@ -402,35 +423,36 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                 children: [
                   if (!widget.hideFavorite)
                     _buttonOnMenu(
-                        child: _liked
-                            ? Icon(Icons.favorite, color: Colors.red)
-                            : Icon(
-                                Icons.favorite_border,
-                                color: Colors.grey[700],
-                              ),
-                        onTap: () async {
-                          if (widget.selectedList!.isNotEmpty) {
-                            if (!_liked) {
-                              await _saveLiked();
-                              Fluttertoast.showToast(
-                                msg: s.liked,
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            } else {
-                              await _setUnliked();
-                              Fluttertoast.showToast(
-                                msg: s.unliked,
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            }
-                            audio.setEpisodeState = true;
+                      child: _liked
+                          ? Icon(Icons.favorite, color: Colors.red)
+                          : Icon(
+                              Icons.favorite_border,
+                              color: Colors.grey[700],
+                            ),
+                      onTap: () async {
+                        if (widget.selectedList!.isNotEmpty) {
+                          if (!_liked) {
+                            await _saveLiked();
+                            Fluttertoast.showToast(
+                              msg: s.liked,
+                              gravity: ToastGravity.BOTTOM,
+                            );
+                          } else {
+                            await _setUnliked();
+                            Fluttertoast.showToast(
+                              msg: s.unliked,
+                              gravity: ToastGravity.BOTTOM,
+                            );
                           }
-                          //  OverlayEntry _overlayEntry;
-                          //  _overlayEntry = _createOverlayEntry();
-                          //  Overlay.of(context).insert(_overlayEntry);
-                          //  await Future.delayed(Duration(seconds: 2));
-                          //  _overlayEntry?.remove();
-                        }),
+                          audio.setEpisodeState = true;
+                        }
+                        //  OverlayEntry _overlayEntry;
+                        //  _overlayEntry = _createOverlayEntry();
+                        //  Overlay.of(context).insert(_overlayEntry);
+                        //  await Future.delayed(Duration(seconds: 2));
+                        //  _overlayEntry?.remove();
+                      },
+                    ),
                   _buttonOnMenu(
                     child: _downloaded
                         ? Center(
@@ -439,10 +461,11 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                               width: 20,
                               child: CustomPaint(
                                 painter: DownloadPainter(
-                                    color: context.accentColor,
-                                    fraction: 1,
-                                    progressColor: context.accentColor,
-                                    progress: 1),
+                                  color: context.accentColor,
+                                  fraction: 1,
+                                  progressColor: context.accentColor,
+                                  progress: 1,
+                                ),
                               ),
                             ),
                           )
@@ -466,91 +489,98 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
                     },
                   ),
                   _buttonOnMenu(
-                      child: _inPlaylist
-                          ? Icon(Icons.playlist_add_check,
-                              color: context.accentColor)
-                          : Icon(
-                              Icons.playlist_add,
-                              color: Colors.grey[700],
-                            ),
-                      onTap: () async {
-                        if (widget.selectedList!.isNotEmpty) {
-                          if (!_inPlaylist) {
-                            for (var episode in widget.selectedList!) {
-                              audio.addToPlaylist(episode);
-                              Fluttertoast.showToast(
-                                msg: s.toastAddPlaylist,
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            }
-                            setState(() => _inPlaylist = true);
-                          } else {
-                            for (var episode in widget.selectedList!) {
-                              audio.delFromPlaylist(episode);
-                              Fluttertoast.showToast(
-                                msg: s.toastRemovePlaylist,
-                                gravity: ToastGravity.BOTTOM,
-                              );
-                            }
-                            setState(() => _inPlaylist = false);
+                    child: _inPlaylist
+                        ? Icon(
+                            Icons.playlist_add_check,
+                            color: context.accentColor,
+                          )
+                        : Icon(Icons.playlist_add, color: Colors.grey[700]),
+                    onTap: () async {
+                      if (widget.selectedList!.isNotEmpty) {
+                        if (!_inPlaylist) {
+                          for (var episode in widget.selectedList!) {
+                            audio.addToPlaylist(episode);
+                            Fluttertoast.showToast(
+                              msg: s.toastAddPlaylist,
+                              gravity: ToastGravity.BOTTOM,
+                            );
                           }
+                          setState(() => _inPlaylist = true);
+                        } else {
+                          for (var episode in widget.selectedList!) {
+                            audio.delFromPlaylist(episode);
+                            Fluttertoast.showToast(
+                              msg: s.toastRemovePlaylist,
+                              gravity: ToastGravity.BOTTOM,
+                            );
+                          }
+                          setState(() => _inPlaylist = false);
                         }
-                      }),
+                      }
+                    },
+                  ),
                   _buttonOnMenu(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: CustomPaint(
-                          size: Size(25, 25),
-                          painter: ListenedAllPainter(
-                              _marked ? context.accentColor : Colors.grey[700],
-                              stroke: 2.0),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: CustomPaint(
+                        size: Size(25, 25),
+                        painter: ListenedAllPainter(
+                          _marked ? context.accentColor : Colors.grey[700],
+                          stroke: 2.0,
                         ),
                       ),
-                      onTap: () async {
-                        if (widget.selectedList!.isNotEmpty) {
-                          if (!_marked) {
-                            await _markListened();
-                            Fluttertoast.showToast(
-                              msg: s.markListened,
-                              gravity: ToastGravity.BOTTOM,
-                            );
-                          } else {
-                            await _markNotListened();
-                            Fluttertoast.showToast(
-                              msg: s.markNotListened,
-                              gravity: ToastGravity.BOTTOM,
-                            );
-                          }
+                    ),
+                    onTap: () async {
+                      if (widget.selectedList!.isNotEmpty) {
+                        if (!_marked) {
+                          await _markListened();
+                          Fluttertoast.showToast(
+                            msg: s.markListened,
+                            gravity: ToastGravity.BOTTOM,
+                          );
+                        } else {
+                          await _markNotListened();
+                          Fluttertoast.showToast(
+                            msg: s.markNotListened,
+                            gravity: ToastGravity.BOTTOM,
+                          );
                         }
-                      }),
+                      }
+                    },
+                  ),
                   _buttonOnMenu(
-                      child: Icon(
-                        Icons.add_box_outlined,
-                        color: Colors.grey[700],
-                      ),
-                      onTap: () {
-                        if (widget.selectedList!.isNotEmpty) {
-                          setState(() {
-                            _showPlaylists = !_showPlaylists;
-                          });
-                        }
-                      }),
+                    child: Icon(
+                      Icons.add_box_outlined,
+                      color: Colors.grey[700],
+                    ),
+                    onTap: () {
+                      if (widget.selectedList!.isNotEmpty) {
+                        setState(() {
+                          _showPlaylists = !_showPlaylists;
+                        });
+                      }
+                    },
+                  ),
                   Spacer(),
                   if (widget.selectAll == null)
                     SizedBox(
                       height: 40,
                       child: Center(
                         child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Text(
-                                '${widget.selectedList!.length} selected',
-                                style: context.textTheme.headline6!
-                                    .copyWith(color: context.accentColor))),
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text(
+                            '${widget.selectedList!.length} selected',
+                            style: context.textTheme.titleLarge!.copyWith(
+                              color: context.accentColor,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   _buttonOnMenu(
-                      child: Icon(Icons.close),
-                      onTap: () => widget.onClose(true))
+                    child: Icon(Icons.close),
+                    onTap: () => widget.onClose(true),
+                  ),
                 ],
               ),
             ],
@@ -563,7 +593,7 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
 
 class _NewPlaylist extends StatefulWidget {
   final List<EpisodeBrief>? episodes;
-  _NewPlaylist(this.episodes, {Key? key}) : super(key: key);
+  const _NewPlaylist(this.episodes);
 
   @override
   __NewPlaylistState createState() => __NewPlaylistState();
@@ -581,8 +611,8 @@ class __NewPlaylistState extends State<_NewPlaylist> {
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor:
             Theme.of(context).brightness == Brightness.light
-                ? Color.fromRGBO(113, 113, 113, 1)
-                : Color.fromRGBO(5, 5, 5, 1),
+            ? Color.fromRGBO(113, 113, 113, 1)
+            : Color.fromRGBO(5, 5, 5, 1),
       ),
       child: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -591,36 +621,49 @@ class __NewPlaylistState extends State<_NewPlaylist> {
         titlePadding: EdgeInsets.all(20),
         actionsPadding: EdgeInsets.zero,
         actions: <Widget>[
-          FlatButton(
-            splashColor: context.accentColor.withAlpha(70),
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              s.cancel,
-              style: TextStyle(color: Colors.grey[600]),
+          TextButton(
+            style: ButtonStyle(
+              overlayColor: WidgetStatePropertyAll(
+                context.accentColor.withAlpha(70),
+              ),
             ),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
           ),
-          FlatButton(
-            splashColor: context.accentColor.withAlpha(70),
+          TextButton(
+            style: ButtonStyle(
+              overlayColor: WidgetStatePropertyAll(
+                context.accentColor.withAlpha(70),
+              ),
+            ),
             onPressed: () async {
-              if (context
-                  .read<AudioPlayerNotifier>()
-                  .playlistExisted(_playlistName)) {
+              if (context.read<AudioPlayerNotifier>().playlistExisted(
+                _playlistName,
+              )) {
                 setState(() => _error = 1);
               } else {
-                final episodesList =
-                    widget.episodes!.map((e) => e.enclosureUrl).toList();
-                final playlist = Playlist(_playlistName,
-                    episodeList: episodesList, episodes: widget.episodes);
+                final episodesList = widget.episodes!
+                    .map((e) => e.enclosureUrl)
+                    .toList();
+                final playlist = Playlist(
+                  _playlistName,
+                  episodeList: episodesList,
+                  episodes: widget.episodes,
+                );
                 context.read<AudioPlayerNotifier>().addPlaylist(playlist);
                 Navigator.of(context).pop();
               }
             },
-            child:
-                Text(s.confirm, style: TextStyle(color: context.accentColor)),
-          )
+            child: Text(
+              s.confirm,
+              style: TextStyle(color: context.accentColor),
+            ),
+          ),
         ],
-        title:
-            SizedBox(width: context.width - 160, child: Text('New playlist')),
+        title: SizedBox(
+          width: context.width - 160,
+          child: Text('New playlist'),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -631,12 +674,16 @@ class __NewPlaylistState extends State<_NewPlaylist> {
                 hintStyle: TextStyle(fontSize: 18),
                 filled: true,
                 focusedBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: context.accentColor, width: 2.0),
+                  borderSide: BorderSide(
+                    color: context.accentColor,
+                    width: 2.0,
+                  ),
                 ),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: context.accentColor, width: 2.0),
+                  borderSide: BorderSide(
+                    color: context.accentColor,
+                    width: 2.0,
+                  ),
                 ),
               ),
               cursorRadius: Radius.circular(2),

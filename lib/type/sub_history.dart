@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class SubHistory {
   /// POdcast subscribe date.
   DateTime subDate;
@@ -16,6 +14,11 @@ class SubHistory {
   /// POdcast rss link.
   String? rssUrl;
 
-  SubHistory(this.delDate, this.subDate, this.rssUrl, this.title,
-      {required this.status});
+  SubHistory(
+    this.delDate,
+    this.subDate,
+    this.rssUrl,
+    this.title, {
+    required this.status,
+  });
 }

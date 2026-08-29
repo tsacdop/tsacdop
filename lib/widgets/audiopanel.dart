@@ -13,16 +13,18 @@ class AudioPanel extends StatefulWidget {
   final double minHeight;
   final double maxHeight;
   final double? expandHeight;
+  final ValueChanged<bool>? onExpandedChanged;
 
-  AudioPanel(
-      {required this.miniPanel,
-      required this.expandedPanel,
-      this.optionPanel,
-      this.minHeight = 70,
-      this.maxHeight = 300,
-      this.expandHeight,
-      Key? key})
-      : super(key: key);
+  const AudioPanel({
+    required this.miniPanel,
+    required this.expandedPanel,
+    this.optionPanel,
+    this.minHeight = 70,
+    this.maxHeight = 300,
+    this.expandHeight,
+    this.onExpandedChanged,
+    super.key,
+  });
   @override
   AudioPanelState createState() => AudioPanelState();
 }
@@ -36,6 +38,7 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
   late Animation _animation;
   SlideDirection? _slideDirection;
   double? _expandHeight;
+  bool _reportedExpanded = false;
 
   @override
   void initState() {
@@ -50,8 +53,10 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
           ..addListener(() {
             if (mounted) setState(() {});
           });
-    _animation =
-        Tween<double>(begin: 0, end: initSize).animate(_slowController);
+    _animation = Tween<double>(
+      begin: 0,
+      end: initSize,
+    ).animate(_slowController);
     _controller.forward();
     _slideDirection = SlideDirection.up;
     super.initState();
@@ -87,157 +92,185 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: <Widget>[
-      Container(
-        child: (_animation.value > widget.minHeight + 30)
-            ? Positioned.fill(
-                child: GestureDetector(
-                  onTap: backToMini,
-                  child: Container(
-                    color: context.background.withOpacity(
-                        0.9 * math.min(_animation.value / widget.maxHeight, 1)),
+    return Stack(
+      children: <Widget>[
+        Container(
+          child: (_animation.value > widget.minHeight + 30)
+              ? Positioned.fill(
+                  child: GestureDetector(
+                    onTap: backToMini,
+                    child: Container(
+                      color: context.background.withValues(
+                        alpha:
+                            0.9 *
+                            math.min(_animation.value / widget.maxHeight, 1),
+                      ),
+                    ),
                   ),
-                ),
-              )
-            : Center(),
-      ),
-      Align(
-        alignment: Alignment.bottomCenter,
-        child: GestureDetector(
-          onVerticalDragStart: _start,
-          onVerticalDragUpdate: _update,
-          onVerticalDragEnd: (event) => _end(),
-          child: Container(
-            height: _getHeight(),
-            child: _animation.value < widget.minHeight + 30
-                ? Container(
-                    color: context.primaryColor,
-                    child: Opacity(
-                      opacity: _animation.value > widget.minHeight
-                          ? (widget.minHeight + 30 - _animation.value) / 40
-                          : 1,
-                      child: widget.miniPanel,
-                    ),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
+                )
+              : Center(),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: GestureDetector(
+            onVerticalDragStart: _start,
+            onVerticalDragUpdate: _update,
+            onVerticalDragEnd: (event) => _end(),
+            child: SizedBox(
+              height: _getHeight(),
+              child: _animation.value < widget.minHeight + 30
+                  ? Container(
                       color: context.primaryColor,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16.0),
-                          topRight: Radius.circular(16.0)),
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, -1),
-                          blurRadius: 1,
-                          color: context.brightness == Brightness.light
-                              ? Colors.grey[400]!.withOpacity(0.5)
-                              : Colors.grey[800]!,
-                        ),
-                        BoxShadow(
-                          offset: Offset(-1, 0),
-                          blurRadius: 1,
-                          color: context.brightness == Brightness.light
-                              ? Colors.grey[400]!.withOpacity(0.5)
-                              : Colors.grey[800]!,
-                        ),
-                        BoxShadow(
-                          offset: Offset(1, 0),
-                          blurRadius: 1,
-                          color: context.brightness == Brightness.light
-                              ? Colors.grey[400]!.withOpacity(0.5)
-                              : Colors.grey[800]!,
-                        ),
-                      ],
-                    ),
-                    child: SingleChildScrollView(
-                      physics: const NeverScrollableScrollPhysics(),
                       child: Opacity(
-                        opacity: _animation.value < (widget.maxHeight - 50)
-                            ? (_animation.value - widget.minHeight) /
-                                (widget.maxHeight - widget.minHeight - 50)
+                        opacity: _animation.value > widget.minHeight
+                            ? (widget.minHeight + 30 - _animation.value) / 40
                             : 1,
-                        child: SizedBox(
-                          height: math.max(widget.maxHeight,
-                              math.min(_animation.value, _expandHeight!)),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(height: 16),
-                              Expanded(child: widget.expandedPanel),
-                            ],
+                        child: widget.miniPanel,
+                      ),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        color: context.primaryColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(16.0),
+                          topRight: Radius.circular(16.0),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0, -1),
+                            blurRadius: 1,
+                            color: context.brightness == Brightness.light
+                                ? Colors.grey[400]!.withValues(alpha: 0.5)
+                                : Colors.grey[800]!,
+                          ),
+                          BoxShadow(
+                            offset: Offset(-1, 0),
+                            blurRadius: 1,
+                            color: context.brightness == Brightness.light
+                                ? Colors.grey[400]!.withValues(alpha: 0.5)
+                                : Colors.grey[800]!,
+                          ),
+                          BoxShadow(
+                            offset: Offset(1, 0),
+                            blurRadius: 1,
+                            color: context.brightness == Brightness.light
+                                ? Colors.grey[400]!.withValues(alpha: 0.5)
+                                : Colors.grey[800]!,
+                          ),
+                        ],
+                      ),
+                      child: SingleChildScrollView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        child: Opacity(
+                          opacity: _animation.value < (widget.maxHeight - 50)
+                              ? (_animation.value - widget.minHeight) /
+                                    (widget.maxHeight - widget.minHeight - 50)
+                              : 1,
+                          child: SizedBox(
+                            height: math.max(
+                              widget.maxHeight,
+                              math.min(_animation.value, _expandHeight!),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(height: 16),
+                                Expanded(child: widget.expandedPanel),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+            ),
           ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 
-  backToMini() {
+  void backToMini() {
     setState(() {
-      _animation = Tween<double>(begin: initSize, end: widget.minHeight)
-          .animate(_slowController);
+      _animation = Tween<double>(
+        begin: initSize,
+        end: widget.minHeight,
+      ).animate(_slowController);
       initSize = widget.minHeight;
     });
+    _notifyExpandedChanged();
     _slowController.forward();
   }
 
-  scrollToTop() {
+  void scrollToTop() {
     setState(() {
-      _animation = Tween<double>(begin: initSize, end: _expandHeight)
-          .animate(_slowController);
+      _animation = Tween<double>(
+        begin: initSize,
+        end: _expandHeight,
+      ).animate(_slowController);
       initSize = _expandHeight;
     });
+    _notifyExpandedChanged();
     _slowController.forward();
   }
 
-  _start(DragStartDetails event) {
+  void _notifyExpandedChanged() {
+    final expanded = (initSize ?? widget.minHeight) > 100;
+    if (_reportedExpanded == expanded) return;
+    _reportedExpanded = expanded;
+    widget.onExpandedChanged?.call(expanded);
+  }
+
+  void _start(DragStartDetails event) {
     setState(() {
       _startdy = event.localPosition.dy;
-      _animation =
-          Tween<double>(begin: initSize, end: initSize).animate(_controller);
+      _animation = Tween<double>(
+        begin: initSize,
+        end: initSize,
+      ).animate(_controller);
     });
     _controller.forward();
   }
 
-  _update(DragUpdateDetails event) {
+  void _update(DragUpdateDetails event) {
     setState(() {
       _move = _startdy - event.localPosition.dy;
-      _animation = Tween<double>(begin: initSize, end: initSize! + _move)
-          .animate(_controller);
+      _animation = Tween<double>(
+        begin: initSize,
+        end: initSize! + _move,
+      ).animate(_controller);
       _slideDirection = _move > 0 ? SlideDirection.up : SlideDirection.down;
     });
     _controller.forward();
   }
 
-  _end() async {
+  Future<void> _end() async {
     if (_slideDirection == SlideDirection.up) {
       if (_move > 50) {
         if (_animation.value > widget.maxHeight + 20) {
           setState(() {
-            _animation =
-                Tween<double>(begin: _animation.value, end: _expandHeight)
-                    .animate(_slowController);
+            _animation = Tween<double>(
+              begin: _animation.value,
+              end: _expandHeight,
+            ).animate(_slowController);
             initSize = _expandHeight;
           });
           _slowController.forward();
         } else {
           setState(() {
-            _animation =
-                Tween<double>(begin: widget.maxHeight, end: widget.maxHeight)
-                    .animate(_controller);
+            _animation = Tween<double>(
+              begin: widget.maxHeight,
+              end: widget.maxHeight,
+            ).animate(_controller);
             initSize = widget.maxHeight;
           });
           _controller.forward();
         }
       } else {
         setState(() {
-          _animation =
-              Tween<double>(begin: _animation.value, end: widget.minHeight)
-                  .animate(_controller);
+          _animation = Tween<double>(
+            begin: _animation.value,
+            end: widget.minHeight,
+          ).animate(_controller);
           initSize = widget.minHeight;
         });
         _controller.forward();
@@ -246,16 +279,18 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
       if (_move > -50) {
         if (_animation.value > widget.maxHeight) {
           setState(() {
-            _animation =
-                Tween<double>(begin: _animation.value, end: _expandHeight)
-                    .animate(_slowController);
+            _animation = Tween<double>(
+              begin: _animation.value,
+              end: _expandHeight,
+            ).animate(_slowController);
             initSize = _expandHeight;
           });
         } else {
           setState(() {
-            _animation =
-                Tween<double>(begin: _animation.value, end: widget.maxHeight)
-                    .animate(_slowController);
+            _animation = Tween<double>(
+              begin: _animation.value,
+              end: widget.maxHeight,
+            ).animate(_slowController);
             initSize = widget.maxHeight;
           });
         }
@@ -263,16 +298,18 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
       } else {
         if (_animation.value > widget.maxHeight) {
           setState(() {
-            _animation =
-                Tween<double>(begin: _animation.value, end: widget.maxHeight)
-                    .animate(_slowController);
+            _animation = Tween<double>(
+              begin: _animation.value,
+              end: widget.maxHeight,
+            ).animate(_slowController);
             initSize = widget.maxHeight;
           });
         } else {
           setState(() {
-            _animation =
-                Tween<double>(begin: _animation.value, end: widget.minHeight)
-                    .animate(_controller);
+            _animation = Tween<double>(
+              begin: _animation.value,
+              end: widget.minHeight,
+            ).animate(_controller);
             initSize = widget.minHeight;
           });
         }
@@ -288,11 +325,12 @@ class AudioPanelState extends State<AudioPanel> with TickerProviderStateMixin {
         initSize = widget.minHeight;
       });
     }
+    _notifyExpandedChanged();
   }
 }
 
 class _AudioPanelRoute extends StatefulWidget {
-  _AudioPanelRoute({this.expandPanel, this.height, Key? key}) : super(key: key);
+  const _AudioPanelRoute() : height = null, expandPanel = null;
   final Widget? expandPanel;
   final double? height;
   @override
@@ -306,47 +344,46 @@ class __AudioPanelRouteState extends State<_AudioPanelRoute> {
       context: context,
       removeTop: true,
       child: Scaffold(
-        body: Stack(children: <Widget>[
-          Container(
-            child: Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                // child:
-                // Container(
-                //   color: Theme.of(context)
-                //       .background
-                //       .withOpacity(0.8),
-                //
-                //),
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: widget.height,
-              decoration: BoxDecoration(
-                color: context.primaryColor,
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0, -1),
-                    blurRadius: 1,
-                    color: context.brightness == Brightness.light
-                        ? Colors.grey[400]!.withOpacity(0.5)
-                        : Colors.grey[800]!,
-                  ),
-                ],
-              ),
-              child: SingleChildScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                child: SizedBox(
-                  height: 300,
-                  child: widget.expandPanel,
+        body: Stack(
+          children: <Widget>[
+            Container(
+              child: Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  // child:
+                  // Container(
+                  //   color: Theme.of(context)
+                  //       .background
+                  //       .withOpacity(0.8),
+                  //
+                  //),
                 ),
               ),
             ),
-          ),
-        ]),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: widget.height,
+                decoration: BoxDecoration(
+                  color: context.primaryColor,
+                  boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, -1),
+                      blurRadius: 1,
+                      color: context.brightness == Brightness.light
+                          ? Colors.grey[400]!.withValues(alpha: 0.5)
+                          : Colors.grey[800]!,
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: SizedBox(height: 300, child: widget.expandPanel),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

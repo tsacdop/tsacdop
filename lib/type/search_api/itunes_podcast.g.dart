@@ -7,7 +7,8 @@ part of 'itunes_podcast.dart';
 // **************************************************************************
 
 ItunesSearchResult<P> _$ItunesSearchResultFromJson<P>(
-    Map<String, dynamic> json) {
+  Map<String, dynamic> json,
+) {
   return ItunesSearchResult<P>(
     resultCount: json['resultCount'] as int?,
     results: (json['results'] as List?)?.map(_ConvertP<P>().fromJson).toList(),
@@ -15,11 +16,11 @@ ItunesSearchResult<P> _$ItunesSearchResultFromJson<P>(
 }
 
 Map<String, dynamic> _$ItunesSearchResultToJson<P>(
-        ItunesSearchResult<P> instance) =>
-    <String, dynamic>{
-      'results': instance.results?.map(_ConvertP<P>().toJson).toList(),
-      'resultCount': instance.resultCount,
-    };
+  ItunesSearchResult<P> instance,
+) => <String, dynamic>{
+  'results': instance.results?.map(_ConvertP<P>().toJson).toList(),
+  'resultCount': instance.resultCount,
+};
 
 ItunesPodcast _$ItunesPodcastFromJson(Map<String, dynamic> json) {
   return ItunesPodcast(

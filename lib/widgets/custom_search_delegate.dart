@@ -9,9 +9,7 @@ Future<T?> showSearch<T>({
 }) {
   delegate.query = query;
   delegate._currentBody = _SearchBody.suggestions;
-  return Navigator.of(context).push(_SearchPageRoute<T>(
-    delegate: delegate,
-  ));
+  return Navigator.of(context).push(_SearchPageRoute<T>(delegate: delegate));
 }
 
 abstract class SearchDelegate<T> {
@@ -49,8 +47,10 @@ abstract class SearchDelegate<T> {
   }
 
   void showSuggestions(BuildContext context) {
-    assert(_focusNode != null,
-        '_focusNode must be set by route before showSuggestions is called.');
+    assert(
+      _focusNode != null,
+      '_focusNode must be set by route before showSuggestions is called.',
+    );
     _focusNode!.requestFocus();
     _currentBody = _SearchBody.suggestions;
   }
@@ -77,8 +77,9 @@ abstract class SearchDelegate<T> {
 
   final TextEditingController _queryTextController = TextEditingController();
 
-  final ProxyAnimation _proxyAnimation =
-      ProxyAnimation(kAlwaysDismissedAnimation);
+  final ProxyAnimation _proxyAnimation = ProxyAnimation(
+    kAlwaysDismissedAnimation,
+  );
 
   final ValueNotifier<_SearchBody?> _currentBodyNotifier =
       ValueNotifier<_SearchBody?>(null);
@@ -91,15 +92,10 @@ abstract class SearchDelegate<T> {
   _SearchPageRoute<T>? _route;
 }
 
-enum _SearchBody {
-  suggestions,
-  results,
-}
+enum _SearchBody { suggestions, results }
 
 class _SearchPageRoute<T> extends PageRoute<T> {
-  _SearchPageRoute({
-    required this.delegate,
-  }) {
+  _SearchPageRoute({required this.delegate}) {
     assert(
       delegate._route == null,
       'The ${delegate.runtimeType} instance is currently used by another active '
@@ -130,10 +126,7 @@ class _SearchPageRoute<T> extends PageRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return FadeTransition(
-      opacity: animation,
-      child: child,
-    );
+    return FadeTransition(opacity: animation, child: child);
   }
 
   @override
@@ -149,10 +142,7 @@ class _SearchPageRoute<T> extends PageRoute<T> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return _SearchPage<T>(
-      delegate: delegate,
-      animation: animation,
-    );
+    return _SearchPage<T>(delegate: delegate, animation: animation);
   }
 
   @override
@@ -165,10 +155,7 @@ class _SearchPageRoute<T> extends PageRoute<T> {
 }
 
 class _SearchPage<T> extends StatefulWidget {
-  const _SearchPage({
-    this.delegate,
-    this.animation,
-  });
+  const _SearchPage({this.delegate, this.animation});
 
   final SearchDelegate<T>? delegate;
   final Animation<double>? animation;
@@ -218,8 +205,9 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
     if (widget.delegate != oldWidget.delegate) {
       oldWidget.delegate!._queryTextController.removeListener(_onQueryChanged);
       widget.delegate!._queryTextController.addListener(_onQueryChanged);
-      oldWidget.delegate!._currentBodyNotifier
-          .removeListener(_onSearchBodyChanged);
+      oldWidget.delegate!._currentBodyNotifier.removeListener(
+        _onSearchBodyChanged,
+      );
       widget.delegate!._currentBodyNotifier.addListener(_onSearchBodyChanged);
       oldWidget.delegate!._focusNode = null;
       widget.delegate!._focusNode = focusNode;
@@ -249,9 +237,11 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterialLocalizations(context));
     final ThemeData theme = widget.delegate!.appBarTheme(context);
-    final String searchFieldLabel = widget.delegate!.searchFieldLabel ??
+    final String searchFieldLabel =
+        widget.delegate!.searchFieldLabel ??
         MaterialLocalizations.of(context).searchFieldLabel;
-    final TextStyle? searchFieldStyle = widget.delegate!.searchFieldStyle ??
+    final TextStyle? searchFieldStyle =
+        widget.delegate!.searchFieldStyle ??
         theme.inputDecorationTheme.hintStyle;
     int? index;
     switch (widget.delegate!._currentBody) {
@@ -291,7 +281,7 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
           title: TextField(
             controller: widget.delegate!._queryTextController,
             focusNode: focusNode,
-            style: theme.textTheme.headline6,
+            style: theme.textTheme.titleLarge,
             textInputAction: widget.delegate!.textInputAction,
             keyboardType: widget.delegate!.keyboardType,
             onSubmitted: (String _) {
@@ -315,7 +305,7 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
             KeyedSubtree(
               key: const ValueKey<_SearchBody>(_SearchBody.results),
               child: widget.delegate!.buildResults(context),
-            )
+            ),
           ],
         ),
         // AnimatedSwitcher(

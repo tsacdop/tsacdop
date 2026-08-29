@@ -1,0 +1,274 @@
+package dev.fluttercommunity.workmanager
+
+import dev.fluttercommunity.workmanager.pigeon.ContinuedProcessingTaskRequest
+import dev.fluttercommunity.workmanager.pigeon.HealthResearchTaskRequest
+import dev.fluttercommunity.workmanager.pigeon.InitializeRequest
+import dev.fluttercommunity.workmanager.pigeon.OneOffTaskRequest
+import dev.fluttercommunity.workmanager.pigeon.PeriodicTaskRequest
+import dev.fluttercommunity.workmanager.pigeon.ProcessingTaskRequest
+import dev.fluttercommunity.workmanager.pigeon.WorkInfoData
+import dev.fluttercommunity.workmanager.pigeon.WorkmanagerHostApi
+import io.flutter.embedding.engine.plugins.FlutterPlugin
+
+private const val INIT_REQUIRED =
+    "You have not properly initialized the Flutter WorkManager Package. " +
+        "You should ensure you have called the 'initialize' function first!"
+
+/**
+ * Pigeon-based implementation of WorkmanagerHostApi for Android.
+ * Replaces the manual method channel and data extraction approach.
+ */
+class WorkmanagerPlugin :
+    FlutterPlugin,
+    WorkmanagerHostApi {
+    private var workManagerWrapper: WorkManagerWrapper? = null
+    private lateinit var preferenceManager: SharedPreferenceHelper
+
+    private var currentDispatcherHandle: Long = -1L
+
+    /**
+     * The binding of the engine this plugin is attached to. Used to resolve
+     * the app-facing messenger for progress updates.
+     */
+    private var pluginBinding: FlutterPlugin.FlutterPluginBinding? = null
+
+    /**
+     * The worker currently running on this plugin's engine, if any. Background
+     * workers bind themselves to the plugin instance attached to their own
+     * engine; the app-facing plugin instance stays unbound.
+     */
+    private var boundWorker: BackgroundWorker? = null
+
+    /**
+     * Binds a background worker to this plugin instance (see [boundWorker]).
+     */
+    internal fun bindWorker(worker: BackgroundWorker) {
+        boundWorker = worker
+    }
+
+    /**
+     * Unbinds a background worker from this plugin instance. Unbinding is
+     * idempotent and only clears the binding when [worker] is the bound one,
+     * so a worker that finishes after its replacement already bound itself
+     * never unbinds the replacement.
+     */
+    internal fun unbindWorker(worker: BackgroundWorker) {
+        if (boundWorker === worker) {
+            boundWorker = null
+        }
+    }
+
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        pluginBinding = binding
+        preferenceManager =
+            SharedPreferenceHelper(
+                binding.applicationContext,
+                object : SharedPreferenceHelper.DispatcherHandleListener {
+                    override fun onDispatcherHandleChanged(handle: Long) {
+                        currentDispatcherHandle = handle
+                    }
+                },
+            )
+        workManagerWrapper = WorkManagerWrapper(binding.applicationContext)
+        WorkmanagerHostApi.setUp(binding.binaryMessenger, this)
+    }
+
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        WorkmanagerHostApi.setUp(binding.binaryMessenger, null)
+        workManagerWrapper = null
+        pluginBinding = null
+    }
+
+    override fun initialize(
+        request: InitializeRequest,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        try {
+            val handle = request.callbackHandle
+
+            // Save to SharedPreferences
+            preferenceManager.saveCallbackDispatcherHandleKey(handle)
+
+            // Update the local variable to match
+            currentDispatcherHandle = handle
+
+            // The engine that initializes the plugin is the one the app talks
+            // to; progress updates are forwarded on this messenger.
+            pluginBinding?.let {
+                ProgressUpdateCoordinator.setAppMessenger(enabled = true, messenger = it.binaryMessenger)
+            }
+
+            callback(Result.success(Unit))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    override fun registerOneOffTask(
+        request: OneOffTaskRequest,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        if (currentDispatcherHandle == -1L) {
+            callback(Result.failure(Exception(INIT_REQUIRED)))
+            return
+        }
+
+        try {
+            workManagerWrapper!!.enqueueOneOffTask(request = request)
+            callback(Result.success(Unit))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    override fun registerPeriodicTask(
+        request: PeriodicTaskRequest,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        if (currentDispatcherHandle == -1L) {
+            callback(Result.failure(Exception(INIT_REQUIRED)))
+            return
+        }
+
+        try {
+            workManagerWrapper!!.enqueuePeriodicTask(request = request)
+            callback(Result.success(Unit))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    override fun registerProcessingTask(
+        request: ProcessingTaskRequest,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        // Processing tasks are iOS-specific
+        callback(Result.failure(UnsupportedOperationException("Processing tasks are not supported on Android")))
+    }
+
+    override fun registerHealthResearchTask(
+        request: HealthResearchTaskRequest,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        // Health research tasks are iOS 17+-specific
+        callback(
+            Result.failure(
+                UnsupportedOperationException(
+                    "Health research tasks are not supported on Android",
+                ),
+            ),
+        )
+    }
+
+    override fun registerContinuedProcessingTask(
+        request: ContinuedProcessingTaskRequest,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        // Continued processing tasks are iOS 26+-specific
+        callback(
+            Result.failure(
+                UnsupportedOperationException(
+                    "Continued processing tasks are not supported on Android",
+                ),
+            ),
+        )
+    }
+
+    override fun cancelByUniqueName(
+        uniqueName: String,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        try {
+            workManagerWrapper!!.cancelByUniqueName(uniqueName)
+            callback(Result.success(Unit))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    override fun cancelByTag(
+        tag: String,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        try {
+            workManagerWrapper!!.cancelByTag(tag)
+            callback(Result.success(Unit))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    override fun cancelAll(callback: (Result<Unit>) -> Unit) {
+        try {
+            workManagerWrapper!!.cancelAll()
+            callback(Result.success(Unit))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    override fun isScheduledByUniqueName(
+        uniqueName: String,
+        callback: (Result<Boolean>) -> Unit,
+    ) {
+        try {
+            val workInfos = workManagerWrapper!!.getWorkInfoByUniqueName(uniqueName).get()
+            val scheduled =
+                workInfos.isNotEmpty() &&
+                    workInfos.all { it.state == androidx.work.WorkInfo.State.ENQUEUED || it.state == androidx.work.WorkInfo.State.RUNNING }
+            callback(Result.success(scheduled))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    override fun printScheduledTasks(callback: (Result<String>) -> Unit) {
+        // Not supported on Android
+        callback(Result.failure(UnsupportedOperationException("printScheduledTasks is not supported on Android")))
+    }
+
+    override fun getWorkInfoByUniqueName(
+        uniqueName: String,
+        callback: (Result<WorkInfoData?>) -> Unit,
+    ) {
+        try {
+            val workInfos = workManagerWrapper!!.getWorkInfoByUniqueName(uniqueName).get()
+            // A unique work name maps to the chain of WorkRequests enqueued
+            // under it (usually one). The head of the chain is the work the
+            // app cares about; a cancelled or pruned chain yields an empty
+            // list, which is reported as "no record" (null).
+            callback(Result.success(workInfos.firstOrNull()?.toWorkInfoData(uniqueName)))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    override fun reportProgress(
+        progress: Map<String?, Any?>?,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        val worker = boundWorker
+        if (worker == null) {
+            // reportProgress outside of a running task (e.g. called from the
+            // app isolate) has nothing to attach to. Keep it a no-op so
+            // portable handlers that report progress unconditionally do not
+            // crash on Android either.
+            callback(Result.success(Unit))
+            return
+        }
+        worker.reportProgress(progress)
+        callback(Result.success(Unit))
+    }
+
+    override fun setProgressListener(
+        enabled: Boolean,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        // (Re)bind the app-facing messenger for progress updates. This call
+        // always originates from the engine the app talks to.
+        pluginBinding?.let {
+            ProgressUpdateCoordinator.setAppMessenger(enabled = enabled, messenger = it.binaryMessenger)
+        }
+        callback(Result.success(Unit))
+    }
+}

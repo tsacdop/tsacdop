@@ -1,10 +1,14 @@
 package com.stonegate.tsacdop
+
+import android.app.Application
 import com.rmawatson.flutterisolate.FlutterIsolatePlugin
-import io.flutter.app.FlutterApplication
 import io.flutter.plugins.IsolatePluginRegistrant
 
-public class MainApplication: FlutterApplication() {
-    public fun MainApplication() {
-        FlutterIsolatePlugin.setCustomIsolateRegistrant(IsolatePluginRegistrant::class.java);
+class MainApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        FlutterIsolatePlugin.setCustomIsolateRegistrant(
+            IsolatePluginRegistrant::class.java,
+        )
     }
 }

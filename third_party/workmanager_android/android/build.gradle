@@ -1,0 +1,60 @@
+group 'dev.fluttercommunity.workmanager'
+version '1.0'
+
+rootProject.allprojects {
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    namespace = 'dev.fluttercommunity.workmanager'
+    compileSdk = 37
+    compileSdkMinor = 0
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        def wmDataSyncEnabled =
+            project.findProperty('workmanager.enableDataSyncForegroundService')
+                ?.toString() == 'true'
+        if (wmDataSyncEnabled) {
+            main.manifest.srcFile 'src/main/AndroidManifest.dataSync.xml'
+        }
+    }
+
+    defaultConfig {
+        minSdk = 24
+        testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
+    }
+
+    lint {
+        disable 'InvalidPackage'
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
+dependencies {
+    def workVersion = '2.11.2'
+    implementation "androidx.work:work-runtime:$workVersion"
+    implementation 'androidx.concurrent:concurrent-futures:1.1.0'
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
+    testImplementation 'org.json:json:20240303'
+    testImplementation 'org.robolectric:robolectric:4.16.1'
+}

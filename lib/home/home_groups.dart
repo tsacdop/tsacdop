@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:focused_menu/focused_menu.dart';
@@ -32,6 +32,8 @@ import '../widgets/custom_widget.dart';
 import '../widgets/general_dialog.dart';
 
 class ScrollPodcasts extends StatefulWidget {
+  const ScrollPodcasts({super.key});
+
   @override
   _ScrollPodcastsState createState() => _ScrollPodcastsState();
 }
@@ -42,12 +44,16 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   late AnimationController _controller;
   late TweenSequence _slideTween;
   TweenSequence<double> _getSlideTween(double value) => TweenSequence<double>([
-        TweenSequenceItem(
-            tween: Tween<double>(begin: 0.0, end: value), weight: 3 / 5),
-        TweenSequenceItem(tween: ConstantTween<double>(value), weight: 1 / 5),
-        TweenSequenceItem(
-            tween: Tween<double>(begin: -value, end: 0), weight: 1 / 5)
-      ]);
+    TweenSequenceItem(
+      tween: Tween<double>(begin: 0.0, end: value),
+      weight: 3 / 5,
+    ),
+    TweenSequenceItem(tween: ConstantTween<double>(value), weight: 1 / 5),
+    TweenSequenceItem(
+      tween: Tween<double>(begin: -value, end: 0),
+      weight: 1 / 5,
+    ),
+  ]);
 
   @override
   void initState() {
@@ -74,19 +80,23 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final s = context.s;
-    return Selector2<GroupList, RefreshWorker,
-        tuple.Tuple3<List<PodcastGroup?>, bool, bool>>(
+    return Selector2<
+      GroupList,
+      RefreshWorker,
+      tuple.Tuple3<List<PodcastGroup?>, bool, bool>
+    >(
       selector: (_, groupList, refreshWorker) => tuple.Tuple3(
-          groupList.groups, groupList.created, refreshWorker.created),
-      builder: (_, data, __) {
+        groupList.groups,
+        groupList.created,
+        refreshWorker.created,
+      ),
+      builder: (_, data, _) {
         final groups = data.item1;
         final import = data.item2;
         if (groups.isEmpty) {
-          return SizedBox(
-            height: (width - 20) / 3 + 140,
-          );
+          return SizedBox(height: (width - 20) / 3 + 140);
         }
-        if (groups[_groupIndex]!.podcastList.length == 0) {
+        if (groups[_groupIndex]!.podcastList.isEmpty) {
           return SizedBox(
             height: (width - 20) / 3 + 140,
             child: Column(
@@ -118,13 +128,11 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                         );
                       } else {
                         if (mounted) {
-                          setState(
-                            () {
-                              (_groupIndex < groups.length - 1)
-                                  ? _groupIndex++
-                                  : _groupIndex = 0;
-                            },
-                          );
+                          setState(() {
+                            (_groupIndex < groups.length - 1)
+                                ? _groupIndex++
+                                : _groupIndex = 0;
+                          });
                         }
                       }
                     }
@@ -139,8 +147,9 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                               padding: EdgeInsets.symmetric(horizontal: 15.0),
                               child: Text(
                                 groups[_groupIndex]!.name!,
-                                style: context.textTheme.bodyText1!
-                                    .copyWith(color: context.accentColor),
+                                style: context.textTheme.bodyLarge!.copyWith(
+                                  color: context.accentColor,
+                                ),
                               ),
                             ),
                             Spacer(),
@@ -153,7 +162,8 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                     Navigator.push(
                                       context,
                                       SlideLeftRoute(
-                                        page: context
+                                        page:
+                                            context
                                                 .read<SettingState>()
                                                 .openAllPodcastDefalt!
                                             ? PodcastList()
@@ -174,12 +184,12 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                   padding: const EdgeInsets.all(5.0),
                                   child: Text(
                                     s.homeGroupsSeeAll,
-                                    style:
-                                        context.textTheme.bodyText1!.copyWith(
-                                      color: import
-                                          ? context.primaryColorDark
-                                          : context.accentColor,
-                                    ),
+                                    style: context.textTheme.bodyLarge!
+                                        .copyWith(
+                                          color: import
+                                              ? context.primaryColorDark
+                                              : context.accentColor,
+                                        ),
                                   ),
                                 ),
                               ),
@@ -188,15 +198,16 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                         ),
                       ),
                       Container(
-                          height: 70,
-                          color: context.background,
-                          child: Row(
-                            children: <Widget>[
-                              _circleContainer(context),
-                              _circleContainer(context),
-                              _circleContainer(context)
-                            ],
-                          )),
+                        height: 70,
+                        color: context.background,
+                        child: Row(
+                          children: <Widget>[
+                            _circleContainer(context),
+                            _circleContainer(context),
+                            _circleContainer(context),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -205,29 +216,41 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                   color: context.background,
                   margin: EdgeInsets.symmetric(horizontal: 15),
                   child: Center(
-                      child: _groupIndex == 0
-                          ? Text.rich(TextSpan(
-                              style: context.textTheme.headline6!
-                                  .copyWith(height: 2),
+                    child: _groupIndex == 0
+                        ? Text.rich(
+                            TextSpan(
+                              style: context.textTheme.titleLarge!.copyWith(
+                                height: 2,
+                              ),
                               children: [
                                 TextSpan(
-                                    text: 'Welcome to Tsacdop\n',
-                                    style: context.textTheme.headline6!
-                                        .copyWith(color: context.accentColor)),
+                                  text: 'Welcome to Tsacdop\n',
+                                  style: context.textTheme.titleLarge!.copyWith(
+                                    color: context.accentColor,
+                                  ),
+                                ),
                                 TextSpan(
-                                    text: 'Get started\n',
-                                    style: context.textTheme.headline6!
-                                        .copyWith(color: context.accentColor)),
+                                  text: 'Get started\n',
+                                  style: context.textTheme.titleLarge!.copyWith(
+                                    color: context.accentColor,
+                                  ),
+                                ),
                                 TextSpan(text: 'Tap '),
                                 WidgetSpan(
-                                    child: Icon(Icons.add_circle_outline)),
-                                TextSpan(text: ' to search podcasts')
+                                  child: Icon(Icons.add_circle_outline),
+                                ),
+                                TextSpan(text: ' to search podcasts'),
                               ],
-                            ))
-                          : Text(s.noPodcastGroup,
-                              style: TextStyle(
-                                  color: context.textTheme.bodyText2!.color!
-                                      .withOpacity(0.5)))),
+                            ),
+                          )
+                        : Text(
+                            s.noPodcastGroup,
+                            style: TextStyle(
+                              color: context.textTheme.bodyMedium!.color!
+                                  .withValues(alpha: 0.5),
+                            ),
+                          ),
+                  ),
                 ),
               ],
             ),
@@ -288,13 +311,16 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                       child: Row(
                         children: <Widget>[
                           Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15.0),
-                              child: Text(
-                                groups[_groupIndex]!.name!,
-                                style: context.textTheme.bodyText1!
-                                    .copyWith(color: context.accentColor),
-                              )),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15.0,
+                            ),
+                            child: Text(
+                              groups[_groupIndex]!.name!,
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                color: context.accentColor,
+                              ),
+                            ),
+                          ),
                           Spacer(),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -304,11 +330,13 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                   Navigator.push(
                                     context,
                                     SlideLeftRoute(
-                                        page: context
-                                                .read<SettingState>()
-                                                .openAllPodcastDefalt!
-                                            ? PodcastList()
-                                            : PodcastManage()),
+                                      page:
+                                          context
+                                              .read<SettingState>()
+                                              .openAllPodcastDefalt!
+                                          ? PodcastList()
+                                          : PodcastManage(),
+                                    ),
                                   );
                                 }
                               },
@@ -325,14 +353,15 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                                 padding: const EdgeInsets.all(5.0),
                                 child: Text(
                                   s.homeGroupsSeeAll,
-                                  style: context.textTheme.bodyText1!.copyWith(
-                                      color: import
-                                          ? context.primaryColorDark
-                                          : context.accentColor),
+                                  style: context.textTheme.bodyLarge!.copyWith(
+                                    color: import
+                                        ? context.primaryColorDark
+                                        : context.accentColor,
+                                  ),
                                 ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -343,24 +372,36 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                       color: context.background,
                       child: TabBar(
                         labelPadding: EdgeInsets.fromLTRB(6.0, 5.0, 6.0, 10.0),
+                        dividerColor: Colors.transparent,
+                        dividerHeight: 0,
                         indicator: CircleTabIndicator(
-                            color: context.accentColor, radius: 3),
+                          color: context.accentColor,
+                          radius: 3,
+                        ),
                         isScrollable: true,
-                        tabs: groups[_groupIndex]!
-                            .podcasts
-                            .map<Widget>((podcastLocal) {
+                        tabAlignment: TabAlignment.start,
+                        overlayColor: const WidgetStatePropertyAll<Color>(
+                          Colors.transparent,
+                        ),
+                        splashFactory: NoSplash.splashFactory,
+                        tabs: groups[_groupIndex]!.podcasts.map<Widget>((
+                          podcastLocal,
+                        ) {
                           final color = podcastLocal.backgroudColor(context);
                           return Tab(
                             child: Transform.translate(
                               offset: Offset(
-                                  0, _slideTween.animate(_controller).value),
+                                0,
+                                _slideTween.animate(_controller).value,
+                              ),
                               child: LimitedBox(
                                 maxHeight: 50,
                                 maxWidth: 50,
                                 child: CircleAvatar(
-                                    backgroundColor: color.withOpacity(0.5),
-                                    backgroundImage: podcastLocal.avatarImage,
-                                    child: _updateIndicator(podcastLocal)),
+                                  backgroundColor: color.withValues(alpha: 0.5),
+                                  backgroundImage: podcastLocal.avatarImage,
+                                  child: _updateIndicator(podcastLocal),
+                                ),
                               ),
                             ),
                           );
@@ -377,40 +418,39 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TabBarView(
-                  children: groups[_groupIndex]!.podcasts.map<Widget>(
-                    (podcastLocal) {
-                      return Container(
-                        decoration: BoxDecoration(
-                            color: context.brightness == Brightness.light
-                                ? context.primaryColor
-                                : Colors.black12),
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
-                        key: ObjectKey(podcastLocal.title),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                HidePlayerRoute(
-                                  PodcastDetail(
-                                    podcastLocal: podcastLocal,
-                                  ),
-                                  PodcastDetail(
-                                      podcastLocal: podcastLocal, hide: true),
-                                  duration: Duration(milliseconds: 300),
+                  children: groups[_groupIndex]!.podcasts.map<Widget>((
+                    podcastLocal,
+                  ) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: context.brightness == Brightness.light
+                            ? context.primaryColor
+                            : Colors.black12,
+                      ),
+                      margin: EdgeInsets.symmetric(horizontal: 5.0),
+                      key: ObjectKey(podcastLocal.title),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              HidePlayerRoute(
+                                PodcastDetail(podcastLocal: podcastLocal),
+                                PodcastDetail(
+                                  podcastLocal: podcastLocal,
+                                  hide: true,
                                 ),
-                              );
-                            },
-                            child: PodcastPreview(
-                              podcastLocal: podcastLocal,
-                            ),
-                          ),
+                                duration: Duration(milliseconds: 300),
+                              ),
+                            );
+                          },
+                          child: PodcastPreview(podcastLocal: podcastLocal),
                         ),
-                      );
-                    },
-                  ).toList(),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
             ],
@@ -426,40 +466,42 @@ class _ScrollPodcastsState extends State<ScrollPodcasts>
   }
 
   Widget _circleContainer(BuildContext context) => Container(
-        margin: EdgeInsets.symmetric(horizontal: 10),
-        height: 50,
-        width: 50,
-        decoration:
-            BoxDecoration(shape: BoxShape.circle, color: context.primaryColor),
-      );
+    margin: EdgeInsets.symmetric(horizontal: 10),
+    height: 50,
+    width: 50,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: context.primaryColor,
+    ),
+  );
 
   Widget _updateIndicator(PodcastLocal podcastLocal) => FutureBuilder<int?>(
-        future: _getPodcastUpdateCounts(podcastLocal.id),
-        initialData: 0,
-        builder: (context, snapshot) {
-          return snapshot.data! > 0
-              ? Align(
-                  alignment: Alignment.bottomRight,
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 10,
-                    width: 10,
-                    decoration: BoxDecoration(
-                        color: Colors.red,
-                        border:
-                            Border.all(color: context.primaryColor, width: 2),
-                        shape: BoxShape.circle),
-                  ),
-                )
-              : Center();
-        },
-      );
+    future: _getPodcastUpdateCounts(podcastLocal.id),
+    initialData: 0,
+    builder: (context, snapshot) {
+      return snapshot.data! > 0
+          ? Align(
+              alignment: Alignment.bottomRight,
+              child: Container(
+                alignment: Alignment.center,
+                height: 10,
+                width: 10,
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  border: Border.all(color: context.primaryColor, width: 2),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            )
+          : Center();
+    },
+  );
 }
 
 class PodcastPreview extends StatefulWidget {
   final PodcastLocal? podcastLocal;
 
-  PodcastPreview({this.podcastLocal, Key? key}) : super(key: key);
+  const PodcastPreview({this.podcastLocal, super.key});
 
   @override
   _PodcastPreviewState createState() => _PodcastPreviewState();
@@ -483,20 +525,19 @@ class _PodcastPreviewState extends State<PodcastPreview> {
           child: Selector2<RefreshWorker, GroupList, tuple.Tuple2<bool, bool>>(
             selector: (_, refreshWorker, groupWorker) =>
                 tuple.Tuple2(refreshWorker.created, groupWorker.created),
-            builder: (_, data, __) {
+            builder: (_, data, _) {
               _getRssItem = _getRssItemTop(widget.podcastLocal!);
               return FutureBuilder<List<EpisodeBrief>>(
-                future:
-                    _getRssItem!.then((value) => value as List<EpisodeBrief>),
+                future: _getRssItem!.then(
+                  (value) => value as List<EpisodeBrief>,
+                ),
                 builder: (context, snapshot) {
                   return (snapshot.hasData)
                       ? ShowEpisode(
                           episodes: snapshot.data,
                           podcastLocal: widget.podcastLocal,
                         )
-                      : Padding(
-                          padding: const EdgeInsets.all(5.0),
-                        );
+                      : Padding(padding: const EdgeInsets.all(5.0));
                 },
               );
             },
@@ -546,7 +587,7 @@ class ShowEpisode extends StatelessWidget {
   final List<EpisodeBrief>? episodes;
   final PodcastLocal? podcastLocal;
   final DBHelper _dbHelper = DBHelper();
-  ShowEpisode({Key? key, this.episodes, this.podcastLocal}) : super(key: key);
+  ShowEpisode({super.key, this.episodes, this.podcastLocal});
 
   @override
   Widget build(BuildContext context) {
@@ -566,53 +607,59 @@ class ShowEpisode extends StatelessWidget {
               mainAxisSpacing: 20,
               crossAxisSpacing: 14,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final c = podcastLocal!.backgroudColor(context);
-                return Selector<AudioPlayerNotifier,
-                    tuple.Tuple3<EpisodeBrief?, List<String>, bool>>(
-                  selector: (_, audio) => tuple.Tuple3(
-                      audio.episode,
-                      audio.queue.episodes.map((e) => e!.enclosureUrl).toList(),
-                      audio.playerRunning),
-                  builder: (_, data, __) => FutureBuilder<
-                      tuple.Tuple5<int, bool, bool, bool, List<int>>>(
-                    future: _initData(episodes![index]),
-                    initialData: tuple.Tuple5(0, false, false, false, []),
-                    builder: (context, snapshot) {
-                      final isListened = snapshot.data!.item1;
-                      final isLiked = snapshot.data!.item2;
-                      final isDownloaded = snapshot.data!.item3;
-                      final tapToOpen = snapshot.data!.item4;
-                      final menuList = snapshot.data!.item5;
-                      return Align(
-                        alignment: Alignment.center,
-                        child: FocusedMenuHolder(
-                          blurSize: 0.0,
-                          menuItemExtent: 45,
-                          menuBoxDecoration: BoxDecoration(
-                            color: context.priamryContainer,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(15.0),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final c = podcastLocal!.backgroudColor(context);
+              return Selector<
+                AudioPlayerNotifier,
+                tuple.Tuple3<EpisodeBrief?, List<String>, bool>
+              >(
+                selector: (_, audio) => tuple.Tuple3(
+                  audio.episode,
+                  audio.queue.episodes.map((e) => e!.enclosureUrl).toList(),
+                  audio.playerRunning,
+                ),
+                builder: (_, data, _) =>
+                    FutureBuilder<
+                      tuple.Tuple5<int, bool, bool, bool, List<int>>
+                    >(
+                      future: _initData(episodes![index]),
+                      initialData: tuple.Tuple5(0, false, false, false, []),
+                      builder: (context, snapshot) {
+                        final isListened = snapshot.data!.item1;
+                        final isLiked = snapshot.data!.item2;
+                        final isDownloaded = snapshot.data!.item3;
+                        final tapToOpen = snapshot.data!.item4;
+                        final menuList = snapshot.data!.item5;
+                        return Align(
+                          alignment: Alignment.center,
+                          child: FocusedMenuHolder(
+                            blurSize: 0.0,
+                            menuItemExtent: 45,
+                            menuBoxDecoration: BoxDecoration(
+                              color: context.priamryContainer,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(15.0),
+                              ),
                             ),
-                          ),
-                          duration: Duration(milliseconds: 100),
-                          tapMode:
-                              tapToOpen ? TapMode.onTap : TapMode.onLongPress,
-                          animateMenuItems: false,
-                          blurBackgroundColor:
-                              context.brightness == Brightness.light
-                                  ? Colors.white38
-                                  : Colors.black38,
-                          bottomOffsetHeight: 10,
-                          menuOffset: 6,
-                          menuItems: <FocusedMenuItem>[
-                            FocusedMenuItem(
+                            duration: Duration(milliseconds: 100),
+                            tapMode: tapToOpen
+                                ? TapMode.onTap
+                                : TapMode.onLongPress,
+                            animateMenuItems: false,
+                            blurBackgroundColor:
+                                context.brightness == Brightness.light
+                                ? Colors.white38
+                                : Colors.black38,
+                            bottomOffsetHeight: 10,
+                            menuOffset: 6,
+                            menuItems: <FocusedMenuItem>[
+                              FocusedMenuItem(
                                 backgroundColor: context.priamryContainer,
-                                title: Text(data.item1 != episodes![index] ||
-                                        !data.item3
-                                    ? s.play
-                                    : s.playing),
+                                title: Text(
+                                  data.item1 != episodes![index] || !data.item3
+                                      ? s.play
+                                      : s.playing,
+                                ),
                                 trailingIcon: Icon(
                                   LineIcons.playCircle,
                                   color: context.accentColor,
@@ -622,12 +669,15 @@ class ShowEpisode extends StatelessWidget {
                                       !data.item3) {
                                     audio.episodeLoad(episodes![index]);
                                   }
-                                }),
-                            if (menuList.contains(1))
-                              FocusedMenuItem(
+                                },
+                              ),
+                              if (menuList.contains(1))
+                                FocusedMenuItem(
                                   backgroundColor: context.priamryContainer,
-                                  title: data.item2.contains(
-                                          episodes![index].enclosureUrl)
+                                  title:
+                                      data.item2.contains(
+                                        episodes![index].enclosureUrl,
+                                      )
                                       ? Text(s.remove)
                                       : Text(s.later),
                                   trailingIcon: Icon(
@@ -636,7 +686,8 @@ class ShowEpisode extends StatelessWidget {
                                   ),
                                   onPressed: () {
                                     if (!data.item2.contains(
-                                        episodes![index].enclosureUrl)) {
+                                      episodes![index].enclosureUrl,
+                                    )) {
                                       audio.addToPlaylist(episodes![index]);
                                       Fluttertoast.showToast(
                                         msg: s.toastAddPlaylist,
@@ -649,18 +700,24 @@ class ShowEpisode extends StatelessWidget {
                                         gravity: ToastGravity.BOTTOM,
                                       );
                                     }
-                                  }),
-                            if (menuList.contains(2))
-                              FocusedMenuItem(
+                                  },
+                                ),
+                              if (menuList.contains(2))
+                                FocusedMenuItem(
                                   backgroundColor: context.priamryContainer,
-                                  title:
-                                      isLiked ? Text(s.unlike) : Text(s.like),
-                                  trailingIcon: Icon(LineIcons.heart,
-                                      color: Colors.red, size: 21),
+                                  title: isLiked
+                                      ? Text(s.unlike)
+                                      : Text(s.like),
+                                  trailingIcon: Icon(
+                                    LineIcons.heart,
+                                    color: Colors.red,
+                                    size: 21,
+                                  ),
                                   onPressed: () async {
                                     if (isLiked) {
                                       await _setUnliked(
-                                          episodes![index].enclosureUrl);
+                                        episodes![index].enclosureUrl,
+                                      );
                                       audio.setEpisodeState = true;
                                       Fluttertoast.showToast(
                                         msg: s.unliked,
@@ -668,22 +725,28 @@ class ShowEpisode extends StatelessWidget {
                                       );
                                     } else {
                                       await _saveLiked(
-                                          episodes![index].enclosureUrl);
+                                        episodes![index].enclosureUrl,
+                                      );
                                       audio.setEpisodeState = true;
                                       Fluttertoast.showToast(
                                         msg: s.liked,
                                         gravity: ToastGravity.BOTTOM,
                                       );
                                     }
-                                  }),
-                            if (menuList.contains(3))
-                              FocusedMenuItem(
+                                  },
+                                ),
+                              if (menuList.contains(3))
+                                FocusedMenuItem(
                                   backgroundColor: context.priamryContainer,
                                   title: isListened > 0
-                                      ? Text(s.listened,
+                                      ? Text(
+                                          s.listened,
                                           style: TextStyle(
-                                              color: context.textColor
-                                                  .withOpacity(0.5)))
+                                            color: context.textColor.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                          ),
+                                        )
                                       : Text(
                                           s.markListened,
                                           maxLines: 1,
@@ -693,8 +756,11 @@ class ShowEpisode extends StatelessWidget {
                                     width: 23,
                                     height: 23,
                                     child: CustomPaint(
-                                        painter: ListenedAllPainter(Colors.blue,
-                                            stroke: 1.5)),
+                                      painter: ListenedAllPainter(
+                                        Colors.blue,
+                                        stroke: 1.5,
+                                      ),
+                                    ),
                                   ),
                                   onPressed: () async {
                                     if (isListened < 1) {
@@ -705,90 +771,104 @@ class ShowEpisode extends StatelessWidget {
                                         gravity: ToastGravity.BOTTOM,
                                       );
                                     }
-                                  }),
-                            if (menuList.contains(4))
-                              FocusedMenuItem(
+                                  },
+                                ),
+                              if (menuList.contains(4))
+                                FocusedMenuItem(
                                   backgroundColor: context.priamryContainer,
                                   title: isDownloaded
-                                      ? Text(s.downloaded,
+                                      ? Text(
+                                          s.downloaded,
                                           style: TextStyle(
-                                              color: context.textColor
-                                                  .withOpacity(0.5)))
+                                            color: context.textColor.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                          ),
+                                        )
                                       : Text(s.download),
-                                  trailingIcon: Icon(LineIcons.download,
-                                      color: Colors.green),
+                                  trailingIcon: Icon(
+                                    LineIcons.download,
+                                    color: Colors.green,
+                                  ),
                                   onPressed: () {
                                     if (!isDownloaded) {
-                                      _requestDownload(context,
-                                          episode: episodes![index]);
+                                      _requestDownload(
+                                        context,
+                                        episode: episodes![index],
+                                      );
                                       //   downloader
                                       //       .startTask(episodes[index]);
                                     }
-                                  }),
-                            if (menuList.contains(5))
-                              FocusedMenuItem(
-                                backgroundColor: context.priamryContainer,
-                                title: Text(s.playNext),
-                                trailingIcon: Icon(
-                                  LineIcons.lightningBolt,
-                                  color: Colors.amber,
+                                  },
                                 ),
-                                onPressed: () {
-                                  audio.moveToTop(episodes![index]);
-                                  Fluttertoast.showToast(
-                                    msg: s.playNextDes,
-                                    gravity: ToastGravity.BOTTOM,
-                                  );
-                                },
-                              ),
-                          ],
-                          onPressed: () => Navigator.push(
-                            context,
-                            ScaleRoute(
+                              if (menuList.contains(5))
+                                FocusedMenuItem(
+                                  backgroundColor: context.priamryContainer,
+                                  title: Text(s.playNext),
+                                  trailingIcon: Icon(
+                                    LineIcons.lightningBolt,
+                                    color: Colors.amber,
+                                  ),
+                                  onPressed: () {
+                                    audio.moveToTop(episodes![index]);
+                                    Fluttertoast.showToast(
+                                      msg: s.playNextDes,
+                                      gravity: ToastGravity.BOTTOM,
+                                    );
+                                  },
+                                ),
+                            ],
+                            onPressed: () => Navigator.push(
+                              context,
+                              ScaleRoute(
                                 page: EpisodeDetail(
-                              episodeItem: episodes![index],
-                              heroTag: 'scroll',
-                              //unique hero tag
-                            )),
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              color: podcastLocal!.cardColor(context),
-                              borderRadius: BorderRadius.circular(15.0),
+                                  episodeItem: episodes![index],
+                                  heroTag: 'scroll',
+                                  //unique hero tag
+                                ),
+                              ),
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Expanded(
-                                  flex: 2,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Hero(
-                                        tag:
-                                            '${episodes![index].enclosureUrl}scroll',
-                                        child: Container(
-                                          height: width / 18,
-                                          width: width / 18,
-                                          child: CircleAvatar(
-                                            backgroundImage:
-                                                podcastLocal!.avatarImage,
+                            child: Container(
+                              padding: EdgeInsets.all(10.0),
+                              decoration: BoxDecoration(
+                                color: podcastLocal!.cardColor(context),
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Expanded(
+                                    flex: 2,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Hero(
+                                          tag:
+                                              '${episodes![index].enclosureUrl}scroll',
+                                          child: SizedBox(
+                                            height: width / 18,
+                                            width: width / 18,
+                                            child: CircleAvatar(
+                                              backgroundImage:
+                                                  podcastLocal!.avatarImage,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Spacer(),
-                                      Selector<
-                                              AudioPlayerNotifier,
-                                              tuple
-                                                  .Tuple2<EpisodeBrief?, bool>>(
+                                        Spacer(),
+                                        Selector<
+                                          AudioPlayerNotifier,
+                                          tuple.Tuple2<EpisodeBrief?, bool>
+                                        >(
                                           selector: (_, audio) => tuple.Tuple2(
-                                              audio.episode,
-                                              audio.playerRunning),
-                                          builder: (_, data, __) {
+                                            audio.episode,
+                                            audio.playerRunning,
+                                          ),
+                                          builder: (_, data, _) {
                                             return (episodes![index]
                                                             .enclosureUrl ==
-                                                        data.item1
+                                                        data
+                                                            .item1
                                                             ?.enclosureUrl &&
                                                     data.item2)
                                                 ? Container(
@@ -796,111 +876,116 @@ class ShowEpisode extends StatelessWidget {
                                                     width: 20,
                                                     margin:
                                                         EdgeInsets.symmetric(
-                                                            horizontal: 2),
+                                                          horizontal: 2,
+                                                        ),
                                                     decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
                                                     ),
                                                     child: WaveLoader(
-                                                        color: context
-                                                            .accentColor))
+                                                      color:
+                                                          context.accentColor,
+                                                    ),
+                                                  )
                                                 : Center();
-                                          }),
-                                      episodes![index].isNew == 1
-                                          ? Text(
-                                              'New',
-                                              style: TextStyle(
+                                          },
+                                        ),
+                                        episodes![index].isNew == 1
+                                            ? Text(
+                                                'New',
+                                                style: TextStyle(
                                                   color: Colors.red,
-                                                  fontStyle: FontStyle.italic),
-                                            )
-                                          : Center(),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 5,
-                                  child: Container(
-                                    padding: EdgeInsets.only(top: 2.0),
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      episodes![index].title!,
-                                      style: TextStyle(
-                                          //fontSize: _width / 32,
-                                          ),
-                                      maxLines: 4,
-                                      overflow: TextOverflow.fade,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              )
+                                            : Center(),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        episodes![index]
-                                            .pubDate!
-                                            .toDate(context),
-                                        overflow: TextOverflow.visible,
+                                  Expanded(
+                                    flex: 5,
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 2.0),
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                        episodes![index].title!,
                                         style: TextStyle(
-                                          height: 1,
-                                          fontSize: width / 35,
-                                          color: c,
-                                          fontStyle: FontStyle.italic,
+                                          //fontSize: _width / 32,
                                         ),
+                                        maxLines: 4,
+                                        overflow: TextOverflow.fade,
                                       ),
-                                      Spacer(),
-                                      if (episodes![index].duration != 0)
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            episodes![index].duration!.toTime,
-                                            style: TextStyle(
-                                              fontSize: width / 35,
-                                              // color: _c,
-                                              // fontStyle: FontStyle.italic,
-                                            ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          episodes![index].pubDate!.toDate(
+                                            context,
+                                          ),
+                                          overflow: TextOverflow.visible,
+                                          style: TextStyle(
+                                            height: 1,
+                                            fontSize: width / 35,
+                                            color: c,
+                                            fontStyle: FontStyle.italic,
                                           ),
                                         ),
-                                      episodes![index].duration == 0 ||
-                                              episodes![index]
-                                                      .enclosureLength ==
-                                                  null ||
-                                              episodes![index]
-                                                      .enclosureLength ==
-                                                  0
-                                          ? Center()
-                                          : Text(
-                                              '|',
+                                        Spacer(),
+                                        if (episodes![index].duration != 0)
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              episodes![index].duration!.toTime,
+                                              style: TextStyle(
+                                                fontSize: width / 35,
+                                                // color: _c,
+                                                // fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
+                                          ),
+                                        episodes![index].duration == 0 ||
+                                                episodes![index]
+                                                        .enclosureLength ==
+                                                    null ||
+                                                episodes![index]
+                                                        .enclosureLength ==
+                                                    0
+                                            ? Center()
+                                            : Text(
+                                                '|',
+                                                style: TextStyle(
+                                                  fontSize: width / 35,
+                                                ),
+                                              ),
+                                        if (episodes![index].enclosureLength !=
+                                                null &&
+                                            episodes![index].enclosureLength !=
+                                                0)
+                                          Container(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              '${episodes![index].enclosureLength! ~/ 1000000}MB',
                                               style: TextStyle(
                                                 fontSize: width / 35,
                                               ),
                                             ),
-                                      if (episodes![index].enclosureLength !=
-                                              null &&
-                                          episodes![index].enclosureLength != 0)
-                                        Container(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            '${episodes![index].enclosureLength! ~/ 1000000}MB',
-                                            style:
-                                                TextStyle(fontSize: width / 35),
                                           ),
-                                        ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-              childCount: math.min(episodes!.length, 2),
-            ),
+                        );
+                      },
+                    ),
+              );
+            }, childCount: math.min(episodes!.length, 2)),
           ),
         ),
       ],
@@ -908,7 +993,8 @@ class ShowEpisode extends StatelessWidget {
   }
 
   Future<tuple.Tuple5<int, bool, bool, bool, List<int>>> _initData(
-      EpisodeBrief episode) async {
+    EpisodeBrief episode,
+  ) async {
     final menuList = await _getEpisodeMenu();
     final tapToOpen = await _getTapToOpenPopupMenu();
     final listened = await _isListened(episode);
@@ -958,13 +1044,15 @@ class ShowEpisode extends StatelessWidget {
     await _dbHelper.setUniked(url);
   }
 
-  Future<void> _requestDownload(BuildContext context,
-      {EpisodeBrief? episode}) async {
+  Future<void> _requestDownload(
+    BuildContext context, {
+    EpisodeBrief? episode,
+  }) async {
     final permissionReady = await _checkPermmison();
     final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
         .getBool(defaultValue: true, reverse: true);
     final result = await Connectivity().checkConnectivity();
-    final usingData = result == ConnectivityResult.mobile;
+    final usingData = result.contains(ConnectivityResult.mobile);
     var dataConfirm = true;
     if (permissionReady) {
       if (downloadUsingData && usingData) {
@@ -1002,21 +1090,15 @@ class ShowEpisode extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text(
-            s.cancel,
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          child: Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
         ),
         TextButton(
           onPressed: () {
             ifUseData = true;
             Navigator.of(context).pop();
           },
-          child: Text(
-            s.confirm,
-            style: TextStyle(color: Colors.red),
-          ),
-        )
+          child: Text(s.confirm, style: TextStyle(color: Colors.red)),
+        ),
       ],
     );
     return ifUseData;
@@ -1027,8 +1109,8 @@ class ShowEpisode extends StatelessWidget {
 class CircleTabIndicator extends Decoration {
   final BoxPainter _painter;
   CircleTabIndicator({required Color color, required double radius})
-      : _painter = _CirclePainter(color, radius);
-  static _returnNull() => null;
+    : _painter = _CirclePainter(color, radius);
+  static Null _returnNull() => null;
   @override
   BoxPainter createBoxPainter([VoidCallback onChanged = _returnNull]) =>
       _painter;
@@ -1039,9 +1121,9 @@ class _CirclePainter extends BoxPainter {
   final double radius;
 
   _CirclePainter(Color color, this.radius)
-      : _paint = Paint()
-          ..color = color
-          ..isAntiAlias = true;
+    : _paint = Paint()
+        ..color = color
+        ..isAntiAlias = true;
 
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration cfg) {

@@ -28,7 +28,7 @@ class PodcastLocal extends Equatable {
 
   //set setEpisodeCount(i) => episodeCount = i;
 
-  PodcastLocal(
+  const PodcastLocal(
     this.title,
     this.imageUrl,
     this.rssUrl,
@@ -52,14 +52,20 @@ class PodcastLocal extends Equatable {
   }
 
   Color backgroudColor(BuildContext context) {
+    if (primaryColor == null || primaryColor!.trim().isEmpty) {
+      return context.accentColor;
+    }
     return context.brightness == Brightness.light
         ? primaryColor!.colorizedark()
         : primaryColor!.colorizeLight();
   }
 
   Color cardColor(BuildContext context) {
+    final seedColor = primaryColor == null || primaryColor!.trim().isEmpty
+        ? context.accentColor
+        : primaryColor!.colorizedark();
     final schema = ColorScheme.fromSeed(
-      seedColor: primaryColor!.colorizedark(),
+      seedColor: seedColor,
       brightness: context.brightness,
     );
     return schema.primaryContainer;

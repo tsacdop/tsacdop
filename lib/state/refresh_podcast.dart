@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_isolate/flutter_isolate.dart';
+import 'package:tsacdop/type/podcastlocal.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
@@ -32,7 +33,9 @@ class RefreshWorker extends ChangeNotifier {
   Future<void> _createIsolate() async {
     receivePort = ReceivePort();
     refreshIsolate = await FlutterIsolate.spawn(
-        refreshIsolateEntryPoint, receivePort.sendPort);
+      refreshIsolateEntryPoint,
+      receivePort.sendPort,
+    );
   }
 
   void _listen(List<String?>? podcasts) {
@@ -42,8 +45,10 @@ class RefreshWorker extends ChangeNotifier {
         refreshSendPort.send(podcasts);
       }
       if (message is List) {
-        _currentRefreshItem =
-            RefreshItem(message[0], RefreshState.values[message[1]]);
+        _currentRefreshItem = RefreshItem(
+          message[0],
+          RefreshState.values[message[1]],
+        );
         notifyListeners();
       } else if (message is String && message == "done") {
         _currentRefreshItem = RefreshItem('', RefreshState.none);
@@ -70,6 +75,7 @@ class RefreshWorker extends ChangeNotifier {
     }
   }
 
+  @override
   void dispose() {
     refreshIsolate?.kill();
     refreshIsolate = null;
@@ -80,18 +86,18 @@ class RefreshWorker extends ChangeNotifier {
 Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
   var refreshReceivePort = ReceivePort();
   sendPort.send(refreshReceivePort.sendPort);
-  var _dbHelper = DBHelper();
+  var dbHelper = DBHelper();
 
-  Future<void> _refreshAll(List<String> podcasts) async {
-    var podcastList;
+  Future<void> refreshAll(List<String> podcasts) async {
+    List<PodcastLocal> podcastList;
     if (podcasts.isEmpty) {
-      podcastList = await _dbHelper.getPodcastLocalAll(updateOnly: true);
+      podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
     } else {
-      podcastList = await _dbHelper.getPodcastLocal(podcasts, updateOnly: true);
+      podcastList = await dbHelper.getPodcastLocal(podcasts, updateOnly: true);
     }
     for (var podcastLocal in podcastList) {
       sendPort.send([podcastLocal.title, 1]);
-      var updateCount = await _dbHelper.updatePodcastRss(podcastLocal);
+      var updateCount = await dbHelper.updatePodcastRss(podcastLocal);
       developer.log('Refresh ${podcastLocal.title}$updateCount');
     }
     sendPort.send("done");
@@ -99,7 +105,7 @@ Future<void> refreshIsolateEntryPoint(SendPort sendPort) async {
 
   refreshReceivePort.distinct().listen((message) {
     if (message is List<dynamic>) {
-      _refreshAll(message as List<String>);
+      refreshAll(message as List<String>);
     }
   });
 }

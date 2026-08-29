@@ -41,28 +41,30 @@ class IndexPodcast {
   final String? image;
   final int? lastUpdateTime;
   final int? itunesId;
-  IndexPodcast(
-      {this.id,
-      this.title,
-      this.url,
-      this.link,
-      this.description,
-      this.author,
-      this.image,
-      this.lastUpdateTime,
-      this.itunesId});
+  IndexPodcast({
+    this.id,
+    this.title,
+    this.url,
+    this.link,
+    this.description,
+    this.author,
+    this.image,
+    this.lastUpdateTime,
+    this.itunesId,
+  });
   factory IndexPodcast.fromJson(Map<String, dynamic> json) =>
       _$IndexPodcastFromJson(json);
   Map<String, dynamic> toJson() => _$IndexPodcastToJson(this);
 
   OnlinePodcast get toOnlinePodcast => OnlinePodcast(
-      earliestPubDate: 0,
-      title: title,
-      count: 0,
-      description: description,
-      image: image,
-      latestPubDate: lastUpdateTime! * 1000,
-      rss: url,
-      publisher: author,
-      id: itunesId.toString());
+    earliestPubDate: 0,
+    title: title,
+    count: 0,
+    description: description,
+    image: image,
+    latestPubDate: lastUpdateTime! * 1000,
+    rss: url,
+    publisher: author,
+    id: itunesId.toString(),
+  );
 }

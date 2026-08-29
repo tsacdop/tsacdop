@@ -8,8 +8,9 @@ part of 'search_top_podcast.dart';
 
 SearchTopPodcast<T> _$SearchTopPodcastFromJson<T>(Map<String, dynamic> json) {
   return SearchTopPodcast<T>(
-    podcasts:
-        (json['podcasts'] as List?)?.map(_ConvertT<T>().fromJson).toList(),
+    podcasts: (json['podcasts'] as List?)
+        ?.map(_ConvertT<T>().fromJson)
+        .toList(),
     id: json['id'] as int?,
     total: json['total'] as int?,
     hasNext: json['has_next'] as bool?,
@@ -18,14 +19,14 @@ SearchTopPodcast<T> _$SearchTopPodcastFromJson<T>(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$SearchTopPodcastToJson<T>(
-        SearchTopPodcast<T> instance) =>
-    <String, dynamic>{
-      'podcasts': instance.podcasts?.map(_ConvertT<T>().toJson).toList(),
-      'id': instance.id,
-      'page': instance.page,
-      'total': instance.total,
-      'has_next': instance.hasNext,
-    };
+  SearchTopPodcast<T> instance,
+) => <String, dynamic>{
+  'podcasts': instance.podcasts?.map(_ConvertT<T>().toJson).toList(),
+  'id': instance.id,
+  'page': instance.page,
+  'total': instance.total,
+  'has_next': instance.hasNext,
+};
 
 OnlineTopPodcast _$OnlineTopPodcastFromJson(Map<String, dynamic> json) {
   return OnlineTopPodcast(

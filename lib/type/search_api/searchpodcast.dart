@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:json_annotation/json_annotation.dart';
 part 'searchpodcast.g.dart';
 
@@ -47,16 +45,17 @@ class OnlinePodcast {
   @JsonKey(name: 'publisher_original')
   final String? publisher;
   final String? id;
-  OnlinePodcast(
-      {this.earliestPubDate,
-      this.title,
-      this.count,
-      this.description,
-      this.image,
-      this.latestPubDate,
-      this.rss,
-      this.publisher,
-      this.id});
+  OnlinePodcast({
+    this.earliestPubDate,
+    this.title,
+    this.count,
+    this.description,
+    this.image,
+    this.latestPubDate,
+    this.rss,
+    this.publisher,
+    this.id,
+  });
   factory OnlinePodcast.fromJson(Map<String, dynamic> json) =>
       _$OnlinePodcastFromJson(json);
   Map<String, dynamic> toJson() => _$OnlinePodcastToJson(this);
@@ -66,13 +65,18 @@ class OnlinePodcast {
       onlinePodcast is OnlinePodcast && onlinePodcast.id == id;
 
   @override
-  int get hashCode => hashValues(id, title);
+  int get hashCode => Object.hash(id, title);
 
   int? get interval {
-    if (count! < 1) {
-      // ignore: avoid_returning_null
+    final episodeCount = count;
+    final firstPublishedAt = earliestPubDate;
+    final lastPublishedAt = latestPubDate;
+    if (episodeCount == null ||
+        episodeCount < 1 ||
+        firstPublishedAt == null ||
+        lastPublishedAt == null) {
       return null;
     }
-    return (latestPubDate! - earliestPubDate!) ~/ count!;
+    return (lastPublishedAt - firstPublishedAt) ~/ episodeCount;
   }
 }

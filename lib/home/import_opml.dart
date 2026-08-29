@@ -1,4 +1,4 @@
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +10,8 @@ import '../state/refresh_podcast.dart';
 import '../util/extension_helper.dart';
 
 class Import extends StatelessWidget {
+  const Import({super.key});
+
   Widget importColumn(String text, BuildContext context) {
     return Container(
       color: context.primaryColorDark,
@@ -29,7 +31,7 @@ class Import extends StatelessWidget {
     );
   }
 
-  _autoDownloadNew(BuildContext context) async {
+  Future<void> _autoDownloadNew(BuildContext context) async {
     final dbHelper = DBHelper();
     final downloader = Provider.of<DownloadState>(context, listen: false);
     final result = await Connectivity().checkConnectivity();
@@ -38,15 +40,15 @@ class Import extends StatelessWidget {
     if (autoDownloadNetwork == 1) {
       final episodes = await dbHelper.getNewEpisodes('all');
       // For safety
-      if (episodes.length < 100 && episodes.length > 0) {
+      if (episodes.length < 100 && episodes.isNotEmpty) {
         for (var episode in episodes) {
           await downloader.startTask(episode, showNotification: true);
         }
       }
-    } else if (result == ConnectivityResult.wifi) {
+    } else if (result.contains(ConnectivityResult.wifi)) {
       var episodes = await dbHelper.getNewEpisodes('all');
       //For safety
-      if (episodes.length < 100 && episodes.length > 0) {
+      if (episodes.length < 100 && episodes.isNotEmpty) {
         for (var episode in episodes) {
           await downloader.startTask(episode, showNotification: true);
         }
@@ -61,23 +63,31 @@ class Import extends StatelessWidget {
     return Column(
       children: <Widget>[
         Consumer<GroupList>(
-          builder: (_, subscribeWorker, __) {
+          builder: (_, subscribeWorker, _) {
             final item = subscribeWorker.currentSubscribeItem;
             switch (item.subscribeState) {
               case SubscribeState.start:
                 return importColumn(
-                    s.notificationSubscribe(item.title!), context);
+                  s.notificationSubscribe(item.title!),
+                  context,
+                );
               case SubscribeState.subscribe:
                 return importColumn(s.notificaitonFatch(item.title!), context);
               case SubscribeState.fetch:
                 return importColumn(
-                    s.notificationSuccess(item.title!), context);
+                  s.notificationSuccess(item.title!),
+                  context,
+                );
               case SubscribeState.exist:
                 return importColumn(
-                    s.notificationSubscribeExisted(item.title!), context);
+                  s.notificationSubscribeExisted(item.title!),
+                  context,
+                );
               case SubscribeState.error:
                 return importColumn(
-                    s.notificationNetworkError(item.title!), context);
+                  s.notificationNetworkError(item.title!),
+                  context,
+                );
               default:
                 return Center();
             }
@@ -95,12 +105,14 @@ class Import extends StatelessWidget {
                 return importColumn(s.notificationUpdate(item.title), context);
               case RefreshState.error:
                 return importColumn(
-                    s.notificationUpdateError(item.title), context);
+                  s.notificationUpdateError(item.title),
+                  context,
+                );
               default:
                 return Center();
             }
           },
-        )
+        ),
       ],
     );
   }

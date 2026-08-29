@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+
 import '../util/extension_helper.dart';
 
 class SecondPage extends StatefulWidget {
-  SecondPage({Key? key}) : super(key: key);
+  const SecondPage({super.key});
 
   @override
   _SecondPageState createState() => _SecondPageState();
@@ -29,14 +30,15 @@ class _SecondPageState extends State<SecondPage> {
               ),
             ),
             SizedBox(
-                height: context.width * 3 / 4,
-                child: FlareActor(
-                  'assets/add.flr',
-                  isPaused: false,
-                  alignment: Alignment.center,
-                  animation: 'add',
-                  fit: BoxFit.cover,
-                )),
+              height: context.width * 3 / 4,
+              child: FlareActor(
+                'assets/add.flr',
+                isPaused: false,
+                alignment: Alignment.center,
+                animation: 'add',
+                fit: BoxFit.cover,
+              ),
+            ),
           ],
         ),
       ),

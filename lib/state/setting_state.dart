@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 import 'dart:io';
 
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -16,6 +16,7 @@ import '../local_storage/sqflite_localpodcast.dart';
 import '../type/settings_backup.dart';
 import 'download_state.dart';
 
+@pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     final dbHelper = DBHelper();
@@ -37,14 +38,14 @@ void callbackDispatcher() {
     if (autoDownloadNetwork == 1) {
       var episodes = await dbHelper.getNewEpisodes('all');
       // For safety
-      if (episodes.length < 100 && episodes.length > 0) {
+      if (episodes.length < 100 && episodes.isNotEmpty) {
         downloader.bindBackgroundIsolate();
         await downloader.startTask(episodes);
       }
-    } else if (result == ConnectivityResult.wifi) {
+    } else if (result.contains(ConnectivityResult.wifi)) {
       var episodes = await dbHelper.getNewEpisodes('all');
       //For safety
-      if (episodes.length < 100 && episodes.length > 0) {
+      if (episodes.length < 100 && episodes.isNotEmpty) {
         downloader.bindBackgroundIsolate();
         await downloader.startTask(episodes);
       }
@@ -57,18 +58,9 @@ void callbackDispatcher() {
 }
 
 final showNotesFontStyles = <TextStyle>[
-  TextStyle(
-    height: 1.8,
-  ),
-  GoogleFonts.martel(
-      textStyle: TextStyle(
-    height: 1.8,
-  )),
-  GoogleFonts.bitter(
-    textStyle: TextStyle(
-      height: 1.8,
-    ),
-  ),
+  TextStyle(height: 1.8),
+  GoogleFonts.martel(textStyle: TextStyle(height: 1.8)),
+  GoogleFonts.bitter(textStyle: TextStyle(height: 1.8)),
 ];
 
 class SettingState extends ChangeNotifier {
@@ -97,8 +89,9 @@ class SettingState extends ChangeNotifier {
   final _localeStorage = KeyValueStorage(localeKey);
   final _showNotesFontStorage = KeyValueStorage(showNotesFontKey);
   final _openPlaylistDefaultStorage = KeyValueStorage(openPlaylistDefaultKey);
-  final _openAllPodcastDefaultStorage =
-      KeyValueStorage(openAllPodcastDefaultKey);
+  final _openAllPodcastDefaultStorage = KeyValueStorage(
+    openAllPodcastDefaultKey,
+  );
   final _useWallpaperThemeStorage = KeyValueStorage(useWallpapterThemeKey);
 
   Future initData() async {
@@ -141,133 +134,206 @@ class SettingState extends ChangeNotifier {
   ThemeMode? get theme => _theme;
 
   ThemeData get lightTheme => ThemeData.light().copyWith(
-        colorScheme: _colors(Brightness.light, _accentSetColor!),
-        brightness: Brightness.light,
-        primaryColor: Colors.grey[100],
-        primaryColorLight: Colors.white,
-        primaryColorDark: Colors.grey[300],
-        dialogBackgroundColor: Colors.white,
-        backgroundColor: Colors.grey[100],
-        appBarTheme: AppBarTheme(
-            color: Colors.grey[100],
-            elevation: 0,
-            titleTextStyle: TextStyle(color: Colors.black),
-            scrolledUnderElevation: 1,
-            iconTheme: IconThemeData(color: Colors.black),
-            systemOverlayStyle: SystemUiOverlayStyle.dark),
-        textTheme: TextTheme(
-          headlineSmall: TextStyle(
-              fontSize: 20.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          bodyLarge: TextStyle(
-              fontSize: 17.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          bodyMedium: TextStyle(
-              fontSize: 15.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          bodySmall: TextStyle(
-              fontSize: 14.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          labelLarge: TextStyle(
-              fontSize: 16.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          labelMedium: TextStyle(
-              fontSize: 14.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          labelSmall: TextStyle(
-              fontSize: 12.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          titleLarge: TextStyle(
-              fontSize: 16.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          titleMedium: TextStyle(
-              fontSize: 14.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-          titleSmall: TextStyle(
-              fontSize: 12.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal),
-        ),
-        tabBarTheme: TabBarTheme(
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.grey[400],
-        ),
-        textSelectionTheme: TextSelectionThemeData(
-          cursorColor: _accentSetColor,
-          selectionHandleColor: _accentSetColor,
-        ),
-        toggleableActiveColor: _accentSetColor,
-        buttonTheme: ButtonThemeData(
-          height: 32,
-          hoverColor: _accentSetColor!.withAlpha(70),
-          splashColor: _accentSetColor!.withAlpha(70),
-        ),
-        useMaterial3: true,
-      );
+    brightness: Brightness.light,
+    primaryColor: Colors.grey[100],
+    primaryColorLight: Colors.white,
+    primaryColorDark: Colors.grey[300],
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.grey[100],
+      elevation: 0,
+      titleTextStyle: TextStyle(color: Colors.black),
+      scrolledUnderElevation: 1,
+      iconTheme: IconThemeData(color: Colors.black),
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
+    ),
+    textTheme: TextTheme(
+      headlineSmall: TextStyle(
+        fontSize: 20.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 17.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 15.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      bodySmall: TextStyle(
+        fontSize: 14.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      labelLarge: TextStyle(
+        fontSize: 16.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      labelMedium: TextStyle(
+        fontSize: 14.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      labelSmall: TextStyle(
+        fontSize: 12.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 16.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 14.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 12.0,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+    ),
+    tabBarTheme: TabBarThemeData(
+      labelColor: Colors.black,
+      unselectedLabelColor: Colors.grey[400],
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: _accentSetColor,
+      selectionHandleColor: _accentSetColor,
+    ),
+    buttonTheme: ButtonThemeData(
+      height: 32,
+      hoverColor: _accentSetColor!.withAlpha(70),
+      splashColor: _accentSetColor!.withAlpha(70),
+    ),
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.resolveWith<Color?>((
+        Set<WidgetState> states,
+      ) {
+        if (states.contains(WidgetState.disabled)) {
+          return null;
+        }
+        if (states.contains(WidgetState.selected)) {
+          return _accentSetColor;
+        }
+        return null;
+      }),
+    ),
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith<Color?>((
+        Set<WidgetState> states,
+      ) {
+        if (states.contains(WidgetState.disabled)) {
+          return null;
+        }
+        if (states.contains(WidgetState.selected)) {
+          return _accentSetColor;
+        }
+        return null;
+      }),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith<Color?>((
+        Set<WidgetState> states,
+      ) {
+        if (states.contains(WidgetState.disabled)) {
+          return null;
+        }
+        if (states.contains(WidgetState.selected)) {
+          return _accentSetColor;
+        }
+        return null;
+      }),
+      trackColor: WidgetStateProperty.resolveWith<Color?>((
+        Set<WidgetState> states,
+      ) {
+        if (states.contains(WidgetState.disabled)) {
+          return null;
+        }
+        if (states.contains(WidgetState.selected)) {
+          return _accentSetColor;
+        }
+        return null;
+      }),
+    ),
+    colorScheme: _colors(
+      Brightness.light,
+      _accentSetColor!,
+    ).copyWith(surface: Colors.grey[100]),
+    dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+  );
 
   ThemeData get darkTheme => ThemeData.dark().copyWith(
-        colorScheme: _colors(Brightness.dark, _accentSetColor!),
-        brightness: Brightness.dark,
-        primaryColorDark: Colors.grey[800],
-        textTheme: TextTheme(
-          headlineSmall: TextStyle(
-              fontSize: 20.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-          bodyLarge: TextStyle(
-              fontSize: 17.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-          bodyMedium: TextStyle(
-              fontSize: 15.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-          labelLarge: TextStyle(
-              fontSize: 16.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-          labelMedium: TextStyle(
-              fontSize: 14.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-          labelSmall: TextStyle(
-              fontSize: 12.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-          titleLarge: TextStyle(
-              fontSize: 16.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-          titleMedium: TextStyle(
-              fontSize: 14.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-          titleSmall: TextStyle(
-              fontSize: 12.0,
-              color: Colors.white,
-              fontWeight: FontWeight.normal),
-        ),
-        primaryColor: _realDark! ? Colors.black : Color(0XFF1B1B1B),
-        popupMenuTheme: PopupMenuThemeData()
-            .copyWith(color: _realDark! ? Colors.grey[900] : null),
-        appBarTheme: AppBarTheme(
-            color: Colors.grey[900],
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            systemOverlayStyle: SystemUiOverlayStyle.light),
-        buttonTheme: ButtonThemeData(height: 32),
-        dialogBackgroundColor: _realDark! ? Colors.grey[900] : null,
-        useMaterial3: true,
-      );
+    colorScheme: _colors(Brightness.dark, _accentSetColor!),
+    brightness: Brightness.dark,
+    primaryColorDark: Colors.grey[800],
+    textTheme: TextTheme(
+      headlineSmall: TextStyle(
+        fontSize: 20.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 17.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 15.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+      labelLarge: TextStyle(
+        fontSize: 16.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+      labelMedium: TextStyle(
+        fontSize: 14.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+      labelSmall: TextStyle(
+        fontSize: 12.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 16.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 14.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 12.0,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+      ),
+    ),
+    primaryColor: _realDark! ? Colors.black : Color(0XFF1B1B1B),
+    popupMenuTheme: PopupMenuThemeData().copyWith(
+      color: _realDark! ? Colors.grey[900] : null,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.grey[900],
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+    ),
+    buttonTheme: ButtonThemeData(height: 32),
+    dialogTheme: DialogThemeData(
+      backgroundColor: _realDark! ? Colors.grey[900] : null,
+    ),
+  );
 
   set setTheme(ThemeMode? mode) {
     _theme = mode;
@@ -276,27 +342,22 @@ class SettingState extends ChangeNotifier {
   }
 
   ColorScheme _colors(Brightness brightness, Color targetColor) {
-    return ColorScheme.fromSeed(
-      seedColor: targetColor,
-      brightness: brightness,
-    );
+    return ColorScheme.fromSeed(seedColor: targetColor, brightness: brightness);
   }
 
   void setWorkManager(int? hour) {
     _updateInterval = hour;
     notifyListeners();
     _saveUpdateInterval();
-    Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: false,
-    );
+    Workmanager().initialize(callbackDispatcher);
     if (Platform.isAndroid) {
-      Workmanager().registerPeriodicTask("1", "update_podcasts",
-          frequency: Duration(hours: hour!),
-          initialDelay: Duration(seconds: 10),
-          constraints: Constraints(
-            networkType: NetworkType.connected,
-          ));
+      Workmanager().registerPeriodicTask(
+        "1",
+        "update_podcasts",
+        frequency: Duration(hours: hour!),
+        initialDelay: Duration(seconds: 10),
+        constraints: Constraints(networkType: NetworkType.connected),
+      );
     }
     developer.log('work manager init done + ');
   }
@@ -457,20 +518,30 @@ class SettingState extends ChangeNotifier {
     _theme = ThemeMode.values[mode];
   }
 
-  Future _getAccentSetColor() async {
-    final colorString = await _accentStorage.getString();
-    if (colorString.isNotEmpty) {
-      var color = int.parse('FF${colorString.toUpperCase()}', radix: 16);
-      _accentSetColor = Color(color).withOpacity(1.0);
-    } else {
-      _accentSetColor = Colors.teal[500];
-      await _saveAccentSetColor();
+  Future<void> _getAccentSetColor() async {
+    final storedValue = (await _accentStorage.getString()).trim();
+    final hex = storedValue.startsWith('#')
+        ? storedValue.substring(1)
+        : storedValue;
+    final isRgb = RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(hex);
+    final isArgb = RegExp(r'^[0-9a-fA-F]{8}$').hasMatch(hex);
+
+    if (isRgb || isArgb) {
+      final value = int.parse(hex, radix: 16);
+      _accentSetColor = Color(isRgb ? 0xFF000000 | value : value)
+          .withValues(alpha: 1.0);
+      return;
     }
+
+    _accentSetColor = Colors.teal[500];
+    await _saveAccentSetColor();
   }
 
   Future _getAutoUpdate() async {
-    _autoUpdate =
-        await _autoupdateStorage.getBool(defaultValue: true, reverse: true);
+    _autoUpdate = await _autoupdateStorage.getBool(
+      defaultValue: true,
+      reverse: true,
+    );
   }
 
   Future _getUpdateInterval() async {
@@ -480,7 +551,9 @@ class SettingState extends ChangeNotifier {
 
   Future _getDownloadUsingData() async {
     _downloadUsingData = await _downloadUsingDataStorage.getBool(
-        defaultValue: true, reverse: true);
+      defaultValue: true,
+      reverse: true,
+    );
   }
 
   Future _saveDownloadUsingData() async {
@@ -497,44 +570,53 @@ class SettingState extends ChangeNotifier {
   }
 
   Future _getUseWallpaperTheme() async {
-    _useWallpaperTheme =
-        await _useWallpaperThemeStorage.getBool(defaultValue: true);
+    _useWallpaperTheme = await _useWallpaperThemeStorage.getBool(
+      defaultValue: true,
+    );
   }
 
   Future _getOpenPlaylistDefault() async {
-    _openPlaylistDefault =
-        await _openPlaylistDefaultStorage.getBool(defaultValue: false);
+    _openPlaylistDefault = await _openPlaylistDefaultStorage.getBool(
+      defaultValue: false,
+    );
   }
 
   Future _getOpenAllPodcastDefault() async {
-    _openAllPodcastDefault =
-        await _openAllPodcastDefaultStorage.getBool(defaultValue: false);
+    _openAllPodcastDefault = await _openAllPodcastDefaultStorage.getBool(
+      defaultValue: false,
+    );
   }
 
   Future _getSleepTimerData() async {
-    _defaultSleepTimer =
-        await _defaultSleepTimerStorage.getInt(defaultValue: 30);
+    _defaultSleepTimer = await _defaultSleepTimerStorage.getInt(
+      defaultValue: 30,
+    );
     _autoSleepTimer = await _autoSleepTimerStorage.getBool(defaultValue: false);
-    _autoSleepTimerStart =
-        await _autoSleepTimerStartStorage.getInt(defaultValue: 1380);
-    _autoSleepTimerEnd =
-        await _autoSleepTimerEndStorage.getInt(defaultValue: 360);
-    _autoPlay =
-        await _autoPlayStorage.getBool(defaultValue: true, reverse: true);
+    _autoSleepTimerStart = await _autoSleepTimerStartStorage.getInt(
+      defaultValue: 1380,
+    );
+    _autoSleepTimerEnd = await _autoSleepTimerEndStorage.getInt(
+      defaultValue: 360,
+    );
+    _autoPlay = await _autoPlayStorage.getBool(
+      defaultValue: true,
+      reverse: true,
+    );
     _autoSleepTimerMode = await _autoSleepTimerModeStorage.getInt();
   }
 
   Future _getPlayerSeconds() async {
     _rewindSeconds = await _rewindSecondsStorage.getInt(defaultValue: 10);
-    _fastForwardSeconds =
-        await _fastForwardSecondsStorage.getInt(defaultValue: 30);
+    _fastForwardSeconds = await _fastForwardSecondsStorage.getInt(
+      defaultValue: 30,
+    );
   }
 
   Future _getLocale() async {
     var localeString = await _localeStorage.getStringList();
     if (localeString.isEmpty) {
       await findSystemLocale();
-      var systemLanCode;
+      String systemLanCode;
       final list = Intl.systemLocale.split('_');
       if (list.length == 2) {
         systemLanCode = list.first;
@@ -555,8 +637,10 @@ class SettingState extends ChangeNotifier {
   }
 
   Future<void> _saveAccentSetColor() async {
-    await _accentStorage
-        .saveString(_accentSetColor.toString().substring(10, 16));
+    final rgb = _accentSetColor!.toARGB32() & 0x00FFFFFF;
+    await _accentStorage.saveString(
+      rgb.toRadixString(16).padLeft(6, '0').toUpperCase(),
+    );
   }
 
   Future<void> _setRealDark() async {
@@ -631,94 +715,108 @@ class SettingState extends ChangeNotifier {
     var theme = await _themeStorage.getInt();
     var accentColor = await _accentStorage.getString();
     var realDark = await _realDarkStorage.getBool(defaultValue: false);
-    var useWallpaperTheme =
-        await _useWallpaperThemeStorage.getBool(defaultValue: true);
-    var autoPlay =
-        await _autoPlayStorage.getBool(defaultValue: true, reverse: true);
-    var autoUpdate =
-        await _autoupdateStorage.getBool(defaultValue: true, reverse: true);
+    var useWallpaperTheme = await _useWallpaperThemeStorage.getBool(
+      defaultValue: true,
+    );
+    var autoPlay = await _autoPlayStorage.getBool(
+      defaultValue: true,
+      reverse: true,
+    );
+    var autoUpdate = await _autoupdateStorage.getBool(
+      defaultValue: true,
+      reverse: true,
+    );
     var updateInterval = await _intervalStorage.getInt();
     var downloadUsingData = await _downloadUsingDataStorage.getBool(
-        defaultValue: true, reverse: true);
+      defaultValue: true,
+      reverse: true,
+    );
     var cacheMax = await _cacheStorage.getInt(defaultValue: 500 * 1024 * 1024);
     var podcastLayout = await _podcastLayoutStorage.getInt();
     var recentLayout = await _recentLayoutStorage.getInt();
     var favLayout = await _favLayoutStorage.getInt();
     var downloadLayout = await _downloadLayoutStorage.getInt();
-    var autoDownloadNetwork =
-        await _autoDownloadStorage.getBool(defaultValue: false);
+    var autoDownloadNetwork = await _autoDownloadStorage.getBool(
+      defaultValue: false,
+    );
     var episodePopupMenu = await KeyValueStorage(episodePopupMenuKey).getMenu();
     var autoDelete = await _autoDeleteStorage.getInt();
-    var autoSleepTimer =
-        await _autoSleepTimerStorage.getBool(defaultValue: false);
+    var autoSleepTimer = await _autoSleepTimerStorage.getBool(
+      defaultValue: false,
+    );
     var autoSleepTimerStart = await _autoSleepTimerStartStorage.getInt();
     var autoSleepTimerEnd = await _autoSleepTimerEndStorage.getInt();
     var autoSleepTimerMode = await _autoSleepTimerModeStorage.getInt();
     var defaultSleepTime = await _defaultSleepTimerStorage.getInt();
     var tapToOpenPopupMenu = await KeyValueStorage(tapToOpenPopupMenuKey)
         .getBool(defaultValue: false);
-    var fastForwardSeconds =
-        await _fastForwardSecondsStorage.getInt(defaultValue: 30);
+    var fastForwardSeconds = await _fastForwardSecondsStorage.getInt(
+      defaultValue: 30,
+    );
     var rewindSeconds = await _rewindSecondsStorage.getInt(defaultValue: 10);
-    var playerHeight =
-        await KeyValueStorage(playerHeightKey).getInt(defaultValue: 0);
+    var playerHeight = await KeyValueStorage(playerHeightKey)
+        .getInt(defaultValue: 0);
     var localeList = await _localeStorage.getStringList();
-    var backupLocale =
-        localeList.isEmpty ? '' : '${'${localeList.first}-'}${localeList[1]}';
-    var hideListened =
-        await KeyValueStorage(hideListenedKey).getBool(defaultValue: false);
-    var notificationLayout =
-        await KeyValueStorage(notificationLayoutKey).getInt(defaultValue: 0);
+    var backupLocale = localeList.isEmpty
+        ? ''
+        : '${'${localeList.first}-'}${localeList[1]}';
+    var hideListened = await KeyValueStorage(hideListenedKey)
+        .getBool(defaultValue: false);
+    var notificationLayout = await KeyValueStorage(notificationLayoutKey)
+        .getInt(defaultValue: 0);
     var showNotesFont = await _showNotesFontStorage.getInt(defaultValue: 1);
     var speedList = await KeyValueStorage(speedListKey).getStringList();
     var hidePodcastDiscovery = await KeyValueStorage(hidePodcastDiscoveryKey)
         .getBool(defaultValue: false);
-    final markListenedAfterSKip =
-        await KeyValueStorage(markListenedAfterSkipKey)
-            .getBool(defaultValue: false);
+    final markListenedAfterSKip = await KeyValueStorage(
+      markListenedAfterSkipKey,
+    ).getBool(defaultValue: false);
     final deleteAfterPlayed = await KeyValueStorage(deleteAfterPlayedKey)
         .getBool(defaultValue: false);
-    final openPlaylistDefault =
-        await _openPlaylistDefaultStorage.getBool(defaultValue: false);
-    final openAllPodcastDefault =
-        await _openAllPodcastDefaultStorage.getBool(defaultValue: false);
+    final openPlaylistDefault = await _openPlaylistDefaultStorage.getBool(
+      defaultValue: false,
+    );
+    final openAllPodcastDefault = await _openAllPodcastDefaultStorage.getBool(
+      defaultValue: false,
+    );
 
     return SettingsBackup(
-        theme: theme,
-        accentColor: accentColor,
-        realDark: realDark,
-        useWallpaperTheme: useWallpaperTheme,
-        autoPlay: autoPlay,
-        autoUpdate: autoUpdate,
-        updateInterval: updateInterval,
-        downloadUsingData: downloadUsingData,
-        cacheMax: cacheMax,
-        podcastLayout: podcastLayout,
-        recentLayout: recentLayout,
-        favLayout: favLayout,
-        downloadLayout: downloadLayout,
-        autoDownloadNetwork: autoDownloadNetwork,
-        episodePopupMenu: episodePopupMenu.map((e) => e.toString()).toList(),
-        autoDelete: autoDelete,
-        autoSleepTimer: autoSleepTimer,
-        autoSleepTimerStart: autoSleepTimerStart,
-        autoSleepTimerEnd: autoSleepTimerEnd,
-        autoSleepTimerMode: autoSleepTimerMode,
-        defaultSleepTime: defaultSleepTime,
-        tapToOpenPopupMenu: tapToOpenPopupMenu,
-        fastForwardSeconds: fastForwardSeconds,
-        rewindSeconds: rewindSeconds,
-        playerHeight: playerHeight,
-        locale: backupLocale,
-        hideListened: hideListened,
-        notificationLayout: notificationLayout,
-        showNotesFont: showNotesFont,
-        speedList: speedList,
-        hidePodcastDiscovery: hidePodcastDiscovery,
-        markListenedAfterSkip: markListenedAfterSKip,
-        deleteAfterPlayed: deleteAfterPlayed,
-        openPlaylistDefault: openPlaylistDefault,
-        openAllPodcastDefault: openAllPodcastDefault);
+      theme: theme,
+      accentColor: accentColor,
+      realDark: realDark,
+      useWallpaperTheme: useWallpaperTheme,
+      autoPlay: autoPlay,
+      autoUpdate: autoUpdate,
+      updateInterval: updateInterval,
+      downloadUsingData: downloadUsingData,
+      cacheMax: cacheMax,
+      podcastLayout: podcastLayout,
+      recentLayout: recentLayout,
+      favLayout: favLayout,
+      downloadLayout: downloadLayout,
+      autoDownloadNetwork: autoDownloadNetwork,
+      episodePopupMenu: episodePopupMenu.map((e) => e.toString()).toList(),
+      autoDelete: autoDelete,
+      autoSleepTimer: autoSleepTimer,
+      autoSleepTimerStart: autoSleepTimerStart,
+      autoSleepTimerEnd: autoSleepTimerEnd,
+      autoSleepTimerMode: autoSleepTimerMode,
+      defaultSleepTime: defaultSleepTime,
+      tapToOpenPopupMenu: tapToOpenPopupMenu,
+      fastForwardSeconds: fastForwardSeconds,
+      rewindSeconds: rewindSeconds,
+      playerHeight: playerHeight,
+      locale: backupLocale,
+      hideListened: hideListened,
+      notificationLayout: notificationLayout,
+      showNotesFont: showNotesFont,
+      speedList: speedList,
+      hidePodcastDiscovery: hidePodcastDiscovery,
+      markListenedAfterSkip: markListenedAfterSKip,
+      deleteAfterPlayed: deleteAfterPlayed,
+      openPlaylistDefault: openPlaylistDefault,
+      openAllPodcastDefault: openAllPodcastDefault,
+    );
   }
 
   Future<void> restore(SettingsBackup backup) async {
@@ -729,8 +827,10 @@ class SettingState extends ChangeNotifier {
     await _autoPlayStorage.saveBool(backup.autoPlay, reverse: true);
     await _autoupdateStorage.saveBool(backup.autoUpdate, reverse: true);
     await _intervalStorage.saveInt(backup.updateInterval!);
-    await _downloadUsingDataStorage.saveBool(backup.downloadUsingData,
-        reverse: true);
+    await _downloadUsingDataStorage.saveBool(
+      backup.downloadUsingData,
+      reverse: true,
+    );
     await _cacheStorage.saveInt(backup.cacheMax!);
     await _podcastLayoutStorage.saveInt(backup.podcastLayout!);
     await _recentLayoutStorage.saveInt(backup.recentLayout!);
@@ -767,14 +867,16 @@ class SettingState extends ChangeNotifier {
       await S.load(Locale(Intl.systemLocale));
     } else {
       var localeList = backup.locale!.split('-');
-      var backupLocale;
+      Locale backupLocale;
       if (localeList[1] == 'null') {
         backupLocale = Locale(localeList.first);
       } else {
         backupLocale = Locale(localeList.first, localeList[1]);
       }
-      await _localeStorage.saveStringList(
-          [backupLocale.languageCode, backupLocale.countryCode]);
+      await _localeStorage.saveStringList([
+        backupLocale.languageCode,
+        backupLocale.countryCode,
+      ]);
       await S.load(backupLocale);
     }
     await initData();

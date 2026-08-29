@@ -7,7 +7,8 @@ part of 'index_episode.dart';
 // **************************************************************************
 
 IndexEpisodeResult<P> _$IndexEpisodeResultFromJson<P>(
-    Map<String, dynamic> json) {
+  Map<String, dynamic> json,
+) {
   return IndexEpisodeResult<P>(
     items: (json['items'] as List?)?.map(_ConvertP<P>().fromJson).toList(),
     status: json['status'] as String?,
@@ -16,12 +17,12 @@ IndexEpisodeResult<P> _$IndexEpisodeResultFromJson<P>(
 }
 
 Map<String, dynamic> _$IndexEpisodeResultToJson<P>(
-        IndexEpisodeResult<P> instance) =>
-    <String, dynamic>{
-      'items': instance.items?.map(_ConvertP<P>().toJson).toList(),
-      'status': instance.status,
-      'count': instance.count,
-    };
+  IndexEpisodeResult<P> instance,
+) => <String, dynamic>{
+  'items': instance.items?.map(_ConvertP<P>().toJson).toList(),
+  'status': instance.status,
+  'count': instance.count,
+};
 
 IndexEpisode _$IndexEpisodeFromJson(Map<String, dynamic> json) {
   return IndexEpisode(

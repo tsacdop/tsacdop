@@ -19,8 +19,13 @@ class PlayHistory {
   /// Listened date.
   DateTime? playdate;
 
-  PlayHistory(this.title, this.url, this.seconds, this.seekValue,
-      {this.playdate});
+  PlayHistory(
+    this.title,
+    this.url,
+    this.seconds,
+    this.seekValue, {
+    this.playdate,
+  });
 
   EpisodeBrief? _episode;
   EpisodeBrief? get episode => _episode;

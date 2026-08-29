@@ -19,6 +19,8 @@ import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
 
 class PlayedHistory extends StatefulWidget {
+  const PlayedHistory({super.key});
+
   @override
   _PlayedHistoryState createState() => _PlayedHistoryState();
 }
@@ -61,20 +63,23 @@ class _PlayedHistoryState extends State<PlayedHistory>
                       top = constraints.biggest.height;
                       return FlexibleSpaceBar(
                         title: top < 70 + MediaQuery.of(context).padding.top
-                            ? Text(
-                                s.settingsHistory,
-                              )
+                            ? Text(s.settingsHistory)
                             : Center(),
                         background: Padding(
                           padding: EdgeInsets.only(
-                              top: 50, left: 20, right: 20, bottom: 20),
+                            top: 50,
+                            left: 20,
+                            right: 20,
+                            bottom: 20,
+                          ),
                           child: FutureBuilder<List<FlSpot>>(
-                              future: getData(),
-                              builder: (context, snapshot) {
-                                return snapshot.hasData
-                                    ? HistoryChart(snapshot.data)
-                                    : Center();
-                              }),
+                            future: getData(),
+                            builder: (context, snapshot) {
+                              return snapshot.hasData
+                                  ? HistoryChart(snapshot.data)
+                                  : Center();
+                            },
+                          ),
                         ),
                       );
                     },
@@ -82,59 +87,60 @@ class _PlayedHistoryState extends State<PlayedHistory>
                 ),
                 SliverPersistentHeader(
                   delegate: _SliverAppBarDelegate(
-                      TabBar(
-                        controller: _controller,
-                        indicatorColor: context.accentColor,
-                        labelColor: context.textColor,
-                        labelStyle: context.textTheme.headline6,
-                        tabs: <Widget>[
-                          Tab(
-                            child: Text(s.listen),
-                          ),
-                          Tab(
-                            child: Text(s.subscribe),
-                          )
-                        ],
-                      ),
-                      context.primaryColor),
+                    TabBar(
+                      controller: _controller,
+                      indicatorColor: context.accentColor,
+                      labelColor: context.textColor,
+                      labelStyle: context.textTheme.titleLarge,
+                      tabs: <Widget>[
+                        Tab(child: Text(s.listen)),
+                        Tab(child: Text(s.subscribe)),
+                      ],
+                    ),
+                    context.primaryColor,
+                  ),
                   pinned: true,
                 ),
               ];
             },
-            body: TabBarView(controller: _controller, children: <Widget>[
-              FutureBuilder<List<PlayHistory>>(
-                future: _getPlayHistory(_top),
-                builder: (context, snapshot) {
-                  var width = context.width;
-                  return snapshot.hasData
-                      ? NotificationListener<ScrollNotification>(
-                          onNotification: (scrollInfo) {
-                            if (scrollInfo.metrics.pixels ==
-                                    scrollInfo.metrics.maxScrollExtent &&
-                                snapshot.data!.length == _top) {
-                              if (!_loadMore) {
-                                _loadMoreData();
+            body: TabBarView(
+              controller: _controller,
+              children: <Widget>[
+                FutureBuilder<List<PlayHistory>>(
+                  future: _getPlayHistory(_top),
+                  builder: (context, snapshot) {
+                    var width = context.width;
+                    return snapshot.hasData
+                        ? NotificationListener<ScrollNotification>(
+                            onNotification: (scrollInfo) {
+                              if (scrollInfo.metrics.pixels ==
+                                      scrollInfo.metrics.maxScrollExtent &&
+                                  snapshot.data!.length == _top) {
+                                if (!_loadMore) {
+                                  _loadMoreData();
+                                }
                               }
-                            }
-                            return true;
-                          },
-                          child: ListView.builder(
+                              return true;
+                            },
+                            child: ListView.builder(
                               scrollDirection: Axis.vertical,
                               itemCount: snapshot.data!.length + 1,
                               itemBuilder: (context, index) {
                                 if (index == snapshot.data!.length) {
                                   return SizedBox(
-                                      height: 2,
-                                      child: _loadMore
-                                          ? LinearProgressIndicator()
-                                          : Center());
+                                    height: 2,
+                                    child: _loadMore
+                                        ? LinearProgressIndicator()
+                                        : Center(),
+                                  );
                                 } else {
                                   var seekValue =
                                       snapshot.data![index].seekValue!;
                                   var seconds = snapshot.data![index].seconds;
                                   return Container(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 5),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 5,
+                                    ),
                                     color: context.background,
                                     child: Column(
                                       children: <Widget>[
@@ -148,15 +154,17 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                               Text(
                                                 DateFormat.yMd()
                                                     .add_jm()
-                                                    .format(snapshot
-                                                        .data![index]
-                                                        .playdate!),
+                                                    .format(
+                                                      snapshot
+                                                          .data![index]
+                                                          .playdate!,
+                                                    ),
                                                 style: TextStyle(
-                                                    color: context.textColor
-                                                        .withOpacity(0.8),
-                                                    fontSize: 15,
-                                                    fontStyle:
-                                                        FontStyle.italic),
+                                                  color: context.textColor
+                                                      .withValues(alpha: 0.8),
+                                                  fontSize: 15,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
                                               ),
                                               Text(
                                                 snapshot.data![index].title!,
@@ -174,36 +182,42 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                               Container(
                                                 height: 2,
                                                 decoration: BoxDecoration(
-                                                    border: Border(
-                                                        bottom: BorderSide(
-                                                            color: Colors
-                                                                .grey[400]!,
-                                                            width: 2.0))),
-                                                width: width * seekValue <
+                                                  border: Border(
+                                                    bottom: BorderSide(
+                                                      color: Colors.grey[400]!,
+                                                      width: 2.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                                width:
+                                                    width * seekValue <
                                                         (width - 120)
                                                     ? width * seekValue
                                                     : width - 120,
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.symmetric(
-                                                    horizontal: 2),
+                                                  horizontal: 2,
+                                                ),
                                               ),
                                               Container(
                                                 width: 50,
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
-                                                    color: context.accentColor,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10))),
+                                                  color: context.accentColor,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                        Radius.circular(10),
+                                                      ),
+                                                ),
                                                 padding: EdgeInsets.all(2),
                                                 child: Text(
                                                   seconds == 0 && seekValue == 1
                                                       ? s.mark
                                                       : seconds!.toInt().toTime,
                                                   style: TextStyle(
-                                                      color: Colors.white),
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -213,93 +227,114 @@ class _PlayedHistoryState extends State<PlayedHistory>
                                     ),
                                   );
                                 }
-                              }),
-                        )
-                      : Center(
-                          child: SizedBox(
+                              },
+                            ),
+                          )
+                        : Center(
+                            child: SizedBox(
                               height: 25,
                               width: 25,
-                              child: CircularProgressIndicator()),
-                        );
-                },
-              ),
-              FutureBuilder<List<SubHistory>>(
-                future: getSubHistory(),
-                builder: (context, snapshot) {
-                  return snapshot.hasData
-                      ? ListView.builder(
-                          // shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            var _status = snapshot.data![index].status;
-                            return Container(
-                              color: context.background,
-                              child: Column(
-                                children: <Widget>[
-                                  ListTile(
-                                    enabled: _status,
-                                    title: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          DateFormat.yMd().add_jm().format(
-                                              snapshot.data![index].subDate),
-                                          style: TextStyle(
-                                              color: context.textColor
-                                                  .withOpacity(0.8),
-                                              fontSize: 15,
-                                              fontStyle: FontStyle.italic),
-                                        ),
-                                        Text(snapshot.data![index].title!),
-                                      ],
-                                    ),
-                                    subtitle: _status
-                                        ? Text(s.daysAgo(DateTime.now()
-                                            .difference(
-                                                snapshot.data![index].subDate)
-                                            .inDays))
-                                        : Text(
-                                            s.removedAt(DateFormat.yMd()
-                                                .add_jm()
-                                                .format(snapshot
-                                                    .data![index].delDate)),
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                    trailing: !_status
-                                        ? Material(
-                                            color: Colors.transparent,
-                                            child: IconButton(
-                                              tooltip: s.recoverSubscribe,
-                                              icon: Icon(LineIcons
-                                                  .alternativeTrashRestore),
-                                              onPressed: () => recoverSub(
-                                                  context,
-                                                  snapshot
-                                                      .data![index].rssUrl!),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                  },
+                ),
+                FutureBuilder<List<SubHistory>>(
+                  future: getSubHistory(),
+                  builder: (context, snapshot) {
+                    return snapshot.hasData
+                        ? ListView.builder(
+                            // shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              var status = snapshot.data![index].status;
+                              return Container(
+                                color: context.background,
+                                child: Column(
+                                  children: <Widget>[
+                                    ListTile(
+                                      enabled: status,
+                                      title: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            DateFormat.yMd().add_jm().format(
+                                              snapshot.data![index].subDate,
                                             ),
-                                          )
-                                        : null,
-                                  ),
-                                  Divider(
-                                    height: 2,
-                                  )
-                                ],
-                              ),
-                            );
-                          })
-                      : Center(
-                          child: SizedBox(
+                                            style: TextStyle(
+                                              color: context.textColor
+                                                  .withValues(alpha: 0.8),
+                                              fontSize: 15,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                          Text(snapshot.data![index].title!),
+                                        ],
+                                      ),
+                                      subtitle: status
+                                          ? Text(
+                                              s.daysAgo(
+                                                DateTime.now()
+                                                    .difference(
+                                                      snapshot
+                                                          .data![index]
+                                                          .subDate,
+                                                    )
+                                                    .inDays,
+                                              ),
+                                            )
+                                          : Text(
+                                              s.removedAt(
+                                                DateFormat.yMd()
+                                                    .add_jm()
+                                                    .format(
+                                                      snapshot
+                                                          .data![index]
+                                                          .delDate,
+                                                    ),
+                                              ),
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                      trailing: !status
+                                          ? Material(
+                                              color: Colors.transparent,
+                                              child: IconButton(
+                                                tooltip: s.recoverSubscribe,
+                                                icon: Icon(
+                                                  LineIcons
+                                                      .alternativeTrashRestore,
+                                                ),
+                                                onPressed: () => recoverSub(
+                                                  context,
+                                                  snapshot.data![index].rssUrl!,
+                                                ),
+                                              ),
+                                            )
+                                          : null,
+                                    ),
+                                    Divider(height: 2),
+                                  ],
+                                ),
+                              );
+                            },
+                          )
+                        : Center(
+                            child: SizedBox(
                               height: 25,
                               width: 25,
-                              child: CircularProgressIndicator()),
-                        );
-                },
-              ),
-            ]),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -363,19 +398,24 @@ class _PlayedHistoryState extends State<PlayedHistory>
     var subscribeWorker = context.watch<GroupList>();
     try {
       var options = BaseOptions(
-        connectTimeout: 10000,
-        receiveTimeout: 10000,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
       );
       var response = await Dio(options).get(url);
       var p = RssFeed.parse(response.data);
       var podcast = OnlinePodcast(
-          rss: url,
-          title: p.title,
-          publisher: p.author,
-          description: p.description,
-          image: p.itunes!.image!.href);
-      var item = SubscribeItem(podcast.rss, podcast.title,
-          imgUrl: podcast.image, group: 'Home');
+        rss: url,
+        title: p.title,
+        publisher: p.author,
+        description: p.description,
+        image: p.itunes!.image!.href,
+      );
+      var item = SubscribeItem(
+        podcast.rss,
+        podcast.title,
+        imgUrl: podcast.image,
+        group: 'Home',
+      );
       subscribeWorker.setSubscribeItem(item);
     } catch (e) {
       developer.log(e.toString(), name: 'Recover podcast error');
@@ -399,11 +439,11 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: _color,
-      child: _tabBar,
-    );
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(color: _color, child: _tabBar);
   }
 
   @override
@@ -414,7 +454,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
 class HistoryChart extends StatelessWidget {
   final List<FlSpot>? stats;
-  HistoryChart(this.stats);
+  const HistoryChart(this.stats, {super.key});
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -437,98 +477,122 @@ class HistoryChart extends StatelessWidget {
           ),
           titlesData: FlTitlesData(
             show: true,
-            bottomTitles: SideTitles(
-              getTextStyles: (_, i) => TextStyle(
-                color: const Color(0xff67727d),
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 28,
+                getTitlesWidget: (value, meta) {
+                  final label = DateFormat.E().format(
+                    DateTime.now().subtract(Duration(days: 7 - value.toInt())),
+                  );
+                  return SideTitleWidget(
+                    meta: meta,
+                    space: 5,
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        color: Color(0xff67727d),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  );
+                },
               ),
-              showTitles: true,
-              reservedSize: 10,
-              getTitles: (value) {
-                return DateFormat.E().format(DateTime.now()
-                    .subtract(Duration(days: (7 - value.toInt()))));
-              },
-              margin: 5,
             ),
-            leftTitles: SideTitles(
-              showTitles: true,
-              getTextStyles: (_, s) => TextStyle(
-                color: const Color(0xff67727d),
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 28,
+                getTitlesWidget: (value, meta) {
+                  final label = value % 60 == 0 && value > 0
+                      ? '${value ~/ 60}h'
+                      : '';
+                  return SideTitleWidget(
+                    meta: meta,
+                    space: 5,
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        color: Color(0xff67727d),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  );
+                },
               ),
-              getTitles: (value) {
-                return value % 60 == 0 && value > 0 ? '${value ~/ 60}h' : '';
-              },
-              reservedSize: 20,
-              margin: 5,
             ),
           ),
           borderData: FlBorderData(
-              show: false,
-              border: Border(
-                left: BorderSide(color: Colors.red, width: 2),
-              )),
+            show: false,
+            border: Border(left: BorderSide(color: Colors.red, width: 2)),
+          ),
           lineTouchData: LineTouchData(
             enabled: true,
             touchTooltipData: LineTouchTooltipData(
-              tooltipBgColor: context.background,
+              getTooltipColor: (_) => context.background,
               fitInsideHorizontally: true,
               getTooltipItems: (touchedBarSpots) {
                 return touchedBarSpots.map((barSpot) {
-                  return LineTooltipItem(context.s.minsCount(barSpot.y.toInt()),
-                      context.textTheme.subtitle1!);
+                  return LineTooltipItem(
+                    context.s.minsCount(barSpot.y.toInt()),
+                    context.textTheme.titleMedium!,
+                  );
                 }).toList();
               },
             ),
             getTouchedSpotIndicator: (barData, spotIndexes) {
               return spotIndexes.map((spotIndex) {
                 return TouchedSpotIndicatorData(
-                    FlLine(color: Colors.transparent),
-                    FlDotData(
-                        show: true,
-                        getDotPainter: (spot, percent, barData, index) {
-                          return FlDotCirclePainter(
-                              radius: 3,
-                              color: context.accentColor,
-                              strokeWidth: 4,
-                              strokeColor: context.primaryColor);
-                        }));
+                  FlLine(color: Colors.transparent),
+                  FlDotData(
+                    show: true,
+                    getDotPainter: (spot, percent, barData, index) {
+                      return FlDotCirclePainter(
+                        radius: 3,
+                        color: context.accentColor,
+                        strokeWidth: 4,
+                        strokeColor: context.primaryColor,
+                      );
+                    },
+                  ),
+                );
               }).toList();
             },
           ),
           lineBarsData: [
             LineChartBarData(
-              spots: stats,
+              spots: stats ?? const [],
               isCurved: true,
-              colors: [context.accentColor],
+              color: context.accentColor,
               preventCurveOverShooting: true,
               barWidth: 3,
               isStrokeCapRound: true,
               belowBarData: BarAreaData(
-                  show: true,
-                  gradientFrom: Offset(0, 0),
-                  gradientTo: Offset(0, 1),
-                  gradientColorStops: [
-                    0.3,
-                    0.8,
-                    0.99
-                  ],
+                show: true,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0.3, 0.8, 0.99],
                   colors: [
-                    context.accentColor.withOpacity(0.6),
-                    context.accentColor.withOpacity(0.1),
-                    context.accentColor.withOpacity(0)
-                  ]),
+                    context.accentColor.withValues(alpha: 0.6),
+                    context.accentColor.withValues(alpha: 0.1),
+                    context.accentColor.withValues(alpha: 0),
+                  ],
+                ),
+              ),
               dotData: FlDotData(
-                  show: true,
-                  getDotPainter: (spot, percent, barData, index) {
-                    return FlDotCirclePainter(
-                        radius: 2,
-                        color: context.primaryColor,
-                        strokeWidth: 3,
-                        strokeColor: context.accentColor);
-                  }),
+                show: true,
+                getDotPainter: (spot, percent, barData, index) {
+                  return FlDotCirclePainter(
+                    radius: 2,
+                    color: context.primaryColor,
+                    strokeWidth: 3,
+                    strokeColor: context.accentColor,
+                  );
+                },
+              ),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tsacdop/type/search_api/search_genre.dart';
+
 import '../type/search_api/searchpodcast.dart';
 
 class SearchState extends ChangeNotifier {

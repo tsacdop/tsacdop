@@ -10,7 +10,7 @@ import 'package:tsacdop/util/extension_helper.dart';
 
 class ShowNote extends StatelessWidget {
   final EpisodeBrief? episode;
-  const ShowNote({this.episode, Key? key}) : super(key: key);
+  const ShowNote({this.episode, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,39 +20,42 @@ class ShowNote extends StatelessWidget {
       future: _getSDescription(episode!.enclosureUrl),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          var description = snapshot.data;
-          if (description == null) return Center();
-          if (description.length > 0) {
+          var description = snapshot.data!;
+          if (description.isNotEmpty) {
             return Selector<AudioPlayerNotifier, EpisodeBrief?>(
               selector: (_, audio) => audio.episode,
-              builder: (_, playEpisode, __) {
-                if (playEpisode == episode && !description!.contains('#t=')) {
-                  final linkList = linkify(description,
-                      options: LinkifyOptions(humanize: false),
-                      linkifiers: [TimeStampLinkifier()]);
+              builder: (_, playEpisode, _) {
+                if (playEpisode == episode && !description.contains('#t=')) {
+                  final linkList = linkify(
+                    description,
+                    options: LinkifyOptions(humanize: false),
+                    linkifiers: [TimeStampLinkifier()],
+                  );
                   for (final element in linkList) {
                     if (element is TimeStampElement) {
                       final time = element.timeStamp;
-                      description = description!.replaceFirst(time!,
-                          '<a rel="nofollow" href = "#t=$time">$time</a>');
+                      description = description.replaceFirst(
+                        time,
+                        '<a rel="nofollow" href = "#t=$time">$time</a>',
+                      );
                     }
                   }
                 }
                 return Selector<SettingState, TextStyle>(
                   selector: (_, settings) => settings.showNoteFontStyle,
-                  builder: (_, data, __) => Html(
+                  builder: (_, data, _) => Html(
                     style: {
                       'html': Style.fromTextStyle(data.copyWith(fontSize: 14))
                           .copyWith(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                      ),
+                            padding: HtmlPaddings.symmetric(horizontal: 12),
+                          ),
                       'a': Style(
                         color: context.accentColor,
                         textDecoration: TextDecoration.none,
                       ),
                     },
                     data: description,
-                    onLinkTap: (url, _, __, ___) {
+                    onLinkTap: (url, _, _) {
                       if (url!.substring(0, 3) == '#t=') {
                         final seconds = _getTimeStamp(url);
                         if (playEpisode == episode) {
@@ -78,10 +81,13 @@ class ShowNote extends StatelessWidget {
                     height: 100.0,
                   ),
                   Padding(padding: EdgeInsets.all(5.0)),
-                  Text(s.noShownote,
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(color: context.textColor.withOpacity(0.5))),
+                  Text(
+                    s.noShownote,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: context.textColor.withValues(alpha: 0.5),
+                    ),
+                  ),
                 ],
               ),
             );
@@ -98,7 +104,8 @@ class ShowNote extends StatelessWidget {
     final data = time.split(':');
     int? seconds;
     if (data.length == 3) {
-      seconds = int.tryParse(data[0])! * 3600 +
+      seconds =
+          int.tryParse(data[0])! * 3600 +
           int.tryParse(data[1])! * 60 +
           int.tryParse(data[2])!;
     } else if (data.length == 2) {
@@ -115,18 +122,24 @@ class ShowNote extends StatelessWidget {
         .replaceAll('\r', '')
         .trim();
     if (!description.contains('<')) {
-      final linkList = linkify(description,
-          options: LinkifyOptions(humanize: false),
-          linkifiers: [UrlLinkifier(), EmailLinkifier()]);
+      final linkList = linkify(
+        description,
+        options: LinkifyOptions(humanize: false),
+        linkifiers: [UrlLinkifier(), EmailLinkifier()],
+      );
       for (var element in linkList) {
         if (element is UrlElement) {
-          description = description.replaceAll(element.url!,
-              '<a rel="nofollow" href = ${element.url}>${element.text}</a>');
+          description = description.replaceAll(
+            element.url,
+            '<a rel="nofollow" href = ${element.url}>${element.text}</a>',
+          );
         }
         if (element is EmailElement) {
           final address = element.emailAddress;
-          description = description.replaceAll(address,
-              '<a rel="nofollow" href = "mailto:$address">$address</a>');
+          description = description.replaceAll(
+            address,
+            '<a rel="nofollow" href = "mailto:$address">$address</a>',
+          );
         }
       }
       await dbHelper.saveEpisodeDes(url, description: description);

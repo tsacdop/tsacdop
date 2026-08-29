@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+
 import '../util/extension_helper.dart';
 
 class EpisodeBrief extends Equatable {
@@ -27,80 +28,92 @@ class EpisodeBrief extends Equatable {
   final int? downloadDate;
   final String? episodeImage;
   final String? chapterLink;
-  EpisodeBrief(
-      this.title,
-      this.enclosureUrl,
-      this.enclosureLength,
-      this.pubDate,
-      this.feedTitle,
-      this.primaryColor,
-      this.duration,
-      this.explicit,
-      this.imagePath,
-      this.isNew,
-      {this.mediaId,
-      this.liked,
-      this.downloaded,
-      this.skipSecondsStart,
-      this.skipSecondsEnd,
-      this.description = '',
-      this.downloadDate = 0,
-      this.chapterLink = '',
-      this.episodeImage = ''})
-      : assert(enclosureUrl != null);
+  const EpisodeBrief(
+    this.title,
+    this.enclosureUrl,
+    this.enclosureLength,
+    this.pubDate,
+    this.feedTitle,
+    this.primaryColor,
+    this.duration,
+    this.explicit,
+    this.imagePath,
+    this.isNew, {
+    this.mediaId,
+    this.liked,
+    this.downloaded,
+    this.skipSecondsStart,
+    this.skipSecondsEnd,
+    this.description = '',
+    this.downloadDate = 0,
+    this.chapterLink = '',
+    this.episodeImage = '',
+  });
 
   MediaItem toMediaItem() {
     return MediaItem(
-        id: mediaId!,
-        title: title!,
-        artist: feedTitle,
-        album: feedTitle,
-        duration: Duration.zero,
-        artUri:
-            Uri.parse(imagePath == '' ? episodeImage! : 'file://$imagePath'),
-        extras: {
-          'skipSecondsStart': skipSecondsStart,
-          'skipSecondsEnd': skipSecondsEnd
-        });
+      id: mediaId!,
+      title: title!,
+      artist: feedTitle,
+      album: feedTitle,
+      duration: Duration.zero,
+      artUri: Uri.parse(imagePath == '' ? episodeImage! : 'file://$imagePath'),
+      extras: {
+        'skipSecondsStart': skipSecondsStart,
+        'skipSecondsEnd': skipSecondsEnd,
+      },
+    );
   }
 
   ImageProvider get avatarImage {
     return File(imagePath!).existsSync()
         ? FileImage(File(imagePath!))
         : File(episodeImage!).existsSync()
-            ? FileImage(File(episodeImage!))
-            : ((episodeImage != '')
-                    ? CachedNetworkImageProvider(episodeImage!)
-                    : AssetImage('assets/avatar_backup.png'))
-                as ImageProvider<Object>;
+        ? FileImage(File(episodeImage!))
+        : ((episodeImage != '')
+                  ? CachedNetworkImageProvider(episodeImage!)
+                  : AssetImage('assets/avatar_backup.png'))
+              as ImageProvider<Object>;
   }
 
   Color backgroudColor(BuildContext context) {
-    if (primaryColor == '') return context.accentColor;
+    if (primaryColor == null || primaryColor!.trim().isEmpty) {
+      return context.accentColor;
+    }
     return context.brightness == Brightness.light
         ? primaryColor!.colorizedark()
         : primaryColor!.colorizeLight();
   }
 
   Color cardColor(BuildContext context) {
+    final seedColor = primaryColor == null || primaryColor!.trim().isEmpty
+        ? context.accentColor
+        : primaryColor!.colorizedark();
     final schema = ColorScheme.fromSeed(
-      seedColor: primaryColor!.colorizedark(),
+      seedColor: seedColor,
       brightness: context.brightness,
     );
     return schema.primaryContainer;
   }
 
-  EpisodeBrief copyWith({
-    String? mediaId,
-  }) =>
-      EpisodeBrief(title, enclosureUrl, enclosureLength, pubDate, feedTitle,
-          primaryColor, duration, explicit, imagePath, isNew,
-          mediaId: mediaId ?? this.mediaId,
-          downloaded: downloaded,
-          skipSecondsStart: skipSecondsStart,
-          skipSecondsEnd: skipSecondsEnd,
-          description: description,
-          downloadDate: downloadDate);
+  EpisodeBrief copyWith({String? mediaId}) => EpisodeBrief(
+    title,
+    enclosureUrl,
+    enclosureLength,
+    pubDate,
+    feedTitle,
+    primaryColor,
+    duration,
+    explicit,
+    imagePath,
+    isNew,
+    mediaId: mediaId ?? this.mediaId,
+    downloaded: downloaded,
+    skipSecondsStart: skipSecondsStart,
+    skipSecondsEnd: skipSecondsEnd,
+    description: description,
+    downloadDate: downloadDate,
+  );
 
   @override
   List<Object?> get props => [enclosureUrl, title];

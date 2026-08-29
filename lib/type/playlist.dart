@@ -17,14 +17,18 @@ class PlaylistEntity {
       'name': name,
       'id': id,
       'isLocal': isLocal,
-      'episodeList': episodeList
+      'episodeList': episodeList,
     };
   }
 
   static PlaylistEntity fromJson(Map<String, dynamic> json) {
     var list = List<String>.from(json['episodeList'] as Iterable<dynamic>);
-    return PlaylistEntity(json['name'] as String?, json['id'] as String?,
-        json['isLocal'] == null ? false : json['isLocal'] as bool?, list);
+    return PlaylistEntity(
+      json['name'] as String?,
+      json['id'] as String?,
+      json['isLocal'] == null ? false : json['isLocal'] as bool?,
+      list,
+    );
   }
 }
 
@@ -53,15 +57,16 @@ class Playlist extends Equatable {
 
   bool contains(EpisodeBrief episode) => episodes.contains(episode);
 
-  Playlist(this.name,
-      {String? id,
-      this.isLocal = false,
-      List<String>? episodeList,
-      List<EpisodeBrief>? episodes})
-      : id = id ?? Uuid().v4(),
-        assert(name != ''),
-        episodeList = episodeList ?? [],
-        episodes = episodes ?? [];
+  Playlist(
+    this.name, {
+    String? id,
+    this.isLocal = false,
+    List<String>? episodeList,
+    List<EpisodeBrief>? episodes,
+  }) : id = id ?? Uuid().v4(),
+       assert(name != ''),
+       episodeList = episodeList ?? [],
+       episodes = episodes ?? [];
 
   PlaylistEntity toEntity() {
     return PlaylistEntity(name, id, isLocal, episodeList.toSet().toList());
@@ -77,7 +82,7 @@ class Playlist extends Equatable {
   }
 
   final DBHelper _dbHelper = DBHelper();
-//  final KeyValueStorage _playlistStorage = KeyValueStorage(playlistKey);
+  //  final KeyValueStorage _playlistStorage = KeyValueStorage(playlistKey);
 
   Future<void> getPlaylist() async {
     episodes.clear();
@@ -99,11 +104,11 @@ class Playlist extends Equatable {
     }
   }
 
-// Future<void> savePlaylist() async {
-//    var urls = <String>[];
-//    urls.addAll(_playlist.map((e) => e.enclosureUrl));
-//    await _playlistStorage.saveStringList(urls.toSet().toList());
-//  }
+  // Future<void> savePlaylist() async {
+  //    var urls = <String>[];
+  //    urls.addAll(_playlist.map((e) => e.enclosureUrl));
+  //    await _playlistStorage.saveStringList(urls.toSet().toList());
+  //  }
 
   void addToPlayList(EpisodeBrief episodeBrief) {
     if (!episodes.contains(episodeBrief)) {
@@ -112,8 +117,11 @@ class Playlist extends Equatable {
     }
   }
 
-  void addToPlayListAt(EpisodeBrief episodeBrief, int index,
-      {bool existed = true}) {
+  void addToPlayListAt(
+    EpisodeBrief episodeBrief,
+    int index, {
+    bool existed = true,
+  }) {
     if (existed) {
       episodes.removeWhere((episode) => episode == episodeBrief);
       episodeList.removeWhere((url) => url == episodeBrief.enclosureUrl);
@@ -130,7 +138,8 @@ class Playlist extends Equatable {
   int delFromPlaylist(EpisodeBrief? episodeBrief) {
     var index = episodes.indexOf(episodeBrief);
     episodes.removeWhere(
-        (episode) => episode!.enclosureUrl == episodeBrief!.enclosureUrl);
+      (episode) => episode!.enclosureUrl == episodeBrief!.enclosureUrl,
+    );
     episodeList.removeWhere((url) => url == episodeBrief!.enclosureUrl);
     if (isLocal!) {
       _dbHelper.deleteLocalEpisodes([episodeBrief!.enclosureUrl]);
@@ -139,9 +148,6 @@ class Playlist extends Equatable {
   }
 
   void reorderPlaylist(int oldIndex, int newIndex) {
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
     final episode = episodes.removeAt(oldIndex)!;
     episodes.insert(newIndex, episode);
     episodeList.removeAt(oldIndex);

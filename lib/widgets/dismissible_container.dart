@@ -10,8 +10,7 @@ import 'custom_widget.dart';
 class DismissibleContainer extends StatefulWidget {
   final EpisodeBrief? episode;
   final ValueChanged<bool>? onRemove;
-  DismissibleContainer({this.episode, this.onRemove, Key? key})
-      : super(key: key);
+  const DismissibleContainer({this.episode, this.onRemove, super.key});
 
   @override
   _DismissibleContainerState createState() => _DismissibleContainerState();
@@ -35,9 +34,7 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
       alignment: Alignment.center,
       height: _delete ? 0 : 91.0,
       child: _delete
-          ? Container(
-              color: Colors.transparent,
-            )
+          ? Container(color: Colors.transparent)
           : Column(
               children: [
                 Padding(
@@ -52,7 +49,9 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                         children: <Widget>[
                           Container(
                             decoration: BoxDecoration(
-                                shape: BoxShape.circle, color: Colors.red),
+                              shape: BoxShape.circle,
+                              color: Colors.red,
+                            ),
                             padding: EdgeInsets.all(5),
                             alignment: Alignment.center,
                             child: Icon(
@@ -63,7 +62,9 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                                shape: BoxShape.circle, color: Colors.red),
+                              shape: BoxShape.circle,
+                              color: Colors.red,
+                            ),
                             padding: EdgeInsets.all(5),
                             alignment: Alignment.center,
                             child: Icon(
@@ -84,13 +85,16 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                           .delFromPlaylist(widget.episode!);
                       widget.onRemove!(true);
                       final episodeRemove = widget.episode;
-                      Scaffold.of(context).removeCurrentSnackBar();
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: Colors.grey[800],
-                        content: Text(s.toastRemovePlaylist,
-                            style: TextStyle(color: Colors.white)),
-                        action: SnackBarAction(
+                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.grey[800],
+                          content: Text(
+                            s.toastRemovePlaylist,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          action: SnackBarAction(
                             textColor: context.accentColor,
                             label: s.undo,
                             onPressed: () async {
@@ -98,8 +102,10 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                                   .read<AudioPlayerNotifier>()
                                   .addToPlaylistAt(episodeRemove!, index);
                               widget.onRemove!(false);
-                            }),
-                      ));
+                            },
+                          ),
+                        ),
+                      );
                     },
                     child: EpisodeCard(
                       widget.episode!,
@@ -107,15 +113,15 @@ class _DismissibleContainerState extends State<DismissibleContainer> {
                       canReorder: true,
                       showDivider: false,
                       onTap: () async {
-                        await context
-                            .read<AudioPlayerNotifier>()
-                            .episodeLoad(widget.episode);
+                        await context.read<AudioPlayerNotifier>().episodeLoad(
+                          widget.episode,
+                        );
                         widget.onRemove!(true);
                       },
                     ),
                   ),
                 ),
-                Divider(height: 1)
+                Divider(height: 1),
               ],
             ),
     );
@@ -130,16 +136,16 @@ class EpisodeCard extends StatelessWidget {
   final bool canReorder;
   final bool showDivider;
   final bool havePadding;
-  const EpisodeCard(this.episode,
-      {this.tileColor,
-      this.onTap,
-      this.isPlaying,
-      this.canReorder = false,
-      this.showDivider = true,
-      this.havePadding = false,
-      Key? key})
-      : assert(episode != null),
-        super(key: key);
+  const EpisodeCard(
+    this.episode, {
+    this.tileColor,
+    this.onTap,
+    this.isPlaying,
+    this.canReorder = false,
+    this.showDivider = true,
+    this.havePadding = false,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -171,8 +177,9 @@ class EpisodeCard extends StatelessWidget {
                     Icon(Icons.unfold_more, color: c),
                   SizedBox(width: canReorder && !havePadding ? 0 : 24),
                   CircleAvatar(
-                      backgroundColor: c.withOpacity(0.5),
-                      backgroundImage: episode.avatarImage),
+                    backgroundColor: c.withValues(alpha: 0.5),
+                    backgroundImage: episode.avatarImage,
+                  ),
                 ],
               ),
               subtitle: Container(
@@ -182,26 +189,30 @@ class EpisodeCard extends StatelessWidget {
                   children: <Widget>[
                     if (episode.explicit == 1)
                       Container(
-                          decoration: BoxDecoration(
-                              color: Colors.red[800], shape: BoxShape.circle),
-                          height: 25.0,
-                          width: 25.0,
-                          margin: EdgeInsets.only(right: 10.0),
-                          alignment: Alignment.center,
-                          child:
-                              Text('E', style: TextStyle(color: Colors.white))),
+                        decoration: BoxDecoration(
+                          color: Colors.red[800],
+                          shape: BoxShape.circle,
+                        ),
+                        height: 25.0,
+                        width: 25.0,
+                        margin: EdgeInsets.only(right: 10.0),
+                        alignment: Alignment.center,
+                        child: Text('E', style: TextStyle(color: Colors.white)),
+                      ),
                     if (episode.duration != 0)
                       episodeTag(
-                          episode.duration == 0
-                              ? ''
-                              : s.minsCount(episode.duration! ~/ 60),
-                          Colors.cyan[300]),
+                        episode.duration == 0
+                            ? ''
+                            : s.minsCount(episode.duration! ~/ 60),
+                        Colors.cyan[300],
+                      ),
                     if (episode.enclosureLength != null)
                       episodeTag(
-                          episode.enclosureLength == 0
-                              ? ''
-                              : '${episode.enclosureLength! ~/ 1000000}MB',
-                          Colors.lightBlue[300]),
+                        episode.enclosureLength == 0
+                            ? ''
+                            : '${episode.enclosureLength! ~/ 1000000}MB',
+                        Colors.lightBlue[300],
+                      ),
                   ],
                 ),
               ),
@@ -210,10 +221,9 @@ class EpisodeCard extends StatelessWidget {
                       height: 20,
                       width: 20,
                       margin: EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: WaveLoader(color: context.accentColor))
+                      decoration: BoxDecoration(shape: BoxShape.circle),
+                      child: WaveLoader(color: context.accentColor),
+                    )
                   : SizedBox(width: 1),
             ),
           ),

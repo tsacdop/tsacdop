@@ -5,3 +5,9 @@ gradle-wrapper.jar
 /gradlew.bat
 /local.properties
 GeneratedPluginRegistrant.java
+.cxx/
+
+# Never commit Android signing material.
+key.properties
+**/*.keystore
+**/*.jks

@@ -20,6 +20,8 @@ import 'syncing.dart';
 import 'theme.dart';
 
 class Settings extends StatefulWidget {
+  const Settings({super.key});
+
   @override
   _SettingsState createState() => _SettingsState();
 }
@@ -27,10 +29,11 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   late bool _showTitle;
   ScrollController? _controller;
-  _scrollListener() {
-    if (_controller!.offset > context.textTheme.headline5!.fontSize!) {
+  void _scrollListener() {
+    if (_controller!.offset > context.textTheme.headlineSmall!.fontSize!) {
       if (!_showTitle) setState(() => _showTitle = true);
-    } else if (_showTitle) setState(() => _showTitle = false);
+    } else if (_showTitle)
+      setState(() => _showTitle = false);
   }
 
   @override
@@ -48,23 +51,19 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _feedbackItem(IconData icon, String name, String url) => ListTile(
-        onTap: () {
-          url.launchUrl;
-          Navigator.pop(context);
-        },
-        dense: true,
-        title: Row(
-          children: [
-            Icon(icon, size: 20),
-            SizedBox(width: 20),
-            Text(
-              name,
-              maxLines: 2,
-              style: context.textTheme.bodyText2,
-            ),
-          ],
-        ),
-      );
+    onTap: () {
+      url.launchUrl;
+      Navigator.pop(context);
+    },
+    dense: true,
+    title: Row(
+      children: [
+        Icon(icon, size: 20),
+        SizedBox(width: 20),
+        Text(name, maxLines: 2, style: context.textTheme.bodyMedium),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -91,20 +90,23 @@ class _SettingsState extends State<Settings> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(10.0),
-              ),
+              Padding(padding: EdgeInsets.all(10.0)),
               Container(
                 height: 30.0,
                 padding: EdgeInsets.symmetric(horizontal: 70),
                 alignment: Alignment.centerLeft,
-                child: Text(s.settingsPrefrence,
-                    style: context.textTheme.bodyText1!
-                        .copyWith(color: context.accentColor)),
+                child: Text(
+                  s.settingsPrefrence,
+                  style: context.textTheme.bodyLarge!.copyWith(
+                    color: context.accentColor,
+                  ),
+                ),
               ),
               ListTile(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ThemeSetting())),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ThemeSetting()),
+                ),
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                 leading: Icon(LineIcons.adjust, color: context.accentColor),
                 title: Text(s.settingsAppearance),
@@ -112,8 +114,10 @@ class _SettingsState extends State<Settings> {
               ),
               Divider(height: 1),
               ListTile(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LayoutSetting())),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LayoutSetting()),
+                ),
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                 leading: Icon(LineIcons.stopCircle, color: Colors.blueAccent),
                 title: Text(s.settingsLayout),
@@ -121,8 +125,10 @@ class _SettingsState extends State<Settings> {
               ),
               Divider(height: 1),
               ListTile(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PlaySetting())),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PlaySetting()),
+                ),
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                 leading: Icon(LineIcons.playCircle, color: Colors.redAccent),
                 title: Text(s.play),
@@ -130,19 +136,24 @@ class _SettingsState extends State<Settings> {
               ),
               Divider(height: 1),
               ListTile(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SyncingSetting())),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading: Icon(LineIcons.alternateCloudDownload,
-                      color: Colors.yellow[700]),
-                  title: Text(s.settingsSyncing),
-                  subtitle: Text(s.settingsSyncingDes)),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SyncingSetting()),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                leading: Icon(
+                  LineIcons.alternateCloudDownload,
+                  color: Colors.yellow[700],
+                ),
+                title: Text(s.settingsSyncing),
+                subtitle: Text(s.settingsSyncingDes),
+              ),
               Divider(height: 1),
               ListTile(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => StorageSetting())),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StorageSetting()),
+                ),
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                 leading: Icon(LineIcons.save, color: Colors.green[700]),
                 title: Text(s.settingStorage),
@@ -150,8 +161,10 @@ class _SettingsState extends State<Settings> {
               ),
               Divider(height: 1),
               ListTile(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PlayedHistory())),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PlayedHistory()),
+                ),
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                 leading: Icon(Icons.update, color: Colors.indigo[700]),
                 title: Text(s.settingsHistory),
@@ -159,9 +172,11 @@ class _SettingsState extends State<Settings> {
               ),
               Divider(height: 1),
               ListTile(
-                onTap: () => generalSheet(context,
-                        title: s.settingsLanguages, child: LanguagesSetting())
-                    .then((value) => setState(() {})),
+                onTap: () => generalSheet(
+                  context,
+                  title: s.settingsLanguages,
+                  child: LanguagesSetting(),
+                ).then((value) => setState(() {})),
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                 leading: Icon(LineIcons.language, color: Colors.purpleAccent),
                 title: Text(s.settingsLanguages),
@@ -171,32 +186,36 @@ class _SettingsState extends State<Settings> {
               ListTile(
                 onTap: () {
                   //_exportOmpl(context);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => DataBackup()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DataBackup()),
+                  );
                 },
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                leading:
-                    Icon(LineIcons.codeFile, color: Colors.lightGreen[700]),
+                leading: Icon(
+                  LineIcons.codeFile,
+                  color: Colors.lightGreen[700],
+                ),
                 title: Text(s.settingsBackup),
                 subtitle: Text(s.settingsBackupDes),
               ),
               Divider(height: 1),
-              Padding(
-                padding: EdgeInsets.all(10.0),
-              ),
+              Padding(padding: EdgeInsets.all(10.0)),
               Container(
                 height: 30.0,
                 padding: EdgeInsets.symmetric(horizontal: 70),
                 alignment: Alignment.centerLeft,
-                child: Text(s.settingsInfo,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1!
-                        .copyWith(color: Theme.of(context).accentColor)),
+                child: Text(
+                  s.settingsInfo,
+                  style: Theme.of(context).textTheme.bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.secondary),
+                ),
               ),
               ListTile(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Libries())),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Libries()),
+                ),
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                 leading: Icon(LineIcons.bookOpen, color: Colors.purple[700]),
                 title: Text(s.settingsLibraries),
@@ -211,14 +230,26 @@ class _SettingsState extends State<Settings> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      _feedbackItem(LineIcons.github, s.feedbackGithub,
-                          'https://github.com/stonega/tsacdop/issues'),
-                      _feedbackItem(LineIcons.telegram, s.feedbackTelegram,
-                          'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg'),
-                      _feedbackItem(LineIcons.envelopeOpenText, s.feedbackEmail,
-                          'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback'),
-                      _feedbackItem(LineIcons.googlePlay, s.feedbackPlay,
-                          'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop'),
+                      _feedbackItem(
+                        LineIcons.github,
+                        s.feedbackGithub,
+                        'https://github.com/stonega/tsacdop/issues',
+                      ),
+                      _feedbackItem(
+                        LineIcons.telegram,
+                        s.feedbackTelegram,
+                        'https://t.me/joinchat/Bk3LkRpTHy40QYC78PK7Qg',
+                      ),
+                      _feedbackItem(
+                        LineIcons.envelopeOpenText,
+                        s.feedbackEmail,
+                        'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback',
+                      ),
+                      _feedbackItem(
+                        LineIcons.googlePlay,
+                        s.feedbackPlay,
+                        'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop',
+                      ),
                     ],
                   ),
                 ),
@@ -227,9 +258,7 @@ class _SettingsState extends State<Settings> {
                 title: Text(s.settingsFeedback),
                 subtitle: Text(s.settingsFeedbackDes),
               ),
-              Divider(
-                height: 2,
-              ),
+              Divider(height: 2),
               ListTile(
                 onTap: () {
                   FeatureDiscovery.clearPreferences(context, <String>{
@@ -240,7 +269,7 @@ class _SettingsState extends State<Settings> {
                     addGroupFeature,
                     configureGroup,
                     configurePodcast,
-                    podcastFeature
+                    podcastFeature,
                   });
                   Fluttertoast.showToast(
                     msg: s.toastDiscovery,
@@ -254,17 +283,17 @@ class _SettingsState extends State<Settings> {
               Divider(height: 1),
               ListTile(
                 onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SlideIntro(goto: Goto.settings))),
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SlideIntro(goto: Goto.settings),
+                  ),
+                ),
                 contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
                 leading: Icon(LineIcons.columns, color: Colors.blueGrey),
                 title: Text(s.settingsAppIntro),
               ),
               Divider(height: 1),
-              Padding(
-                padding: EdgeInsets.all(10.0),
-              ),
+              Padding(padding: EdgeInsets.all(10.0)),
             ],
           ),
         ),

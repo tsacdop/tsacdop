@@ -15,7 +15,7 @@ enum Goto { home, settings }
 
 class SlideIntro extends StatefulWidget {
   final Goto? goto;
-  SlideIntro({this.goto, Key? key}) : super(key: key);
+  const SlideIntro({this.goto, super.key});
 
   @override
   _SlideIntroState createState() => _SlideIntroState();
@@ -55,18 +55,15 @@ class _SlideIntroState extends State<SlideIntro> {
     return Center(
       child: Container(
         alignment: Alignment.center,
+        height: size,
+        width: size,
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
         child: distance < 0.2
             ? Text(
                 (index + 1).toString(),
                 style: TextStyle(color: Color.fromRGBO(35, 204, 198, 1)),
               )
             : Center(),
-        height: size,
-        width: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white,
-        ),
       ),
     );
   }
@@ -75,8 +72,9 @@ class _SlideIntroState extends State<SlideIntro> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.light,
-          systemNavigationBarIconBrightness: Brightness.dark),
+        statusBarBrightness: Brightness.light,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
       child: Scaffold(
         backgroundColor: Colors.grey[100],
         body: Container(
@@ -97,10 +95,14 @@ class _SlideIntroState extends State<SlideIntro> {
                 bottom: 0,
                 left: 0,
                 child: Container(
-                  color: Colors.grey[100]!.withOpacity(0.5),
+                  color: Colors.grey[100]!.withValues(alpha: 0.5),
                   width: context.width,
-                  padding:
-                      EdgeInsets.only(left: 40, right: 20, bottom: 30, top: 20),
+                  padding: EdgeInsets.only(
+                    left: 40,
+                    right: 20,
+                    bottom: 30,
+                    top: 20,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
@@ -113,7 +115,7 @@ class _SlideIntroState extends State<SlideIntro> {
                             _indicatorWidget(0),
                             _indicatorWidget(1),
                             _indicatorWidget(2),
-                            _indicatorWidget(3)
+                            _indicatorWidget(3),
                           ],
                         ),
                       ),
@@ -132,43 +134,58 @@ class _SlideIntroState extends State<SlideIntro> {
                           color: Colors.transparent,
                           child: _position! < 2.5
                               ? InkWell(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
                                   onTap: () => _controller!.animateToPage(
-                                      _position!.toInt() + 1,
-                                      duration: Duration(milliseconds: 200),
-                                      curve: Curves.linear),
+                                    _position!.toInt() + 1,
+                                    duration: Duration(milliseconds: 200),
+                                    curve: Curves.linear,
+                                  ),
                                   child: SizedBox(
-                                      height: 40,
-                                      width: 80,
-                                      child: Center(
-                                          child: Text(context.s.next,
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight:
-                                                      FontWeight.bold)))))
+                                    height: 40,
+                                    width: 80,
+                                    child: Center(
+                                      child: Text(
+                                        context.s.next,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
                               : InkWell(
                                   borderRadius: BorderRadius.circular(20),
                                   onTap: () {
                                     if (widget.goto == Goto.home) {
-                                      Navigator.push(context,
-                                          SlideLeftRoute(page: Home()));
-                                      Provider.of<SettingState>(context,
-                                              listen: false)
-                                          .saveShowIntro(1);
+                                      Navigator.push(
+                                        context,
+                                        SlideLeftRoute(page: Home()),
+                                      );
+                                      Provider.of<SettingState>(
+                                        context,
+                                        listen: false,
+                                      ).saveShowIntro(1);
                                     } else if (widget.goto == Goto.settings) {
                                       Navigator.pop(context);
                                     }
                                   },
                                   child: SizedBox(
-                                      height: 40,
-                                      width: 80,
-                                      child: Center(
-                                          child: Text(context.s.done,
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight:
-                                                      FontWeight.bold))))),
+                                    height: 40,
+                                    width: 80,
+                                    child: Center(
+                                      child: Text(
+                                        context.s.done,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
                     ],

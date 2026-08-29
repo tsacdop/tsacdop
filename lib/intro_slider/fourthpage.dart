@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+
 import '../util/extension_helper.dart';
 
 class FourthPage extends StatefulWidget {
-  FourthPage({Key? key}) : super(key: key);
+  const FourthPage({super.key});
 
   @override
   _FourthPageState createState() => _FourthPageState();
@@ -29,13 +30,14 @@ class _FourthPageState extends State<FourthPage> {
               ),
             ),
             SizedBox(
-                height: context.width * 3 / 4,
-                child: FlareActor(
-                  'assets/longtap.flr',
-                  alignment: Alignment.center,
-                  animation: 'longtap',
-                  fit: BoxFit.cover,
-                )),
+              height: context.width * 3 / 4,
+              child: FlareActor(
+                'assets/longtap.flr',
+                alignment: Alignment.center,
+                animation: 'longtap',
+                fit: BoxFit.cover,
+              ),
+            ),
             Spacer(),
           ],
         ),

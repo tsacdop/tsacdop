@@ -15,6 +15,8 @@ import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
 
 class DownloadsManage extends StatefulWidget {
+  const DownloadsManage({super.key});
+
   @override
   _DownloadsManageState createState() => _DownloadsManageState();
 }
@@ -78,8 +80,11 @@ class _DownloadsManageState extends State<DownloadsManage> {
     _getStorageSize();
   }
 
-  String _downloadDateToString(BuildContext context,
-      {required int downloadDate, int? pubDate}) {
+  String _downloadDateToString(
+    BuildContext context, {
+    required int downloadDate,
+    int? pubDate,
+  }) {
     final s = context.s;
     var date = DateTime.fromMillisecondsSinceEpoch(downloadDate);
     var diffrence = DateTime.now().toUtc().difference(date);
@@ -89,13 +94,14 @@ class _DownloadsManageState extends State<DownloadsManage> {
       return s.daysAgo(diffrence.inDays);
     } else {
       return DateFormat.yMMMd().format(
-          DateTime.fromMillisecondsSinceEpoch(pubDate!, isUtc: true).toLocal());
+        DateTime.fromMillisecondsSinceEpoch(pubDate!, isUtc: true).toLocal(),
+      );
     }
   }
 
   int sumSelected() {
     var sum = 0;
-    if (_selectedList.length == 0) {
+    if (_selectedList.isEmpty) {
       return sum;
     } else {
       for (var episode in _selectedList) {
@@ -120,10 +126,9 @@ class _DownloadsManageState extends State<DownloadsManage> {
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).accentColorBrightness,
+        statusBarIconBrightness: context.iconBrightness,
         systemNavigationBarColor: Theme.of(context).primaryColor,
-        systemNavigationBarIconBrightness:
-            Theme.of(context).accentColorBrightness,
+        systemNavigationBarIconBrightness: context.iconBrightness,
       ),
       child: Scaffold(
         appBar: AppBar(
@@ -158,36 +163,43 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                 TextSpan(
                                   text: _fileNum.toString(),
                                   style: GoogleFonts.cairo(
-                                      textStyle: TextStyle(
-                                    color: context.accentColor,
-                                    fontSize: 40,
-                                  )),
+                                    textStyle: TextStyle(
+                                      color: context.accentColor,
+                                      fontSize: 40,
+                                    ),
+                                  ),
                                 ),
                                 TextSpan(
-                                    text: _fileNum < 2
-                                        ? ' episode'
-                                        : ' episodes ',
-                                    style: TextStyle(
-                                      color: context.accentColor,
-                                      fontSize: 20,
-                                    )),
+                                  text: _fileNum < 2
+                                      ? ' episode'
+                                      : ' episodes ',
+                                  style: TextStyle(
+                                    color: context.accentColor,
+                                    fontSize: 20,
+                                  ),
+                                ),
                                 TextSpan(
                                   text: (_size ~/ 1000000) < 1000
                                       ? (_size ~/ 1000000).toString()
                                       : (_size / 1000000000).toStringAsFixed(1),
                                   style: GoogleFonts.cairo(
-                                      textStyle: TextStyle(
-                                    color: Theme.of(context).accentColor,
-                                    fontSize: 50,
-                                  )),
+                                    textStyle: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      fontSize: 50,
+                                    ),
+                                  ),
                                 ),
                                 TextSpan(
-                                    text:
-                                        (_size ~/ 1000000) < 1000 ? 'Mb' : 'Gb',
-                                    style: TextStyle(
-                                      color: Theme.of(context).accentColor,
-                                      fontSize: 20,
-                                    )),
+                                  text: (_size ~/ 1000000) < 1000 ? 'Mb' : 'Gb',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary,
+                                    fontSize: 20,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -201,32 +213,37 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                 color: Colors.transparent,
                                 child: PopupMenuButton<int>(
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10))),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                  ),
                                   elevation: 1,
                                   tooltip: s.homeSubMenuSortBy,
                                   child: Container(
-                                      height: 40,
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 20),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Text(s.homeSubMenuSortBy),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 5),
+                                    height: 40,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text(s.homeSubMenuSortBy),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 5,
                                           ),
-                                          Icon(
-                                            _mode == 0
-                                                ? LineIcons.hourglassStart
-                                                : _mode == 1
-                                                    ? LineIcons.hourglassHalf
-                                                    : LineIcons.save,
-                                            size: 18,
-                                          )
-                                        ],
-                                      )),
+                                        ),
+                                        Icon(
+                                          _mode == 0
+                                              ? LineIcons.hourglassStart
+                                              : _mode == 1
+                                              ? LineIcons.hourglassHalf
+                                              : LineIcons.save,
+                                          size: 18,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   itemBuilder: (context) => [
                                     PopupMenuItem(
                                       value: 0,
@@ -263,19 +280,21 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                   child: Row(
                                     children: [
                                       Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(horizontal: 5),
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 5,
+                                        ),
                                       ),
                                       Text(s.listened),
                                       Transform.scale(
                                         scale: 0.8,
                                         child: Checkbox(
-                                            value: _onlyListened,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _onlyListened = value;
-                                              });
-                                            }),
+                                          value: _onlyListened,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _onlyListened = value;
+                                            });
+                                          },
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -292,145 +311,160 @@ class _DownloadsManageState extends State<DownloadsManage> {
                       future: _getDownloadedEpisode(_mode),
                       initialData: [],
                       builder: (context, snapshot) {
-                        var _episodes = snapshot.data!;
+                        var episodes = snapshot.data!;
                         return ListView.builder(
-                            itemCount: _episodes.length,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemBuilder: (context, index) {
-                              return FutureBuilder(
-                                  future: _isListened(_episodes[index]),
-                                  initialData: 0,
-                                  builder: (context, snapshot) {
-                                    return (_onlyListened! &&
-                                            snapshot.data == 0)
-                                        ? Center()
-                                        : Column(
-                                            children: <Widget>[
-                                              ListTile(
-                                                onTap: () {
-                                                  if (_selectedList.contains(
-                                                      _episodes[index])) {
-                                                    setState(() => _selectedList
-                                                        .removeWhere((episode) =>
+                          itemCount: episodes.length,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, index) {
+                            return FutureBuilder(
+                              future: _isListened(episodes[index]),
+                              initialData: 0,
+                              builder: (context, snapshot) {
+                                return (_onlyListened! && snapshot.data == 0)
+                                    ? Center()
+                                    : Column(
+                                        children: <Widget>[
+                                          ListTile(
+                                            onTap: () {
+                                              if (_selectedList.contains(
+                                                episodes[index],
+                                              )) {
+                                                setState(
+                                                  () =>
+                                                      _selectedList.removeWhere(
+                                                        (episode) =>
                                                             episode
                                                                 .enclosureUrl ==
-                                                            _episodes[index]
-                                                                .enclosureUrl));
-                                                  } else {
-                                                    setState(() => _selectedList
-                                                        .add(_episodes[index]));
-                                                  }
-                                                },
-                                                leading: CircleAvatar(
-                                                    backgroundImage:
-                                                        _episodes[index]
-                                                            .avatarImage),
-                                                title: Text(
-                                                  _episodes[index].title!,
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
+                                                            episodes[index]
+                                                                .enclosureUrl,
+                                                      ),
+                                                );
+                                              } else {
+                                                setState(
+                                                  () => _selectedList.add(
+                                                    episodes[index],
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            leading: CircleAvatar(
+                                              backgroundImage:
+                                                  episodes[index].avatarImage,
+                                            ),
+                                            title: Text(
+                                              episodes[index].title!,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            subtitle: Row(
+                                              children: [
+                                                Text(
+                                                  _downloadDateToString(
+                                                    context,
+                                                    downloadDate:
+                                                        episodes[index]
+                                                            .downloadDate!,
+                                                    pubDate:
+                                                        episodes[index].pubDate,
+                                                  ),
                                                 ),
-                                                subtitle: Row(
-                                                  children: [
-                                                    Text(_downloadDateToString(
-                                                        context,
-                                                        downloadDate:
-                                                            _episodes[index]
-                                                                .downloadDate!,
-                                                        pubDate:
-                                                            _episodes[index]
-                                                                .pubDate)),
-                                                    SizedBox(width: 20),
-                                                    if (_episodes[index]
-                                                            .enclosureLength !=
-                                                        0)
-                                                      Text(
-                                                          '${_episodes[index].enclosureLength! ~/ 1000000} Mb'),
-                                                  ],
-                                                ),
-                                                trailing: Checkbox(
-                                                  value: _selectedList.contains(
-                                                      _episodes[index]),
-                                                  onChanged: (boo) {
-                                                    if (boo!) {
-                                                      setState(() =>
-                                                          _selectedList.add(
-                                                              _episodes[
-                                                                  index]));
-                                                    } else {
-                                                      setState(() => _selectedList
-                                                          .removeWhere((episode) =>
+                                                SizedBox(width: 20),
+                                                if (episodes[index]
+                                                        .enclosureLength !=
+                                                    0)
+                                                  Text(
+                                                    '${episodes[index].enclosureLength! ~/ 1000000} Mb',
+                                                  ),
+                                              ],
+                                            ),
+                                            trailing: Checkbox(
+                                              value: _selectedList.contains(
+                                                episodes[index],
+                                              ),
+                                              onChanged: (boo) {
+                                                if (boo!) {
+                                                  setState(
+                                                    () => _selectedList.add(
+                                                      episodes[index],
+                                                    ),
+                                                  );
+                                                } else {
+                                                  setState(
+                                                    () => _selectedList
+                                                        .removeWhere(
+                                                          (episode) =>
                                                               episode
                                                                   .enclosureUrl ==
-                                                              _episodes[index]
-                                                                  .enclosureUrl));
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                              Divider(
-                                                height: 2,
-                                              ),
-                                            ],
-                                          );
-                                  });
-                            });
+                                                              episodes[index]
+                                                                  .enclosureUrl,
+                                                        ),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          Divider(height: 2),
+                                        ],
+                                      );
+                              },
+                            );
+                          },
+                        );
                       },
                     ),
-                  )
+                  ),
                 ],
               ),
               AnimatedPositioned(
                 duration: Duration(milliseconds: 800),
                 curve: Curves.elasticInOut,
                 left: context.width / 2 - 50,
-                bottom: _selectedList.length == 0 ? -100 : 30,
+                bottom: _selectedList.isEmpty ? -100 : 30,
                 child: InkWell(
-                    onTap: _delSelectedEpisodes,
-                    child: Stack(
-                      alignment: _clearing
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight,
-                      children: <Widget>[
-                        Container(
-                          alignment: Alignment.center,
-                          width: 100,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20.0)),
-                            color: Theme.of(context).accentColor,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Icon(
-                                LineIcons.alternateTrash,
-                                color: Colors.white,
-                              ),
-                              Text('${sumSelected() ~/ 1000000}Mb',
-                                  style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
+                  onTap: _delSelectedEpisodes,
+                  child: Stack(
+                    alignment: _clearing
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
+                    children: <Widget>[
+                      Container(
+                        alignment: Alignment.center,
+                        width: 100,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: AnimatedContainer(
-                            duration: Duration(milliseconds: 500),
-                            alignment: Alignment.center,
-                            width: _clearing ? 100 : 0,
-                            height: _clearing ? 40 : 0,
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20.0)),
-                              color: Colors.red.withOpacity(0.6),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Icon(LineIcons.alternateTrash, color: Colors.white),
+                            Text(
+                              '${sumSelected() ~/ 1000000}Mb',
+                              style: TextStyle(color: Colors.white),
                             ),
+                          ],
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: AnimatedContainer(
+                          duration: Duration(milliseconds: 500),
+                          alignment: Alignment.center,
+                          width: _clearing ? 100 : 0,
+                          height: _clearing ? 40 : 0,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(20.0),
+                            ),
+                            color: Colors.red.withValues(alpha: 0.6),
                           ),
                         ),
-                      ],
-                    )),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

@@ -39,29 +39,32 @@ class ItunesPodcast {
   final String? releaseDate;
   final int? collectionId;
 
-  ItunesPodcast(
-      {this.artistName,
-      this.collectionName,
-      this.feedUrl,
-      this.artworkUrl600,
-      this.releaseDate,
-      this.collectionId});
+  ItunesPodcast({
+    this.artistName,
+    this.collectionName,
+    this.feedUrl,
+    this.artworkUrl600,
+    this.releaseDate,
+    this.collectionId,
+  });
 
   factory ItunesPodcast.fromJson(Map<String, dynamic> json) =>
       _$ItunesPodcastFromJson(json);
   Map<String, dynamic> toJson() => _$ItunesPodcastToJson(this);
 
-  int get latestPubDate => DateFormat('yyyy-MM-DDTHH:MM:SSZ', 'en_US')
-      .parse(releaseDate!)
-      .millisecondsSinceEpoch;
+  int get latestPubDate => DateFormat(
+    'yyyy-MM-DDTHH:MM:SSZ',
+    'en_US',
+  ).parse(releaseDate!).millisecondsSinceEpoch;
   OnlinePodcast get toOnlinePodcast => OnlinePodcast(
-      earliestPubDate: 0,
-      title: collectionName,
-      count: 0,
-      description: '',
-      image: artworkUrl600,
-      latestPubDate: latestPubDate,
-      rss: feedUrl,
-      publisher: artistName,
-      id: collectionId.toString());
+    earliestPubDate: 0,
+    title: collectionName,
+    count: 0,
+    description: '',
+    image: artworkUrl600,
+    latestPubDate: latestPubDate,
+    rss: feedUrl,
+    publisher: artistName,
+    id: collectionId.toString(),
+  );
 }

@@ -8,8 +8,9 @@ part of 'searchepisodes.dart';
 
 SearchEpisodes<E> _$SearchEpisodesFromJson<E>(Map<String, dynamic> json) {
   return SearchEpisodes<E>(
-    episodes:
-        (json['episodes'] as List?)?.map(_ConvertE<E>().fromJson).toList(),
+    episodes: (json['episodes'] as List?)
+        ?.map(_ConvertE<E>().fromJson)
+        .toList(),
     nextEpisodeDate: json['next_episode_pub_date'] as int?,
   );
 }

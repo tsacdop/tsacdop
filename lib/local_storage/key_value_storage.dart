@@ -71,10 +71,11 @@ class KeyValueStorage {
     if (prefs.getString(key) == null) {
       final home = PodcastGroup('Home');
       await prefs.setString(
-          key,
-          json.encode({
-            'groups': [home.toEntity().toJson()]
-          }));
+        key,
+        json.encode({
+          'groups': [home.toEntity().toJson()],
+        }),
+      );
     }
     final groups = json.decode(prefs.getString(key)!)['groups'];
     return [for (final g in groups) GroupEntity.fromJson(g)];
@@ -83,10 +84,11 @@ class KeyValueStorage {
   Future<bool> saveGroup(List<GroupEntity> groupList) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.setString(
-        key,
-        json.encode({
-          'groups': [for (var g in groupList) g.toJson()]
-        }));
+      key,
+      json.encode({
+        'groups': [for (var g in groupList) g.toJson()],
+      }),
+    );
   }
 
   Future<List<PlaylistEntity>?> getPlaylists() async {
@@ -95,10 +97,11 @@ class KeyValueStorage {
       var episodeList = prefs.getStringList(playlistKey);
       var playlist = Playlist('Queue', episodeList: episodeList);
       await prefs.setString(
-          key,
-          json.encode({
-            'playlists': [playlist.toEntity().toJson()]
-          }));
+        key,
+        json.encode({
+          'playlists': [playlist.toEntity().toJson()],
+        }),
+      );
     }
     print(prefs.getString(key));
     final playlist = json.decode(prefs.getString(key)!)['playlists'];
@@ -108,14 +111,18 @@ class KeyValueStorage {
   Future<bool> savePlaylists(List<PlaylistEntity> playlists) async {
     var prefs = await SharedPreferences.getInstance();
     return prefs.setString(
-        key,
-        json.encode({
-          'playlists': [for (var p in playlists) p.toJson()]
-        }));
+      key,
+      json.encode({
+        'playlists': [for (var p in playlists) p.toJson()],
+      }),
+    );
   }
 
   Future<bool> savePlayerState(
-      String playlist, String episode, int position) async {
+    String playlist,
+    String episode,
+    int position,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     return prefs.setStringList(key, [playlist, episode, position.toString()]);
   }
@@ -169,7 +176,9 @@ class KeyValueStorage {
   Future<bool> saveMenu(List<int> list) async {
     var prefs = await SharedPreferences.getInstance();
     return await prefs.setStringList(
-        key, list.map((e) => e.toString()).toList());
+      key,
+      list.map((e) => e.toString()).toList(),
+    );
   }
 
   Future<List<int>> getMenu() async {
@@ -187,22 +196,34 @@ class KeyValueStorage {
     var prefs = await SharedPreferences.getInstance();
     list.sort();
     return await prefs.setStringList(
-        key, list.map((e) => e.toStringAsFixed(1)).toList());
+      key,
+      list.map((e) => e.toStringAsFixed(1)).toList(),
+    );
   }
 
   Future<List<double>> getSpeedList() async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getStringList(key) == null || prefs.getStringList(key)!.isEmpty) {
-      await prefs.setStringList(
-          key, ['0.5', '0.6', '0.8', '1.0', '1.1', '1.2', '1.5', '2.0']);
+      await prefs.setStringList(key, [
+        '0.5',
+        '0.6',
+        '0.8',
+        '1.0',
+        '1.1',
+        '1.2',
+        '1.5',
+        '2.0',
+      ]);
     }
     var list = prefs.getStringList(key)!;
     return list.map(double.parse).toList();
   }
 
   /// Rreverse is used for compatite bool value save before which set true = 0, false = 1
-  Future<bool> getBool(
-      {required bool defaultValue, bool reverse = false}) async {
+  Future<bool> getBool({
+    required bool defaultValue,
+    bool reverse = false,
+  }) async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.getInt(key) == null) {
       reverse

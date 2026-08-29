@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -33,8 +33,11 @@ const String kDefaultAvatar = """http://xuanmei.us/assets/default/avatar_small-
 170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg""";
 
 class PodcastDetail extends StatefulWidget {
-  PodcastDetail({Key? key, required this.podcastLocal, this.hide = false})
-      : super(key: key);
+  const PodcastDetail({
+    super.key,
+    required this.podcastLocal,
+    this.hide = false,
+  });
   final PodcastLocal? podcastLocal;
   final bool hide;
   @override
@@ -46,6 +49,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
       GlobalKey<RefreshIndicatorState>();
 
   final GlobalKey<AudioPanelState> _playerKey = GlobalKey<AudioPanelState>();
+  bool _isPlayerExpanded = false;
   final _dbHelper = DBHelper();
 
   /// Episodes total count.
@@ -113,7 +117,9 @@ class _PodcastDetailState extends State<PodcastDetail> {
   }
 
   Future<void> _updateRssItem(
-      BuildContext context, PodcastLocal podcastLocal) async {
+    BuildContext context,
+    PodcastLocal podcastLocal,
+  ) async {
     final result = await _dbHelper.updatePodcastRss(podcastLocal);
     if (result >= 0) {
       Fluttertoast.showToast(
@@ -136,7 +142,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
               downloader.startTask(episode, showNotification: false);
             }
           }
-        } else if (result == ConnectivityResult.wifi) {
+        } else if (result.contains(ConnectivityResult.wifi)) {
           var episodes = await _dbHelper.getNewEpisodes(podcastLocal.id);
           //For safety
           if (episodes.length < 100) {
@@ -155,28 +161,35 @@ class _PodcastDetailState extends State<PodcastDetail> {
     if (mounted && result > 0) setState(() {});
   }
 
-  Future<List<EpisodeBrief>> _getRssItem(PodcastLocal podcastLocal,
-      {int? count, bool? reverse, Filter? filter, String? query}) async {
+  Future<List<EpisodeBrief>> _getRssItem(
+    PodcastLocal podcastLocal, {
+    int? count,
+    bool? reverse,
+    Filter? filter,
+    String? query,
+  }) async {
     var episodes = <EpisodeBrief>[];
     _episodeCount = await _dbHelper.getPodcastCounts(podcastLocal.id);
     final layoutStorage = KeyValueStorage(podcastLayoutKey);
     final hideListenedStorage = KeyValueStorage(hideListenedKey);
     final index = await layoutStorage.getInt(defaultValue: 1);
-    if (_layout == null) _layout = Layout.values[index];
-    if (_hideListened == null) {
-      _hideListened = await hideListenedStorage.getBool(defaultValue: false);
-    }
-    episodes = await _dbHelper.getRssItem(podcastLocal.id, count,
-        reverse: reverse,
-        filter: filter,
-        query: query,
-        hideListened: _hideListened!);
+    _layout ??= Layout.values[index];
+    _hideListened ??= await hideListenedStorage.getBool(defaultValue: false);
+    episodes = await _dbHelper.getRssItem(
+      podcastLocal.id,
+      count,
+      reverse: reverse,
+      filter: filter,
+      query: query,
+      hideListened: _hideListened!,
+    );
     _dataCount = episodes.length;
     return episodes;
   }
 
   Future<Tuple2<String?, List<PodcastHost>?>> _getHosts(
-      PodcastLocal podcastLocal) async {
+    PodcastLocal podcastLocal,
+  ) async {
     if (!podcastLocal.provider!.contains('fireside')) return Tuple2('', []);
     var data = FiresideData(podcastLocal.id, podcastLocal.link);
     await data.getData();
@@ -221,16 +234,17 @@ class _PodcastDetailState extends State<PodcastDetail> {
         widget.podcastLocal!.title!,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: context.textTheme.headline5!.copyWith(color: Colors.white),
+        style: context.textTheme.headlineSmall!.copyWith(color: Colors.white),
       ),
     );
   }
 
-  Widget _podcastLink(
-      {required String title,
-      Widget? child,
-      VoidCallback? onTap,
-      required Color backgroundColor}) {
+  Widget _podcastLink({
+    required String title,
+    Widget? child,
+    VoidCallback? onTap,
+    required Color backgroundColor,
+  }) {
     return Container(
       padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
       width: 60.0,
@@ -243,14 +257,14 @@ class _PodcastDetailState extends State<PodcastDetail> {
             onTap: onTap,
             child: CircleAvatar(
               radius: 20,
+              backgroundColor: backgroundColor.withValues(alpha: 0.5),
               child: child,
-              backgroundColor: backgroundColor.withOpacity(0.5),
             ),
           ),
           SizedBox(height: 4),
           Text(
             title,
-            style: context.textTheme.subtitle2,
+            style: context.textTheme.titleSmall,
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.fade,
@@ -266,97 +280,103 @@ class _PodcastDetailState extends State<PodcastDetail> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         FutureBuilder<Tuple2<String?, List<PodcastHost>?>>(
-            future: _getHosts(podcastLocal),
-            builder: (context, snapshot) {
-              return Container(
-                width: double.infinity,
-                alignment: Alignment.centerLeft,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+          future: _getHosts(podcastLocal),
+          builder: (context, snapshot) {
+            return Container(
+              width: double.infinity,
+              alignment: Alignment.centerLeft,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _podcastLink(
+                      title: 'Link',
+                      child: Icon(Icons.link, size: 30),
+                      backgroundColor: Colors.green[600]!,
+                      onTap: () => widget.podcastLocal!.link!.launchUrl,
+                    ),
+                    _podcastLink(
+                      title: 'Rss',
+                      child: Icon(LineIcons.rssSquare, size: 30),
+                      backgroundColor: Colors.blue[600]!,
+                      onTap: () => widget.podcastLocal!.rssUrl.launchUrl,
+                    ),
+                    if (widget.podcastLocal!.funding.isNotEmpty)
+                      for (var funding in widget.podcastLocal!.funding)
                         _podcastLink(
-                            title: 'Link',
-                            child: Icon(Icons.link, size: 30),
-                            backgroundColor: Colors.green[600]!,
-                            onTap: () => widget.podcastLocal!.link!.launchUrl),
-                        _podcastLink(
-                            title: 'Rss',
-                            child: Icon(LineIcons.rssSquare, size: 30),
-                            backgroundColor: Colors.blue[600]!,
-                            onTap: () => widget.podcastLocal!.rssUrl.launchUrl),
-                        if (widget.podcastLocal!.funding.isNotEmpty)
-                          for (var funding in widget.podcastLocal!.funding)
-                            _podcastLink(
-                                title: 'Donate',
-                                child: Icon(
-                                    funding.contains(
-                                      'paypal',
-                                    )
-                                        ? LineIcons.paypal
-                                        : LineIcons.donate,
-                                    size: 30),
-                                backgroundColor: Colors.red[600]!,
-                                onTap: () => funding.launchUrl),
-                        if (snapshot.hasData)
-                          ...snapshot.data!.item2!
-                              .map<Widget>((host) {
-                                final image = host.image == kDefaultAvatar
-                                    ? kDefaultAvatar
-                                    : host.image;
-                                return Container(
-                                  padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
-                                  width: 60.0,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      CachedNetworkImage(
-                                        imageUrl: image!,
-                                        progressIndicatorBuilder:
-                                            (context, url, downloadProgress) =>
-                                                CircleAvatar(
-                                          backgroundColor: Colors.cyan[600]!
-                                              .withOpacity(0.5),
-                                          child: SizedBox(
-                                            width: 30,
-                                            height: 2,
-                                            child: LinearProgressIndicator(
-                                                value:
-                                                    downloadProgress.progress),
+                          title: 'Donate',
+                          child: Icon(
+                            funding.contains('paypal')
+                                ? LineIcons.paypal
+                                : LineIcons.donate,
+                            size: 30,
+                          ),
+                          backgroundColor: Colors.red[600]!,
+                          onTap: () => funding.launchUrl,
+                        ),
+                    if (snapshot.hasData)
+                      ...snapshot.data!.item2!
+                          .map<Widget>((host) {
+                            final image = host.image == kDefaultAvatar
+                                ? kDefaultAvatar
+                                : host.image;
+                            return Container(
+                              padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+                              width: 60.0,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  CachedNetworkImage(
+                                    imageUrl: image!,
+                                    progressIndicatorBuilder:
+                                        (context, url, downloadProgress) =>
+                                            CircleAvatar(
+                                              backgroundColor: Colors.cyan[600]!
+                                                  .withValues(alpha: 0.5),
+                                              child: SizedBox(
+                                                width: 30,
+                                                height: 2,
+                                                child: LinearProgressIndicator(
+                                                  value:
+                                                      downloadProgress.progress,
+                                                ),
+                                              ),
+                                            ),
+                                    errorWidget: (context, url, error) =>
+                                        CircleAvatar(
+                                          backgroundColor: Colors.grey[400],
+                                          backgroundImage: AssetImage(
+                                            'assets/fireside.jpg',
                                           ),
                                         ),
-                                        errorWidget: (context, url, error) =>
-                                            CircleAvatar(
+                                    imageBuilder: (context, hostImage) =>
+                                        CircleAvatar(
                                           backgroundColor: Colors.grey[400],
-                                          backgroundImage:
-                                              AssetImage('assets/fireside.jpg'),
+                                          backgroundImage: hostImage,
                                         ),
-                                        imageBuilder: (context, hostImage) =>
-                                            CircleAvatar(
-                                                backgroundColor:
-                                                    Colors.grey[400],
-                                                backgroundImage: hostImage),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        host.name!,
-                                        style: context.textTheme.subtitle2,
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.fade,
-                                      ),
-                                    ],
                                   ),
-                                );
-                              })
-                              .toList()
-                              .cast<Widget>()
-                      ]),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    host.name!,
+                                    style: context.textTheme.titleSmall,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                ],
+                              ),
+                            );
+                          })
+                          .toList()
+                          .cast<Widget>(),
+                  ],
                 ),
-              );
-            }),
+              ),
+            );
+          },
+        ),
         Container(
           padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
           alignment: Alignment.topLeft,
@@ -372,321 +392,338 @@ class _PodcastDetailState extends State<PodcastDetail> {
     String? tooltip,
     List<PopupMenuEntry<int>>? itemBuilder,
     Function(int)? onSelected,
-  }) =>
-      Material(
-        key: UniqueKey(),
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(100),
-        clipBehavior: Clip.hardEdge,
-        child: PopupMenuButton<int>(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 1,
-          tooltip: tooltip,
-          child: child,
-          itemBuilder: (context) => itemBuilder!,
-          onSelected: (value) => onSelected!(value),
-        ),
-      );
+  }) => Material(
+    key: UniqueKey(),
+    color: Colors.transparent,
+    borderRadius: BorderRadius.circular(100),
+    clipBehavior: Clip.hardEdge,
+    child: PopupMenuButton<int>(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 1,
+      tooltip: tooltip,
+      child: child,
+      itemBuilder: (context) => itemBuilder!,
+      onSelected: (value) => onSelected!(value),
+    ),
+  );
 
   Widget _actionBar(BuildContext context) {
     final s = context.s;
     return SizedBox(
-        height: 30,
-        child: Row(
-          children: <Widget>[
-            SizedBox(width: 15),
-            _customPopupMenu(
-                tooltip: s.filter,
-                child: Container(
-                  height: 30,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      border: Border.all(color: context.primaryColorDark)),
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(s.filter),
-                      SizedBox(width: 5),
-                      Icon(
-                        LineIcons.filter,
-                        color:
-                            _filter != Filter.all ? context.accentColor : null,
-                        size: 18,
-                      )
-                    ],
-                  ),
-                ),
-                itemBuilder: [
-                  PopupMenuItem(
-                    value: 0,
-                    child: Row(
-                      children: [
-                        Text(s.all),
-                        Spacer(),
-                        if (_filter == Filter.all) DotIndicator(),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 1,
-                    child: Row(
-                      children: [
-                        Text(s.homeTabMenuFavotite),
-                        Spacer(),
-                        if (_filter == Filter.liked) DotIndicator()
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 2,
-                    child: Row(
-                      children: [
-                        Text(s.downloaded),
-                        Spacer(),
-                        if (_filter == Filter.downloaded) DotIndicator()
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 3,
-                    child: Container(
-                      padding:
-                          EdgeInsets.only(top: 5, bottom: 5, left: 2, right: 2),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                              width: 2,
-                              color: context.textColor.withOpacity(0.2))),
-                      child: _query == ''
-                          ? Row(
-                              children: [
-                                Text(
-                                  s.search,
-                                  style: TextStyle(
-                                    color: context.textColor.withOpacity(0.4),
-                                  ),
-                                ),
-                                Spacer()
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
-                                  child: Text(_query,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: context.accentColor)),
-                                ),
-                              ],
-                            ),
-                    ),
+      height: 30,
+      child: Row(
+        children: <Widget>[
+          SizedBox(width: 15),
+          _customPopupMenu(
+            tooltip: s.filter,
+            child: Container(
+              height: 30,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(color: context.primaryColorDark),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(s.filter),
+                  SizedBox(width: 5),
+                  Icon(
+                    LineIcons.filter,
+                    color: _filter != Filter.all ? context.accentColor : null,
+                    size: 18,
                   ),
                 ],
-                onSelected: (value) {
-                  switch (value) {
-                    case 0:
-                      if (_filter != Filter.all) {
-                        setState(() {
-                          _filter = Filter.all;
-                          _query = '';
-                        });
-                      }
-                      break;
-                    case 1:
-                      if (_filter != Filter.liked) {
-                        setState(() {
-                          _query = '';
-                          _filter = Filter.liked;
-                        });
-                      }
-                      break;
-                    case 2:
-                      if (_filter != Filter.downloaded) {
-                        setState(() {
-                          _query = '';
-                          _filter = Filter.downloaded;
-                        });
-                      }
-                      break;
-                    case 3:
-                      showGeneralDialog(
-                          context: context,
-                          barrierDismissible: true,
-                          barrierLabel: MaterialLocalizations.of(context)
-                              .modalBarrierDismissLabel,
-                          barrierColor: Colors.black54,
-                          transitionDuration: const Duration(milliseconds: 200),
-                          pageBuilder:
-                              (context, animaiton, secondaryAnimation) =>
-                                  SearchEpisode(
-                                    onSearch: (query) {
-                                      setState(() {
-                                        if (query != null && query != '') {
-                                          _query = query;
-                                          _filter = Filter.search;
-                                        }
-                                      });
-                                    },
-                                  ));
-                      break;
-                    default:
-                  }
-                }),
-            Spacer(),
-            FutureBuilder<int?>(
-                future: _getNewCount(),
-                initialData: 0,
-                builder: (context, snapshot) {
-                  return snapshot.data != 0
-                      ? Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Material(
-                            color: Colors.transparent,
-                            clipBehavior: Clip.hardEdge,
-                            borderRadius: BorderRadius.circular(100),
-                            child: SizedBox(
-                              width: 30,
-                              child: IconButton(
-                                  padding: EdgeInsets.only(bottom: 5),
-                                  tooltip: s.removeNewMark,
-                                  icon: Container(
-                                      height: 18,
-                                      width: 18,
-                                      child: CustomPaint(
-                                          painter: RemoveNewFlagPainter(
-                                              context
-                                                  .textTheme.bodyText1!.color,
-                                              Colors.red))),
-                                  onPressed: () async {
-                                    await _removePodcastNewMark();
-                                    if (mounted) {
-                                      setState(() {});
-                                    }
-                                  }),
+              ),
+            ),
+            itemBuilder: [
+              PopupMenuItem(
+                value: 0,
+                child: Row(
+                  children: [
+                    Text(s.all),
+                    Spacer(),
+                    if (_filter == Filter.all) DotIndicator(),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: Row(
+                  children: [
+                    Text(s.homeTabMenuFavotite),
+                    Spacer(),
+                    if (_filter == Filter.liked) DotIndicator(),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: [
+                    Text(s.downloaded),
+                    Spacer(),
+                    if (_filter == Filter.downloaded) DotIndicator(),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 3,
+                child: Container(
+                  padding: EdgeInsets.only(
+                    top: 5,
+                    bottom: 5,
+                    left: 2,
+                    right: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      width: 2,
+                      color: context.textColor.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: _query == ''
+                      ? Row(
+                          children: [
+                            Text(
+                              s.search,
+                              style: TextStyle(
+                                color: context.textColor.withValues(alpha: 0.4),
+                              ),
                             ),
-                          ),
+                            Spacer(),
+                          ],
                         )
-                      : Center();
-                }),
-            if (!widget.hide)
-              Material(
-                  color: Colors.transparent,
-                  clipBehavior: Clip.hardEdge,
-                  borderRadius: BorderRadius.circular(100),
-                  child: TweenAnimationBuilder(
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeInOutQuart,
-                    tween: Tween<double>(begin: 0.0, end: 1.0),
-                    builder: (context, dynamic angle, child) =>
-                        Transform.rotate(
-                      angle: math.pi * 2 * angle,
-                      child: SizedBox(
-                        width: 30,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          tooltip: s.homeSubMenuSortBy,
-                          icon: Icon(
-                            _reverse
-                                ? LineIcons.hourglassStart
-                                : LineIcons.hourglassEnd,
-                            color: _reverse ? context.accentColor : null,
-                          ),
-                          iconSize: 18,
-                          onPressed: () {
-                            setState(() => _reverse = !_reverse);
+                      : Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _query,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: context.accentColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ],
+            onSelected: (value) {
+              switch (value) {
+                case 0:
+                  if (_filter != Filter.all) {
+                    setState(() {
+                      _filter = Filter.all;
+                      _query = '';
+                    });
+                  }
+                  break;
+                case 1:
+                  if (_filter != Filter.liked) {
+                    setState(() {
+                      _query = '';
+                      _filter = Filter.liked;
+                    });
+                  }
+                  break;
+                case 2:
+                  if (_filter != Filter.downloaded) {
+                    setState(() {
+                      _query = '';
+                      _filter = Filter.downloaded;
+                    });
+                  }
+                  break;
+                case 3:
+                  showGeneralDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    barrierLabel: MaterialLocalizations.of(context)
+                        .modalBarrierDismissLabel,
+                    barrierColor: Colors.black54,
+                    transitionDuration: const Duration(milliseconds: 200),
+                    pageBuilder: (context, animaiton, secondaryAnimation) =>
+                        SearchEpisode(
+                          onSearch: (query) {
+                            setState(() {
+                              if (query != null && query != '') {
+                                _query = query;
+                                _filter = Filter.search;
+                              }
+                            });
                           },
                         ),
-                      ),
-                    ),
-                  )),
-            FutureBuilder<bool>(
-                future: _getHideListened(),
-                builder: (context, snapshot) {
-                  if (_hideListened == null) {
-                    _hideListened = snapshot.data;
-                  }
-                  return Material(
-                      color: Colors.transparent,
-                      clipBehavior: Clip.hardEdge,
-                      borderRadius: BorderRadius.circular(100),
-                      child: IconButton(
-                        icon: SizedBox(
+                  );
+                  break;
+                default:
+              }
+            },
+          ),
+          Spacer(),
+          FutureBuilder<int?>(
+            future: _getNewCount(),
+            initialData: 0,
+            builder: (context, snapshot) {
+              return snapshot.data != 0
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      child: Material(
+                        color: Colors.transparent,
+                        clipBehavior: Clip.hardEdge,
+                        borderRadius: BorderRadius.circular(100),
+                        child: SizedBox(
                           width: 30,
-                          height: 30,
-                          child: HideListened(
-                            hideListened: _hideListened ?? false,
+                          child: IconButton(
+                            padding: EdgeInsets.only(bottom: 5),
+                            tooltip: s.removeNewMark,
+                            icon: SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CustomPaint(
+                                painter: RemoveNewFlagPainter(
+                                  context.textTheme.bodyLarge!.color,
+                                  Colors.red,
+                                ),
+                              ),
+                            ),
+                            onPressed: () async {
+                              await _removePodcastNewMark();
+                              if (mounted) {
+                                setState(() {});
+                              }
+                            },
                           ),
                         ),
-                        onPressed: () {
-                          setState(() => _hideListened = !_hideListened!);
-                        },
-                      ));
-                }),
-            FutureBuilder<int?>(
-                future: _getLayout(),
-                builder: (context, snapshot) {
-                  if (_layout == null && snapshot.data != null) {
-                    _layout = Layout.values[snapshot.data!];
-                  }
-                  return Material(
-                    color: Colors.transparent,
-                    clipBehavior: Clip.hardEdge,
-                    borderRadius: BorderRadius.circular(100),
-                    child: LayoutButton(
-                      layout: _layout ?? Layout.two,
-                      onPressed: (layout) => setState(() {
-                        _layout = layout;
-                      }),
-                    ),
-                  );
-                }),
+                      ),
+                    )
+                  : Center();
+            },
+          ),
+          if (!widget.hide)
             Material(
+              color: Colors.transparent,
+              clipBehavior: Clip.hardEdge,
+              borderRadius: BorderRadius.circular(100),
+              child: TweenAnimationBuilder(
+                duration: Duration(milliseconds: 500),
+                curve: Curves.easeInOutQuart,
+                tween: Tween<double>(begin: 0.0, end: 1.0),
+                builder: (context, dynamic angle, child) => Transform.rotate(
+                  angle: math.pi * 2 * angle,
+                  child: SizedBox(
+                    width: 30,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      tooltip: s.homeSubMenuSortBy,
+                      icon: Icon(
+                        _reverse
+                            ? LineIcons.hourglassStart
+                            : LineIcons.hourglassEnd,
+                        color: _reverse ? context.accentColor : null,
+                      ),
+                      iconSize: 18,
+                      onPressed: () {
+                        setState(() => _reverse = !_reverse);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          FutureBuilder<bool>(
+            future: _getHideListened(),
+            builder: (context, snapshot) {
+              _hideListened ??= snapshot.data;
+              return Material(
                 color: Colors.transparent,
                 clipBehavior: Clip.hardEdge,
                 borderRadius: BorderRadius.circular(100),
                 child: IconButton(
                   icon: SizedBox(
-                    width: 20,
-                    height: 10,
-                    child: CustomPaint(
-                        painter:
-                            MultiSelectPainter(color: context.accentColor)),
+                    width: 30,
+                    height: 30,
+                    child: HideListened(hideListened: _hideListened ?? false),
                   ),
                   onPressed: () {
-                    setState(() {
-                      _top = -1;
-                      _selectedEpisodes = [];
-                      _multiSelect = true;
-                    });
+                    setState(() => _hideListened = !_hideListened!);
                   },
-                )),
-            SizedBox(width: 10)
-          ],
-        ));
+                ),
+              );
+            },
+          ),
+          FutureBuilder<int?>(
+            future: _getLayout(),
+            builder: (context, snapshot) {
+              if (_layout == null && snapshot.data != null) {
+                _layout = Layout.values[snapshot.data!];
+              }
+              return Material(
+                color: Colors.transparent,
+                clipBehavior: Clip.hardEdge,
+                borderRadius: BorderRadius.circular(100),
+                child: LayoutButton(
+                  layout: _layout ?? Layout.two,
+                  onPressed: (layout) => setState(() {
+                    _layout = layout;
+                  }),
+                ),
+              );
+            },
+          ),
+          Material(
+            color: Colors.transparent,
+            clipBehavior: Clip.hardEdge,
+            borderRadius: BorderRadius.circular(100),
+            child: IconButton(
+              icon: SizedBox(
+                width: 20,
+                height: 10,
+                child: CustomPaint(
+                  painter: MultiSelectPainter(color: context.accentColor),
+                ),
+              ),
+              onPressed: () {
+                setState(() {
+                  _top = -1;
+                  _selectedEpisodes = [];
+                  _multiSelect = true;
+                });
+              },
+            ),
+          ),
+          SizedBox(width: 10),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final color = widget.podcastLocal!.primaryColor!.colorizedark();
+    final statusBarIconBrightness = Platform.isAndroid
+        ? ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark
+        : context.iconBrightness;
+    final systemUiOverlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Platform.isAndroid ? Colors.transparent : color,
+      statusBarIconBrightness: statusBarIconBrightness,
+    );
     final s = context.s;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-          statusBarColor: color, statusBarIconBrightness: Brightness.light),
-      child: WillPopScope(
-        onWillPop: () {
-          if (_playerKey.currentState != null &&
-              _playerKey.currentState!.initSize! > 100) {
-            _playerKey.currentState!.backToMini();
-            return Future.value(false);
-          } else {
-            return Future.value(true);
+      value: systemUiOverlayStyle,
+      child: PopScope<void>(
+        canPop: !_isPlayerExpanded,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop && _isPlayerExpanded) {
+            _playerKey.currentState?.backToMini();
           }
         },
         child: Scaffold(
           body: SafeArea(
+            top: !Platform.isAndroid,
             child: RefreshIndicator(
               key: _refreshIndicatorKey,
               displacement: context.paddingTop + 40,
@@ -730,65 +767,73 @@ class _PodcastDetailState extends State<PodcastDetail> {
                             physics: const AlwaysScrollableScrollPhysics(),
                             slivers: <Widget>[
                               SliverAppBar(
+                                systemOverlayStyle: systemUiOverlayStyle,
                                 actions: <Widget>[
                                   IconButton(
                                     icon: Icon(Icons.more_vert),
                                     splashRadius: 20,
                                     tooltip: s.menu,
-                                    onPressed: () => generalSheet(
-                                      context,
-                                      title: widget.podcastLocal!.title,
-                                      child: PodcastSetting(
-                                          podcastLocal: widget.podcastLocal),
-                                    ).then((value) {
-                                      _checkPodcast();
-                                      if (mounted) setState(() {});
-                                    }),
+                                    onPressed: () =>
+                                        generalSheet(
+                                          context,
+                                          title: widget.podcastLocal!.title,
+                                          child: PodcastSetting(
+                                            podcastLocal: widget.podcastLocal,
+                                          ),
+                                        ).then((value) {
+                                          _checkPodcast();
+                                          if (mounted) setState(() {});
+                                        }),
                                   ),
                                 ],
                                 elevation: 0,
                                 scrolledUnderElevation: 0,
-                                iconTheme: IconThemeData(
-                                  color: Colors.white,
+                                iconTheme: IconThemeData(color: Colors.white),
+                                expandedHeight: math.max(
+                                  130 + context.paddingTop,
+                                  180,
                                 ),
-                                expandedHeight:
-                                    math.max(130 + context.paddingTop, 180),
                                 backgroundColor: color,
                                 floating: true,
                                 pinned: true,
                                 leading: CustomBackButton(),
                                 flexibleSpace: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                  _topHeight = constraints.biggest.height;
-                                  return FlexibleSpaceBar(
-                                    background: Stack(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 120 + context.paddingTop),
-                                          child: InkWell(
-                                            onTap: () => setState(
-                                                () => _showInfo = !_showInfo!),
-                                            child: Container(
-                                              padding: EdgeInsets.only(
-                                                  left: 80, right: 130),
-                                              color: Colors.white10,
-                                              alignment: Alignment.centerLeft,
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: <Widget>[
-                                                        Text(
-                                                            widget.podcastLocal!
+                                  builder: (context, constraints) {
+                                    _topHeight = constraints.biggest.height;
+                                    return FlexibleSpaceBar(
+                                      background: Stack(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              top: 120 + context.paddingTop,
+                                            ),
+                                            child: InkWell(
+                                              onTap: () => setState(
+                                                () => _showInfo = !_showInfo!,
+                                              ),
+                                              child: Container(
+                                                padding: EdgeInsets.only(
+                                                  left: 80,
+                                                  right: 130,
+                                                ),
+                                                color: Colors.white10,
+                                                alignment: Alignment.centerLeft,
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          Text(
+                                                            widget
+                                                                    .podcastLocal!
                                                                     .author ??
                                                                 '',
                                                             maxLines: 1,
@@ -796,74 +841,89 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                                                 TextOverflow
                                                                     .ellipsis,
                                                             style: TextStyle(
-                                                                color: Colors
-                                                                    .white)),
-                                                        if (widget
-                                                            .podcastLocal!
-                                                            .provider!
-                                                            .isNotEmpty)
-                                                          Text(
-                                                            s.hostedOn(widget
-                                                                .podcastLocal!
-                                                                .provider!),
-                                                            maxLines: 1,
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
                                                           ),
-                                                      ],
+                                                          if (widget
+                                                              .podcastLocal!
+                                                              .provider!
+                                                              .isNotEmpty)
+                                                            Text(
+                                                              s.hostedOn(
+                                                                widget
+                                                                    .podcastLocal!
+                                                                    .provider!,
+                                                              ),
+                                                              maxLines: 1,
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ),
-                                                  UpDownIndicator(
+                                                    UpDownIndicator(
                                                       status: _showInfo,
-                                                      color: Colors.white),
-                                                ],
+                                                      color: Colors.white,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Container(
-                                          alignment: Alignment.bottomRight,
-                                          padding: EdgeInsets.only(
-                                              right: 20, bottom: 10),
-                                          child: Container(
-                                            height: 100,
-                                            width: 100,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.white,
-                                                  width: 2),
+                                          Container(
+                                            alignment: Alignment.bottomRight,
+                                            padding: EdgeInsets.only(
+                                              right: 20,
+                                              bottom: 10,
                                             ),
-                                            child: Image.file(
-                                              File(
-                                                  "${widget.podcastLocal!.imagePath}"),
-                                              errorBuilder: (context, _, __) {
-                                                return ColoredBox(
+                                            child: Container(
+                                              height: 100,
+                                              width: 100,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child: Image.file(
+                                                File(
+                                                  "${widget.podcastLocal!.imagePath}",
+                                                ),
+                                                errorBuilder: (context, _, _) {
+                                                  return ColoredBox(
                                                     color: color,
-                                                    child: Icon(Icons.error));
-                                              },
+                                                    child: Icon(Icons.error),
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: _podcastInfo(context),
-                                        ),
-                                      ],
-                                    ),
-                                    title: _topHeight < 70 + context.paddingTop
-                                        ? SizedBox(
-                                            width: context.width * 4 / 5,
-                                            child: Text(
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: _podcastInfo(context),
+                                          ),
+                                        ],
+                                      ),
+                                      title:
+                                          _topHeight < 70 + context.paddingTop
+                                          ? SizedBox(
+                                              width: context.width * 4 / 5,
+                                              child: Text(
                                                 widget.podcastLocal!.title!,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.clip,
                                                 style: TextStyle(
-                                                    color: Colors.white)),
-                                          )
-                                        : Center(),
-                                  );
-                                }),
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            )
+                                          : Center(),
+                                    );
+                                  },
+                                ),
                               ),
                               SliverToBoxAdapter(
                                 child: _showInfo!
@@ -871,132 +931,146 @@ class _PodcastDetailState extends State<PodcastDetail> {
                                     : SizedBox(height: 10),
                               ),
                               SliverToBoxAdapter(
-                                  child: _multiSelect!
-                                      ? Center()
-                                      : _actionBar(context)),
+                                child: _multiSelect!
+                                    ? Center()
+                                    : _actionBar(context),
+                              ),
                               if (!widget.hide)
                                 FutureBuilder<List<EpisodeBrief>>(
-                                    future: _getRssItem(widget.podcastLocal!,
-                                        count: _top,
-                                        reverse: _reverse,
-                                        filter: _filter,
-                                        query: _query),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        if (_selectAll!) {
-                                          _selectedEpisodes = snapshot.data;
-                                        }
-                                        if (_selectBefore) {
-                                          final index = snapshot.data!.indexOf(
-                                              _selectedEpisodes!.first);
-                                          if (index != 0) {
-                                            _selectedEpisodes = snapshot.data!
-                                                .sublist(0, index + 1);
-                                          }
-                                        }
-                                        if (_selectAfter) {
-                                          final index = snapshot.data!.indexOf(
-                                              _selectedEpisodes!.first);
-                                          _selectedEpisodes =
-                                              snapshot.data!.sublist(index);
-                                        }
-                                        return EpisodeGrid(
-                                          episodes: snapshot.data,
-                                          showFavorite: true,
-                                          showNumber: _filter == Filter.all &&
-                                                  !_hideListened!
-                                              ? true
-                                              : false,
-                                          layout: _layout,
-                                          reverse: _reverse,
-                                          episodeCount: _episodeCount,
-                                          initNum: _scroll ? 0 : 12,
-                                          multiSelect: _multiSelect,
-                                          selectedList: _selectedEpisodes ?? [],
-                                          onSelect: (value) => setState(() {
-                                            _selectAll = false;
-                                            _selectBefore = false;
-                                            _selectAfter = false;
-                                            _selectedEpisodes = value;
-                                          }),
-                                        );
+                                  future: _getRssItem(
+                                    widget.podcastLocal!,
+                                    count: _top,
+                                    reverse: _reverse,
+                                    filter: _filter,
+                                    query: _query,
+                                  ),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      if (_selectAll!) {
+                                        _selectedEpisodes = snapshot.data;
                                       }
-                                      return SliverToBoxAdapter(
-                                          child: Center());
-                                    }),
-                              SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    return _loadMore
-                                        ? Container(
-                                            height: 2,
-                                            child: LinearProgressIndicator())
-                                        : Center();
+                                      if (_selectBefore) {
+                                        final index = snapshot.data!.indexOf(
+                                          _selectedEpisodes!.first,
+                                        );
+                                        if (index != 0) {
+                                          _selectedEpisodes = snapshot.data!
+                                              .sublist(0, index + 1);
+                                        }
+                                      }
+                                      if (_selectAfter) {
+                                        final index = snapshot.data!.indexOf(
+                                          _selectedEpisodes!.first,
+                                        );
+                                        _selectedEpisodes = snapshot.data!
+                                            .sublist(index);
+                                      }
+                                      return EpisodeGrid(
+                                        episodes: snapshot.data,
+                                        showFavorite: true,
+                                        showNumber:
+                                            _filter == Filter.all &&
+                                                !_hideListened!
+                                            ? true
+                                            : false,
+                                        layout: _layout,
+                                        reverse: _reverse,
+                                        episodeCount: _episodeCount,
+                                        initNum: _scroll ? 0 : 12,
+                                        multiSelect: _multiSelect,
+                                        selectedList: _selectedEpisodes ?? [],
+                                        onSelect: (value) => setState(() {
+                                          _selectAll = false;
+                                          _selectBefore = false;
+                                          _selectAfter = false;
+                                          _selectedEpisodes = value;
+                                        }),
+                                      );
+                                    }
+                                    return SliverToBoxAdapter(child: Center());
                                   },
-                                  childCount: 1,
                                 ),
+                              SliverList(
+                                delegate: SliverChildBuilderDelegate((
+                                  context,
+                                  index,
+                                ) {
+                                  return _loadMore
+                                      ? SizedBox(
+                                          height: 2,
+                                          child: LinearProgressIndicator(),
+                                        )
+                                      : Center();
+                                }, childCount: 1),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      Selector<AudioPlayerNotifier,
-                              Tuple2<bool, PlayerHeight?>>(
-                          selector: (_, audio) =>
-                              Tuple2(audio.playerRunning, audio.playerHeight),
-                          builder: (_, data, __) {
-                            var height = kMinPlayerHeight[data.item2!.index];
-                            return Column(
-                              children: [
-                                if (_multiSelect!)
-                                  MultiSelectMenuBar(
-                                    selectedList: _selectedEpisodes,
-                                    selectAll: _selectAll,
-                                    onSelectAll: (value) {
-                                      setState(() {
-                                        _selectAll = value;
+                      Selector<
+                        AudioPlayerNotifier,
+                        Tuple2<bool, PlayerHeight?>
+                      >(
+                        selector: (_, audio) =>
+                            Tuple2(audio.playerRunning, audio.playerHeight),
+                        builder: (_, data, _) {
+                          var height = kMinPlayerHeight[data.item2!.index];
+                          return Column(
+                            children: [
+                              if (_multiSelect!)
+                                MultiSelectMenuBar(
+                                  selectedList: _selectedEpisodes,
+                                  selectAll: _selectAll,
+                                  onSelectAll: (value) {
+                                    setState(() {
+                                      _selectAll = value;
+                                      _selectAfter = false;
+                                      _selectBefore = false;
+                                      if (!value) {
+                                        _selectedEpisodes = [];
+                                      }
+                                    });
+                                  },
+                                  onSelectAfter: (value) {
+                                    setState(() {
+                                      _selectBefore = false;
+                                      _selectAfter = true;
+                                    });
+                                  },
+                                  onSelectBefore: (value) {
+                                    setState(() {
+                                      _selectAfter = false;
+                                      _selectBefore = true;
+                                    });
+                                  },
+                                  onClose: (value) {
+                                    setState(() {
+                                      if (value) {
+                                        _multiSelect = false;
+                                        _selectAll = false;
                                         _selectAfter = false;
                                         _selectBefore = false;
-                                        if (!value) {
-                                          _selectedEpisodes = [];
-                                        }
-                                      });
-                                    },
-                                    onSelectAfter: (value) {
-                                      setState(() {
-                                        _selectBefore = false;
-                                        _selectAfter = true;
-                                      });
-                                    },
-                                    onSelectBefore: (value) {
-                                      setState(() {
-                                        _selectAfter = false;
-                                        _selectBefore = true;
-                                      });
-                                    },
-                                    onClose: (value) {
-                                      setState(() {
-                                        if (value) {
-                                          _multiSelect = false;
-                                          _selectAll = false;
-                                          _selectAfter = false;
-                                          _selectBefore = false;
-                                        }
-                                      });
-                                    },
-                                  ),
-                                SizedBox(
-                                  height: data.item1 ? height : 0,
+                                      }
+                                    });
+                                  },
                                 ),
-                              ],
-                            );
-                          }),
+                              SizedBox(height: data.item1 ? height : 0),
+                            ],
+                          );
+                        },
+                      ),
                     ],
                   ),
                   Container(
-                      child: PlayerWidget(
-                    playerKey: _playerKey,
-                  )),
+                    child: PlayerWidget(
+                      playerKey: _playerKey,
+                      onExpandedChanged: (expanded) {
+                        if (mounted && _isPlayerExpanded != expanded) {
+                          setState(() => _isPlayerExpanded = expanded);
+                        }
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1009,7 +1083,7 @@ class _PodcastDetailState extends State<PodcastDetail> {
 
 class AboutPodcast extends StatefulWidget {
   final PodcastLocal? podcastLocal;
-  AboutPodcast({this.podcastLocal, Key? key}) : super(key: key);
+  const AboutPodcast({this.podcastLocal, super.key});
 
   @override
   _AboutPodcastState createState() => _AboutPodcastState();
@@ -1028,17 +1102,19 @@ class _AboutPodcastState extends State<AboutPodcast> {
 
   @override
   Widget build(BuildContext context) {
-    if (_load)
+    if (_load) {
       return Linkify(
         text: _description,
         onOpen: (link) {
-          link.url!.launchUrl;
+          link.url.launchUrl;
         },
         linkStyle: TextStyle(
-            color: context.accentColor,
-            decoration: TextDecoration.underline,
-            textBaseline: TextBaseline.ideographic),
+          color: context.accentColor,
+          decoration: TextDecoration.underline,
+          textBaseline: TextBaseline.ideographic,
+        ),
       );
+    }
     return Center();
   }
 
@@ -1056,7 +1132,7 @@ class _AboutPodcastState extends State<AboutPodcast> {
 }
 
 class SearchEpisode extends StatefulWidget {
-  SearchEpisode({this.onSearch, Key? key}) : super(key: key);
+  const SearchEpisode({this.onSearch, super.key});
   final ValueChanged<String?>? onSearch;
   @override
   _SearchEpisodeState createState() => _SearchEpisodeState();
@@ -1086,12 +1162,13 @@ class _SearchEpisodeState extends State<SearchEpisode> {
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor:
             Theme.of(context).brightness == Brightness.light
-                ? Color.fromRGBO(113, 113, 113, 1)
-                : Color.fromRGBO(5, 5, 5, 1),
+            ? Color.fromRGBO(113, 113, 113, 1)
+            : Color.fromRGBO(5, 5, 5, 1),
       ),
       child: AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
         elevation: 1,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20),
         titlePadding: const EdgeInsets.all(20),
@@ -1112,9 +1189,11 @@ class _SearchEpisodeState extends State<SearchEpisode> {
                 Navigator.of(context).pop();
               }
             },
-            child:
-                Text(s.confirm, style: TextStyle(color: context.accentColor)),
-          )
+            child: Text(
+              s.confirm,
+              style: TextStyle(color: context.accentColor),
+            ),
+          ),
         ],
         title: SizedBox(width: context.width - 160, child: Text(s.search)),
         content: Column(
@@ -1127,12 +1206,16 @@ class _SearchEpisodeState extends State<SearchEpisode> {
                 hintStyle: TextStyle(fontSize: 18),
                 filled: true,
                 focusedBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: context.accentColor, width: 2.0),
+                  borderSide: BorderSide(
+                    color: context.accentColor,
+                    width: 2.0,
+                  ),
                 ),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: context.accentColor, width: 2.0),
+                  borderSide: BorderSide(
+                    color: context.accentColor,
+                    width: 2.0,
+                  ),
                 ),
               ),
               cursorRadius: Radius.circular(2),

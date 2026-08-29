@@ -1,29 +1,92 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/main.dart';
+import 'package:tsacdop/state/setting_state.dart';
+import 'package:tsacdop/type/search_api/searchpodcast.dart';
+import 'package:tsacdop/util/extension_helper.dart';
+
+class _TestSettingState extends SettingState {
+  @override
+  ThemeMode get theme => ThemeMode.light;
+
+  @override
+  ThemeData get lightTheme => ThemeData.light();
+
+  @override
+  ThemeData get darkTheme => ThemeData.dark();
+
+  @override
+  bool get useWallpaperTheme => false;
+
+  @override
+  bool get showIntro => true;
+
+  @override
+  void addListener(VoidCallback listener) {}
+
+  @override
+  void removeListener(VoidCallback listener) {}
+}
 
 void main() {
-  testWidgets('Counter increments smoke test', (tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+  test('falls back safely for missing or malformed image colors', () {
+    expect(''.colorizedark(), const Color(0xFF009688));
+    expect('not json'.colorizeLight(), const Color(0xFF649688));
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('Favorites'), findsOneWidget);
-    expect(find.text('Next'), findsNothing);
+  test('handles incomplete podcast interval metadata', () {
+    expect(OnlinePodcast(count: 0).interval, isNull);
+    expect(OnlinePodcast(count: 4, latestPubDate: 100).interval, isNull);
+    expect(
+      OnlinePodcast(
+        count: 4,
+        earliestPubDate: 100,
+        latestPubDate: 500,
+      ).interval,
+      100,
+    );
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    //await tester.tap(find.byIcon(Icons.add));
-    //await tester.pump();
+  test('repairs an invalid persisted accent color', () async {
+    SharedPreferences.setMockInitialValues({accentsKey: 'FFA: 1.0'});
+    final setting = SettingState();
+    addTearDown(setting.dispose);
 
-    // Verify that our counter has incremented.
-    //expect(find.text('0'), findsNothing);
-    //expect(find.text('1'), findsOneWidget);
+    await setting.initData();
+
+    expect(setting.accentSetColor, Colors.teal[500]);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString(accentsKey), '009688');
+  });
+
+  test('loads a legacy six-digit accent color', () async {
+    SharedPreferences.setMockInitialValues({accentsKey: 'FF0000'});
+    final setting = SettingState();
+    addTearDown(setting.dispose);
+
+    await setting.initData();
+
+    expect(setting.accentSetColor, const Color(0xFFFF0000));
+  });
+
+  testWidgets('renders the localized introduction screen', (tester) async {
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<SettingState>.value(
+        value: _TestSettingState(),
+        child: const MyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.text('Next'), findsOneWidget);
   });
 }

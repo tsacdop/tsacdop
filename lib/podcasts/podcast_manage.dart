@@ -19,6 +19,8 @@ import 'podcast_group.dart';
 import 'podcastlist.dart';
 
 class PodcastManage extends StatefulWidget {
+  const PodcastManage({super.key});
+
   @override
   _PodcastManageState createState() => _PodcastManageState();
 }
@@ -42,20 +44,25 @@ class _PodcastManageState extends State<PodcastManage>
     _menuValue = 0;
     _index = 0;
     _menuController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
         if (mounted) {
           setState(() => _fraction = _animation.value);
         }
       });
-    _menuAnimation = Tween(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(parent: _menuController, curve: Curves.ease))
-      ..addListener(() {
-        if (mounted) setState(() => _menuValue = _menuAnimation.value);
-      });
+    _menuAnimation =
+        Tween(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: _menuController, curve: Curves.ease),
+        )..addListener(() {
+          if (mounted) setState(() => _menuValue = _menuAnimation.value);
+        });
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -65,8 +72,11 @@ class _PodcastManageState extends State<PodcastManage>
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      FeatureDiscovery.discoverFeatures(context,
-          const <String>{addGroupFeature, configureGroup, configurePodcast});
+      FeatureDiscovery.discoverFeatures(context, const <String>{
+        addGroupFeature,
+        configureGroup,
+        configurePodcast,
+      });
     });
   }
 
@@ -80,6 +90,7 @@ class _PodcastManageState extends State<PodcastManage>
   @override
   Widget build(BuildContext context) {
     final s = context.s;
+    final groupListState = context.read<GroupList>();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: context.priamryContainer,
@@ -103,49 +114,54 @@ class _PodcastManageState extends State<PodcastManage>
               description: s.featureDiscoveryGroupDes,
               buttonColor: Colors.cyan[500],
               child: IconButton(
-                  splashRadius: 20,
-                  onPressed: () => showGeneralDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      barrierLabel: MaterialLocalizations.of(context)
-                          .modalBarrierDismissLabel,
-                      barrierColor: Colors.black54,
-                      transitionDuration: const Duration(milliseconds: 200),
-                      pageBuilder: (context, animaiton, secondaryAnimation) =>
-                          AddGroup()),
-                  icon: Icon(Icons.add_circle_outline)),
+                splashRadius: 20,
+                onPressed: () => showGeneralDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierLabel: MaterialLocalizations.of(context)
+                      .modalBarrierDismissLabel,
+                  barrierColor: Colors.black54,
+                  transitionDuration: const Duration(milliseconds: 200),
+                  pageBuilder: (context, animaiton, secondaryAnimation) =>
+                      AddGroup(),
+                ),
+                icon: Icon(Icons.add_circle_outline),
+              ),
             ),
             Selector<SettingState, bool?>(
-                selector: (_, setting) => setting.openAllPodcastDefalt,
-                builder: (_, data, __) {
-                  return !data!
-                      ? IconButton(
-                          splashRadius: 20,
-                          onPressed: () => Navigator.push(
-                              context, ScaleRoute(page: PodcastList())),
-                          icon: Icon(Icons.all_out))
-                      : Center();
-                })
+              selector: (_, setting) => setting.openAllPodcastDefalt,
+              builder: (_, data, _) {
+                return !data!
+                    ? IconButton(
+                        splashRadius: 20,
+                        onPressed: () => Navigator.push(
+                          context,
+                          ScaleRoute(page: PodcastList()),
+                        ),
+                        icon: Icon(Icons.all_out),
+                      )
+                    : Center();
+              },
+            ),
             // _OrderMenu(),
           ],
         ),
         body: SafeArea(
-          child: WillPopScope(
-            onWillPop: () async {
-              context.read<GroupList>().clearOrderChanged();
-              return true;
+          child: PopScope<void>(
+            onPopInvokedWithResult: (didPop, result) {
+              if (didPop) groupListState.clearOrderChanged();
             },
             child: Consumer<GroupList>(
-              builder: (_, groupList, __) {
+              builder: (_, groupList, _) {
                 // var _isLoading = groupList.isLoading;
-                final _groups = groupList.groups;
-                if (_groups.isEmpty) return Center();
+                final groups = groupList.groups;
+                if (groups.isEmpty) return Center();
                 return Stack(
                   children: <Widget>[
                     ColoredBox(
                       color: context.priamryContainer,
                       child: CustomTabView(
-                        itemCount: _groups.length,
+                        itemCount: groups.length,
                         tabBuilder: (context, index) => Tab(
                           child: Container(
                             height: 50.0,
@@ -154,25 +170,23 @@ class _PodcastManageState extends State<PodcastManage>
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                             ),
-                            child: Text(
-                              _groups[index]!.name!,
-                            ),
+                            child: Text(groups[index]!.name!),
                           ),
                         ),
                         pageBuilder: (context, index) =>
                             featureDiscoveryOverlay(
-                          context,
-                          featureId: configurePodcast,
-                          tapTarget: Text(s.podcast(1)),
-                          title: s.featureDiscoveryGroupPodcast,
-                          backgroundColor: Colors.cyan[600],
-                          buttonColor: Colors.cyan[500],
-                          description: s.featureDiscoveryGroupPodcastDes,
-                          child: PodcastGroupList(
-                            group: _groups[index],
-                            key: ValueKey<String?>(_groups[index]!.name),
-                          ),
-                        ),
+                              context,
+                              featureId: configurePodcast,
+                              tapTarget: Text(s.podcast(1)),
+                              title: s.featureDiscoveryGroupPodcast,
+                              backgroundColor: Colors.cyan[600],
+                              buttonColor: Colors.cyan[500],
+                              description: s.featureDiscoveryGroupPodcastDes,
+                              child: PodcastGroupList(
+                                group: groups[index],
+                                key: ValueKey<String?>(groups[index]!.name),
+                              ),
+                            ),
                         onPositionChange: (value) =>
                             // setState(() =>
                             _index = value,
@@ -189,16 +203,15 @@ class _PodcastManageState extends State<PodcastManage>
                             }
                           },
                           child: Container(
-                            color: context.background.withOpacity(
-                                0.8 * math.min(_menuController.value * 2, 1.0)),
+                            color: context.background.withValues(
+                              alpha:
+                                  0.8 *
+                                  math.min(_menuController.value * 2, 1.0),
+                            ),
                           ),
                         ),
                       ),
-                    Positioned(
-                      right: 30,
-                      bottom: 30,
-                      child: _saveButton(),
-                    ),
+                    Positioned(right: 30, bottom: 30, child: _saveButton()),
                     if (_showSetting)
                       Positioned(
                         right: 100 * _menuValue - 70,
@@ -225,20 +238,25 @@ class _PodcastManageState extends State<PodcastManage>
                                               MaterialLocalizations.of(context)
                                                   .modalBarrierDismissLabel,
                                           barrierColor: Colors.black54,
-                                          transitionDuration:
-                                              const Duration(milliseconds: 300),
-                                          pageBuilder: (context, animaiton,
-                                                  secondaryAnimation) =>
-                                              RenameGroup(
-                                                group: _groups[_index!],
-                                              ));
+                                          transitionDuration: const Duration(
+                                            milliseconds: 300,
+                                          ),
+                                          pageBuilder:
+                                              (
+                                                context,
+                                                animaiton,
+                                                secondaryAnimation,
+                                              ) => RenameGroup(
+                                                group: groups[_index!],
+                                              ),
+                                        );
                                 },
                                 child: Container(
                                   height: 30.0,
                                   decoration: BoxDecoration(
-                                      color: Colors.grey[700],
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
+                                    color: Colors.grey[700],
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
                                   padding: EdgeInsets.symmetric(horizontal: 10),
                                   child: Row(
                                     children: <Widget>[
@@ -249,11 +267,13 @@ class _PodcastManageState extends State<PodcastManage>
                                       ),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
-                                            horizontal: 5.0),
+                                          horizontal: 5.0,
+                                        ),
                                       ),
-                                      Text(context.s.editGroupName,
-                                          style:
-                                              TextStyle(color: Colors.white)),
+                                      Text(
+                                        context.s.editGroupName,
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -282,7 +302,8 @@ class _PodcastManageState extends State<PodcastManage>
                                               child: Text(
                                                 context.s.cancel,
                                                 style: TextStyle(
-                                                    color: Colors.grey[600]),
+                                                  color: Colors.grey[600],
+                                                ),
                                               ),
                                             ),
                                             TextButton(
@@ -294,28 +315,31 @@ class _PodcastManageState extends State<PodcastManage>
                                                     _index = _index! - 1;
                                                   });
                                                   groupList.delGroup(
-                                                      _groups[_index! + 1]!);
+                                                    groups[_index! + 1]!,
+                                                  );
                                                 } else {
                                                   groupList.delGroup(
-                                                      _groups[_index!]!);
+                                                    groups[_index!]!,
+                                                  );
                                                 }
                                                 Navigator.of(context).pop();
                                               },
                                               child: Text(
                                                 context.s.confirm,
                                                 style: TextStyle(
-                                                    color: Colors.red),
+                                                  color: Colors.red,
+                                                ),
                                               ),
-                                            )
+                                            ),
                                           ],
                                         );
                                 },
                                 child: Container(
                                   height: 30,
                                   decoration: BoxDecoration(
-                                      color: Colors.grey[700],
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
+                                    color: Colors.grey[700],
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
                                   padding: EdgeInsets.symmetric(horizontal: 10),
                                   child: Row(
                                     children: <Widget>[
@@ -325,8 +349,10 @@ class _PodcastManageState extends State<PodcastManage>
                                         size: 15.0,
                                       ),
                                       SizedBox(width: 10),
-                                      Text(s.remove,
-                                          style: TextStyle(color: Colors.red)),
+                                      Text(
+                                        s.remove,
+                                        style: TextStyle(color: Colors.red),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -348,7 +374,7 @@ class _PodcastManageState extends State<PodcastManage>
   Widget _saveButton() {
     final s = context.s;
     return Consumer<GroupList>(
-      builder: (_, groupList, __) {
+      builder: (_, groupList, _) {
         if (groupList.orderChanged.contains(groupList.groups[_index!])) {
           _controller.forward();
         } else if (_fraction! > 0) {
@@ -380,8 +406,9 @@ class _PodcastManageState extends State<PodcastManage>
                   }
                 } else {
                   groupList.saveOrder(groupList.groups[_index!]);
-                  groupList
-                      .drlFromOrderChanged(groupList.groups[_index!]!.name);
+                  groupList.drlFromOrderChanged(
+                    groupList.groups[_index!]!.name,
+                  );
                   Fluttertoast.showToast(
                     msg: context.s.toastSettingSaved,
                     gravity: ToastGravity.BOTTOM,
@@ -393,15 +420,16 @@ class _PodcastManageState extends State<PodcastManage>
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                    color: _fraction! > 0.5 ? Colors.red : context.accentColor,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey[700]!.withOpacity(0.5),
-                        blurRadius: 1,
-                        offset: Offset(1, 1),
-                      ),
-                    ]),
+                  color: _fraction! > 0.5 ? Colors.red : context.accentColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey[700]!.withValues(alpha: 0.5),
+                      blurRadius: 1,
+                      offset: Offset(1, 1),
+                    ),
+                  ],
+                ),
                 alignment: Alignment.center,
                 child: _fraction! > 0.5
                     ? Icon(LineIcons.save, color: Colors.white)
@@ -420,38 +448,9 @@ class _PodcastManageState extends State<PodcastManage>
   }
 }
 
-class _OrderMenu extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final s = context.s;
-    return PopupMenuButton(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 1,
-      tooltip: s.menu,
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 1,
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.all_out),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
-              ),
-              Text(s.menuAllPodcasts),
-            ],
-          ),
-        ),
-      ],
-      onSelected: (dynamic value) {
-        if (value == 1) {
-          Navigator.push(context, ScaleRoute(page: PodcastList()));
-        }
-      },
-    );
-  }
-}
-
 class AddGroup extends StatefulWidget {
+  const AddGroup({super.key});
+
   @override
   _AddGroupState createState() => _AddGroupState();
 }
@@ -484,8 +483,8 @@ class _AddGroupState extends State<AddGroup> {
         statusBarColor: Colors.transparent,
         systemNavigationBarColor:
             Theme.of(context).brightness == Brightness.light
-                ? Color.fromRGBO(113, 113, 113, 1)
-                : Color.fromRGBO(5, 5, 5, 1),
+            ? Color.fromRGBO(113, 113, 113, 1)
+            : Color.fromRGBO(5, 5, 5, 1),
       ),
       child: SafeArea(
         top: false,
@@ -500,10 +499,7 @@ class _AddGroupState extends State<AddGroup> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                s.cancel,
-                style: TextStyle(color: Colors.grey[600]),
-              ),
+              child: Text(s.cancel, style: TextStyle(color: Colors.grey[600])),
             ),
             TextButton(
               onPressed: () async {
@@ -514,9 +510,11 @@ class _AddGroupState extends State<AddGroup> {
                   Navigator.of(context).pop();
                 }
               },
-              child:
-                  Text(s.confirm, style: TextStyle(color: context.accentColor)),
-            )
+              child: Text(
+                s.confirm,
+                style: TextStyle(color: context.accentColor),
+              ),
+            ),
           ],
           title: SizedBox(width: context.width - 160, child: Text(s.newGroup)),
           content: Column(
@@ -529,12 +527,16 @@ class _AddGroupState extends State<AddGroup> {
                   hintStyle: TextStyle(fontSize: 18),
                   filled: true,
                   focusedBorder: UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: context.accentColor, width: 2.0),
+                    borderSide: BorderSide(
+                      color: context.accentColor,
+                      width: 2.0,
+                    ),
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: context.accentColor, width: 2.0),
+                    borderSide: BorderSide(
+                      color: context.accentColor,
+                      width: 2.0,
+                    ),
                   ),
                 ),
                 cursorRadius: Radius.circular(2),

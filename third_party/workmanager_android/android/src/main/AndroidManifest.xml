@@ -1,0 +1,31 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Foreground service support for long-running workers. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <!--
+        Android 14+ (target SDK 34+) requires a type-specific permission for
+        each FGS type the app starts.
+
+        FOREGROUND_SERVICE_SHORT_SERVICE is always declared — expedited work
+        runs as a shortService FGS (see #715). It is not a Play Console
+        "special type" and needs no declaration/video.
+
+        FOREGROUND_SERVICE_DATA_SYNC is a Play Console special type that
+        requires a declaration form and a demonstration video even when the
+        app never starts a data-sync foreground service. It is therefore
+        NOT declared here: apps that run long-running workers with the
+        `dataSync` foreground service type must set
+        `workmanager.enableDataSyncForegroundService=true` in gradle.properties
+        (or via -P), which swaps in the opt-in manifest
+        (src/main/AndroidManifest.dataSync.xml). See #725.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SHORT_SERVICE"/>
+    <application>
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="shortService"
+            tools:node="merge"
+            tools:targetApi="34"/>
+    </application>
+</manifest>

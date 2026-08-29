@@ -27,19 +27,21 @@ class FiresideData {
 
   Future fatchData() async {
     var options = BaseOptions(
-      connectTimeout: 20000,
-      receiveTimeout: 20000,
+      connectTimeout: const Duration(seconds: 20),
+      receiveTimeout: const Duration(seconds: 20),
     );
 
     var response = await Dio(options).get(parseLink(link)!);
     if (response.statusCode == 200) {
       var doc = parse(response.data);
       var reg = RegExp(r'https(.+)jpg');
-      var backgroundImage = reg.stringMatch(doc.body!
-          .getElementsByClassName('hero-background')
-          .first
-          .attributes
-          .toString());
+      var backgroundImage = reg.stringMatch(
+        doc.body!
+            .getElementsByClassName('hero-background')
+            .first
+            .attributes
+            .toString(),
+      );
       var ul = doc.body!.getElementsByClassName('episode-hosts').first.children;
       var hosts = <PodcastHost>[];
       for (var element in ul) {
@@ -47,17 +49,18 @@ class FiresideData {
         var name = element.text.trim();
         var image = element.children.first.children.first.attributes.toString();
         host = PodcastHost(
-            name,
-            reg.stringMatch(image) ??
-                'https://fireside.fm/assets/default/avatar_small'
-                    '-170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg');
+          name,
+          reg.stringMatch(image) ??
+              'https://fireside.fm/assets/default/avatar_small'
+                  '-170afdc2be97fc6148b283083942d82c101d4c1061f6b28f87c8958b52664af9.jpg',
+        );
 
         hosts.add(host);
       }
       var data = <String?>[
         id,
         backgroundImage,
-        json.encode({'hosts': hosts.map((host) => host.toJson()).toList()})
+        json.encode({'hosts': hosts.map((host) => host.toJson()).toList()}),
       ];
       await _dbHelper.saveFiresideData(data);
     }

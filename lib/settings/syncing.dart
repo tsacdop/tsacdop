@@ -9,6 +9,8 @@ import '../widgets/custom_dropdown.dart';
 import '../widgets/custom_widget.dart';
 
 class SyncingSetting extends StatelessWidget {
+  const SyncingSetting({super.key});
+
   @override
   Widget build(BuildContext context) {
     final s = context.s;
@@ -26,16 +28,19 @@ class SyncingSetting extends StatelessWidget {
           child: Selector<SettingState, Tuple2<bool?, int?>>(
             selector: (_, settings) =>
                 Tuple2(settings.autoUpdate, settings.updateInterval),
-            builder: (_, data, __) => Column(
+            builder: (_, data, _) => Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(70, 20, 70, 10),
-                  child: Text(s.settingsSyncing,
-                      style: context.textTheme.bodyText1!
-                          .copyWith(color: context.accentColor)),
+                  child: Text(
+                    s.settingsSyncing,
+                    style: context.textTheme.bodyLarge!.copyWith(
+                      color: context.accentColor,
+                    ),
+                  ),
                 ),
                 ListTile(
                   onTap: () {
@@ -47,22 +52,26 @@ class SyncingSetting extends StatelessWidget {
                       settings.setWorkManager(data.item2);
                     }
                   },
-                  contentPadding:
-                      const EdgeInsets.only(left: 70.0, right: 20, bottom: 10),
+                  contentPadding: const EdgeInsets.only(
+                    left: 70.0,
+                    right: 20,
+                    bottom: 10,
+                  ),
                   title: Text(s.settingsEnableSyncing),
                   subtitle: Text(s.settingsEnableSyncingDes),
                   trailing: Transform.scale(
                     scale: 0.9,
                     child: Switch(
-                        value: data.item1!,
-                        onChanged: (boo) async {
-                          settings.autoUpdate = boo;
-                          if (boo) {
-                            settings.setWorkManager(data.item2);
-                          } else {
-                            settings.cancelWork();
-                          }
-                        }),
+                      value: data.item1!,
+                      onChanged: (boo) async {
+                        settings.autoUpdate = boo;
+                        if (boo) {
+                          settings.setWorkManager(data.item2);
+                        } else {
+                          settings.cancelWork();
+                        }
+                      },
+                    ),
                   ),
                 ),
                 ListTile(
@@ -70,22 +79,26 @@ class SyncingSetting extends StatelessWidget {
                   title: Text(s.settingsUpdateInterval),
                   subtitle: Text(s.settingsUpdateIntervalDes),
                   trailing: MyDropdownButton(
-                      hint: Text(s.hoursCount(data.item2!)),
-                      underline: Center(),
-                      elevation: 1,
-                      displayItemCount: 5,
-                      value: data.item2,
-                      onChanged: data.item1!
-                          ? (dynamic value) async {
-                              await settings.cancelWork();
-                              settings.setWorkManager(value);
-                            }
-                          : (int i) {},
-                      items: <int>[1, 2, 4, 8, 24, 48]
-                          .map<DropdownMenuItem<int>>((e) {
+                    hint: Text(s.hoursCount(data.item2!)),
+                    underline: Center(),
+                    elevation: 1,
+                    displayItemCount: 5,
+                    value: data.item2,
+                    onChanged: data.item1!
+                        ? (dynamic value) async {
+                            await settings.cancelWork();
+                            settings.setWorkManager(value);
+                          }
+                        : (int i) {},
+                    items: <int>[1, 2, 4, 8, 24, 48].map<DropdownMenuItem<int>>(
+                      (e) {
                         return DropdownMenuItem<int>(
-                            value: e, child: Text(s.hoursCount(e)));
-                      }).toList()),
+                          value: e,
+                          child: Text(s.hoursCount(e)),
+                        );
+                      },
+                    ).toList(),
+                  ),
                 ),
                 Divider(height: 1),
               ],

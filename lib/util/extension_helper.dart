@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
 import '../generated/l10n.dart';
 
 extension ContextExtension on BuildContext {
@@ -14,7 +15,7 @@ extension ContextExtension on BuildContext {
   Color get primaryColor => Theme.of(this).colorScheme.onPrimary;
   Color get priamryContainer => Theme.of(this).colorScheme.primaryContainer;
   Color get onPrimary => Theme.of(this).colorScheme.onPrimary;
-  Color get background => Theme.of(this).colorScheme.background;
+  Color get background => Theme.of(this).colorScheme.surface;
   Color get tertiary => colorScheme.tertiary;
   Color get tertiaryContainer => colorScheme.tertiaryContainer;
   Color get onTertiary => colorScheme.onTertiary;
@@ -23,7 +24,9 @@ extension ContextExtension on BuildContext {
   Color get error => colorScheme.error;
   Color get primaryColorDark => Theme.of(this).primaryColorDark;
   Color get textColor => textTheme.bodyLarge!.color!;
-  Color get dialogBackgroundColor => Theme.of(this).dialogBackgroundColor;
+  Color get dialogBackgroundColor =>
+      Theme.of(this).dialogTheme.backgroundColor ??
+      Theme.of(this).colorScheme.surface;
   Brightness get brightness => Theme.of(this).brightness;
   Brightness get iconBrightness =>
       brightness == Brightness.dark ? Brightness.light : Brightness.dark;
@@ -32,11 +35,11 @@ extension ContextExtension on BuildContext {
   double get paddingTop => MediaQuery.of(this).padding.top;
   TextTheme get textTheme => Theme.of(this).textTheme;
   SystemUiOverlayStyle get overlay => SystemUiOverlayStyle(
-        statusBarColor: background,
-        statusBarIconBrightness: iconBrightness,
-        systemNavigationBarColor: background,
-        systemNavigationBarIconBrightness: iconBrightness,
-      );
+    statusBarColor: background,
+    statusBarIconBrightness: iconBrightness,
+    systemNavigationBarColor: background,
+    systemNavigationBarIconBrightness: iconBrightness,
+  );
   S get s => S.of(this);
 }
 
@@ -55,7 +58,8 @@ extension IntExtension on int {
       return s.daysAgo(difference.inDays);
     } else {
       return DateFormat.yMMMd().format(
-          DateTime.fromMillisecondsSinceEpoch(this, isUtc: true).toLocal());
+        DateTime.fromMillisecondsSinceEpoch(this, isUtc: true).toLocal(),
+      );
     }
   }
 
@@ -93,27 +97,49 @@ extension StringExtension on String {
 
   Color colorizedark() {
     Color c;
-    var color = json.decode(this);
+    final color = _rgbValues() ?? const <int>[0, 150, 136];
     if (color[0] > 200 && color[1] > 200 && color[2] > 200) {
-      c = Color.fromRGBO(255 - color[0] as int, 255 - color[1] as int,
-          255 - color[2] as int, 1.0);
+      c = Color.fromRGBO(255 - color[0], 255 - color[1], 255 - color[2], 1.0);
     } else {
-      c = Color.fromRGBO(color[0], color[1] > 200 ? 190 : color[1],
-          color[2] > 200 ? 190 : color[2], 1);
+      c = Color.fromRGBO(
+        color[0],
+        color[1] > 200 ? 190 : color[1],
+        color[2] > 200 ? 190 : color[2],
+        1,
+      );
     }
     return c;
   }
 
   Color colorizeLight() {
     Color c;
-    var color = json.decode(this);
+    final color = _rgbValues() ?? const <int>[0, 150, 136];
     if (color[0] < 50 && color[1] < 50 && color[2] < 50) {
-      c = Color.fromRGBO(255 - color[0] as int, 255 - color[1] as int,
-          255 - color[2] as int, 1.0);
+      c = Color.fromRGBO(255 - color[0], 255 - color[1], 255 - color[2], 1.0);
     } else {
-      c = Color.fromRGBO(color[0] < 50 ? 100 : color[0],
-          color[1] < 50 ? 100 : color[1], color[2] < 50 ? 100 : color[2], 1.0);
+      c = Color.fromRGBO(
+        color[0] < 50 ? 100 : color[0],
+        color[1] < 50 ? 100 : color[1],
+        color[2] < 50 ? 100 : color[2],
+        1.0,
+      );
     }
     return c;
+  }
+
+  List<int>? _rgbValues() {
+    try {
+      final decoded = json.decode(this);
+      if (decoded is! List || decoded.length < 3) return null;
+
+      final values = <int>[];
+      for (final component in decoded.take(3)) {
+        if (component is! num) return null;
+        values.add(component.round().clamp(0, 255));
+      }
+      return values;
+    } on FormatException {
+      return null;
+    }
   }
 }

@@ -4,7 +4,6 @@
 [![GitHub Release][]][github release - recent]
 [![Github Downloads][]][github release - recent]
 [![Localizely][]][localizely - website]
-[![style: effective dart][]][effective dart pub]
 [![License badge][]][license]
 [![fdroid install][]][fdroid link]
 
@@ -63,29 +62,62 @@ Tsacdop is licensed under the [GPL v3.0](https://github.com/stonega/tsacdop/blob
 
 ## Build
 
-1. If you don't have Flutter SDK installed; Please visit the official [Flutter][Flutter Install] site.
-2. Fetch the latest source code from the master branch.
+The current toolchain is Flutter 3.47.2, Dart 3.13.2, Android Gradle Plugin
+9.3.1, Gradle 9.5, and JDK 21. Android release lint requires JDK 21. The iOS
+deployment target is 15.0.
 
-``` 
+1. Install Flutter and JDK 21, then fetch the source code.
+
+```
 git clone https://github.com/stonega/tsacdop.git
+cd tsacdop
+flutter config --jdk-dir /path/to/jdk-21
 ```
 
-3. Add api search api configure file.  
+2. Resolve the dependencies.
 
-Tsacdop uses the ListenNotes API 1.0 pro to search for podcasts, which is not free, so I can not expose the API key in the repo.
-If you want to build the app, you need to create a new file named `.env.dart` in the lib folder. Add the following code to `.env.dart`. If you don't have a ListenNotes api key, keep the apiKey empty like ''. Then the app will only support the PodcastIndex search.
-You can get your own ListenNotes API key on [ListenNotes](https://www.listennotes.com/api/). Remember that you need to get a pro plan API because the basic plan doesn't provide an rss link for the search result. 
-
-``` dart
-final environment = {"apiKey":""};
 ```
-
-4. Run the app with Android Studio or Visual Studio. Or the command line.
-
-``` 
 flutter pub get
-flutter run
 ```
+
+3. Optionally supply a Listen Notes API key at build time. Without it, the app
+   uses Podcast Index search only. Do not commit the key to the repository.
+
+```
+flutter run --flavor fdroid \
+  --dart-define=LISTEN_NOTES_API_KEY=your_key
+```
+
+4. Build Android artifacts. The F-Droid release is intentionally unsigned so
+   that the store can sign it. The Play flavor reads its signing credentials
+   from `KEYSTORE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD`.
+
+```
+flutter build apk --debug --flavor fdroid
+
+JAVA_HOME=/path/to/jdk-21 \
+  ./android/gradlew -p android assembleFdroidRelease
+
+flutter build appbundle --release --flavor play \
+  --dart-define=LISTEN_NOTES_API_KEY=your_key
+```
+
+5. For iOS, run `pod install` in `ios/` on macOS, then build with Xcode or
+   Flutter.
+
+```
+cd ios
+pod install
+cd ..
+flutter build ios --release --no-codesign \
+  --dart-define=LISTEN_NOTES_API_KEY=your_key
+```
+
+Plugins that need compatibility patches are vendored in `third_party/`. Each
+fork includes an `UPSTREAM.md` file recording its original repository, pinned
+commit, and local changes.
+
+You can obtain a Listen Notes key from [Listen Notes](https://www.listennotes.com/api/).
 
 ## Contribute 
 
@@ -189,7 +221,5 @@ For help getting started with Flutter, view our
 [Podcast Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png
 [Episode Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585896237809.png
 [Darkmode Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893920721.png
-[style: effective dart]: https://img.shields.io/badge/style-effective_dart-40c4ff.svg
-[effective dart pub]: https://pub.dev/packages/effective_dart
 [license]: https://github.com/stonega/tsacdop/blob/master/LICENSE
 [License badge]: https://img.shields.io/badge/license-GPLv3-yellow.svg

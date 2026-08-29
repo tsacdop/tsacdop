@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:color_thief_dart/color_thief_dart.dart';
 import 'package:dio/dio.dart';
@@ -24,6 +25,7 @@ import '../type/fireside_data.dart';
 import '../type/podcastlocal.dart';
 import '../util/helpers.dart';
 
+@pragma('vm:entry-point')
 void callbackDispatcher() {
   if (Platform.isAndroid) {
     Workmanager().executeTask((task, inputData) async {
@@ -52,8 +54,12 @@ class GroupEntity {
 
   static GroupEntity fromJson(Map<String, dynamic> json) {
     var list = List<String>.from(json['podcastList'] as Iterable<dynamic>);
-    return GroupEntity(json['name'] as String?, json['id'] as String?,
-        json['color'] as String?, list);
+    return GroupEntity(
+      json['name'] as String?,
+      json['id'] as String?,
+      json['color'] as String?,
+      list,
+    );
   }
 }
 
@@ -71,14 +77,15 @@ class PodcastGroup extends Equatable {
 
   final List<PodcastLocal> podcasts;
 
-  PodcastGroup(this.name,
-      {this.color = '#000000',
-      String? id,
-      List<String?>? podcastList,
-      List<PodcastLocal>? podcasts})
-      : id = id ?? Uuid().v4(),
-        podcastList = podcastList ?? [],
-        podcasts = podcasts ?? [];
+  PodcastGroup(
+    this.name, {
+    this.color = '#000000',
+    String? id,
+    List<String?>? podcastList,
+    List<PodcastLocal>? podcasts,
+  }) : id = id ?? Uuid().v4(),
+       podcastList = podcastList ?? [],
+       podcasts = podcasts ?? [];
 
   final _dbHelper = DBHelper();
 
@@ -104,16 +111,18 @@ class PodcastGroup extends Equatable {
     var count = await _dbHelper.getPodcastCounts(podcast.id);
     var list = [
       for (var p in podcasts)
-        p == podcast ? podcast.copyWith(updateCount: count) : p
+        p == podcast ? podcast.copyWith(updateCount: count) : p,
     ];
-    return PodcastGroup(name,
-        id: id, color: color, podcastList: podcastList, podcasts: list);
+    return PodcastGroup(
+      name,
+      id: id,
+      color: color,
+      podcastList: podcastList,
+      podcasts: list,
+    );
   }
 
   void reorderGroup(int oldIndex, int newIndex) {
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
     final podcast = podcasts.removeAt(oldIndex);
     podcasts.insert(newIndex, podcast);
     podcastList.removeAt(oldIndex);
@@ -142,7 +151,7 @@ class PodcastGroup extends Equatable {
   Color? getColor() {
     if (color != '#000000') {
       var colorInt = int.parse('FF${color!.toUpperCase()}', radix: 16);
-      return Color(colorInt).withOpacity(1.0);
+      return Color(colorInt).withValues(alpha: 1.0);
     } else {
       return Colors.blue[400];
     }
@@ -247,13 +256,16 @@ class GroupList extends ChangeNotifier {
   /// Subscribe podcast via isolate.
   /// Add subsribe item
   late SubscribeItem _subscribeItem;
-  setSubscribeItem(SubscribeItem item, {bool syncGpodder = true}) async {
+  Future<void> setSubscribeItem(
+    SubscribeItem item, {
+    bool syncGpodder = true,
+  }) async {
     _subscribeItem = item;
     if (syncGpodder) _syncAdd(item.url);
     await _start();
   }
 
-  _setCurrentSubscribeItem(SubscribeItem item) {
+  void _setCurrentSubscribeItem(SubscribeItem item) {
     _currentSubscribeItem = item;
     notifyListeners();
   }
@@ -282,8 +294,10 @@ class GroupList extends ChangeNotifier {
 
   Future<void> _createIsolate() async {
     receivePort = ReceivePort();
-    subIsolate =
-        await FlutterIsolate.spawn(subIsolateEntryPoint, receivePort.sendPort);
+    subIsolate = await FlutterIsolate.spawn(
+      subIsolateEntryPoint,
+      receivePort.sendPort,
+    );
   }
 
   /// Isolate listener to get subscrribe status.
@@ -298,11 +312,13 @@ class GroupList extends ChangeNotifier {
           _subscribeItem.group,
         ]);
       } else if (message is List) {
-        _setCurrentSubscribeItem(SubscribeItem(
-          message[1],
-          message[0],
-          subscribeState: SubscribeState.values[message[2]],
-        ));
+        _setCurrentSubscribeItem(
+          SubscribeItem(
+            message[1],
+            message[0],
+            subscribeState: SubscribeState.values[message[2]],
+          ),
+        );
         if (message.length == 5) {
           _subscribeNewPodcast(id: message[3], groupName: message[4]);
         }
@@ -358,16 +374,14 @@ class GroupList extends ChangeNotifier {
   }
 
   void setWorkManager() {
-    Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: false,
+    Workmanager().initialize(callbackDispatcher);
+    Workmanager().registerPeriodicTask(
+      "2",
+      "gpodder_sync",
+      frequency: Duration(hours: 4),
+      initialDelay: Duration(seconds: 10),
+      constraints: Constraints(networkType: NetworkType.connected),
     );
-    Workmanager().registerPeriodicTask("2", "gpodder_sync",
-        frequency: Duration(hours: 4),
-        initialDelay: Duration(seconds: 10),
-        constraints: Constraints(
-          networkType: NetworkType.connected,
-        ));
     developer.log('work manager init done + (gpodder sync)');
   }
 
@@ -401,7 +415,7 @@ class GroupList extends ChangeNotifier {
   void drlFromOrderChanged(String? name) {
     _orderChanged = [
       for (var group in _orderChanged)
-        if (group!.name != name) group
+        if (group!.name != name) group,
     ];
     notifyListeners();
   }
@@ -435,7 +449,7 @@ class GroupList extends ChangeNotifier {
     }
     _groups = [
       for (var group in _groups)
-        if (group!.id != podcastGroup.id) group
+        if (group!.id != podcastGroup.id) group,
     ];
     notifyListeners();
     await _saveGroup();
@@ -443,7 +457,7 @@ class GroupList extends ChangeNotifier {
 
   Future<void> updateGroup(PodcastGroup podcastGroup) async {
     _groups = [
-      for (var group in _groups) group == podcastGroup ? podcastGroup : group
+      for (var group in _groups) group == podcastGroup ? podcastGroup : group,
     ];
     notifyListeners();
     _saveGroup();
@@ -467,8 +481,10 @@ class GroupList extends ChangeNotifier {
   }
 
   /// Subscribe podcast from OPML.
-  Future<bool> _subscribeNewPodcast(
-      {String? id, String groupName = 'Home'}) async {
+  Future<bool> _subscribeNewPodcast({
+    String? id,
+    String groupName = 'Home',
+  }) async {
     //List<String> groupNames = _groups.map((e) => e.name).toList();
     var podcasts = await _dbHelper.getPodcastLocal([id]);
     for (var group in _groups) {
@@ -484,7 +500,7 @@ class GroupList extends ChangeNotifier {
     }
     _groups = [
       ..._groups,
-      PodcastGroup(groupName, podcastList: [id], podcasts: podcasts)
+      PodcastGroup(groupName, podcastList: [id], podcasts: podcasts),
     ];
     notifyListeners();
     await _saveGroup();
@@ -503,7 +519,9 @@ class GroupList extends ChangeNotifier {
 
   //Change podcast groups
   Future<void> changeGroup(
-      PodcastLocal podcast, List<PodcastGroup?> list) async {
+    PodcastLocal podcast,
+    List<PodcastGroup?> list,
+  ) async {
     for (var group in getPodcastGroup(podcast.id)) {
       if (list.contains(group)) {
         list.remove(group);
@@ -534,9 +552,7 @@ class GroupList extends ChangeNotifier {
   }
 
   /// Delete podcsat from device.
-  Future<void> removePodcast(
-    PodcastLocal podcast,
-  ) async {
+  Future<void> removePodcast(PodcastLocal podcast) async {
     _syncRemove(podcast.rssUrl);
     await _unsubscribe(podcast);
     await File(podcast.imagePath!).delete();
@@ -544,7 +560,7 @@ class GroupList extends ChangeNotifier {
 
   Future<void> saveOrder(PodcastGroup? group) async {
     // group.podcastList = group.orderedPodcasts.map((e) => e.id).toList();
-    var orderedGroup;
+    PodcastGroup? orderedGroup;
     for (var g in _orderChanged) {
       if (g == group) orderedGroup = g;
     }
@@ -554,21 +570,17 @@ class GroupList extends ChangeNotifier {
   }
 }
 
+@pragma('vm:entry-point')
 Future<void> subIsolateEntryPoint(SendPort sendPort) async {
   if (Platform.isAndroid) SharedPreferencesAndroid.registerWith();
   if (Platform.isAndroid) PathProviderAndroid.registerWith();
   var items = <SubscribeItem>[];
-  var _running = false;
-  final listColor = <String>[
-    '388E3C',
-    '1976D2',
-    'D32F2F',
-    '00796B',
-  ];
+  var running = false;
+  final listColor = <String>['388E3C', '1976D2', 'D32F2F', '00796B'];
   var subReceivePort = ReceivePort();
   sendPort.send(subReceivePort.sendPort);
 
-  Future<String> _getColor(File file) async {
+  Future<String> getColor(File file) async {
     final imageProvider = FileImage(file);
     var colorImage = await getImageFromProvider(imageProvider);
     var color = await getColorFromImage(colorImage);
@@ -576,13 +588,13 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
     return primaryColor;
   }
 
-  Future<void> _subscribe(SubscribeItem item) async {
+  Future<void> subscribe(SubscribeItem item) async {
     var dbHelper = DBHelper();
     var rss = item.url!;
     sendPort.send([item.title, item.url, 1]);
     var options = BaseOptions(
-      connectTimeout: 30000,
-      receiveTimeout: 90000,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 90),
     );
 
     try {
@@ -597,7 +609,7 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         sendPort.send([item.title, item.url, 4]);
         items.removeWhere((element) => element.url == item.url);
         if (items.isNotEmpty) {
-          await _subscribe(items.first);
+          await subscribe(items.first);
         } else {
           sendPort.send("done");
         }
@@ -605,8 +617,9 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       developer.log('get dir');
       final dir = await getApplicationDocumentsDirectory();
 
-      final realUrl =
-          response.redirects.isEmpty ? rss : response.realUri.toString();
+      final realUrl = response.redirects.isEmpty
+          ? rss
+          : response.realUri.toString();
 
       final checkUrl = await dbHelper.checkPodcast(realUrl);
 
@@ -615,43 +628,53 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         img.Image? thumbnail;
         String? imageUrl;
         try {
-          var imageResponse = await Dio().get<List<int>>(p.itunes!.image!.href!,
-              options: Options(
-                responseType: ResponseType.bytes,
-                receiveTimeout: 90000,
-              ));
+          var imageResponse = await Dio().get<List<int>>(
+            p.itunes!.image!.href!,
+            options: Options(
+              responseType: ResponseType.bytes,
+              receiveTimeout: const Duration(seconds: 90),
+            ),
+          );
           imageUrl = p.itunes!.image!.href;
-          var image = img.decodeImage(imageResponse.data!)!;
+          var image = img.decodeImage(Uint8List.fromList(imageResponse.data!))!;
           thumbnail = img.copyResize(image, width: 300);
         } catch (e) {
           try {
-            var imageResponse = await Dio().get<List<int>>(item.imgUrl!,
-                options: Options(
-                  responseType: ResponseType.bytes,
-                  receiveTimeout: 90000,
-                ));
+            var imageResponse = await Dio().get<List<int>>(
+              item.imgUrl!,
+              options: Options(
+                responseType: ResponseType.bytes,
+                receiveTimeout: const Duration(seconds: 90),
+              ),
+            );
             imageUrl = item.imgUrl;
-            var image = img.decodeImage(imageResponse.data!)!;
+            var image = img.decodeImage(
+              Uint8List.fromList(imageResponse.data!),
+            )!;
             thumbnail = img.copyResize(image, width: 300);
           } catch (e) {
             developer.log(e.toString(), name: 'Download image error');
             try {
               var index = math.Random().nextInt(3);
               var imageResponse = await Dio().get<List<int>>(
+                "https://ui-avatars.com/api/?size=300&background="
+                "${listColor[index]}&color=fff&name=${item.title}&length=2&bold=true",
+                options: Options(responseType: ResponseType.bytes),
+              );
+              imageUrl =
                   "https://ui-avatars.com/api/?size=300&background="
-                  "${listColor[index]}&color=fff&name=${item.title}&length=2&bold=true",
-                  options: Options(responseType: ResponseType.bytes));
-              imageUrl = "https://ui-avatars.com/api/?size=300&background="
                   "${listColor[index]}&color=fff&name=${item.title}&length=2&bold=true";
-              thumbnail = img.decodeImage(imageResponse.data!);
+              thumbnail = img.decodeImage(
+                Uint8List.fromList(imageResponse.data!),
+              );
             } catch (e) {
               developer.log(e.toString(), name: 'Donwload image error');
               sendPort.send([item.title, item.url, 6]);
               await Future.delayed(Duration(seconds: 2));
               sendPort.send([item.title, item.url, 4]);
               items.removeWhere((element) => element.url == item.url);
-              if (items.length > 0) {
-                await _subscribe(items.first);
+              if (items.isNotEmpty) {
+                await subscribe(items.first);
               } else {
                 sendPort.send("done");
               }
@@ -662,16 +685,26 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         File("${dir.path}/$uuid.png")
             .writeAsBytesSync(img.encodePng(thumbnail!));
         var imagePath = "${dir.path}/$uuid.png";
-        var primaryColor = await _getColor(File(imagePath));
+        var primaryColor = await getColor(File(imagePath));
         var author = p.itunes!.author ?? p.author ?? '';
         var provider = p.generator ?? '';
         var link = p.link ?? '';
         var funding = p.podcastFunding!.isNotEmpty
             ? [for (var f in p.podcastFunding!) f!.url]
             : <String>[];
-        var podcastLocal = PodcastLocal(p.title, imageUrl, realUrl,
-            primaryColor, author, uuid, imagePath, provider, link, funding,
-            description: p.description);
+        var podcastLocal = PodcastLocal(
+          p.title,
+          imageUrl,
+          realUrl,
+          primaryColor,
+          author,
+          uuid,
+          imagePath,
+          provider,
+          link,
+          funding,
+          description: p.description,
+        );
 
         await dbHelper.savePodcastLocal(podcastLocal);
 
@@ -693,8 +726,8 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
 
         sendPort.send([item.title, item.url, 4]);
         items.removeAt(0);
-        if (items.length > 0) {
-          await _subscribe(items.first);
+        if (items.isNotEmpty) {
+          await subscribe(items.first);
         } else {
           sendPort.send("done");
         }
@@ -703,8 +736,8 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
         await Future.delayed(Duration(seconds: 2));
         sendPort.send([item.title, item.url, 4]);
         items.removeAt(0);
-        if (items.length > 0) {
-          await _subscribe(items.first);
+        if (items.isNotEmpty) {
+          await subscribe(items.first);
         } else {
           sendPort.send("done");
         }
@@ -715,8 +748,8 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
       await Future.delayed(Duration(seconds: 2));
       sendPort.send([item.title, item.url, 4]);
       items.removeWhere((element) => element.url == item.url);
-      if (items.length > 0) {
-        await _subscribe(items.first);
+      if (items.isNotEmpty) {
+        await subscribe(items.first);
       } else {
         sendPort.send("done");
       }
@@ -725,11 +758,17 @@ Future<void> subIsolateEntryPoint(SendPort sendPort) async {
 
   subReceivePort.distinct().listen((message) {
     if (message is List<dynamic>) {
-      items.add(SubscribeItem(message[0], message[1],
-          imgUrl: message[2], group: message[3]));
-      if (!_running) {
-        _subscribe(items.first);
-        _running = true;
+      items.add(
+        SubscribeItem(
+          message[0],
+          message[1],
+          imgUrl: message[2],
+          group: message[3],
+        ),
+      );
+      if (!running) {
+        subscribe(items.first);
+        running = true;
       }
     }
   });

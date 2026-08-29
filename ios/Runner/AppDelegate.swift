@@ -1,23 +1,33 @@
-import UIKit
 import Flutter
+import UIKit
 import flutter_downloader
+import workmanager_apple
 
-@UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate {
+@main
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
-    FlutterDownloaderPlugin.setPluginRegistrantCallback(registerPlugins)
-    UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60*60*4))
+    WorkmanagerPlugin.registerLaunchHandlers()
+    WorkmanagerPlugin.setPluginRegistrantCallback { registry in
+      GeneratedPluginRegistrant.register(with: registry)
+    }
+    FlutterDownloaderPlugin.setPluginRegistrantCallback(registerDownloaderPlugins)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
   }
 }
 
-private func registerPlugins(registry: FlutterPluginRegistry) { 
-    if (!registry.hasPlugin("FlutterDownloaderPlugin")) {
-        FlutterDownloaderPlugin.register(with: registry.registrar(forPlugin: "FlutterDownloaderPlugin")!)
-    }
+private func registerDownloaderPlugins(registry: FlutterPluginRegistry) {
+  guard !registry.hasPlugin("FlutterDownloaderPlugin") else {
+    return
+  }
+
+  FlutterDownloaderPlugin.register(
+    with: registry.registrar(forPlugin: "FlutterDownloaderPlugin")!
+  )
 }
- 
