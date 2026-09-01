@@ -90,6 +90,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     final height = (context.width - 20) / 3 + 140;
     final settings = Provider.of<SettingState>(context, listen: false);
     final s = context.s;
+    final bottomViewPadding = MediaQuery.viewPaddingOf(context).bottom;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         systemNavigationBarIconBrightness: context.brightness,
@@ -237,7 +238,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         selector: (_, audio) => audio.playerRunning,
                         builder: (_, data, _) {
                           return Padding(
-                            padding: EdgeInsets.only(bottom: data ? 60.0 : 0),
+                            padding: EdgeInsets.only(
+                              bottom: data ? 60.0 + bottomViewPadding : 0,
+                            ),
                           );
                         },
                       ),
@@ -248,6 +251,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               Container(
                 child: PlayerWidget(
                   playerKey: _playerKey,
+                  collapsedBottomPadding: bottomViewPadding,
                   onExpandedChanged: (expanded) {
                     if (mounted && _isPlayerExpanded != expanded) {
                       setState(() => _isPlayerExpanded = expanded);

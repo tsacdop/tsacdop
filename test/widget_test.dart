@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/main.dart';
+import 'package:tsacdop/podcasts/custom_tabview.dart';
 import 'package:tsacdop/state/setting_state.dart';
 import 'package:tsacdop/type/search_api/searchpodcast.dart';
 import 'package:tsacdop/util/extension_helper.dart';
@@ -70,6 +71,35 @@ void main() {
     await setting.initData();
 
     expect(setting.accentSetColor, const Color(0xFFFF0000));
+  });
+
+  testWidgets('group tabs have no horizontal inset or bottom divider', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CustomTabView(
+            itemCount: 2,
+            tabBuilder: (_, index) => Tab(text: 'Group $index'),
+            pageBuilder: (_, index) => Text('Page $index'),
+          ),
+        ),
+      ),
+    );
+
+    final tabBar = tester.widget<TabBar>(find.byType(TabBar));
+    expect(tabBar.dividerHeight, 0);
+    expect(tabBar.tabAlignment, TabAlignment.start);
+    expect(tabBar.splashFactory, NoSplash.splashFactory);
+    expect(tabBar.overlayColor?.resolve(<WidgetState>{}), Colors.transparent);
+
+    final tabContainer = tester.widget<Container>(
+      find.byWidgetPredicate(
+        (widget) => widget is Container && widget.child is TabBar,
+      ),
+    );
+    expect(tabContainer.padding, const EdgeInsets.symmetric(vertical: 10));
   });
 
   testWidgets('renders the localized introduction screen', (tester) async {

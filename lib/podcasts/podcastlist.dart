@@ -35,31 +35,32 @@ class _PodcastListState extends State<PodcastList> {
     final width = context.width;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: context.overlay,
-      child: SafeArea(
-        child: Scaffold(
+      child: Scaffold(
+        backgroundColor: context.background,
+        appBar: AppBar(
           backgroundColor: context.background,
-          appBar: AppBar(
-            backgroundColor: context.background,
-            title: Text(context.s.podcast(2)),
-            leading: CustomBackButton(),
-            actions: [
-              Selector<SettingState, bool?>(
-                selector: (_, setting) => setting.openAllPodcastDefalt,
-                builder: (_, data, _) {
-                  if (!data!) return Center();
-                  return IconButton(
-                    splashRadius: 20,
-                    icon: Icon(Icons.all_out),
-                    onPressed: () => Navigator.push(
-                      context,
-                      ScaleRoute(page: PodcastManage()),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          body: Container(
+          title: Text(context.s.podcast(2)),
+          leading: CustomBackButton(),
+          actions: [
+            Selector<SettingState, bool?>(
+              selector: (_, setting) => setting.openAllPodcastDefalt,
+              builder: (_, data, _) {
+                if (!data!) return Center();
+                return IconButton(
+                  splashRadius: 20,
+                  icon: Icon(Icons.all_out),
+                  onPressed: () => Navigator.push(
+                    context,
+                    ScaleRoute(page: PodcastManage()),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        body: SafeArea(
+          top: false,
+          child: Container(
             color: context.primaryColor,
             child: FutureBuilder<List<PodcastLocal>>(
               future: _getPodcastLocal(),

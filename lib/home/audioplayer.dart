@@ -58,10 +58,12 @@ class PlayerWidget extends StatelessWidget {
     this.playerKey,
     this.isPlayingPage = false,
     this.onExpandedChanged,
+    this.collapsedBottomPadding = 0,
   });
   final GlobalKey<AudioPanelState>? playerKey;
   final bool isPlayingPage;
   final ValueChanged<bool>? onExpandedChanged;
+  final double collapsedBottomPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +76,8 @@ class PlayerWidget extends StatelessWidget {
           });
           return Center();
         } else {
-          final minHeight = kMinPlayerHeight[data.item2!.index];
+          final minHeight =
+              kMinPlayerHeight[data.item2!.index] + collapsedBottomPadding;
           final maxHeight = math.min(
             kMaxPlayerHeight[data.item2!.index] as double,
             context.height - 20,
@@ -85,7 +88,7 @@ class PlayerWidget extends StatelessWidget {
             expandHeight: context.height - context.paddingTop - 20,
             key: playerKey,
             onExpandedChanged: onExpandedChanged,
-            miniPanel: _MiniPanel(),
+            miniPanel: _MiniPanel(bottomPadding: collapsedBottomPadding),
             expandedPanel: ControlPanel(
               maxHeight: maxHeight,
               isPlayingPage: isPlayingPage,
@@ -104,7 +107,9 @@ class PlayerWidget extends StatelessWidget {
 }
 
 class _MiniPanel extends StatelessWidget {
-  const _MiniPanel();
+  const _MiniPanel({required this.bottomPadding});
+
+  final double bottomPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +120,8 @@ class _MiniPanel extends StatelessWidget {
         : audio.episode!.cardColor(context);
     return Container(
       color: bgColor,
-      height: 60,
+      height: 60 + bottomPadding,
+      padding: EdgeInsets.only(bottom: bottomPadding),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[

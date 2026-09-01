@@ -275,7 +275,9 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: theme.primaryColor,
-          iconTheme: theme.primaryIconTheme,
+          iconTheme: theme.iconTheme.copyWith(
+            color: theme.textTheme.bodyLarge?.color,
+          ),
           leading: widget.delegate!.buildLeading(context),
           elevation: 1,
           title: TextField(

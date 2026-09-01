@@ -99,12 +99,18 @@ class _CustomTabsState extends State<CustomTabView>
         Container(
           alignment: Alignment.centerLeft,
           height: 50.0,
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.symmetric(vertical: 10.0),
           child: TabBar(
+            dividerHeight: 0,
             indicatorSize: TabBarIndicatorSize.label,
             labelPadding: EdgeInsets.symmetric(horizontal: 5.0),
             indicatorPadding: EdgeInsets.symmetric(horizontal: 5.0),
             isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            overlayColor: const WidgetStatePropertyAll<Color>(
+              Colors.transparent,
+            ),
+            splashFactory: NoSplash.splashFactory,
             controller: controller,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey[700],
