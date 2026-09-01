@@ -1,7 +1,7 @@
 name: tsacdop
 description: An open source podcast player.
 
-version: 1.0.0+49
+version: 1.0.1+50
 publish_to: "none"
 environment:
   sdk: ^3.13.2
