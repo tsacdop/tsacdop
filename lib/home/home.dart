@@ -197,6 +197,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       SliverPersistentHeader(
                         delegate: _SliverAppBarDelegate(
                           TabBar(
+                            dividerHeight: 0,
                             indicator: _getIndicator(context),
                             isScrollable: true,
                             tabAlignment: TabAlignment.start,
@@ -272,9 +273,9 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar _tabBar;
 
   @override
-  double get minExtent => _tabBar.preferredSize.height + 2;
+  double get minExtent => _tabBar.preferredSize.height;
   @override
-  double get maxExtent => _tabBar.preferredSize.height + 2;
+  double get maxExtent => _tabBar.preferredSize.height;
 
   @override
   Widget build(
@@ -285,27 +286,21 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     final s = context.s;
     return Container(
       color: context.background,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              _tabBar,
-              Spacer(),
-              featureDiscoveryOverlay(
-                context,
-                featureId: playlistFeature,
-                tapTarget: Icon(Icons.playlist_play),
-                backgroundColor: Colors.cyan[500],
-                title: s.featureDiscoveryPlaylist,
-                description: s.featureDiscoveryPlaylistDes,
-                buttonColor: Colors.cyan[600],
-                child: _PlaylistButton(),
-              ),
-            ],
+          _tabBar,
+          Spacer(),
+          featureDiscoveryOverlay(
+            context,
+            featureId: playlistFeature,
+            tapTarget: Icon(Icons.playlist_play),
+            backgroundColor: Colors.cyan[500],
+            title: s.featureDiscoveryPlaylist,
+            description: s.featureDiscoveryPlaylistDes,
+            buttonColor: Colors.cyan[600],
+            child: _PlaylistButton(),
           ),
-          Container(height: 2, color: context.primaryColor),
         ],
       ),
     );

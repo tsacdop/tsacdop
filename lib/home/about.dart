@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
 
+import '../util/app_info.dart';
 import '../util/extension_helper.dart';
 import '../widgets/custom_widget.dart';
 
-const String version = '0.6.0';
-
-class AboutApp extends StatelessWidget {
+class AboutApp extends StatefulWidget {
   const AboutApp({super.key});
+
+  @override
+  State<AboutApp> createState() => _AboutAppState();
+}
+
+class _AboutAppState extends State<AboutApp> {
+  late final Future<String> _version = AppInfo.version;
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +44,17 @@ class AboutApp extends StatelessWidget {
         systemNavigationBarColor: context.background,
         systemNavigationBarIconBrightness: context.iconBrightness,
       ),
-      child: SafeArea(
-        child: Scaffold(
+      child: Scaffold(
+        backgroundColor: context.background,
+        appBar: AppBar(
           backgroundColor: context.background,
-          appBar: AppBar(
-            backgroundColor: context.background,
-            title: Text(s.homeToprightMenuAbout),
-            scrolledUnderElevation: 1,
-            leading: CustomBackButton(),
-          ),
-          body: SingleChildScrollView(
+          title: Text(s.homeToprightMenuAbout),
+          scrolledUnderElevation: 1,
+          leading: CustomBackButton(),
+        ),
+        body: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -63,7 +70,11 @@ class AboutApp extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Image(image: AssetImage('assets/logo.png'), height: 80),
-                        Text(s.version(version)),
+                        FutureBuilder<String>(
+                          future: _version,
+                          builder: (context, snapshot) =>
+                              Text(s.version(snapshot.data ?? '')),
+                        ),
                       ],
                     ),
                   ),
@@ -161,11 +172,16 @@ class AboutApp extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
-                                    Text(
-                                      'Buy Me A Coffee',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white,
+                                    Flexible(
+                                      child: Text(
+                                        'Buy Me A Coffee',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.fade,
+                                        softWrap: false,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                     SizedBox(width: 10),

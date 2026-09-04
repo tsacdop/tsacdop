@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tsacdop/generated/l10n.dart';
+import 'package:tsacdop/home/about.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/main.dart';
 import 'package:tsacdop/podcasts/custom_tabview.dart';
@@ -33,6 +36,35 @@ class _TestSettingState extends SettingState {
 }
 
 void main() {
+  testWidgets('about page uses the installed app version and normal app bar', (
+    tester,
+  ) async {
+    PackageInfo.setMockInitialValues(
+      appName: 'Tsacdop',
+      packageName: 'com.stonegate.tsacdop',
+      version: '1.0.1',
+      buildNumber: '50',
+      buildSignature: '',
+      installerStore: null,
+      installTime: null,
+      updateTime: null,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: const [S.delegate],
+        home: MediaQuery(
+          data: const MediaQueryData(padding: EdgeInsets.only(top: 24)),
+          child: const AboutApp(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Version: 1.0.1'), findsOneWidget);
+    expect(tester.getTopLeft(find.byType(AppBar)).dy, 0);
+  });
+
   test('falls back safely for missing or malformed image colors', () {
     expect(''.colorizedark(), const Color(0xFF009688));
     expect('not json'.colorizeLight(), const Color(0xFF649688));

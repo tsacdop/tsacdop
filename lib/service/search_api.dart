@@ -5,13 +5,13 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 
 import '../environment.dart';
-import '../home/about.dart';
 import '../type/search_api/index_episode.dart';
 import '../type/search_api/index_podcast.dart';
 import '../type/search_api/itunes_podcast.dart';
 import '../type/search_api/search_top_podcast.dart';
 import '../type/search_api/searchepisodes.dart';
 import '../type/search_api/searchpodcast.dart';
+import '../util/app_info.dart';
 
 const podcastIndexApi = {
   "podcastIndexApiKey": "XXWQEGULBJABVHZUM8NF",
@@ -122,7 +122,7 @@ class PodcastsIndexSearch {
     ),
   );
   final _baseUrl = 'https://api.podcastindex.org';
-  Map<String, String> _initSearch() {
+  Future<Map<String, String>> _initSearch() async {
     final unixTime = (DateTime.now().millisecondsSinceEpoch / 1000)
         .round()
         .toString();
@@ -143,7 +143,7 @@ class PodcastsIndexSearch {
       "X-Auth-Date": unixTime,
       "X-Auth-Key": apiKey,
       "Authorization": digest.toString(),
-      "User-Agent": "Tsacdop/$version",
+      "User-Agent": "Tsacdop/${await AppInfo.version}",
     };
     return headers;
   }
@@ -155,7 +155,7 @@ class PodcastsIndexSearch {
     final url =
         "$_baseUrl/api/1.0/search/byterm"
         "?q=${Uri.encodeComponent(searchText)}&max=$limit&fulltext=true";
-    final headers = _initSearch();
+    final headers = await _initSearch();
     final response = await _dio.get(url, options: Options(headers: headers));
     Map searchResultMap = jsonDecode(response.toString());
     final searchResult = PodcastIndexSearchResult.fromJson(
@@ -166,7 +166,7 @@ class PodcastsIndexSearch {
 
   Future<IndexEpisodeResult<dynamic>> fetchEpisode({String? rssUrl}) async {
     final url = "$_baseUrl/api/1.0/episodes/byfeedurl?url=$rssUrl";
-    final headers = _initSearch();
+    final headers = await _initSearch();
     final response = await _dio.get(url, options: Options(headers: headers));
     Map searchResultMap = jsonDecode(response.toString());
     final searchResult = IndexEpisodeResult.fromJson(
