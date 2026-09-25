@@ -1054,10 +1054,12 @@ class CustomAudioHandler extends BaseAudioHandler
   final _equalizer = AndroidEqualizer();
   final _loudnessEnhancer = AndroidLoudnessEnhancer();
   late final AudioPlayer _player = AudioPlayer(
+    handleInterruptions: false,
     audioPipeline: AudioPipeline(
       androidAudioEffects: [_loudnessEnhancer, _equalizer],
     ),
   );
+  late final Future<void> _audioSessionReady;
   bool _interrupted = false;
   int? _layoutIndex;
   int? _previousIndex;
@@ -1074,7 +1076,7 @@ class CustomAudioHandler extends BaseAudioHandler
 
   CustomAudioHandler(int cacheMax) {
     // _player.cacheMax = cacheMax;
-    _handleInterruption();
+    _audioSessionReady = _configureAudioSession();
     _player.currentIndexStream.listen((index) {
       if (index == null) {
         _previousIndex = null;
@@ -1157,51 +1159,32 @@ class CustomAudioHandler extends BaseAudioHandler
     }
   }
 
-  void _handleInterruption() async {
+  Future<void> _configureAudioSession() async {
     final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration.speech());
+    // Let the car reduce the output volume without pausing playback.
+    await session.configure(
+      const AudioSessionConfiguration.speech().copyWith(
+        androidWillPauseWhenDucked: false,
+      ),
+    );
     session.interruptionEventStream.listen((event) {
+      if (event.type == AudioInterruptionType.duck) {
+        return;
+      }
       if (event.begin) {
-        switch (event.type) {
-          case AudioInterruptionType.pause:
-            if (playing) {
-              pause();
-              _interrupted = true;
-            }
-            break;
-          case AudioInterruptionType.duck:
-            if (playing) {
-              pause();
-              _interrupted = true;
-            }
-            break;
-          case AudioInterruptionType.unknown:
-            if (playing) {
-              pause();
-              _interrupted = true;
-            }
-            break;
+        if (_player.playing) {
+          _interrupted = true;
+          unawaited(_player.pause());
         }
       } else {
-        switch (event.type) {
-          case AudioInterruptionType.pause:
-            if (!playing && _interrupted) {
-              play();
-            }
-            break;
-          case AudioInterruptionType.duck:
-            if (!playing && _interrupted) {
-              play();
-            }
-            break;
-          case AudioInterruptionType.unknown:
-            break;
+        if (event.type == AudioInterruptionType.pause && _interrupted) {
+          unawaited(play());
         }
         _interrupted = false;
       }
     });
     session.becomingNoisyEventStream.listen((_) {
-      if (playing) pause();
+      if (_player.playing) unawaited(pause());
     });
   }
 
@@ -1230,6 +1213,8 @@ class CustomAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> play() async {
+    await _audioSessionReady;
+    _interrupted = false;
     final wasPlaying = playing;
     await super.play();
     if (wasPlaying) {
@@ -1257,6 +1242,7 @@ class CustomAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> pause() async {
+    _interrupted = false;
     await _player.pause();
   }
 
@@ -1303,6 +1289,7 @@ class CustomAudioHandler extends BaseAudioHandler
   @override
   Future<void> stop() async {
     _stopAtEnd = false;
+    _interrupted = false;
     await _player.stop();
     // await _player.dispose();
     await _player.clearAudioSources();
