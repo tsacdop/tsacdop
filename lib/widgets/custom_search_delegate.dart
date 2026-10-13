@@ -168,10 +168,12 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
   // This node is owned, but not hosted by, the search page. Hosting is done by
   // the text field.
   FocusNode focusNode = FocusNode();
+  late String _lastQuery;
 
   @override
   void initState() {
     super.initState();
+    _lastQuery = widget.delegate!.query;
     widget.delegate!._queryTextController.addListener(_onQueryChanged);
     widget.animation!.addStatusListener(_onAnimationStatusChanged);
     widget.delegate!._currentBodyNotifier.addListener(_onSearchBodyChanged);
@@ -203,6 +205,7 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
   void didUpdateWidget(_SearchPage<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.delegate != oldWidget.delegate) {
+      _lastQuery = widget.delegate!.query;
       oldWidget.delegate!._queryTextController.removeListener(_onQueryChanged);
       widget.delegate!._queryTextController.addListener(_onQueryChanged);
       oldWidget.delegate!._currentBodyNotifier.removeListener(
@@ -222,8 +225,11 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
   }
 
   void _onQueryChanged() {
+    final query = widget.delegate!.query;
+    // TextField handles selection and composing-range changes itself.
+    if (query == _lastQuery) return;
     setState(() {
-      // rebuild ourselves because query changed.
+      _lastQuery = query;
     });
   }
 
@@ -243,17 +249,17 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
     final TextStyle? searchFieldStyle =
         widget.delegate!.searchFieldStyle ??
         theme.inputDecorationTheme.hintStyle;
-    int? index;
-    switch (widget.delegate!._currentBody) {
-      case _SearchBody.suggestions:
-        index = 0;
-        break;
-      case _SearchBody.results:
-        index = 1;
-        break;
-      default:
-        break;
-    }
+    final Widget? body = switch (widget.delegate!._currentBody) {
+      _SearchBody.suggestions => KeyedSubtree(
+        key: const ValueKey<_SearchBody>(_SearchBody.suggestions),
+        child: widget.delegate!.buildSuggestions(context),
+      ),
+      _SearchBody.results => KeyedSubtree(
+        key: ValueKey((_SearchBody.results, widget.delegate!.query)),
+        child: widget.delegate!.buildResults(context),
+      ),
+      null => null,
+    };
     String? routeName;
     switch (theme.platform) {
       case TargetPlatform.iOS:
@@ -297,23 +303,7 @@ class _SearchPageState<T> extends State<_SearchPage<T>> {
           ),
           actions: widget.delegate!.buildActions(context),
         ),
-        body: IndexedStack(
-          index: index,
-          children: [
-            KeyedSubtree(
-              key: const ValueKey<_SearchBody>(_SearchBody.suggestions),
-              child: widget.delegate!.buildSuggestions(context),
-            ),
-            KeyedSubtree(
-              key: const ValueKey<_SearchBody>(_SearchBody.results),
-              child: widget.delegate!.buildResults(context),
-            ),
-          ],
-        ),
-        // AnimatedSwitcher(
-        //   duration: const Duration(milliseconds: 300),
-        //   child: body,
-        // ),
+        body: body,
       ),
     );
   }
