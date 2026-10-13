@@ -43,6 +43,7 @@ local app data.
 * Listening and subscription history record
 * Dark mode / accent color
 * Download for offline play
+* Sort downloaded episodes by download time, episode title, or podcast name
 * Auto-download new episodes / auto-delete outdated downloads
 * Settings backup
 * Skip silence

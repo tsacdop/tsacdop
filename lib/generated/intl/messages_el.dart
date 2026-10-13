@@ -613,6 +613,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "showNotesFonts": MessageLookupByLibrary.simpleMessage(
       "Προβολή γραμματοσειράς σημειώσεων",
     ),
+    "sortEpisodeTitle": MessageLookupByLibrary.simpleMessage(
+      "Τίτλος επεισοδίου (Α–Ω)",
+    ),
+    "sortPodcastName": MessageLookupByLibrary.simpleMessage(
+      "Όνομα podcast (Α–Ω)",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("Μέγεθος"),
     "skipSecondsAtEnd": MessageLookupByLibrary.simpleMessage(
       "Παράλειψη δευτερολέπτων στο τέλος",

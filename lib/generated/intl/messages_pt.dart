@@ -600,6 +600,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "showNotesFonts": MessageLookupByLibrary.simpleMessage(
       "Mostrar tipo de letra das notas",
     ),
+    "sortEpisodeTitle": MessageLookupByLibrary.simpleMessage(
+      "Título do episódio (A–Z)",
+    ),
+    "sortPodcastName": MessageLookupByLibrary.simpleMessage(
+      "Nome do podcast (A–Z)",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("Tamanho"),
     "skipSecondsAtEnd": MessageLookupByLibrary.simpleMessage(
       "Saltar segundos no fim",

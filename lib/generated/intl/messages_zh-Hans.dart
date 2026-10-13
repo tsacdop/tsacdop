@@ -405,6 +405,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "share": MessageLookupByLibrary.simpleMessage("分享"),
     "showNotesFonts": MessageLookupByLibrary.simpleMessage("节目简介字体"),
+    "sortEpisodeTitle": MessageLookupByLibrary.simpleMessage("节目标题（A–Z）"),
+    "sortPodcastName": MessageLookupByLibrary.simpleMessage("播客名称（A–Z）"),
     "size": MessageLookupByLibrary.simpleMessage("大小"),
     "skipSecondsAtEnd": MessageLookupByLibrary.simpleMessage("结束跳过秒数"),
     "skipSecondsAtStart": MessageLookupByLibrary.simpleMessage("开头跳过秒数"),

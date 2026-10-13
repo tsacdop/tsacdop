@@ -10,6 +10,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../type/episodebrief.dart';
+import '../type/download_sort.dart';
 import '../type/play_histroy.dart';
 import '../type/podcastlocal.dart';
 import '../type/sub_history.dart';
@@ -1644,67 +1645,42 @@ class DBHelper {
   }) async {
     var dbClient = await database;
     var episodes = <EpisodeBrief>[];
-    late List<Map> list;
-    if (hideListened) {
-      if (mode == 0) {
-        list = await dbClient.rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date, E.is_new,
-        E.milliseconds, P.title as feed_title, E.duration, E.explicit,
-        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url
-        WHERE E.enclosure_url != E.media_id GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null
-        OR SUM(H.listen_time) = 0 ORDER BY E.download_date DESC""");
-      } else if (mode == 1) {
-        list = await dbClient.rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,E.is_new,
-        E.milliseconds, P.title as feed_title, E.duration, E.explicit,
-        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url
-        WHERE E.enclosure_url != E.media_id GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null
-        OR SUM(H.listen_time) = 0 ORDER BY E.download_date ASC""");
-      } else if (mode == 2) {
-        list = await dbClient.rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,E.is_new,
-        E.milliseconds, P.title as feed_title, E.duration, E.explicit,
-        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url
-        WHERE E.enclosure_url != E.media_id GROUP BY E.enclosure_url HAVING SUM(H.listen_time) is null
-        OR SUM(H.listen_time) = 0 ORDER BY E.enclosure_length DESC""");
-      }
-    } else //Ordered by date
-    {
-      if (mode == 0) {
-        list = await dbClient.rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date, E.is_new,
-        E.milliseconds, P.title as feed_title, E.duration, E.explicit,
-        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE E.enclosure_url != E.media_id
-        ORDER BY E.download_date DESC""");
-      } else if (mode == 1) {
-        list = await dbClient.rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,E.is_new,
-        E.milliseconds, P.title as feed_title, E.duration, E.explicit,
-        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE E.enclosure_url != E.media_id
-        ORDER BY E.download_date ASC""");
-      } else if (mode == 2) {
-        list = await dbClient.rawQuery("""SELECT E.title, E.enclosure_url, E.enclosure_length, E.download_date,E.is_new,
-        E.milliseconds, P.title as feed_title, E.duration, E.explicit,
-        P.imagePath, P.primaryColor FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
-        WHERE E.enclosure_url != E.media_id
-        ORDER BY E.enclosure_length DESC""");
-      }
-    }
+    final orderBy = switch (DownloadSort.fromIndex(mode)) {
+      DownloadSort.newest => 'E.download_date DESC, E.enclosure_url ASC',
+      DownloadSort.oldest => 'E.download_date ASC, E.enclosure_url ASC',
+      DownloadSort.size => 'E.enclosure_length DESC, E.enclosure_url ASC',
+      DownloadSort.title => 'E.title COLLATE NOCASE ASC, E.enclosure_url ASC',
+      DownloadSort.podcast =>
+        'P.title COLLATE NOCASE ASC, E.download_date DESC, E.enclosure_url ASC',
+    };
+    final historyJoin = hideListened
+        ? 'LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url'
+        : '';
+    final listenedFilter = hideListened
+        ? 'GROUP BY E.enclosure_url HAVING SUM(H.listen_time) IS NULL OR SUM(H.listen_time) = 0'
+        : '';
+    final list = await dbClient.rawQuery("""SELECT E.title, E.enclosure_url,
+      E.enclosure_length, E.download_date, E.is_new, E.milliseconds,
+      P.title as feed_title, E.duration, E.explicit, P.imagePath, P.primaryColor
+      FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+      $historyJoin
+      WHERE E.enclosure_url != E.media_id $listenedFilter
+      ORDER BY $orderBy""");
     if (list.isNotEmpty) {
       for (var i in list) {
         episodes.add(
           EpisodeBrief(
-            i['title'],
-            i['enclosure_url'],
-            i['enclosure_length'],
-            i['milliseconds'],
-            i['feed_title'],
-            i['primaryColor'],
-            i['duration'],
-            i['explicit'],
-            i['imagePath'],
-            i['is_new'],
-            downloadDate: i['download_date'],
+            i['title'] as String?,
+            i['enclosure_url'] as String,
+            i['enclosure_length'] as int?,
+            i['milliseconds'] as int?,
+            i['feed_title'] as String?,
+            i['primaryColor'] as String?,
+            i['duration'] as int?,
+            i['explicit'] as int?,
+            i['imagePath'] as String?,
+            i['is_new'] as int?,
+            downloadDate: i['download_date'] as int?,
           ),
         );
       }

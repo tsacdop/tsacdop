@@ -2324,6 +2324,22 @@ class S {
     );
   }
 
+  /// `Episode title (A–Z)`
+  String get sortEpisodeTitle => Intl.message(
+    'Episode title (A–Z)',
+    name: 'sortEpisodeTitle',
+    desc: '',
+    args: [],
+  );
+
+  /// `Podcast name (A–Z)`
+  String get sortPodcastName => Intl.message(
+    'Podcast name (A–Z)',
+    name: 'sortPodcastName',
+    desc: '',
+    args: [],
+  );
+
   /// `Size`
   String get size {
     return Intl.message('Size', name: 'size', desc: '', args: []);

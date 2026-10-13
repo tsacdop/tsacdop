@@ -23,6 +23,7 @@ const String podcastLayoutKey = 'podcastLayoutKey';
 const String recentLayoutKey = 'recentLayoutKey';
 const String favLayoutKey = 'favLayoutKey';
 const String downloadLayoutKey = 'downloadLayoutKey';
+const String downloadSortKey = 'downloadSortKey';
 const String autoDownloadNetworkKey = 'autoDownloadNetwork';
 const String episodePopupMenuKey = 'episodePopupMenuKey';
 const String autoDeleteKey = 'autoDeleteKey';

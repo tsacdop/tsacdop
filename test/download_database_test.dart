@@ -28,6 +28,9 @@ void main() {
     await database.execute("""CREATE TABLE PodcastLocal (
       id TEXT, title TEXT, imagePath TEXT, primaryColor TEXT
     )""");
+    await database.execute(
+      'CREATE TABLE PlayHistory (enclosure_url TEXT, listen_time INTEGER)',
+    );
     await database.insert('PodcastLocal', {
       'id': 'podcast',
       'title': 'Podcast',
@@ -97,4 +100,93 @@ void main() {
     expect(row['media_id'], 'file:///new.mp3');
     expect(row['enclosure_length'], 300);
   });
+  Future<void> seedSortEpisodes() async {
+    for (final (id, title) in [('alpha', 'Alpha'), ('zulu', 'zulu')]) {
+      await database.insert('PodcastLocal', {'id': id, 'title': title});
+    }
+    for (final (id, title, feed, date, size) in [
+      ('a', 'zebra', 'alpha', 100, 80),
+      ('b', 'Apple', 'zulu', 300, 40),
+      ('c', 'banana', 'alpha', 200, 20),
+      ('d', 'aardvark', 'zulu', 200, 100),
+    ]) {
+      await database.insert('Episodes', {
+        'enclosure_url': 'https://example.com/$id.mp3',
+        'media_id': 'file:///$id.mp3',
+        'downloaded': id,
+        'download_date': date,
+        'enclosure_length': size,
+        'title': title,
+        'milliseconds': 1000 - date,
+        'feed_id': feed,
+        'duration': 60,
+        'explicit': 0,
+        'is_new': 0,
+      });
+    }
+  }
+
+  Future<List<String>> sortedIds(
+    int? mode, {
+    bool hideListened = false,
+  }) async =>
+      (await helper.getDownloadedEpisode(mode, hideListened: hideListened))
+          .map(
+            (episode) => episode.enclosureUrl.split('/').last.split('.').first,
+          )
+          .toList();
+
+  test('sorts newest and oldest by download date with stable ties', () async {
+    await seedSortEpisodes();
+    expect(await sortedIds(0), ['b', 'c', 'd', 'a']);
+    expect(await sortedIds(1), ['a', 'c', 'd', 'b']);
+  });
+
+  test('sorts episode titles without ASCII case affecting the order', () async {
+    await seedSortEpisodes();
+    expect(await sortedIds(3), ['d', 'b', 'c', 'a']);
+  });
+
+  test(
+    'groups podcasts alphabetically with newest downloads within each',
+    () async {
+      await seedSortEpisodes();
+      expect(await sortedIds(4), ['c', 'a', 'b', 'd']);
+    },
+  );
+
+  test(
+    'preserves the storage size sort and defaults invalid modes to newest',
+    () async {
+      await seedSortEpisodes();
+      expect(await sortedIds(2), ['d', 'a', 'b', 'c']);
+      for (final mode in [null, -1, 99]) {
+        expect(await sortedIds(mode), ['b', 'c', 'd', 'a']);
+      }
+    },
+  );
+
+  test(
+    'every sort excludes listened episodes without duplicating history joins',
+    () async {
+      await seedSortEpisodes();
+      for (final (id, listened) in [('b', 12), ('b', 80), ('c', 0)]) {
+        await database.insert('PlayHistory', {
+          'enclosure_url': 'https://example.com/$id.mp3',
+          'listen_time': listened,
+        });
+      }
+      final expected = [
+        ['c', 'd', 'a'],
+        ['a', 'c', 'd'],
+        ['d', 'a', 'c'],
+        ['d', 'c', 'a'],
+        ['c', 'a', 'd'],
+      ];
+      for (var mode = 0; mode < expected.length; mode++) {
+        expect(await sortedIds(mode, hideListened: true), expected[mode]);
+      }
+      expect(await sortedIds(0), ['b', 'c', 'd', 'a']);
+    },
+  );
 }

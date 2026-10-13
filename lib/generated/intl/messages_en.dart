@@ -573,6 +573,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "share": MessageLookupByLibrary.simpleMessage("Share"),
     "showNotesFonts": MessageLookupByLibrary.simpleMessage("Show notes font"),
+    "sortEpisodeTitle": MessageLookupByLibrary.simpleMessage(
+      "Episode title (A–Z)",
+    ),
+    "sortPodcastName": MessageLookupByLibrary.simpleMessage(
+      "Podcast name (A–Z)",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("Size"),
     "skipSecondsAtEnd": MessageLookupByLibrary.simpleMessage(
       "Skip seconds at end",
