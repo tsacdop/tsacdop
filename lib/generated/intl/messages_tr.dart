@@ -588,6 +588,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "showNotesFonts": MessageLookupByLibrary.simpleMessage(
       "Not yazı tipini göster",
     ),
+    "sortEpisodeTitle": MessageLookupByLibrary.simpleMessage(
+      "Bölüm başlığı (A–Z)",
+    ),
+    "sortPodcastName": MessageLookupByLibrary.simpleMessage(
+      "Podcast adı (A–Z)",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("Boyut"),
     "skipSecondsAtEnd": MessageLookupByLibrary.simpleMessage(
       "Sondaki saniyeleri atla",

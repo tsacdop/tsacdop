@@ -258,15 +258,17 @@ class _DownloadsManageState extends State<DownloadsManage> {
                                       value: 2,
                                       child: Text(s.size),
                                     ),
+                                    PopupMenuItem(
+                                      value: 3,
+                                      child: Text(s.sortEpisodeTitle),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 4,
+                                      child: Text(s.sortPodcastName),
+                                    ),
                                   ],
                                   onSelected: (value) {
-                                    if (value == 0) {
-                                      setState(() => _mode = 0);
-                                    } else if (value == 1) {
-                                      setState(() => _mode = 1);
-                                    } else if (value == 2) {
-                                      setState(() => _mode = 2);
-                                    }
+                                    setState(() => _mode = value);
                                   },
                                 ),
                               ),

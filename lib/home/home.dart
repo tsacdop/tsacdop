@@ -21,6 +21,7 @@ import '../state/podcast_group.dart';
 import '../state/refresh_podcast.dart';
 import '../state/setting_state.dart';
 import '../type/episodebrief.dart';
+import '../type/download_sort.dart';
 import '../util/extension_helper.dart';
 import '../widgets/audiopanel.dart';
 import '../widgets/custom_popupmenu.dart';
@@ -230,7 +231,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             ),
                             KeyedSubtree(
                               key: const PageStorageKey<String>('tab2'),
-                              child: _MyDownload(),
+                              child: DownloadsTab(),
                             ),
                           ],
                         ),
@@ -1228,37 +1229,54 @@ class _MyFavoriteState extends State<_MyFavorite>
   bool get wantKeepAlive => true;
 }
 
-class _MyDownload extends StatefulWidget {
+class DownloadsTab extends StatefulWidget {
+  final DBHelper? dbHelper;
+  const DownloadsTab({this.dbHelper, super.key});
+
   @override
-  _MyDownloadState createState() => _MyDownloadState();
+  State<DownloadsTab> createState() => _DownloadsTabState();
 }
 
-class _MyDownloadState extends State<_MyDownload>
+class _DownloadsTabState extends State<DownloadsTab>
     with AutomaticKeepAliveClientMixin {
   Layout? _layout;
-  int? _sortBy;
+  DownloadSort? _sortBy;
   bool? _hideListened;
-  Future<List<EpisodeBrief>> _getDownloadedEpisodes(
-    int? sortBy, {
-    bool? hideListened,
-  }) async {
-    var storage = KeyValueStorage(downloadLayoutKey);
-    var index = await storage.getInt(defaultValue: 1);
-    var hideListenedStorage = KeyValueStorage(hideListenedKey);
-    _layout ??= Layout.values[index];
-    _hideListened ??= await hideListenedStorage.getBool(defaultValue: false);
-    var dbHelper = DBHelper();
-    var episodes = await dbHelper.getDownloadedEpisode(
-      sortBy,
+  late final DBHelper _dbHelper;
+  late final Future<void> _preferences;
+
+  Future<void> _loadPreferences() async {
+    final layout = await KeyValueStorage(downloadLayoutKey)
+        .getInt(defaultValue: 1);
+    final sort = await KeyValueStorage(downloadSortKey).getInt();
+    final hideListened = await KeyValueStorage(hideListenedKey)
+        .getBool(defaultValue: false);
+    _layout ??= layout >= 0 && layout < Layout.values.length
+        ? Layout.values[layout]
+        : Layout.two;
+    _sortBy ??= DownloadSort.fromIndex(sort);
+    _hideListened ??= hideListened;
+  }
+
+  Future<List<EpisodeBrief>> _getDownloadedEpisodes() async {
+    await _preferences;
+    if (!mounted) return [];
+    return _dbHelper.getDownloadedEpisode(
+      _sortBy!.index,
       hideListened: _hideListened!,
     );
-    return episodes;
+  }
+
+  void _setSort(DownloadSort sort) {
+    setState(() => _sortBy = sort);
+    KeyValueStorage(downloadSortKey).saveInt(sort.index);
   }
 
   @override
   void initState() {
     super.initState();
-    _sortBy = 0;
+    _dbHelper = widget.dbHelper ?? DBHelper();
+    _preferences = _loadPreferences();
   }
 
   @override
@@ -1267,7 +1285,7 @@ class _MyDownloadState extends State<_MyDownload>
     final s = context.s;
     return Consumer<DownloadState>(
       builder: (_, data, _) => FutureBuilder<List<EpisodeBrief>>(
-        future: _getDownloadedEpisodes(_sortBy, hideListened: _hideListened),
+        future: _getDownloadedEpisodes(),
         builder: (context, snapshot) {
           var episodes = snapshot.data ?? [];
           return ScrollConfiguration(
@@ -1282,11 +1300,45 @@ class _MyDownloadState extends State<_MyDownload>
                     color: context.primaryColor,
                     child: Row(
                       children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(s.downloaded),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.only(
+                              start: 20,
+                              end: 8,
+                            ),
+                            child: Text(
+                              s.downloaded,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
-                        Spacer(),
+                        PopupMenuButton<DownloadSort>(
+                          tooltip: s.homeSubMenuSortBy,
+                          icon: Icon(Icons.sort),
+                          initialValue: _sortBy ?? DownloadSort.newest,
+                          onSelected: _setSort,
+                          itemBuilder: (context) => [
+                            for (final sort in [
+                              DownloadSort.newest,
+                              DownloadSort.oldest,
+                              DownloadSort.title,
+                              DownloadSort.podcast,
+                            ])
+                              CheckedPopupMenuItem(
+                                value: sort,
+                                checked:
+                                    sort == (_sortBy ?? DownloadSort.newest),
+                                child: Text(switch (sort) {
+                                  DownloadSort.newest => s.newestFirst,
+                                  DownloadSort.oldest => s.oldestFirst,
+                                  DownloadSort.title => s.sortEpisodeTitle,
+                                  DownloadSort.podcast => s.sortPodcastName,
+                                  DownloadSort.size => s.size,
+                                }),
+                              ),
+                          ],
+                        ),
                         Material(
                           color: Colors.transparent,
                           child: IconButton(
@@ -1298,7 +1350,9 @@ class _MyDownloadState extends State<_MyDownload>
                               ),
                             ),
                             onPressed: () {
-                              setState(() => _hideListened = !_hideListened!);
+                              setState(
+                                () => _hideListened = !(_hideListened ?? false),
+                              );
                             },
                           ),
                         ),
