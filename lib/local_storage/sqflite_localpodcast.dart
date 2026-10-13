@@ -1653,13 +1653,17 @@ class DBHelper {
       DownloadSort.podcast =>
         'P.title COLLATE NOCASE ASC, E.download_date DESC, E.enclosure_url ASC',
     };
+    final historyJoin = hideListened
+        ? 'LEFT JOIN PlayHistory H ON E.enclosure_url = H.enclosure_url'
+        : '';
     final listenedFilter = hideListened
-        ? 'AND NOT EXISTS (SELECT 1 FROM PlayHistory H WHERE H.enclosure_url = E.enclosure_url AND H.listen_time > 0)'
+        ? 'GROUP BY E.enclosure_url HAVING SUM(H.listen_time) IS NULL OR SUM(H.listen_time) = 0'
         : '';
     final list = await dbClient.rawQuery("""SELECT E.title, E.enclosure_url,
       E.enclosure_length, E.download_date, E.is_new, E.milliseconds,
       P.title as feed_title, E.duration, E.explicit, P.imagePath, P.primaryColor
       FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
+      $historyJoin
       WHERE E.enclosure_url != E.media_id $listenedFilter
       ORDER BY $orderBy""");
     if (list.isNotEmpty) {
