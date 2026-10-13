@@ -324,6 +324,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationUpdateError": m20,
     "oldestFirst": MessageLookupByLibrary.simpleMessage("Önce eskiler"),
     "pause": MessageLookupByLibrary.simpleMessage("Duraklat"),
+    "continueListening": MessageLookupByLibrary.simpleMessage(
+      "Dinlemeye devam et",
+    ),
     "play": MessageLookupByLibrary.simpleMessage("Oynat"),
     "playNext": MessageLookupByLibrary.simpleMessage("Sonrakini çal"),
     "playNextDes": MessageLookupByLibrary.simpleMessage(

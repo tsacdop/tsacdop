@@ -320,6 +320,8 @@
   "@oldestFirst": {},
   "pause": "Pausa",
   "@pause": {},
+  "continueListening": "Riprendi l’ascolto",
+  "@continueListening": {},
   "play": "Riproduci",
   "@play": {},
   "playback": "Controlli riproduzione",

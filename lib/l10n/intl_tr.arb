@@ -320,6 +320,8 @@
   "@oldestFirst": {},
   "pause": "Duraklat",
   "@pause": {},
+  "continueListening": "Dinlemeye devam et",
+  "@continueListening": {},
   "play": "Oynat",
   "@play": {},
   "playback": "Playback kontrol",

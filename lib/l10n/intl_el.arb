@@ -320,6 +320,8 @@
   "@oldestFirst": {},
   "pause": "Παύση",
   "@pause": {},
+  "continueListening": "Συνέχεια ακρόασης",
+  "@continueListening": {},
   "play": "Αναπαραγωγή",
   "@play": {},
   "playback": "Έλεγχος αναπαραγωγής ",

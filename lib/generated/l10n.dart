@@ -1200,6 +1200,14 @@ class S {
     return Intl.message('Pause', name: 'pause', desc: '', args: []);
   }
 
+  /// `Continue listening`
+  String get continueListening => Intl.message(
+    'Continue listening',
+    name: 'continueListening',
+    desc: '',
+    args: [],
+  );
+
   /// `Play`
   String get play {
     return Intl.message('Play', name: 'play', desc: '', args: []);

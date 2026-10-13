@@ -259,6 +259,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationUpdateError": m20,
     "oldestFirst": MessageLookupByLibrary.simpleMessage("由旧到新"),
     "pause": MessageLookupByLibrary.simpleMessage("暂停"),
+    "continueListening": MessageLookupByLibrary.simpleMessage("继续收听"),
     "play": MessageLookupByLibrary.simpleMessage("播放"),
     "playNext": MessageLookupByLibrary.simpleMessage("下一首"),
     "playNextDes": MessageLookupByLibrary.simpleMessage("添加节目到播放列表的顶部"),
