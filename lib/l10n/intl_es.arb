@@ -140,10 +140,6 @@
   "@feedbackEmail": {},
   "feedbackGithub": "Reportar problema",
   "@feedbackGithub": {},
-  "feedbackPlay": "Calificar en Play Store",
-  "@feedbackPlay": {
-    "description": "Rate on Google Play Store.\nUser can tap to open play link."
-  },
   "feedbackTelegram": "Unirse a grupo",
   "@feedbackTelegram": {},
   "filter": "Filtrar",

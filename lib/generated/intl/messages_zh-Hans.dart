@@ -185,7 +185,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "feedbackEmail": MessageLookupByLibrary.simpleMessage("发送邮件"),
     "feedbackGithub": MessageLookupByLibrary.simpleMessage("提交Issue"),
-    "feedbackPlay": MessageLookupByLibrary.simpleMessage("Play评价"),
     "feedbackTelegram": MessageLookupByLibrary.simpleMessage("加入小组"),
     "filter": MessageLookupByLibrary.simpleMessage("过滤"),
     "fontStyle": MessageLookupByLibrary.simpleMessage("字体风格"),

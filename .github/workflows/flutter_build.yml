@@ -3,42 +3,56 @@ on:
   push:
     branches:
       - main
+  pull_request:
+
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - uses: actions/setup-java@v6
         with:
           distribution: "temurin"
-          java-version: "17"
-      - uses: subosito/flutter-action@v1
+          java-version: "21"
+      - uses: subosito/flutter-action@v2
         with:
-          channel: "stable" # 'dev', 'alpha', default to: 'stable'
+          channel: "stable"
+          flutter-version: "3.47.2"
+          cache: true
       - run: flutter pub get
-      - run: echo $ENCODED_KEYSTORE | base64 -di > android/app/keystore.jks
+      - run: flutter analyze --no-pub --no-fatal-infos
+      - run: flutter test --no-pub
+      - name: Build unsigned F-Droid APKs
+        run: flutter build apk --release --split-per-abi --flavor fdroid
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fdroid-apks
+          path: build/app/outputs/flutter-apk/*-fdroid-release.apk
+          if-no-files-found: error
+      - name: Prepare GitHub release signing key
+        if: github.event_name == 'push'
+        run: printf '%s' "$ENCODED_KEYSTORE" | base64 --decode > android/app/keystore.jks
         env:
           ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
-      - run: dart tool/env.dart
+      - name: Build signed GitHub APKs
+        if: github.event_name == 'push'
+        run: >-
+          flutter build apk --release --split-per-abi --obfuscate
+          --split-debug-info=debug/ --flavor github
+          --dart-define=LISTEN_NOTES_API_KEY="$LISTEN_NOTES_API_KEY"
         env:
-          API_KEY: ${{ secrets.API_KEY }}
-          PI_API_SECRET: ${{ secrets.PI_API_SECRET}}
-          PI_API_KEY: ${{ secrets.PI_API_KEY}}
-      - run: flutter build apk --split-per-abi --obfuscate --split-debug-info=debug/ --flavor=play
-        env:
+          LISTEN_NOTES_API_KEY: ${{ secrets.API_KEY }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
-
-      - run: flutter build appbundle  --obfuscate --split-debug-info=debug/ --flavor=play
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
         with:
           name: release-file
           path: |
-            build/app/outputs/flutter-apk/*
-            build/app/outputs/bundle/playRelease/*
-          
+            build/app/outputs/flutter-apk/*-github-release.apk
+            debug/
+          if-no-files-found: error

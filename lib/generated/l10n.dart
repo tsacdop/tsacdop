@@ -590,16 +590,6 @@ class S {
     );
   }
 
-  /// `Rate on Play Store`
-  String get feedbackPlay {
-    return Intl.message(
-      'Rate on Play Store',
-      name: 'feedbackPlay',
-      desc: 'Rate on Google Play Store.\nUser can tap to open play link.',
-      args: [],
-    );
-  }
-
   /// `Join group`
   String get feedbackTelegram {
     return Intl.message(

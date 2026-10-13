@@ -210,9 +210,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "feedbackEmail": MessageLookupByLibrary.simpleMessage("Escríbeme "),
     "feedbackGithub": MessageLookupByLibrary.simpleMessage("Reportar problema"),
-    "feedbackPlay": MessageLookupByLibrary.simpleMessage(
-      "Calificar en Play Store",
-    ),
     "feedbackTelegram": MessageLookupByLibrary.simpleMessage("Unirse a grupo"),
     "filter": MessageLookupByLibrary.simpleMessage("Filtrar"),
     "fontStyle": MessageLookupByLibrary.simpleMessage("Estilo de fuente"),
