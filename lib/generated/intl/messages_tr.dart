@@ -216,7 +216,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "feedbackEmail": MessageLookupByLibrary.simpleMessage("İletişim"),
     "feedbackGithub": MessageLookupByLibrary.simpleMessage("Sorun bildir"),
-    "feedbackPlay": MessageLookupByLibrary.simpleMessage("Play Store\'da oyla"),
     "feedbackTelegram": MessageLookupByLibrary.simpleMessage("Telegram Grubu"),
     "filter": MessageLookupByLibrary.simpleMessage("Filtrele"),
     "fontStyle": MessageLookupByLibrary.simpleMessage("Yazı tipi stili"),

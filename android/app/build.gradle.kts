@@ -49,7 +49,7 @@ android {
 
     flavorDimensions += "deploy"
     productFlavors {
-        create("play") {
+        create("github") {
             dimension = "deploy"
             signingConfig = signingConfigs.getByName("release")
         }

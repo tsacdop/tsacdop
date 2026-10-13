@@ -10,7 +10,7 @@
             "type": "dart",
             "args": [
                 "--flavor",
-                "play"
+                "fdroid"
             ]
         }
     ]

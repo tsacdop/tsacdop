@@ -217,9 +217,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "feedbackEmail": MessageLookupByLibrary.simpleMessage("Γράψε μου"),
     "feedbackGithub": MessageLookupByLibrary.simpleMessage("GitHub"),
-    "feedbackPlay": MessageLookupByLibrary.simpleMessage(
-      "Βαθμολόγηση στο PlayStore",
-    ),
     "feedbackTelegram": MessageLookupByLibrary.simpleMessage(
       "Συμμετοχή στην ομάδα",
     ),

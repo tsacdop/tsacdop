@@ -245,11 +245,6 @@ class _SettingsState extends State<Settings> {
                         s.feedbackEmail,
                         'mailto:<tsacdop.app@gmail.com>?subject=Tsacdop Feedback',
                       ),
-                      _feedbackItem(
-                        LineIcons.googlePlay,
-                        s.feedbackPlay,
-                        'https://play.google.com/store/apps/details?id=com.stonegate.tsacdop',
-                      ),
                     ],
                   ),
                 ),

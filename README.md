@@ -1,4 +1,4 @@
-[![Tsacdop Banner][]][google play]
+[![Tsacdop Banner][]][github release - recent]
 
 [![github action][]][github action link]
 [![GitHub Release][]][github release - recent]
@@ -16,6 +16,22 @@ Tsacdop is a podcast player developed with Flutter, a clean, simply beautiful, a
 Credit to the Flutter team and all involved plugins, especially [webfeed](https://github.com/witochandra/webfeed), [Just_Audio](https://pub.dev/packages/just_audio), and [Provider](https://pub.dev/packages/provider).
 
 The podcast search engine is powered by, [ListenNotes](https://listennotes.com) & [PodcastIndex](https://podcastindex.org/).
+
+## Download
+
+* Install Tsacdop from [F-Droid][fdroid link] to receive updates through the
+  F-Droid client.
+* Alternatively, download an APK from the [latest GitHub release][github release - recent].
+  Choose `arm64-v8a` for most modern Android phones, `armeabi-v7a` for older
+  32-bit ARM devices, or `x86_64` for compatible Intel/AMD devices and emulators.
+  GitHub APK installations need to be updated manually.
+
+Google Play distribution is no longer supported.
+
+F-Droid signs its own builds, so switching between F-Droid and another
+distribution may require uninstalling the existing app. Export your subscriptions
+and back up your settings in Tsacdop before uninstalling, as uninstalling removes
+local app data.
 
 ## Features
 
@@ -63,13 +79,13 @@ Tsacdop is licensed under the [GPL v3.0](https://github.com/stonega/tsacdop/blob
 ## Build
 
 The current toolchain is Flutter 3.47.2, Dart 3.13.2, Android Gradle Plugin
-9.3.1, Gradle 9.5, and JDK 21. Android release lint requires JDK 21. The iOS
+9.3.2, Gradle 9.5, and JDK 21. Android release lint requires JDK 21. The iOS
 deployment target is 15.0.
 
 1. Install Flutter and JDK 21, then fetch the source code.
 
 ```
-git clone https://github.com/stonega/tsacdop.git
+git clone https://github.com/tsacdop/tsacdop.git
 cd tsacdop
 flutter config --jdk-dir /path/to/jdk-21
 ```
@@ -88,9 +104,11 @@ flutter run --flavor fdroid \
   --dart-define=LISTEN_NOTES_API_KEY=your_key
 ```
 
-4. Build Android artifacts. The F-Droid release is intentionally unsigned so
-   that the store can sign it. The Play flavor reads its signing credentials
-   from `KEYSTORE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD`.
+4. Build Android APKs. The `fdroid` release is intentionally unsigned so
+   that F-Droid can sign it. The `github` flavor produces signed APKs for
+   GitHub Releases using `KEYSTORE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and
+   `KEY_PASSWORD`. Keep using the same release key to allow existing GitHub
+   installations to update.
 
 ```
 flutter build apk --debug --flavor fdroid
@@ -98,7 +116,7 @@ flutter build apk --debug --flavor fdroid
 JAVA_HOME=/path/to/jdk-21 \
   ./android/gradlew -p android assembleFdroidRelease
 
-flutter build appbundle --release --flavor play \
+flutter build apk --release --split-per-abi --flavor github \
   --dart-define=LISTEN_NOTES_API_KEY=your_key
 ```
 
@@ -202,9 +220,9 @@ For help getting started with Flutter, view our
 [github action]: https://github.com/stonega/tsacdop/workflows/Flutter%20Build/badge.svg
 [github action link]: https://github.com/stonega/tsacdop/actions
 [build status ]: https://circleci.com/gh/stonega/tsacdop/tree/master
-[github release]: https://img.shields.io/github/v/release/stonega/tsacdop
-[github release - recent]: https://github.com/stonega/tsacdop/releases
-[github downloads]: https://img.shields.io/github/downloads/stonega/tsacdop/total?color=%230000d&label=downloads
+[github release]: https://img.shields.io/github/v/release/tsacdop/tsacdop
+[github release - recent]: https://github.com/tsacdop/tsacdop/releases/latest
+[github downloads]: https://img.shields.io/github/downloads/tsacdop/tsacdop/total?color=%230000d&label=downloads
 [fdroid install]: https://img.shields.io/f-droid/v/com.stonegate.tsacdop?include_prereleases
 [fdroid link]: https://f-droid.org/en/packages/com.stonegate.tsacdop/
 [localizely]: https://img.shields.io/badge/dynamic/json?color=%2326c6da&label=localizely&query=%24.languages.length&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus
@@ -214,8 +232,6 @@ For help getting started with Flutter, view our
 [Spanish]: https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=%2323CCC6&label=Spanish(Joel)&query=%24.languages%5B7%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus&suffix=%
 [Portuguese]: https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=%2323CCC6&label=portuguese(Bruno)&query=%24.languages%5B9%5D.reviewedProgress&url=https%3A%2F%2Fapi.localizely.com%2Fv1%2Fprojects%2Fbde4e9bd-4cb2-449b-9de2-18f231ddb47d%2Fstatus&suffix=%
 [localizely - website]: https://localizely.com/
-[google play - icon]: https://img.shields.io/badge/google-playStore-%2323CCC6
-[google play]: https://play.google.com/store/apps/details?id=com.stonegate.tsacdop
 [Homepage ScreenShot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893838840.png
 [Group Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585894051734.png
 [Podcast Screenshot]: https://raw.githubusercontent.com/stonega/tsacdop/master/preview/1585893877702.png

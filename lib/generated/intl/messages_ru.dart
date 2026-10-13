@@ -215,9 +215,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "feedbackEmail": MessageLookupByLibrary.simpleMessage("Написать мне"),
     "feedbackGithub": MessageLookupByLibrary.simpleMessage("GitHub"),
-    "feedbackPlay": MessageLookupByLibrary.simpleMessage(
-      "Оценить в Play Store",
-    ),
     "feedbackTelegram": MessageLookupByLibrary.simpleMessage("Telegram"),
     "filter": MessageLookupByLibrary.simpleMessage("Фильтр"),
     "fontStyle": MessageLookupByLibrary.simpleMessage("Стиль шрифта"),
