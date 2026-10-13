@@ -48,10 +48,6 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m9(count) =>
       "${Intl.plural(count, zero: '0 час.', one: '${count} час.', few: '${count} час.', many: '${count} час.', other: '${count} час.')}";
 
-  static String m10(service) => "Интегрировать с  ${service}";
-
-  static String m11(userName) => "Авторизован как ${userName}";
-
   static String m12(count) =>
       "${Intl.plural(count, zero: 'Только что', one: 'Минуту назад', few: '${count} минуты назад', many: '${count} минут назад', other: '${count} минут назад')}";
 
@@ -221,9 +217,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "fonts": MessageLookupByLibrary.simpleMessage("Шрифты"),
     "from": m5,
     "goodNight": MessageLookupByLibrary.simpleMessage("Спокойной ночи"),
-    "gpodderLoginDes": MessageLookupByLibrary.simpleMessage(
-      "Поздравляем! Вы успешно связали учетную запись gpodder.net. Tsacdop будет автоматически синхронизировать подписки на вашем устройстве с вашей учетной записью gpodder.net.",
-    ),
     "groupExisted": MessageLookupByLibrary.simpleMessage(
       "Нажмите, чтобы добавить группу",
     ),
@@ -259,7 +252,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hoursAgo": m8,
     "hoursCount": m9,
     "import": MessageLookupByLibrary.simpleMessage("Импорт"),
-    "intergateWith": m10,
     "introFourthPage": MessageLookupByLibrary.simpleMessage(
       "Длительное нажатие на выпуск запускает быстрые действия.",
     ),
@@ -269,10 +261,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "introThirdPage": MessageLookupByLibrary.simpleMessage(
       "Вы можете создать новую группу для подкастов.",
     ),
-    "invalidName": MessageLookupByLibrary.simpleMessage(
-      "Неверное имя пользователя",
-    ),
-    "lastUpdate": MessageLookupByLibrary.simpleMessage("Последнее обновление"),
     "later": MessageLookupByLibrary.simpleMessage("Позже"),
     "lightMode": MessageLookupByLibrary.simpleMessage("Светлая"),
     "like": MessageLookupByLibrary.simpleMessage("Нравится"),
@@ -281,12 +269,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "listen": MessageLookupByLibrary.simpleMessage("Слушать"),
     "listened": MessageLookupByLibrary.simpleMessage("Прослушано"),
     "loadMore": MessageLookupByLibrary.simpleMessage("Загрузить еще"),
-    "loggedInAs": m11,
-    "login": MessageLookupByLibrary.simpleMessage("Войти"),
-    "loginFailed": MessageLookupByLibrary.simpleMessage(
-      "Не удалось авторизоваться",
-    ),
-    "logout": MessageLookupByLibrary.simpleMessage("Выйти"),
     "mark": MessageLookupByLibrary.simpleMessage("Пометить"),
     "markConfirm": MessageLookupByLibrary.simpleMessage("Подтвердить отметку"),
     "markConfirmContent": MessageLookupByLibrary.simpleMessage(
@@ -340,8 +322,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationUpdate": m19,
     "notificationUpdateError": m20,
     "oldestFirst": MessageLookupByLibrary.simpleMessage("Начиная со старых"),
-    "passwdRequired": MessageLookupByLibrary.simpleMessage("Требуется пароль"),
-    "password": MessageLookupByLibrary.simpleMessage("Пароль"),
     "pause": MessageLookupByLibrary.simpleMessage("Пауза"),
     "play": MessageLookupByLibrary.simpleMessage("Воспроизвести"),
     "playNext": MessageLookupByLibrary.simpleMessage("Воспроизвести следующий"),
@@ -701,10 +681,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "useWallpaperTheme": MessageLookupByLibrary.simpleMessage(""),
     "useWallpaperThemeDes": MessageLookupByLibrary.simpleMessage(""),
-    "username": MessageLookupByLibrary.simpleMessage("Имя пользователя"),
-    "usernameRequired": MessageLookupByLibrary.simpleMessage(
-      "Требуется имя пользователя",
-    ),
     "version": m31,
   };
 }

@@ -16,29 +16,17 @@ import 'package:path_provider_android/path_provider_android.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:uuid/uuid.dart';
 import 'package:webfeed/webfeed.dart';
-import 'package:workmanager/workmanager.dart';
 
 import '../local_storage/key_value_storage.dart';
 import '../local_storage/sqflite_localpodcast.dart';
-import '../service/gpodder_api.dart';
 import '../type/fireside_data.dart';
 import '../type/podcastlocal.dart';
 import '../util/helpers.dart';
+import 'setting_state.dart' as settings;
 
+// Compatibility entry point for jobs scheduled by older releases.
 @pragma('vm:entry-point')
-void callbackDispatcher() {
-  if (Platform.isAndroid) {
-    Workmanager().executeTask((task, inputData) async {
-      final gpodder = Gpodder();
-      final status = await gpodder.getChanges();
-      if (status == 200) {
-        await gpodder.updateChange();
-        developer.log('Gpodder sync successfully');
-      }
-      return Future.value(true);
-    });
-  }
-}
+void callbackDispatcher() => settings.callbackDispatcher();
 
 class GroupEntity {
   final String? name;
@@ -242,7 +230,6 @@ class GroupList extends ChangeNotifier {
   void addListener(VoidCallback listener) {
     if (_groups.isEmpty) {
       loadGroups().then((value) => super.addListener(listener));
-      gpodderSyncNow();
     }
   }
 
@@ -256,25 +243,14 @@ class GroupList extends ChangeNotifier {
   /// Subscribe podcast via isolate.
   /// Add subsribe item
   late SubscribeItem _subscribeItem;
-  Future<void> setSubscribeItem(
-    SubscribeItem item, {
-    bool syncGpodder = true,
-  }) async {
+  Future<void> setSubscribeItem(SubscribeItem item) async {
     _subscribeItem = item;
-    if (syncGpodder) _syncAdd(item.url);
     await _start();
   }
 
   void _setCurrentSubscribeItem(SubscribeItem item) {
     _currentSubscribeItem = item;
     notifyListeners();
-  }
-
-  Future<void> _syncAdd(String? rssUrl) async {
-    final check = await _checkGpodderLoggedin();
-    if (check) {
-      await _addStorage.addList([rssUrl]);
-    }
   }
 
   Future<void> _start() async {
@@ -330,64 +306,6 @@ class GroupList extends ChangeNotifier {
         notifyListeners();
       }
     });
-  }
-
-  ///Set gpodder sync
-  final _loginInfp = KeyValueStorage(gpodderApiKey);
-  final _addStorage = KeyValueStorage(gpodderAddKey);
-  final _removeStorage = KeyValueStorage(gpodderRemoveKey);
-  final _remoteAddStorage = KeyValueStorage(gpodderRemoteAddKey);
-  final _remoteRemoveStorage = KeyValueStorage(gpodderRemoteRemoveKey);
-
-  Future<bool> _checkGpodderLoggedin() async {
-    final loginInfo = await _loginInfp.getStringList();
-    return loginInfo.isNotEmpty;
-  }
-
-  Future<void> gpodderSyncNow() async {
-    final addList = await _remoteAddStorage.getStringList();
-    final removeList = await _remoteRemoveStorage.getStringList();
-
-    if (removeList.isNotEmpty) {
-      for (var rssLink in removeList) {
-        final exist = await _dbHelper.checkPodcast(rssLink);
-        if (exist != '') {
-          var podcast = await _dbHelper.getPodcastWithUrl(rssLink);
-          await _unsubscribe(podcast!);
-        }
-      }
-      await _remoteAddStorage.clearList();
-    }
-    if (addList.isNotEmpty) {
-      for (var rssLink in addList) {
-        final exist = await _dbHelper.checkPodcast(rssLink);
-        if (exist == '') {
-          var item = SubscribeItem(rssLink, rssLink, group: 'Home');
-          _subscribeItem = item;
-          await _start();
-
-          await Future.delayed(Duration(milliseconds: 200));
-        }
-      }
-      await _remoteRemoveStorage.clearList();
-    }
-  }
-
-  void setWorkManager() {
-    Workmanager().initialize(callbackDispatcher);
-    Workmanager().registerPeriodicTask(
-      "2",
-      "gpodder_sync",
-      frequency: Duration(hours: 4),
-      initialDelay: Duration(seconds: 10),
-      constraints: Constraints(networkType: NetworkType.connected),
-    );
-    developer.log('work manager init done + (gpodder sync)');
-  }
-
-  Future cancelWork() async {
-    await Workmanager().cancelByUniqueName('2');
-    developer.log('work job cancelled');
   }
 
   /// Mange groups states in app.
@@ -535,14 +453,6 @@ class GroupList extends ChangeNotifier {
     _updateGroups();
   }
 
-  /// Unsubscribe podcast
-  Future<void> _syncRemove(String rssUrl) async {
-    final check = await _checkGpodderLoggedin();
-    if (check) {
-      await _removeStorage.addList([rssUrl]);
-    }
-  }
-
   Future<void> _unsubscribe(PodcastLocal podcast) async {
     for (var group in _groups) {
       group!.deleteFromGroup(podcast);
@@ -553,7 +463,6 @@ class GroupList extends ChangeNotifier {
 
   /// Delete podcsat from device.
   Future<void> removePodcast(PodcastLocal podcast) async {
-    _syncRemove(podcast.rssUrl);
     await _unsubscribe(podcast);
     await File(podcast.imagePath!).delete();
   }

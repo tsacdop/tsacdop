@@ -156,8 +156,6 @@
   },
   "goodNight": "Καληνύχτα",
   "@goodNight": {},
-  "gpodderLoginDes": "Συγχαρητήρια! Έχετε συνδέσει το gpodder.net λογαριασμό σας με επιτυχία. Το Tsacdop θα συγχρονίσει αυτόματα τις εγγραφές στη συσκευή σας με το gpodder.net λογαριασμό σας.",
-  "@gpodderLoginDes": {},
   "groupExisted": "Η ομάδα υπάρχει ήδη",
   "@groupExisted": {
     "description": "Group name validate in add group dialog. User can't add group with same name."
@@ -204,25 +202,12 @@
   "@hoursCount": {},
   "import": "Εισαγωγή",
   "@import": {},
-  "intergateWith": "Ενσωμάτωση με {service}",
-  "@intergateWith": {
-    "description": "Integrate with",
-    "placeholders": {
-      "service": {}
-    }
-  },
   "introFourthPage": "Πάτα παρατεταμένα στο επεισόδιο για γρήγορες ενέργειες.",
   "@introFourthPage": {},
   "introSecondPage": "Ανακάλυψε podcast μέσω αναζήτησης ή εισαγωγής αρχείου OPML.",
   "@introSecondPage": {},
   "introThirdPage": "Μπορείς να φτιάξεις μία ομάδα για podcast.",
   "@introThirdPage": {},
-  "invalidName": "Εσφαλμένο όνομα χρήστη",
-  "@invalidName": {},
-  "lastUpdate": "Τελευταία ενημέρωση",
-  "@lastUpdate": {
-    "description": "gpodder.net update"
-  },
   "later": "Αργότερα",
   "@later": {},
   "lightMode": "Φωτεινό θέμα",
@@ -241,23 +226,6 @@
   "@listened": {},
   "loadMore": "Περισσότερα",
   "@loadMore": {},
-  "loggedInAs": "Συνδεδεμένος/η ως {userName}",
-  "@loggedInAs": {
-    "description": "gpodder.net",
-    "placeholders": {
-      "userName": {}
-    }
-  },
-  "login": "Σύνδεση",
-  "@login": {
-    "description": "gpodder.net login"
-  },
-  "loginFailed": "Αποτυχία σύνδεσης",
-  "@loginFailed": {},
-  "logout": "Αποσύνδεση",
-  "@logout": {
-    "description": "gpodder.net logout"
-  },
   "mark": "Επισήμανση",
   "@mark": {
     "description": "In listen history page, if a episode is marked as listened."
@@ -350,10 +318,6 @@
   },
   "oldestFirst": "Παλιότερα πρώτα",
   "@oldestFirst": {},
-  "passwdRequired": "Ο κωδικός πρόσβασης είναι υποχρεωτικός",
-  "@passwdRequired": {},
-  "password": "Κωδικός πρόσβασης",
-  "@password": {},
   "pause": "Παύση",
   "@pause": {},
   "play": "Αναπαραγωγή",
@@ -665,7 +629,7 @@
   "@sleepTimer": {},
   "status": "Κατάσταση",
   "@status": {
-    "description": "gpodder.net status"
+    "description": ""
   },
   "statusAuthError": "Σφάλμα πιστοποίησης",
   "@statusAuthError": {
@@ -762,10 +726,6 @@
   "@updateEpisodesCount": {},
   "updateFailed": "Ενημέρωση ανεπιτυχείς, σφάλμα δικτύου",
   "@updateFailed": {},
-  "username": "Όνομα χρήστη",
-  "@username": {},
-  "usernameRequired": "Το όνομα χρήστη είναι υποχρεωτικό",
-  "@usernameRequired": {},
   "useWallpaperTheme": "",
   "@useWallpaperTheme": {},
   "useWallpaperThemeDes": "",

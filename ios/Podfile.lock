@@ -6,8 +6,6 @@ PODS:
     - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
-  - device_info_plus (0.0.1):
-    - Flutter
   - file_picker_darwin (1.0.0):
     - Flutter
     - FlutterMacOS
@@ -44,7 +42,6 @@ DEPENDENCIES:
   - audio_service (from `.symlinks/plugins/audio_service/darwin`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
-  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - file_picker_darwin (from `.symlinks/plugins/file_picker_darwin/darwin`)
   - Flutter (from `Flutter`)
   - flutter_downloader (from `.symlinks/plugins/flutter_downloader/ios`)
@@ -67,8 +64,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/audio_session/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
-  device_info_plus:
-    :path: ".symlinks/plugins/device_info_plus/ios"
   file_picker_darwin:
     :path: ".symlinks/plugins/file_picker_darwin/darwin"
   Flutter:
@@ -102,7 +97,6 @@ SPEC CHECKSUMS:
   audio_service: aa99a6ba2ae7565996015322b0bb024e1d25c6fd
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
   connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
-  device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   file_picker_darwin: 5c32d1a83c7cd2e4e2d2eaea629cf830b3b5dc49
   Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
   flutter_downloader: b6c99787f43ba0389763dee50ccf7912ed509de4

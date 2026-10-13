@@ -48,10 +48,6 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m9(count) =>
       "${Intl.plural(count, zero: '0 heure', one: '${count} heure', other: '${count} heures')}";
 
-  static String m10(service) => "Integrate with ${service}";
-
-  static String m11(userName) => "Logged in as ${userName}";
-
   static String m12(count) =>
       "${Intl.plural(count, zero: 'A l\'instant', one: 'Il y a ${count} minute', other: 'Il y a ${count} minutes')}";
 
@@ -221,9 +217,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "fonts": MessageLookupByLibrary.simpleMessage("Polices"),
     "from": m5,
     "goodNight": MessageLookupByLibrary.simpleMessage("Bonne nuit"),
-    "gpodderLoginDes": MessageLookupByLibrary.simpleMessage(
-      "Congratulations! You  have linked gpodder.net account successfully. Tsacdop will automatically sync subscriptions on your device with your gpodder.net account.",
-    ),
     "groupExisted": MessageLookupByLibrary.simpleMessage(
       "Ce groupe existe déjà",
     ),
@@ -257,7 +250,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hoursAgo": m8,
     "hoursCount": m9,
     "import": MessageLookupByLibrary.simpleMessage("Importer"),
-    "intergateWith": m10,
     "introFourthPage": MessageLookupByLibrary.simpleMessage(
       "Un appui long sur un épisode lance les actions rapides.",
     ),
@@ -267,8 +259,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "introThirdPage": MessageLookupByLibrary.simpleMessage(
       "Vous pouvez créer des groupes de podcasts.",
     ),
-    "invalidName": MessageLookupByLibrary.simpleMessage("Invalid username"),
-    "lastUpdate": MessageLookupByLibrary.simpleMessage("Last update"),
     "later": MessageLookupByLibrary.simpleMessage("Plus tard"),
     "lightMode": MessageLookupByLibrary.simpleMessage("Mode clair"),
     "like": MessageLookupByLibrary.simpleMessage("Like"),
@@ -277,10 +267,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "listen": MessageLookupByLibrary.simpleMessage("Écoutés"),
     "listened": MessageLookupByLibrary.simpleMessage("Écouté "),
     "loadMore": MessageLookupByLibrary.simpleMessage("Voir plus"),
-    "loggedInAs": m11,
-    "login": MessageLookupByLibrary.simpleMessage("Login"),
-    "loginFailed": MessageLookupByLibrary.simpleMessage("Login failed"),
-    "logout": MessageLookupByLibrary.simpleMessage("Logout"),
     "mark": MessageLookupByLibrary.simpleMessage("✓"),
     "markConfirm": MessageLookupByLibrary.simpleMessage("Marquage effectué"),
     "markConfirmContent": MessageLookupByLibrary.simpleMessage(
@@ -338,8 +324,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "oldestFirst": MessageLookupByLibrary.simpleMessage(
       "Le plus ancien en premier",
     ),
-    "passwdRequired": MessageLookupByLibrary.simpleMessage("Password required"),
-    "password": MessageLookupByLibrary.simpleMessage("Password"),
     "pause": MessageLookupByLibrary.simpleMessage("Pause"),
     "play": MessageLookupByLibrary.simpleMessage("Lecture"),
     "playNext": MessageLookupByLibrary.simpleMessage("Play next"),
@@ -691,10 +675,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "useWallpaperTheme": MessageLookupByLibrary.simpleMessage(""),
     "useWallpaperThemeDes": MessageLookupByLibrary.simpleMessage(""),
-    "username": MessageLookupByLibrary.simpleMessage("Username"),
-    "usernameRequired": MessageLookupByLibrary.simpleMessage(
-      "Username required",
-    ),
     "version": m31,
   };
 }

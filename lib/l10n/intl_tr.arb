@@ -156,8 +156,6 @@
   },
   "goodNight": "İyi Geceler",
   "@goodNight": {},
-  "gpodderLoginDes": "Tebrikler! Gpodder.net hesabınızla bağlantı kuruldu.Tsacdop aboneliklerinizi gpodder.net  hesabınızla otomatik olarak eşitleyecek.",
-  "@gpodderLoginDes": {},
   "groupExisted": "Liste zaten mevcut",
   "@groupExisted": {
     "description": "Group name validate in add group dialog. User can't add group with same name."
@@ -204,25 +202,12 @@
   "@hoursCount": {},
   "import": "İçe aktar",
   "@import": {},
-  "intergateWith": "{service} ile bağlantı kur",
-  "@intergateWith": {
-    "description": "Integrate with",
-    "placeholders": {
-      "service": {}
-    }
-  },
   "introFourthPage": "Bölüm resmine uzun basarak hızlı menüyü açabilirsin.",
   "@introFourthPage": {},
   "introSecondPage": "Arama yaparak ya da OPML dosyasını içe aktararak podcaste abone olabilirsin.",
   "@introSecondPage": {},
   "introThirdPage": "Podcastler için yeni bir grup oluşturabilirsin.",
   "@introThirdPage": {},
-  "invalidName": "Geçersiz kullanıcı adı",
-  "@invalidName": {},
-  "lastUpdate": "Son güncelleme\n",
-  "@lastUpdate": {
-    "description": "gpodder.net update"
-  },
   "later": "Sonra",
   "@later": {},
   "lightMode": "Aydınlık mod",
@@ -241,23 +226,6 @@
   "@listened": {},
   "loadMore": "Daha fazla göster",
   "@loadMore": {},
-  "loggedInAs": "{userName} olarak giriş yapıldı ",
-  "@loggedInAs": {
-    "description": "gpodder.net",
-    "placeholders": {
-      "userName": {}
-    }
-  },
-  "login": "Giriş",
-  "@login": {
-    "description": "gpodder.net login"
-  },
-  "loginFailed": "Giriş başarısız ",
-  "@loginFailed": {},
-  "logout": "Çıkış yap",
-  "@logout": {
-    "description": "gpodder.net logout"
-  },
   "mark": "İşaretle",
   "@mark": {
     "description": "In listen history page, if a episode is marked as listened."
@@ -350,10 +318,6 @@
   },
   "oldestFirst": "Önce eskiler",
   "@oldestFirst": {},
-  "passwdRequired": "Parola gerekli",
-  "@passwdRequired": {},
-  "password": "Şifre",
-  "@password": {},
   "pause": "Duraklat",
   "@pause": {},
   "play": "Oynat",
@@ -665,7 +629,7 @@
   "@sleepTimer": {},
   "status": "Durum",
   "@status": {
-    "description": "gpodder.net status"
+    "description": ""
   },
   "statusAuthError": "Doğrulama hatası",
   "@statusAuthError": {
@@ -762,10 +726,6 @@
   "@updateEpisodesCount": {},
   "updateFailed": "Güncelleme başarısız, bağlantı hatası",
   "@updateFailed": {},
-  "username": "Kullanıcı adı",
-  "@username": {},
-  "usernameRequired": "Kullanıcı adı gerekli",
-  "@usernameRequired": {},
   "useWallpaperTheme": "",
   "@useWallpaperTheme": {},
   "useWallpaperThemeDes": "",

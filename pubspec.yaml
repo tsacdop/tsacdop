@@ -16,10 +16,8 @@ dependencies:
   audio_session: ^0.2.4
   cached_network_image: ^4.0.0
   color_thief_dart: ^0.1.0
-  confetti: ^0.8.0
   cupertino_icons: ^1.0.2
   crypto: ^3.0.1
-  dio_cookie_manager: ^3.5.0
   dio: ^5.11.0
   extended_nested_scroll_view: ^6.2.1
   feature_discovery: ^0.14.0
@@ -76,11 +74,9 @@ dependencies:
   shared_preferences: any
   path: any
   html: any
-  cookie_jar: any
   convert: any
   rxdart: any
   connectivity_plus: ^7.3.1
-  device_info_plus: ^13.2.0
   share_plus: ^13.3.0
   material_ui: ^1.0.1
 dependency_overrides:

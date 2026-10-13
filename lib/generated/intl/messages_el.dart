@@ -48,10 +48,6 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m9(count) =>
       "${Intl.plural(count, zero: '0 ώρες', one: '${count} ώρα', other: '${count} ώρες')}";
 
-  static String m10(service) => "Ενσωμάτωση με ${service}";
-
-  static String m11(userName) => "Συνδεδεμένος/η ως ${userName}";
-
   static String m12(count) =>
       "${Intl.plural(count, zero: 'Μόλις τώρα', one: '${count} λεπτό πριν', other: '${count} λεπτά πριν')}";
 
@@ -225,9 +221,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "fonts": MessageLookupByLibrary.simpleMessage("Γραμματοσειρές"),
     "from": m5,
     "goodNight": MessageLookupByLibrary.simpleMessage("Καληνύχτα"),
-    "gpodderLoginDes": MessageLookupByLibrary.simpleMessage(
-      "Συγχαρητήρια! Έχετε συνδέσει το gpodder.net λογαριασμό σας με επιτυχία. Το Tsacdop θα συγχρονίσει αυτόματα τις εγγραφές στη συσκευή σας με το gpodder.net λογαριασμό σας.",
-    ),
     "groupExisted": MessageLookupByLibrary.simpleMessage("Η ομάδα υπάρχει ήδη"),
     "groupFilter": MessageLookupByLibrary.simpleMessage("Φίλτρο ομάδων"),
     "groupRemoveConfirm": MessageLookupByLibrary.simpleMessage(
@@ -261,7 +254,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hoursAgo": m8,
     "hoursCount": m9,
     "import": MessageLookupByLibrary.simpleMessage("Εισαγωγή"),
-    "intergateWith": m10,
     "introFourthPage": MessageLookupByLibrary.simpleMessage(
       "Πάτα παρατεταμένα στο επεισόδιο για γρήγορες ενέργειες.",
     ),
@@ -271,10 +263,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "introThirdPage": MessageLookupByLibrary.simpleMessage(
       "Μπορείς να φτιάξεις μία ομάδα για podcast.",
     ),
-    "invalidName": MessageLookupByLibrary.simpleMessage(
-      "Εσφαλμένο όνομα χρήστη",
-    ),
-    "lastUpdate": MessageLookupByLibrary.simpleMessage("Τελευταία ενημέρωση"),
     "later": MessageLookupByLibrary.simpleMessage("Αργότερα"),
     "lightMode": MessageLookupByLibrary.simpleMessage("Φωτεινό θέμα"),
     "like": MessageLookupByLibrary.simpleMessage("Μου Αρέσει"),
@@ -283,10 +271,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "listen": MessageLookupByLibrary.simpleMessage("Άκουσε"),
     "listened": MessageLookupByLibrary.simpleMessage("Ακουσμένο"),
     "loadMore": MessageLookupByLibrary.simpleMessage("Περισσότερα"),
-    "loggedInAs": m11,
-    "login": MessageLookupByLibrary.simpleMessage("Σύνδεση"),
-    "loginFailed": MessageLookupByLibrary.simpleMessage("Αποτυχία σύνδεσης"),
-    "logout": MessageLookupByLibrary.simpleMessage("Αποσύνδεση"),
     "mark": MessageLookupByLibrary.simpleMessage("Επισήμανση"),
     "markConfirm": MessageLookupByLibrary.simpleMessage(
       "Επιβεβαίωση επισήμανσης",
@@ -342,10 +326,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationUpdate": m19,
     "notificationUpdateError": m20,
     "oldestFirst": MessageLookupByLibrary.simpleMessage("Παλιότερα πρώτα"),
-    "passwdRequired": MessageLookupByLibrary.simpleMessage(
-      "Ο κωδικός πρόσβασης είναι υποχρεωτικός",
-    ),
-    "password": MessageLookupByLibrary.simpleMessage("Κωδικός πρόσβασης"),
     "pause": MessageLookupByLibrary.simpleMessage("Παύση"),
     "play": MessageLookupByLibrary.simpleMessage("Αναπαραγωγή"),
     "playNext": MessageLookupByLibrary.simpleMessage("Επόμενο"),
@@ -717,10 +697,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "useWallpaperTheme": MessageLookupByLibrary.simpleMessage(""),
     "useWallpaperThemeDes": MessageLookupByLibrary.simpleMessage(""),
-    "username": MessageLookupByLibrary.simpleMessage("Όνομα χρήστη"),
-    "usernameRequired": MessageLookupByLibrary.simpleMessage(
-      "Το όνομα χρήστη είναι υποχρεωτικό",
-    ),
     "version": m31,
   };
 }
