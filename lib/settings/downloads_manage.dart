@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
+import '../local_storage/download_storage.dart';
 import '../state/download_state.dart';
 import '../type/episodebrief.dart';
 import '../util/extension_helper.dart';
@@ -30,6 +29,7 @@ class _DownloadsManageState extends State<DownloadsManage> {
   late bool _clearing;
   bool? _onlyListened;
   late List<EpisodeBrief> _selectedList;
+  int _storageScan = 0;
 
   Future<List<EpisodeBrief>> _getDownloadedEpisode(int? mode) async {
     var episodes = <EpisodeBrief>[];
@@ -44,40 +44,39 @@ class _DownloadsManageState extends State<DownloadsManage> {
   }
 
   Future<void> _getStorageSize() async {
-    _size = 0;
-    _fileNum = 0;
+    final scan = ++_storageScan;
     final dirs = await getExternalStorageDirectories();
-    for (var dir in dirs!) {
-      dir.list().forEach((d) {
-        var fileDir = Directory(d.path);
-        fileDir.list().forEach((file) async {
-          await File(file.path).stat().then((value) {
-            _size += value.size;
-            _fileNum += 1;
-            if (mounted) setState(() {});
-          });
-        });
+    final usage = await measureDownloadStorage(dirs ?? []);
+    if (mounted && scan == _storageScan) {
+      setState(() {
+        _size = usage.bytes;
+        _fileNum = usage.files;
       });
     }
   }
 
   Future<void> _delSelectedEpisodes() async {
+    if (_clearing) return;
     setState(() => _clearing = true);
-    // await Future.forEach(_selectedList, (EpisodeBrief episode) async
-    for (var episode in _selectedList) {
-      var downloader = Provider.of<DownloadState>(context, listen: false);
-      await downloader.delTask(episode);
-      if (mounted) setState(() {});
+    final downloader = Provider.of<DownloadState>(context, listen: false);
+    try {
+      for (final episode in _selectedList.toList()) {
+        await downloader.delTask(episode);
+        if (!mounted) return;
+        setState(() => _selectedList.remove(episode));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${context.s.delete}: ${context.s.statusFail}'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _clearing = false);
+      await _getStorageSize();
     }
-    await Future.delayed(Duration(seconds: 1));
-    if (mounted) {
-      setState(() {
-        _clearing = false;
-      });
-    }
-    await Future.delayed(Duration(seconds: 1));
-    if (mounted) setState(() => _selectedList = []);
-    _getStorageSize();
   }
 
   String _downloadDateToString(
@@ -115,6 +114,8 @@ class _DownloadsManageState extends State<DownloadsManage> {
   void initState() {
     super.initState();
     _clearing = false;
+    _size = 0;
+    _fileNum = 0;
     _selectedList = [];
     _mode = 0;
     _onlyListened = false;

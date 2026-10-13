@@ -6,6 +6,7 @@ import '../episodes/episode_detail.dart';
 import '../state/download_state.dart';
 import '../type/episode_task.dart';
 import '../util/pageroute.dart';
+import '../util/extension_helper.dart';
 
 class DownloadList extends StatefulWidget {
   const DownloadList({super.key});
@@ -16,6 +17,17 @@ class DownloadList extends StatefulWidget {
 
 Widget _downloadButton(EpisodeTask task, BuildContext context) {
   var downloader = Provider.of<DownloadState>(context, listen: false);
+  Future<void> delete() async {
+    try {
+      await downloader.delTask(task.episode!);
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${context.s.delete}: ${context.s.statusFail}')),
+      );
+    }
+  }
+
   switch (task.status) {
     case DownloadTaskStatus.running:
       return Row(
@@ -29,7 +41,7 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
           IconButton(
             splashRadius: 20,
             icon: Icon(Icons.close),
-            onPressed: () => downloader.delTask(task.episode!),
+            onPressed: delete,
           ),
         ],
       );
@@ -45,7 +57,7 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
           IconButton(
             splashRadius: 20,
             icon: Icon(Icons.close),
-            onPressed: () => downloader.delTask(task.episode!),
+            onPressed: delete,
           ),
         ],
       );
@@ -61,7 +73,7 @@ Widget _downloadButton(EpisodeTask task, BuildContext context) {
           IconButton(
             splashRadius: 20,
             icon: Icon(Icons.close),
-            onPressed: () => downloader.delTask(task.episode!),
+            onPressed: delete,
           ),
         ],
       );

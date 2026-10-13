@@ -42,12 +42,21 @@ class _DownloadButtonState extends State<DownloadButton> {
     }
   }
 
-  void _deleteDownload(EpisodeBrief episode) async {
-    Provider.of<DownloadState>(context, listen: false).delTask(episode);
-    Fluttertoast.showToast(
-      msg: context.s.downloadRemovedToast,
-      gravity: ToastGravity.BOTTOM,
-    );
+  Future<void> _deleteDownload(EpisodeBrief episode) async {
+    try {
+      await Provider.of<DownloadState>(context, listen: false).delTask(episode);
+      if (!mounted) return;
+      Fluttertoast.showToast(
+        msg: context.s.downloadRemovedToast,
+        gravity: ToastGravity.BOTTOM,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      Fluttertoast.showToast(
+        msg: '${context.s.delete}: ${context.s.statusFail}',
+        gravity: ToastGravity.BOTTOM,
+      );
+    }
   }
 
   Future<void> _pauseDownload(EpisodeBrief? episode) async {

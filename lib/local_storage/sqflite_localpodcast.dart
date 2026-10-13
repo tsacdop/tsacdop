@@ -1913,8 +1913,8 @@ class DBHelper {
     int? count;
     await dbClient.transaction((txn) async {
       count = await txn.rawUpdate(
-        "UPDATE Episodes SET enclosure_length = ?, media_id = ?, download_date = ?, downloaded = ? WHERE enclosure_url = ?",
-        [size, path, milliseconds, id, url],
+        "UPDATE Episodes SET enclosure_length = ?, media_id = ?, download_date = ?, downloaded = ? WHERE enclosure_url = ? AND downloaded = ?",
+        [size, path, milliseconds, id, url, id],
       );
     });
     return count;
@@ -1925,7 +1925,7 @@ class DBHelper {
     int? count;
     await dbClient.transaction((txn) async {
       count = await txn.rawUpdate(
-        "UPDATE Episodes SET downloaded = 'ND', media_id = ? WHERE enclosure_url = ?",
+        "UPDATE Episodes SET downloaded = 'ND', download_date = 0, media_id = ? WHERE enclosure_url = ?",
         [url, url],
       );
     });
@@ -1989,7 +1989,7 @@ class DBHelper {
     List<Map> list = await dbClient.rawQuery(
       """SELECT E.title, E.enclosure_url, E.enclosure_length, E.milliseconds, P.imagePath,
         P.title as feed_title, E.duration, E.explicit, P.skip_seconds, P.skip_seconds_end,
-        E.is_new, P.primaryColor, E.media_id, E.episode_image, E.chapter_link
+        E.is_new, P.primaryColor, E.media_id, E.downloaded, E.episode_image, E.chapter_link
         FROM Episodes E INNER JOIN PodcastLocal P ON E.feed_id = P.id
         WHERE E.enclosure_url = ?""",
       [url],
@@ -2009,6 +2009,7 @@ class DBHelper {
         list.first['imagePath'],
         list.first['is_new'],
         mediaId: list.first['media_id'],
+        downloaded: list.first['downloaded'],
         skipSecondsStart: list.first['skip_seconds'],
         skipSecondsEnd: list.first['skip_seconds_end'],
         episodeImage: list.first['episode_image'],
