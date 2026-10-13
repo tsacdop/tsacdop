@@ -12,6 +12,7 @@ import 'package:workmanager/workmanager.dart';
 
 import '../generated/l10n.dart';
 import '../local_storage/key_value_storage.dart';
+import '../local_storage/retired_gpodder.dart';
 import '../local_storage/sqflite_localpodcast.dart';
 import '../type/settings_backup.dart';
 import 'download_state.dart';
@@ -19,6 +20,7 @@ import 'download_state.dart';
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
+    if (task == 'gpodder_sync') return true;
     final dbHelper = DBHelper();
     final podcastList = await dbHelper.getPodcastLocalAll(updateOnly: true);
     //lastWork is a indicator for if the app was opened since last backgroundwork
@@ -95,6 +97,14 @@ class SettingState extends ChangeNotifier {
   final _useWallpaperThemeStorage = KeyValueStorage(useWallpapterThemeKey);
 
   Future initData() async {
+    await retireGpodderIntegration(
+      cancelSyncWork: (uniqueName) async {
+        if (Platform.isAndroid) {
+          await Workmanager().cancelByUniqueName(uniqueName);
+          await Workmanager().initialize(callbackDispatcher);
+        }
+      },
+    );
     await _getTheme();
     await _getAccentSetColor();
     await _getShowIntro();

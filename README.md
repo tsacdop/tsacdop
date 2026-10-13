@@ -50,6 +50,9 @@ local app data.
 
 More to come...
 
+gpodder.net account synchronization is no longer supported. Use OPML export
+and import to transfer podcast subscriptions between devices.
+
 ## Preview
 
 | Home Page | Group | Podcast | Episode| Dark Mode |
@@ -188,7 +191,6 @@ Service
 src
 └──service
    ├──api_service.dart [Podcast Search]
-   ├──gpodder_api.dart [Gpodder intergate]
    └──ompl_builde.dart [OMPL export]
 ```
 

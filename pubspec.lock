@@ -217,14 +217,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.0"
-  confetti:
-    dependency: "direct main"
-    description:
-      name: confetti
-      sha256: "79376a99648efbc3f23582f5784ced0fe239922bd1a0fb41f582051eba750751"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.0"
   connectivity_plus:
     dependency: "direct main"
     description:
@@ -249,14 +241,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
-  cookie_jar:
-    dependency: "direct main"
-    description:
-      name: cookie_jar
-      sha256: "963da02c1ef64cb5ac20de948c9e5940aa351f1e34a12b1d327c83d85b7e8fff"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.9"
   cross_file:
     dependency: transitive
     description:
@@ -313,22 +297,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.15"
-  device_info_plus:
-    dependency: "direct main"
-    description:
-      name: device_info_plus
-      sha256: "0891702f96b2e465fe567b7ec448380e6b1c14f60af552a8536d9f583b6b8442"
-      url: "https://pub.dev"
-    source: hosted
-    version: "13.2.0"
-  device_info_plus_platform_interface:
-    dependency: transitive
-    description:
-      name: device_info_plus_platform_interface
-      sha256: "04b173a92e2d9161dfead145667037c8d834db725ce2e7b942bfe18fd2f45a46"
-      url: "https://pub.dev"
-    source: hosted
-    version: "8.1.0"
   dio:
     dependency: "direct main"
     description:
@@ -337,14 +305,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.11.0"
-  dio_cookie_manager:
-    dependency: "direct main"
-    description:
-      name: dio_cookie_manager
-      sha256: "4ed4669cacb11931517c1158876a2189f19386674b9dab498abcca063dbe4c61"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.5.0"
   dio_web_adapter:
     dependency: transitive
     description:
@@ -1331,14 +1291,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
-  universal_io:
-    dependency: transitive
-    description:
-      name: universal_io
-      sha256: f63cbc48103236abf48e345e07a03ce5757ea86285ed313a6a032596ed9301e2
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.1"
   url_launcher:
     dependency: "direct main"
     description:
@@ -1482,14 +1434,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.0"
-  win32_registry:
-    dependency: transitive
-    description:
-      name: win32_registry
-      sha256: "73b1d78920a9d6e03f8b4e43e612b87bf3152a0e5c5e5150267762b7c4116904"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.3"
   windows_file_picker:
     dependency: transitive
     description:

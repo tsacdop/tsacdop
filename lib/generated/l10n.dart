@@ -625,16 +625,6 @@ class S {
     return Intl.message('Good Night', name: 'goodNight', desc: '', args: []);
   }
 
-  /// `Congratulations! You  have linked gpodder.net account successfully. Tsacdop will automatically sync subscriptions on your device with your gpodder.net account.`
-  String get gpodderLoginDes {
-    return Intl.message(
-      'Congratulations! You  have linked gpodder.net account successfully. Tsacdop will automatically sync subscriptions on your device with your gpodder.net account.',
-      name: 'gpodderLoginDes',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Group already exists`
   String get groupExisted {
     return Intl.message(
@@ -829,16 +819,6 @@ class S {
     return Intl.message('Import', name: 'import', desc: '', args: []);
   }
 
-  /// `Integrate with {service}`
-  String intergateWith(Object service) {
-    return Intl.message(
-      'Integrate with $service',
-      name: 'intergateWith',
-      desc: 'Integrate with',
-      args: [service],
-    );
-  }
-
   /// `You can long press on episode card for quick actions.`
   String get introFourthPage {
     return Intl.message(
@@ -865,26 +845,6 @@ class S {
       'You can create new group for podcasts.',
       name: 'introThirdPage',
       desc: '',
-      args: [],
-    );
-  }
-
-  /// `Invalid username`
-  String get invalidName {
-    return Intl.message(
-      'Invalid username',
-      name: 'invalidName',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Last update`
-  String get lastUpdate {
-    return Intl.message(
-      'Last update',
-      name: 'lastUpdate',
-      desc: 'gpodder.net update',
       args: [],
     );
   }
@@ -932,46 +892,6 @@ class S {
   /// `Load more`
   String get loadMore {
     return Intl.message('Load more', name: 'loadMore', desc: '', args: []);
-  }
-
-  /// `Logged in as {userName}`
-  String loggedInAs(Object userName) {
-    return Intl.message(
-      'Logged in as $userName',
-      name: 'loggedInAs',
-      desc: 'gpodder.net',
-      args: [userName],
-    );
-  }
-
-  /// `Login`
-  String get login {
-    return Intl.message(
-      'Login',
-      name: 'login',
-      desc: 'gpodder.net login',
-      args: [],
-    );
-  }
-
-  /// `Login failed`
-  String get loginFailed {
-    return Intl.message(
-      'Login failed',
-      name: 'loginFailed',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Logout`
-  String get logout {
-    return Intl.message(
-      'Logout',
-      name: 'logout',
-      desc: 'gpodder.net logout',
-      args: [],
-    );
   }
 
   /// `Mark`
@@ -1273,21 +1193,6 @@ class S {
       desc: '',
       args: [],
     );
-  }
-
-  /// `Password required`
-  String get passwdRequired {
-    return Intl.message(
-      'Password required',
-      name: 'passwdRequired',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Password`
-  String get password {
-    return Intl.message('Password', name: 'password', desc: '', args: []);
   }
 
   /// `Pause`
@@ -2466,12 +2371,7 @@ class S {
 
   /// `Status`
   String get status {
-    return Intl.message(
-      'Status',
-      name: 'status',
-      desc: 'gpodder.net status',
-      args: [],
-    );
+    return Intl.message('Status', name: 'status', desc: '', args: []);
   }
 
   /// `Authentication error`
@@ -2752,21 +2652,6 @@ class S {
     return Intl.message(
       'Update failed, network error',
       name: 'updateFailed',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Username`
-  String get username {
-    return Intl.message('Username', name: 'username', desc: '', args: []);
-  }
-
-  /// `Username required`
-  String get usernameRequired {
-    return Intl.message(
-      'Username required',
-      name: 'usernameRequired',
       desc: '',
       args: [],
     );

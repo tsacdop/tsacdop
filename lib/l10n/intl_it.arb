@@ -156,8 +156,6 @@
   },
   "goodNight": "Buonanotte",
   "@goodNight": {},
-  "gpodderLoginDes": "Congratulazioni! Hai collegato con successo il tuo account gpodder.net. Tsacdop sincronizzerà in automatico le tue sottoscrizioni con l'account gpodder.net.",
-  "@gpodderLoginDes": {},
   "groupExisted": "Il gruppo esiste già",
   "@groupExisted": {
     "description": "Group name validate in add group dialog. User can't add group with same name."
@@ -204,25 +202,12 @@
   "@hoursCount": {},
   "import": "Importa",
   "@import": {},
-  "intergateWith": "Integra con {service}",
-  "@intergateWith": {
-    "description": "Integrate with",
-    "placeholders": {
-      "service": {}
-    }
-  },
   "introFourthPage": "Puoi tener premuto sulla scheda di un episodio per le azioni rapide.",
   "@introFourthPage": {},
   "introSecondPage": "Iscriviti al podcast tramite ricerca o importando un file OPML.",
   "@introSecondPage": {},
   "introThirdPage": "Puoi creare gruppi diversi per i podcast.",
   "@introThirdPage": {},
-  "invalidName": "Nome utente non valido",
-  "@invalidName": {},
-  "lastUpdate": "Ultimo aggiornamento",
-  "@lastUpdate": {
-    "description": "gpodder.net update"
-  },
   "later": "Più tardi",
   "@later": {},
   "lightMode": "Tema chiaro",
@@ -241,23 +226,6 @@
   "@listened": {},
   "loadMore": "Visualizza altri",
   "@loadMore": {},
-  "loggedInAs": "Accesso effettuato come {userName}",
-  "@loggedInAs": {
-    "description": "gpodder.net",
-    "placeholders": {
-      "userName": {}
-    }
-  },
-  "login": "Login",
-  "@login": {
-    "description": "gpodder.net login"
-  },
-  "loginFailed": "Accesso fallito",
-  "@loginFailed": {},
-  "logout": "Logout",
-  "@logout": {
-    "description": "gpodder.net logout"
-  },
   "mark": "Segna",
   "@mark": {
     "description": "In listen history page, if a episode is marked as listened."
@@ -350,10 +318,6 @@
   },
   "oldestFirst": "Prima i più vecchi",
   "@oldestFirst": {},
-  "passwdRequired": "Password obbligatoria",
-  "@passwdRequired": {},
-  "password": "Password",
-  "@password": {},
   "pause": "Pausa",
   "@pause": {},
   "play": "Riproduci",
@@ -665,7 +629,7 @@
   "@sleepTimer": {},
   "status": "Stato",
   "@status": {
-    "description": "gpodder.net status"
+    "description": ""
   },
   "statusAuthError": "Errore di autenticazione",
   "@statusAuthError": {
@@ -762,10 +726,6 @@
   "@updateEpisodesCount": {},
   "updateFailed": "Aggiornamento fallito, errore di rete",
   "@updateFailed": {},
-  "username": "Nome utente",
-  "@username": {},
-  "usernameRequired": "Nome utente obbligatorio",
-  "@usernameRequired": {},
   "useWallpaperTheme": "",
   "@useWallpaperTheme": {},
   "useWallpaperThemeDes": "",

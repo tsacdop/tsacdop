@@ -48,10 +48,6 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m9(count) =>
       "${Intl.plural(count, zero: '0 saat', one: '${count} saat', other: '${count} saat')}";
 
-  static String m10(service) => "${service} ile bağlantı kur";
-
-  static String m11(userName) => "${userName} olarak giriş yapıldı ";
-
   static String m12(count) =>
       "${Intl.plural(count, zero: 'Şimdi', one: '${count} dakika önce', other: '${count} dakika önce')}";
 
@@ -222,9 +218,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "fonts": MessageLookupByLibrary.simpleMessage("Yazı tipleri"),
     "from": m5,
     "goodNight": MessageLookupByLibrary.simpleMessage("İyi Geceler"),
-    "gpodderLoginDes": MessageLookupByLibrary.simpleMessage(
-      "Tebrikler! Gpodder.net hesabınızla bağlantı kuruldu.Tsacdop aboneliklerinizi gpodder.net  hesabınızla otomatik olarak eşitleyecek.",
-    ),
     "groupExisted": MessageLookupByLibrary.simpleMessage("Liste zaten mevcut"),
     "groupFilter": MessageLookupByLibrary.simpleMessage(
       "Listeleye göre filtrele",
@@ -258,7 +251,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hoursAgo": m8,
     "hoursCount": m9,
     "import": MessageLookupByLibrary.simpleMessage("İçe aktar"),
-    "intergateWith": m10,
     "introFourthPage": MessageLookupByLibrary.simpleMessage(
       "Bölüm resmine uzun basarak hızlı menüyü açabilirsin.",
     ),
@@ -268,10 +260,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "introThirdPage": MessageLookupByLibrary.simpleMessage(
       "Podcastler için yeni bir grup oluşturabilirsin.",
     ),
-    "invalidName": MessageLookupByLibrary.simpleMessage(
-      "Geçersiz kullanıcı adı",
-    ),
-    "lastUpdate": MessageLookupByLibrary.simpleMessage("Son güncelleme\n"),
     "later": MessageLookupByLibrary.simpleMessage("Sonra"),
     "lightMode": MessageLookupByLibrary.simpleMessage("Aydınlık mod"),
     "like": MessageLookupByLibrary.simpleMessage("Beğen"),
@@ -280,10 +268,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "listen": MessageLookupByLibrary.simpleMessage("Dinle"),
     "listened": MessageLookupByLibrary.simpleMessage("Oynatılan"),
     "loadMore": MessageLookupByLibrary.simpleMessage("Daha fazla göster"),
-    "loggedInAs": m11,
-    "login": MessageLookupByLibrary.simpleMessage("Giriş"),
-    "loginFailed": MessageLookupByLibrary.simpleMessage("Giriş başarısız "),
-    "logout": MessageLookupByLibrary.simpleMessage("Çıkış yap"),
     "mark": MessageLookupByLibrary.simpleMessage("İşaretle"),
     "markConfirm": MessageLookupByLibrary.simpleMessage("Seçimi onayla"),
     "markConfirmContent": MessageLookupByLibrary.simpleMessage(
@@ -339,8 +323,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationUpdate": m19,
     "notificationUpdateError": m20,
     "oldestFirst": MessageLookupByLibrary.simpleMessage("Önce eskiler"),
-    "passwdRequired": MessageLookupByLibrary.simpleMessage("Parola gerekli"),
-    "password": MessageLookupByLibrary.simpleMessage("Şifre"),
     "pause": MessageLookupByLibrary.simpleMessage("Duraklat"),
     "play": MessageLookupByLibrary.simpleMessage("Oynat"),
     "playNext": MessageLookupByLibrary.simpleMessage("Sonrakini çal"),
@@ -684,10 +666,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "useWallpaperTheme": MessageLookupByLibrary.simpleMessage(""),
     "useWallpaperThemeDes": MessageLookupByLibrary.simpleMessage(""),
-    "username": MessageLookupByLibrary.simpleMessage("Kullanıcı adı"),
-    "usernameRequired": MessageLookupByLibrary.simpleMessage(
-      "Kullanıcı adı gerekli",
-    ),
     "version": m31,
   };
 }
