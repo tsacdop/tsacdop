@@ -44,6 +44,7 @@ local app data.
 * Dark mode / accent color
 * Download for offline play
 * Sort downloaded episodes by download time, episode title, or podcast name
+* Continue the last playback session from the home screen after reopening the app
 * Auto-download new episodes / auto-delete outdated downloads
 * Settings backup
 * Skip silence

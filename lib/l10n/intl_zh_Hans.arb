@@ -320,6 +320,8 @@
   "@oldestFirst": {},
   "pause": "暂停",
   "@pause": {},
+  "continueListening": "继续收听",
+  "@continueListening": {},
   "play": "播放",
   "@play": {},
   "playback": "播放控制",

@@ -29,6 +29,7 @@ import '../util/pageroute.dart';
 import '../widgets/audiopanel.dart';
 import '../widgets/custom_slider.dart';
 import '../widgets/custom_widget.dart';
+import 'resume_playback.dart';
 
 final List<BoxShadow> _customShadow = [
   BoxShadow(blurRadius: 26, offset: Offset(-6, -6), color: Colors.white),
@@ -67,19 +68,35 @@ class PlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<AudioPlayerNotifier, Tuple2<bool, PlayerHeight?>>(
-      selector: (_, audio) => Tuple2(audio.playerRunning, audio.playerHeight),
+    return Selector<AudioPlayerNotifier, Tuple3<bool, PlayerHeight?, bool>>(
+      selector: (_, audio) =>
+          Tuple3(audio.playerRunning, audio.playerHeight, audio.canResume),
       builder: (_, data, _) {
         if (!data.item1) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             onExpandedChanged?.call(false);
           });
-          return Center();
+          if (!data.item3) return Center();
+          return Align(
+            alignment: Alignment.bottomCenter,
+            child: Selector<AudioPlayerNotifier, Tuple2<EpisodeBrief?, int>>(
+              selector: (_, audio) => Tuple2(audio.episode, audio.lastPosition),
+              builder: (context, saved, _) => ResumePlaybackBar(
+                episode: saved.item1!,
+                position: saved.item2,
+                bottomPadding: collapsedBottomPadding,
+                onResume: context
+                    .read<AudioPlayerNotifier>()
+                    .playFromLastPosition,
+              ),
+            ),
+          );
         } else {
+          final height = data.item2 ?? PlayerHeight.short;
           final minHeight =
-              kMinPlayerHeight[data.item2!.index] + collapsedBottomPadding;
+              kMinPlayerHeight[height.index] + collapsedBottomPadding;
           final maxHeight = math.min(
-            kMaxPlayerHeight[data.item2!.index] as double,
+            kMaxPlayerHeight[height.index] as double,
             context.height - 20,
           );
           return AudioPanel(

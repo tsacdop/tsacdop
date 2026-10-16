@@ -36,6 +36,7 @@ import 'home_groups.dart';
 import 'home_menu.dart';
 import 'import_opml.dart';
 import 'search_podcast.dart';
+import 'resume_playback.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -236,12 +237,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ],
                         ),
                       ),
-                      Selector<AudioPlayerNotifier, bool>(
-                        selector: (_, audio) => audio.playerRunning,
+                      Selector<
+                        AudioPlayerNotifier,
+                        ({bool running, bool resume})
+                      >(
+                        selector: (_, audio) => (
+                          running: audio.playerRunning,
+                          resume: audio.canResume,
+                        ),
                         builder: (_, data, _) {
                           return Padding(
                             padding: EdgeInsets.only(
-                              bottom: data ? 60.0 + bottomViewPadding : 0,
+                              bottom: data.running
+                                  ? 60.0 + bottomViewPadding
+                                  : data.resume
+                                  ? resumePlaybackHeight(context) +
+                                        bottomViewPadding
+                                  : 0,
                             ),
                           );
                         },
@@ -384,11 +396,21 @@ class __PlaylistButtonState extends State<_PlaylistButton> {
                               topLeft: Radius.circular(10.0),
                               topRight: Radius.circular(10.0),
                             ),
-                            onTap: () {
-                              context
-                                  .read<AudioPlayerNotifier>()
-                                  .playFromLastPosition();
+                            onTap: () async {
+                              final audio = context.read<AudioPlayerNotifier>();
+                              final messenger = ScaffoldMessenger.of(context);
+                              final failure =
+                                  '${context.s.play}: ${context.s.statusFail}';
                               Navigator.pop<int>(context);
+                              try {
+                                await audio.playFromLastPosition();
+                              } catch (_) {
+                                if (messenger.mounted) {
+                                  messenger.showSnackBar(
+                                    SnackBar(content: Text(failure)),
+                                  );
+                                }
+                              }
                             },
                             child: Column(
                               children: <Widget>[

@@ -324,6 +324,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Mais antigos primeiro",
     ),
     "pause": MessageLookupByLibrary.simpleMessage("Pausa"),
+    "continueListening": MessageLookupByLibrary.simpleMessage(
+      "Continuar ouvindo",
+    ),
     "play": MessageLookupByLibrary.simpleMessage("Reproduzir"),
     "playNext": MessageLookupByLibrary.simpleMessage("Play next"),
     "playNextDes": MessageLookupByLibrary.simpleMessage(

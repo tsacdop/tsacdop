@@ -63,25 +63,28 @@ class Playlist extends Equatable {
     this.isLocal = false,
     List<String>? episodeList,
     List<EpisodeBrief>? episodes,
+    DBHelper? dbHelper,
   }) : id = id ?? Uuid().v4(),
        assert(name != ''),
        episodeList = episodeList ?? [],
-       episodes = episodes ?? [];
+       episodes = episodes ?? [],
+       _dbHelper = dbHelper ?? DBHelper();
 
   PlaylistEntity toEntity() {
     return PlaylistEntity(name, id, isLocal, episodeList.toSet().toList());
   }
 
-  static Playlist fromEntity(PlaylistEntity entity) {
+  static Playlist fromEntity(PlaylistEntity entity, {DBHelper? dbHelper}) {
     return Playlist(
       entity.name,
       id: entity.id,
       isLocal: entity.isLocal,
       episodeList: entity.episodeList,
+      dbHelper: dbHelper,
     );
   }
 
-  final DBHelper _dbHelper = DBHelper();
+  final DBHelper _dbHelper;
   //  final KeyValueStorage _playlistStorage = KeyValueStorage(playlistKey);
 
   Future<void> getPlaylist() async {

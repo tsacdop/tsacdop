@@ -157,7 +157,7 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                               : LineIcons.play,
                                           size: 40,
                                         ),
-                                        onPressed: () {
+                                        onPressed: () async {
                                           if (running) {
                                             playing
                                                 ? audio.pauseAduio()
@@ -167,9 +167,21 @@ class _PlaylistHomeState extends State<PlaylistHome> {
                                               msg: 'Playlist is empty',
                                             );
                                           } else {
-                                            context
-                                                .read<AudioPlayerNotifier>()
-                                                .playFromLastPosition();
+                                            try {
+                                              await audio
+                                                  .playFromLastPosition();
+                                            } catch (_) {
+                                              if (!context.mounted) return;
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    '${s.play}: ${s.statusFail}',
+                                                  ),
+                                                ),
+                                              );
+                                            }
                                           }
                                         },
                                       ),
