@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:line_icons/line_icons.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
 
@@ -330,10 +329,7 @@ class _PodcastSettingState extends State<PodcastSetting> {
   }
 
   Future<void> _setAutoDownload(bool boo) async {
-    var permission = await _checkPermmison();
-    if (permission) {
-      await _dbHelper.saveAutoDownload(widget.podcastLocal!.id, boo: boo);
-    }
+    await _dbHelper.saveAutoDownload(widget.podcastLocal!.id, boo: boo);
     if (mounted) setState(() {});
   }
 
@@ -436,20 +432,6 @@ class _PodcastSettingState extends State<PodcastSetting> {
       }
     } else if (_coverStatus == RefreshCoverStatus.start && mounted) {
       setState(() => _coverStatus = RefreshCoverStatus.complete);
-    }
-  }
-
-  Future<bool> _checkPermmison() async {
-    var permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
-      var permissions = await [Permission.storage].request();
-      if (permissions[Permission.storage] == PermissionStatus.granted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
     }
   }
 

@@ -5,7 +5,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -28,17 +27,14 @@ class _DownloadButtonState extends State<DownloadButton> {
   Future<void> _requestDownload(EpisodeBrief? episode) async {
     final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
         .getBool(defaultValue: true, reverse: true);
-    final permissionReady = await _checkPermmison();
     final result = await Connectivity().checkConnectivity();
     final usingData = result.contains(ConnectivityResult.mobile);
     var dataConfirm = true;
-    if (permissionReady) {
-      if (downloadUsingData && usingData) {
-        dataConfirm = await _useDataConfirm();
-      }
-      if (dataConfirm) {
-        Provider.of<DownloadState>(context, listen: false).startTask(episode!);
-      }
+    if (downloadUsingData && usingData) {
+      dataConfirm = await _useDataConfirm();
+    }
+    if (dataConfirm) {
+      Provider.of<DownloadState>(context, listen: false).startTask(episode!);
     }
   }
 
@@ -69,20 +65,6 @@ class _DownloadButtonState extends State<DownloadButton> {
 
   Future<void> _retryDownload(EpisodeBrief episode) async {
     Provider.of<DownloadState>(context, listen: false).retryTask(episode);
-  }
-
-  Future<bool> _checkPermmison() async {
-    var permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
-      var permissions = await [Permission.storage].request();
-      if (permissions[Permission.storage] == PermissionStatus.granted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
   }
 
   Future<bool> _useDataConfirm() async {

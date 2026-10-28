@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../local_storage/sqflite_localpodcast.dart';
@@ -470,30 +469,13 @@ class __PodcastCardState extends State<_PodcastCard>
   }
 
   Future<void> _setAutoDownload(String? id, bool boo) async {
-    final permission = await _checkPermmison();
-    if (permission) {
-      final dbHelper = DBHelper();
-      await dbHelper.saveAutoDownload(id, boo: boo);
-    }
+    final dbHelper = DBHelper();
+    await dbHelper.saveAutoDownload(id, boo: boo);
   }
 
   Future<bool> _getAutoDownload(String? id) async {
     final dbHelper = DBHelper();
     return await dbHelper.getAutoDownload(id);
-  }
-
-  Future<bool> _checkPermmison() async {
-    final permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
-      final permissions = await [Permission.storage].request();
-      if (permissions[Permission.storage] == PermissionStatus.granted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
   }
 }
 

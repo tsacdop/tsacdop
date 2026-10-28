@@ -2,7 +2,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../local_storage/key_value_storage.dart';
@@ -114,25 +113,22 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
   }
 
   Future<void> _requestDownload() async {
-    final permissionReady = await _checkPermmison();
     final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
         .getBool(defaultValue: true, reverse: true);
     var dataConfirm = true;
     final result = await Connectivity().checkConnectivity();
     final usingData = result.contains(ConnectivityResult.mobile);
-    if (permissionReady) {
-      if (downloadUsingData && usingData) {
-        dataConfirm = await _useDataConfirm();
+    if (downloadUsingData && usingData) {
+      dataConfirm = await _useDataConfirm();
+    }
+    if (dataConfirm) {
+      for (var episode in widget.selectedList!) {
+        Provider.of<DownloadState>(context, listen: false).startTask(episode);
       }
-      if (dataConfirm) {
-        for (var episode in widget.selectedList!) {
-          Provider.of<DownloadState>(context, listen: false).startTask(episode);
-        }
-        if (mounted) {
-          setState(() {
-            _downloaded = true;
-          });
-        }
+      if (mounted) {
+        setState(() {
+          _downloaded = true;
+        });
       }
     }
   }
@@ -161,20 +157,6 @@ class _MultiSelectMenuBarState extends State<MultiSelectMenuBar> {
       ],
     );
     return ifUseData;
-  }
-
-  Future<bool> _checkPermmison() async {
-    var permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
-      var permissions = await [Permission.storage].request();
-      if (permissions[Permission.storage] == PermissionStatus.granted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
   }
 
   Future<EpisodeBrief?> _getEpisode(String url) async {

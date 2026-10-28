@@ -6,7 +6,6 @@ import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
@@ -120,37 +119,20 @@ class EpisodeGrid extends StatelessWidget {
     BuildContext context, {
     EpisodeBrief? episode,
   }) async {
-    final permissionReady = await _checkPermmison();
     final downloadUsingData = await KeyValueStorage(downloadUsingDataKey)
         .getBool(defaultValue: true, reverse: true);
     final result = await Connectivity().checkConnectivity();
     final usingData = result.contains(ConnectivityResult.mobile);
     var dataConfirm = true;
-    if (permissionReady) {
-      if (downloadUsingData && usingData) {
-        dataConfirm = await _useDataConfirm(context);
-      }
-      if (dataConfirm) {
-        context.read<DownloadState>().startTask(episode!);
-        Fluttertoast.showToast(
-          msg: context.s.downloadStart,
-          gravity: ToastGravity.BOTTOM,
-        );
-      }
+    if (downloadUsingData && usingData) {
+      dataConfirm = await _useDataConfirm(context);
     }
-  }
-
-  Future<bool> _checkPermmison() async {
-    var permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
-      var permissions = await [Permission.storage].request();
-      if (permissions[Permission.storage] == PermissionStatus.granted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
+    if (dataConfirm) {
+      context.read<DownloadState>().startTask(episode!);
+      Fluttertoast.showToast(
+        msg: context.s.downloadStart,
+        gravity: ToastGravity.BOTTOM,
+      );
     }
   }
 
