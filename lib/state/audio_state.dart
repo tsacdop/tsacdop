@@ -423,7 +423,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> _savePlaybackState({bool force = false}) {
-    if (_loadingPlayback || _episode == null || _playlist == null) {
+    if (_loadingPlayback ||
+        !_hasResumeState ||
+        _episode == null ||
+        _playlist == null) {
       return _stateWrites;
     }
     final mediaId = _audioHandler.mediaItem.value?.id;
@@ -440,6 +443,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
     _savedEpisode = episode;
     _savedPlaylist = playlist;
     _savedPosition = position;
+    return _writePlaybackState(playlist, episode, position);
+  }
+
+  Future<void> _writePlaybackState(
+    String playlist,
+    String episode,
+    int position,
+  ) {
     _stateWrites = _stateWrites.then((_) async {
       try {
         await _playerStateStorage.savePlayerState(playlist, episode, position);
@@ -657,7 +668,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
             _backgroundAudioDuration = mediaDuration > 0
                 ? mediaDuration
                 : (episode.duration ?? 0) * 1000;
-            _hasResumeState = true;
+            _hasResumeState = _audioState != AudioProcessingState.completed;
             unawaited(_savePlaybackState());
             notifyListeners();
           } else {
@@ -677,7 +688,15 @@ class AudioPlayerNotifier extends ChangeNotifier {
       if (!_loadingPlayback && _playerRunning) {
         _lastPosition = _currentPosition < 0 ? 0 : _currentPosition;
         _backgroundAudioPosition = _lastPosition;
-        await _savePlaybackState(force: !event.playing);
+        if (event.processingState == AudioProcessingState.completed) {
+          _hasResumeState = false;
+          _savedEpisode = null;
+          _savedPlaylist = null;
+          await _writePlaybackState('', '', 0);
+        } else {
+          _hasResumeState = true;
+          await _savePlaybackState(force: !event.playing);
+        }
         if (wasPlaying && !event.playing && _episode != null) {
           final progress = _backgroundAudioDuration > 0
               ? (_lastPosition / _backgroundAudioDuration).clamp(0.0, 1.0)
