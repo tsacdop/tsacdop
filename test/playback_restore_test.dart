@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsacdop/local_storage/key_value_storage.dart';
 import 'package:tsacdop/state/audio_state.dart';
@@ -261,4 +262,25 @@ void main() {
       expect(handler.plays, 1);
     },
   );
+  test('completed sessions are not offered again after reopening', () async {
+    await audio.playFromLastPosition();
+    handler.progress(3600000);
+    handler.playbackState.add(
+      PlaybackState(
+        processingState: AudioProcessingState.completed,
+        updatePosition: const Duration(hours: 1),
+      ),
+    );
+    await Future<void>.delayed(Duration.zero);
+    await handler.stop();
+    await Future<void>.delayed(Duration.zero);
+    final reopened = AudioPlayerNotifier(
+      dbHelper: database,
+      createHandler: (_, cacheMax) async => handler,
+    );
+    addTearDown(reopened.dispose);
+    await reopened.initPlaylist();
+    expect(reopened.canResume, isFalse);
+    expect(audio.canResume, isFalse);
+  });
 }
