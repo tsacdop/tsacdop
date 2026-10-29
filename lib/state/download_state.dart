@@ -19,7 +19,8 @@ void downloadCallback(String id, int rawStatus, int progress) {
   final status = DownloadTaskStatus.fromInt(rawStatus);
   developer.log('Homepage callback task in $id  status ($status) $progress');
   final send = IsolateNameServer.lookupPortByName('downloader_send_port');
-  send?.send([id, status, progress]);
+  // FlutterEngine isolates can only exchange primitive values, not enums.
+  send?.send([id, rawStatus, progress]);
 }
 
 @pragma('vm:entry-point')
@@ -29,7 +30,7 @@ void autoDownloadCallback(String id, int rawStatus, int progress) {
     'Autodownload callback task in $id  status ($status) $progress',
   );
   final send = IsolateNameServer.lookupPortByName('auto_downloader_send_port');
-  send?.send([id, status, progress]);
+  send?.send([id, rawStatus, progress]);
 }
 
 //For background auto downlaod
@@ -59,7 +60,7 @@ class AutoDownloader {
     }
     port.listen((dynamic data) {
       String? id = data[0];
-      DownloadTaskStatus? status = data[1];
+      final status = DownloadTaskStatus.fromInt(data[1] as int);
       int? progress = data[2];
 
       for (var episodeTask in _episodeTasks.toList()) {
@@ -292,7 +293,7 @@ class DownloadState extends ChangeNotifier {
 
     port.listen((dynamic data) {
       String? id = data[0];
-      DownloadTaskStatus? status = data[1];
+      final status = DownloadTaskStatus.fromInt(data[1] as int);
       int? progress = data[2];
 
       for (var episodeTask in _episodeTasks) {
