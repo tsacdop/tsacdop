@@ -1,4 +1,24 @@
 # Tsacdop Changelog
+
+## 1.0.4
+Release date 2026/10/29
+
+### New features
+* Add sorting options to the Downloads tab.
+* Restore the last playback session and saved position on the home screen.
+
+### Bug fixes
+* Fix downloads blocked by obsolete Android storage permission checks.
+* Fix download progress and completion updates across Flutter engines.
+* Fix episode download deletion and storage accounting.
+* Fix premature podcast searches and stale results.
+* Clear the saved playback session after an episode finishes.
+
+### Other changes
+* Shorten the download progress badge animation to 300 ms.
+* Remove the retired gpodder.net sync integration.
+* End Google Play distribution; GitHub and F-Droid remain supported.
+
 ## 0.6.0
 Release date 2021/2/27
 
