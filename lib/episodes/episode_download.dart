@@ -115,7 +115,7 @@ class _DownloadButtonState extends State<DownloadButton> {
           children: <Widget>[
             _downloadButton(task, context),
             AnimatedContainer(
-              duration: Duration(seconds: 1),
+              duration: Duration(milliseconds: 300),
               decoration: BoxDecoration(
                 color: context.accentColor,
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
