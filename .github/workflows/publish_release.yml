@@ -34,6 +34,8 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+      - name: Test release verification
+        run: python3 -B -m unittest discover -s .github/scripts -p 'test_*.py'
       - name: Verify and publish signed APKs
         run: python3 .github/scripts/publish_release.py
         env:

@@ -22,6 +22,14 @@ def require(condition, message):
         raise RuntimeError(message)
 
 
+def certificate_digests(result):
+    # Signer labels vary between Android build-tools versions.
+    digests = re.findall(r"certificate SHA-256 digest:\s*([0-9a-f]{64})(?=\s|$)",
+                         result, re.IGNORECASE)
+    require(digests, f"APK signing certificate is missing from apksigner output:\n{result}")
+    return frozenset(digest.lower() for digest in digests)
+
+
 def main():
     repo = os.environ["GITHUB_REPOSITORY"]
     tag = os.environ["RELEASE_TAG"]
@@ -58,9 +66,7 @@ def main():
 
     def certificate(apk):
         result = output(str(tool / "apksigner"), "verify", "--print-certs", str(apk))
-        digest = re.search(r"Signer #1 certificate SHA-256 digest: ([0-9a-f]+)", result)
-        require(digest is not None, "APK signing certificate is missing")
-        return digest[1]
+        return certificate_digests(result)
 
     previous = json.loads(gh("release", "view", "--json", "tagName"))["tagName"]
     gh("release", "download", previous, "--pattern", "*arm64-v8a*-release.apk",
